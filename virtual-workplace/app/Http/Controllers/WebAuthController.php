@@ -97,9 +97,9 @@ class WebAuthController extends Controller
     {
         $user = Auth::user();
 
-        // Get the first active membership
+        // Get the active/invited membership
         $membership = OrganizationMember::where('user_id', $user->id)
-            ->where('status', 'active')
+            ->whereIn('status', ['active', 'invited'])
             ->with(['organization.plan', 'role'])
             ->first();
 
@@ -107,11 +107,15 @@ class WebAuthController extends Controller
             return redirect()->route('login')->with('error', 'No active organization found.');
         }
 
+        if ($membership->status === 'invited') {
+            $membership->update(['status' => 'active']);
+        }
+
         $organization = $membership->organization;
         $this->ensureDefaultWorkspace($organization);
 
         $stats = [
-            'members' => OrganizationMember::where('organization_id', $organization->id)->where('status', 'active')->count(),
+            'members' => OrganizationMember::where('organization_id', $organization->id)->whereIn('status', ['active', 'invited'])->count(),
             'departments' => $organization->departments()->count(),
             'teams' => $organization->teams()->count(),
         ];
@@ -135,12 +139,16 @@ class WebAuthController extends Controller
         $user = Auth::user();
 
         $membership = OrganizationMember::where('user_id', $user->id)
-            ->where('status', 'active')
+            ->whereIn('status', ['active', 'invited'])
             ->with(['organization'])
             ->first();
 
         if (!$membership) {
             return redirect()->route('login')->with('error', 'No active organization found.');
+        }
+
+        if ($membership->status === 'invited') {
+            $membership->update(['status' => 'active']);
         }
 
         $organization = $membership->organization;
@@ -165,12 +173,16 @@ class WebAuthController extends Controller
         $user = Auth::user();
 
         $membership = OrganizationMember::where('user_id', $user->id)
-            ->where('status', 'active')
+            ->whereIn('status', ['active', 'invited'])
             ->with(['organization.plan'])
             ->first();
 
         if (!$membership) {
             return redirect()->route('login')->with('error', 'No active organization found.');
+        }
+
+        if ($membership->status === 'invited') {
+            $membership->update(['status' => 'active']);
         }
 
         $organization = $membership->organization;

@@ -16,6 +16,7 @@ class InviteMemberRequest extends FormRequest
         return [
             'email' => ['required', 'email', 'max:255'],
             'name' => ['nullable', 'string', 'max:255'],
+            'password' => ['nullable', 'string', 'min:6'],
             'role' => ['nullable', 'string', 'in:company_admin,manager,employee,guest'],
         ];
     }

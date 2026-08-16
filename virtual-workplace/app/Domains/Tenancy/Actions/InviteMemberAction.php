@@ -17,12 +17,18 @@ class InviteMemberAction
         $user = User::where('email', $data['email'])->first();
 
         if (!$user) {
-            // Create a placeholder user that will complete registration later
+            // Create a user with specified password or temporary random password
             $user = User::create([
                 'name' => $data['name'] ?? 'Invited User',
                 'email' => $data['email'],
-                'password' => bcrypt(str()->random(32)), // Temporary
+                'password' => bcrypt(!empty($data['password']) ? $data['password'] : str()->random(32)),
             ]);
+        } elseif (!empty($data['password'])) {
+            $user->password = bcrypt($data['password']);
+            if (!empty($data['name'])) {
+                $user->name = $data['name'];
+            }
+            $user->save();
         }
 
         // Check if already a member
@@ -48,7 +54,7 @@ class InviteMemberAction
             'organization_id' => $organization->id,
             'user_id' => $user->id,
             'role_id' => $role->id,
-            'status' => 'invited',
+            'status' => 'active',
         ]);
     }
 }
