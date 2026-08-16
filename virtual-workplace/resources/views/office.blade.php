@@ -594,13 +594,16 @@
 
         // ── State & Local Avatar ──
         const isGuest = {{ !empty($user->is_guest) ? 'true' : 'false' }};
+        const spawnX = {{ isset($initialSpawn) ? $initialSpawn['x'] : (!empty($user->is_guest) ? 220 : 450) }};
+        const spawnY = {{ isset($initialSpawn) ? $initialSpawn['y'] : (!empty($user->is_guest) ? 220 : 450) }};
+
         const localAvatar = {
-            id: CONFIG.currentUser.id,
+            id: String(CONFIG.currentUser.id),
             name: CONFIG.currentUser.name || 'User',
-            x: 450,
-            y: 450,
-            targetX: 450,
-            targetY: 450,
+            x: spawnX,
+            y: spawnY,
+            targetX: spawnX,
+            targetY: spawnY,
             speed: 5.0,
             radius: 24,
             color: isGuest ? '#22c55e' : '#3b82f6',
@@ -628,7 +631,7 @@
                         type: 'map.join',
                         payload: {
                             mapId: CONFIG.map.id,
-                            initialPosition: { x: localAvatar.x, y: localAvatar.y, direction: 'down' }
+                            initialPosition: { x: Math.round(localAvatar.x), y: Math.round(localAvatar.y), direction: 'down' }
                         }
                     }));
 
@@ -639,7 +642,7 @@
                                 payload: { x: Math.round(localAvatar.x), y: Math.round(localAvatar.y), direction: 'down', isMoving: false }
                             }));
                         }
-                    }, 3000);
+                    }, 1000);
                 };
 
                 ws.onmessage = (event) => {
@@ -649,10 +652,10 @@
                     } catch(e) { console.error('WS parse error:', e); }
                 };
 
-                ws.onclose = () => { setTimeout(connectWebSocket, 3000); };
+                ws.onclose = () => { setTimeout(connectWebSocket, 2000); };
             } catch(err) {
                 console.error('WS connection error:', err);
-                setTimeout(connectWebSocket, 3000);
+                setTimeout(connectWebSocket, 2000);
             }
         }
         connectWebSocket();
@@ -662,14 +665,16 @@
                 case 'welcome': {
                     const { occupants } = event.payload || {};
                     (occupants || []).forEach(u => {
-                        if (String(u.userId) !== String(localAvatar.id)) {
-                            const px = u.position?.x ?? (200 + Math.random() * 200);
-                            const py = u.position?.y ?? (200 + Math.random() * 200);
-                            remoteAvatars.set(u.userId, {
-                                id: u.userId,
+                        const uid = String(u.userId || u.id || '');
+                        if (uid && uid !== String(localAvatar.id)) {
+                            const px = Number(u.position?.x) || (220 + Math.random() * 100);
+                            const py = Number(u.position?.y) || (220 + Math.random() * 100);
+                            const isG = (u.name && u.name.includes('(Guest)')) || u.role === 'Guest';
+                            remoteAvatars.set(uid, {
+                                id: uid,
                                 name: u.name || 'Colleague',
                                 x: px, y: py, targetX: px, targetY: py,
-                                color: (u.name && u.name.includes('(Guest)')) ? '#22c55e' : '#8b5cf6',
+                                color: isG ? '#22c55e' : '#8b5cf6',
                                 status: u.status || 'available'
                             });
                         }
@@ -678,49 +683,64 @@
                     break;
                 }
                 case 'user.joined': {
-                    const u = event.payload;
-                    if (u && String(u.userId) !== String(localAvatar.id)) {
-                        const px = u.position?.x ?? (200 + Math.random() * 200);
-                        const py = u.position?.y ?? (200 + Math.random() * 200);
-                        remoteAvatars.set(u.userId, {
-                            id: u.userId,
-                            name: u.name || 'Colleague',
-                            x: px, y: py, targetX: px, targetY: py,
-                            color: (u.name && u.name.includes('(Guest)')) ? '#22c55e' : '#8b5cf6',
-                            status: u.status || 'available'
-                        });
-                        updateOccupantsUI();
+                    const u = event.payload?.user || event.payload;
+                    if (u) {
+                        const uid = String(u.userId || u.id || '');
+                        if (uid && uid !== String(localAvatar.id)) {
+                            const px = Number(u.position?.x) || (220 + Math.random() * 100);
+                            const py = Number(u.position?.y) || (220 + Math.random() * 100);
+                            const isG = (u.name && u.name.includes('(Guest)')) || u.role === 'Guest';
+                            remoteAvatars.set(uid, {
+                                id: uid,
+                                name: u.name || 'Colleague',
+                                x: px, y: py, targetX: px, targetY: py,
+                                color: isG ? '#22c55e' : '#8b5cf6',
+                                status: u.status || 'available'
+                            });
+                            updateOccupantsUI();
+                        }
                     }
                     break;
                 }
                 case 'user.left': {
-                    const { userId } = event.payload || {};
-                    if (userId) {
-                        remoteAvatars.delete(userId);
+                    const uid = String(event.payload?.userId || event.payload?.id || event.payload || '');
+                    if (uid) {
+                        remoteAvatars.delete(uid);
                         updateOccupantsUI();
-                        document.getElementById(`peer-video-${userId}`)?.remove();
+                        document.getElementById(`peer-video-${uid}`)?.remove();
                     }
                     break;
                 }
                 case 'position.updated': {
                     const { userId, position } = event.payload || {};
-                    if (userId && String(userId) !== String(localAvatar.id)) {
-                        let av = remoteAvatars.get(userId);
+                    const uid = String(userId || '');
+                    if (uid && uid !== String(localAvatar.id)) {
+                        let av = remoteAvatars.get(uid);
                         if (!av && position) {
-                            av = { id: userId, name: 'Colleague', x: position.x, y: position.y, targetX: position.x, targetY: position.y, color: '#8b5cf6', status: 'available' };
-                            remoteAvatars.set(userId, av);
+                            av = {
+                                id: uid,
+                                name: 'Colleague',
+                                x: Number(position.x) || 300,
+                                y: Number(position.y) || 300,
+                                targetX: Number(position.x) || 300,
+                                targetY: Number(position.y) || 300,
+                                color: '#8b5cf6',
+                                status: 'available'
+                            };
+                            remoteAvatars.set(uid, av);
                             updateOccupantsUI();
                         }
                         if (av && position) {
-                            av.targetX = position.x;
-                            av.targetY = position.y;
+                            av.targetX = Number(position.x) || av.targetX;
+                            av.targetY = Number(position.y) || av.targetY;
                         }
                     }
                     break;
                 }
                 case 'presence.updated': {
                     const { userId, status } = event.payload || {};
-                    const av = remoteAvatars.get(userId);
+                    const uid = String(userId || '');
+                    const av = remoteAvatars.get(uid);
                     if (av) { av.status = status; updateOccupantsUI(); }
                     break;
                 }
