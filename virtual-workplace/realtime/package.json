@@ -1,0 +1,22 @@
+{
+  "name": "virtual-workplace-realtime",
+  "version": "1.0.0",
+  "description": "Virtual Workplace Realtime WebSocket Service (Presence, Movement, Proximity, Rooms)",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "tsx test/realtime.test.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/ws": "^8.5.10",
+    "tsx": "^4.19.0",
+    "typescript": "^5.4.5"
+  }
+}

@@ -1,0 +1,34 @@
+# Dependencies
+**/vendor/
+**/node_modules/
+
+# Environment files
+**/.env
+**/.env.backup
+**/.env.production
+
+# Logs and databases
+*.log
+**/*.log
+*.sqlite
+*.sqlite-journal
+
+# Laravel storage & cache
+**/storage/*.key
+**/storage/logs/*
+**/storage/framework/cache/*
+**/storage/framework/sessions/*
+**/storage/framework/views/*
+**/storage/pail
+**/public/hot
+**/public/storage
+
+# Testing & IDEs
+.phpunit.result.cache
+**/.phpunit.cache/
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.fleet/
+.zed/
