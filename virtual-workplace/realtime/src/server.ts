@@ -184,31 +184,40 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
           const user = conn.user;
           if (!user.mapId) break;
 
-          const occupants = presence.getRoomOccupants(user.organizationId, user.mapId, roomId);
+          let occupants = presence.getRoomOccupants(user.organizationId, user.mapId, roomId);
 
-          // Rule: If room is empty, door is always open!
           if (occupants.length === 0) {
-            presence.send(ws, {
-              type: 'room.knock_result',
-              payload: {
-                roomId,
-                approved: true,
-                responderName: 'Door Open (Empty Room)',
-              },
-            });
-            console.log(`[WS] ${user.name} entered empty room ${roomId} freely.`);
+            // Broadcast knock request to map occupants so any person in/managing the room receives it
+            const mapOccupants = presence.getMapOccupants(user.organizationId, user.mapId).filter((u) => u.userId !== user.userId);
+            for (const occ of mapOccupants) {
+              const occWs = presence.findUserSocket(occ.userId);
+              if (occWs) {
+                presence.send(occWs, {
+                  type: 'room.knock_request',
+                  payload: {
+                    roomId,
+                    roomName: roomName || 'Private Room',
+                    requesterUserId: user.userId,
+                    requesterName: user.name,
+                  },
+                });
+              }
+            }
+            console.log(`[WS] ${user.name} sent knock alert for room ${roomId} to ${mapOccupants.length} map colleagues.`);
           } else {
-            // Room is occupied -> send knock alert to occupants inside
+            // Room has explicit occupants -> send knock alert to them
             for (const occ of occupants) {
-              presence.send(occ.ws, {
-                type: 'room.knock_request',
-                payload: {
-                  roomId,
-                  roomName: roomName || 'Private Room',
-                  requesterUserId: user.userId,
-                  requesterName: user.name,
-                },
-              });
+              if (occ.user.userId !== user.userId) {
+                presence.send(occ.ws, {
+                  type: 'room.knock_request',
+                  payload: {
+                    roomId,
+                    roomName: roomName || 'Private Room',
+                    requesterUserId: user.userId,
+                    requesterName: user.name,
+                  },
+                });
+              }
             }
             console.log(`[WS] ${user.name} is knocking on door of room ${roomId} with ${occupants.length} occupants.`);
           }
@@ -253,6 +262,43 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
             },
           });
           console.log(`[WS] ${user.name} set door of room ${roomId} to ${isClosed ? 'CLOSED/LOCKED' : 'OPEN'}`);
+          break;
+        }
+
+        case 'presentation.start': {
+          const user = conn.user;
+          if (!user.mapId) break;
+          presence.broadcastToMap(
+            user.organizationId,
+            user.mapId,
+            {
+              type: 'presentation.started',
+              payload: {
+                presenterId: user.userId,
+                presenterName: user.name,
+              },
+            },
+            ws
+          );
+          console.log(`[WS] ${user.name} started screen presentation on map ${user.mapId}`);
+          break;
+        }
+
+        case 'presentation.stop': {
+          const user = conn.user;
+          if (!user.mapId) break;
+          presence.broadcastToMap(
+            user.organizationId,
+            user.mapId,
+            {
+              type: 'presentation.stopped',
+              payload: {
+                presenterId: user.userId,
+              },
+            },
+            ws
+          );
+          console.log(`[WS] ${user.name} stopped screen presentation`);
           break;
         }
 

@@ -886,6 +886,11 @@
                     pc.addTrack(track, localMediaStream);
                 });
             }
+            if (presentStream) {
+                presentStream.getTracks().forEach(track => {
+                    pc.addTrack(track, presentStream);
+                });
+            }
 
             pc.onicecandidate = (e) => {
                 if (e.candidate && ws && ws.readyState === WebSocket.OPEN) {
@@ -903,42 +908,55 @@
                 const remoteStream = e.streams[0] || new MediaStream([e.track]);
 
                 // 1. Audio element for spatial audio
-                let audioEl = peerAudioElements.get(peerUserId);
-                if (!audioEl) {
-                    audioEl = new Audio();
-                    audioEl.autoplay = true;
-                    audioEl.srcObject = remoteStream;
-                    peerAudioElements.set(peerUserId, audioEl);
+                if (e.track.kind === 'audio') {
+                    let audioEl = peerAudioElements.get(peerUserId);
+                    if (!audioEl) {
+                        audioEl = new Audio();
+                        audioEl.autoplay = true;
+                        audioEl.srcObject = remoteStream;
+                        peerAudioElements.set(peerUserId, audioEl);
+                    } else {
+                        audioEl.srcObject = remoteStream;
+                    }
+                }
+
+                // 2. Screen Presentation or Video Camera
+                if (activeRemotePresenterId === peerUserId || e.track.label.toLowerCase().includes('screen') || e.track.label.toLowerCase().includes('window')) {
+                    const presModal = document.getElementById('presentation-modal');
+                    const presVid = document.getElementById('presentation-video');
+                    if (presVid && presModal) {
+                        presVid.srcObject = remoteStream;
+                        presVid.play().catch(() => {});
+                        presModal.style.display = 'flex';
+                    }
                 } else {
-                    audioEl.srcObject = remoteStream;
-                }
+                    // Regular Camera Video Tile
+                    let remoteVidTile = document.getElementById(`peer-video-tile-${peerUserId}`);
+                    const grid = document.getElementById('office-video-grid');
+                    if (!remoteVidTile && grid) {
+                        remoteVidTile = document.createElement('div');
+                        remoteVidTile.className = 'video-tile';
+                        remoteVidTile.id = `peer-video-tile-${peerUserId}`;
+                        const av = remoteAvatars.get(peerUserId);
+                        const name = av?.name || 'Colleague';
+                        remoteVidTile.innerHTML = `
+                            <video id="peer-vid-${peerUserId}" autoplay playsinline></video>
+                            <div class="video-tile-name">${escapeHtml(name)}</div>
+                        `;
+                        grid.appendChild(remoteVidTile);
+                        grid.style.display = 'flex';
+                    }
+                    const vidEl = document.getElementById(`peer-vid-${peerUserId}`);
+                    if (vidEl) {
+                        vidEl.srcObject = remoteStream;
+                        vidEl.play().catch(() => {});
+                    }
 
-                // 2. Video tile
-                let remoteVidTile = document.getElementById(`peer-video-tile-${peerUserId}`);
-                const grid = document.getElementById('office-video-grid');
-                if (!remoteVidTile && grid) {
-                    remoteVidTile = document.createElement('div');
-                    remoteVidTile.className = 'video-tile';
-                    remoteVidTile.id = `peer-video-tile-${peerUserId}`;
+                    // Store reference for canvas rendering
                     const av = remoteAvatars.get(peerUserId);
-                    const name = av?.name || 'Colleague';
-                    remoteVidTile.innerHTML = `
-                        <video id="peer-vid-${peerUserId}" autoplay playsinline></video>
-                        <div class="video-tile-name">${escapeHtml(name)}</div>
-                    `;
-                    grid.appendChild(remoteVidTile);
-                    grid.style.display = 'flex';
-                }
-                const vidEl = document.getElementById(`peer-vid-${peerUserId}`);
-                if (vidEl) {
-                    vidEl.srcObject = remoteStream;
-                    vidEl.play().catch(() => {});
-                }
-
-                // 3. Store reference for canvas rendering
-                const av = remoteAvatars.get(peerUserId);
-                if (av) {
-                    av.videoElement = vidEl;
+                    if (av) {
+                        av.videoElement = vidEl;
+                    }
                 }
             };
 
@@ -1113,14 +1131,20 @@
                 }
                 case 'room.knock_request': {
                     const { roomId, roomName, requesterUserId, requesterName } = event.payload || {};
-                    pendingKnockRequesterId = requesterUserId;
-                    pendingKnockRoomId = roomId;
-                    playKnockSound();
-                    
-                    document.getElementById('knock-alert-desc').innerHTML = `
-                        <strong>${escapeHtml(requesterName || 'A colleague')}</strong> is knocking at the door of <strong>${escapeHtml(roomName || 'this room')}</strong>.
-                    `;
-                    document.getElementById('knock-alert-modal').style.display = 'flex';
+                    if (requesterUserId === String(localAvatar.id)) break;
+
+                    const myCurrentRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+                    // Show alert if occupant is inside the room or on the workplace floor
+                    if (!myCurrentRoom || myCurrentRoom.id === roomId || roomDoorStates.get(roomId)) {
+                        pendingKnockRequesterId = requesterUserId;
+                        pendingKnockRoomId = roomId;
+                        playKnockSound();
+                        
+                        document.getElementById('knock-alert-desc').innerHTML = `
+                            <strong>${escapeHtml(requesterName || 'A colleague')}</strong> is knocking at the door of <strong>${escapeHtml(roomName || 'this room')}</strong>.
+                        `;
+                        document.getElementById('knock-alert-modal').style.display = 'flex';
+                    }
                     break;
                 }
                 case 'room.knock_result': {
@@ -1199,6 +1223,27 @@
                     if (senderName && !senderName.includes('(You)')) {
                         renderChatMessage(senderName, body, fileUrl, fileName);
                     }
+                    break;
+                }
+                case 'presentation.started': {
+                    const { presenterId, presenterName } = event.payload || {};
+                    activeRemotePresenterId = presenterId;
+                    const presModal = document.getElementById('presentation-modal');
+                    if (presModal) {
+                        presModal.style.display = 'flex';
+                        const titleEl = presModal.querySelector('strong');
+                        if (titleEl) titleEl.textContent = `🖥️ ${escapeHtml(presenterName || 'Colleague')}'s Screen Share`;
+                    }
+                    // Trigger peer renegotiation to receive presentation track
+                    if (presenterId) callPeer(presenterId);
+                    break;
+                }
+                case 'presentation.stopped': {
+                    activeRemotePresenterId = null;
+                    const presModal = document.getElementById('presentation-modal');
+                    const presVid = document.getElementById('presentation-video');
+                    if (presVid) presVid.srcObject = null;
+                    if (presModal) presModal.style.display = 'none';
                     break;
                 }
             }
@@ -1423,10 +1468,35 @@
 
             updateRoomDoorPill();
 
+            // Track Room Enter / Leave transitions
+            const curRNow = getCurrentRoom(localAvatar.x, localAvatar.y);
+            const curRId = curRNow ? curRNow.id : null;
+            if (curRId !== localAvatar.currentRoomId) {
+                const prevRId = localAvatar.currentRoomId;
+                localAvatar.currentRoomId = curRId;
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    if (curRId) {
+                        ws.send(JSON.stringify({ type: 'room.enter', payload: { roomId: curRId } }));
+                    } else if (prevRId) {
+                        ws.send(JSON.stringify({ type: 'room.leave', payload: { roomId: prevRId } }));
+                    }
+                }
+            }
+
             // Smooth remote avatar interpolation & Dynamic Spatial Audio
             remoteAvatars.forEach(av => {
                 av.x += (av.targetX - av.x) * 0.25;
                 av.y += (av.targetY - av.y) * 0.25;
+
+                // Anti-overlap separation
+                const dxx = localAvatar.x - av.x;
+                const dyy = localAvatar.y - av.y;
+                const sepDist = Math.hypot(dxx, dyy);
+                if (sepDist < 36 && sepDist > 0) {
+                    const pushAmount = (36 - sepDist) * 0.1;
+                    localAvatar.x += (dxx / sepDist) * pushAmount;
+                    localAvatar.y += (dyy / sepDist) * pushAmount;
+                }
 
                 const audioEl = peerAudioElements.get(av.id);
                 if (audioEl) {
@@ -1833,6 +1903,7 @@
 
         // ── Presentation / Screen Sharing ──
         let presentStream = null;
+        let activeRemotePresenterId = null;
         const presentBtn = document.getElementById('present-btn');
         const presentModal = document.getElementById('presentation-modal');
         const presentVideo = document.getElementById('presentation-video');
@@ -1842,23 +1913,51 @@
                 stopPresentation();
             } else {
                 try {
-                    presentStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-                    if (presentVideo) presentVideo.srcObject = presentStream;
-                    if (presentModal) presentModal.style.display = 'flex';
+                    presentStream = await navigator.mediaDevices.getDisplayMedia({ video: { cursor: 'always' }, audio: true });
+                    if (presentVideo) {
+                        presentVideo.srcObject = presentStream;
+                        presentVideo.play().catch(() => {});
+                    }
+                    if (presentModal) {
+                        presentModal.style.display = 'flex';
+                        const titleEl = presentModal.querySelector('strong');
+                        if (titleEl) titleEl.textContent = `🖥️ You are sharing your screen`;
+                    }
                     presentBtn.classList.add('active');
-                    presentStream.getVideoTracks()[0].onended = () => { stopPresentation(); };
+
+                    // Add screen share tracks to all active peer connections
+                    presentStream.getTracks().forEach(track => {
+                        peerConnections.forEach(pc => {
+                            try { pc.addTrack(track, presentStream); } catch(e) {}
+                        });
+                        track.onended = () => { stopPresentation(); };
+                    });
+
+                    // Broadcast offer to peers so they receive screen stream
+                    remoteAvatars.forEach((_, peerId) => callPeer(peerId));
+
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'presentation.start', payload: {} }));
+                    }
                 } catch(e) { console.log('Screen sharing cancelled:', e); }
             }
         });
+
         function stopPresentation() {
             if (presentStream) {
                 presentStream.getTracks().forEach(t => t.stop());
                 presentStream = null;
             }
-            if (presentVideo) presentVideo.srcObject = null;
-            if (presentModal) presentModal.style.display = 'none';
+            if (presentVideo && !activeRemotePresenterId) presentVideo.srcObject = null;
+            if (presentModal && !activeRemotePresenterId) presentModal.style.display = 'none';
             if (presentBtn) presentBtn.classList.remove('active');
+
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'presentation.stop', payload: {} }));
+            }
+            remoteAvatars.forEach((_, peerId) => callPeer(peerId));
         }
+
         function closePresentationModal() {
             if (presentModal) presentModal.style.display = 'none';
         }
