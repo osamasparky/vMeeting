@@ -116,4 +116,12 @@ class User extends Authenticatable
     {
         return !is_null($this->two_factor_secret);
     }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->email === 'info@meemdtt.com' ||
+            $this->memberships()->whereHas('role', function ($q) {
+                $q->where('slug', 'super_admin');
+            })->exists();
+    }
 }

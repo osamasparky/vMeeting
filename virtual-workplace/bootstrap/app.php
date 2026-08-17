@@ -12,9 +12,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->web(append: [
+            \App\Http\Middleware\SetLocaleMiddleware::class,
+        ]);
+
         $middleware->alias([
             'org.member' => \App\Http\Middleware\EnsureOrganizationMember::class,
             'permission' => \App\Http\Middleware\EnsurePermission::class,
+            'superadmin' => \App\Http\Middleware\SuperAdminMiddleware::class,
         ]);
 
         $middleware->statefulApi();

@@ -17,14 +17,22 @@ class CreateOrganizationAction
      */
     public function execute(array $data, User $owner): Organization
     {
-        // Default to Free plan
-        $freePlan = Plan::where('slug', 'free')->first();
+        // Determine plan (selected or default free)
+        $selectedPlan = null;
+        if (!empty($data['plan_id'])) {
+            $selectedPlan = Plan::find($data['plan_id']);
+        } elseif (!empty($data['plan_slug'])) {
+            $selectedPlan = Plan::where('slug', $data['plan_slug'])->first();
+        }
+        if (!$selectedPlan) {
+            $selectedPlan = Plan::where('slug', 'free')->first() ?? Plan::first();
+        }
 
         $organization = Organization::create([
             'name' => $data['name'],
             'slug' => $data['slug'] ?? Str::slug($data['name']) . '-' . Str::random(4),
             'timezone' => $data['timezone'] ?? 'UTC',
-            'plan_id' => $freePlan?->id,
+            'plan_id' => $selectedPlan?->id,
         ]);
 
         // Create default settings

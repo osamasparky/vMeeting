@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,23 +9,38 @@
     <title>{{ $organization->name }} — Virtual Workplace</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-canvas: #131b19;
-            --bg-sidebar: #0a1110;
-            --bg-panel: rgba(16, 24, 23, 0.95);
-            --border-panel: rgba(255, 255, 255, 0.1);
-            --accent-green: #22c55e;
-            --accent-glow: rgba(34, 197, 94, 0.4);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --text-dim: #64748b;
+            /* Clean White & Saudi Brand Theme */
+            --bg-canvas: #f8fafc;
+            --bg-sidebar: #ffffff;
+            --bg-panel: rgba(255, 255, 255, 0.96);
+            --border-panel: #e2e8f0;
+
+            /* Saudi Brand Colors from color.webp */
+            --brand-teal: #00b4b3;
+            --brand-pine: #00726c;
+            --brand-ocean: #004862;
+            --brand-navy: #012c41;
+            --brand-green: #006847;
+            --brand-lime: #a7c545;
+            --brand-gold: #ffd136;
+            --brand-orange: #f57b36;
+            --brand-coral: #ff3600;
+            --brand-crimson: #d20005;
+
+            --accent-green: #00b4b3;
+            --accent-glow: rgba(0, 180, 179, 0.4);
+            --text-main: #012c41;
+            --text-muted: #64748b;
+            --text-dim: #94a3b8;
+
+            --font-family: {{ app()->getLocale() === 'ar' ? "'Cairo', 'Inter', sans-serif" : "'Inter', 'Cairo', sans-serif" }};
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-family); }
         body {
-            font-family: 'Inter', sans-serif;
             background: var(--bg-canvas);
             color: var(--text-main);
             height: 100vh;
@@ -36,21 +51,25 @@
 
         /* ── Sidebar ── */
         .sidebar {
-            width: 270px;
+            width: 280px;
             height: 100vh;
             background: var(--bg-sidebar);
-            border-right: 1px solid var(--border-panel);
+            border-inline-end: 1px solid var(--border-panel);
             display: flex;
             flex-direction: column;
             z-index: 50;
+            box-shadow: 2px 0 16px rgba(1, 44, 65, 0.05);
             transition: transform 0.25s ease;
         }
-        .sidebar.collapsed { transform: translateX(-270px); margin-right: -270px; }
+        .sidebar.collapsed {
+            transform: translateX({{ app()->getLocale() === 'ar' ? '280px' : '-280px' }});
+            margin-inline-end: -280px;
+        }
 
         .sidebar-header {
             padding: 16px;
             border-bottom: 1px solid var(--border-panel);
-            background: rgba(0, 0, 0, 0.2);
+            background: #f8fafc;
         }
         .org-switcher {
             display: flex;
@@ -58,9 +77,9 @@
             justify-content: space-between;
         }
         .org-title {
-            font-weight: 800;
+            font-weight: 900;
             font-size: 15px;
-            color: white;
+            color: var(--brand-navy);
             display: flex;
             align-items: center;
             gap: 6px;
@@ -70,6 +89,7 @@
             font-size: 11px;
             color: var(--text-muted);
             margin-top: 2px;
+            font-weight: 600;
         }
         .header-btn-row {
             display: flex;
@@ -77,26 +97,26 @@
             gap: 6px;
         }
         .btn-invite-pill {
-            background: var(--accent-green);
-            color: #000;
+            background: linear-gradient(135deg, var(--brand-green), #004d34);
+            color: white;
             font-size: 11px;
-            font-weight: 700;
-            padding: 5px 10px;
+            font-weight: 800;
+            padding: 5px 12px;
             border-radius: 12px;
             border: none;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 4px;
-            box-shadow: 0 0 10px var(--accent-glow);
+            box-shadow: 0 4px 10px rgba(0, 104, 71, 0.25);
         }
         .btn-icon-square {
-            width: 28px;
-            height: 28px;
-            background: rgba(255,255,255,0.06);
+            width: 30px;
+            height: 30px;
+            background: #ffffff;
             border: 1px solid var(--border-panel);
             border-radius: 8px;
-            color: var(--text-muted);
+            color: var(--brand-navy);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -107,20 +127,25 @@
 
         .sidebar-tabs {
             display: flex;
-            padding: 8px 16px;
+            padding: 10px 16px;
             border-bottom: 1px solid var(--border-panel);
-            gap: 12px;
+            gap: 16px;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
+            background: #ffffff;
         }
         .sidebar-tab {
-            color: var(--text-dim);
+            color: var(--text-muted);
             cursor: pointer;
             padding-bottom: 4px;
+            transition: color 0.2s;
+        }
+        .sidebar-tab:hover {
+            color: var(--brand-navy);
         }
         .sidebar-tab.active {
-            color: var(--accent-green);
-            border-bottom: 2px solid var(--accent-green);
+            color: var(--brand-teal);
+            border-bottom: 2px solid var(--brand-teal);
         }
 
         .sidebar-content {
@@ -128,6 +153,7 @@
             overflow-y: auto;
             display: flex;
             flex-direction: column;
+            background: #ffffff;
         }
 
         .chat-container {
@@ -135,7 +161,7 @@
             flex-direction: column;
             height: 250px;
             border-bottom: 1px solid var(--border-panel);
-            background: rgba(0, 0, 0, 0.15);
+            background: #f8fafc;
         }
         .chat-messages {
             flex: 1;
@@ -145,6 +171,7 @@
             flex-direction: column;
             gap: 8px;
             font-size: 12px;
+            text-align: {{ app()->getLocale() === 'ar' ? 'right' : 'left' }};
         }
         .chat-input-area {
             padding: 8px 12px;
@@ -152,25 +179,27 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            background: rgba(0,0,0,0.25);
+            background: #ffffff;
         }
         .chat-input-area input[type="text"] {
             flex: 1;
-            background: rgba(255,255,255,0.06);
+            background: #f8fafc;
             border: 1px solid var(--border-panel);
             border-radius: 8px;
-            padding: 6px 10px;
-            color: white;
+            padding: 8px 10px;
+            color: var(--brand-navy);
             font-size: 12px;
+            font-weight: 600;
             outline: none;
+            text-align: {{ app()->getLocale() === 'ar' ? 'right' : 'left' }};
         }
         .chat-input-area button, .chat-input-area label {
-            background: rgba(255,255,255,0.08);
+            background: #f1f5f9;
             border: 1px solid var(--border-panel);
-            color: var(--text-muted);
+            color: var(--brand-navy);
             border-radius: 8px;
-            width: 28px;
-            height: 28px;
+            width: 30px;
+            height: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -179,10 +208,10 @@
         }
 
         .sidebar-section-title {
-            padding: 10px 14px 4px;
+            padding: 12px 14px 6px;
             font-size: 11px;
-            font-weight: 700;
-            color: var(--text-dim);
+            font-weight: 800;
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.05em;
             display: flex;
@@ -198,18 +227,20 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 6px 8px;
+            padding: 8px 10px;
             border-radius: 8px;
             font-size: 12px;
-            color: var(--text-main);
-            background: rgba(255, 255, 255, 0.03);
+            font-weight: 700;
+            color: var(--brand-navy);
+            background: #f8fafc;
+            border: 1px solid var(--border-panel);
         }
         .status-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: var(--accent-green);
-            box-shadow: 0 0 6px var(--accent-green);
+            background: var(--brand-green);
+            box-shadow: 0 0 6px var(--brand-green);
         }
 
         /* ── Main Viewport ── */
@@ -218,7 +249,7 @@
             height: 100vh;
             position: relative;
             overflow: hidden;
-            background: #111a18;
+            background: #f1f5f9;
         }
         canvas#office-canvas {
             display: block;
@@ -227,13 +258,44 @@
             cursor: crosshair;
         }
 
+        /* ── Floating Top Language & Navigation Bar ── */
+        .floating-top-bar {
+            position: fixed;
+            top: 18px;
+            inset-inline-end: 80px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 90;
+        }
+        .btn-lang-float {
+            background: #ffffff;
+            border: 1px solid var(--border-panel);
+            color: var(--brand-navy);
+            font-size: 12px;
+            font-weight: 800;
+            padding: 8px 14px;
+            border-radius: 10px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 14px rgba(1, 44, 65, 0.08);
+            transition: all 0.2s;
+        }
+        .btn-lang-float:hover {
+            border-color: var(--brand-teal);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(0, 180, 179, 0.2);
+        }
+
         /* ── Floating Room Door Control Pill ── */
         .room-door-pill {
             position: fixed;
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: var(--bg-panel);
+            background: #ffffff;
             border: 1px solid var(--border-panel);
             border-radius: 14px;
             padding: 8px 16px;
@@ -241,19 +303,19 @@
             align-items: center;
             gap: 12px;
             z-index: 90;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(1, 44, 65, 0.12);
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 800;
+            color: var(--brand-navy);
         }
         .btn-door-toggle {
-            background: rgba(239, 68, 68, 0.2);
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            color: #fca5a5;
+            background: rgba(210, 0, 5, 0.1);
+            border: 1px solid rgba(210, 0, 5, 0.3);
+            color: var(--brand-crimson);
             padding: 4px 12px;
             border-radius: 8px;
             cursor: pointer;
-            font-weight: 700;
+            font-weight: 800;
             font-size: 12px;
             display: flex;
             align-items: center;
@@ -261,17 +323,17 @@
             transition: all 0.2s;
         }
         .btn-door-toggle.unlocked {
-            background: rgba(34, 197, 94, 0.2);
-            border-color: rgba(34, 197, 94, 0.4);
-            color: #86efac;
+            background: rgba(0, 104, 71, 0.1);
+            border-color: rgba(0, 104, 71, 0.3);
+            color: var(--brand-green);
         }
 
         /* ── Right Toolbar ── */
         .right-toolbar {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            background: var(--bg-panel);
+            top: 18px;
+            inset-inline-end: 20px;
+            background: #ffffff;
             border: 1px solid var(--border-panel);
             border-radius: 12px;
             display: flex;
@@ -279,24 +341,23 @@
             gap: 4px;
             padding: 6px;
             z-index: 90;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 25px rgba(1, 44, 65, 0.08);
         }
         .tool-btn {
-            width: 34px;
-            height: 34px;
+            width: 36px;
+            height: 36px;
             border-radius: 8px;
             border: none;
             background: transparent;
             color: var(--text-muted);
-            font-size: 15px;
+            font-size: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: all 0.15s;
         }
-        .tool-btn:hover { background: rgba(255, 255, 255, 0.08); color: white; }
+        .tool-btn:hover { background: #f1f5f9; color: var(--brand-navy); }
 
         /* ── Bottom Control Dock ── */
         .bottom-dock {
@@ -304,7 +365,7 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: var(--bg-panel);
+            background: #ffffff;
             border: 1px solid var(--border-panel);
             border-radius: 18px;
             padding: 8px 14px;
@@ -312,8 +373,7 @@
             align-items: center;
             gap: 8px;
             z-index: 100;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(16px);
+            box-shadow: 0 15px 35px rgba(1, 44, 65, 0.15);
         }
         .dock-btn {
             display: flex;
@@ -322,29 +382,29 @@
             justify-content: center;
             background: transparent;
             border: none;
-            color: var(--text-muted);
+            color: var(--text-secondary);
             padding: 6px 12px;
             border-radius: 10px;
             cursor: pointer;
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 700;
             gap: 3px;
             transition: all 0.15s;
             min-width: 60px;
         }
         .dock-btn .icon { font-size: 17px; }
-        .dock-btn:hover { background: rgba(255, 255, 255, 0.08); color: white; }
+        .dock-btn:hover { background: #f1f5f9; color: var(--brand-navy); }
         .dock-btn.active {
-            background: rgba(34, 197, 94, 0.2);
-            color: var(--accent-green);
-            border: 1px solid rgba(34, 197, 94, 0.3);
+            background: rgba(0, 180, 179, 0.12);
+            color: var(--brand-teal);
+            border: 1px solid rgba(0, 180, 179, 0.3);
         }
 
         /* ── Video Stage ── */
         .video-grid {
             position: fixed;
             top: 24px;
-            left: 285px;
+            inset-inline-start: 300px;
             display: none;
             gap: 10px;
             z-index: 95;
@@ -354,70 +414,53 @@
         .video-tile {
             width: 170px;
             height: 120px;
-            background: #0f172a;
-            border: 2px solid rgba(34, 197, 94, 0.5);
+            background: #012c41;
+            border: 2px solid var(--brand-teal);
             border-radius: 12px;
             overflow: hidden;
             position: relative;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 10px 25px rgba(1, 44, 65, 0.2);
         }
         .video-tile video { width: 100%; height: 100%; object-fit: cover; }
         .video-tile-name {
             position: absolute;
             bottom: 4px;
-            left: 6px;
-            background: rgba(0, 0, 0, 0.75);
+            inset-inline-start: 6px;
+            background: rgba(1, 44, 65, 0.85);
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 10px;
-            font-weight: 700;
-            color: #f8fafc;
+            font-weight: 800;
+            color: #ffffff;
         }
 
         /* ── Modals ── */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(1, 44, 65, 0.5);
             backdrop-filter: blur(8px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 1000;
+            padding: 20px;
         }
         .modal-box {
-            background: rgba(15, 23, 42, 0.98);
+            background: #ffffff;
             border: 1px solid var(--border-panel);
             border-radius: 20px;
             padding: 24px;
             width: 100%;
             max-width: 520px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.8);
-            color: white;
-        }
-
-        .modal-tab-btn {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid var(--border-panel);
-            color: var(--text-muted);
-            padding: 8px 14px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            flex: 1;
-        }
-        .modal-tab-btn.active {
-            background: var(--accent-green);
-            color: #000;
-            font-weight: 700;
-            border-color: var(--accent-green);
+            box-shadow: 0 25px 60px rgba(1, 44, 65, 0.25);
+            color: var(--brand-navy);
         }
     </style>
 </head>
 <body>
 
-    <!-- Left Sidebar -->
+    <!-- Left / Right Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="org-switcher">
@@ -425,14 +468,20 @@
                     <div class="org-title" onclick="window.location.href='{{ route('dashboard') }}'">
                         <span>{{ $organization->name }}</span>
                         @if(!empty($user->is_guest))
-                            <span style="background: rgba(34, 197, 94, 0.2); border: 1px solid var(--accent-green); color: #86efac; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-left: 6px;">GUEST ACCESS</span>
+                            <span style="background: rgba(0, 104, 71, 0.1); border: 1px solid var(--brand-green); color: var(--brand-green); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; margin-inline-start: 6px;">GUEST ACCESS</span>
                         @endif
                     </div>
-                    <div class="space-subtitle">{{ $floor->name }} Floor</div>
+                    <div class="space-subtitle">{{ $floor->name }} {{ __('Floor') }}</div>
                 </div>
                 <div class="header-btn-row">
+                    @if(app()->getLocale() === 'ar')
+                        <a href="{{ route('lang.switch', 'en') }}" class="btn-icon-square" title="English" style="font-weight: 800; font-size: 11px;">EN</a>
+                    @else
+                        <a href="{{ route('lang.switch', 'ar') }}" class="btn-icon-square" title="العربية" style="font-weight: 800; font-size: 11px;">عربي</a>
+                    @endif
+
                     @if(empty($user->is_guest))
-                        <button class="btn-invite-pill" onclick="openInviteModal()">+ Invite</button>
+                        <button class="btn-invite-pill" onclick="openInviteModal()">+ {{ __('Invite') }}</button>
                         <a href="{{ route('editor') }}" class="btn-icon-square" title="Office Editor">⚙️</a>
                     @endif
                 </div>
@@ -440,19 +489,19 @@
         </div>
 
         <div class="sidebar-tabs">
-            <span class="sidebar-tab active">Chat</span>
-            <span class="sidebar-tab" onclick="alert('📅 Scheduled Meetings:\n1. All-Hands Sync (10:00 AM)\n2. Product Review (2:00 PM)')">Calendar</span>
-            <span class="sidebar-tab" onclick="alert('Virtual Workplace Shortcuts:\n• Arrow Keys / WASD: Move Avatar\n• Click Floor: Move to Location\n• Scroll: Zoom In/Out\n• Doors: Click room tag or door to lock/unlock')">Help</span>
+            <span class="sidebar-tab active">{{ __('Chat') }}</span>
+            <span class="sidebar-tab" onclick="alert('📅 Scheduled Meetings:\n1. All-Hands Sync (10:00 AM)\n2. Product Review (2:00 PM)')">{{ __('Calendar') }}</span>
+            <span class="sidebar-tab" onclick="alert('Virtual Workplace Shortcuts:\n• Arrow Keys / WASD: Move Avatar\n• Click Floor: Move to Location\n• Scroll: Zoom In/Out\n• Doors: Click room tag or door to lock/unlock')">{{ __('Help') }}</span>
         </div>
 
         <div class="sidebar-content">
             <!-- Chat -->
             <div class="chat-container">
                 <div class="chat-messages" id="chat-messages-container">
-                    <div style="color: #64748b; font-size: 11px; text-align: center; padding: 4px 0;">Welcome to {{ $organization->name }} team chat!</div>
+                    <div style="color: #64748b; font-size: 11px; text-align: center; padding: 4px 0;">{{ __('Welcome to') }} {{ $organization->name }} {{ __('team chat!') }}</div>
                 </div>
                 <div class="chat-input-area">
-                    <input type="text" id="chat-text-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendChatMessage()">
+                    <input type="text" id="chat-text-input" placeholder="{{ __('Type a message...') }}" onkeydown="if(event.key==='Enter') sendChatMessage()">
                     <label for="chat-file-input" title="Attach Image or File">📎</label>
                     <input type="file" id="chat-file-input" style="display: none;" onchange="handleChatFileUpload(this)">
                     <button onclick="sendChatMessage()" title="Send">➤</button>
@@ -461,13 +510,13 @@
 
             <!-- Online Occupants -->
             <div class="sidebar-section-title">
-                <span>Online Colleagues</span>
-                <span id="sidebar-online-count" style="color: var(--accent-green);">1</span>
+                <span>{{ __('Online Colleagues') }}</span>
+                <span id="sidebar-online-count" style="color: var(--brand-teal);">1</span>
             </div>
             <div class="occupant-list" id="sidebar-online-list">
                 <div class="user-occupant-item">
                     <span class="status-dot"></span>
-                    <strong>{{ $user->name }} (You)</strong>
+                    <strong>{{ $user->name }} ({{ __('You') }})</strong>
                 </div>
             </div>
         </div>
@@ -477,27 +526,41 @@
     <main class="viewport">
         <canvas id="office-canvas"></canvas>
 
+        <!-- Floating Top Bar with Language Switcher and Dashboard Link -->
+        <div class="floating-top-bar">
+            @if(app()->getLocale() === 'ar')
+                <a href="{{ route('lang.switch', 'en') }}" class="btn-lang-float" title="Switch to English">🌐 English</a>
+            @else
+                <a href="{{ route('lang.switch', 'ar') }}" class="btn-lang-float" title="التبديل إلى العربية">🌐 العربية</a>
+            @endif
+
+            <a href="{{ route('dashboard') }}" class="btn-lang-float" style="background: var(--brand-teal); color: white; border-color: var(--brand-teal);" title="{{ __('Dashboard') }}">
+                <span>🏢</span>
+                <span>{{ __('Dashboard') }}</span>
+            </a>
+        </div>
+
         <!-- Floating Room Door Control Pill -->
         <div class="room-door-pill" id="room-door-pill">
             <span id="room-door-name">🏢 Executive Room</span>
             <button class="btn-door-toggle" id="btn-toggle-room-door" onclick="toggleCurrentRoomDoor()">
                 <span>🔒</span>
-                <span id="room-door-status-text">Lock Door</span>
+                <span id="room-door-status-text">{{ __('Lock Door') }}</span>
             </button>
         </div>
 
         <!-- Right Tool Dock -->
         <div class="right-toolbar">
-            <button class="tool-btn" onclick="openWhiteboard()" title="Interactive Whiteboard">📋</button>
+            <button class="tool-btn" onclick="openWhiteboard()" title="{{ __('Whiteboard') }}">📋</button>
             @if(empty($user->is_guest))
-            <a href="{{ route('editor') }}" class="tool-btn" title="Edit Furniture & Floor">🪑</a>
+            <a href="{{ route('editor') }}" class="tool-btn" title="{{ __('Edit Furniture & Floor') }}">🪑</a>
             @endif
-            <button class="tool-btn" id="btn-toggle-sidebar" title="Toggle Sidebar">🔲</button>
-            <button class="tool-btn" id="btn-reset-view" title="Reset View">🏠</button>
-            <button class="tool-btn" id="btn-center-avatar" title="Center on Me">🎯</button>
+            <button class="tool-btn" id="btn-toggle-sidebar" title="{{ __('Toggle Sidebar') }}">🔲</button>
+            <button class="tool-btn" id="btn-reset-view" title="{{ __('Reset View') }}">🏠</button>
+            <button class="tool-btn" id="btn-center-avatar" title="{{ __('Center on Me') }}">🎯</button>
             <div style="height: 1px; background: var(--border-panel); margin: 2px 0;"></div>
-            <button class="tool-btn" id="btn-zoom-in" title="Zoom In">➕</button>
-            <button class="tool-btn" id="btn-zoom-out" title="Zoom Out">➖</button>
+            <button class="tool-btn" id="btn-zoom-in" title="{{ __('Zoom In') }}">➕</button>
+            <button class="tool-btn" id="btn-zoom-out" title="{{ __('Zoom Out') }}">➖</button>
         </div>
 
         <!-- Floating Video Grid -->
@@ -510,39 +573,39 @@
 
         <!-- Bottom Floating Control Dock -->
         <div class="bottom-dock">
-            <button class="dock-btn" id="cam-btn" title="Toggle Camera">
+            <button class="dock-btn" id="cam-btn" title="{{ __('Camera') }}">
                 <span class="icon">📹</span>
-                <span>Camera</span>
+                <span>{{ __('Camera') }}</span>
             </button>
-            <button class="dock-btn" id="mic-btn" title="Toggle Microphone">
+            <button class="dock-btn" id="mic-btn" title="{{ __('Mic') }}">
                 <span class="icon">🎤</span>
-                <span>Mic</span>
+                <span>{{ __('Mic') }}</span>
             </button>
-            <button class="dock-btn" id="status-dock-btn" title="Change Status">
+            <button class="dock-btn" id="status-dock-btn" title="{{ __('Available') }}">
                 <span class="icon">🟢</span>
-                <span>Available</span>
+                <span>{{ __('Available') }}</span>
             </button>
-            <button class="dock-btn" id="whiteboard-dock-btn" onclick="openWhiteboard()" title="Team Whiteboard">
+            <button class="dock-btn" id="whiteboard-dock-btn" onclick="openWhiteboard()" title="{{ __('Whiteboard') }}">
                 <span class="icon">📋</span>
-                <span>Whiteboard</span>
+                <span>{{ __('Whiteboard') }}</span>
             </button>
-            <button class="dock-btn" id="present-btn" title="Share Screen">
+            <button class="dock-btn" id="present-btn" title="{{ __('Present') }}">
                 <span class="icon">🖥️</span>
-                <span>Present</span>
+                <span>{{ __('Present') }}</span>
             </button>
             @if(empty($user->is_guest))
-            <button class="dock-btn" id="record-btn" title="Record Session">
+            <button class="dock-btn" id="record-btn" title="{{ __('Record') }}">
                 <span class="icon">⭕</span>
-                <span>Record</span>
+                <span>{{ __('Record') }}</span>
             </button>
             @endif
-            <button class="dock-btn" id="gallery-btn" title="Toggle Video Grid">
+            <button class="dock-btn" id="gallery-btn" title="{{ __('Gallery') }}">
                 <span class="icon">🪟</span>
-                <span>Gallery</span>
+                <span>{{ __('Gallery') }}</span>
             </button>
-            <button class="dock-btn" onclick="window.location.href='{{ route('dashboard') }}'" title="Dashboard">
+            <button class="dock-btn" onclick="window.location.href='{{ route('dashboard') }}'" title="{{ __('Dashboard') }}">
                 <span class="icon">↗️</span>
-                <span>Exit</span>
+                <span>{{ __('Exit') }}</span>
             </button>
         </div>
     </main>
@@ -551,16 +614,16 @@
     <div id="knock-prompt-modal" class="modal-overlay">
         <div class="modal-box" style="max-width: 440px; text-align: center;">
             <div style="font-size: 40px; margin-bottom: 10px;">🔒</div>
-            <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 6px;" id="knock-room-title">Meeting Room is Locked</h3>
+            <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 6px;" id="knock-room-title">{{ __('Meeting Room is Locked') }}</h3>
             <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.5;" id="knock-room-desc">
-                This room is currently in a private session. You must knock to request entry permission.
+                {{ __('This room is currently in a private session. You must knock to request entry permission.') }}
             </p>
             <div style="display: flex; gap: 10px;">
-                <button onclick="confirmKnock()" id="btn-knock-send" style="flex: 1; background: #6366f1; color: white; font-weight: 700; border: none; border-radius: 12px; padding: 12px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px;">
-                    <span>🔔</span> Knock on Door (استئذان)
+                <button onclick="confirmKnock()" id="btn-knock-send" style="flex: 1; background: var(--brand-teal); color: white; font-weight: 800; border: none; border-radius: 12px; padding: 12px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                    <span>🔔</span> {{ __('Knock on Door') }}
                 </button>
                 <button onclick="closeKnockPrompt()" style="background: rgba(255,255,255,0.08); border: 1px solid var(--border-panel); color: #94a3b8; border-radius: 12px; padding: 12px 18px; cursor: pointer; font-size: 13px;">
-                    Cancel
+                    {{ __('Cancel') }}
                 </button>
             </div>
             <div id="knock-status-msg" style="margin-top: 14px; font-size: 12px; display: none;"></div>
@@ -569,18 +632,18 @@
 
     <!-- 🔔 Knock Request Alert Modal (For occupants inside the locked room) -->
     <div id="knock-alert-modal" class="modal-overlay">
-        <div class="modal-box" style="max-width: 440px; text-align: center; border: 2px solid #6366f1;">
+        <div class="modal-box" style="max-width: 440px; text-align: center; border: 2px solid var(--brand-teal);">
             <div style="font-size: 42px; margin-bottom: 10px; animation: bounce 0.6s infinite alternate;">🔔</div>
-            <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 6px;">Someone is Knocking at the Door!</h3>
+            <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 6px;">{{ __('Knock Knock! Request to Enter') }}</h3>
             <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 20px;" id="knock-alert-desc">
-                <strong>John Doe</strong> is requesting permission to enter <strong>Executive Room</strong>.
+                <strong>John Doe</strong> {{ __('is knocking on the door to enter') }} <strong>Executive Room</strong>.
             </p>
             <div style="display: flex; gap: 10px;">
-                <button onclick="respondToKnock(true)" style="flex: 1; background: var(--accent-green); color: black; font-weight: 800; border: none; border-radius: 12px; padding: 12px; cursor: pointer; font-size: 13px;">
-                    ✅ Let Them In (فتح الباب)
+                <button onclick="respondToKnock(true)" style="flex: 1; background: var(--brand-teal); color: white; font-weight: 800; border: none; border-radius: 12px; padding: 12px; cursor: pointer; font-size: 13px;">
+                    ✅ {{ __('Allow Entry') }}
                 </button>
                 <button onclick="respondToKnock(false)" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; font-weight: 700; border-radius: 12px; padding: 12px 18px; cursor: pointer; font-size: 13px;">
-                    ❌ Deny (رفض)
+                    ❌ {{ __('Deny') }}
                 </button>
             </div>
         </div>
@@ -590,47 +653,47 @@
     <div id="invite-modal" class="modal-overlay">
         <div class="modal-box">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <h3 style="font-size: 16px; font-weight: 700;">👥 Workplace Invitations & Team Access</h3>
+                <h3 style="font-size: 16px; font-weight: 800; color: var(--brand-navy);">👥 {{ __('Invite & Guest Access') }}</h3>
                 <button onclick="closeInviteModal()" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
             </div>
 
             <!-- Tab Switcher -->
-            <div style="display: flex; gap: 8px; margin-bottom: 18px;">
-                <button class="modal-tab-btn active" id="modal-tab-guest" onclick="switchInviteTab('guest')">🔗 Instant Guest Link</button>
-                <button class="modal-tab-btn" id="modal-tab-member" onclick="switchInviteTab('member')">👤 Add Team Member (with Password)</button>
+            <div style="display: flex; gap: 8px; margin-bottom: 18px; background: #f1f5f9; padding: 4px; border-radius: 10px;">
+                <button class="modal-tab-btn active" id="modal-tab-guest" onclick="switchInviteTab('guest')" style="flex: 1; padding: 8px; border-radius: 8px; border: none; font-size: 12px; font-weight: 700; cursor: pointer; background: var(--brand-teal); color: white;">🔗 {{ __('Guest Meeting Link') }}</button>
+                <button class="modal-tab-btn" id="modal-tab-member" onclick="switchInviteTab('member')" style="flex: 1; padding: 8px; border-radius: 8px; border: none; font-size: 12px; font-weight: 700; cursor: pointer; background: none; color: var(--text-muted);">👤 {{ __('Add Team Member') }}</button>
             </div>
 
             <!-- Section 1: Guest Link -->
             <div id="tab-section-guest" style="display: flex; flex-direction: column; gap: 12px;">
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 4px;">Destination Room</label>
-                    <select id="invite-room-select" style="width: 100%; background: rgba(255,255,255,0.06); border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: white; outline: none; font-size: 13px;">
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 4px;">{{ __('Destination Room') }}</label>
+                    <select id="invite-room-select" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
                         @foreach($map->rooms as $r)
-                            <option value="{{ $r->id }}" style="background: #0f172a;">🏢 {{ $r->name }} ({{ ucfirst($r->type) }})</option>
+                            <option value="{{ $r->id }}">🏢 {{ $r->name }} ({{ ucfirst($r->type) }})</option>
                         @endforeach
                     </select>
                 </div>
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 4px;">Guest Name / Role</label>
-                    <input type="text" id="invite-guest-name" value="Guest / Partner" style="width: 100%; background: rgba(255,255,255,0.06); border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: white; outline: none; font-size: 13px;">
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 4px;">{{ __('Guest Name / Label') }}</label>
+                    <input type="text" id="invite-guest-name" value="Guest / Partner" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 4px;">Expiration</label>
-                    <select id="invite-guest-hours" style="width: 100%; background: rgba(255,255,255,0.06); border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: white; outline: none; font-size: 13px;">
-                        <option value="1">1 Hour</option>
-                        <option value="24" selected>24 Hours</option>
-                        <option value="72">3 Days</option>
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 4px;">{{ __('Link Expiration') }}</label>
+                    <select id="invite-guest-hours" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                        <option value="1">1 {{ __('Hour') }}</option>
+                        <option value="24" selected>24 {{ __('Hours') }} (1 Day)</option>
+                        <option value="72">72 {{ __('Hours') }} (3 Days)</option>
                     </select>
                 </div>
-                <button onclick="generateGuestLink()" id="btn-gen-guest" style="margin-top: 4px; background: var(--accent-green); color: black; font-weight: 700; border: none; border-radius: 10px; padding: 12px; cursor: pointer; font-size: 13px;">
-                    ⚡ Generate Instant Link
+                <button onclick="generateGuestLink()" id="btn-gen-guest" style="margin-top: 4px; background: linear-gradient(135deg, var(--brand-green), #004d34); color: white; font-weight: 800; border: none; border-radius: 10px; padding: 12px; cursor: pointer; font-size: 13px; box-shadow: 0 4px 12px rgba(0, 104, 71, 0.2);">
+                    ⚡ {{ __('Generate Instant Guest Link') }}
                 </button>
-                <div id="guest-result-box" style="display: none; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 10px; padding: 12px;">
-                    <div style="font-size: 11px; font-weight: 700; color: #86efac; margin-bottom: 6px;">✅ Link Ready!</div>
-                    <input type="text" id="guest-link-output" readonly style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 8px; color: white; font-size: 12px; font-family: monospace; margin-bottom: 8px;">
+                <div id="guest-result-box" style="display: none; background: rgba(0, 104, 71, 0.08); border: 1px solid rgba(0, 104, 71, 0.25); border-radius: 10px; padding: 12px;">
+                    <div style="font-size: 11px; font-weight: 800; color: var(--brand-green); margin-bottom: 6px;">✅ {{ __('Invitation Link Ready!') }}</div>
+                    <input type="text" id="guest-link-output" readonly style="width: 100%; background: #ffffff; border: 1px solid var(--border-panel); border-radius: 6px; padding: 8px; color: var(--brand-navy); font-size: 12px; font-family: monospace; margin-bottom: 8px;">
                     <div style="display: flex; gap: 8px;">
-                        <button onclick="copyGuestLink()" id="btn-copy-link" style="flex: 1; background: #6366f1; color: white; font-weight: 600; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-size: 12px;">📋 Copy Link</button>
-                        <a id="guest-open-link" href="#" target="_blank" style="background: rgba(255,255,255,0.1); color: white; font-weight: 600; text-decoration: none; border-radius: 6px; padding: 8px 12px; font-size: 12px;">👁️ Open</a>
+                        <button onclick="copyGuestLink()" id="btn-copy-link" style="flex: 1; background: var(--brand-teal); color: white; font-weight: 700; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-size: 12px;">📋 {{ __('Copy Link') }}</button>
+                        <a id="guest-open-link" href="#" target="_blank" style="background: #ffffff; border: 1px solid var(--border-panel); color: var(--brand-navy); font-weight: 700; text-decoration: none; border-radius: 6px; padding: 8px 12px; font-size: 12px;">👁️ {{ __('Open') }}</a>
                     </div>
                 </div>
             </div>
@@ -638,31 +701,31 @@
             <!-- Section 2: Permanent Team Member with Password -->
             <div id="tab-section-member" style="display: none; flex-direction: column; gap: 12px;">
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 4px;">Full Name (الاسم الكامل)</label>
-                    <input type="text" id="member-name" placeholder="e.g. John Doe" style="width: 100%; background: rgba(255,255,255,0.06); border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: white; outline: none; font-size: 13px;">
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 4px;">{{ __('Full Name') }}</label>
+                    <input type="text" id="member-name" placeholder="e.g. John Doe" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 4px;">Email Address (البريد الإلكتروني)</label>
-                    <input type="email" id="member-email" placeholder="john@example.com" style="width: 100%; background: rgba(255,255,255,0.06); border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: white; outline: none; font-size: 13px;">
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 4px;">{{ __('Email Address') }}</label>
+                    <input type="email" id="member-email" placeholder="john@example.com" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 4px;">Assign Password (كلمة المرور الخاصة به)</label>
-                    <input type="text" id="member-password" placeholder="e.g. Secret123" style="width: 100%; background: rgba(255,255,255,0.06); border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: white; outline: none; font-size: 13px;">
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 4px;">{{ __('Password') }}</label>
+                    <input type="text" id="member-password" placeholder="e.g. Secret123" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 600; color: #94a3b8; margin-bottom: 4px;">Role (الصلاحية)</label>
-                    <select id="member-role" style="width: 100%; background: rgba(255,255,255,0.06); border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: white; outline: none; font-size: 13px;">
-                        <option value="employee" selected>Employee (عضو فريق عادي)</option>
-                        <option value="manager">Manager (مدير)</option>
-                        <option value="company_admin">Admin (مشرف عام)</option>
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 4px;">{{ __('Role') }}</label>
+                    <select id="member-role" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                        <option value="employee" selected>{{ __('Member') }}</option>
+                        <option value="manager">{{ __('Manager') }}</option>
+                        <option value="company_admin">{{ __('Company Admin') }}</option>
                     </select>
                 </div>
-                <button onclick="createTeamMember()" id="btn-create-member" style="margin-top: 4px; background: #6366f1; color: white; font-weight: 700; border: none; border-radius: 10px; padding: 12px; cursor: pointer; font-size: 13px;">
-                    ✨ Add Member to Team
+                <button onclick="createTeamMember()" id="btn-create-member" style="margin-top: 4px; background: var(--brand-teal); color: white; font-weight: 800; border: none; border-radius: 10px; padding: 12px; cursor: pointer; font-size: 13px;">
+                    ✨ {{ __('Add Member to Team') }}
                 </button>
-                <div id="member-result-box" style="display: none; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.35); border-radius: 10px; padding: 12px; font-size: 12px; color: #c7d2fe;">
-                    <div style="font-weight: 700; margin-bottom: 4px; color: #a5b4fc;">✅ Member Created Successfully!</div>
-                    <div>The member can now login directly at <strong>/login</strong> using the specified email and password.</div>
+                <div id="member-result-box" style="display: none; background: rgba(0, 180, 179, 0.1); border: 1px solid rgba(0, 180, 179, 0.3); border-radius: 10px; padding: 12px; font-size: 12px; color: var(--brand-navy);">
+                    <div style="font-weight: 800; margin-bottom: 4px; color: var(--brand-teal);">✅ {{ __('Member Created Successfully!') }}</div>
+                    <div>{{ __('The member can now login directly at /login') }}</div>
                 </div>
             </div>
         </div>
@@ -670,27 +733,27 @@
 
     <!-- Whiteboard Modal -->
     <div id="whiteboard-modal" class="modal-overlay">
-        <div style="background: rgba(15, 23, 42, 0.98); border: 1px solid var(--border-panel); border-radius: 20px; width: 90vw; max-width: 1000px; height: 80vh; display: flex; flex-direction: column; overflow: hidden;">
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: rgba(0,0,0,0.4); border-bottom: 1px solid var(--border-panel);">
-                <div style="display: flex; align-items: center; gap: 8px; font-weight: 700;">
-                    <span>📋</span> Team Whiteboard
+        <div style="background: #ffffff; border: 1px solid var(--border-panel); border-radius: 20px; width: 90vw; max-width: 1000px; height: 80vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 60px rgba(1, 44, 65, 0.25);">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: #f8fafc; border-bottom: 1px solid var(--border-panel);">
+                <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; color: var(--brand-navy);">
+                    <span>📋</span> {{ __('Team Whiteboard') }}
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <button class="tool-btn active" id="wb-tool-pen" onclick="setWbTool('pen')" title="Pen">✏️</button>
                     <button class="tool-btn" id="wb-tool-highlighter" onclick="setWbTool('highlighter')" title="Highlighter">🖍️</button>
                     <button class="tool-btn" id="wb-tool-eraser" onclick="setWbTool('eraser')" title="Eraser">🧹</button>
                     <div style="display: flex; gap: 4px; margin: 0 6px;">
-                        <span onclick="setWbColor('#38bdf8')" style="width: 20px; height: 20px; border-radius: 50%; background: #38bdf8; cursor: pointer;"></span>
-                        <span onclick="setWbColor('#f43f5e')" style="width: 20px; height: 20px; border-radius: 50%; background: #f43f5e; cursor: pointer;"></span>
-                        <span onclick="setWbColor('#10b981')" style="width: 20px; height: 20px; border-radius: 50%; background: #10b981; cursor: pointer;"></span>
-                        <span onclick="setWbColor('#facc15')" style="width: 20px; height: 20px; border-radius: 50%; background: #facc15; cursor: pointer;"></span>
+                        <span onclick="setWbColor('#00b4b3')" style="width: 20px; height: 20px; border-radius: 50%; background: #00b4b3; cursor: pointer;"></span>
+                        <span onclick="setWbColor('#006847')" style="width: 20px; height: 20px; border-radius: 50%; background: #006847; cursor: pointer;"></span>
+                        <span onclick="setWbColor('#f57b36')" style="width: 20px; height: 20px; border-radius: 50%; background: #f57b36; cursor: pointer;"></span>
+                        <span onclick="setWbColor('#d20005')" style="width: 20px; height: 20px; border-radius: 50%; background: #d20005; cursor: pointer;"></span>
                     </div>
-                    <button class="tool-btn" onclick="clearWhiteboard()" title="Clear Board" style="color: #ef4444;">🗑️</button>
+                    <button class="tool-btn" onclick="clearWhiteboard()" title="Clear Board" style="color: var(--brand-crimson);">🗑️</button>
                     <button class="tool-btn" onclick="exportWhiteboard()" title="Download PNG">💾</button>
-                    <button onclick="closeWhiteboard()" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; margin-left: 10px;">✕</button>
+                    <button onclick="closeWhiteboard()" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; margin-inline-start: 10px;">✕</button>
                 </div>
             </div>
-            <div style="flex: 1; position: relative; background: #0b0f19;" id="wb-container">
+            <div style="flex: 1; position: relative; background: #ffffff;" id="wb-container">
                 <canvas id="wb-canvas" style="width: 100%; height: 100%; cursor: crosshair;"></canvas>
             </div>
         </div>

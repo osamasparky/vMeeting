@@ -56,7 +56,9 @@ class WebAuthController extends Controller
             return redirect()->route('dashboard');
         }
 
-        return view('auth.register');
+        $plans = \App\Domains\Tenancy\Models\Plan::where('is_active', true)->orderBy('price', 'asc')->get();
+
+        return view('auth.register', compact('plans'));
     }
 
     /**
@@ -69,6 +71,8 @@ class WebAuthController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'organization_name' => ['required', 'string', 'max:255'],
+            'plan_id' => ['nullable', 'exists:plans,id'],
+            'plan_slug' => ['nullable', 'string'],
         ]);
 
         // Create user
@@ -78,9 +82,13 @@ class WebAuthController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        // Create organization with user as admin
+        // Create organization with user as admin and assigned plan
         $createOrgAction->execute(
-            ['name' => $validated['organization_name']],
+            [
+                'name' => $validated['organization_name'],
+                'plan_id' => $validated['plan_id'] ?? null,
+                'plan_slug' => $validated['plan_slug'] ?? null,
+            ],
             $user
         );
 
@@ -127,8 +135,36 @@ class WebAuthController extends Controller
         $teams = $organization->teams()->with('department')->get();
         $auditLogs = \App\Domains\Administration\Models\AuditLog::where('organization_id', $organization->id)->latest()->take(20)->get();
         $guestInvitations = \App\Domains\Guests\Models\GuestInvitation::where('organization_id', $organization->id)->with('room')->latest()->take(20)->get();
+        $allPlans = \App\Domains\Tenancy\Models\Plan::where('is_active', true)->orderBy('price', 'asc')->get();
 
-        return view('dashboard', compact('user', 'membership', 'organization', 'stats', 'rooms', 'roles', 'members', 'departments', 'teams', 'auditLogs', 'guestInvitations'));
+        return view('dashboard', compact('user', 'membership', 'organization', 'stats', 'rooms', 'roles', 'members', 'departments', 'teams', 'auditLogs', 'guestInvitations', 'allPlans'));
+    }
+
+    /**
+     * Upgrade / switch company subscription plan from dashboard.
+     */
+    public function upgradePlan(Request $request)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)
+            ->whereIn('status', ['active', 'invited'])
+            ->with('organization')
+            ->first();
+
+        if (!$membership) {
+            return redirect()->route('login');
+        }
+
+        $validated = $request->validate([
+            'plan_id' => ['required', 'exists:plans,id'],
+        ]);
+
+        $organization = $membership->organization;
+        $newPlan = \App\Domains\Tenancy\Models\Plan::findOrFail($validated['plan_id']);
+
+        $organization->update(['plan_id' => $newPlan->id]);
+
+        return back()->with('success', "Subscription successfully upgraded to {$newPlan->name} Plan!");
     }
 
     /**
@@ -259,6 +295,27 @@ class WebAuthController extends Controller
                 'bounds' => ['x' => 22, 'y' => 16, 'width' => 8, 'height' => 6],
             ]);
         }
+
+        if ($organization->departments()->count() === 0) {
+            $eng = \App\Domains\People\Models\Department::create([
+                'organization_id' => $organization->id,
+                'name' => 'Engineering & Technology',
+            ]);
+            \App\Domains\People\Models\Team::create(['organization_id' => $organization->id, 'department_id' => $eng->id, 'name' => 'Frontend Team']);
+            \App\Domains\People\Models\Team::create(['organization_id' => $organization->id, 'department_id' => $eng->id, 'name' => 'Backend & Cloud']);
+
+            $sales = \App\Domains\People\Models\Department::create([
+                'organization_id' => $organization->id,
+                'name' => 'Sales & Business Growth',
+            ]);
+            \App\Domains\People\Models\Team::create(['organization_id' => $organization->id, 'department_id' => $sales->id, 'name' => 'Enterprise Sales']);
+
+            $design = \App\Domains\People\Models\Department::create([
+                'organization_id' => $organization->id,
+                'name' => 'Product & Design',
+            ]);
+            \App\Domains\People\Models\Team::create(['organization_id' => $organization->id, 'department_id' => $design->id, 'name' => 'UI / UX Design']);
+        }
     }
 
 
@@ -329,6 +386,113 @@ class WebAuthController extends Controller
         ];
 
         return view('office', compact('user', 'invitation', 'organization', 'floor', 'map', 'room', 'realtimeToken', 'wsUrl', 'initialSpawn'));
+    }
+
+    /**
+     * Store new Department.
+     */
+    public function storeDepartment(Request $request)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        if (!$membership) abort(403);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        \App\Domains\People\Models\Department::create([
+            'organization_id' => $membership->organization_id,
+            'name' => $validated['name'],
+        ]);
+
+        return back()->with('success', 'Department created successfully.');
+    }
+
+    /**
+     * Update Department.
+     */
+    public function updateDepartment(Request $request, \App\Domains\People\Models\Department $department)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $department->update(['name' => $validated['name']]);
+        return back()->with('success', 'Department updated successfully.');
+    }
+
+    /**
+     * Delete Department.
+     */
+    public function deleteDepartment(\App\Domains\People\Models\Department $department)
+    {
+        $department->teams()->delete();
+        $department->delete();
+        return back()->with('success', 'Department deleted successfully.');
+    }
+
+    /**
+     * Store new Team in Department.
+     */
+    public function storeTeam(Request $request)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        if (!$membership) abort(403);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'department_id' => 'required|exists:departments,id',
+        ]);
+
+        \App\Domains\People\Models\Team::create([
+            'organization_id' => $membership->organization_id,
+            'department_id' => $validated['department_id'],
+            'name' => $validated['name'],
+        ]);
+
+        return back()->with('success', 'Team created successfully.');
+    }
+
+    /**
+     * Delete Team.
+     */
+    public function deleteTeam(\App\Domains\People\Models\Team $team)
+    {
+        $team->delete();
+        return back()->with('success', 'Team deleted successfully.');
+    }
+
+    /**
+     * Assign member to department, team, role, and job title.
+     */
+    public function assignMemberDepartment(Request $request, OrganizationMember $member)
+    {
+        $validated = $request->validate([
+            'department_id' => 'nullable|exists:departments,id',
+            'team_id' => 'nullable|exists:teams,id',
+            'role_id' => 'nullable|exists:roles,id',
+            'job_title' => 'nullable|string|max:255',
+        ]);
+
+        if (!empty($validated['role_id'])) {
+            $member->update(['role_id' => $validated['role_id']]);
+        }
+
+        $profile = \App\Domains\People\Models\UserProfile::firstOrNew([
+            'user_id' => $member->user_id,
+            'organization_id' => $member->organization_id,
+        ]);
+
+        $profile->department_id = $validated['department_id'] ?? null;
+        $profile->team_id = $validated['team_id'] ?? null;
+        if (isset($validated['job_title'])) {
+            $profile->job_title = $validated['job_title'];
+        }
+        $profile->save();
+
+        return back()->with('success', 'Member department assignment updated.');
     }
 
     /**

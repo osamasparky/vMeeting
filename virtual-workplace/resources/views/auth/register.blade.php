@@ -1,24 +1,32 @@
 @extends('layouts.auth')
 
-@section('title', 'Register — Virtual Workplace')
+@section('title', __('Register') . ' — Virtual Workplace')
 
 @section('content')
+<div style="position: absolute; top: 20px; inset-inline-end: 24px; z-index: 10;">
+    @if(app()->getLocale() === 'ar')
+        <a href="{{ route('lang.switch', 'en') }}" class="lang-switch-btn" style="background: #ffffff; border: 1px solid var(--border-color); color: var(--brand-navy); padding: 7px 14px; border-radius: 8px; font-size: 13px; text-decoration: none; font-weight: 800; box-shadow: var(--shadow-input);">🌐 English</a>
+    @else
+        <a href="{{ route('lang.switch', 'ar') }}" class="lang-switch-btn" style="background: #ffffff; border: 1px solid var(--border-color); color: var(--brand-navy); padding: 7px 14px; border-radius: 8px; font-size: 13px; text-decoration: none; font-weight: 800; box-shadow: var(--shadow-input);">🌐 العربية</a>
+    @endif
+</div>
+
 <div class="auth-wrapper">
     <!-- Left: Register Form -->
-    <div class="auth-left">
-        <div class="auth-card">
+    <div class="auth-left" style="max-width: 620px; margin: 0 auto; width: 100%;">
+        <div class="auth-card" style="max-width: 580px;">
             <div class="auth-logo">
                 <div class="logo-icon">🏢</div>
-                <span class="logo-text">Virtual Workplace</span>
+                <span class="logo-text">{{ __('Virtual Workplace') }}</span>
             </div>
 
-            <h1 class="auth-title">Create your account</h1>
-            <p class="auth-subtitle">Join the future of remote work — set up your virtual office in minutes</p>
+            <h1 class="auth-title">{{ __('Create your account') }}</h1>
+            <p class="auth-subtitle">{{ __('Join the future of remote work — set up your virtual office in minutes') }}</p>
 
             @if($errors->any())
                 <div class="alert alert-error">
                     <span>⚠️</span>
-                    <ul class="error-list">
+                    <ul style="list-style: none; padding: 0;">
                         @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
@@ -30,14 +38,14 @@
                 @csrf
 
                 <div class="form-group">
-                    <label class="form-label" for="name">Full Name</label>
+                    <label class="form-label" for="name">{{ __('Full Name') }}</label>
                     <div class="form-input-wrapper">
                         <input
                             type="text"
                             id="name"
                             name="name"
                             class="form-input"
-                            placeholder="Enter your full name"
+                            placeholder="{{ __('Enter your full name') }}"
                             value="{{ old('name') }}"
                             required
                             autocomplete="name"
@@ -47,7 +55,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="email">Email Address</label>
+                    <label class="form-label" for="email">{{ __('Email Address') }}</label>
                     <div class="form-input-wrapper">
                         <input
                             type="email"
@@ -63,50 +71,51 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="password">Password</label>
-                    <div class="form-input-wrapper">
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            class="form-input"
-                            placeholder="Create a strong password"
-                            required
-                            minlength="8"
-                            autocomplete="new-password"
-                        >
-                        <span class="form-input-icon">🔒</span>
-                        <button type="button" class="password-toggle" onclick="togglePassword('password', this)">👁️</button>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                    <div class="form-group">
+                        <label class="form-label" for="password">{{ __('Password') }}</label>
+                        <div class="form-input-wrapper">
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                class="form-input"
+                                placeholder="{{ __('Create password') }}"
+                                required
+                                minlength="8"
+                                autocomplete="new-password"
+                            >
+                            <span class="form-input-icon">🔒</span>
+                            <button type="button" class="password-toggle" onclick="togglePassword('password', this)">👁️</button>
+                        </div>
                     </div>
-                    <div class="password-strength" id="passwordStrength"></div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="password_confirmation">{{ __('Confirm Password') }}</label>
+                        <div class="form-input-wrapper">
+                            <input
+                                type="password"
+                                id="password_confirmation"
+                                name="password_confirmation"
+                                class="form-input"
+                                placeholder="{{ __('Confirm password') }}"
+                                required
+                                autocomplete="new-password"
+                            >
+                            <span class="form-input-icon">🔒</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="password_confirmation">Confirm Password</label>
-                    <div class="form-input-wrapper">
-                        <input
-                            type="password"
-                            id="password_confirmation"
-                            name="password_confirmation"
-                            class="form-input"
-                            placeholder="Confirm your password"
-                            required
-                            autocomplete="new-password"
-                        >
-                        <span class="form-input-icon">🔒</span>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label" for="organization_name">Organization Name</label>
+                    <label class="form-label" for="organization_name">{{ __('Company Name') }}</label>
                     <div class="form-input-wrapper">
                         <input
                             type="text"
                             id="organization_name"
                             name="organization_name"
                             class="form-input"
-                            placeholder="Your company or team name"
+                            placeholder="{{ __('Your company or team name') }}"
                             value="{{ old('organization_name') }}"
                             required
                         >
@@ -114,57 +123,38 @@
                     </div>
                 </div>
 
+                <!-- Choose Subscription Plan (Seats) -->
+                <div class="form-group" style="margin-top: 20px; margin-bottom: 24px;">
+                    <label class="form-label">{{ __('Choose Subscription Plan') }}</label>
+                    <input type="hidden" name="plan_id" id="selectedPlanId" value="{{ $plans->first()?->id }}">
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
+                        @foreach($plans as $index => $plan)
+                        <div
+                            class="plan-card-opt {{ $index === 0 ? 'selected' : '' }}"
+                            onclick="selectPlan('{{ $plan->id }}', this)"
+                            style="border: 2px solid var(--border-color); background: #f8fafc; border-radius: 12px; padding: 12px; cursor: pointer; transition: all 0.2s;"
+                        >
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                <strong style="font-size: 13px; color: var(--brand-navy);">💎 {{ $plan->name }}</strong>
+                                <span style="font-size: 11px; font-weight: 800; color: var(--brand-green);">${{ number_format($plan->price, 0) }}/mo</span>
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">
+                                👥 <strong>{{ $plan->seat_limit === 0 ? __('Unlimited') : $plan->seat_limit }}</strong> {{ __('Seats') }}
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+
                 <button type="submit" class="btn btn-primary" id="registerBtn" style="margin-top: 8px;">
-                    <span class="btn-text">Create Account & Organization</span>
+                    <span class="btn-text">{{ __('Create Account') }}</span>
                     <div class="spinner"></div>
                 </button>
             </form>
 
             <div class="auth-footer">
-                Already have an account? <a href="{{ route('login') }}">Sign in</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Right: Branding Panel -->
-    <div class="auth-right">
-        <div class="brand-panel">
-            <div class="brand-illustration">
-                <div class="orbit">
-                    <div class="orbit-dot" style="top: 0; left: 50%; transform: translate(-50%, -50%);"></div>
-                </div>
-                <div class="orbit">
-                    <div class="orbit-dot" style="bottom: 0; left: 50%; transform: translate(-50%, 50%);"></div>
-                </div>
-                <div class="orbit">
-                    <div class="orbit-dot" style="top: 50%; right: 0; transform: translate(50%, -50%);"></div>
-                </div>
-                <div class="center-icon">🚀</div>
-            </div>
-
-            <h2 class="brand-title">Start Your Virtual Office</h2>
-            <p class="brand-description">
-                Create your workspace, invite your team, and transform the way you
-                collaborate — all from your browser.
-            </p>
-
-            <div class="brand-features">
-                <div class="brand-feature">
-                    <div class="brand-feature-icon">⚡</div>
-                    <span class="brand-feature-text">Instant Setup</span>
-                </div>
-                <div class="brand-feature">
-                    <div class="brand-feature-icon">👥</div>
-                    <span class="brand-feature-text">Team Ready</span>
-                </div>
-                <div class="brand-feature">
-                    <div class="brand-feature-icon">🔒</div>
-                    <span class="brand-feature-text">Secure</span>
-                </div>
-                <div class="brand-feature">
-                    <div class="brand-feature-icon">🆓</div>
-                    <span class="brand-feature-text">Free Plan</span>
-                </div>
+                {{ __('Already have an account?') }} <a href="{{ route('login') }}">{{ __('Sign in') }}</a>
             </div>
         </div>
     </div>
@@ -173,16 +163,11 @@
 
 @section('styles')
 <style>
-    .password-strength {
-        height: 3px;
-        border-radius: 2px;
-        margin-top: 8px;
-        transition: all 0.3s;
-        background: var(--border-color);
+    .plan-card-opt.selected {
+        border-color: var(--brand-teal) !important;
+        background: rgba(0, 180, 179, 0.08) !important;
+        box-shadow: 0 4px 12px rgba(0, 180, 179, 0.2);
     }
-    .password-strength.weak { background: linear-gradient(90deg, var(--error) 33%, transparent 33%); }
-    .password-strength.medium { background: linear-gradient(90deg, var(--warning) 66%, transparent 66%); }
-    .password-strength.strong { background: var(--success); }
 </style>
 @endsection
 
@@ -199,27 +184,10 @@
         }
     }
 
-    // Password strength indicator
-    document.getElementById('password').addEventListener('input', function() {
-        const bar = document.getElementById('passwordStrength');
-        const val = this.value;
-        bar.className = 'password-strength';
-
-        if (val.length === 0) {
-            bar.className = 'password-strength';
-        } else if (val.length < 6) {
-            bar.classList.add('weak');
-        } else if (val.length < 10 || !/[A-Z]/.test(val) || !/[0-9]/.test(val)) {
-            bar.classList.add('medium');
-        } else {
-            bar.classList.add('strong');
-        }
-    });
-
-    document.getElementById('registerForm').addEventListener('submit', function() {
-        const btn = document.getElementById('registerBtn');
-        btn.classList.add('btn-loading');
-        btn.disabled = true;
-    });
+    function selectPlan(planId, element) {
+        document.getElementById('selectedPlanId').value = planId;
+        document.querySelectorAll('.plan-card-opt').forEach(el => el.classList.remove('selected'));
+        element.classList.add('selected');
+    }
 </script>
 @endsection

@@ -1,32 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Map Editor & Floor Designer — {{ $organization->name }}</title>
+    <title>{{ __('Map Editor') }} & {{ __('Floor Designer') }} — {{ $organization->name }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #070913;
-            --bg-panel: rgba(15, 23, 42, 0.94);
-            --border-panel: rgba(255, 255, 255, 0.08);
-            --accent: #6366f1;
-            --accent-hover: #4f46e5;
-            --accent-glow: rgba(99, 102, 241, 0.35);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
+            /* Clean White & Saudi Brand Theme */
+            --bg-body: #f8fafc;
+            --bg-panel: #ffffff;
+            --bg-card: #f8fafc;
+            --border-panel: #e2e8f0;
+            --border-hover: #cbd5e1;
+
+            /* Saudi Brand Colors from color.webp */
+            --brand-teal: #00b4b3;
+            --brand-pine: #00726c;
+            --brand-ocean: #004862;
+            --brand-navy: #012c41;
+            --brand-green: #006847;
+            --brand-lime: #a7c545;
+            --brand-gold: #ffd136;
+            --brand-orange: #f57b36;
+            --brand-coral: #ff3600;
+            --brand-crimson: #d20005;
+
+            --text-main: #012c41;
+            --text-muted: #64748b;
+            --text-dim: #94a3b8;
+
+            --font-family: {{ app()->getLocale() === 'ar' ? "'Cairo', 'Inter', sans-serif" : "'Inter', 'Cairo', sans-serif" }};
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-family); }
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-dark);
+            background: var(--bg-body);
             color: var(--text-main);
             height: 100vh;
             overflow: hidden;
@@ -37,7 +49,7 @@
 
         /* ── Top Bar ── */
         .editor-header {
-            height: 60px;
+            height: 62px;
             background: var(--bg-panel);
             border-bottom: 1px solid var(--border-panel);
             display: flex;
@@ -45,30 +57,33 @@
             justify-content: space-between;
             padding: 0 20px;
             z-index: 50;
+            box-shadow: 0 2px 10px rgba(1, 44, 65, 0.04);
         }
 
         .header-left {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
         }
 
         .back-btn {
-            background: rgba(255, 255, 255, 0.06);
+            background: #f8fafc;
             border: 1px solid var(--border-panel);
-            color: var(--text-main);
-            padding: 6px 12px;
-            border-radius: 8px;
+            color: var(--brand-navy);
+            padding: 7px 14px;
+            border-radius: 10px;
             font-size: 13px;
+            font-weight: 700;
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 6px;
             transition: all 0.2s;
         }
-
         .back-btn:hover {
-            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--brand-teal);
+            background: #ffffff;
+            color: var(--brand-teal);
         }
 
         .map-title-group {
@@ -79,55 +94,54 @@
 
         .map-name {
             font-size: 16px;
-            font-weight: 700;
+            font-weight: 900;
+            color: var(--brand-navy);
             letter-spacing: -0.3px;
         }
 
         .version-badge {
-            background: rgba(99, 102, 241, 0.15);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            color: #a5b4fc;
-            padding: 3px 8px;
+            background: rgba(0, 180, 179, 0.1);
+            border: 1px solid rgba(0, 180, 179, 0.3);
+            color: var(--brand-teal);
+            padding: 3px 10px;
             border-radius: 6px;
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 800;
         }
 
         .header-center {
             display: flex;
             align-items: center;
-            gap: 8px;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 4px 8px;
-            border-radius: 10px;
+            gap: 6px;
+            background: #f8fafc;
+            padding: 4px 6px;
+            border-radius: 12px;
             border: 1px solid var(--border-panel);
         }
 
         .tool-chip {
-            background: none;
+            background: transparent;
             border: 1px solid transparent;
             color: var(--text-muted);
-            padding: 6px 12px;
+            padding: 6px 14px;
             border-radius: 8px;
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 6px;
-            transition: all 0.2s;
+            transition: all 0.18s;
         }
-
         .tool-chip:hover {
-            color: var(--text-main);
-            background: rgba(255, 255, 255, 0.05);
+            color: var(--brand-navy);
+            background: #ffffff;
         }
-
         .tool-chip.active {
-            background: var(--accent);
+            background: var(--brand-teal);
             color: white;
-            border-color: var(--accent);
-            box-shadow: 0 0 12px var(--accent-glow);
+            border-color: var(--brand-teal);
+            box-shadow: 0 2px 8px rgba(0, 180, 179, 0.3);
         }
 
         .header-right {
@@ -136,11 +150,30 @@
             gap: 10px;
         }
 
+        .btn-lang-toggle {
+            background: #f8fafc;
+            border: 1px solid var(--border-panel);
+            color: var(--brand-navy);
+            padding: 7px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 800;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .btn-lang-toggle:hover {
+            border-color: var(--brand-teal);
+            color: var(--brand-teal);
+        }
+
         .action-btn {
-            padding: 7px 14px;
-            border-radius: 8px;
+            padding: 8px 16px;
+            border-radius: 10px;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 800;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -151,36 +184,34 @@
         }
 
         .action-btn.secondary {
-            background: rgba(255, 255, 255, 0.06);
+            background: #ffffff;
             border: 1px solid var(--border-panel);
-            color: var(--text-main);
+            color: var(--brand-navy);
         }
-
         .action-btn.secondary:hover {
-            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--brand-teal);
+            background: #f8fafc;
         }
 
         .action-btn.primary {
-            background: var(--accent);
+            background: var(--brand-teal);
             color: white;
-            box-shadow: 0 0 14px var(--accent-glow);
+            box-shadow: 0 4px 12px rgba(0, 180, 179, 0.3);
         }
-
         .action-btn.primary:hover {
-            background: var(--accent-hover);
+            background: var(--brand-pine);
         }
 
         .action-btn.success {
-            background: var(--success);
+            background: linear-gradient(135deg, var(--brand-green), #004d34);
             color: white;
-            box-shadow: 0 0 14px rgba(16, 185, 129, 0.35);
+            box-shadow: 0 4px 12px rgba(0, 104, 71, 0.25);
         }
-
         .action-btn.success:hover {
-            background: #059669;
+            opacity: 0.95;
         }
 
-        /* ── Main Layout ── */
+        /* ── Main Workspace ── */
         .editor-workspace {
             flex: 1;
             display: flex;
@@ -188,73 +219,11 @@
             overflow: hidden;
         }
 
-        /* ── Left Palette ── */
-        .palette-sidebar {
-            width: 280px;
-            background: var(--bg-panel);
-            border-right: 1px solid var(--border-panel);
-            display: flex;
-            flex-direction: column;
-            padding: 16px;
-            gap: 18px;
-            overflow-y: auto;
-            z-index: 40;
-        }
-
-        .palette-section-title {
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-        }
-
-        .objects-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-        }
-
-        .object-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border-panel);
-            border-radius: 10px;
-            padding: 10px 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 11px;
-            color: var(--text-muted);
-            text-align: center;
-        }
-
-        .object-card:hover {
-            background: rgba(99, 102, 241, 0.12);
-            border-color: rgba(99, 102, 241, 0.35);
-            color: var(--text-main);
-            transform: translateY(-2px);
-        }
-
-        .object-card.active {
-            background: rgba(99, 102, 241, 0.25);
-            border-color: var(--accent);
-            color: white;
-            box-shadow: 0 0 12px var(--accent-glow);
-        }
-
-        .object-card-icon {
-            font-size: 22px;
-        }
-
-        /* ── Center Canvas Viewport ── */
+        /* ── Canvas Viewport ── */
         .canvas-container {
             flex: 1;
             position: relative;
-            background: radial-gradient(circle at center, #0f172a 0%, #030712 100%);
+            background: #edf2f7;
             overflow: hidden;
             cursor: crosshair;
         }
@@ -265,94 +234,311 @@
             height: 100%;
         }
 
-        /* ── Right Properties Inspector ── */
-        .inspector-sidebar {
-            width: 290px;
-            background: var(--bg-panel);
-            border-left: 1px solid var(--border-panel);
+        /* ── Floating Canvas View Controls (Zoom, Reset, Center) ── */
+        .canvas-view-tools {
+            position: absolute;
+            top: 20px;
+            inset-inline-start: 20px;
+            background: #ffffff;
+            border: 1px solid var(--border-panel);
+            border-radius: 12px;
             display: flex;
             flex-direction: column;
-            padding: 18px;
-            gap: 16px;
-            z-index: 40;
-            overflow-y: auto;
+            gap: 4px;
+            padding: 6px;
+            z-index: 45;
+            box-shadow: 0 10px 25px rgba(1, 44, 65, 0.08);
+        }
+        .canvas-tool-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 15px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .canvas-tool-btn:hover {
+            background: #f1f5f9;
+            color: var(--brand-navy);
         }
 
-        .inspector-title {
-            font-size: 14px;
-            font-weight: 700;
+        /* ── Kumospace-Style Right Customizer Drawer ── */
+        .customize-drawer {
+            width: 340px;
+            background: var(--bg-panel);
+            border-inline-start: 1px solid var(--border-panel);
+            display: flex;
+            flex-direction: column;
+            z-index: 40;
+            box-shadow: -4px 0 20px rgba(1, 44, 65, 0.05);
+            transition: transform 0.25s ease;
+        }
+        .customize-drawer.collapsed {
+            transform: translateX({{ app()->getLocale() === 'ar' ? '-340px' : '340px' }});
+            margin-inline-end: -340px;
+        }
+
+        .drawer-header {
+            padding: 16px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            border-bottom: 1px solid var(--border-panel);
+            background: #ffffff;
+        }
+        .drawer-title-dropdown {
+            font-size: 15px;
+            font-weight: 900;
+            color: var(--brand-navy);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+        .drawer-close-btn {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .drawer-close-btn:hover {
+            background: #f1f5f9;
+            color: var(--brand-navy);
         }
 
-        .prop-group {
+        /* ── Sub Navigation Tabs (Furniture / Rooms / Settings) ── */
+        .drawer-tabs {
+            display: flex;
+            padding: 0 16px;
+            border-bottom: 1px solid var(--border-panel);
+            background: #ffffff;
+            gap: 20px;
+        }
+        .drawer-tab {
+            padding: 12px 4px;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-muted);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+        .drawer-tab:hover {
+            color: var(--brand-navy);
+        }
+        .drawer-tab.active {
+            color: var(--brand-teal);
+            border-bottom: 2px solid var(--brand-teal);
+        }
+
+        .drawer-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 16px;
         }
 
-        .prop-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        /* ── Search Furniture Input ── */
+        .search-box-wrapper {
+            position: relative;
+            width: 100%;
         }
-
-        .prop-input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-panel);
-            border-radius: 8px;
-            padding: 8px 12px;
-            color: var(--text-main);
-            font-size: 13px;
-            outline: none;
-        }
-
-        .prop-input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 8px var(--accent-glow);
-        }
-
-        .stats-box {
-            background: rgba(255, 255, 255, 0.02);
+        .search-input {
+            width: 100%;
+            background: #f8fafc;
             border: 1px solid var(--border-panel);
             border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--brand-navy);
+            outline: none;
+            transition: all 0.2s;
+        }
+        .search-input:focus {
+            border-color: var(--brand-teal);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(0, 180, 179, 0.12);
+        }
+
+        /* ── Accordion Category Section ── */
+        .category-accordion {
+            border: 1px solid var(--border-panel);
+            border-radius: 12px;
+            overflow: hidden;
+            background: #ffffff;
+        }
+        .category-header {
+            padding: 12px 14px;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--brand-navy);
+            user-select: none;
+        }
+        .category-header:hover {
+            background: #f1f5f9;
+        }
+        .category-body {
             padding: 12px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        /* ── 2-Column Furniture Cards (Matching Kumospace Reference) ── */
+        .furn-card {
+            background: #ffffff;
+            border: 1px solid var(--border-panel);
+            border-radius: 12px;
+            padding: 12px 8px 10px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            font-size: 12px;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
         }
-
-        .stat-row {
+        .furn-card:hover {
+            border-color: var(--brand-teal);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 180, 179, 0.12);
+        }
+        .furn-card.active {
+            border-color: var(--brand-teal);
+            background: rgba(0, 180, 179, 0.04);
+            box-shadow: 0 0 0 2px var(--brand-teal);
+        }
+        .furn-preview-icon {
+            font-size: 28px;
+            margin-bottom: 6px;
             display: flex;
-            justify-content: space-between;
-            color: var(--text-muted);
+            align-items: center;
+            justify-content: center;
+            height: 38px;
+        }
+        .furn-name {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--brand-navy);
+            margin-bottom: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+        .color-swatches {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .swatch-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+        .swatch-dot:hover {
+            transform: scale(1.3);
         }
 
-        .stat-row strong {
-            color: var(--text-main);
+        /* ── Room Template Cards ── */
+        .room-card {
+            background: #ffffff;
+            border: 1px solid var(--border-panel);
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .room-card:hover {
+            border-color: var(--brand-teal);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 180, 179, 0.1);
+        }
+        .room-card.active {
+            border-color: var(--brand-teal);
+            background: rgba(0, 180, 179, 0.05);
+            box-shadow: 0 0 0 2px var(--brand-teal);
         }
 
-        /* ── Notifications Toast ── */
+        /* ── Selected Item Properties Panel ── */
+        .properties-box {
+            background: #ffffff;
+            border: 1px solid var(--border-panel);
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .prop-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .prop-label {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--brand-ocean);
+            text-transform: uppercase;
+        }
+        .prop-input {
+            width: 100%;
+            background: #f8fafc;
+            border: 1px solid var(--border-panel);
+            border-radius: 8px;
+            padding: 8px 10px;
+            color: var(--brand-navy);
+            font-size: 12px;
+            font-weight: 600;
+            outline: none;
+        }
+        .prop-input:focus {
+            border-color: var(--brand-teal);
+        }
+
+        /* ── Notification Toast ── */
         .toast {
             position: fixed;
             bottom: 24px;
-            right: 24px;
-            background: rgba(16, 185, 129, 0.95);
+            inset-inline-start: 24px;
+            background: var(--brand-green);
             color: white;
-            padding: 12px 20px;
+            padding: 12px 22px;
             border-radius: 12px;
             font-size: 13px;
-            font-weight: 600;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            font-weight: 800;
+            box-shadow: 0 10px 25px -5px rgba(0, 104, 71, 0.4);
             display: none;
             z-index: 1000;
             animation: slideUp 0.3s ease;
         }
-
         @keyframes slideUp {
             from { transform: translateY(20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
@@ -364,37 +550,49 @@
     <!-- Header -->
     <header class="editor-header">
         <div class="header-left">
-            <a href="{{ route('dashboard') }}" class="back-btn">← Dashboard</a>
+            <a href="{{ route('dashboard') }}" class="back-btn">
+                <span>←</span>
+                <span>{{ __('Dashboard') }}</span>
+            </a>
             <div class="map-title-group">
-                <div class="map-name">{{ $map->name }}</div>
+                <div class="map-name">{{ __('Map Editor') }}: {{ $map->name }} <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);">({{ $organization->name }})</span></div>
                 <span class="version-badge" id="header-version-badge">v{{ $map->version }} ({{ ucfirst($map->status) }})</span>
             </div>
         </div>
 
         <div class="header-center">
             <button class="tool-chip active" id="tool-select" onclick="setTool('select')">
-                <span>🖱️</span> Select
+                <span>🖱️</span> {{ __('Select') }}
             </button>
             <button class="tool-chip" id="tool-room" onclick="setTool('room')">
-                <span>🏢</span> Add Room
+                <span>🏢</span> {{ __('Add Room') }}
             </button>
             <button class="tool-chip" id="tool-zone" onclick="setTool('zone')">
-                <span>🎙️</span> Audio Zone
+                <span>🎙️</span> {{ __('Audio Zone') }}
             </button>
             <button class="tool-chip" id="tool-object" onclick="setTool('object')">
-                <span>🪑</span> Furniture
+                <span>🪑</span> {{ __('Furniture') }}
+            </button>
+            <button class="tool-chip" id="btn-delete-selected" onclick="deleteSelectedItem()" style="color: var(--brand-crimson);">
+                <span>🗑️</span> {{ __('Delete') }}
             </button>
         </div>
 
         <div class="header-right">
+            @if(app()->getLocale() === 'ar')
+                <a href="{{ route('lang.switch', 'en') }}" class="btn-lang-toggle" title="Switch to English">🌐 English</a>
+            @else
+                <a href="{{ route('lang.switch', 'ar') }}" class="btn-lang-toggle" title="التبديل إلى العربية">🌐 العربية</a>
+            @endif
+
             <button class="action-btn secondary" id="btn-save-draft" onclick="saveMapDraft()">
-                <span>💾</span> Save Draft
+                <span>💾</span> {{ __('Save Draft') }}
             </button>
             <button class="action-btn success" id="btn-publish" onclick="publishMap()">
-                <span>🚀</span> Publish Map
+                <span>🚀</span> {{ __('Publish Map') }}
             </button>
             <a href="{{ route('office') }}" class="action-btn primary" target="_blank">
-                <span>👁️</span> Test Live
+                <span>👁️</span> {{ __('Test Live') }}
             </a>
         </div>
     </header>
@@ -402,170 +600,268 @@
     <!-- Main Workspace -->
     <div class="editor-workspace">
 
-        <!-- Left Palette -->
-        <aside class="palette-sidebar">
-            <div>
-                <div class="palette-section-title">Room Templates</div>
-                <div class="objects-grid">
-                    <div class="object-card active" onclick="setRoomType('meeting', '#6366F1')">
-                        <div class="object-card-icon">👥</div>
-                        <span>Meeting Room</span>
-                    </div>
-                    <div class="object-card" onclick="setRoomType('private', '#F59E0B')">
-                        <div class="object-card-icon">🔒</div>
-                        <span>Private Office</span>
-                    </div>
-                    <div class="object-card" onclick="setRoomType('reception', '#10B981')">
-                        <div class="object-card-icon">🛎️</div>
-                        <span>Reception</span>
-                    </div>
-                    <div class="object-card" onclick="setRoomType('lounge', '#EC4899')">
-                        <div class="object-card-icon">☕</div>
-                        <span>Team Lounge</span>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <div class="palette-section-title">Office Furniture & Items (16 Items)</div>
-                <div class="objects-grid">
-                    <div class="object-card" onclick="selectObjectType('desk')">
-                        <div class="object-card-icon">💻</div>
-                        <span>Workstation</span>
-                    </div>
-                    <div class="object-card" onclick="selectObjectType('executive_desk')">
-                        <div class="object-card-icon">🖥️</div>
-                        <span>Exec Desk</span>
-                    </div>
-                    <div class="object-card" onclick="selectObjectType('chair')">
-                        <div class="object-card-icon">🪑</div>
-                        <span>Ergo Chair</span>
-                    </div>
-                    <div class="object-card" onclick="selectObjectType('sofa')">
-                        <div class="object-card-icon">🛋️</div>
-                        <span>Lounge Sofa</span>
-                    </div>
-                    <div class="object-card" onclick="selectObjectType('coffee_bar')">
-                        <div class="object-card-icon">☕</div>
-                        <span>Coffee Bar</span>
-                    </div>
-                    <div class="object-card" onclick="selectObjectType('whiteboard')">
-                        <div class="object-card-icon">📋</div>
-                        <span>Whiteboard</span>
-                    </div>
-                    <div class="object-card" onclick="selectObjectType('screen')">
-                        <div class="object-card-icon">📺</div>
-                        <span>AV Screen</span>
-                    </div>
-                    <div class="object-card" onclick="selectObjectType('plant')">
-                        <div class="object-card-icon">🪴</div>
-                        <span>Plant</span>
-                    </div>
-                    <div class="object-card" onclick="selectObjectType('wall')">
-                        <div class="object-card-icon">🧱</div>
-                        <span>Glass Wall</span>
-                    </div>
-                    <div class="object-card" onclick="selectObjectType('door')">
-                        <div class="object-card-icon">🚪</div>
-                        <span>Door</span>
-                    </div>
-                    <div class="object-card" onclick="selectObjectType('pingpong')">
-                        <div class="object-card-icon">🏓</div>
-                        <span>Ping Pong</span>
-                    </div>
-                    <div class="object-card" onclick="selectObjectType('water_cooler')">
-                        <div class="object-card-icon">🚰</div>
-                        <span>Water Cooler</span>
-                    </div>
-                    <div class="object-card" onclick="selectObjectType('bookshelf')">
-                        <div class="object-card-icon">📚</div>
-                        <span>Bookshelf</span>
-                    </div>
-                    <div class="object-card" onclick="selectObjectType('cabinet')">
-                        <div class="object-card-icon">🗄️</div>
-                        <span>Cabinet</span>
-                    </div>
-                    <div class="object-card" onclick="selectObjectType('dining_table')">
-                        <div class="object-card-icon">🍽️</div>
-                        <span>Dining Table</span>
-                    </div>
-                    <div class="object-card" onclick="selectObjectType('lamp')">
-                        <div class="object-card-icon">💡</div>
-                        <span>Floor Lamp</span>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <div class="palette-section-title">Selected Action</div>
-                <button class="action-btn secondary" id="btn-delete-selected" style="width: 100%; justify-content: center; color: var(--danger); border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.08);" onclick="deleteSelectedItem()">
-                    <span>🗑️</span> Delete Selected
-                </button>
-                <div style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 6px;">
-                    Or press <strong style="color: #cbd5e1;">Delete / Backspace</strong>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Center Canvas -->
+        <!-- Canvas Viewport -->
         <div class="canvas-container" id="canvas-container">
             <canvas id="editor-canvas"></canvas>
+
+            <!-- Floating Canvas View Controls (Kumospace Style) -->
+            <div class="canvas-view-tools">
+                <button class="canvas-tool-btn" onclick="toggleCustomizeDrawer()" title="{{ __('Toggle Customize Drawer') }}">🪑</button>
+                <button class="canvas-tool-btn" onclick="zoomIn()" title="{{ __('Zoom In') }}">➕</button>
+                <button class="canvas-tool-btn" onclick="zoomOut()" title="{{ __('Zoom Out') }}">➖</button>
+                <button class="canvas-tool-btn" onclick="resetView()" title="{{ __('Reset View') }}">🏠</button>
+                <button class="canvas-tool-btn" onclick="toggleGrid()" title="{{ __('Toggle Grid') }}">🔲</button>
+            </div>
         </div>
 
-        <!-- Right Properties Inspector -->
-        <aside class="inspector-sidebar">
-            <div class="inspector-title">
-                <span>Properties</span>
-                <span id="selection-type-badge" style="font-size: 11px; color: var(--text-muted); background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px;">FLOOR</span>
+        <!-- Kumospace-Style Right Customizer Drawer -->
+        <aside class="customize-drawer" id="customize-drawer">
+            <div class="drawer-header">
+                <div class="drawer-title-dropdown">
+                    <span>✨</span>
+                    <span>{{ __('Customize') }} ▾</span>
+                </div>
+                <button class="drawer-close-btn" onclick="toggleCustomizeDrawer()" title="{{ __('Close') }}">✕</button>
             </div>
 
-            <div id="inspector-form" style="display: flex; flex-direction: column; gap: 14px;">
-                <div class="prop-group">
-                    <label class="prop-label">Name / Label</label>
-                    <input type="text" class="prop-input" id="prop-name" value="{{ $map->name }}" oninput="updateSelectedProp('name', this.value)">
+            <!-- Sub Navigation Tabs -->
+            <div class="drawer-tabs">
+                <div class="drawer-tab active" id="tab-btn-furniture" onclick="switchDrawerTab('furniture')">
+                    {{ __('Furniture') }}
                 </div>
-
-                <div class="prop-group" id="prop-color-group">
-                    <label class="prop-label">Theme Color</label>
-                    <input type="color" class="prop-input" id="prop-color" value="#6366F1" style="height: 38px; padding: 2px;" oninput="updateSelectedProp('color', this.value)">
+                <div class="drawer-tab" id="tab-btn-rooms" onclick="switchDrawerTab('rooms')">
+                    {{ __('Rooms') }}
                 </div>
-
-                <div class="prop-group" id="prop-capacity-group">
-                    <label class="prop-label">Seat Capacity</label>
-                    <input type="number" class="prop-input" id="prop-capacity" value="10" min="1" max="100" oninput="updateSelectedProp('capacity', parseInt(this.value) || 1)">
-                </div>
-            </div>
-
-            <div class="palette-section-title" style="margin-top: 10px;">Floor Statistics</div>
-            <div class="stats-box">
-                <div class="stat-row">
-                    <span>Grid Size:</span>
-                    <strong>32 × 24 (32px)</strong>
-                </div>
-                <div class="stat-row">
-                    <span>Total Rooms:</span>
-                    <strong id="stat-rooms-count">0</strong>
-                </div>
-                <div class="stat-row">
-                    <span>Audio Zones:</span>
-                    <strong id="stat-zones-count">0</strong>
-                </div>
-                <div class="stat-row">
-                    <span>Objects Placed:</span>
-                    <strong id="stat-objects-count">0</strong>
+                <div class="drawer-tab" id="tab-btn-settings" onclick="switchDrawerTab('settings')">
+                    {{ __('Settings') }}
                 </div>
             </div>
 
-            <div class="palette-section-title" style="margin-top: 10px;">Version Snapshots</div>
-            <div class="stats-box" id="snapshots-list" style="gap: 6px;">
-                @forelse($map->versions as $ver)
-                    <div class="stat-row">
-                        <span>v{{ $ver->version }} Snapshot</span>
-                        <span>{{ $ver->created_at->format('M d, H:i') }}</span>
+            <div class="drawer-content">
+
+                <!-- 1. FURNITURE TAB -->
+                <div id="drawer-view-furniture" style="display: flex; flex-direction: column; gap: 14px;">
+                    <!-- Search Input -->
+                    <div class="search-box-wrapper">
+                        <input type="text" id="furniture-search" class="search-input" placeholder="🔍 {{ __('Search furniture, seating, tables...') }}" oninput="filterFurniture(this.value)">
                     </div>
-                @empty
-                    <div style="color: var(--text-muted); font-size: 11px;">No previous snapshots yet.</div>
-                @endforelse
+
+                    <!-- Category 1: Seating -->
+                    <div class="category-accordion" id="cat-seating">
+                        <div class="category-header" onclick="toggleAccordion('cat-seating')">
+                            <span>🪑 {{ __('Seating & Sofas') }}</span>
+                            <span class="acc-icon">▴</span>
+                        </div>
+                        <div class="category-body">
+                            <div class="furn-card" onclick="selectFurnitureItem('chair', '#00b4b3')">
+                                <div class="furn-preview-icon">🪑</div>
+                                <div class="furn-name">{{ __('Ergo Chair') }}</div>
+                                <div class="color-swatches">
+                                    <span class="swatch-dot" style="background: #00b4b3;" onclick="event.stopPropagation(); selectFurnitureItem('chair', '#00b4b3')"></span>
+                                    <span class="swatch-dot" style="background: #006847;" onclick="event.stopPropagation(); selectFurnitureItem('chair', '#006847')"></span>
+                                    <span class="swatch-dot" style="background: #f57b36;" onclick="event.stopPropagation(); selectFurnitureItem('chair', '#f57b36')"></span>
+                                    <span class="swatch-dot" style="background: #d20005;" onclick="event.stopPropagation(); selectFurnitureItem('chair', '#d20005')"></span>
+                                </div>
+                            </div>
+
+                            <div class="furn-card" onclick="selectFurnitureItem('sofa', '#012c41')">
+                                <div class="furn-preview-icon">🛋️</div>
+                                <div class="furn-name">{{ __('Lounge Sofa') }}</div>
+                                <div class="color-swatches">
+                                    <span class="swatch-dot" style="background: #012c41;" onclick="event.stopPropagation(); selectFurnitureItem('sofa', '#012c41')"></span>
+                                    <span class="swatch-dot" style="background: #00726c;" onclick="event.stopPropagation(); selectFurnitureItem('sofa', '#00726c')"></span>
+                                    <span class="swatch-dot" style="background: #ffd136;" onclick="event.stopPropagation(); selectFurnitureItem('sofa', '#ffd136')"></span>
+                                </div>
+                            </div>
+
+                            <div class="furn-card" onclick="selectFurnitureItem('beanbag', '#ffd136')">
+                                <div class="furn-preview-icon">🟡</div>
+                                <div class="furn-name">{{ __('Bean Bag Chair') }}</div>
+                                <div class="color-swatches">
+                                    <span class="swatch-dot" style="background: #ffd136;" onclick="event.stopPropagation(); selectFurnitureItem('beanbag', '#ffd136')"></span>
+                                    <span class="swatch-dot" style="background: #00b4b3;" onclick="event.stopPropagation(); selectFurnitureItem('beanbag', '#00b4b3')"></span>
+                                    <span class="swatch-dot" style="background: #f57b36;" onclick="event.stopPropagation(); selectFurnitureItem('beanbag', '#f57b36')"></span>
+                                </div>
+                            </div>
+
+                            <div class="furn-card" onclick="selectFurnitureItem('booth', '#d20005')">
+                                <div class="furn-preview-icon">🟥</div>
+                                <div class="furn-name">{{ __('Booth Corner') }}</div>
+                                <div class="color-swatches">
+                                    <span class="swatch-dot" style="background: #d20005;" onclick="event.stopPropagation(); selectFurnitureItem('booth', '#d20005')"></span>
+                                    <span class="swatch-dot" style="background: #004862;" onclick="event.stopPropagation(); selectFurnitureItem('booth', '#004862')"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category 2: Tables & Desks -->
+                    <div class="category-accordion" id="cat-tables">
+                        <div class="category-header" onclick="toggleAccordion('cat-tables')">
+                            <span>🖥️ {{ __('Tables & Desks') }}</span>
+                            <span class="acc-icon">▴</span>
+                        </div>
+                        <div class="category-body">
+                            <div class="furn-card" onclick="selectFurnitureItem('desk', '#00b4b3')">
+                                <div class="furn-preview-icon">💻</div>
+                                <div class="furn-name">{{ __('Workstation') }}</div>
+                                <div class="color-swatches">
+                                    <span class="swatch-dot" style="background: #5c4033;" onclick="event.stopPropagation(); selectFurnitureItem('desk', '#5c4033')"></span>
+                                    <span class="swatch-dot" style="background: #004862;" onclick="event.stopPropagation(); selectFurnitureItem('desk', '#004862')"></span>
+                                </div>
+                            </div>
+
+                            <div class="furn-card" onclick="selectFurnitureItem('executive_desk', '#012c41')">
+                                <div class="furn-preview-icon">🖥️</div>
+                                <div class="furn-name">{{ __('Executive Desk') }}</div>
+                                <div class="color-swatches">
+                                    <span class="swatch-dot" style="background: #271610;" onclick="event.stopPropagation(); selectFurnitureItem('executive_desk', '#271610')"></span>
+                                    <span class="swatch-dot" style="background: #00726c;" onclick="event.stopPropagation(); selectFurnitureItem('executive_desk', '#00726c')"></span>
+                                </div>
+                            </div>
+
+                            <div class="furn-card" onclick="selectFurnitureItem('dining_table', '#ffd136')">
+                                <div class="furn-preview-icon">🍽️</div>
+                                <div class="furn-name">{{ __('Conference Table') }}</div>
+                                <div class="color-swatches">
+                                    <span class="swatch-dot" style="background: #3e2723;" onclick="event.stopPropagation(); selectFurnitureItem('dining_table', '#3e2723')"></span>
+                                    <span class="swatch-dot" style="background: #00b4b3;" onclick="event.stopPropagation(); selectFurnitureItem('dining_table', '#00b4b3')"></span>
+                                </div>
+                            </div>
+
+                            <div class="furn-card" onclick="selectFurnitureItem('cabinet', '#64748b')">
+                                <div class="furn-preview-icon">🗄️</div>
+                                <div class="furn-name">{{ __('Cabinets') }}</div>
+                                <div class="color-swatches">
+                                    <span class="swatch-dot" style="background: #64748b;" onclick="event.stopPropagation(); selectFurnitureItem('cabinet', '#64748b')"></span>
+                                    <span class="swatch-dot" style="background: #a7c545;" onclick="event.stopPropagation(); selectFurnitureItem('cabinet', '#a7c545')"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category 3: Plants & Decor -->
+                    <div class="category-accordion" id="cat-decor">
+                        <div class="category-header" onclick="toggleAccordion('cat-decor')">
+                            <span>🪴 {{ __('Plants & Workplace Decor') }}</span>
+                            <span class="acc-icon">▴</span>
+                        </div>
+                        <div class="category-body">
+                            <div class="furn-card" onclick="selectFurnitureItem('plant', '#006847')">
+                                <div class="furn-preview-icon">🪴</div>
+                                <div class="furn-name">{{ __('Decor Plant') }}</div>
+                            </div>
+                            <div class="furn-card" onclick="selectFurnitureItem('water_cooler', '#00b4b3')">
+                                <div class="furn-preview-icon">🚰</div>
+                                <div class="furn-name">{{ __('Water Cooler') }}</div>
+                            </div>
+                            <div class="furn-card" onclick="selectFurnitureItem('whiteboard', '#ffffff')">
+                                <div class="furn-preview-icon">📋</div>
+                                <div class="furn-name">{{ __('Whiteboard') }}</div>
+                            </div>
+                            <div class="furn-card" onclick="selectFurnitureItem('screen', '#012c41')">
+                                <div class="furn-preview-icon">📺</div>
+                                <div class="furn-name">{{ __('AV Screen') }}</div>
+                            </div>
+                            <div class="furn-card" onclick="selectFurnitureItem('lamp', '#ffd136')">
+                                <div class="furn-preview-icon">💡</div>
+                                <div class="furn-name">{{ __('Floor Lamp') }}</div>
+                            </div>
+                            <div class="furn-card" onclick="selectFurnitureItem('pingpong', '#00b4b3')">
+                                <div class="furn-preview-icon">🏓</div>
+                                <div class="furn-name">{{ __('Ping Pong') }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. ROOMS TAB -->
+                <div id="drawer-view-rooms" style="display: none; flex-direction: column; gap: 14px;">
+                    <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;">
+                        {{ __('Choose a room template, then click and drag on the floor canvas to draw.') }}
+                    </div>
+
+                    <div class="room-card active" onclick="setRoomTemplate('meeting', '#00b4b3')">
+                        <div style="font-size: 26px;">👥</div>
+                        <div>
+                            <strong style="font-size: 13px; color: var(--brand-navy);">{{ __('Meeting Room') }}</strong>
+                            <div style="font-size: 11px; color: var(--text-muted);">{{ __('Open collaboration area for teams') }}</div>
+                        </div>
+                    </div>
+
+                    <div class="room-card" onclick="setRoomTemplate('private', '#f57b36')">
+                        <div style="font-size: 26px;">🔒</div>
+                        <div>
+                            <strong style="font-size: 13px; color: var(--brand-navy);">{{ __('Private Office') }}</strong>
+                            <div style="font-size: 11px; color: var(--text-muted);">{{ __('Locked door with knock-to-enter approval') }}</div>
+                        </div>
+                    </div>
+
+                    <div class="room-card" onclick="setRoomTemplate('reception', '#006847')">
+                        <div style="font-size: 26px;">🛎️</div>
+                        <div>
+                            <strong style="font-size: 13px; color: var(--brand-navy);">{{ __('Reception & Lobby') }}</strong>
+                            <div style="font-size: 11px; color: var(--text-muted);">{{ __('Welcoming area for guests & visitors') }}</div>
+                        </div>
+                    </div>
+
+                    <div class="room-card" onclick="setRoomTemplate('lounge', '#004862')">
+                        <div style="font-size: 26px;">☕</div>
+                        <div>
+                            <strong style="font-size: 13px; color: var(--brand-navy);">{{ __('Breakout Lounge') }}</strong>
+                            <div style="font-size: 11px; color: var(--text-muted);">{{ __('Casual coffee and social zone') }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Selected Properties Inspector -->
+                    <div class="properties-box" style="margin-top: 10px;">
+                        <strong style="font-size: 12px; color: var(--brand-navy);">{{ __('Selected Item Properties') }}</strong>
+                        <div class="prop-field">
+                            <label class="prop-label">{{ __('Name') }}</label>
+                            <input type="text" class="prop-input" id="prop-name" value="" oninput="updateSelectedProp('name', this.value)">
+                        </div>
+                        <div class="prop-field" id="prop-color-group">
+                            <label class="prop-label">{{ __('Theme Color') }}</label>
+                            <input type="color" class="prop-input" id="prop-color" value="#00b4b3" style="height: 38px; padding: 2px;" oninput="updateSelectedProp('color', this.value)">
+                        </div>
+                        <div class="prop-field" id="prop-capacity-group">
+                            <label class="prop-label">{{ __('Seat Capacity') }}</label>
+                            <input type="number" class="prop-input" id="prop-capacity" value="10" min="1" max="100" oninput="updateSelectedProp('capacity', parseInt(this.value) || 1)">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. SETTINGS TAB -->
+                <div id="drawer-view-settings" style="display: none; flex-direction: column; gap: 14px;">
+                    <div class="properties-box">
+                        <strong style="font-size: 12px; color: var(--brand-navy);">{{ __('Floor Metrics') }}</strong>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--border-panel); padding-bottom: 6px;">
+                            <span>{{ __('Total Rooms') }}:</span>
+                            <strong style="color: var(--brand-navy);" id="stat-rooms-count">0</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--border-panel); padding-bottom: 6px;">
+                            <span>{{ __('Audio Zones') }}:</span>
+                            <strong style="color: var(--brand-navy);" id="stat-zones-count">0</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);">
+                            <span>{{ __('Furniture Placed') }}:</span>
+                            <strong style="color: var(--brand-navy);" id="stat-objects-count">0</strong>
+                        </div>
+                    </div>
+
+                    <div class="properties-box">
+                        <strong style="font-size: 12px; color: var(--brand-navy);">{{ __('Version History') }}</strong>
+                        @forelse($map->versions as $ver)
+                            <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); padding: 4px 0; border-bottom: 1px solid #f1f5f9;">
+                                <span>v{{ $ver->version }} Snapshot</span>
+                                <span>{{ $ver->created_at->format('M d, H:i') }}</span>
+                            </div>
+                        @empty
+                            <div style="font-size: 11px; color: var(--text-muted);">No snapshots saved yet.</div>
+                        @endforelse
+                    </div>
+                </div>
+
             </div>
         </aside>
     </div>
@@ -581,26 +877,32 @@
 
         const canvas = document.getElementById('editor-canvas');
         const ctx = canvas.getContext('2d');
-        let width = canvas.width = window.innerWidth - 570;
-        let height = canvas.height = window.innerHeight - 60;
+        let width = canvas.width = window.innerWidth - 340;
+        let height = canvas.height = window.innerHeight - 62;
 
         window.addEventListener('resize', () => {
-            width = canvas.width = window.innerWidth - 570;
-            height = canvas.height = window.innerHeight - 60;
+            const drawer = document.getElementById('customize-drawer');
+            const drawerWidth = drawer.classList.contains('collapsed') ? 0 : 340;
+            width = canvas.width = window.innerWidth - drawerWidth;
+            height = canvas.height = window.innerHeight - 62;
             draw();
         });
 
         const TILE_SIZE = 32;
         let currentTool = 'select'; // select | room | zone | object
         let currentRoomType = 'meeting';
-        let currentRoomColor = '#6366F1';
+        let currentRoomColor = '#00b4b3';
         let currentObjectType = 'desk';
+        let currentObjectColor = '#00b4b3';
+        let zoomLevel = 1.0;
+        let panOffset = { x: 40, y: 30 };
+        let showGrid = true;
 
         let rooms = MAP_DATA.rooms || [];
         let zones = MAP_DATA.zones || [];
         let objects = MAP_DATA.objects || [];
 
-        let selectedItem = null; // { type: 'object'|'room'|'zone', item: ref }
+        let selectedItem = null;
         let isDrawing = false;
         let isDragging = false;
         let dragStartTileX = 0;
@@ -610,24 +912,23 @@
         let startX = 0;
         let startY = 0;
         let currentRect = null;
+        let attachedObjects = [];
 
         const OBJECT_CONFIGS = {
             desk: { icon: '💻', name: 'Workstation', collision: true },
             executive_desk: { icon: '🖥️', name: 'Executive Desk', collision: true },
             chair: { icon: '🪑', name: 'Ergo Chair', collision: false },
             sofa: { icon: '🛋️', name: 'Lounge Sofa', collision: true },
-            coffee_bar: { icon: '☕', name: 'Coffee Bar', collision: true },
+            beanbag: { icon: '🟡', name: 'Bean Bag Chair', collision: false },
+            booth: { icon: '🟥', name: 'Booth Corner', collision: true },
             whiteboard: { icon: '📋', name: 'Whiteboard', collision: true },
             screen: { icon: '📺', name: 'AV Screen', collision: true },
             plant: { icon: '🪴', name: 'Decor Plant', collision: false },
-            wall: { icon: '🧱', name: 'Glass Wall', collision: true },
-            door: { icon: '🚪', name: 'Office Door', collision: false },
+            lamp: { icon: '💡', name: 'Floor Lamp', collision: false },
             pingpong: { icon: '🏓', name: 'Ping Pong Table', collision: true },
             water_cooler: { icon: '🚰', name: 'Water Cooler', collision: true },
-            bookshelf: { icon: '📚', name: 'Bookshelf', collision: true },
             cabinet: { icon: '🗄️', name: 'Filing Cabinet', collision: true },
-            dining_table: { icon: '🍽️', name: 'Dining Table', collision: true },
-            lamp: { icon: '💡', name: 'Floor Lamp', collision: false }
+            dining_table: { icon: '🍽️', name: 'Conference Table', collision: true }
         };
 
         function setTool(tool) {
@@ -637,18 +938,66 @@
             canvas.style.cursor = tool === 'select' ? 'default' : 'crosshair';
         }
 
-        function setRoomType(type, color) {
+        function setRoomTemplate(type, color) {
             setTool('room');
             currentRoomType = type;
             currentRoomColor = color;
+            document.querySelectorAll('.room-card').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
         }
 
-        function selectObjectType(type) {
+        function selectFurnitureItem(type, color) {
             setTool('object');
             currentObjectType = type;
+            currentObjectColor = color || '#00b4b3';
+            document.querySelectorAll('.furn-card').forEach(el => el.classList.remove('active'));
+            event.currentTarget.closest('.furn-card')?.classList.add('active');
         }
 
-        // ── Keyboard Delete Support ──
+        function toggleCustomizeDrawer() {
+            const drawer = document.getElementById('customize-drawer');
+            drawer.classList.toggle('collapsed');
+            const drawerWidth = drawer.classList.contains('collapsed') ? 0 : 340;
+            width = canvas.width = window.innerWidth - drawerWidth;
+            draw();
+        }
+
+        function switchDrawerTab(tab) {
+            document.querySelectorAll('.drawer-tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-btn-${tab}`).classList.add('active');
+
+            document.getElementById('drawer-view-furniture').style.display = tab === 'furniture' ? 'flex' : 'none';
+            document.getElementById('drawer-view-rooms').style.display = tab === 'rooms' ? 'flex' : 'none';
+            document.getElementById('drawer-view-settings').style.display = tab === 'settings' ? 'flex' : 'none';
+        }
+
+        function toggleAccordion(catId) {
+            const el = document.getElementById(catId);
+            const body = el.querySelector('.category-body');
+            const icon = el.querySelector('.acc-icon');
+            if (body.style.display === 'none') {
+                body.style.display = 'grid';
+                icon.textContent = '▴';
+            } else {
+                body.style.display = 'none';
+                icon.textContent = '▾';
+            }
+        }
+
+        function filterFurniture(q) {
+            const query = q.toLowerCase();
+            document.querySelectorAll('.furn-card').forEach(card => {
+                const name = card.querySelector('.furn-name').textContent.toLowerCase();
+                card.style.display = name.includes(query) ? 'flex' : 'none';
+            });
+        }
+
+        function zoomIn() { zoomLevel = Math.min(2.0, zoomLevel + 0.15); draw(); }
+        function zoomOut() { zoomLevel = Math.max(0.6, zoomLevel - 0.15); draw(); }
+        function resetView() { zoomLevel = 1.0; panOffset = { x: 40, y: 30 }; draw(); }
+        function toggleGrid() { showGrid = !showGrid; draw(); }
+
+        // ── Keyboard Shortcuts ──
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Delete' || e.key === 'Backspace') {
                 if (document.activeElement.tagName !== 'INPUT') {
@@ -657,11 +1006,11 @@
             }
         });
 
-        // ── Mouse & Canvas Interactions ──
+        // ── Mouse Canvas Interaction ──
         canvas.addEventListener('mousedown', (e) => {
             const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
+            const mouseX = (e.clientX - rect.left - panOffset.x) / zoomLevel;
+            const mouseY = (e.clientY - rect.top - panOffset.y) / zoomLevel;
 
             const tileX = Math.floor(mouseX / TILE_SIZE);
             const tileY = Math.floor(mouseY / TILE_SIZE);
@@ -670,7 +1019,7 @@
                 selectedItem = null;
                 attachedObjects = [];
 
-                // 1. Check Objects FIRST (allows clicking objects inside rooms)
+                // 1. Objects first
                 for (let i = objects.length - 1; i >= 0; i--) {
                     const obj = objects[i];
                     if (obj.position.x === tileX && obj.position.y === tileY) {
@@ -679,7 +1028,7 @@
                     }
                 }
 
-                // 2. Check Zones
+                // 2. Zones
                 if (!selectedItem) {
                     for (let i = zones.length - 1; i >= 0; i--) {
                         const z = zones[i];
@@ -691,7 +1040,7 @@
                     }
                 }
 
-                // 3. Check Rooms
+                // 3. Rooms
                 if (!selectedItem) {
                     for (let i = rooms.length - 1; i >= 0; i--) {
                         const r = rooms[i];
@@ -715,7 +1064,6 @@
                         dragOrigX = selectedItem.item.bounds.x;
                         dragOrigY = selectedItem.item.bounds.y;
 
-                        // Attach all objects currently located inside this room!
                         const rx = dragOrigX;
                         const ry = dragOrigY;
                         const rw = selectedItem.item.bounds.width;
@@ -729,11 +1077,7 @@
                             origX: obj.position.x,
                             origY: obj.position.y
                         }));
-                    } else if (selectedItem.type === 'zone') {
-                        dragOrigX = selectedItem.item.shape_data.x;
-                        dragOrigY = selectedItem.item.shape_data.y;
                     }
-
                     canvas.style.cursor = 'grabbing';
                 }
 
@@ -750,6 +1094,7 @@
                     type: currentObjectType,
                     name: `${conf.name} #${objects.length + 1}`,
                     position: { x: tileX, y: tileY },
+                    color: currentObjectColor,
                     collision: conf.collision
                 };
                 objects.push(newObj);
@@ -762,8 +1107,8 @@
 
         canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
+            const mouseX = (e.clientX - rect.left - panOffset.x) / zoomLevel;
+            const mouseY = (e.clientY - rect.top - panOffset.y) / zoomLevel;
 
             const tileX = Math.floor(mouseX / TILE_SIZE);
             const tileY = Math.floor(mouseY / TILE_SIZE);
@@ -784,18 +1129,13 @@
                     selectedItem.item.bounds.x = newRoomX;
                     selectedItem.item.bounds.y = newRoomY;
 
-                    // Synchronously shift all attached furniture with the room
                     if (attachedObjects && attachedObjects.length > 0) {
                         attachedObjects.forEach(att => {
                             att.obj.position.x = Math.max(0, Math.min(31, att.origX + actualDeltaX));
                             att.obj.position.y = Math.max(0, Math.min(23, att.origY + actualDeltaY));
                         });
                     }
-                } else if (selectedItem.type === 'zone') {
-                    selectedItem.item.shape_data.x = Math.max(0, Math.min(32 - selectedItem.item.shape_data.width, dragOrigX + dx));
-                    selectedItem.item.shape_data.y = Math.max(0, Math.min(24 - selectedItem.item.shape_data.height, dragOrigY + dy));
                 }
-
                 draw();
                 return;
             }
@@ -808,29 +1148,6 @@
 
                 currentRect = { x, y, width: w, height: h };
                 draw();
-                return;
-            }
-
-            // Hover cursor preview in select mode
-            if (currentTool === 'select') {
-                let hover = false;
-                for (let i = objects.length - 1; i >= 0; i--) {
-                    if (objects[i].position.x === tileX && objects[i].position.y === tileY) {
-                        hover = true;
-                        break;
-                    }
-                }
-                if (!hover) {
-                    for (let i = rooms.length - 1; i >= 0; i--) {
-                        const r = rooms[i];
-                        if (tileX >= r.bounds.x && tileX < r.bounds.x + r.bounds.width &&
-                            tileY >= r.bounds.y && tileY < r.bounds.y + r.bounds.height) {
-                            hover = true;
-                            break;
-                        }
-                    }
-                }
-                canvas.style.cursor = hover ? 'grab' : 'default';
             }
         });
 
@@ -838,7 +1155,7 @@
             if (isDragging) {
                 isDragging = false;
                 attachedObjects = [];
-                canvas.style.cursor = currentTool === 'select' ? 'grab' : 'crosshair';
+                canvas.style.cursor = currentTool === 'select' ? 'default' : 'crosshair';
                 draw();
             }
 
@@ -874,7 +1191,6 @@
         });
 
         function updateInspector() {
-            const badge = document.getElementById('selection-type-badge');
             const nameInput = document.getElementById('prop-name');
             const colorInput = document.getElementById('prop-color');
             const capInput = document.getElementById('prop-capacity');
@@ -882,20 +1198,17 @@
             const capGroup = document.getElementById('prop-capacity-group');
 
             if (selectedItem) {
-                badge.textContent = selectedItem.type.toUpperCase();
                 nameInput.value = selectedItem.item.name || '';
-
                 if (selectedItem.type === 'room') {
                     colorGroup.style.display = 'flex';
                     capGroup.style.display = 'flex';
-                    colorInput.value = selectedItem.item.color || '#6366F1';
+                    colorInput.value = selectedItem.item.color || '#00b4b3';
                     capInput.value = selectedItem.item.capacity || 10;
                 } else {
                     colorGroup.style.display = 'none';
                     capGroup.style.display = 'none';
                 }
             } else {
-                badge.textContent = 'FLOOR';
                 nameInput.value = 'Office Layout';
                 colorGroup.style.display = 'none';
                 capGroup.style.display = 'none';
@@ -912,12 +1225,11 @@
 
         function deleteSelectedItem() {
             if (!selectedItem) {
-                showToast('ℹ️ Please click on an item to select it first.', '#F59E0B');
+                showToast('ℹ️ Please click on an item to select it first.', '#f57b36');
                 return;
             }
 
             const item = selectedItem.item;
-
             if (selectedItem.type === 'room') {
                 const idx = rooms.indexOf(item);
                 if (idx > -1) rooms.splice(idx, 1);
@@ -932,13 +1244,6 @@
             } else if (selectedItem.type === 'zone') {
                 const idx = zones.indexOf(item);
                 if (idx > -1) zones.splice(idx, 1);
-                if (item.id) {
-                    fetch(`/api/v1/organizations/${ORG_ID}/zones/${item.id}`, {
-                        method: 'DELETE',
-                        headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
-                        credentials: 'same-origin'
-                    }).catch(console.error);
-                }
                 showToast('🗑️ Audio zone removed');
             } else if (selectedItem.type === 'object') {
                 const idx = objects.indexOf(item);
@@ -958,22 +1263,7 @@
             document.getElementById('stat-objects-count').textContent = objects.length;
         }
 
-        // ── Helper Canvas Round Rect ──
-        function drawRoundedRect(ctx, x, y, width, height, radius) {
-            ctx.beginPath();
-            ctx.moveTo(x + radius, y);
-            ctx.lineTo(x + width - radius, y);
-            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-            ctx.lineTo(x + width, y + height - radius);
-            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-            ctx.lineTo(x + radius, y + height);
-            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-            ctx.lineTo(x, y + radius);
-            ctx.quadraticCurveTo(x, y, x + radius, y);
-            ctx.closePath();
-        }
-
-        // ── Top-Down Furniture Sprites for Editor ──
+        // ── Top-Down Furniture Sprites ──
         const FURN_SHEET1 = new Image();
         FURN_SHEET1.src = '/images/furniture/furniture_sheet1.webp';
         let furnSheet1Loaded = false;
@@ -989,132 +1279,131 @@
                 if (furnSheet1Loaded) {
                     ctx.drawImage(FURN_SHEET1, 40, 205, 260, 215, x - 4, y - 6, 40, 38);
                 } else {
-                    ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(x + 3, y + 6, 27, 21);
                     ctx.fillStyle = '#5c4033'; ctx.fillRect(x + 2, y + 4, 28, 22);
-                    ctx.fillStyle = '#38bdf8'; ctx.fillRect(x + 9, y + 11, 12, 5);
                 }
             },
             executive_desk: (x, y) => {
                 if (furnSheet2Loaded) {
                     ctx.drawImage(FURN_SHEET2, 500, 70, 340, 500, x - 8, y - 10, 48, 52);
                 } else {
-                    ctx.fillStyle = 'rgba(0,0,0,0.35)'; ctx.fillRect(x + 3, y + 5, 27, 23);
                     ctx.fillStyle = '#271610'; ctx.fillRect(x + 2, y + 3, 28, 24);
-                    ctx.fillStyle = '#38bdf8'; ctx.fillRect(x + 5, y + 6, 9, 5);
                 }
             },
             chair: (x, y) => {
                 if (furnSheet1Loaded) {
                     ctx.drawImage(FURN_SHEET1, 50, 68, 120, 105, x + 2, y + 2, 28, 28);
                 } else {
-                    ctx.fillStyle = '#18181b'; drawRoundedRect(ctx, x + 8, y + 8, 16, 16, 4); ctx.fill();
+                    ctx.fillStyle = '#00b4b3'; ctx.beginPath(); ctx.arc(x + 16, y + 16, 10, 0, Math.PI * 2); ctx.fill();
                 }
             },
             sofa: (x, y) => {
                 if (furnSheet1Loaded) {
                     ctx.drawImage(FURN_SHEET1, 400, 830, 245, 115, x - 4, y - 2, 40, 28);
                 } else {
-                    ctx.fillStyle = '#18181b'; drawRoundedRect(ctx, x + 2, y + 4, 28, 22, 4); ctx.fill();
+                    ctx.fillStyle = '#012c41'; ctx.fillRect(x + 2, y + 4, 28, 22);
                 }
             },
             plant: (x, y) => {
                 if (furnSheet1Loaded) {
                     ctx.drawImage(FURN_SHEET1, 310, 68, 110, 110, x + 2, y + 2, 28, 28);
                 } else {
-                    ctx.fillStyle = '#78350f'; ctx.beginPath(); ctx.arc(x + 16, y + 16, 7, 0, Math.PI * 2); ctx.fill();
-                    ctx.fillStyle = '#16a34a'; ctx.beginPath(); ctx.arc(x + 16, y + 16, 5, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#006847'; ctx.beginPath(); ctx.arc(x + 16, y + 16, 8, 0, Math.PI * 2); ctx.fill();
                 }
             },
             dining_table: (x, y) => {
                 if (furnSheet1Loaded) {
                     ctx.drawImage(FURN_SHEET1, 600, 80, 360, 320, x - 8, y - 8, 48, 48);
                 } else {
-                    ctx.fillStyle = '#3e2723'; drawRoundedRect(ctx, x + 2, y + 2, 28, 28, 5); ctx.fill();
+                    ctx.fillStyle = '#3e2723'; ctx.fillRect(x + 2, y + 2, 28, 28);
                 }
-            },
-            whiteboard: (x, y) => {
-                ctx.fillStyle = '#ffffff'; ctx.fillRect(x + 2, y + 6, 28, 14);
-                ctx.strokeStyle = '#64748b'; ctx.lineWidth = 1.5; ctx.strokeRect(x + 2, y + 6, 28, 14);
-                ctx.fillStyle = '#38bdf8'; ctx.fillRect(x + 6, y + 8, 4, 3);
-            },
-            screen: (x, y) => {
-                ctx.fillStyle = '#09090b'; ctx.fillRect(x + 2, y + 4, 28, 16);
-                ctx.fillStyle = '#0284c7'; ctx.fillRect(x + 4, y + 6, 24, 12);
-            },
-            water_cooler: (x, y) => {
-                ctx.fillStyle = '#e2e8f0'; ctx.fillRect(x + 8, y + 10, 16, 18);
-                ctx.fillStyle = '#0284c7'; ctx.beginPath(); ctx.arc(x + 16, y + 10, 7, 0, Math.PI * 2); ctx.fill();
             }
         };
 
-        // ── Render Function ──
+        // ── Main Draw Loop ──
         function draw() {
             ctx.clearRect(0, 0, width, height);
 
-            // 1. Grid
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
-            ctx.lineWidth = 1;
-            for (let x = 0; x < width; x += TILE_SIZE) {
-                ctx.beginPath();
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x, height);
-                ctx.stroke();
-            }
-            for (let y = 0; y < height; y += TILE_SIZE) {
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(width, y);
-                ctx.stroke();
+            ctx.save();
+            ctx.translate(panOffset.x, panOffset.y);
+            ctx.scale(zoomLevel, zoomLevel);
+
+            const mapW = 1024;
+            const mapH = 768;
+
+            // 1. Floor Base
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, mapW, mapH);
+
+            // Subtle Wood / Tile Pattern
+            ctx.fillStyle = '#f8fafc';
+            for (let x = 0; x < mapW; x += 64) {
+                for (let y = 0; y < mapH; y += 32) {
+                    if ((Math.floor(x / 64) + Math.floor(y / 32)) % 2 === 0) {
+                        ctx.fillRect(x, y, 64, 32);
+                    }
+                }
             }
 
-            // 2. Zones
+            // Floor Border
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(0, 0, mapW, mapH);
+
+            // 2. Grid Lines
+            if (showGrid) {
+                ctx.strokeStyle = 'rgba(1, 44, 65, 0.06)';
+                ctx.lineWidth = 1;
+                for (let x = 0; x <= mapW; x += TILE_SIZE) {
+                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, mapH); ctx.stroke();
+                }
+                for (let y = 0; y <= mapH; y += TILE_SIZE) {
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(mapW, y); ctx.stroke();
+                }
+            }
+
+            // 3. Audio Zones
             zones.forEach(z => {
                 const zx = z.shape_data.x * TILE_SIZE;
                 const zy = z.shape_data.y * TILE_SIZE;
                 const zw = z.shape_data.width * TILE_SIZE;
                 const zh = z.shape_data.height * TILE_SIZE;
 
-                ctx.fillStyle = 'rgba(16, 185, 129, 0.08)';
+                ctx.fillStyle = 'rgba(0, 180, 179, 0.08)';
                 ctx.fillRect(zx, zy, zw, zh);
 
                 const isSelected = selectedItem && selectedItem.type === 'zone' && selectedItem.item === z;
-                ctx.strokeStyle = isSelected ? '#ffffff' : 'rgba(16, 185, 129, 0.4)';
-                ctx.lineWidth = isSelected ? 2.5 : 1.5;
+                ctx.strokeStyle = isSelected ? 'var(--brand-navy)' : 'rgba(0, 180, 179, 0.4)';
+                ctx.lineWidth = isSelected ? 3 : 1.5;
                 ctx.setLineDash([4, 4]);
                 ctx.strokeRect(zx, zy, zw, zh);
                 ctx.setLineDash([]);
 
-                ctx.fillStyle = '#6ee7b7';
-                ctx.font = '11px Inter';
+                ctx.fillStyle = '#00726c';
+                ctx.font = '700 11px Cairo, Inter';
                 ctx.fillText(`🎙️ ${z.name}`, zx + 6, zy + 16);
             });
 
-            // 3. Rooms
+            // 4. Rooms
             rooms.forEach((r) => {
                 const rx = r.bounds.x * TILE_SIZE;
                 const ry = r.bounds.y * TILE_SIZE;
                 const rw = r.bounds.width * TILE_SIZE;
                 const rh = r.bounds.height * TILE_SIZE;
 
-                ctx.fillStyle = 'rgba(30, 41, 59, 0.7)';
+                ctx.fillStyle = 'rgba(241, 245, 249, 0.85)';
                 ctx.fillRect(rx, ry, rw, rh);
 
                 const isSelected = selectedItem && selectedItem.type === 'room' && selectedItem.item === r;
-                ctx.strokeStyle = isSelected ? '#ffffff' : (r.color || '#6366F1');
-                ctx.lineWidth = isSelected ? 3 : 2;
+                ctx.strokeStyle = isSelected ? '#012c41' : (r.color || '#00b4b3');
+                ctx.lineWidth = isSelected ? 4 : 2;
                 ctx.strokeRect(rx, ry, rw, rh);
 
-                if (isSelected) {
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-                    ctx.fillRect(rx, ry, rw, rh);
-                }
-
-                ctx.fillStyle = '#f8fafc';
-                ctx.font = '700 12px Inter';
-                ctx.fillText(`🏢 ${r.name}`, rx + 8, ry + 20);
+                ctx.fillStyle = '#012c41';
+                ctx.font = '800 12px Cairo, Inter';
+                ctx.fillText(`🏢 ${r.name}`, rx + 8, ry + 18);
             });
 
-            // 4. 3D Objects
+            // 5. Furniture Objects
             objects.forEach((obj) => {
                 const ox = obj.position.x * TILE_SIZE;
                 const oy = obj.position.y * TILE_SIZE;
@@ -1122,9 +1411,9 @@
                 if (EDITOR_3D_FURNITURE[obj.type]) {
                     EDITOR_3D_FURNITURE[obj.type](ox, oy);
                 } else {
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+                    ctx.fillStyle = 'rgba(0, 180, 179, 0.1)';
                     ctx.fillRect(ox + 2, oy + 2, TILE_SIZE - 4, TILE_SIZE - 4);
-                    ctx.font = '18px Inter';
+                    ctx.font = '18px Cairo, Inter';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     const conf = OBJECT_CONFIGS[obj.type] || { icon: '📦' };
@@ -1135,31 +1424,32 @@
 
                 const isSelected = selectedItem && selectedItem.type === 'object' && selectedItem.item === obj;
                 if (isSelected) {
-                    ctx.strokeStyle = '#ffffff';
+                    ctx.strokeStyle = '#012c41';
                     ctx.lineWidth = 2.5;
                     ctx.strokeRect(ox, oy, TILE_SIZE, TILE_SIZE);
                 }
             });
 
-            // 5. Active Drawing Rect
+            // 6. Drawing Preview
             if (isDrawing && currentRect) {
                 const dx = currentRect.x * TILE_SIZE;
                 const dy = currentRect.y * TILE_SIZE;
                 const dw = currentRect.width * TILE_SIZE;
                 const dh = currentRect.height * TILE_SIZE;
 
-                ctx.fillStyle = currentTool === 'room' ? 'rgba(99, 102, 241, 0.2)' : 'rgba(16, 185, 129, 0.2)';
+                ctx.fillStyle = currentTool === 'room' ? 'rgba(0, 180, 179, 0.2)' : 'rgba(0, 104, 71, 0.2)';
                 ctx.fillRect(dx, dy, dw, dh);
-                ctx.strokeStyle = currentTool === 'room' ? '#6366F1' : '#10B981';
+                ctx.strokeStyle = currentTool === 'room' ? '#00b4b3' : '#006847';
                 ctx.lineWidth = 2;
                 ctx.strokeRect(dx, dy, dw, dh);
             }
+
+            ctx.restore();
         }
 
         // ── API Actions (Save Draft & Publish) ──
         async function saveMapDraft() {
             try {
-                // 1. Sync Rooms (creates new ones and updates moved/edited existing ones)
                 for (const r of rooms) {
                     const payload = {
                         map_id: MAP_DATA.id,
@@ -1167,18 +1457,14 @@
                         type: r.type || 'meeting',
                         access_mode: r.access_mode || 'public',
                         capacity: r.capacity || 10,
-                        color: r.color || '#6366F1',
+                        color: r.color || '#00b4b3',
                         bounds: r.bounds
                     };
 
                     if (!r.id) {
                         const res = await fetch(`/api/v1/organizations/${ORG_ID}/rooms`, {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': CSRF_TOKEN
-                            },
+                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
                             credentials: 'same-origin',
                             body: JSON.stringify(payload)
                         });
@@ -1187,34 +1473,25 @@
                     } else {
                         await fetch(`/api/v1/organizations/${ORG_ID}/rooms/${r.id}`, {
                             method: 'PATCH',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json',
-                                'X-CSRF-TOKEN': CSRF_TOKEN
-                            },
+                            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
                             credentials: 'same-origin',
                             body: JSON.stringify(payload)
                         });
                     }
                 }
 
-                // 2. Sync Objects
                 await fetch(`/api/v1/organizations/${ORG_ID}/maps/${MAP_DATA.id}/objects/sync`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': CSRF_TOKEN
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
                     credentials: 'same-origin',
                     body: JSON.stringify({ objects })
                 });
 
-                showToast('✅ Map Draft & Furniture Saved!');
+                showToast('✅ {{ __('Map Draft & Furniture Saved!') }}');
                 return true;
             } catch (err) {
                 console.error(err);
-                showToast('❌ Error saving draft', '#EF4444');
+                showToast('❌ Error saving draft', '#d20005');
                 return false;
             }
         }
@@ -1226,11 +1503,7 @@
 
                 const res = await fetch(`/api/v1/organizations/${ORG_ID}/maps/${MAP_DATA.id}/publish`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': CSRF_TOKEN
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
                     credentials: 'same-origin'
                 });
 
@@ -1241,10 +1514,10 @@
 
                 const data = await res.json();
                 document.getElementById('header-version-badge').textContent = `v${data.map.version} (Published)`;
-                showToast(`🚀 Map Published! Snapshot v${data.map.version} is now live.`);
+                showToast(`🚀 {{ __('Map Published! Snapshot is now live.') }}`);
             } catch (err) {
                 console.error(err);
-                showToast(`❌ Error: ${err.message || 'Could not publish map'}`, '#EF4444');
+                showToast(`❌ Error: ${err.message || 'Could not publish map'}`, '#d20005');
             }
         }
 
@@ -1252,7 +1525,7 @@
             const toast = document.getElementById('toast-msg');
             toast.textContent = msg;
             if (bg) toast.style.background = bg;
-            else toast.style.background = 'rgba(16, 185, 129, 0.95)';
+            else toast.style.background = 'var(--brand-green)';
             toast.style.display = 'block';
             setTimeout(() => { toast.style.display = 'none'; }, 3500);
         }

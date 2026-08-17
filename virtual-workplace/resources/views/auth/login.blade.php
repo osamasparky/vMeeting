@@ -1,24 +1,32 @@
 @extends('layouts.auth')
 
-@section('title', 'Login — Virtual Workplace')
+@section('title', __('Login') . ' — Virtual Workplace')
 
 @section('content')
+<div style="position: absolute; top: 20px; inset-inline-end: 24px; z-index: 10;">
+    @if(app()->getLocale() === 'ar')
+        <a href="{{ route('lang.switch', 'en') }}" class="lang-switch-btn" style="background: #ffffff; border: 1px solid var(--border-color); color: var(--brand-navy); padding: 7px 14px; border-radius: 8px; font-size: 13px; text-decoration: none; font-weight: 800; box-shadow: var(--shadow-input);">🌐 English</a>
+    @else
+        <a href="{{ route('lang.switch', 'ar') }}" class="lang-switch-btn" style="background: #ffffff; border: 1px solid var(--border-color); color: var(--brand-navy); padding: 7px 14px; border-radius: 8px; font-size: 13px; text-decoration: none; font-weight: 800; box-shadow: var(--shadow-input);">🌐 العربية</a>
+    @endif
+</div>
+
 <div class="auth-wrapper">
     <!-- Left: Login Form -->
     <div class="auth-left">
         <div class="auth-card">
             <div class="auth-logo">
                 <div class="logo-icon">🏢</div>
-                <span class="logo-text">Virtual Workplace</span>
+                <span class="logo-text">{{ __('Virtual Workplace') }}</span>
             </div>
 
-            <h1 class="auth-title">Welcome back</h1>
-            <p class="auth-subtitle">Sign in to your account to access your virtual office</p>
+            <h1 class="auth-title">{{ __('Welcome back') }}</h1>
+            <p class="auth-subtitle">{{ __('Sign in to your account to access your virtual office') }}</p>
 
             @if($errors->any())
                 <div class="alert alert-error">
                     <span>⚠️</span>
-                    <ul class="error-list">
+                    <ul style="list-style: none; padding: 0;">
                         @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
@@ -37,7 +45,7 @@
                 @csrf
 
                 <div class="form-group">
-                    <label class="form-label" for="email">Email Address</label>
+                    <label class="form-label" for="email">{{ __('Email Address') }}</label>
                     <div class="form-input-wrapper">
                         <input
                             type="email"
@@ -54,14 +62,14 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label" for="password">Password</label>
+                    <label class="form-label" for="password">{{ __('Password') }}</label>
                     <div class="form-input-wrapper">
                         <input
                             type="password"
                             id="password"
                             name="password"
                             class="form-input"
-                            placeholder="Enter your password"
+                            placeholder="{{ __('Enter your password') }}"
                             required
                             autocomplete="current-password"
                         >
@@ -73,19 +81,19 @@
                 <div class="form-check">
                     <label class="form-check-label">
                         <input type="checkbox" name="remember" class="form-check-input">
-                        Remember me
+                        {{ __('Remember me') }}
                     </label>
-                    <a href="#" class="form-link">Forgot password?</a>
+                    <a href="#" class="form-link">{{ __('Forgot password?') }}</a>
                 </div>
 
                 <button type="submit" class="btn btn-primary" id="loginBtn">
-                    <span class="btn-text">Sign In</span>
+                    <span class="btn-text">{{ __('Sign In') }}</span>
                     <div class="spinner"></div>
                 </button>
             </form>
 
             <div class="auth-footer">
-                Don't have an account? <a href="{{ route('register') }}">Create one</a>
+                {{ __("Don't have an account?") }} <a href="{{ route('register') }}">{{ __('Create one') }}</a>
             </div>
         </div>
     </div>
@@ -93,43 +101,11 @@
     <!-- Right: Branding Panel -->
     <div class="auth-right">
         <div class="brand-panel">
-            <div class="brand-illustration">
-                <div class="orbit">
-                    <div class="orbit-dot" style="top: 0; left: 50%; transform: translate(-50%, -50%);"></div>
-                </div>
-                <div class="orbit">
-                    <div class="orbit-dot" style="bottom: 0; left: 50%; transform: translate(-50%, 50%);"></div>
-                </div>
-                <div class="orbit">
-                    <div class="orbit-dot" style="top: 50%; right: 0; transform: translate(50%, -50%);"></div>
-                </div>
-                <div class="center-icon">🏢</div>
-            </div>
-
-            <h2 class="brand-title">Your Virtual Office Awaits</h2>
+            <div style="font-size: 64px; margin-bottom: 20px;">🏢</div>
+            <h2 class="brand-title">{{ __('Your Virtual Office Awaits') }}</h2>
             <p class="brand-description">
-                Step into a persistent, spatial workspace where your team connects naturally
-                — just like a real office, but without walls.
+                {{ __('Step into a persistent, spatial workspace where your team connects naturally — just like a real office, but without walls.') }}
             </p>
-
-            <div class="brand-features">
-                <div class="brand-feature">
-                    <div class="brand-feature-icon">🎤</div>
-                    <span class="brand-feature-text">Spatial Audio</span>
-                </div>
-                <div class="brand-feature">
-                    <div class="brand-feature-icon">🗺️</div>
-                    <span class="brand-feature-text">Virtual Maps</span>
-                </div>
-                <div class="brand-feature">
-                    <div class="brand-feature-icon">💬</div>
-                    <span class="brand-feature-text">Live Chat</span>
-                </div>
-                <div class="brand-feature">
-                    <div class="brand-feature-icon">📊</div>
-                    <span class="brand-feature-text">Analytics</span>
-                </div>
-            </div>
         </div>
     </div>
 </div>
