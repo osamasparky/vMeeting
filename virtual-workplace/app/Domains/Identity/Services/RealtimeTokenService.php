@@ -28,7 +28,7 @@ class RealtimeTokenService
             'exp' => time() + $ttlSeconds,
         ]));
 
-        $secret = env('REALTIME_SECRET', 'super-secret-virtual-workplace-key-2026');
+        $secret = $this->getSecret();
         $signature = hash_hmac('sha256', "{$header}.{$payload}", $secret, true);
         $base64Signature = base64_encode($signature);
 
@@ -62,11 +62,23 @@ class RealtimeTokenService
             'exp' => time() + $ttlSeconds,
         ]));
 
-        $secret = env('REALTIME_SECRET', 'super-secret-virtual-workplace-key-2026');
+        $secret = $this->getSecret();
         $signature = hash_hmac('sha256', "{$header}.{$payload}", $secret, true);
         $base64Signature = base64_encode($signature);
 
         return "{$header}.{$payload}.{$base64Signature}";
+    }
+
+    /**
+     * Retrieve the cryptographic signing secret.
+     */
+    private function getSecret(): string
+    {
+        $secret = env('REALTIME_SECRET') ?: config('app.key');
+        if (empty($secret)) {
+            throw new \RuntimeException('REALTIME_SECRET or APP_KEY must be configured in .env for signing tokens.');
+        }
+        return $secret;
     }
 }
 

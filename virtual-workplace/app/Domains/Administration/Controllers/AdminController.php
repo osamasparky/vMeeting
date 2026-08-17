@@ -33,11 +33,20 @@ class AdminController extends Controller
         Organization $organization,
         OrganizationMember $member
     ): JsonResponse {
+        if ($member->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Unauthorized member access.'], 403);
+        }
+
         $validated = $request->validate([
             'role_id' => 'required|exists:roles,id',
         ]);
 
-        $member->update(['role_id' => $validated['role_id']]);
+        $role = Role::findOrFail($validated['role_id']);
+        if ($role->organization_id && $role->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Invalid role selection.'], 403);
+        }
+
+        $member->update(['role_id' => $role->id]);
 
         return response()->json([
             'message' => 'Member role updated.',

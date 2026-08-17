@@ -122,6 +122,10 @@ class OrganizationController extends Controller
      */
     public function updateMember(Request $request, Organization $organization, OrganizationMember $member): JsonResponse
     {
+        if ($member->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Unauthorized member access.'], 403);
+        }
+
         $validated = $request->validate([
             'status' => 'sometimes|in:active,suspended',
         ]);
@@ -139,6 +143,10 @@ class OrganizationController extends Controller
      */
     public function removeMember(Request $request, Organization $organization, OrganizationMember $member): JsonResponse
     {
+        if ($member->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Unauthorized member access.'], 403);
+        }
+
         $member->delete();
 
         return response()->json(['message' => 'Member removed.']);

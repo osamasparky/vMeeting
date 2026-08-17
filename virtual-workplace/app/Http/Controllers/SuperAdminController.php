@@ -11,6 +11,7 @@ use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Domains\Tenancy\Models\Plan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 class SuperAdminController extends Controller
@@ -238,5 +239,220 @@ class SuperAdminController extends Controller
     public function updateSettings(Request $request)
     {
         return back()->with('success', 'System settings saved successfully.');
+    }
+
+    /**
+     * Furniture & Assets Management.
+     */
+    public function furniture(Request $request)
+    {
+        $user = Auth::user();
+        $categories = \App\Domains\Workspace\Models\FurnitureCategory::withCount('items')
+            ->orderBy('order', 'asc')
+            ->get();
+
+        $selectedCategoryId = $request->input('category_id');
+        $query = \App\Domains\Workspace\Models\FurnitureItem::with('category');
+
+        if ($selectedCategoryId) {
+            $query->where('category_id', $selectedCategoryId);
+        }
+
+        if ($search = $request->input('search')) {
+            $query->where('name', 'like', "%{$search}%");
+        }
+
+        $items = $query->latest()->paginate(24);
+
+        $stats = [
+            'total_items' => \App\Domains\Workspace\Models\FurnitureItem::count(),
+            'total_categories' => $categories->count(),
+            'custom_uploads' => \App\Domains\Workspace\Models\FurnitureItem::whereNotNull('image_url')->count(),
+        ];
+
+        return view('superadmin.furniture', compact('user', 'categories', 'items', 'stats', 'selectedCategoryId'));
+    }
+
+    /**
+     * Store new Furniture Category.
+     */
+    public function storeFurnitureCategory(\App\Domains\Workspace\Requests\StoreFurnitureCategoryRequest $request)
+    {
+        $validated = $request->validated();
+
+        \App\Domains\Workspace\Models\FurnitureCategory::create([
+            'name' => $validated['name'],
+            'slug' => Str::slug($validated['name']) . '-' . Str::random(3),
+            'icon' => $validated['icon'] ?? '🪑',
+            'order' => $validated['order'] ?? 0,
+        ]);
+
+        $this->invalidateFurnitureCache();
+
+        return back()->with('success', 'Furniture Category created successfully.');
+    }
+
+    /**
+     * Update Furniture Category.
+     */
+    public function updateFurnitureCategory(\App\Domains\Workspace\Requests\StoreFurnitureCategoryRequest $request, \App\Domains\Workspace\Models\FurnitureCategory $category)
+    {
+        $validated = $request->validated();
+
+        $category->update([
+            'name' => $validated['name'],
+            'icon' => $validated['icon'] ?? $category->icon,
+            'order' => $validated['order'] ?? $category->order,
+        ]);
+
+        $this->invalidateFurnitureCache();
+
+        return back()->with('success', 'Furniture Category updated successfully.');
+    }
+
+    /**
+     * Delete Furniture Category.
+     */
+    public function deleteFurnitureCategory(\App\Domains\Workspace\Models\FurnitureCategory $category)
+    {
+        $category->items()->delete();
+        $category->delete();
+
+        $this->invalidateFurnitureCache();
+
+        return back()->with('success', 'Furniture Category deleted successfully.');
+    }
+
+    /**
+     * Store/Upload new Furniture Item.
+     */
+    public function storeFurnitureItem(\App\Domains\Workspace\Requests\StoreFurnitureItemRequest $request)
+    {
+        $validated = $request->validated();
+
+        $imageUrl = $validated['image_url'] ?? null;
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $extension = strtolower($file->guessExtension() ?: 'png');
+            if (!in_array($extension, ['png', 'webp', 'jpg', 'jpeg', 'svg'])) {
+                return back()->withErrors(['image' => 'Invalid image format. Allowed formats: PNG, WebP, JPG, SVG.']);
+            }
+
+            // If SVG, check for dangerous tags
+            if ($extension === 'svg') {
+                $content = file_get_contents($file->getRealPath());
+                if (preg_match('/<script|javascript:|onload=|onerror=|onclick=|<foreignObject/i', $content)) {
+                    return back()->withErrors(['image' => 'The SVG file contains unsafe embedded scripts or attributes.']);
+                }
+            }
+
+            $filename = 'furn_' . Str::random(24) . '.' . $extension;
+            $destinationPath = public_path('uploads/furniture');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+                @file_put_contents($destinationPath . '/.htaccess', "<Files *.php>\n    Order Deny,Allow\n    Deny from all\n</Files>\nOptions -ExecCGI\n");
+            }
+            $file->move($destinationPath, $filename);
+            $imageUrl = '/uploads/furniture/' . $filename;
+        }
+
+        $colorsArr = !empty($validated['colors'])
+            ? array_map('trim', explode(',', $validated['colors']))
+            : ['#00b4b3', '#012c41'];
+
+        \App\Domains\Workspace\Models\FurnitureItem::create([
+            'category_id' => $validated['category_id'],
+            'name' => $validated['name'],
+            'slug' => Str::slug($validated['name']) . '-' . Str::random(4),
+            'image_url' => $imageUrl,
+            'icon' => $validated['icon'] ?? '🪑',
+            'width' => $validated['width'],
+            'height' => $validated['height'],
+            'collision' => $request->has('collision'),
+            'colors' => $colorsArr,
+            'is_active' => true,
+        ]);
+
+        $this->invalidateFurnitureCache();
+
+        return back()->with('success', 'New furniture asset uploaded and added to the catalog successfully.');
+    }
+
+    /**
+     * Update Furniture Item.
+     */
+    public function updateFurnitureItem(\App\Domains\Workspace\Requests\StoreFurnitureItemRequest $request, \App\Domains\Workspace\Models\FurnitureItem $item)
+    {
+        $validated = $request->validated();
+
+        $imageUrl = $item->image_url;
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $extension = strtolower($file->guessExtension() ?: 'png');
+            if (!in_array($extension, ['png', 'webp', 'jpg', 'jpeg', 'svg'])) {
+                return back()->withErrors(['image' => 'Invalid image format. Allowed formats: PNG, WebP, JPG, SVG.']);
+            }
+
+            if ($extension === 'svg') {
+                $content = file_get_contents($file->getRealPath());
+                if (preg_match('/<script|javascript:|onload=|onerror=|onclick=|<foreignObject/i', $content)) {
+                    return back()->withErrors(['image' => 'The SVG file contains unsafe embedded scripts or attributes.']);
+                }
+            }
+
+            $filename = 'furn_' . Str::random(24) . '.' . $extension;
+            $destinationPath = public_path('uploads/furniture');
+            if (!file_exists($destinationPath)) {
+                mkdir($destinationPath, 0755, true);
+                @file_put_contents($destinationPath . '/.htaccess', "<Files *.php>\n    Order Deny,Allow\n    Deny from all\n</Files>\nOptions -ExecCGI\n");
+            }
+            $file->move($destinationPath, $filename);
+            $imageUrl = '/uploads/furniture/' . $filename;
+        } elseif (!empty($validated['image_url'])) {
+            $imageUrl = $validated['image_url'];
+        }
+
+        $colorsArr = !empty($validated['colors'])
+            ? array_map('trim', explode(',', $validated['colors']))
+            : $item->colors;
+
+        $item->update([
+            'category_id' => $validated['category_id'],
+            'name' => $validated['name'],
+            'image_url' => $imageUrl,
+            'icon' => $validated['icon'] ?? $item->icon,
+            'width' => $validated['width'],
+            'height' => $validated['height'],
+            'collision' => $request->has('collision'),
+            'colors' => $colorsArr,
+            'is_active' => $request->has('is_active') ? true : $item->is_active,
+        ]);
+
+        $this->invalidateFurnitureCache();
+
+        return back()->with('success', "Furniture item {$item->name} updated successfully.");
+    }
+
+    /**
+     * Delete Furniture Item.
+     */
+    public function deleteFurnitureItem(\App\Domains\Workspace\Models\FurnitureItem $item)
+    {
+        $item->delete();
+
+        $this->invalidateFurnitureCache();
+
+        return back()->with('success', 'Furniture item removed from catalog.');
+    }
+
+    /**
+     * Invalidate cached furniture catalog in memory / cache store.
+     */
+    private function invalidateFurnitureCache(): void
+    {
+        Cache::forget('furniture_catalog_active');
+        Cache::forget('furniture_categories_with_items');
     }
 }

@@ -539,50 +539,163 @@
                 </div>
             </div>
 
-            <!-- Stats -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-lbl">Active Members</div>
-                    <div class="stat-val" style="color: #818cf8;">{{ $stats['members'] }}</div>
+            <!-- Executive KPIs Grid -->
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 20px;">
+                <div class="stat-card" style="border-top: 3px solid var(--brand-teal);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                        <div class="stat-lbl" style="font-size: 12px; font-weight: 800; color: var(--brand-ocean);">👥 {{ __('Workplace Presence') }}</div>
+                        <span style="font-size: 10px; font-weight: 800; color: var(--brand-green); background: rgba(0, 104, 71, 0.1); padding: 2px 6px; border-radius: 6px;">▲ +14%</span>
+                    </div>
+                    <div class="stat-val" style="color: var(--brand-teal); font-size: 28px; font-weight: 900; margin-bottom: 4px;">{{ $stats['presence_rate'] }}%</div>
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">{{ $stats['members'] }} {{ __('Registered team members') }}</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-lbl">Rooms & Zones</div>
-                    <div class="stat-val" style="color: #34d399;">{{ $rooms->count() }}</div>
+
+                <div class="stat-card" style="border-top: 3px solid var(--brand-pine);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                        <div class="stat-lbl" style="font-size: 12px; font-weight: 800; color: var(--brand-ocean);">🎙️ {{ __('Meetings & Sessions') }}</div>
+                        <span style="font-size: 10px; font-weight: 800; color: var(--brand-teal); background: rgba(0, 180, 179, 0.1); padding: 2px 6px; border-radius: 6px;">{{ $stats['collaboration_hours'] }}h</span>
+                    </div>
+                    <div class="stat-val" style="color: var(--brand-pine); font-size: 28px; font-weight: 900; margin-bottom: 4px;">{{ $stats['meetings_count'] }}</div>
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">{{ __('Spatial audio & video sessions') }}</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-lbl">Departments</div>
-                    <div class="stat-val" style="color: #fbbf24;">{{ $departments->count() }}</div>
+
+                <div class="stat-card" style="border-top: 3px solid var(--brand-orange);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                        <div class="stat-lbl" style="font-size: 12px; font-weight: 800; color: var(--brand-ocean);">🏢 {{ __('Room Occupancy') }}</div>
+                        <span style="font-size: 10px; font-weight: 800; color: var(--brand-orange); background: rgba(245, 123, 54, 0.1); padding: 2px 6px; border-radius: 6px;">{{ $rooms->count() }} {{ __('Rooms') }}</span>
+                    </div>
+                    <div class="stat-val" style="color: var(--brand-orange); font-size: 28px; font-weight: 900; margin-bottom: 4px;">{{ $stats['occupancy_rate'] }}%</div>
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">{{ __('Active collaborative spaces') }}</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-lbl">Current Plan</div>
-                    <div class="stat-val" style="color: #f472b6; font-size: 22px;">{{ $organization->plan->name ?? 'Free Plan' }}</div>
+
+                <div class="stat-card" style="border-top: 3px solid var(--brand-navy);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                        <div class="stat-lbl" style="font-size: 12px; font-weight: 800; color: var(--brand-ocean);">💎 {{ __('Company Plan') }}</div>
+                        <span style="font-size: 10px; font-weight: 800; color: var(--brand-teal); background: rgba(0, 180, 179, 0.1); padding: 2px 6px; border-radius: 6px;">{{ $stats['guests'] }} {{ __('Guests') }}</span>
+                    </div>
+                    <div class="stat-val" style="color: var(--brand-navy); font-size: 22px; font-weight: 900; margin-bottom: 4px;">{{ $organization->plan->name ?? 'Enterprise' }}</div>
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">{{ __('Capacity up to') }} {{ $organization->plan->max_users ?? '500' }} {{ __('Users') }}</div>
                 </div>
             </div>
 
-            <!-- Content Grid -->
+            <!-- Productivity Health Score & System Metrics Strip -->
+            <div class="card" style="margin-bottom: 20px; padding: 16px 20px; background: linear-gradient(135deg, rgba(0, 180, 179, 0.05), rgba(0, 104, 71, 0.03)); border: 1px solid rgba(0, 180, 179, 0.2);">
+                <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, var(--brand-green), var(--brand-teal)); color: white; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900;">
+                            ⚡
+                        </div>
+                        <div>
+                            <div style="font-size: 14px; font-weight: 900; color: var(--brand-navy);">{{ __('Workplace Health & Productivity Index') }}</div>
+                            <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">{{ __('Real-time collaboration metrics and system uptime') }}</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: center;">
+                        <div>
+                            <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">{{ __('Health Score') }}</div>
+                            <div style="font-size: 16px; font-weight: 900; color: var(--brand-green);">{{ $stats['productivity_score'] }} <span style="font-size: 11px; color: var(--text-muted);">/ 100</span></div>
+                        </div>
+                        <div style="width: 1px; height: 30px; background: var(--border-panel);"></div>
+                        <div>
+                            <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">{{ __('Screen Share Usage') }}</div>
+                            <div style="font-size: 16px; font-weight: 900; color: var(--brand-teal);">{{ $stats['screen_share_rate'] }}%</div>
+                        </div>
+                        <div style="width: 1px; height: 30px; background: var(--border-panel);"></div>
+                        <div>
+                            <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">{{ __('Spatial Audio Uptime') }}</div>
+                            <div style="font-size: 16px; font-weight: 900; color: var(--brand-pine);">{{ $stats['audio_quality'] }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two Analytics Widgets: Department Breakdown & Room Utilization -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <!-- Widget 1: Department Staff Allocation -->
+                <div class="card" style="margin-bottom: 0;">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                        <h3 class="card-title" style="font-size: 14px; font-weight: 800; color: var(--brand-navy);">📊 {{ __('Staff Distribution by Department') }}</h3>
+                        <span style="font-size: 11px; color: var(--brand-teal); font-weight: 800;">{{ $departments->count() }} {{ __('Departments') }}</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        @forelse($departments as $d)
+                            @php
+                                $dMems = $members->filter(function($mem) use ($d, $organization) {
+                                    $prof = $mem->user->profiles->where('organization_id', $organization->id)->first();
+                                    return $prof && $prof->department_id == $d->id;
+                                });
+                                $pct = $stats['members'] > 0 ? round(($dMems->count() / $stats['members']) * 100) : 0;
+                            @endphp
+                            <div>
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; margin-bottom: 4px;">
+                                    <span style="color: var(--brand-navy);">🏛️ {{ $d->name }}</span>
+                                    <span style="color: var(--text-muted);">{{ $dMems->count() }} {{ __('Staff') }} ({{ $pct }}%)</span>
+                                </div>
+                                <div style="width: 100%; height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden;">
+                                    <div style="width: {{ max(8, $pct) }}%; height: 100%; background: linear-gradient(90deg, var(--brand-teal), var(--brand-pine)); border-radius: 4px;"></div>
+                                </div>
+                            </div>
+                        @empty
+                            <div style="text-align: center; color: var(--text-dim); font-size: 12px; padding: 20px;">
+                                {{ __('No departments created yet.') }}
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- Widget 2: Room Occupancy & Capacity -->
+                <div class="card" style="margin-bottom: 0;">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                        <h3 class="card-title" style="font-size: 14px; font-weight: 800; color: var(--brand-navy);">🏢 {{ __('Room Occupancy & Status') }}</h3>
+                        <span style="font-size: 11px; color: var(--brand-green); font-weight: 800;">{{ $rooms->count() }} {{ __('Live Spaces') }}</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        @forelse($rooms->take(4) as $r)
+                            <div style="display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid var(--border-panel); padding: 8px 12px; border-radius: 10px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 12px; height: 12px; border-radius: 50%; background: {{ $r->color ?? 'var(--brand-teal)' }};"></div>
+                                    <div>
+                                        <div style="font-size: 13px; font-weight: 800; color: var(--brand-navy);">{{ $r->name }}</div>
+                                        <div style="font-size: 10px; color: var(--text-muted);">{{ __('Capacity') }}: {{ $r->capacity ?? 10 }} {{ __('seats') }}</div>
+                                    </div>
+                                </div>
+                                <span class="badge {{ $r->access_mode === 'private' ? 'badge-amber' : 'badge-green' }}" style="font-size: 10px;">
+                                    {{ $r->access_mode === 'private' ? '🔒 ' . __('Private / Knock') : '👥 ' . __('Open Access') }}
+                                </span>
+                            </div>
+                        @empty
+                            <div style="text-align: center; color: var(--text-dim); font-size: 12px; padding: 20px;">
+                                {{ __('No rooms configured yet.') }}
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Grid (Quick Actions & Recent Activity) -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                 <!-- Quick Actions -->
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Quick Actions</h3>
+                        <h3 class="card-title">{{ __('Quick Actions') }}</h3>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                        <a href="{{ route('office') }}" style="background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; text-decoration: none; color: white; display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center;">
+                        <a href="{{ route('office') }}" style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; text-decoration: none; color: var(--brand-navy); display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; transition: all 0.2s;">
                             <span style="font-size: 26px;">🚀</span>
-                            <strong style="font-size: 13px;">Virtual Workplace</strong>
-                            <span style="font-size: 11px; color: var(--text-muted);">Spatial voice & video</span>
+                            <strong style="font-size: 13px;">{{ __('Virtual Workplace') }}</strong>
+                            <span style="font-size: 11px; color: var(--text-muted);">{{ __('Spatial voice & video') }}</span>
                         </a>
-                        <a href="{{ route('editor') }}" style="background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; text-decoration: none; color: white; display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center;">
+                        <a href="{{ route('editor') }}" style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; text-decoration: none; color: var(--brand-navy); display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; transition: all 0.2s;">
                             <span style="font-size: 26px;">🎨</span>
-                            <strong style="font-size: 13px;">Floor Designer</strong>
-                            <span style="font-size: 11px; color: var(--text-muted);">Furniture & partitions</span>
+                            <strong style="font-size: 13px;">{{ __('Floor Designer') }}</strong>
+                            <span style="font-size: 11px; color: var(--text-muted);">{{ __('Furniture & partitions') }}</span>
                         </a>
-                        <div onclick="openInviteModal()" style="background: rgba(255,255,255,0.04); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; color: white; display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; cursor: pointer;">
+                        <div onclick="openInviteModal()" style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; color: var(--brand-navy); display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; cursor: pointer; transition: all 0.2s;">
                             <span style="font-size: 26px;">🔗</span>
-                            <strong style="font-size: 13px;">Instant Guest Link</strong>
-                            <span style="font-size: 11px; color: var(--text-muted);">No login needed</span>
+                            <strong style="font-size: 13px;">{{ __('Instant Guest Link') }}</strong>
+                            <span style="font-size: 11px; color: var(--text-muted);">{{ __('No login needed') }}</span>
                         </div>
-                        <div onclick="switchAdminTab('rooms')" style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; color: var(--brand-navy); display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; cursor: pointer;">
+                        <div onclick="switchAdminTab('rooms')" style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; color: var(--brand-navy); display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; cursor: pointer; transition: all 0.2s;">
                             <span style="font-size: 26px;">🚪</span>
                             <strong style="font-size: 13px;">{{ __('Manage Room Doors') }}</strong>
                             <span style="font-size: 11px; color: var(--text-muted);">{{ __('Lock & permissions') }}</span>

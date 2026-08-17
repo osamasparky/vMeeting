@@ -20,7 +20,13 @@ class ChatController extends Controller
     {
         $user = Auth::user();
 
-        $channels = $organization->hasMany(Channel::class)
+        $channels = Channel::where('organization_id', $organization->id)
+            ->where(function ($query) use ($user) {
+                $query->where('type', '!=', 'dm')
+                    ->orWhereHas('members', function ($q) use ($user) {
+                        $q->where('users.id', $user->id);
+                    });
+            })
             ->with(['room:id,name', 'members:id,name,email'])
             ->get();
 

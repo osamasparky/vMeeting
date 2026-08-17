@@ -23,9 +23,9 @@ Route::get('/lang/{locale}', function (string $locale) {
 // Authentication & Dashboard Routes (Web UI)
 Route::middleware('guest')->group(function () {
     Route::get('/login', [WebAuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [WebAuthController::class, 'login'])->name('login.submit');
+    Route::post('/login', [WebAuthController::class, 'login'])->middleware('throttle:10,1')->name('login.submit');
     Route::get('/register', [WebAuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [WebAuthController::class, 'register'])->name('register.submit');
+    Route::post('/register', [WebAuthController::class, 'register'])->middleware('throttle:6,1')->name('register.submit');
 });
 
 Route::middleware('auth')->group(function () {
@@ -48,7 +48,7 @@ Route::middleware('auth')->group(function () {
 
 // Guest Access Routes (Public / Unauthenticated)
 Route::get('/guest/join/{token}', [WebAuthController::class, 'guestJoin'])->name('guest.join');
-Route::post('/guest/join/{token}', [WebAuthController::class, 'guestEnter'])->name('guest.enter');
+Route::post('/guest/join/{token}', [WebAuthController::class, 'guestEnter'])->middleware('throttle:10,1')->name('guest.enter');
 
 // Super Admin Portal Routes
 Route::prefix('superadmin')->middleware(['auth', 'superadmin'])->name('superadmin.')->group(function () {
@@ -67,6 +67,16 @@ Route::prefix('superadmin')->middleware(['auth', 'superadmin'])->name('superadmi
 
     Route::get('/settings', [\App\Http\Controllers\SuperAdminController::class, 'settings'])->name('settings');
     Route::post('/settings', [\App\Http\Controllers\SuperAdminController::class, 'updateSettings'])->name('settings.update');
+
+    // Furniture & Assets Catalog Management
+    Route::get('/furniture', [\App\Http\Controllers\SuperAdminController::class, 'furniture'])->name('furniture');
+    Route::post('/furniture/category', [\App\Http\Controllers\SuperAdminController::class, 'storeFurnitureCategory'])->name('furniture.category.store');
+    Route::put('/furniture/category/{category}', [\App\Http\Controllers\SuperAdminController::class, 'updateFurnitureCategory'])->name('furniture.category.update');
+    Route::delete('/furniture/category/{category}', [\App\Http\Controllers\SuperAdminController::class, 'deleteFurnitureCategory'])->name('furniture.category.delete');
+
+    Route::post('/furniture/item', [\App\Http\Controllers\SuperAdminController::class, 'storeFurnitureItem'])->name('furniture.item.store');
+    Route::put('/furniture/item/{item}', [\App\Http\Controllers\SuperAdminController::class, 'updateFurnitureItem'])->name('furniture.item.update');
+    Route::delete('/furniture/item/{item}', [\App\Http\Controllers\SuperAdminController::class, 'deleteFurnitureItem'])->name('furniture.item.delete');
 });
 
 

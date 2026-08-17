@@ -646,133 +646,35 @@
                         <input type="text" id="furniture-search" class="search-input" placeholder="🔍 {{ __('Search furniture, seating, tables...') }}" oninput="filterFurniture(this.value)">
                     </div>
 
-                    <!-- Category 1: Seating -->
-                    <div class="category-accordion" id="cat-seating">
-                        <div class="category-header" onclick="toggleAccordion('cat-seating')">
-                            <span>🪑 {{ __('Seating & Sofas') }}</span>
+                    @foreach($furnitureCategories as $cat)
+                    <div class="category-accordion" id="cat-{{ $cat->slug }}">
+                        <div class="category-header" onclick="toggleAccordion('cat-{{ $cat->slug }}')">
+                            <span>{{ $cat->icon }} {{ $cat->name }}</span>
                             <span class="acc-icon">▴</span>
                         </div>
                         <div class="category-body">
-                            <div class="furn-card" onclick="selectFurnitureItem('chair', '#00b4b3')">
-                                <div class="furn-preview-icon">🪑</div>
-                                <div class="furn-name">{{ __('Ergo Chair') }}</div>
-                                <div class="color-swatches">
-                                    <span class="swatch-dot" style="background: #00b4b3;" onclick="event.stopPropagation(); selectFurnitureItem('chair', '#00b4b3')"></span>
-                                    <span class="swatch-dot" style="background: #006847;" onclick="event.stopPropagation(); selectFurnitureItem('chair', '#006847')"></span>
-                                    <span class="swatch-dot" style="background: #f57b36;" onclick="event.stopPropagation(); selectFurnitureItem('chair', '#f57b36')"></span>
-                                    <span class="swatch-dot" style="background: #d20005;" onclick="event.stopPropagation(); selectFurnitureItem('chair', '#d20005')"></span>
+                            @foreach($cat->items as $item)
+                                <div class="furn-card" onclick="selectFurnitureItem('{{ $item->slug }}', '{{ $item->colors[0] ?? '#00b4b3' }}', '{{ $item->image_url }}', {{ $item->width }}, {{ $item->height }}, {{ $item->collision ? 'true' : 'false' }})">
+                                    <div class="furn-preview-icon">
+                                        @if($item->image_url)
+                                            <img src="{{ $item->image_url }}" alt="{{ $item->name }}" style="max-height: 36px; max-width: 100%; object-fit: contain;">
+                                        @else
+                                            {{ $item->icon }}
+                                        @endif
+                                    </div>
+                                    <div class="furn-name">{{ $item->name }}</div>
+                                    @if(!empty($item->colors))
+                                    <div class="color-swatches">
+                                        @foreach($item->colors as $col)
+                                            <span class="swatch-dot" style="background: {{ $col }};" onclick="event.stopPropagation(); selectFurnitureItem('{{ $item->slug }}', '{{ $col }}', '{{ $item->image_url }}', {{ $item->width }}, {{ $item->height }}, {{ $item->collision ? 'true' : 'false' }})"></span>
+                                        @endforeach
+                                    </div>
+                                    @endif
                                 </div>
-                            </div>
-
-                            <div class="furn-card" onclick="selectFurnitureItem('sofa', '#012c41')">
-                                <div class="furn-preview-icon">🛋️</div>
-                                <div class="furn-name">{{ __('Lounge Sofa') }}</div>
-                                <div class="color-swatches">
-                                    <span class="swatch-dot" style="background: #012c41;" onclick="event.stopPropagation(); selectFurnitureItem('sofa', '#012c41')"></span>
-                                    <span class="swatch-dot" style="background: #00726c;" onclick="event.stopPropagation(); selectFurnitureItem('sofa', '#00726c')"></span>
-                                    <span class="swatch-dot" style="background: #ffd136;" onclick="event.stopPropagation(); selectFurnitureItem('sofa', '#ffd136')"></span>
-                                </div>
-                            </div>
-
-                            <div class="furn-card" onclick="selectFurnitureItem('beanbag', '#ffd136')">
-                                <div class="furn-preview-icon">🟡</div>
-                                <div class="furn-name">{{ __('Bean Bag Chair') }}</div>
-                                <div class="color-swatches">
-                                    <span class="swatch-dot" style="background: #ffd136;" onclick="event.stopPropagation(); selectFurnitureItem('beanbag', '#ffd136')"></span>
-                                    <span class="swatch-dot" style="background: #00b4b3;" onclick="event.stopPropagation(); selectFurnitureItem('beanbag', '#00b4b3')"></span>
-                                    <span class="swatch-dot" style="background: #f57b36;" onclick="event.stopPropagation(); selectFurnitureItem('beanbag', '#f57b36')"></span>
-                                </div>
-                            </div>
-
-                            <div class="furn-card" onclick="selectFurnitureItem('booth', '#d20005')">
-                                <div class="furn-preview-icon">🟥</div>
-                                <div class="furn-name">{{ __('Booth Corner') }}</div>
-                                <div class="color-swatches">
-                                    <span class="swatch-dot" style="background: #d20005;" onclick="event.stopPropagation(); selectFurnitureItem('booth', '#d20005')"></span>
-                                    <span class="swatch-dot" style="background: #004862;" onclick="event.stopPropagation(); selectFurnitureItem('booth', '#004862')"></span>
-                                </div>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
-
-                    <!-- Category 2: Tables & Desks -->
-                    <div class="category-accordion" id="cat-tables">
-                        <div class="category-header" onclick="toggleAccordion('cat-tables')">
-                            <span>🖥️ {{ __('Tables & Desks') }}</span>
-                            <span class="acc-icon">▴</span>
-                        </div>
-                        <div class="category-body">
-                            <div class="furn-card" onclick="selectFurnitureItem('desk', '#00b4b3')">
-                                <div class="furn-preview-icon">💻</div>
-                                <div class="furn-name">{{ __('Workstation') }}</div>
-                                <div class="color-swatches">
-                                    <span class="swatch-dot" style="background: #5c4033;" onclick="event.stopPropagation(); selectFurnitureItem('desk', '#5c4033')"></span>
-                                    <span class="swatch-dot" style="background: #004862;" onclick="event.stopPropagation(); selectFurnitureItem('desk', '#004862')"></span>
-                                </div>
-                            </div>
-
-                            <div class="furn-card" onclick="selectFurnitureItem('executive_desk', '#012c41')">
-                                <div class="furn-preview-icon">🖥️</div>
-                                <div class="furn-name">{{ __('Executive Desk') }}</div>
-                                <div class="color-swatches">
-                                    <span class="swatch-dot" style="background: #271610;" onclick="event.stopPropagation(); selectFurnitureItem('executive_desk', '#271610')"></span>
-                                    <span class="swatch-dot" style="background: #00726c;" onclick="event.stopPropagation(); selectFurnitureItem('executive_desk', '#00726c')"></span>
-                                </div>
-                            </div>
-
-                            <div class="furn-card" onclick="selectFurnitureItem('dining_table', '#ffd136')">
-                                <div class="furn-preview-icon">🍽️</div>
-                                <div class="furn-name">{{ __('Conference Table') }}</div>
-                                <div class="color-swatches">
-                                    <span class="swatch-dot" style="background: #3e2723;" onclick="event.stopPropagation(); selectFurnitureItem('dining_table', '#3e2723')"></span>
-                                    <span class="swatch-dot" style="background: #00b4b3;" onclick="event.stopPropagation(); selectFurnitureItem('dining_table', '#00b4b3')"></span>
-                                </div>
-                            </div>
-
-                            <div class="furn-card" onclick="selectFurnitureItem('cabinet', '#64748b')">
-                                <div class="furn-preview-icon">🗄️</div>
-                                <div class="furn-name">{{ __('Cabinets') }}</div>
-                                <div class="color-swatches">
-                                    <span class="swatch-dot" style="background: #64748b;" onclick="event.stopPropagation(); selectFurnitureItem('cabinet', '#64748b')"></span>
-                                    <span class="swatch-dot" style="background: #a7c545;" onclick="event.stopPropagation(); selectFurnitureItem('cabinet', '#a7c545')"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Category 3: Plants & Decor -->
-                    <div class="category-accordion" id="cat-decor">
-                        <div class="category-header" onclick="toggleAccordion('cat-decor')">
-                            <span>🪴 {{ __('Plants & Workplace Decor') }}</span>
-                            <span class="acc-icon">▴</span>
-                        </div>
-                        <div class="category-body">
-                            <div class="furn-card" onclick="selectFurnitureItem('plant', '#006847')">
-                                <div class="furn-preview-icon">🪴</div>
-                                <div class="furn-name">{{ __('Decor Plant') }}</div>
-                            </div>
-                            <div class="furn-card" onclick="selectFurnitureItem('water_cooler', '#00b4b3')">
-                                <div class="furn-preview-icon">🚰</div>
-                                <div class="furn-name">{{ __('Water Cooler') }}</div>
-                            </div>
-                            <div class="furn-card" onclick="selectFurnitureItem('whiteboard', '#ffffff')">
-                                <div class="furn-preview-icon">📋</div>
-                                <div class="furn-name">{{ __('Whiteboard') }}</div>
-                            </div>
-                            <div class="furn-card" onclick="selectFurnitureItem('screen', '#012c41')">
-                                <div class="furn-preview-icon">📺</div>
-                                <div class="furn-name">{{ __('AV Screen') }}</div>
-                            </div>
-                            <div class="furn-card" onclick="selectFurnitureItem('lamp', '#ffd136')">
-                                <div class="furn-preview-icon">💡</div>
-                                <div class="furn-name">{{ __('Floor Lamp') }}</div>
-                            </div>
-                            <div class="furn-card" onclick="selectFurnitureItem('pingpong', '#00b4b3')">
-                                <div class="furn-preview-icon">🏓</div>
-                                <div class="furn-name">{{ __('Ping Pong') }}</div>
-                            </div>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
 
                 <!-- 2. ROOMS TAB -->
@@ -915,21 +817,42 @@
         let attachedObjects = [];
 
         const OBJECT_CONFIGS = {
-            desk: { icon: '💻', name: 'Workstation', collision: true },
-            executive_desk: { icon: '🖥️', name: 'Executive Desk', collision: true },
-            chair: { icon: '🪑', name: 'Ergo Chair', collision: false },
-            sofa: { icon: '🛋️', name: 'Lounge Sofa', collision: true },
-            beanbag: { icon: '🟡', name: 'Bean Bag Chair', collision: false },
-            booth: { icon: '🟥', name: 'Booth Corner', collision: true },
-            whiteboard: { icon: '📋', name: 'Whiteboard', collision: true },
-            screen: { icon: '📺', name: 'AV Screen', collision: true },
-            plant: { icon: '🪴', name: 'Decor Plant', collision: false },
-            lamp: { icon: '💡', name: 'Floor Lamp', collision: false },
-            pingpong: { icon: '🏓', name: 'Ping Pong Table', collision: true },
-            water_cooler: { icon: '🚰', name: 'Water Cooler', collision: true },
-            cabinet: { icon: '🗄️', name: 'Filing Cabinet', collision: true },
-            dining_table: { icon: '🍽️', name: 'Conference Table', collision: true }
+            desk: { icon: '💻', name: 'Workstation', collision: true, width: 2, height: 1 },
+            executive_desk: { icon: '🖥️', name: 'Executive Desk', collision: true, width: 2, height: 2 },
+            chair: { icon: '🪑', name: 'Ergo Chair', collision: false, width: 1, height: 1 },
+            sofa: { icon: '🛋️', name: 'Lounge Sofa', collision: true, width: 2, height: 1 },
+            beanbag: { icon: '🟡', name: 'Bean Bag Chair', collision: false, width: 1, height: 1 },
+            booth: { icon: '🟥', name: 'Booth Corner', collision: true, width: 2, height: 2 },
+            whiteboard: { icon: '📋', name: 'Whiteboard', collision: true, width: 2, height: 1 },
+            screen: { icon: '📺', name: 'AV Screen', collision: true, width: 2, height: 1 },
+            plant: { icon: '🪴', name: 'Decor Plant', collision: false, width: 1, height: 1 },
+            lamp: { icon: '💡', name: 'Floor Lamp', collision: false, width: 1, height: 1 },
+            pingpong: { icon: '🏓', name: 'Ping Pong Table', collision: true, width: 3, height: 2 },
+            water_cooler: { icon: '🚰', name: 'Water Cooler', collision: true, width: 1, height: 1 },
+            cabinet: { icon: '🗄️', name: 'Filing Cabinet', collision: true, width: 1, height: 1 },
+            dining_table: { icon: '🍽️', name: 'Conference Table', collision: true, width: 3, height: 2 }
         };
+
+        const ALL_FURNITURE_ITEMS = @json($furnitureItems ?? []);
+        const CUSTOM_IMAGE_CACHE = {};
+        ALL_FURNITURE_ITEMS.forEach(it => {
+            if (it.image_url) {
+                const img = new Image();
+                img.src = it.image_url;
+                img.onload = () => draw();
+                CUSTOM_IMAGE_CACHE[it.slug] = { img, width: it.width || 1, height: it.height || 1 };
+            }
+            OBJECT_CONFIGS[it.slug] = {
+                icon: it.icon || '🪑',
+                name: it.name,
+                collision: it.collision,
+                width: it.width || 1,
+                height: it.height || 1,
+                image_url: it.image_url
+            };
+        });
+
+        let currentObjectCustom = null;
 
         function setTool(tool) {
             currentTool = tool;
@@ -946,12 +869,20 @@
             event.currentTarget.classList.add('active');
         }
 
-        function selectFurnitureItem(type, color) {
+        function selectFurnitureItem(type, color, imageUrl = null, w = 1, h = 1, collision = true) {
             setTool('object');
             currentObjectType = type;
             currentObjectColor = color || '#00b4b3';
+            currentObjectCustom = {
+                imageUrl: imageUrl || null,
+                width: w || 1,
+                height: h || 1,
+                collision: Boolean(collision)
+            };
             document.querySelectorAll('.furn-card').forEach(el => el.classList.remove('active'));
-            event.currentTarget.closest('.furn-card')?.classList.add('active');
+            if (event && event.currentTarget) {
+                event.currentTarget.closest('.furn-card')?.classList.add('active');
+            }
         }
 
         function toggleCustomizeDrawer() {
@@ -1089,13 +1020,16 @@
                 startY = tileY;
                 currentRect = { x: tileX, y: tileY, width: 1, height: 1 };
             } else if (currentTool === 'object') {
-                const conf = OBJECT_CONFIGS[currentObjectType] || { name: 'Object', collision: false };
+                const conf = OBJECT_CONFIGS[currentObjectType] || { name: 'Object', collision: false, width: 1, height: 1 };
                 const newObj = {
                     type: currentObjectType,
                     name: `${conf.name} #${objects.length + 1}`,
                     position: { x: tileX, y: tileY },
                     color: currentObjectColor,
-                    collision: conf.collision
+                    image_url: currentObjectCustom?.imageUrl || conf.image_url || null,
+                    width: currentObjectCustom?.width || conf.width || 1,
+                    height: currentObjectCustom?.height || conf.height || 1,
+                    collision: currentObjectCustom ? currentObjectCustom.collision : conf.collision
                 };
                 objects.push(newObj);
                 selectedItem = { type: 'object', item: newObj };
@@ -1407,17 +1341,23 @@
             objects.forEach((obj) => {
                 const ox = obj.position.x * TILE_SIZE;
                 const oy = obj.position.y * TILE_SIZE;
+                const objW = (obj.width || (obj.size ? obj.size.width : 1)) * TILE_SIZE;
+                const objH = (obj.height || (obj.size ? obj.size.height : 1)) * TILE_SIZE;
 
-                if (EDITOR_3D_FURNITURE[obj.type]) {
+                const sprite = CUSTOM_IMAGE_CACHE[obj.type] || (obj.image_url ? { img: (function(){ const i = new Image(); i.src = obj.image_url; return i; })() } : null);
+
+                if (sprite && sprite.img && sprite.img.complete && sprite.img.naturalWidth > 0) {
+                    ctx.drawImage(sprite.img, ox, oy, objW, objH);
+                } else if (EDITOR_3D_FURNITURE[obj.type]) {
                     EDITOR_3D_FURNITURE[obj.type](ox, oy);
                 } else {
-                    ctx.fillStyle = 'rgba(0, 180, 179, 0.1)';
-                    ctx.fillRect(ox + 2, oy + 2, TILE_SIZE - 4, TILE_SIZE - 4);
+                    ctx.fillStyle = obj.color ? `${obj.color}22` : 'rgba(0, 180, 179, 0.1)';
+                    ctx.fillRect(ox + 2, oy + 2, objW - 4, objH - 4);
                     ctx.font = '18px Cairo, Inter';
                     ctx.textAlign = 'center';
                     ctx.textBaseline = 'middle';
                     const conf = OBJECT_CONFIGS[obj.type] || { icon: '📦' };
-                    ctx.fillText(conf.icon, ox + TILE_SIZE / 2, oy + TILE_SIZE / 2);
+                    ctx.fillText(conf.icon, ox + objW / 2, oy + objH / 2);
                     ctx.textAlign = 'start';
                     ctx.textBaseline = 'alphabetic';
                 }
@@ -1426,7 +1366,7 @@
                 if (isSelected) {
                     ctx.strokeStyle = '#012c41';
                     ctx.lineWidth = 2.5;
-                    ctx.strokeRect(ox, oy, TILE_SIZE, TILE_SIZE);
+                    ctx.strokeRect(ox, oy, objW, objH);
                 }
             });
 

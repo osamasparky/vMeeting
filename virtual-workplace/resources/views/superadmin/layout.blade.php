@@ -509,6 +509,10 @@
                 <span class="nav-item-icon">💎</span>
                 <span>{{ __('Subscription Plans') }}</span>
             </a>
+            <a href="{{ route('superadmin.furniture') }}" class="nav-item {{ request()->routeIs('superadmin.furniture*') ? 'active' : '' }}">
+                <span class="nav-item-icon">🛋️</span>
+                <span>{{ __('Furniture & Assets') }}</span>
+            </a>
 
             <div class="nav-category-title">{{ __('Access & Security') }}</div>
             <a href="{{ route('superadmin.matrix') }}" class="nav-item {{ request()->routeIs('superadmin.matrix') ? 'active' : '' }}">

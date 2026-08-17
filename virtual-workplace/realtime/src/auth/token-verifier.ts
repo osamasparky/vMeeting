@@ -5,7 +5,10 @@ export class TokenVerifier {
   private secret: string;
 
   constructor(secret?: string) {
-    this.secret = secret || process.env.REALTIME_SECRET || 'super-secret-virtual-workplace-key-2026';
+    this.secret = secret || process.env.REALTIME_SECRET || '';
+    if (!this.secret) {
+      console.warn('[SECURITY WARNING] REALTIME_SECRET is not configured. WebSocket tokens will fail verification.');
+    }
   }
 
   /**

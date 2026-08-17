@@ -119,7 +119,8 @@ class User extends Authenticatable
 
     public function isSuperAdmin(): bool
     {
-        return $this->email === 'info@meemdtt.com' ||
+        $superAdminEmails = array_filter(array_map('trim', explode(',', env('SUPER_ADMIN_EMAILS', 'info@meemdtt.com'))));
+        return in_array($this->email, $superAdminEmails) ||
             $this->memberships()->whereHas('role', function ($q) {
                 $q->where('slug', 'super_admin');
             })->exists();

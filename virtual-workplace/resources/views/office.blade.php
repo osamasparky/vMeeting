@@ -851,6 +851,17 @@
         const rooms = CONFIG.map.rooms || [];
         const roomDoorStates = new Map(); // roomId -> boolean (true: locked/closed, false: open)
 
+        const FURNITURE_CATALOG = @json($furnitureItems ?? []);
+        const CUSTOM_FURNITURE_SPRITES = {};
+        FURNITURE_CATALOG.forEach(it => {
+            if (it.image_url) {
+                const img = new Image();
+                img.src = it.image_url;
+                img.onload = () => { if (typeof draw === 'function') draw(); };
+                CUSTOM_FURNITURE_SPRITES[it.slug] = { img, width: it.width || 1, height: it.height || 1 };
+            }
+        });
+
         let zoomLevel = 1.0;
         let cameraOffset = { x: 0, y: 0 };
 
@@ -1673,25 +1684,35 @@
                 (CONFIG.map.objects || []).forEach(obj => {
                     const ox = obj.position.x * 32;
                     const oy = obj.position.y * 32;
-                    if (obj.type === 'desk' || obj.type === 'executive_desk') {
-                        ctx.fillStyle = '#b45309'; ctx.fillRect(ox + 2, oy + 4, 28, 22);
-                        ctx.fillStyle = '#d97706'; ctx.fillRect(ox + 4, oy + 6, 24, 18);
+                    const objW = (obj.width || (obj.size ? obj.size.width : 1)) * 32;
+                    const objH = (obj.height || (obj.size ? obj.size.height : 1)) * 32;
+
+                    const customSprite = CUSTOM_FURNITURE_SPRITES[obj.type] || (obj.image_url ? { img: (function(){ const i = new Image(); i.src = obj.image_url; return i; })() } : null);
+
+                    if (customSprite && customSprite.img && customSprite.img.complete && customSprite.img.naturalWidth > 0) {
+                        ctx.drawImage(customSprite.img, ox, oy, objW, objH);
+                    } else if (obj.type === 'desk' || obj.type === 'executive_desk') {
+                        ctx.fillStyle = '#b45309'; ctx.fillRect(ox + 2, oy + 4, objW - 4, objH - 8);
+                        ctx.fillStyle = '#d97706'; ctx.fillRect(ox + 4, oy + 6, objW - 8, objH - 12);
                         ctx.fillStyle = '#0f172a'; ctx.fillRect(ox + 6, oy + 8, 10, 4);
                         ctx.fillStyle = '#38bdf8'; ctx.fillRect(ox + 7, oy + 9, 8, 2);
-                        ctx.fillStyle = '#1e293b'; ctx.beginPath(); ctx.arc(ox + 16, oy + 23, 6, 0, Math.PI * 2); ctx.fill();
+                        ctx.fillStyle = '#1e293b'; ctx.beginPath(); ctx.arc(ox + objW / 2, oy + objH - 8, 6, 0, Math.PI * 2); ctx.fill();
                     } else if (obj.type === 'chair') {
-                        ctx.fillStyle = '#0f172a'; ctx.beginPath(); ctx.arc(ox + 16, oy + 16, 7, 0, Math.PI * 2); ctx.fill();
+                        ctx.fillStyle = obj.color || '#00b4b3'; ctx.beginPath(); ctx.arc(ox + 16, oy + 16, 7, 0, Math.PI * 2); ctx.fill();
                     } else if (obj.type === 'sofa') {
-                        ctx.fillStyle = '#18181b'; ctx.fillRect(ox + 2, oy + 4, 28, 22);
-                        ctx.fillStyle = '#27272a'; ctx.fillRect(ox + 4, oy + 6, 11, 16); ctx.fillRect(ox + 17, oy + 6, 11, 16);
+                        ctx.fillStyle = obj.color || '#012c41'; ctx.fillRect(ox + 2, oy + 4, objW - 4, objH - 8);
+                        ctx.fillStyle = '#27272a'; ctx.fillRect(ox + 4, oy + 6, (objW - 12) / 2, objH - 12); ctx.fillRect(ox + (objW / 2) + 2, oy + 6, (objW - 12) / 2, objH - 12);
                     } else if (obj.type === 'plant') {
                         ctx.fillStyle = '#78350f'; ctx.beginPath(); ctx.arc(ox + 16, oy + 16, 7, 0, Math.PI * 2); ctx.fill();
                         [0, 1.05, 2.1, 3.14, 4.2, 5.25].forEach(a => {
-                            ctx.fillStyle = '#22c55e'; ctx.beginPath();
+                            ctx.fillStyle = '#006847'; ctx.beginPath();
                             ctx.arc(ox + 16 + Math.cos(a) * 7, oy + 16 + Math.sin(a) * 7, 4, 0, Math.PI * 2); ctx.fill();
                         });
+                    } else if (obj.type === 'whiteboard') {
+                        ctx.fillStyle = '#ffffff'; ctx.fillRect(ox + 2, oy + 2, objW - 4, objH - 4);
+                        ctx.strokeStyle = '#64748b'; ctx.lineWidth = 2; ctx.strokeRect(ox + 2, oy + 2, objW - 4, objH - 4);
                     } else {
-                        ctx.fillStyle = '#64748b'; ctx.fillRect(ox + 4, oy + 4, 24, 24);
+                        ctx.fillStyle = obj.color || '#00b4b3'; ctx.fillRect(ox + 4, oy + 4, objW - 8, objH - 8);
                     }
                 });
 

@@ -108,6 +108,7 @@ class AuthController extends Controller
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function (User $user, string $password) {
                 $user->update(['password' => Hash::make($password)]);
+                $user->tokens()->delete();
             }
         );
 
