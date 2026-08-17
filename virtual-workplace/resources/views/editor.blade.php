@@ -1253,6 +1253,572 @@
             }
         };
 
+        // ── Ultra-High-Fidelity Procedural Office Furniture Rendering Engine ──
+        function drawEnhancedOfficeFurniture(ctx, obj, ox, oy, objW, objH) {
+            ctx.save();
+
+            // 1. Check custom uploaded sprite image first
+            const customSprite = CUSTOM_IMAGE_CACHE[obj.type] || (obj.image_url ? { img: (function(){ const i = new Image(); i.src = obj.image_url; return i; })() } : null);
+            if (customSprite && customSprite.img && customSprite.img.complete && customSprite.img.naturalWidth > 0) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
+                ctx.beginPath();
+                if (ctx.roundRect) ctx.roundRect(ox + 2, oy + 4, objW - 4, objH - 4, 6);
+                else ctx.rect(ox + 2, oy + 4, objW - 4, objH - 4);
+                ctx.fill();
+
+                ctx.drawImage(customSprite.img, ox, oy, objW, objH);
+                ctx.restore();
+                return;
+            }
+
+            const type = String(obj.type || '').toLowerCase();
+            const primaryColor = obj.color || '#00b4b3';
+
+            function roundRect(x, y, w, h, r) {
+                if (ctx.roundRect) {
+                    ctx.roundRect(x, y, w, h, r);
+                } else {
+                    ctx.beginPath();
+                    ctx.moveTo(x + r, y);
+                    ctx.lineTo(x + w - r, y);
+                    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+                    ctx.lineTo(x + w, y + h - r);
+                    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+                    ctx.lineTo(x + r, y + h);
+                    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+                    ctx.lineTo(x, y + r);
+                    ctx.quadraticCurveTo(x, y, x + r, y);
+                    ctx.closePath();
+                }
+            }
+
+            // ── 1. ERGONOMIC OFFICE CHAIR / BEANBAG ──
+            if (type === 'chair' || type === 'ergo_chair' || type === 'beanbag') {
+                if (type === 'beanbag') {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+                    ctx.beginPath();
+                    ctx.arc(ox + objW/2, oy + objH/2 + 3, objW/2 - 2, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    const bbGrad = ctx.createRadialGradient(ox + objW/2 - 3, oy + objH/2 - 3, 2, ox + objW/2, oy + objH/2, objW/2 - 2);
+                    bbGrad.addColorStop(0, primaryColor);
+                    bbGrad.addColorStop(1, '#d97706');
+                    ctx.fillStyle = bbGrad;
+                    ctx.beginPath();
+                    ctx.arc(ox + objW/2, oy + objH/2, objW/2 - 3, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+                    ctx.beginPath();
+                    ctx.arc(ox + objW/2, oy + objH/2 + 2, objW/4, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.arc(ox + objW/2, oy + objH/2 - 4, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    const cx = ox + objW / 2;
+                    const cy = oy + objH / 2;
+
+                    ctx.strokeStyle = '#475569';
+                    ctx.lineWidth = 2.5;
+                    for (let a = 0; a < 5; a++) {
+                        const angle = (a * 2 * Math.PI) / 5 - Math.PI / 2;
+                        ctx.beginPath();
+                        ctx.moveTo(cx, cy);
+                        ctx.lineTo(cx + Math.cos(angle) * 11, cy + Math.sin(angle) * 11);
+                        ctx.stroke();
+
+                        ctx.fillStyle = '#1e293b';
+                        ctx.beginPath();
+                        ctx.arc(cx + Math.cos(angle) * 11, cy + Math.sin(angle) * 11, 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
+                    ctx.beginPath();
+                    ctx.arc(cx, cy + 2, 10, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    const seatGrad = ctx.createRadialGradient(cx - 2, cy - 2, 2, cx, cy, 10);
+                    seatGrad.addColorStop(0, primaryColor);
+                    seatGrad.addColorStop(1, '#004862');
+                    ctx.fillStyle = seatGrad;
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, 9, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#0f172a';
+                    roundRect(cx - 8, cy - 11, 16, 5, 2.5);
+                    ctx.fill();
+                    ctx.fillStyle = primaryColor;
+                    roundRect(cx - 6, cy - 10, 12, 3, 1.5);
+                    ctx.fill();
+
+                    ctx.strokeStyle = '#94a3b8';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(cx - 7, cy - 9);
+                    ctx.lineTo(cx + 7, cy - 9);
+                    ctx.stroke();
+
+                    ctx.fillStyle = '#1e293b';
+                    roundRect(cx - 12, cy - 4, 3, 8, 1.5);
+                    ctx.fill();
+                    roundRect(cx + 9, cy - 4, 3, 8, 1.5);
+                    ctx.fill();
+                }
+            }
+
+            // ── 2. EXECUTIVE & STANDARD WORKSTATION DESKS ──
+            else if (type === 'desk' || type === 'executive_desk' || type === 'workstation') {
+                const isExec = type === 'executive_desk' || (objW >= 64 && objH >= 64);
+
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                roundRect(ox + 2, oy + 4, objW - 4, objH - 4, 6);
+                ctx.fill();
+
+                const deskGrad = ctx.createLinearGradient(ox, oy, ox, oy + objH);
+                if (isExec) {
+                    deskGrad.addColorStop(0, '#331c12');
+                    deskGrad.addColorStop(0.5, '#4a2818');
+                    deskGrad.addColorStop(1, '#27140b');
+                } else {
+                    deskGrad.addColorStop(0, '#78350f');
+                    deskGrad.addColorStop(0.5, '#92400e');
+                    deskGrad.addColorStop(1, '#662d0b');
+                }
+                ctx.fillStyle = deskGrad;
+                roundRect(ox + 1, oy + 1, objW - 2, objH - 2, 4);
+                ctx.fill();
+
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                const padW = Math.min(objW - 12, 38);
+                const padH = Math.min(objH - 10, 20);
+                const padX = ox + (objW - padW) / 2;
+                const padY = oy + (objH - padH) / 2 + (isExec ? 4 : 2);
+
+                ctx.fillStyle = '#0f172a';
+                roundRect(padX, padY, padW, padH, 2);
+                ctx.fill();
+                ctx.strokeStyle = '#334155';
+                ctx.lineWidth = 0.5;
+                ctx.stroke();
+
+                const monW = Math.min(objW - 14, 30);
+                const monH = 4;
+                const monX = ox + (objW - monW) / 2;
+                const monY = oy + 4;
+
+                ctx.fillStyle = '#94a3b8';
+                ctx.fillRect(ox + objW/2 - 4, monY + monH, 8, 2);
+
+                ctx.fillStyle = '#020617';
+                roundRect(monX, monY, monW, monH, 1.5);
+                ctx.fill();
+
+                const screenGrad = ctx.createLinearGradient(monX + 2, monY, monX + monW - 2, monY);
+                screenGrad.addColorStop(0, '#00b4b3');
+                screenGrad.addColorStop(0.5, '#38bdf8');
+                screenGrad.addColorStop(1, '#006847');
+                ctx.fillStyle = screenGrad;
+                ctx.fillRect(monX + 2, monY + 1, monW - 4, 2);
+
+                const kbW = Math.min(padW - 14, 18);
+                const kbH = 6;
+                const kbX = padX + (padW - kbW) / 2 - 4;
+                const kbY = padY + padH - kbH - 2;
+
+                ctx.fillStyle = '#1e293b';
+                roundRect(kbX, kbY, kbW, kbH, 1);
+                ctx.fill();
+                ctx.fillStyle = '#38bdf8';
+                ctx.fillRect(kbX + 2, kbY + 2, kbW - 4, 2);
+
+                ctx.fillStyle = '#334155';
+                roundRect(kbX + kbW + 3, kbY + 1, 4, 5, 1.5);
+                ctx.fill();
+
+                ctx.fillStyle = '#f8fafc';
+                ctx.beginPath();
+                ctx.arc(ox + 8, oy + objH - 8, 3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#78350f';
+                ctx.beginPath();
+                ctx.arc(ox + 8, oy + objH - 8, 2, 0, Math.PI * 2);
+                ctx.fill();
+
+                if (isExec) {
+                    ctx.fillStyle = '#d20005';
+                    roundRect(ox + objW - 16, oy + 8, 10, 14, 1.5);
+                    ctx.fill();
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(ox + objW - 14, oy + 10, 6, 2);
+
+                    const lampGrad = ctx.createRadialGradient(ox + 10, oy + 8, 2, ox + 10, oy + 8, 16);
+                    lampGrad.addColorStop(0, 'rgba(254, 240, 138, 0.4)');
+                    lampGrad.addColorStop(1, 'rgba(254, 240, 138, 0)');
+                    ctx.fillStyle = lampGrad;
+                    ctx.beginPath();
+                    ctx.arc(ox + 10, oy + 8, 16, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#ffd136';
+                    ctx.beginPath();
+                    ctx.arc(ox + 10, oy + 8, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // ── 3. CONFERENCE & MEETING TABLES ──
+            else if (type === 'dining_table' || type === 'conference_table' || type === 'meeting_table') {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+                roundRect(ox + 3, oy + 5, objW - 6, objH - 6, 8);
+                ctx.fill();
+
+                const confGrad = ctx.createLinearGradient(ox, oy, ox, oy + objH);
+                confGrad.addColorStop(0, '#2b170e');
+                confGrad.addColorStop(0.5, '#452618');
+                confGrad.addColorStop(1, '#23120a');
+                ctx.fillStyle = confGrad;
+                roundRect(ox + 2, oy + 2, objW - 4, objH - 4, 8);
+                ctx.fill();
+
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+                roundRect(ox + 10, oy + (objH - 12) / 2, objW - 20, 12, 3);
+                ctx.fill();
+
+                const numPods = Math.max(2, Math.floor(objW / 28));
+                for (let i = 0; i < numPods; i++) {
+                    const px = ox + 14 + (i * (objW - 28)) / (numPods - 1);
+                    const py = oy + objH / 2;
+
+                    ctx.fillStyle = '#334155';
+                    ctx.beginPath();
+                    ctx.arc(px, py, 3, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#22c55e';
+                    ctx.beginPath();
+                    ctx.arc(px, py, 1, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                const chairsCount = Math.max(2, Math.floor((objW - 16) / 22));
+                for (let i = 0; i < chairsCount; i++) {
+                    const cx = ox + 12 + i * 22;
+                    ctx.fillStyle = '#1e293b';
+                    roundRect(cx, oy - 2, 14, 4, 2);
+                    ctx.fill();
+                    roundRect(cx, oy + objH - 2, 14, 4, 2);
+                    ctx.fill();
+                }
+            }
+
+            // ── 4. MODERN SOFAS & BOOTHS ──
+            else if (type === 'sofa' || type === 'lounge_sofa' || type === 'booth') {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                roundRect(ox + 2, oy + 4, objW - 4, objH - 4, 6);
+                ctx.fill();
+
+                const sofaGrad = ctx.createLinearGradient(ox, oy, ox, oy + objH);
+                sofaGrad.addColorStop(0, primaryColor);
+                sofaGrad.addColorStop(1, '#002535');
+                ctx.fillStyle = sofaGrad;
+                roundRect(ox + 1, oy + 1, objW - 2, objH - 2, 6);
+                ctx.fill();
+
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+                roundRect(ox + 3, oy + 3, objW - 6, 7, 3);
+                ctx.fill();
+
+                const numCushions = objW > 48 ? 2 : 1;
+                const cW = (objW - 12) / numCushions;
+                for (let i = 0; i < numCushions; i++) {
+                    const cx = ox + 5 + i * cW + (i > 0 ? 2 : 0);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+                    roundRect(cx, oy + 11, cW - 2, objH - 14, 3);
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+                roundRect(ox + 1, oy + 2, 4, objH - 4, 2);
+                ctx.fill();
+                roundRect(ox + objW - 5, oy + 2, 4, objH - 4, 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffd136';
+                roundRect(ox + 5, oy + 12, 6, 6, 2);
+                ctx.fill();
+
+                if (objW > 48) {
+                    ctx.fillStyle = '#f57b36';
+                    roundRect(ox + objW - 11, oy + 12, 6, 6, 2);
+                    ctx.fill();
+                }
+            }
+
+            // ── 5. POTTED TROPICAL OFFICE PLANTS ──
+            else if (type === 'plant' || type === 'decor_plant') {
+                const cx = ox + objW / 2;
+                const cy = oy + objH / 2;
+
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
+                ctx.beginPath();
+                ctx.arc(cx, cy + 3, 11, 0, Math.PI * 2);
+                ctx.fill();
+
+                const potGrad = ctx.createRadialGradient(cx - 3, cy - 3, 2, cx, cy, 10);
+                potGrad.addColorStop(0, '#f8fafc');
+                potGrad.addColorStop(1, '#94a3b8');
+                ctx.fillStyle = potGrad;
+                ctx.beginPath();
+                ctx.arc(cx, cy, 10, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#451a03';
+                ctx.beginPath();
+                ctx.arc(cx, cy, 7.5, 0, Math.PI * 2);
+                ctx.fill();
+
+                const leafAngles = [0, 0.78, 1.57, 2.35, 3.14, 3.92, 4.71, 5.49];
+                leafAngles.forEach((angle, idx) => {
+                    const lx = cx + Math.cos(angle) * 11;
+                    const ly = cy + Math.sin(angle) * 11;
+
+                    const leafGrad = ctx.createRadialGradient(cx, cy, 2, lx, ly, 7);
+                    leafGrad.addColorStop(0, idx % 2 === 0 ? '#006847' : '#00b4b3');
+                    leafGrad.addColorStop(1, idx % 2 === 0 ? '#004d34' : '#00726c');
+                    ctx.fillStyle = leafGrad;
+
+                    ctx.beginPath();
+                    ctx.arc(lx, ly, 4.5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    ctx.strokeStyle = '#a7c545';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.lineTo(lx, ly);
+                    ctx.stroke();
+                });
+
+                ctx.fillStyle = '#a7c545';
+                ctx.beginPath();
+                ctx.arc(cx, cy, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // ── 6. GLASS & MAGNETIC WHITEBOARDS ──
+            else if (type === 'whiteboard') {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
+                roundRect(ox + 2, oy + 3, objW - 4, objH - 4, 3);
+                ctx.fill();
+
+                ctx.fillStyle = '#94a3b8';
+                roundRect(ox + 1, oy + 1, objW - 2, objH - 2, 3);
+                ctx.fill();
+
+                const boardGrad = ctx.createLinearGradient(ox, oy, ox, oy + objH);
+                boardGrad.addColorStop(0, '#ffffff');
+                boardGrad.addColorStop(1, '#f1f5f9');
+                ctx.fillStyle = boardGrad;
+                roundRect(ox + 3, oy + 3, objW - 6, objH - 6, 2);
+                ctx.fill();
+
+                ctx.strokeStyle = '#00b4b3';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(ox + 8, oy + 8);
+                ctx.lineTo(ox + 18, oy + 8);
+                ctx.lineTo(ox + 24, oy + 14);
+                ctx.stroke();
+
+                ctx.strokeStyle = '#d20005';
+                ctx.beginPath();
+                ctx.arc(ox + objW - 12, oy + 11, 3, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.fillStyle = '#475569';
+                ctx.fillRect(ox + (objW - 24) / 2, oy + objH - 3, 24, 2);
+                ctx.fillStyle = '#00b4b3'; ctx.fillRect(ox + (objW - 20) / 2, oy + objH - 3, 4, 1.5);
+                ctx.fillStyle = '#d20005'; ctx.fillRect(ox + (objW - 20) / 2 + 6, oy + objH - 3, 4, 1.5);
+                ctx.fillStyle = '#012c41'; ctx.fillRect(ox + (objW - 20) / 2 + 12, oy + objH - 3, 4, 1.5);
+            }
+
+            // ── 7. LARGE PRESENTATION AV SCREEN ──
+            else if (type === 'screen' || type === 'tv') {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+                roundRect(ox + 2, oy + 3, objW - 4, objH - 4, 3);
+                ctx.fill();
+
+                ctx.fillStyle = '#020617';
+                roundRect(ox + 1, oy + 1, objW - 2, objH - 2, 2);
+                ctx.fill();
+
+                const scrGrad = ctx.createLinearGradient(ox, oy, ox + objW, oy + objH);
+                scrGrad.addColorStop(0, '#004862');
+                scrGrad.addColorStop(0.5, '#00b4b3');
+                scrGrad.addColorStop(1, '#012c41');
+                ctx.fillStyle = scrGrad;
+                roundRect(ox + 3, oy + 3, objW - 6, objH - 6, 1);
+                ctx.fill();
+
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+                ctx.fillRect(ox + 6, oy + 6, 8, 2);
+                ctx.fillRect(ox + 6, oy + 10, 14, 2);
+                ctx.fillStyle = '#ffd136';
+                ctx.beginPath();
+                ctx.arc(ox + objW - 10, oy + objH / 2, 4, 0, Math.PI * 1.4);
+                ctx.lineTo(ox + objW - 10, oy + objH / 2);
+                ctx.fill();
+            }
+
+            // ── 8. PING PONG / GAME TABLE ──
+            else if (type === 'pingpong') {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+                roundRect(ox + 3, oy + 5, objW - 6, objH - 6, 4);
+                ctx.fill();
+
+                ctx.fillStyle = '#00726c';
+                roundRect(ox + 2, oy + 2, objW - 4, objH - 4, 3);
+                ctx.fill();
+
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1.5;
+                ctx.strokeRect(ox + 4, oy + 4, objW - 8, objH - 8);
+
+                ctx.beginPath();
+                ctx.moveTo(ox + 4, oy + objH / 2);
+                ctx.lineTo(ox + objW - 4, oy + objH / 2);
+                ctx.stroke();
+
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.fillRect(ox + objW / 2 - 1, oy + 2, 2, objH - 4);
+                ctx.fillStyle = '#0f172a';
+                ctx.fillRect(ox + objW / 2 - 2, oy + 1, 4, 2);
+                ctx.fillRect(ox + objW / 2 - 2, oy + objH - 3, 4, 2);
+
+                ctx.fillStyle = '#d20005';
+                ctx.beginPath(); ctx.arc(ox + 12, oy + 10, 3, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#004862';
+                ctx.beginPath(); ctx.arc(ox + objW - 12, oy + objH - 10, 3, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath(); ctx.arc(ox + objW / 2 + 4, oy + 8, 1.5, 0, Math.PI * 2); ctx.fill();
+            }
+
+            // ── 9. WATER COOLER ──
+            else if (type === 'water_cooler') {
+                const cx = ox + objW / 2;
+                const cy = oy + objH / 2;
+
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
+                ctx.beginPath();
+                ctx.arc(cx, cy + 2, 9, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#f8fafc';
+                roundRect(ox + 4, oy + 6, objW - 8, objH - 8, 3);
+                ctx.fill();
+                ctx.strokeStyle = '#cbd5e1';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                const waterGrad = ctx.createRadialGradient(cx - 2, cy - 2, 1, cx, cy, 6);
+                waterGrad.addColorStop(0, '#38bdf8');
+                waterGrad.addColorStop(1, '#0284c7');
+                ctx.fillStyle = waterGrad;
+                ctx.beginPath();
+                ctx.arc(cx, cy - 1, 6, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(cx - 3, cy + 6, 1.5, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(cx + 3, cy + 6, 1.5, 0, Math.PI * 2); ctx.fill();
+            }
+
+            // ── 10. FILING CABINET ──
+            else if (type === 'cabinet' || type === 'storage') {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
+                roundRect(ox + 2, oy + 3, objW - 4, objH - 4, 3);
+                ctx.fill();
+
+                ctx.fillStyle = '#334155';
+                roundRect(ox + 2, oy + 2, objW - 4, objH - 4, 2);
+                ctx.fill();
+
+                const numDrawers = Math.max(2, Math.floor(objH / 14));
+                const dH = (objH - 6) / numDrawers;
+                for (let i = 0; i < numDrawers; i++) {
+                    const dy = oy + 3 + i * dH;
+                    ctx.fillStyle = '#475569';
+                    roundRect(ox + 4, dy + 1, objW - 8, dH - 2, 1.5);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#cbd5e1';
+                    ctx.fillRect(ox + objW / 2 - 4, dy + dH / 2 - 1, 8, 2);
+                }
+            }
+
+            // ── 11. FLOOR LAMP ──
+            else if (type === 'lamp') {
+                const cx = ox + objW / 2;
+                const cy = oy + objH / 2;
+
+                const lightGrad = ctx.createRadialGradient(cx, cy, 4, cx, cy, 28);
+                lightGrad.addColorStop(0, 'rgba(254, 240, 138, 0.5)');
+                lightGrad.addColorStop(0.5, 'rgba(254, 240, 138, 0.2)');
+                lightGrad.addColorStop(1, 'rgba(254, 240, 138, 0)');
+                ctx.fillStyle = lightGrad;
+                ctx.beginPath();
+                ctx.arc(cx, cy, 28, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#1e293b';
+                ctx.beginPath();
+                ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffd136';
+                ctx.beginPath();
+                ctx.arc(cx, cy, 4.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // ── 12. GENERIC FALLBACK ──
+            else {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
+                roundRect(ox + 2, oy + 3, objW - 4, objH - 4, 4);
+                ctx.fill();
+
+                const genGrad = ctx.createLinearGradient(ox, oy, ox, oy + objH);
+                genGrad.addColorStop(0, '#ffffff');
+                genGrad.addColorStop(1, '#f1f5f9');
+                ctx.fillStyle = genGrad;
+                roundRect(ox + 2, oy + 2, objW - 4, objH - 4, 3);
+                ctx.fill();
+
+                ctx.fillStyle = primaryColor;
+                roundRect(ox + 2, oy + 2, objW - 4, 4, 2);
+                ctx.fill();
+
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+
+            ctx.restore();
+        }
+
         // ── Main Draw Loop ──
         function draw() {
             ctx.clearRect(0, 0, width, height);
@@ -1344,29 +1910,13 @@
                 const objW = (obj.width || (obj.size ? obj.size.width : 1)) * TILE_SIZE;
                 const objH = (obj.height || (obj.size ? obj.size.height : 1)) * TILE_SIZE;
 
-                const sprite = CUSTOM_IMAGE_CACHE[obj.type] || (obj.image_url ? { img: (function(){ const i = new Image(); i.src = obj.image_url; return i; })() } : null);
-
-                if (sprite && sprite.img && sprite.img.complete && sprite.img.naturalWidth > 0) {
-                    ctx.drawImage(sprite.img, ox, oy, objW, objH);
-                } else if (EDITOR_3D_FURNITURE[obj.type]) {
-                    EDITOR_3D_FURNITURE[obj.type](ox, oy);
-                } else {
-                    ctx.fillStyle = obj.color ? `${obj.color}22` : 'rgba(0, 180, 179, 0.1)';
-                    ctx.fillRect(ox + 2, oy + 2, objW - 4, objH - 4);
-                    ctx.font = '18px Cairo, Inter';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    const conf = OBJECT_CONFIGS[obj.type] || { icon: '📦' };
-                    ctx.fillText(conf.icon, ox + objW / 2, oy + objH / 2);
-                    ctx.textAlign = 'start';
-                    ctx.textBaseline = 'alphabetic';
-                }
+                drawEnhancedOfficeFurniture(ctx, obj, ox, oy, objW, objH);
 
                 const isSelected = selectedItem && selectedItem.type === 'object' && selectedItem.item === obj;
                 if (isSelected) {
-                    ctx.strokeStyle = '#012c41';
+                    ctx.strokeStyle = '#00b4b3';
                     ctx.lineWidth = 2.5;
-                    ctx.strokeRect(ox, oy, objW, objH);
+                    ctx.strokeRect(ox - 1, oy - 1, objW + 2, objH + 2);
                 }
             });
 
