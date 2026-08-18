@@ -16,7 +16,7 @@
                 name="search"
                 value="{{ request('search') }}"
                 placeholder="{{ __('Search by name or slug...') }}"
-                style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 14px; color: var(--brand-navy); font-size: 13px; outline: none; width: 220px;"
+                style="background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 14px; color: var(--text-primary); font-size: 13px; outline: none; width: 220px;"
             >
             <button type="submit" class="btn-action">🔍 {{ __('Search') }}</button>
         </form>
@@ -46,11 +46,11 @@
                 @endphp
                 <tr>
                     <td>
-                        <strong style="color: var(--brand-navy); font-size: 14px;">{{ $comp->name }}</strong>
+                        <strong style="color: var(--text-primary); font-size: 14px;">{{ $comp->name }}</strong>
                         <div style="font-size: 11px; color: var(--text-muted);">{{ $comp->slug }}</div>
                     </td>
                     <td>
-                        <div style="font-weight: 700; color: var(--brand-ocean);">{{ $owner?->name ?? 'Administrator' }}</div>
+                        <div style="font-weight: 700; color: var(--text-primary);">{{ $owner?->name ?? 'Administrator' }}</div>
                         <div style="font-size: 11px; color: var(--text-muted);">{{ $owner?->email }}</div>
                     </td>
                     <td>
@@ -68,7 +68,7 @@
                         <div style="font-size: 10px; color: var(--text-muted);">{{ __('Seats used') }}</div>
                     </td>
                     <td>
-                        <span style="font-weight: 700; color: var(--brand-ocean);">{{ $comp->rooms->count() }} {{ __('Rooms') }}</span>
+                        <span style="font-weight: 700; color: var(--text-secondary);">{{ $comp->rooms->count() }} {{ __('Rooms') }}</span>
                     </td>
                     <td>
                         @if($isSuspended)

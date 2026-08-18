@@ -75,11 +75,11 @@
                 @endphp
                 <tr>
                     <td>
-                        <strong style="color: var(--brand-navy); font-size: 14px;">{{ $comp->name }}</strong>
+                        <strong style="color: var(--text-primary); font-size: 14px;">{{ $comp->name }}</strong>
                         <div style="font-size: 11px; color: var(--text-muted);">{{ $comp->slug }}</div>
                     </td>
                     <td>
-                        <div style="font-weight: 700; color: var(--brand-ocean);">{{ $owner?->name ?? 'Administrator' }}</div>
+                        <div style="font-weight: 700; color: var(--text-primary);">{{ $owner?->name ?? 'Administrator' }}</div>
                         <div style="font-size: 11px; color: var(--text-muted);">{{ $owner?->email }}</div>
                     </td>
                     <td>

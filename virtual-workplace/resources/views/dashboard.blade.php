@@ -157,14 +157,14 @@
         }
 
         .nav-tab-btn:hover {
-            background: #f1f5f9;
-            color: var(--brand-navy);
+            background: var(--bg-elevated);
+            color: var(--text-primary);
         }
 
         .nav-tab-btn.active {
-            background: linear-gradient(135deg, var(--brand-teal), var(--brand-pine));
-            color: white;
-            box-shadow: 0 4px 12px rgba(0, 180, 179, 0.25);
+            background: var(--accent-gradient);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
         }
 
         .sidebar-user {
@@ -174,7 +174,7 @@
             gap: 10px;
             padding: 10px;
             border-radius: var(--radius-md);
-            background: #f8fafc;
+            background: var(--bg-elevated);
             border: 1px solid var(--border-color);
         }
 
@@ -212,7 +212,7 @@
         .page-title {
             font-size: 24px;
             font-weight: 900;
-            color: var(--brand-navy);
+            color: var(--text-primary);
             letter-spacing: -0.5px;
         }
 
@@ -240,30 +240,30 @@
         .btn-primary {
             background: var(--accent-gradient);
             color: white;
-            box-shadow: 0 4px 14px rgba(0, 180, 179, 0.35);
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
         }
 
         .btn-primary:hover {
             transform: translateY(-1px);
-            box-shadow: 0 6px 18px rgba(0, 180, 179, 0.45);
+            box-shadow: 0 6px 18px rgba(59, 130, 246, 0.45);
         }
 
         .btn-success {
-            background: linear-gradient(135deg, var(--brand-green), #004d34);
+            background: linear-gradient(135deg, #10b981, #059669);
             color: white;
             font-weight: 800;
-            box-shadow: 0 4px 12px rgba(0, 104, 71, 0.25);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
         }
 
         .btn-outline {
-            background: #ffffff;
+            background: var(--bg-card);
             border: 1px solid var(--border-color);
-            color: var(--brand-navy);
+            color: var(--text-primary);
         }
 
         .btn-outline:hover {
-            background: #f8fafc;
-            border-color: var(--brand-teal);
+            background: var(--bg-elevated);
+            border-color: var(--brand-primary);
         }
 
         /* ── Stats ── */
@@ -290,7 +290,7 @@
         .stat-val {
             font-size: 28px;
             font-weight: 900;
-            color: var(--brand-navy);
+            color: var(--text-primary);
             margin: 6px 0 2px;
         }
 
@@ -319,6 +319,7 @@
             padding: 24px;
             box-shadow: var(--shadow-card);
             margin-bottom: 24px;
+            color: var(--text-primary);
         }
 
         .card-header {
@@ -333,7 +334,7 @@
         .card-title {
             font-size: 16px;
             font-weight: 800;
-            color: var(--brand-navy);
+            color: var(--text-primary);
         }
 
         .data-table {
@@ -345,7 +346,7 @@
 
         .data-table th {
             padding: 12px 14px;
-            background: #f8fafc;
+            background: var(--bg-elevated);
             color: var(--text-secondary);
             font-weight: 800;
             font-size: 11px;
@@ -357,11 +358,11 @@
         .data-table td {
             padding: 14px;
             border-bottom: 1px solid var(--border-color);
-            color: var(--brand-navy);
-            background: #ffffff;
+            color: var(--text-primary);
+            background: var(--bg-card);
         }
         .data-table tr:hover td {
-            background: #f8fafc;
+            background: var(--bg-elevated);
         }
 
         .badge {
@@ -372,15 +373,16 @@
             font-weight: 800;
         }
 
-        .badge-green { background: rgba(0, 104, 71, 0.1); color: var(--brand-green); border: 1px solid rgba(0, 104, 71, 0.25); }
-        .badge-purple { background: rgba(0, 180, 179, 0.12); color: var(--brand-pine); border: 1px solid rgba(0, 180, 179, 0.3); }
-        .badge-amber { background: rgba(245, 123, 54, 0.12); color: var(--brand-orange); border: 1px solid rgba(245, 123, 54, 0.3); }
+        .badge-green { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-purple { background: rgba(139, 92, 246, 0.15); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.3); }
+        .badge-teal { background: rgba(6, 182, 212, 0.15); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.3); }
+        .badge-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
 
         /* ── Modal Overlay ── */
         .modal, .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(1, 44, 65, 0.5);
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(8px);
             display: none;
             align-items: center;
@@ -390,14 +392,14 @@
         }
 
         .modal-box, .modal-card {
-            background: #ffffff;
+            background: var(--bg-surface);
             border: 1px solid var(--border-color);
             border-radius: 20px;
             padding: 28px;
             width: 100%;
             max-width: 500px;
-            box-shadow: 0 25px 60px rgba(1, 44, 65, 0.25);
-            color: var(--brand-navy);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.45);
+            color: var(--text-primary);
             position: relative;
             animation: modalFadeIn 0.2s ease-out;
         }
@@ -417,13 +419,13 @@
         .modal-title {
             font-size: 18px;
             font-weight: 800;
-            color: var(--brand-navy);
+            color: var(--text-primary);
         }
 
         .modal-close {
             background: none;
             border: none;
-            color: #94a3b8;
+            color: var(--text-muted);
             font-size: 20px;
             cursor: pointer;
             padding: 4px;
@@ -437,13 +439,13 @@
 
         .mobile-menu-btn {
             display: none;
-            background: #f8fafc;
+            background: var(--bg-elevated);
             border: 1px solid var(--border-color);
             font-size: 20px;
             padding: 6px 12px;
             border-radius: 8px;
             cursor: pointer;
-            color: var(--brand-navy);
+            color: var(--text-primary);
         }
 
         @media (max-width: 900px) {
@@ -972,9 +974,19 @@
                     <h1 class="page-title">{{ __('Guest Meeting Links') }}</h1>
                     <p class="page-subtitle">{{ __('Generate instant join links for clients, interviewees, and external partners.') }}</p>
                 </div>
-                <button onclick="openInviteModal()" class="header-btn btn-success">
-                    <span>⚡</span> {{ __('Create Guest Link') }}
-                </button>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    @if($guestInvitations->count() > 0)
+                        <form method="POST" action="{{ route('guest_invitations.clear') }}" onsubmit="return confirm('{{ __('Are you sure you want to delete all guest meeting links?') }}');" style="display: inline;">
+                            @csrf
+                            <button type="submit" class="header-btn" style="background: #ef4444; color: white; border: none; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
+                                <span>🗑️</span> {{ __('Clear All Links') }}
+                            </button>
+                        </form>
+                    @endif
+                    <button onclick="openInviteModal()" class="header-btn btn-success">
+                        <span>⚡</span> {{ __('Create Guest Link') }}
+                    </button>
+                </div>
             </div>
 
             <div class="card">
@@ -1137,6 +1149,16 @@
                 <div>
                     <h1 class="page-title">{{ __('Audit Logs') }}</h1>
                     <p class="page-subtitle">{{ __('Track administrative actions and security events across the workplace.') }}</p>
+                </div>
+                <div>
+                    @if($auditLogs->count() > 0)
+                        <form method="POST" action="{{ route('audit_logs.clear') }}" onsubmit="return confirm('{{ __('Are you sure you want to purge all audit logs?') }}');" style="display: inline;">
+                            @csrf
+                            <button type="submit" class="header-btn" style="background: #ef4444; color: white; border: none; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);">
+                                <span>🗑️</span> {{ __('Clear All Logs') }}
+                            </button>
+                        </form>
+                    @endif
                 </div>
             </div>
 

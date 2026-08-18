@@ -44,6 +44,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/teams/{team}', [WebAuthController::class, 'deleteTeam'])->name('teams.delete');
 
     Route::post('/members/{member}/assign', [WebAuthController::class, 'assignMemberDepartment'])->name('members.assign_department');
+
+    // Bulk Clear Routes
+    Route::post('/organization/guest-invitations/clear', [WebAuthController::class, 'clearGuestInvitations'])->name('guest_invitations.clear');
+    Route::post('/organization/audit-logs/clear', [WebAuthController::class, 'clearAuditLogs'])->name('audit_logs.clear');
 });
 
 // Guest Access Routes (Public / Unauthenticated)

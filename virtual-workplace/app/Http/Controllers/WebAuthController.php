@@ -604,6 +604,42 @@ class WebAuthController extends Controller
     }
 
     /**
+     * Clear all guest meeting links for the organization.
+     */
+    public function clearGuestInvitations(Request $request)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
+        if (!$membership) abort(403);
+
+        if (!$membership->hasPermission('organizations.manage') && $membership->role?->slug !== 'company_admin') {
+            abort(403, 'Unauthorized: insufficient permissions.');
+        }
+
+        \App\Domains\Guests\Models\GuestInvitation::where('organization_id', $membership->organization_id)->delete();
+
+        return back()->with('success', __('All guest meeting links have been cleared successfully.'));
+    }
+
+    /**
+     * Clear / Purge all audit logs for the organization.
+     */
+    public function clearAuditLogs(Request $request)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
+        if (!$membership) abort(403);
+
+        if (!$membership->hasPermission('audit.view') && !$membership->hasPermission('organizations.manage') && $membership->role?->slug !== 'company_admin') {
+            abort(403, 'Unauthorized: insufficient permissions.');
+        }
+
+        \App\Domains\Administration\Models\AuditLog::where('organization_id', $membership->organization_id)->delete();
+
+        return back()->with('success', __('All audit logs have been cleared successfully.'));
+    }
+
+    /**
      * Logout.
      */
     public function logout(Request $request)
