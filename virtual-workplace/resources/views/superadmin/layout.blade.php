@@ -14,33 +14,49 @@
            Palette: #00b4b3, #00726c, #004862, #012c41, #006847, #a7c545, #ffd136, #f57b36, #ff3600
            ═══════════════════════════════════════════════════════════════ */
         :root {
+            --bg-base: #0b0f19;
+            --bg-surface: #111827;
+            --bg-card: #111827;
+            --bg-input: #1e293b;
+            --border-color: rgba(255, 255, 255, 0.10);
+            --border-color-glow: rgba(59, 130, 246, 0.4);
+
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+
+            --brand-primary: #3b82f6;
+            --brand-secondary: #8b5cf6;
+            --brand-teal: #06b6d4;
+            --brand-pine: #0d9488;
+            --brand-ocean: #0284c7;
+            --brand-navy: #f8fafc;
+            --brand-green: #10b981;
+            --brand-lime: #84cc16;
+            --brand-gold: #f59e0b;
+            --brand-orange: #f97316;
+            --brand-coral: #fb7185;
+            --brand-crimson: #ef4444;
+
+            --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
+            --shadow-hover: 0 12px 28px -4px rgba(59, 130, 246, 0.25);
+
+            --font-family: {{ app()->getLocale() === 'ar' ? "'IBM Plex Sans Arabic', 'Cairo', 'Plus Jakarta Sans', sans-serif" : "'Plus Jakarta Sans', 'Inter', 'IBM Plex Sans Arabic', sans-serif" }};
+        }
+
+        [data-theme="light"] {
             --bg-base: #f8fafc;
             --bg-surface: #ffffff;
             --bg-card: #ffffff;
             --bg-input: #f1f5f9;
             --border-color: #e2e8f0;
-            --border-color-glow: rgba(0, 180, 179, 0.4);
-
-            --text-primary: #012c41;
-            --text-secondary: #004862;
+            --border-color-glow: rgba(59, 130, 246, 0.3);
+            --brand-navy: #0f172a;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
             --text-muted: #64748b;
-
-            /* Brand Colors from color.webp */
-            --brand-teal: #00b4b3;
-            --brand-pine: #00726c;
-            --brand-ocean: #004862;
-            --brand-navy: #012c41;
-            --brand-green: #006847;
-            --brand-lime: #a7c545;
-            --brand-gold: #ffd136;
-            --brand-orange: #f57b36;
-            --brand-coral: #ff3600;
-            --brand-crimson: #d20005;
-
-            --shadow-card: 0 4px 20px -2px rgba(1, 44, 65, 0.06), 0 2px 6px -1px rgba(1, 44, 65, 0.04);
-            --shadow-hover: 0 12px 28px -4px rgba(1, 44, 65, 0.12), 0 4px 10px -2px rgba(1, 44, 65, 0.06);
-
-            --font-family: {{ app()->getLocale() === 'ar' ? "'Cairo', 'Inter', sans-serif" : "'Inter', 'Cairo', sans-serif" }};
+            --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
+            --shadow-hover: 0 12px 28px -4px rgba(59, 130, 246, 0.15);
         }
 
         * {

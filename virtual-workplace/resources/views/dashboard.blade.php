@@ -9,39 +9,62 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Clean White & Saudi Brand Theme */
+            /* Modern Digital Workplace OS Palette */
+            --bg-primary: #0b0f19;
+            --bg-secondary: #111827;
+            --bg-card: #111827;
+            --bg-elevated: #1e293b;
+            --bg-glass: rgba(17, 24, 39, 0.88);
+            --border-color: rgba(255, 255, 255, 0.09);
+            --border-panel: rgba(255, 255, 255, 0.09);
+
+            --brand-primary: #3b82f6;
+            --brand-secondary: #8b5cf6;
+            --brand-teal: #06b6d4;
+            --brand-pine: #0d9488;
+            --brand-ocean: #0284c7;
+            --brand-navy: #f8fafc;
+            --brand-green: #10b981;
+            --brand-lime: #84cc16;
+            --brand-gold: #f59e0b;
+            --brand-orange: #f97316;
+            --brand-coral: #fb7185;
+            --brand-crimson: #ef4444;
+
+            --accent-primary: #3b82f6;
+            --accent-gradient: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --text-dim: #475569;
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --radius-full: 9999px;
+            --shadow-card: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
+            --shadow-hover: 0 12px 28px -4px rgba(59, 130, 246, 0.25);
+
+            --font-family: {{ app()->getLocale() === 'ar' ? "'IBM Plex Sans Arabic', 'Cairo', 'Plus Jakarta Sans', sans-serif" : "'Plus Jakarta Sans', 'Inter', 'IBM Plex Sans Arabic', sans-serif" }};
+        }
+
+        [data-theme="light"] {
             --bg-primary: #f8fafc;
             --bg-secondary: #ffffff;
             --bg-card: #ffffff;
+            --bg-elevated: #f1f5f9;
+            --bg-glass: rgba(255, 255, 255, 0.92);
             --border-color: #e2e8f0;
-
-            /* Saudi Brand Palette from color.webp */
-            --brand-teal: #00b4b3;
-            --brand-pine: #00726c;
-            --brand-ocean: #004862;
-            --brand-navy: #012c41;
-            --brand-green: #006847;
-            --brand-lime: #a7c545;
-            --brand-gold: #ffd136;
-            --brand-orange: #f57b36;
-            --brand-coral: #ff3600;
-            --brand-crimson: #d20005;
-
-            --accent-primary: #00b4b3;
-            --accent-gradient: linear-gradient(135deg, #00b4b3, #00726c, #004862);
-            --accent-green: #006847;
-            --accent-amber: #f57b36;
-
-            --text-primary: #012c41;
-            --text-secondary: #004862;
+            --border-panel: #e2e8f0;
+            --brand-navy: #0f172a;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
             --text-muted: #64748b;
-
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --shadow-card: 0 4px 20px -2px rgba(1, 44, 65, 0.06), 0 2px 6px -1px rgba(1, 44, 65, 0.04);
-            --shadow-hover: 0 12px 28px -4px rgba(1, 44, 65, 0.12), 0 4px 10px -2px rgba(1, 44, 65, 0.06);
-
-            --font-family: {{ app()->getLocale() === 'ar' ? "'Cairo', 'Inter', sans-serif" : "'Inter', 'Cairo', sans-serif" }};
+            --shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
+            --shadow-hover: 0 12px 28px -4px rgba(59, 130, 246, 0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-family); }
@@ -495,12 +518,15 @@
             @endif
         </div>
 
-        <div style="padding: 10px; margin-bottom: 10px;">
+        <div style="padding: 10px; margin-bottom: 10px; display: flex; gap: 8px;">
             @if(app()->getLocale() === 'ar')
-                <a href="{{ route('lang.switch', 'en') }}" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px; background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); border-radius: 8px; color: white; text-decoration: none; font-size: 12px; font-weight: 700;">🌐 English</a>
+                <a href="{{ route('lang.switch', 'en') }}" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 7px; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-primary); text-decoration: none; font-size: 12px; font-weight: 700;">🌐 EN</a>
             @else
-                <a href="{{ route('lang.switch', 'ar') }}" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px; background: rgba(255,255,255,0.06); border: 1px solid var(--border-color); border-radius: 8px; color: white; text-decoration: none; font-size: 12px; font-weight: 700;">🌐 العربية</a>
+                <a href="{{ route('lang.switch', 'ar') }}" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 7px; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-primary); text-decoration: none; font-size: 12px; font-weight: 700;">🌐 العربية</a>
             @endif
+            <button onclick="toggleGlobalTheme()" style="padding: 7px 12px; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-primary); cursor: pointer; font-size: 13px;">
+                <span id="theme-icon">🌙</span>
+            </button>
         </div>
 
         <div class="sidebar-user">
@@ -1564,9 +1590,21 @@
             }
         }
 
-        function toggleDashboardSidebar() {
-            document.getElementById('dashboardSidebar').classList.toggle('open');
+        function toggleGlobalTheme() {
+            const current = document.documentElement.getAttribute('data-theme') || 'dark';
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('vw_theme', next);
+            document.getElementById('theme-icon').textContent = next === 'dark' ? '🌙' : '☀️';
         }
+
+        // Initialize theme on page load
+        (function() {
+            const saved = localStorage.getItem('vw_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+            const icon = document.getElementById('theme-icon');
+            if (icon) icon.textContent = saved === 'dark' ? '🌙' : '☀️';
+        })();
     </script>
 </body>
 </html>

@@ -10,30 +10,43 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Clean White & Saudi Brand Theme */
+            /* Modern Digital Workplace OS Palette */
+            --bg-body: #0b0f19;
+            --bg-panel: #111827;
+            --bg-card: #1e293b;
+            --border-panel: rgba(255, 255, 255, 0.10);
+            --border-hover: rgba(255, 255, 255, 0.20);
+
+            --brand-teal: #06b6d4;
+            --brand-pine: #0d9488;
+            --brand-ocean: #0284c7;
+            --brand-navy: #f8fafc;
+            --brand-green: #10b981;
+            --brand-lime: #84cc16;
+            --brand-gold: #f59e0b;
+            --brand-orange: #f97316;
+            --brand-coral: #fb7185;
+            --brand-crimson: #ef4444;
+
+            --brand-primary: #3b82f6;
+            --brand-secondary: #8b5cf6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+
+            --font-family: {{ app()->getLocale() === 'ar' ? "'IBM Plex Sans Arabic', 'Cairo', 'Plus Jakarta Sans', sans-serif" : "'Plus Jakarta Sans', 'Inter', 'IBM Plex Sans Arabic', sans-serif" }};
+        }
+
+        [data-theme="light"] {
             --bg-body: #f8fafc;
             --bg-panel: #ffffff;
-            --bg-card: #f8fafc;
+            --bg-card: #f1f5f9;
             --border-panel: #e2e8f0;
             --border-hover: #cbd5e1;
-
-            /* Saudi Brand Colors from color.webp */
-            --brand-teal: #00b4b3;
-            --brand-pine: #00726c;
-            --brand-ocean: #004862;
-            --brand-navy: #012c41;
-            --brand-green: #006847;
-            --brand-lime: #a7c545;
-            --brand-gold: #ffd136;
-            --brand-orange: #f57b36;
-            --brand-coral: #ff3600;
-            --brand-crimson: #d20005;
-
-            --text-main: #012c41;
+            --brand-navy: #0f172a;
+            --text-main: #0f172a;
             --text-muted: #64748b;
             --text-dim: #94a3b8;
-
-            --font-family: {{ app()->getLocale() === 'ar' ? "'Cairo', 'Inter', sans-serif" : "'Inter', 'Cairo', sans-serif" }};
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-family); }

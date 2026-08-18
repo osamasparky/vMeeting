@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -5,7 +6,123 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+:root {
+  /* ── 1. Color Palette (HSL Architecture) ── */
+  --brand-500: hsl(228, 89%, 60%);
+  --brand-600: hsl(228, 85%, 52%);
+  --brand-400: hsl(228, 89%, 68%);
+  --brand-light: hsla(228, 89%, 60%, 0.15);
+  
+  --violet-500: hsl(265, 85%, 64%);
+  --cyan-500:   hsl(190, 95%, 48%);
+
+  /* Semantic Feedback */
+  --emerald-500: hsl(152, 69%, 45%);
+  --emerald-400: hsl(152, 69%, 52%);
+  --rose-500:    hsl(356, 75%, 58%);
+  --rose-400:    hsl(356, 75%, 64%);
+  --amber-500:   hsl(38, 92%, 50%);
+  --amber-400:   hsl(38, 92%, 58%);
+  --purple-500:  hsl(270, 70%, 60%);
+
+  /* Dark Theme (Default) */
+  --bg-base:        hsl(224, 25%, 8%);
+  --bg-surface:     hsl(224, 20%, 12%);
+  --bg-elevated:    hsl(224, 18%, 16%);
+  --bg-overlay:     hsl(224, 18%, 20%);
+  --bg-glass:       hsla(224, 20%, 12%, 0.85);
+  --bg-glass-hover: hsla(224, 20%, 18%, 0.92);
+
+  --border-subtle:  hsla(220, 20%, 90%, 0.07);
+  --border-default: hsla(220, 20%, 90%, 0.12);
+  --border-strong:  hsla(220, 20%, 90%, 0.22);
+  --border-brand:   hsla(228, 89%, 60%, 0.45);
+
+  --text-primary:   hsl(220, 25%, 96%);
+  --text-secondary: hsl(220, 15%, 72%);
+  --text-muted:     hsl(220, 10%, 48%);
+  --text-disabled:  hsl(220, 8%, 32%);
+  --text-inverse:   hsl(224, 25%, 8%);
+
+  /* Status */
+  --status-available: var(--emerald-500);
+  --status-busy:      var(--rose-500);
+  --status-away:      var(--amber-500);
+  --status-focus:     var(--purple-500);
+  --status-offline:   hsl(220, 10%, 45%);
+
+  /* Spacing Scale */
+  --space-1: 4px;  --space-2: 8px;   --space-3: 12px;
+  --space-4: 16px; --space-5: 20px;  --space-6: 24px;
+  --space-8: 32px; --space-10: 40px; --space-12: 48px;
+
+  /* Typography */
+  --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-arabic: 'IBM Plex Sans Arabic', 'Cairo', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Border Radius */
+  --radius-sm: 6px;   --radius-md: 10px;
+  --radius-lg: 16px;  --radius-xl: 22px;
+  --radius-2xl: 30px; --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm:    0 1px 3px rgba(0, 0, 0, 0.25);
+  --shadow-md:    0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg:    0 12px 36px rgba(0, 0, 0, 0.45);
+  --shadow-xl:    0 24px 64px rgba(0, 0, 0, 0.60);
+  --shadow-brand: 0 0 28px hsla(228, 89%, 60%, 0.32);
+
+  /* Transitions */
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+[data-theme="light"] {
+  --bg-base:        hsl(220, 25%, 97%);
+  --bg-surface:     hsl(0, 0%, 100%);
+  --bg-elevated:    hsl(220, 20%, 94%);
+  --bg-overlay:     hsl(220, 20%, 90%);
+  --bg-glass:       hsla(0, 0%, 100%, 0.90);
+  --bg-glass-hover: hsla(220, 25%, 95%, 0.95);
+
+  --border-subtle:  hsla(224, 25%, 15%, 0.06);
+  --border-default: hsla(224, 25%, 15%, 0.10);
+  --border-strong:  hsla(224, 25%, 15%, 0.18);
+  --border-brand:   hsla(228, 89%, 60%, 0.35);
+
+  --text-primary:   hsl(224, 30%, 12%);
+  --text-secondary: hsl(224, 15%, 38%);
+  --text-muted:     hsl(224, 10%, 55%);
+  --text-disabled:  hsl(224, 8%, 70%);
+  --text-inverse:   hsl(0, 0%, 100%);
+
+  --shadow-sm:    0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md:    0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-lg:    0 12px 36px rgba(0, 0, 0, 0.12);
+}
+
+[dir="rtl"], [lang="ar"] {
+  font-family: var(--font-arabic), var(--font-sans);
+}
+
+/* Animations */
+@keyframes pulseSpeaking {
+  0% { box-shadow: 0 0 0 0 hsla(152, 69%, 45%, 0.6); }
+  70% { box-shadow: 0 0 0 10px hsla(152, 69%, 45%, 0); }
+  100% { box-shadow: 0 0 0 0 hsla(152, 69%, 45%, 0); }
+}
+
+@keyframes pulseRadar {
+  0% { transform: scale(0.96); opacity: 0.7; }
+  50% { transform: scale(1.04); opacity: 0.3; }
+  100% { transform: scale(0.96); opacity: 0.7; }
+}
+
+.animate-speaking {
+  animation: pulseSpeaking 1.8s infinite;
+}
+
+.animate-radar {
+  animation: pulseRadar 3s infinite ease-in-out;
 }
