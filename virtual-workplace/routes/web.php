@@ -48,6 +48,11 @@ Route::middleware('auth')->group(function () {
     // Bulk Clear Routes
     Route::post('/organization/guest-invitations/clear', [WebAuthController::class, 'clearGuestInvitations'])->name('guest_invitations.clear');
     Route::post('/organization/audit-logs/clear', [WebAuthController::class, 'clearAuditLogs'])->name('audit_logs.clear');
+
+    // Recordings Gallery Routes (Web Session)
+    Route::get('/organizations/{organization}/recordings', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'index'])->name('recordings.index');
+    Route::post('/organizations/{organization}/recordings', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'store'])->name('recordings.store');
+    Route::delete('/organizations/{organization}/recordings/{recording}', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'destroy'])->name('recordings.destroy');
 });
 
 // Guest Access Routes (Public / Unauthenticated)

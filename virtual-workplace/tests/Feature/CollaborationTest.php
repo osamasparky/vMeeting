@@ -155,4 +155,73 @@ class CollaborationTest extends TestCase
             ->assertSee('GUEST ACCESS')
             ->assertSee('Investor / Partner');
     }
+
+    public function test_host_and_guest_can_access_office_and_mint_realtime_presence_tokens(): void
+    {
+        // 1. Host (Member) enters Office View
+        $hostResponse = $this->actingAs($this->user)->get('/office');
+        $hostResponse->assertStatus(200)
+            ->assertSee('Acme Collaboration')
+            ->assertSee('office-canvas');
+
+        // Host mints Realtime Token
+        $hostTokenResp = $this->actingAs($this->user)->postJson("/api/v1/organizations/{$this->organization->id}/realtime-token");
+        $hostTokenResp->assertStatus(200)
+            ->assertJsonStructure(['token', 'ws_url']);
+
+        // 2. Create Guest Invitation
+        $invite = \App\Domains\Guests\Models\GuestInvitation::create([
+            'organization_id' => $this->organization->id,
+            'room_id' => $this->room->id,
+            'invited_by' => $this->user->id,
+            'token' => 'test-guest-token-123456789',
+            'guest_name' => 'Sara Investor',
+            'guest_email' => 'sara@invest.test',
+            'expires_at' => now()->addHours(2),
+            'status' => 'pending',
+        ]);
+
+        // 3. Guest Enters /office via Invitation Post
+        $guestOfficeResp = $this->post("/guest/join/{$invite->token}", [
+            'guest_name' => 'Sara Investor',
+        ]);
+        $guestOfficeResp->assertStatus(200)
+            ->assertSee('Sara Investor')
+            ->assertSee('GUEST ACCESS')
+            ->assertSee('office-canvas');
+    }
+
+    public function test_can_upload_and_list_session_recordings(): void
+    {
+        Sanctum::actingAs($this->user);
+        \Illuminate\Support\Facades\Storage::fake('public');
+
+        $fakeVideo = \Illuminate\Http\UploadedFile::fake()->create('session_test.webm', 1024, 'video/webm');
+
+        // 1. Upload Recording
+        $uploadResp = $this->postJson("/api/v1/organizations/{$this->organization->id}/recordings", [
+            'video' => $fakeVideo,
+            'title' => 'Executive Strategic Meeting Q3',
+            'room_id' => $this->room->id,
+            'duration_seconds' => 125,
+        ]);
+
+        $uploadResp->assertStatus(201)
+            ->assertJsonPath('recording.title', 'Executive Strategic Meeting Q3')
+            ->assertJsonPath('recording.duration_seconds', 125);
+
+        $recordingId = $uploadResp->json('recording.id');
+
+        // 2. List Recordings
+        $listResp = $this->getJson("/api/v1/organizations/{$this->organization->id}/recordings");
+        $listResp->assertStatus(200)
+            ->assertJsonCount(1, 'recordings');
+
+        // 3. Delete Recording
+        $delResp = $this->deleteJson("/api/v1/organizations/{$this->organization->id}/recordings/{$recordingId}");
+        $delResp->assertStatus(200);
+
+        $listAfter = $this->getJson("/api/v1/organizations/{$this->organization->id}/recordings");
+        $listAfter->assertJsonCount(0, 'recordings');
+    }
 }

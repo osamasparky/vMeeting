@@ -1,0 +1,4214 @@
+[
+  {
+    "id": "FUR-DESK-EMP-001",
+    "name": "Modern Individual Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "employee_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_employee_modern_01.png",
+      "thumbnail": "/assets/furniture/desks/desk_employee_modern_01.png"
+    },
+    "dimensions": {
+      "width_cm": 140,
+      "depth_cm": 70,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 3,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 90,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "oak",
+      "style": "modern",
+      "color": "natural"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-EMP-002",
+    "name": "Standard Individual Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "employee_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_employee_modern_02.png",
+      "thumbnail": "/assets/furniture/desks/desk_employee_modern_02.png"
+    },
+    "dimensions": {
+      "width_cm": 140,
+      "depth_cm": 70,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 3,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 90,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "laminate",
+      "style": "standard",
+      "color": "white"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-EMP-003",
+    "name": "Large Individual Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "employee_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_employee_modern_03.png",
+      "thumbnail": "/assets/furniture/desks/desk_employee_modern_03.png"
+    },
+    "dimensions": {
+      "width_cm": 160,
+      "depth_cm": 80,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 4,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 100,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "walnut",
+      "style": "executive",
+      "color": "dark_walnut"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-EMP-004",
+    "name": "Employee Desk With Drawers",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "employee_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_employee_modern_04.png",
+      "thumbnail": "/assets/furniture/desks/desk_employee_modern_04.png"
+    },
+    "dimensions": {
+      "width_cm": 150,
+      "depth_cm": 70,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 3,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 90,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "oak",
+      "style": "modern",
+      "color": "natural"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-EMP-005",
+    "name": "Employee Desk With Side Cabinet",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "employee_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_employee_modern_05.png",
+      "thumbnail": "/assets/furniture/desks/desk_employee_modern_05.png"
+    },
+    "dimensions": {
+      "width_cm": 160,
+      "depth_cm": 120,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 4,
+      "height_tiles": 3
+    },
+    "clearance": {
+      "front_cm": 90,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "birch",
+      "style": "modern",
+      "color": "light_oak"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-EMP-006",
+    "name": "L-Shaped Employee Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "employee_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_employee_modern_06.png",
+      "thumbnail": "/assets/furniture/desks/desk_employee_modern_06.png"
+    },
+    "dimensions": {
+      "width_cm": 160,
+      "depth_cm": 140,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 4,
+      "height_tiles": 3
+    },
+    "clearance": {
+      "front_cm": 90,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "oak",
+      "style": "corner",
+      "color": "natural"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-EMP-007",
+    "name": "U-Shaped Employee Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "employee_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_employee_modern_07.png",
+      "thumbnail": "/assets/furniture/desks/desk_employee_modern_07.png"
+    },
+    "dimensions": {
+      "width_cm": 200,
+      "depth_cm": 160,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 5,
+      "height_tiles": 4
+    },
+    "clearance": {
+      "front_cm": 90,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "walnut",
+      "style": "executive_u",
+      "color": "dark_walnut"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-EMP-008",
+    "name": "Modern Workstation",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "employee_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_employee_modern_08.png",
+      "thumbnail": "/assets/furniture/desks/desk_employee_modern_08.png"
+    },
+    "dimensions": {
+      "width_cm": 140,
+      "depth_cm": 70,
+      "height_cm": 110
+    },
+    "footprint": {
+      "width_tiles": 3,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 90,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "laminate",
+      "style": "acoustic_pod",
+      "color": "teal_screen"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-EMP-009",
+    "name": "Double Workstation",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "employee_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_employee_modern_09.png",
+      "thumbnail": "/assets/furniture/desks/desk_employee_modern_09.png"
+    },
+    "dimensions": {
+      "width_cm": 140,
+      "depth_cm": 140,
+      "height_cm": 110
+    },
+    "footprint": {
+      "width_tiles": 3,
+      "height_tiles": 3
+    },
+    "clearance": {
+      "front_cm": 90,
+      "back_cm": 90,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 2,
+    "appearance": {
+      "material": "laminate",
+      "style": "benching_2",
+      "color": "white"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-EMP-010",
+    "name": "Four Person Workstation",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "employee_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_employee_modern_10.png",
+      "thumbnail": "/assets/furniture/desks/desk_employee_modern_10.png"
+    },
+    "dimensions": {
+      "width_cm": 280,
+      "depth_cm": 140,
+      "height_cm": 110
+    },
+    "footprint": {
+      "width_tiles": 6,
+      "height_tiles": 3
+    },
+    "clearance": {
+      "front_cm": 90,
+      "back_cm": 90,
+      "left_cm": 30,
+      "right_cm": 30
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 4,
+    "appearance": {
+      "material": "oak",
+      "style": "cluster_4",
+      "color": "natural_oak"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-EMP-011",
+    "name": "Six Person Workstation",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "employee_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_employee_modern_11.png",
+      "thumbnail": "/assets/furniture/desks/desk_employee_modern_11.png"
+    },
+    "dimensions": {
+      "width_cm": 420,
+      "depth_cm": 140,
+      "height_cm": 110
+    },
+    "footprint": {
+      "width_tiles": 8,
+      "height_tiles": 3
+    },
+    "clearance": {
+      "front_cm": 90,
+      "back_cm": 90,
+      "left_cm": 30,
+      "right_cm": 30
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 6,
+    "appearance": {
+      "material": "oak",
+      "style": "cluster_6",
+      "color": "natural_oak"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-EMP-012",
+    "name": "Adjustable Height Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "employee_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_employee_modern_12.png",
+      "thumbnail": "/assets/furniture/desks/desk_employee_modern_12.png"
+    },
+    "dimensions": {
+      "width_cm": 140,
+      "depth_cm": 70,
+      "height_cm": 65
+    },
+    "footprint": {
+      "width_tiles": 3,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 90,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "laminate",
+      "style": "motorized",
+      "color": "white"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-EMP-013",
+    "name": "Standing Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "employee_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_employee_modern_13.png",
+      "thumbnail": "/assets/furniture/desks/desk_employee_modern_13.png"
+    },
+    "dimensions": {
+      "width_cm": 120,
+      "depth_cm": 60,
+      "height_cm": 105
+    },
+    "footprint": {
+      "width_tiles": 3,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 90,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "walnut",
+      "style": "high_table",
+      "color": "dark_walnut"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-EMP-014",
+    "name": "Hot Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "employee_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_employee_modern_14.png",
+      "thumbnail": "/assets/furniture/desks/desk_employee_modern_14.png"
+    },
+    "dimensions": {
+      "width_cm": 120,
+      "depth_cm": 70,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 3,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 90,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "oak",
+      "style": "touchdown",
+      "color": "natural_oak"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-EMP-015",
+    "name": "Shared Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "employee_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_employee_modern_15.png",
+      "thumbnail": "/assets/furniture/desks/desk_employee_modern_15.png"
+    },
+    "dimensions": {
+      "width_cm": 200,
+      "depth_cm": 80,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 4,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 90,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 2,
+    "appearance": {
+      "material": "laminate",
+      "style": "continuous",
+      "color": "white"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-EMP-016",
+    "name": "Compact Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "employee_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_employee_modern_16.png",
+      "thumbnail": "/assets/furniture/desks/desk_employee_modern_16.png"
+    },
+    "dimensions": {
+      "width_cm": 100,
+      "depth_cm": 60,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 2,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 80,
+      "back_cm": 15,
+      "left_cm": 15,
+      "right_cm": 15
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "birch",
+      "style": "compact",
+      "color": "natural"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-EMP-017",
+    "name": "Executive Employee Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "employee_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_employee_modern_17.png",
+      "thumbnail": "/assets/furniture/desks/desk_employee_modern_17.png"
+    },
+    "dimensions": {
+      "width_cm": 180,
+      "depth_cm": 90,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 4,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 100,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "walnut",
+      "style": "executive",
+      "color": "dark_walnut"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-EMP-018",
+    "name": "Minimal Employee Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "employee_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_employee_modern_18.png",
+      "thumbnail": "/assets/furniture/desks/desk_employee_modern_18.png"
+    },
+    "dimensions": {
+      "width_cm": 120,
+      "depth_cm": 60,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 3,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 90,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "birch",
+      "style": "scandinavian",
+      "color": "blonde_wood"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-EMP-019",
+    "name": "Wooden Employee Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "employee_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_employee_modern_19.png",
+      "thumbnail": "/assets/furniture/desks/desk_employee_modern_19.png"
+    },
+    "dimensions": {
+      "width_cm": 150,
+      "depth_cm": 75,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 3,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 90,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "oak",
+      "style": "solid_wood",
+      "color": "golden_oak"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-EMP-020",
+    "name": "Modern White Employee Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "employee_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_employee_modern_20.png",
+      "thumbnail": "/assets/furniture/desks/desk_employee_modern_20.png"
+    },
+    "dimensions": {
+      "width_cm": 140,
+      "depth_cm": 70,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 3,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 90,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "lacquer",
+      "style": "high_gloss",
+      "color": "pure_white"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-MGR-001",
+    "name": "Manager Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "manager_executive_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_manager_executive_01.png",
+      "thumbnail": "/assets/furniture/desks/desk_manager_executive_01.png"
+    },
+    "dimensions": {
+      "width_cm": 180,
+      "depth_cm": 90,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 4,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 100,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "walnut",
+      "style": "executive",
+      "color": "walnut"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-MGR-002",
+    "name": "Large Manager Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "manager_executive_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_manager_executive_02.png",
+      "thumbnail": "/assets/furniture/desks/desk_manager_executive_02.png"
+    },
+    "dimensions": {
+      "width_cm": 200,
+      "depth_cm": 100,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 5,
+      "height_tiles": 3
+    },
+    "clearance": {
+      "front_cm": 100,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "walnut",
+      "style": "large_executive",
+      "color": "walnut"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-MGR-003",
+    "name": "Executive Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "manager_executive_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_manager_executive_03.png",
+      "thumbnail": "/assets/furniture/desks/desk_manager_executive_03.png"
+    },
+    "dimensions": {
+      "width_cm": 200,
+      "depth_cm": 95,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 5,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 100,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "ebony_gold",
+      "style": "luxury_executive",
+      "color": "luxury"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-MGR-004",
+    "name": "Executive L-Shape Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "manager_executive_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_manager_executive_04.png",
+      "thumbnail": "/assets/furniture/desks/desk_manager_executive_04.png"
+    },
+    "dimensions": {
+      "width_cm": 220,
+      "depth_cm": 180,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 5,
+      "height_tiles": 4
+    },
+    "clearance": {
+      "front_cm": 100,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "walnut",
+      "style": "executive_l",
+      "color": "walnut"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-MGR-005",
+    "name": "Executive U-Shape Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "manager_executive_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_manager_executive_05.png",
+      "thumbnail": "/assets/furniture/desks/desk_manager_executive_05.png"
+    },
+    "dimensions": {
+      "width_cm": 240,
+      "depth_cm": 200,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 6,
+      "height_tiles": 5
+    },
+    "clearance": {
+      "front_cm": 100,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "luxury_wood",
+      "style": "executive_u",
+      "color": "luxury"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-MGR-006",
+    "name": "Manager Desk With Credenza",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "manager_executive_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_manager_executive_06.png",
+      "thumbnail": "/assets/furniture/desks/desk_manager_executive_06.png"
+    },
+    "dimensions": {
+      "width_cm": 200,
+      "depth_cm": 100,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 5,
+      "height_tiles": 3
+    },
+    "clearance": {
+      "front_cm": 100,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "walnut",
+      "style": "credenza_suite",
+      "color": "walnut"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-MGR-007",
+    "name": "Manager Desk With Side Storage",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "manager_executive_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_manager_executive_07.png",
+      "thumbnail": "/assets/furniture/desks/desk_manager_executive_07.png"
+    },
+    "dimensions": {
+      "width_cm": 190,
+      "depth_cm": 95,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 5,
+      "height_tiles": 3
+    },
+    "clearance": {
+      "front_cm": 100,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "dark_wood",
+      "style": "side_storage",
+      "color": "dark_wood"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-MGR-008",
+    "name": "Premium Wooden Manager Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "manager_executive_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_manager_executive_08.png",
+      "thumbnail": "/assets/furniture/desks/desk_manager_executive_08.png"
+    },
+    "dimensions": {
+      "width_cm": 180,
+      "depth_cm": 90,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 4,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 100,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "solid_oak",
+      "style": "premium_wood",
+      "color": "oak"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-MGR-009",
+    "name": "Glass Manager Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "manager_executive_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_manager_executive_09.png",
+      "thumbnail": "/assets/furniture/desks/desk_manager_executive_09.png"
+    },
+    "dimensions": {
+      "width_cm": 180,
+      "depth_cm": 85,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 4,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 100,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "tempered_glass",
+      "style": "modern_glass",
+      "color": "glass"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-MGR-010",
+    "name": "Modern Executive Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "manager_executive_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_manager_executive_10.png",
+      "thumbnail": "/assets/furniture/desks/desk_manager_executive_10.png"
+    },
+    "dimensions": {
+      "width_cm": 190,
+      "depth_cm": 90,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 5,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 100,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "dark_wood",
+      "style": "modern_executive",
+      "color": "dark_wood"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-MGR-011",
+    "name": "Minimal Executive Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "manager_executive_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_manager_executive_11.png",
+      "thumbnail": "/assets/furniture/desks/desk_manager_executive_11.png"
+    },
+    "dimensions": {
+      "width_cm": 170,
+      "depth_cm": 80,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 4,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 100,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "oak",
+      "style": "minimal_executive",
+      "color": "oak"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-MGR-012",
+    "name": "Dark Executive Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "manager_executive_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_manager_executive_12.png",
+      "thumbnail": "/assets/furniture/desks/desk_manager_executive_12.png"
+    },
+    "dimensions": {
+      "width_cm": 200,
+      "depth_cm": 95,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 5,
+      "height_tiles": 3
+    },
+    "clearance": {
+      "front_cm": 100,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "charcoal_wood",
+      "style": "dark_executive",
+      "color": "dark_wood"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-MGR-013",
+    "name": "Walnut Executive Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "manager_executive_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_manager_executive_13.png",
+      "thumbnail": "/assets/furniture/desks/desk_manager_executive_13.png"
+    },
+    "dimensions": {
+      "width_cm": 200,
+      "depth_cm": 95,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 5,
+      "height_tiles": 3
+    },
+    "clearance": {
+      "front_cm": 100,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "walnut",
+      "style": "heritage_walnut",
+      "color": "walnut"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-MGR-014",
+    "name": "Luxury Executive Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "manager_executive_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_manager_executive_14.png",
+      "thumbnail": "/assets/furniture/desks/desk_manager_executive_14.png"
+    },
+    "dimensions": {
+      "width_cm": 220,
+      "depth_cm": 105,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 6,
+      "height_tiles": 3
+    },
+    "clearance": {
+      "front_cm": 100,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "luxury_ebony",
+      "style": "presidential",
+      "color": "luxury"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-DESK-MGR-015",
+    "name": "Corner Executive Desk",
+    "category": "furniture",
+    "subcategory": "desks",
+    "type": "manager_executive_desk",
+    "asset": {
+      "image": "/assets/furniture/desks/desk_manager_executive_15.png",
+      "thumbnail": "/assets/furniture/desks/desk_manager_executive_15.png"
+    },
+    "dimensions": {
+      "width_cm": 220,
+      "depth_cm": 190,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 6,
+      "height_tiles": 5
+    },
+    "clearance": {
+      "front_cm": 100,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "walnut",
+      "style": "executive_corner",
+      "color": "walnut"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-CHAIR-OFF-001",
+    "name": "Ergonomic Mesh Chair",
+    "category": "furniture",
+    "subcategory": "chairs",
+    "type": "office_chair",
+    "asset": {
+      "image": "/assets/furniture/chairs/chair_office_01.png",
+      "thumbnail": "/assets/furniture/chairs/chair_office_01.png"
+    },
+    "dimensions": {
+      "width_cm": 65,
+      "depth_cm": 65,
+      "height_cm": 95
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 40,
+      "back_cm": 20,
+      "left_cm": 15,
+      "right_cm": 15
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "mesh",
+      "style": "ergonomic",
+      "color": "charcoal"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-CHAIR-OFF-002",
+    "name": "Modern Office Chair",
+    "category": "furniture",
+    "subcategory": "chairs",
+    "type": "office_chair",
+    "asset": {
+      "image": "/assets/furniture/chairs/chair_office_02.png",
+      "thumbnail": "/assets/furniture/chairs/chair_office_02.png"
+    },
+    "dimensions": {
+      "width_cm": 65,
+      "depth_cm": 65,
+      "height_cm": 95
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 40,
+      "back_cm": 20,
+      "left_cm": 15,
+      "right_cm": 15
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "standard",
+      "style": "ergonomic",
+      "color": "blue"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-CHAIR-OFF-003",
+    "name": "Standard Staff Chair",
+    "category": "furniture",
+    "subcategory": "chairs",
+    "type": "office_chair",
+    "asset": {
+      "image": "/assets/furniture/chairs/chair_office_03.png",
+      "thumbnail": "/assets/furniture/chairs/chair_office_03.png"
+    },
+    "dimensions": {
+      "width_cm": 65,
+      "depth_cm": 65,
+      "height_cm": 95
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 40,
+      "back_cm": 20,
+      "left_cm": 15,
+      "right_cm": 15
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "standard",
+      "style": "ergonomic",
+      "color": "charcoal"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-CHAIR-OFF-004",
+    "name": "Executive Chair",
+    "category": "furniture",
+    "subcategory": "chairs",
+    "type": "office_chair",
+    "asset": {
+      "image": "/assets/furniture/chairs/chair_office_04.png",
+      "thumbnail": "/assets/furniture/chairs/chair_office_04.png"
+    },
+    "dimensions": {
+      "width_cm": 65,
+      "depth_cm": 65,
+      "height_cm": 95
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 40,
+      "back_cm": 20,
+      "left_cm": 15,
+      "right_cm": 15
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "executive",
+      "style": "ergonomic",
+      "color": "black_leather"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-CHAIR-OFF-005",
+    "name": "Manager Chair",
+    "category": "furniture",
+    "subcategory": "chairs",
+    "type": "office_chair",
+    "asset": {
+      "image": "/assets/furniture/chairs/chair_office_05.png",
+      "thumbnail": "/assets/furniture/chairs/chair_office_05.png"
+    },
+    "dimensions": {
+      "width_cm": 65,
+      "depth_cm": 65,
+      "height_cm": 95
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 40,
+      "back_cm": 20,
+      "left_cm": 15,
+      "right_cm": 15
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "executive",
+      "style": "ergonomic",
+      "color": "charcoal"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-CHAIR-OFF-006",
+    "name": "Task Chair",
+    "category": "furniture",
+    "subcategory": "chairs",
+    "type": "office_chair",
+    "asset": {
+      "image": "/assets/furniture/chairs/chair_office_06.png",
+      "thumbnail": "/assets/furniture/chairs/chair_office_06.png"
+    },
+    "dimensions": {
+      "width_cm": 65,
+      "depth_cm": 65,
+      "height_cm": 95
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 40,
+      "back_cm": 20,
+      "left_cm": 15,
+      "right_cm": 15
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "mesh",
+      "style": "ergonomic",
+      "color": "teal"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-CHAIR-OFF-007",
+    "name": "Visitor Chair",
+    "category": "furniture",
+    "subcategory": "chairs",
+    "type": "office_chair",
+    "asset": {
+      "image": "/assets/furniture/chairs/chair_office_07.png",
+      "thumbnail": "/assets/furniture/chairs/chair_office_07.png"
+    },
+    "dimensions": {
+      "width_cm": 65,
+      "depth_cm": 65,
+      "height_cm": 95
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 40,
+      "back_cm": 20,
+      "left_cm": 15,
+      "right_cm": 15
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "standard",
+      "style": "ergonomic",
+      "color": "beige"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-CHAIR-OFF-010",
+    "name": "Guest Chair",
+    "category": "furniture",
+    "subcategory": "chairs",
+    "type": "office_chair",
+    "asset": {
+      "image": "/assets/furniture/chairs/chair_office_10.png",
+      "thumbnail": "/assets/furniture/chairs/chair_office_10.png"
+    },
+    "dimensions": {
+      "width_cm": 65,
+      "depth_cm": 65,
+      "height_cm": 95
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 40,
+      "back_cm": 20,
+      "left_cm": 15,
+      "right_cm": 15
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "standard",
+      "style": "ergonomic",
+      "color": "charcoal"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-CHAIR-OFF-011",
+    "name": "Lounge Chair",
+    "category": "furniture",
+    "subcategory": "chairs",
+    "type": "office_chair",
+    "asset": {
+      "image": "/assets/furniture/chairs/chair_office_11.png",
+      "thumbnail": "/assets/furniture/chairs/chair_office_11.png"
+    },
+    "dimensions": {
+      "width_cm": 65,
+      "depth_cm": 65,
+      "height_cm": 95
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 40,
+      "back_cm": 20,
+      "left_cm": 15,
+      "right_cm": 15
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "standard",
+      "style": "ergonomic",
+      "color": "orange"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-CHAIR-OFF-012",
+    "name": "Armchair",
+    "category": "furniture",
+    "subcategory": "chairs",
+    "type": "office_chair",
+    "asset": {
+      "image": "/assets/furniture/chairs/chair_office_12.png",
+      "thumbnail": "/assets/furniture/chairs/chair_office_12.png"
+    },
+    "dimensions": {
+      "width_cm": 65,
+      "depth_cm": 65,
+      "height_cm": 95
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 40,
+      "back_cm": 20,
+      "left_cm": 15,
+      "right_cm": 15
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "standard",
+      "style": "ergonomic",
+      "color": "teal"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-CHAIR-OFF-015",
+    "name": "Stackable Chair",
+    "category": "furniture",
+    "subcategory": "chairs",
+    "type": "office_chair",
+    "asset": {
+      "image": "/assets/furniture/chairs/chair_office_15.png",
+      "thumbnail": "/assets/furniture/chairs/chair_office_15.png"
+    },
+    "dimensions": {
+      "width_cm": 65,
+      "depth_cm": 65,
+      "height_cm": 95
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 40,
+      "back_cm": 20,
+      "left_cm": 15,
+      "right_cm": 15
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "standard",
+      "style": "ergonomic",
+      "color": "blue"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-CHAIR-OFF-016",
+    "name": "High Stool",
+    "category": "furniture",
+    "subcategory": "chairs",
+    "type": "office_chair",
+    "asset": {
+      "image": "/assets/furniture/chairs/chair_office_16.png",
+      "thumbnail": "/assets/furniture/chairs/chair_office_16.png"
+    },
+    "dimensions": {
+      "width_cm": 65,
+      "depth_cm": 65,
+      "height_cm": 95
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 40,
+      "back_cm": 20,
+      "left_cm": 15,
+      "right_cm": 15
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "stool",
+      "style": "ergonomic",
+      "color": "charcoal"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-CHAIR-OFF-017",
+    "name": "Bar Stool",
+    "category": "furniture",
+    "subcategory": "chairs",
+    "type": "office_chair",
+    "asset": {
+      "image": "/assets/furniture/chairs/chair_office_17.png",
+      "thumbnail": "/assets/furniture/chairs/chair_office_17.png"
+    },
+    "dimensions": {
+      "width_cm": 65,
+      "depth_cm": 65,
+      "height_cm": 95
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 40,
+      "back_cm": 20,
+      "left_cm": 15,
+      "right_cm": 15
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "stool",
+      "style": "ergonomic",
+      "color": "teal"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-CHAIR-OFF-020",
+    "name": "Minimal Office Chair",
+    "category": "furniture",
+    "subcategory": "chairs",
+    "type": "office_chair",
+    "asset": {
+      "image": "/assets/furniture/chairs/chair_office_20.png",
+      "thumbnail": "/assets/furniture/chairs/chair_office_20.png"
+    },
+    "dimensions": {
+      "width_cm": 65,
+      "depth_cm": 65,
+      "height_cm": 95
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 40,
+      "back_cm": 20,
+      "left_cm": 15,
+      "right_cm": 15
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "mesh",
+      "style": "ergonomic",
+      "color": "beige"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-SIDE-001",
+    "name": "Small Side Table",
+    "category": "furniture",
+    "subcategory": "tables",
+    "type": "side_table",
+    "asset": {
+      "image": "/assets/furniture/tables/table_side_01.png",
+      "thumbnail": "/assets/furniture/tables/table_side_01.png"
+    },
+    "dimensions": {
+      "width_cm": 50,
+      "depth_cm": 50,
+      "height_cm": 45
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 30,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "oak",
+      "style": "square",
+      "color": "oak"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-SIDE-002",
+    "name": "Medium Side Table",
+    "category": "furniture",
+    "subcategory": "tables",
+    "type": "side_table",
+    "asset": {
+      "image": "/assets/furniture/tables/table_side_02.png",
+      "thumbnail": "/assets/furniture/tables/table_side_02.png"
+    },
+    "dimensions": {
+      "width_cm": 70,
+      "depth_cm": 70,
+      "height_cm": 45
+    },
+    "footprint": {
+      "width_tiles": 2,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 30,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "walnut",
+      "style": "square",
+      "color": "walnut"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-SIDE-003",
+    "name": "Coffee Table",
+    "category": "furniture",
+    "subcategory": "tables",
+    "type": "side_table",
+    "asset": {
+      "image": "/assets/furniture/tables/table_side_03.png",
+      "thumbnail": "/assets/furniture/tables/table_side_03.png"
+    },
+    "dimensions": {
+      "width_cm": 120,
+      "depth_cm": 60,
+      "height_cm": 45
+    },
+    "footprint": {
+      "width_tiles": 3,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 30,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "oak",
+      "style": "rect",
+      "color": "oak"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-SIDE-004",
+    "name": "Center Table",
+    "category": "furniture",
+    "subcategory": "tables",
+    "type": "side_table",
+    "asset": {
+      "image": "/assets/furniture/tables/table_side_04.png",
+      "thumbnail": "/assets/furniture/tables/table_side_04.png"
+    },
+    "dimensions": {
+      "width_cm": 100,
+      "depth_cm": 100,
+      "height_cm": 45
+    },
+    "footprint": {
+      "width_tiles": 2,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 30,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "marble",
+      "style": "round",
+      "color": "marble"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-SIDE-005",
+    "name": "End Table",
+    "category": "furniture",
+    "subcategory": "tables",
+    "type": "side_table",
+    "asset": {
+      "image": "/assets/furniture/tables/table_side_05.png",
+      "thumbnail": "/assets/furniture/tables/table_side_05.png"
+    },
+    "dimensions": {
+      "width_cm": 50,
+      "depth_cm": 50,
+      "height_cm": 55
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 30,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "dark_wood",
+      "style": "square",
+      "color": "dark_wood"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-SIDE-006",
+    "name": "Round Side Table",
+    "category": "furniture",
+    "subcategory": "tables",
+    "type": "side_table",
+    "asset": {
+      "image": "/assets/furniture/tables/table_side_06.png",
+      "thumbnail": "/assets/furniture/tables/table_side_06.png"
+    },
+    "dimensions": {
+      "width_cm": 60,
+      "depth_cm": 60,
+      "height_cm": 50
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 30,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "oak",
+      "style": "round",
+      "color": "oak"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-SIDE-007",
+    "name": "Square Side Table",
+    "category": "furniture",
+    "subcategory": "tables",
+    "type": "side_table",
+    "asset": {
+      "image": "/assets/furniture/tables/table_side_07.png",
+      "thumbnail": "/assets/furniture/tables/table_side_07.png"
+    },
+    "dimensions": {
+      "width_cm": 60,
+      "depth_cm": 60,
+      "height_cm": 50
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 30,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "white",
+      "style": "square",
+      "color": "white"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-SIDE-008",
+    "name": "Laptop Table",
+    "category": "furniture",
+    "subcategory": "tables",
+    "type": "side_table",
+    "asset": {
+      "image": "/assets/furniture/tables/table_side_08.png",
+      "thumbnail": "/assets/furniture/tables/table_side_08.png"
+    },
+    "dimensions": {
+      "width_cm": 55,
+      "depth_cm": 40,
+      "height_cm": 65
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 30,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "walnut",
+      "style": "rect",
+      "color": "walnut"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-SIDE-009",
+    "name": "Printer Table",
+    "category": "furniture",
+    "subcategory": "tables",
+    "type": "side_table",
+    "asset": {
+      "image": "/assets/furniture/tables/table_side_09.png",
+      "thumbnail": "/assets/furniture/tables/table_side_09.png"
+    },
+    "dimensions": {
+      "width_cm": 70,
+      "depth_cm": 55,
+      "height_cm": 70
+    },
+    "footprint": {
+      "width_tiles": 2,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 30,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "white",
+      "style": "rect",
+      "color": "white"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-SIDE-010",
+    "name": "Telephone Table",
+    "category": "furniture",
+    "subcategory": "tables",
+    "type": "side_table",
+    "asset": {
+      "image": "/assets/furniture/tables/table_side_10.png",
+      "thumbnail": "/assets/furniture/tables/table_side_10.png"
+    },
+    "dimensions": {
+      "width_cm": 45,
+      "depth_cm": 45,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 30,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "oak",
+      "style": "square",
+      "color": "oak"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-SIDE-011",
+    "name": "Folding Table",
+    "category": "furniture",
+    "subcategory": "tables",
+    "type": "side_table",
+    "asset": {
+      "image": "/assets/furniture/tables/table_side_11.png",
+      "thumbnail": "/assets/furniture/tables/table_side_11.png"
+    },
+    "dimensions": {
+      "width_cm": 120,
+      "depth_cm": 60,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 3,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 30,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "white",
+      "style": "rect",
+      "color": "white"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-SIDE-012",
+    "name": "High Table",
+    "category": "furniture",
+    "subcategory": "tables",
+    "type": "side_table",
+    "asset": {
+      "image": "/assets/furniture/tables/table_side_12.png",
+      "thumbnail": "/assets/furniture/tables/table_side_12.png"
+    },
+    "dimensions": {
+      "width_cm": 110,
+      "depth_cm": 55,
+      "height_cm": 105
+    },
+    "footprint": {
+      "width_tiles": 3,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 30,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "dark_wood",
+      "style": "rect",
+      "color": "dark_wood"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-SIDE-014",
+    "name": "Nesting Table",
+    "category": "furniture",
+    "subcategory": "tables",
+    "type": "side_table",
+    "asset": {
+      "image": "/assets/furniture/tables/table_side_14.png",
+      "thumbnail": "/assets/furniture/tables/table_side_14.png"
+    },
+    "dimensions": {
+      "width_cm": 80,
+      "depth_cm": 80,
+      "height_cm": 48
+    },
+    "footprint": {
+      "width_tiles": 2,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 30,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "marble",
+      "style": "round",
+      "color": "marble"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-SIDE-015",
+    "name": "Modern Side Table",
+    "category": "furniture",
+    "subcategory": "tables",
+    "type": "side_table",
+    "asset": {
+      "image": "/assets/furniture/tables/table_side_15.png",
+      "thumbnail": "/assets/furniture/tables/table_side_15.png"
+    },
+    "dimensions": {
+      "width_cm": 55,
+      "depth_cm": 55,
+      "height_cm": 50
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 30,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "glass",
+      "style": "round",
+      "color": "glass"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-MTG-001",
+    "name": "Small Meeting Table",
+    "category": "meeting",
+    "subcategory": "conference_tables",
+    "type": "meeting_table",
+    "asset": {
+      "image": "/assets/meeting/table_meeting_01.png",
+      "thumbnail": "/assets/meeting/table_meeting_01.png"
+    },
+    "dimensions": {
+      "width_cm": 140,
+      "depth_cm": 90,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 3,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 80,
+      "back_cm": 80,
+      "left_cm": 50,
+      "right_cm": 50
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 6,
+    "appearance": {
+      "material": "oak",
+      "style": "boardroom",
+      "color": "oak"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-MTG-002",
+    "name": "Medium Meeting Table",
+    "category": "meeting",
+    "subcategory": "conference_tables",
+    "type": "meeting_table",
+    "asset": {
+      "image": "/assets/meeting/table_meeting_02.png",
+      "thumbnail": "/assets/meeting/table_meeting_02.png"
+    },
+    "dimensions": {
+      "width_cm": 200,
+      "depth_cm": 100,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 5,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 80,
+      "back_cm": 80,
+      "left_cm": 50,
+      "right_cm": 50
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 10,
+    "appearance": {
+      "material": "walnut",
+      "style": "boardroom",
+      "color": "walnut"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-MTG-003",
+    "name": "Large Meeting Table",
+    "category": "meeting",
+    "subcategory": "conference_tables",
+    "type": "meeting_table",
+    "asset": {
+      "image": "/assets/meeting/table_meeting_03.png",
+      "thumbnail": "/assets/meeting/table_meeting_03.png"
+    },
+    "dimensions": {
+      "width_cm": 260,
+      "depth_cm": 120,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 6,
+      "height_tiles": 3
+    },
+    "clearance": {
+      "front_cm": 80,
+      "back_cm": 80,
+      "left_cm": 50,
+      "right_cm": 50
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 12,
+    "appearance": {
+      "material": "walnut",
+      "style": "boardroom",
+      "color": "walnut"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-MTG-004",
+    "name": "Rectangular Meeting Table",
+    "category": "meeting",
+    "subcategory": "conference_tables",
+    "type": "meeting_table",
+    "asset": {
+      "image": "/assets/meeting/table_meeting_04.png",
+      "thumbnail": "/assets/meeting/table_meeting_04.png"
+    },
+    "dimensions": {
+      "width_cm": 220,
+      "depth_cm": 110,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 5,
+      "height_tiles": 3
+    },
+    "clearance": {
+      "front_cm": 80,
+      "back_cm": 80,
+      "left_cm": 50,
+      "right_cm": 50
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 10,
+    "appearance": {
+      "material": "oak",
+      "style": "boardroom",
+      "color": "oak"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-MTG-005",
+    "name": "Round Meeting Table",
+    "category": "meeting",
+    "subcategory": "conference_tables",
+    "type": "meeting_table",
+    "asset": {
+      "image": "/assets/meeting/table_meeting_05.png",
+      "thumbnail": "/assets/meeting/table_meeting_05.png"
+    },
+    "dimensions": {
+      "width_cm": 120,
+      "depth_cm": 120,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 3,
+      "height_tiles": 3
+    },
+    "clearance": {
+      "front_cm": 80,
+      "back_cm": 80,
+      "left_cm": 50,
+      "right_cm": 50
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 6,
+    "appearance": {
+      "material": "oak",
+      "style": "boardroom",
+      "color": "oak"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-MTG-006",
+    "name": "Oval Meeting Table",
+    "category": "meeting",
+    "subcategory": "conference_tables",
+    "type": "meeting_table",
+    "asset": {
+      "image": "/assets/meeting/table_meeting_06.png",
+      "thumbnail": "/assets/meeting/table_meeting_06.png"
+    },
+    "dimensions": {
+      "width_cm": 240,
+      "depth_cm": 120,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 6,
+      "height_tiles": 3
+    },
+    "clearance": {
+      "front_cm": 80,
+      "back_cm": 80,
+      "left_cm": 50,
+      "right_cm": 50
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 12,
+    "appearance": {
+      "material": "walnut",
+      "style": "boardroom",
+      "color": "walnut"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-MTG-007",
+    "name": "Modular Meeting Table",
+    "category": "meeting",
+    "subcategory": "conference_tables",
+    "type": "meeting_table",
+    "asset": {
+      "image": "/assets/meeting/table_meeting_07.png",
+      "thumbnail": "/assets/meeting/table_meeting_07.png"
+    },
+    "dimensions": {
+      "width_cm": 200,
+      "depth_cm": 100,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 5,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 80,
+      "back_cm": 80,
+      "left_cm": 50,
+      "right_cm": 50
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 10,
+    "appearance": {
+      "material": "white",
+      "style": "boardroom",
+      "color": "white"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-MTG-008",
+    "name": "Folding Meeting Table",
+    "category": "meeting",
+    "subcategory": "conference_tables",
+    "type": "meeting_table",
+    "asset": {
+      "image": "/assets/meeting/table_meeting_08.png",
+      "thumbnail": "/assets/meeting/table_meeting_08.png"
+    },
+    "dimensions": {
+      "width_cm": 180,
+      "depth_cm": 80,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 4,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 80,
+      "back_cm": 80,
+      "left_cm": 50,
+      "right_cm": 50
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 8,
+    "appearance": {
+      "material": "white",
+      "style": "boardroom",
+      "color": "white"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-MTG-009",
+    "name": "Conference Table",
+    "category": "meeting",
+    "subcategory": "conference_tables",
+    "type": "meeting_table",
+    "asset": {
+      "image": "/assets/meeting/table_meeting_09.png",
+      "thumbnail": "/assets/meeting/table_meeting_09.png"
+    },
+    "dimensions": {
+      "width_cm": 320,
+      "depth_cm": 130,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 8,
+      "height_tiles": 3
+    },
+    "clearance": {
+      "front_cm": 80,
+      "back_cm": 80,
+      "left_cm": 50,
+      "right_cm": 50
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 16,
+    "appearance": {
+      "material": "dark_wood",
+      "style": "boardroom",
+      "color": "dark_wood"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-MTG-010",
+    "name": "Video Conference Table",
+    "category": "meeting",
+    "subcategory": "conference_tables",
+    "type": "meeting_table",
+    "asset": {
+      "image": "/assets/meeting/table_meeting_10.png",
+      "thumbnail": "/assets/meeting/table_meeting_10.png"
+    },
+    "dimensions": {
+      "width_cm": 280,
+      "depth_cm": 130,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 7,
+      "height_tiles": 3
+    },
+    "clearance": {
+      "front_cm": 80,
+      "back_cm": 80,
+      "left_cm": 50,
+      "right_cm": 50
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 14,
+    "appearance": {
+      "material": "walnut",
+      "style": "boardroom",
+      "color": "walnut"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-MTG-011",
+    "name": "Executive Conference Table",
+    "category": "meeting",
+    "subcategory": "conference_tables",
+    "type": "meeting_table",
+    "asset": {
+      "image": "/assets/meeting/table_meeting_11.png",
+      "thumbnail": "/assets/meeting/table_meeting_11.png"
+    },
+    "dimensions": {
+      "width_cm": 360,
+      "depth_cm": 140,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 9,
+      "height_tiles": 3
+    },
+    "clearance": {
+      "front_cm": 80,
+      "back_cm": 80,
+      "left_cm": 50,
+      "right_cm": 50
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 18,
+    "appearance": {
+      "material": "marble",
+      "style": "boardroom",
+      "color": "marble"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-TBL-MTG-012",
+    "name": "Premium Conference Table",
+    "category": "meeting",
+    "subcategory": "conference_tables",
+    "type": "meeting_table",
+    "asset": {
+      "image": "/assets/meeting/table_meeting_12.png",
+      "thumbnail": "/assets/meeting/table_meeting_12.png"
+    },
+    "dimensions": {
+      "width_cm": 400,
+      "depth_cm": 150,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 10,
+      "height_tiles": 4
+    },
+    "clearance": {
+      "front_cm": 80,
+      "back_cm": 80,
+      "left_cm": 50,
+      "right_cm": 50
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 20,
+    "appearance": {
+      "material": "walnut",
+      "style": "boardroom",
+      "color": "walnut"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-STOR-OFF-001",
+    "name": "Office Storage Cabinet 01",
+    "category": "furniture",
+    "subcategory": "storage",
+    "type": "storage_cabinet",
+    "asset": {
+      "image": "/assets/furniture/storage/storage_office_01.png",
+      "thumbnail": "/assets/furniture/storage/storage_office_01.png"
+    },
+    "dimensions": {
+      "width_cm": 80,
+      "depth_cm": 45,
+      "height_cm": 110
+    },
+    "footprint": {
+      "width_tiles": 2,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 60,
+      "back_cm": 10,
+      "left_cm": 10,
+      "right_cm": 10
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "metal",
+      "style": "cabinet",
+      "color": "charcoal"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-STOR-OFF-002",
+    "name": "Office Storage Cabinet 02",
+    "category": "furniture",
+    "subcategory": "storage",
+    "type": "storage_cabinet",
+    "asset": {
+      "image": "/assets/furniture/storage/storage_office_02.png",
+      "thumbnail": "/assets/furniture/storage/storage_office_02.png"
+    },
+    "dimensions": {
+      "width_cm": 80,
+      "depth_cm": 45,
+      "height_cm": 110
+    },
+    "footprint": {
+      "width_tiles": 2,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 60,
+      "back_cm": 10,
+      "left_cm": 10,
+      "right_cm": 10
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "metal",
+      "style": "cabinet",
+      "color": "charcoal"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-STOR-OFF-003",
+    "name": "Office Storage Cabinet 03",
+    "category": "furniture",
+    "subcategory": "storage",
+    "type": "storage_cabinet",
+    "asset": {
+      "image": "/assets/furniture/storage/storage_office_03.png",
+      "thumbnail": "/assets/furniture/storage/storage_office_03.png"
+    },
+    "dimensions": {
+      "width_cm": 80,
+      "depth_cm": 45,
+      "height_cm": 110
+    },
+    "footprint": {
+      "width_tiles": 2,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 60,
+      "back_cm": 10,
+      "left_cm": 10,
+      "right_cm": 10
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "metal",
+      "style": "cabinet",
+      "color": "charcoal"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-STOR-OFF-006",
+    "name": "Office Storage Cabinet 06",
+    "category": "furniture",
+    "subcategory": "storage",
+    "type": "storage_cabinet",
+    "asset": {
+      "image": "/assets/furniture/storage/storage_office_06.png",
+      "thumbnail": "/assets/furniture/storage/storage_office_06.png"
+    },
+    "dimensions": {
+      "width_cm": 80,
+      "depth_cm": 45,
+      "height_cm": 110
+    },
+    "footprint": {
+      "width_tiles": 2,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 60,
+      "back_cm": 10,
+      "left_cm": 10,
+      "right_cm": 10
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "metal",
+      "style": "cabinet",
+      "color": "charcoal"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-RECP-CTR-001",
+    "name": "Reception Counter 01",
+    "category": "furniture",
+    "subcategory": "reception",
+    "type": "reception_desk",
+    "asset": {
+      "image": "/assets/furniture/reception/reception_01.png",
+      "thumbnail": "/assets/furniture/reception/reception_01.png"
+    },
+    "dimensions": {
+      "width_cm": 220,
+      "depth_cm": 80,
+      "height_cm": 115
+    },
+    "footprint": {
+      "width_tiles": 5,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 100,
+      "back_cm": 80,
+      "left_cm": 30,
+      "right_cm": 30
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 2,
+    "appearance": {
+      "material": "oak",
+      "style": "reception",
+      "color": "natural"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-LOUNG-SOF-001",
+    "name": "Lounge Sofa 01",
+    "category": "furniture",
+    "subcategory": "lounge",
+    "type": "lounge_sofa",
+    "asset": {
+      "image": "/assets/furniture/lounge/lounge_01.png",
+      "thumbnail": "/assets/furniture/lounge/lounge_01.png"
+    },
+    "dimensions": {
+      "width_cm": 100,
+      "depth_cm": 85,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 2,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 60,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "fabric",
+      "style": "lounge",
+      "color": "teal"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-LOUNG-SOF-002",
+    "name": "Lounge Sofa 02",
+    "category": "furniture",
+    "subcategory": "lounge",
+    "type": "lounge_sofa",
+    "asset": {
+      "image": "/assets/furniture/lounge/lounge_02.png",
+      "thumbnail": "/assets/furniture/lounge/lounge_02.png"
+    },
+    "dimensions": {
+      "width_cm": 100,
+      "depth_cm": 85,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 2,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 60,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "fabric",
+      "style": "lounge",
+      "color": "beige"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-LOUNG-SOF-003",
+    "name": "Lounge Sofa 03",
+    "category": "furniture",
+    "subcategory": "lounge",
+    "type": "lounge_sofa",
+    "asset": {
+      "image": "/assets/furniture/lounge/lounge_03.png",
+      "thumbnail": "/assets/furniture/lounge/lounge_03.png"
+    },
+    "dimensions": {
+      "width_cm": 100,
+      "depth_cm": 85,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 2,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 60,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "fabric",
+      "style": "lounge",
+      "color": "blue"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-LOUNG-SOF-004",
+    "name": "Lounge Sofa 04",
+    "category": "furniture",
+    "subcategory": "lounge",
+    "type": "lounge_sofa",
+    "asset": {
+      "image": "/assets/furniture/lounge/lounge_04.png",
+      "thumbnail": "/assets/furniture/lounge/lounge_04.png"
+    },
+    "dimensions": {
+      "width_cm": 180,
+      "depth_cm": 85,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 4,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 60,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 3,
+    "appearance": {
+      "material": "fabric",
+      "style": "lounge",
+      "color": "leather"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-LOUNG-SOF-005",
+    "name": "Lounge Sofa 05",
+    "category": "furniture",
+    "subcategory": "lounge",
+    "type": "lounge_sofa",
+    "asset": {
+      "image": "/assets/furniture/lounge/lounge_05.png",
+      "thumbnail": "/assets/furniture/lounge/lounge_05.png"
+    },
+    "dimensions": {
+      "width_cm": 180,
+      "depth_cm": 85,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 4,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 60,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 3,
+    "appearance": {
+      "material": "fabric",
+      "style": "lounge",
+      "color": "charcoal"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-LOUNG-SOF-006",
+    "name": "Lounge Sofa 06",
+    "category": "furniture",
+    "subcategory": "lounge",
+    "type": "lounge_sofa",
+    "asset": {
+      "image": "/assets/furniture/lounge/lounge_06.png",
+      "thumbnail": "/assets/furniture/lounge/lounge_06.png"
+    },
+    "dimensions": {
+      "width_cm": 180,
+      "depth_cm": 85,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 4,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 60,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 3,
+    "appearance": {
+      "material": "fabric",
+      "style": "lounge",
+      "color": "teal"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-LOUNG-SOF-007",
+    "name": "Lounge Sofa 07",
+    "category": "furniture",
+    "subcategory": "lounge",
+    "type": "lounge_sofa",
+    "asset": {
+      "image": "/assets/furniture/lounge/lounge_07.png",
+      "thumbnail": "/assets/furniture/lounge/lounge_07.png"
+    },
+    "dimensions": {
+      "width_cm": 180,
+      "depth_cm": 85,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 4,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 60,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 3,
+    "appearance": {
+      "material": "fabric",
+      "style": "lounge",
+      "color": "beige"
+    },
+    "status": "active"
+  },
+  {
+    "id": "FUR-LOUNG-SOF-008",
+    "name": "Lounge Sofa 08",
+    "category": "furniture",
+    "subcategory": "lounge",
+    "type": "lounge_sofa",
+    "asset": {
+      "image": "/assets/furniture/lounge/lounge_08.png",
+      "thumbnail": "/assets/furniture/lounge/lounge_08.png"
+    },
+    "dimensions": {
+      "width_cm": 180,
+      "depth_cm": 85,
+      "height_cm": 75
+    },
+    "footprint": {
+      "width_tiles": 4,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 60,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 3,
+    "appearance": {
+      "material": "fabric",
+      "style": "lounge",
+      "color": "blue"
+    },
+    "status": "active"
+  },
+  {
+    "id": "DEC-PLANT-IND-001",
+    "name": "Indoor Plant 01",
+    "category": "decor",
+    "subcategory": "plants",
+    "type": "indoor_plant",
+    "asset": {
+      "image": "/assets/decor/plants/plant_office_01.png",
+      "thumbnail": "/assets/decor/plants/plant_office_01.png"
+    },
+    "dimensions": {
+      "width_cm": 50,
+      "depth_cm": 50,
+      "height_cm": 120
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 10,
+      "back_cm": 10,
+      "left_cm": 10,
+      "right_cm": 10
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "natural",
+      "style": "botanical",
+      "color": "green"
+    },
+    "status": "active"
+  },
+  {
+    "id": "DEC-PLANT-IND-011",
+    "name": "Indoor Plant 11",
+    "category": "decor",
+    "subcategory": "plants",
+    "type": "indoor_plant",
+    "asset": {
+      "image": "/assets/decor/plants/plant_office_11.png",
+      "thumbnail": "/assets/decor/plants/plant_office_11.png"
+    },
+    "dimensions": {
+      "width_cm": 50,
+      "depth_cm": 50,
+      "height_cm": 120
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 10,
+      "back_cm": 10,
+      "left_cm": 10,
+      "right_cm": 10
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "natural",
+      "style": "botanical",
+      "color": "green"
+    },
+    "status": "active"
+  },
+  {
+    "id": "TEC-OFF-EQP-001",
+    "name": "Office Tech Dual Monitor 01",
+    "category": "technology",
+    "subcategory": "hardware",
+    "type": "dual_monitor",
+    "asset": {
+      "image": "/assets/technology/technology_office_01.png",
+      "thumbnail": "/assets/technology/technology_office_01.png"
+    },
+    "dimensions": {
+      "width_cm": 60,
+      "depth_cm": 40,
+      "height_cm": 45
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 20,
+      "back_cm": 10,
+      "left_cm": 10,
+      "right_cm": 10
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "matte_black",
+      "style": "tech",
+      "color": "dark"
+    },
+    "status": "active"
+  },
+  {
+    "id": "TEC-OFF-EQP-002",
+    "name": "Office Tech Laptop 02",
+    "category": "technology",
+    "subcategory": "hardware",
+    "type": "laptop",
+    "asset": {
+      "image": "/assets/technology/technology_office_02.png",
+      "thumbnail": "/assets/technology/technology_office_02.png"
+    },
+    "dimensions": {
+      "width_cm": 60,
+      "depth_cm": 40,
+      "height_cm": 45
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 20,
+      "back_cm": 10,
+      "left_cm": 10,
+      "right_cm": 10
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "matte_black",
+      "style": "tech",
+      "color": "dark"
+    },
+    "status": "active"
+  },
+  {
+    "id": "TEC-OFF-EQP-003",
+    "name": "Office Tech Printer 03",
+    "category": "technology",
+    "subcategory": "hardware",
+    "type": "printer",
+    "asset": {
+      "image": "/assets/technology/technology_office_03.png",
+      "thumbnail": "/assets/technology/technology_office_03.png"
+    },
+    "dimensions": {
+      "width_cm": 60,
+      "depth_cm": 40,
+      "height_cm": 45
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 20,
+      "back_cm": 10,
+      "left_cm": 10,
+      "right_cm": 10
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "matte_black",
+      "style": "tech",
+      "color": "dark"
+    },
+    "status": "active"
+  },
+  {
+    "id": "TEC-OFF-EQP-005",
+    "name": "Office Tech Webcam 05",
+    "category": "technology",
+    "subcategory": "hardware",
+    "type": "webcam",
+    "asset": {
+      "image": "/assets/technology/technology_office_05.png",
+      "thumbnail": "/assets/technology/technology_office_05.png"
+    },
+    "dimensions": {
+      "width_cm": 60,
+      "depth_cm": 40,
+      "height_cm": 45
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 20,
+      "back_cm": 10,
+      "left_cm": 10,
+      "right_cm": 10
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "matte_black",
+      "style": "tech",
+      "color": "dark"
+    },
+    "status": "active"
+  },
+  {
+    "id": "VIR-ZONE-MRK-001",
+    "name": "Zone Indicator 01",
+    "category": "virtual",
+    "subcategory": "zones",
+    "type": "zone_marker",
+    "asset": {
+      "image": "/assets/virtual/indicators/virtual_marker_01.png",
+      "thumbnail": "/assets/virtual/indicators/virtual_marker_01.png"
+    },
+    "dimensions": {
+      "width_cm": 100,
+      "depth_cm": 100,
+      "height_cm": 0
+    },
+    "footprint": {
+      "width_tiles": 2,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 0,
+      "back_cm": 0,
+      "left_cm": 0,
+      "right_cm": 0
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": false,
+      "interactive": true
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "hologram",
+      "style": "hud",
+      "color": "cyan"
+    },
+    "status": "active"
+  },
+  {
+    "id": "PAR-DIV-OFF-001",
+    "name": "Office Partition Screen 01",
+    "category": "partitions",
+    "subcategory": "dividers",
+    "type": "room_partition",
+    "asset": {
+      "image": "/assets/partitions/partition_office_01.png",
+      "thumbnail": "/assets/partitions/partition_office_01.png"
+    },
+    "dimensions": {
+      "width_cm": 140,
+      "depth_cm": 15,
+      "height_cm": 150
+    },
+    "footprint": {
+      "width_tiles": 3,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 10,
+      "back_cm": 10,
+      "left_cm": 10,
+      "right_cm": 10
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "acoustic_fabric",
+      "style": "divider",
+      "color": "cyan"
+    },
+    "status": "active"
+  },
+  {
+    "id": "PAR-DIV-OFF-002",
+    "name": "Office Partition Screen 02",
+    "category": "partitions",
+    "subcategory": "dividers",
+    "type": "room_partition",
+    "asset": {
+      "image": "/assets/partitions/partition_office_02.png",
+      "thumbnail": "/assets/partitions/partition_office_02.png"
+    },
+    "dimensions": {
+      "width_cm": 140,
+      "depth_cm": 15,
+      "height_cm": 150
+    },
+    "footprint": {
+      "width_tiles": 3,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 10,
+      "back_cm": 10,
+      "left_cm": 10,
+      "right_cm": 10
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "acoustic_fabric",
+      "style": "divider",
+      "color": "cyan"
+    },
+    "status": "active"
+  },
+  {
+    "id": "LGT-OFF-LMP-001",
+    "name": "Office Lighting Lamp 01",
+    "category": "lighting",
+    "subcategory": "lamps",
+    "type": "office_lamp",
+    "asset": {
+      "image": "/assets/lighting/lighting_office_01.png",
+      "thumbnail": "/assets/lighting/lighting_office_01.png"
+    },
+    "dimensions": {
+      "width_cm": 45,
+      "depth_cm": 45,
+      "height_cm": 160
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 10,
+      "back_cm": 10,
+      "left_cm": 10,
+      "right_cm": 10
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "matte_black",
+      "style": "modern_lamp",
+      "color": "warm_yellow"
+    },
+    "status": "active"
+  },
+  {
+    "id": "BRD-MTG-WBD-001",
+    "name": "Presentation Whiteboard 01",
+    "category": "meeting",
+    "subcategory": "presentation",
+    "type": "whiteboard",
+    "asset": {
+      "image": "/assets/meeting/board_office_01.png",
+      "thumbnail": "/assets/meeting/board_office_01.png"
+    },
+    "dimensions": {
+      "width_cm": 180,
+      "depth_cm": 30,
+      "height_cm": 120
+    },
+    "footprint": {
+      "width_tiles": 4,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 60,
+      "back_cm": 10,
+      "left_cm": 10,
+      "right_cm": 10
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "porcelain",
+      "style": "magnetic",
+      "color": "white"
+    },
+    "status": "active"
+  },
+  {
+    "id": "POD-FOC-BOO-001",
+    "name": "Acoustic Focus Pod 01",
+    "category": "meeting",
+    "subcategory": "pods",
+    "type": "focus_pod",
+    "asset": {
+      "image": "/assets/meeting/pod_office_01.png",
+      "thumbnail": "/assets/meeting/pod_office_01.png"
+    },
+    "dimensions": {
+      "width_cm": 120,
+      "depth_cm": 120,
+      "height_cm": 220
+    },
+    "footprint": {
+      "width_tiles": 3,
+      "height_tiles": 3
+    },
+    "clearance": {
+      "front_cm": 60,
+      "back_cm": 20,
+      "left_cm": 20,
+      "right_cm": 20
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 1,
+    "appearance": {
+      "material": "soundproof_felt",
+      "style": "acoustic_cube",
+      "color": "dark_slate"
+    },
+    "status": "active"
+  },
+  {
+    "id": "BRK-KIT-EQP-001",
+    "name": "Kitchen Water Dispenser 01",
+    "category": "breakroom",
+    "subcategory": "kitchen",
+    "type": "water_dispenser",
+    "asset": {
+      "image": "/assets/breakroom/breakroom_01.png",
+      "thumbnail": "/assets/breakroom/breakroom_01.png"
+    },
+    "dimensions": {
+      "width_cm": 70,
+      "depth_cm": 60,
+      "height_cm": 90
+    },
+    "footprint": {
+      "width_tiles": 2,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 60,
+      "back_cm": 10,
+      "left_cm": 10,
+      "right_cm": 10
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "stainless_steel",
+      "style": "breakroom",
+      "color": "silver"
+    },
+    "status": "active"
+  },
+  {
+    "id": "BRK-KIT-EQP-005",
+    "name": "Kitchen Coffee Machine 05",
+    "category": "breakroom",
+    "subcategory": "kitchen",
+    "type": "coffee_machine",
+    "asset": {
+      "image": "/assets/breakroom/breakroom_05.png",
+      "thumbnail": "/assets/breakroom/breakroom_05.png"
+    },
+    "dimensions": {
+      "width_cm": 70,
+      "depth_cm": 60,
+      "height_cm": 90
+    },
+    "footprint": {
+      "width_tiles": 2,
+      "height_tiles": 2
+    },
+    "clearance": {
+      "front_cm": 60,
+      "back_cm": 10,
+      "left_cm": 10,
+      "right_cm": 10
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "stainless_steel",
+      "style": "breakroom",
+      "color": "silver"
+    },
+    "status": "active"
+  },
+  {
+    "id": "SAF-FAC-EQP-001",
+    "name": "Facility First Aid 01",
+    "category": "safety",
+    "subcategory": "facilities",
+    "type": "first_aid",
+    "asset": {
+      "image": "/assets/safety/safety_office_01.png",
+      "thumbnail": "/assets/safety/safety_office_01.png"
+    },
+    "dimensions": {
+      "width_cm": 40,
+      "depth_cm": 40,
+      "height_cm": 60
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 10,
+      "back_cm": 10,
+      "left_cm": 10,
+      "right_cm": 10
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "metal",
+      "style": "facility",
+      "color": "standard"
+    },
+    "status": "active"
+  },
+  {
+    "id": "SAF-FAC-EQP-003",
+    "name": "Facility Waste Bin 03",
+    "category": "safety",
+    "subcategory": "facilities",
+    "type": "waste_bin",
+    "asset": {
+      "image": "/assets/safety/safety_office_03.png",
+      "thumbnail": "/assets/safety/safety_office_03.png"
+    },
+    "dimensions": {
+      "width_cm": 40,
+      "depth_cm": 40,
+      "height_cm": 60
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 10,
+      "back_cm": 10,
+      "left_cm": 10,
+      "right_cm": 10
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "metal",
+      "style": "facility",
+      "color": "standard"
+    },
+    "status": "active"
+  },
+  {
+    "id": "SAF-FAC-EQP-005",
+    "name": "Facility Fire Ext 05",
+    "category": "safety",
+    "subcategory": "facilities",
+    "type": "fire_ext",
+    "asset": {
+      "image": "/assets/safety/safety_office_05.png",
+      "thumbnail": "/assets/safety/safety_office_05.png"
+    },
+    "dimensions": {
+      "width_cm": 40,
+      "depth_cm": 40,
+      "height_cm": 60
+    },
+    "footprint": {
+      "width_tiles": 1,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 10,
+      "back_cm": 10,
+      "left_cm": 10,
+      "right_cm": 10
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "metal",
+      "style": "facility",
+      "color": "standard"
+    },
+    "status": "active"
+  },
+  {
+    "id": "BLD-ARC-ELM-001",
+    "name": "Architectural Door Double 01",
+    "category": "building",
+    "subcategory": "doors",
+    "type": "door_double",
+    "asset": {
+      "image": "/assets/building/doors/building_element_01.png",
+      "thumbnail": "/assets/building/doors/building_element_01.png"
+    },
+    "dimensions": {
+      "width_cm": 100,
+      "depth_cm": 20,
+      "height_cm": 240
+    },
+    "footprint": {
+      "width_tiles": 2,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 40,
+      "back_cm": 40,
+      "left_cm": 0,
+      "right_cm": 0
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": true
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "glass_metal",
+      "style": "architectural",
+      "color": "dark"
+    },
+    "status": "active"
+  },
+  {
+    "id": "BLD-ARC-ELM-003",
+    "name": "Architectural Window Standard 03",
+    "category": "building",
+    "subcategory": "windows",
+    "type": "window_standard",
+    "asset": {
+      "image": "/assets/building/windows/building_element_03.png",
+      "thumbnail": "/assets/building/windows/building_element_03.png"
+    },
+    "dimensions": {
+      "width_cm": 100,
+      "depth_cm": 20,
+      "height_cm": 240
+    },
+    "footprint": {
+      "width_tiles": 2,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 40,
+      "back_cm": 40,
+      "left_cm": 0,
+      "right_cm": 0
+    },
+    "behavior": {
+      "collision": false,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "glass_metal",
+      "style": "architectural",
+      "color": "dark"
+    },
+    "status": "active"
+  },
+  {
+    "id": "BLD-ARC-ELM-005",
+    "name": "Architectural Wall Partition 05",
+    "category": "building",
+    "subcategory": "walls",
+    "type": "wall_partition",
+    "asset": {
+      "image": "/assets/building/walls/building_element_05.png",
+      "thumbnail": "/assets/building/walls/building_element_05.png"
+    },
+    "dimensions": {
+      "width_cm": 100,
+      "depth_cm": 20,
+      "height_cm": 240
+    },
+    "footprint": {
+      "width_tiles": 2,
+      "height_tiles": 1
+    },
+    "clearance": {
+      "front_cm": 40,
+      "back_cm": 40,
+      "left_cm": 0,
+      "right_cm": 0
+    },
+    "behavior": {
+      "collision": true,
+      "movable": true,
+      "rotatable": true,
+      "interactive": false
+    },
+    "capacity": 0,
+    "appearance": {
+      "material": "glass_metal",
+      "style": "architectural",
+      "color": "dark"
+    },
+    "status": "active"
+  }
+]

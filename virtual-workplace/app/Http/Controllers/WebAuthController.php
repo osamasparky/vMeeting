@@ -269,12 +269,12 @@ class WebAuthController extends Controller
     }
 
     /**
-     * Helper to guarantee default floor, map, and meeting rooms exist.
+     * Helper to guarantee default floor, map, and Meem meeting rooms exist.
      */
     private function ensureDefaultWorkspace(\App\Domains\Tenancy\Models\Organization $organization): void
     {
         $floor = $organization->floors()->firstOrCreate(
-            ['name' => 'Main Floor'],
+            ['name' => 'الدور الرئيسي - Main Floor'],
             ['order' => 1]
         );
 
@@ -283,11 +283,11 @@ class WebAuthController extends Controller
             $map = \App\Domains\Workspace\Models\Map::create([
                 'organization_id' => $organization->id,
                 'floor_id' => $floor->id,
-                'name' => 'Main Headquarters',
+                'name' => 'مكتب ميم الافتراضي - Meem Default Office',
                 'status' => 'published',
                 'version' => 1,
                 'width' => 32,
-                'height' => 24,
+                'height' => 32,
                 'tile_size' => 32,
                 'layout_data' => [
                     'theme' => 'modern_dark',
@@ -300,34 +300,78 @@ class WebAuthController extends Controller
             \App\Domains\Workspace\Models\Room::create([
                 'organization_id' => $organization->id,
                 'map_id' => $map->id,
-                'name' => 'Main Conference Room',
-                'type' => 'meeting',
-                'access_mode' => 'public',
-                'capacity' => 12,
-                'color' => '#6366F1',
-                'bounds' => ['x' => 2, 'y' => 2, 'width' => 8, 'height' => 6],
+                'name' => 'مكتب خاص 1 - Private Office 1',
+                'type' => 'private',
+                'access_mode' => 'private',
+                'capacity' => 2,
+                'color' => '#3b82f6',
+                'bounds' => ['x' => 1, 'y' => 1, 'width' => 5, 'height' => 7],
             ]);
 
             \App\Domains\Workspace\Models\Room::create([
                 'organization_id' => $organization->id,
                 'map_id' => $map->id,
-                'name' => 'Design Studio',
+                'name' => 'مكتب خاص 2 - Private Office 2',
+                'type' => 'private',
+                'access_mode' => 'private',
+                'capacity' => 2,
+                'color' => '#3b82f6',
+                'bounds' => ['x' => 6, 'y' => 1, 'width' => 5, 'height' => 7],
+            ]);
+
+            \App\Domains\Workspace\Models\Room::create([
+                'organization_id' => $organization->id,
+                'map_id' => $map->id,
+                'name' => 'كبسولة اجتماعات زجاجية - Glass Pod',
+                'type' => 'meeting',
+                'access_mode' => 'public',
+                'capacity' => 6,
+                'color' => '#06b6d4',
+                'bounds' => ['x' => 12, 'y' => 1, 'width' => 7, 'height' => 9],
+            ]);
+
+            \App\Domains\Workspace\Models\Room::create([
+                'organization_id' => $organization->id,
+                'map_id' => $map->id,
+                'name' => 'المسرح وقاعة العرض - Auditorium & Stage',
+                'type' => 'meeting',
+                'access_mode' => 'public',
+                'capacity' => 25,
+                'color' => '#8b5cf6',
+                'bounds' => ['x' => 20, 'y' => 1, 'width' => 11, 'height' => 19],
+            ]);
+
+            \App\Domains\Workspace\Models\Room::create([
+                'organization_id' => $organization->id,
+                'map_id' => $map->id,
+                'name' => 'استوديو العمل الجماعي - Collab Studio',
                 'type' => 'meeting',
                 'access_mode' => 'public',
                 'capacity' => 8,
-                'color' => '#EC4899',
-                'bounds' => ['x' => 22, 'y' => 2, 'width' => 8, 'height' => 6],
+                'color' => '#10b981',
+                'bounds' => ['x' => 1, 'y' => 9, 'width' => 10, 'height' => 8],
             ]);
 
             \App\Domains\Workspace\Models\Room::create([
                 'organization_id' => $organization->id,
                 'map_id' => $map->id,
-                'name' => 'Executive Office',
-                'type' => 'private',
-                'access_mode' => 'private',
-                'capacity' => 4,
-                'color' => '#F59E0B',
-                'bounds' => ['x' => 22, 'y' => 16, 'width' => 8, 'height' => 6],
+                'name' => 'استقبال ولوبي ميم - Meem Welcome Lounge',
+                'type' => 'reception',
+                'access_mode' => 'public',
+                'capacity' => 10,
+                'color' => '#0d9488',
+                'bounds' => ['x' => 1, 'y' => 23, 'width' => 11, 'height' => 8],
+            ]);
+
+            \App\Domains\Workspace\Models\Room::create([
+                'organization_id' => $organization->id,
+                'map_id' => $map->id,
+                'name' => 'قاعة مجلس الإدارة - Executive Boardroom',
+                'type' => 'meeting',
+                'access_mode' => 'public',
+                'capacity' => 10,
+                'color' => '#3b82f6',
+                'bounds' => ['x' => 20, 'y' => 21, 'width' => 11, 'height' => 10],
             ]);
         }
 

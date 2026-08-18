@@ -1,29 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guest Invitation — Virtual Workplace</title>
+    <title>{{ __('Guest Invitation') }} — {{ __('Virtual Workplace') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-dark: #070913;
-            --bg-card: rgba(15, 23, 42, 0.85);
-            --border-card: rgba(255, 255, 255, 0.08);
-            --accent: #6366f1;
-            --accent-hover: #4f46e5;
-            --accent-glow: rgba(99, 102, 241, 0.35);
+            --bg-card: rgba(15, 23, 42, 0.88);
+            --border-card: rgba(255, 255, 255, 0.1);
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-glow: rgba(59, 130, 246, 0.35);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --success: #10b981;
             --danger: #ef4444;
+            --font-family: {{ app()->getLocale() === 'ar' ? "'Cairo', 'Inter', sans-serif" : "'Inter', 'Cairo', sans-serif" }};
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-family); }
         body {
-            font-family: 'Inter', sans-serif;
             background: var(--bg-dark);
             color: var(--text-main);
             min-height: 100vh;
@@ -31,7 +31,7 @@
             align-items: center;
             justify-content: center;
             background-image: 
-                radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
                 radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.12) 0%, transparent 40%);
             padding: 20px;
         }
@@ -43,7 +43,7 @@
             padding: 40px;
             width: 100%;
             max-width: 480px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(20px);
             text-align: center;
         }
@@ -51,7 +51,7 @@
         .brand-icon {
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, #6366f1, #a855f7);
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
             border-radius: 16px;
             display: inline-flex;
             align-items: center;
@@ -79,9 +79,9 @@
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(99, 102, 241, 0.12);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            color: #a5b4fc;
+            background: rgba(59, 130, 246, 0.12);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #93c5fd;
             padding: 8px 16px;
             border-radius: 12px;
             font-size: 13px;
@@ -90,14 +90,14 @@
         }
 
         .form-group {
-            text-align: left;
+            text-align: {{ app()->getLocale() === 'ar' ? 'right' : 'left' }};
             margin-bottom: 20px;
         }
 
         .form-label {
             display: block;
             font-size: 12px;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text-muted);
             margin-bottom: 8px;
             text-transform: uppercase;
@@ -114,6 +114,7 @@
             font-size: 15px;
             outline: none;
             transition: all 0.2s;
+            text-align: {{ app()->getLocale() === 'ar' ? 'right' : 'left' }};
         }
 
         .form-input:focus {
@@ -124,13 +125,13 @@
 
         .join-btn {
             width: 100%;
-            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
             color: white;
             border: none;
             border-radius: 14px;
             padding: 15px;
             font-size: 15px;
-            font-weight: 700;
+            font-weight: 800;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -163,31 +164,31 @@
         <div class="brand-icon">🌐</div>
 
         @if(!empty($error))
-            <h1 class="title">Invitation Issue</h1>
+            <h1 class="title">{{ __('Invitation Issue') }}</h1>
             <div class="error-card">{{ $error }}</div>
             <a href="{{ route('login') }}" class="join-btn" style="text-decoration: none;">
-                Go to Homepage
+                {{ __('Go to Homepage') }}
             </a>
         @else
             <h1 class="title">{{ $invitation->organization->name }}</h1>
             <p class="subtitle">
-                You have been invited by <strong>{{ $invitation->host->name }}</strong> to join their virtual office space.
+                {{ __('You have been invited by') }} <strong>{{ $invitation->host->name }}</strong> {{ __('to join their virtual office space.') }}
             </p>
 
             <div class="room-badge">
                 <span>🏢</span>
-                <span>Destination Room: <strong>{{ $invitation->room->name }}</strong></span>
+                <span>{{ __('Destination Room:') }} <strong>{{ $invitation->room->name }}</strong></span>
             </div>
 
             <form action="{{ route('guest.enter', $invitation->token) }}" method="POST">
                 @csrf
                 <div class="form-group">
-                    <label class="form-label">Your Full Name (Display Name)</label>
+                    <label class="form-label">{{ __('Your Full Name (Display Name)') }}</label>
                     <input type="text" name="guest_name" class="form-input" value="{{ old('guest_name', $invitation->guest_name) }}" required placeholder="e.g. John Smith / Partner">
                 </div>
 
                 <button type="submit" class="join-btn">
-                    <span>🚀</span> Enter Workplace as Guest
+                    <span>🚀</span> {{ __('Enter Workplace as Guest') }}
                 </button>
             </form>
         @endif
@@ -195,3 +196,4 @@
 
 </body>
 </html>
+

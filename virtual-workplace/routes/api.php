@@ -145,6 +145,11 @@ Route::prefix('v1')->group(function () {
 
                 // ── Guest Invitations Domain ──
                 Route::post('/rooms/{room}/guest-invitations', [\App\Domains\Guests\Controllers\GuestController::class, 'createInvitation']);
+
+                // ── Session & Meeting Recordings Gallery ──
+                Route::get('/recordings', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'index']);
+                Route::post('/recordings', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'store']);
+                Route::delete('/recordings/{recording}', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'destroy']);
             });
 
         // ── Plans (public listing) ──

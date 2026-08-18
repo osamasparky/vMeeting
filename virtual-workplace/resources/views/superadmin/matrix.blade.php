@@ -9,7 +9,7 @@
 
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
         <div>
-            <h2 style="font-size: 18px; font-weight: 800; color: var(--brand-navy);">🔐 {{ __('Role & Permission Matrix') }}</h2>
+            <h2 style="font-size: 18px; font-weight: 800; color: var(--text-primary);">🔐 {{ __('Role & Permission Matrix') }}</h2>
             <p style="font-size: 13px; color: var(--text-secondary);">
                 {{ __('Define system-wide access controls and capabilities for each role') }}
             </p>
@@ -35,7 +35,7 @@
                         <th style="width: 320px;">{{ __('Permission') }}</th>
                         @foreach($roles as $role)
                         <th style="text-align: center; min-width: 130px;">
-                            <div style="font-weight: 800; color: var(--brand-navy);">{{ $role->name }}</div>
+                            <div style="font-weight: 800; color: var(--text-primary);">{{ $role->name }}</div>
                             <div style="font-size: 10px; color: var(--text-muted); font-weight: 600;">{{ $role->slug }}</div>
                         </th>
                         @endforeach
@@ -45,7 +45,7 @@
                     @foreach($groupPerms as $perm)
                     <tr>
                         <td>
-                            <div style="font-weight: 700; color: var(--brand-navy); font-size: 13px;">{{ $perm->key }}</div>
+                            <div style="font-weight: 700; color: var(--text-primary); font-size: 13px;">{{ $perm->key }}</div>
                             <div style="font-size: 11px; color: var(--text-muted);">{{ $perm->description }}</div>
                         </td>
                         @foreach($roles as $role)

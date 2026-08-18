@@ -113,10 +113,30 @@ export interface InboundRoomDoorToggle {
   };
 }
 
+export interface InboundAvatarUpdate {
+  type: 'avatar.update';
+  payload: {
+    gender: string;
+  };
+}
+
+export interface InboundPresentationStart {
+  type: 'presentation.start';
+  payload?: any;
+}
+
+export interface InboundPresentationStop {
+  type: 'presentation.stop';
+  payload?: any;
+}
+
 export type InboundEvent =
   | InboundJoinMap
   | InboundPositionUpdate
   | InboundStatusUpdate
+  | InboundAvatarUpdate
+  | InboundPresentationStart
+  | InboundPresentationStop
   | InboundRoomEnter
   | InboundRoomLeave
   | InboundChatMessage
@@ -125,9 +145,6 @@ export type InboundEvent =
   | InboundRoomDoorToggle
   | InboundWebRtcSignal;
 
-
-
-
 // ── Outbound Server Events ──
 
 export interface OutboundWelcome {
@@ -135,6 +152,29 @@ export interface OutboundWelcome {
   payload: {
     user: OfficeUser;
     occupants: OfficeUser[];
+  };
+}
+
+export interface OutboundAvatarUpdated {
+  type: 'avatar.updated';
+  payload: {
+    userId: string;
+    gender: string;
+  };
+}
+
+export interface OutboundPresentationStarted {
+  type: 'presentation.started';
+  payload: {
+    presenterId: string;
+    presenterName: string;
+  };
+}
+
+export interface OutboundPresentationStopped {
+  type: 'presentation.stopped';
+  payload: {
+    presenterId: string;
   };
 }
 
@@ -253,6 +293,9 @@ export type OutboundEvent =
   | OutboundUserLeft
   | OutboundPositionUpdated
   | OutboundPresenceUpdated
+  | OutboundAvatarUpdated
+  | OutboundPresentationStarted
+  | OutboundPresentationStopped
   | OutboundRoomEntered
   | OutboundRoomLeft
   | OutboundProximityChanged

@@ -76,10 +76,10 @@
         <div style="padding: 24px;">
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px;">
                 @forelse($items as $item)
-                    <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-card); transition: all 0.2s; position: relative;">
+                    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-card); transition: all 0.2s; position: relative;">
                         <div>
                             <!-- Image / Thumbnail Preview -->
-                            <div style="height: 100px; background: #f8fafc; border-radius: 10px; border: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; overflow: hidden; position: relative;">
+                            <div style="height: 100px; background: var(--bg-input); border-radius: 10px; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; overflow: hidden; position: relative;">
                                 @if($item->image_url)
                                     <img src="{{ $item->image_url }}" alt="{{ $item->name }}" style="max-height: 85px; max-width: 85%; object-fit: contain;">
                                 @else
@@ -92,7 +92,7 @@
                             </div>
 
                             <!-- Name & Category -->
-                            <h4 style="font-size: 13px; font-weight: 800; color: var(--brand-navy); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            <h4 style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                 {{ $item->name }}
                             </h4>
                             <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
@@ -113,7 +113,7 @@
                         </div>
 
                         <!-- Card Action Buttons -->
-                        <div style="display: flex; justify-content: flex-end; gap: 6px; padding-top: 8px; border-top: 1px solid #f1f5f9;">
+                        <div style="display: flex; justify-content: flex-end; gap: 6px; padding-top: 8px; border-top: 1px solid var(--border-color);">
                             <button onclick="editItem({{ json_encode($item) }})" class="btn-action btn-outline" style="padding: 4px 8px; font-size: 11px;">
                                 ✏️ {{ __('Edit') }}
                             </button>
@@ -129,7 +129,7 @@
                 @empty
                     <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 40px;">
                         <div style="font-size: 32px; margin-bottom: 8px;">🛋️</div>
-                        <h4 style="font-size: 15px; font-weight: 800; color: var(--brand-navy); margin-bottom: 4px;">{{ __('No furniture items found') }}</h4>
+                        <h4 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">{{ __('No furniture items found') }}</h4>
                         <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">{{ __('Upload pictures and configure furniture assets to appear in the Floor Map Editor.') }}</p>
                         <button onclick="openItemModal()" class="btn-action btn-primary" style="padding: 8px 16px; font-size: 12px;">
                             + {{ __('Upload First Item') }}
@@ -172,7 +172,7 @@
                     @foreach($categories as $cat)
                         <tr>
                             <td style="font-size: 20px;">{{ $cat->icon }}</td>
-                            <td><strong style="color: var(--brand-navy);">{{ $cat->name }}</strong></td>
+                            <td><strong style="color: var(--text-primary);">{{ $cat->name }}</strong></td>
                             <td style="font-family: monospace; font-size: 11px; color: var(--text-muted);">{{ $cat->slug }}</td>
                             <td><span class="badge badge-teal">{{ $cat->items_count }} {{ __('Items') }}</span></td>
                             <td>{{ $cat->order }}</td>
@@ -192,17 +192,17 @@
     </div>
 
     <!-- Modal 1: Upload / Edit Furniture Item (Ultra Premium UX) -->
-    <div id="item-modal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(1, 44, 65, 0.55); backdrop-filter: blur(10px); z-index: 9999; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;">
-        <div style="background: #ffffff; border: 1px solid rgba(0, 180, 179, 0.25); border-radius: 24px; padding: 32px; width: 100%; max-width: 640px; box-shadow: 0 25px 60px -10px rgba(1, 44, 65, 0.25); position: relative; margin: auto;">
+    <div id="item-modal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(1, 44, 65, 0.7); backdrop-filter: blur(10px); z-index: 9999; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;">
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 24px; padding: 32px; width: 100%; max-width: 640px; box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.5); position: relative; margin: auto;">
             
             <!-- Modal Header -->
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
                 <div style="display: flex; align-items: center; gap: 14px;">
-                    <div style="width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(135deg, rgba(0, 180, 179, 0.15), rgba(0, 104, 71, 0.1)); color: var(--brand-teal); display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                    <div style="width: 46px; height: 46px; border-radius: 14px; background: rgba(59, 130, 246, 0.15); color: var(--brand-teal); display: flex; align-items: center; justify-content: center; font-size: 24px;">
                         🛋️
                     </div>
                     <div>
-                        <h3 style="font-size: 19px; font-weight: 900; color: var(--brand-navy); margin-bottom: 2px;" id="item-modal-title">
+                        <h3 style="font-size: 19px; font-weight: 900; color: var(--text-primary); margin-bottom: 2px;" id="item-modal-title">
                             {{ __('Upload Furniture Asset') }}
                         </h3>
                         <p style="font-size: 12px; color: var(--text-muted); font-weight: 600;">
@@ -210,7 +210,7 @@
                         </p>
                     </div>
                 </div>
-                <button onclick="closeItemModal()" style="background: #f1f5f9; border: none; width: 34px; height: 34px; border-radius: 10px; font-size: 16px; color: var(--brand-navy); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" title="{{ __('Close') }}">
+                <button onclick="closeItemModal()" style="background: var(--bg-input); border: 1px solid var(--border-color); width: 34px; height: 34px; border-radius: 10px; font-size: 16px; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" title="{{ __('Close') }}">
                     ✕
                 </button>
             </div>
@@ -223,14 +223,14 @@
                 <!-- Row 1: Name & Category -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 800; color: var(--brand-navy); margin-bottom: 6px;">
+                        <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">
                             {{ __('Item Name') }} <span style="color: var(--brand-crimson);">*</span>
                         </label>
                         <input type="text" name="name" id="item-name" required placeholder="e.g. Modern Executive Sofa" class="form-input" style="width: 100%; padding: 11px 14px; border-radius: 12px; font-weight: 600; font-size: 13px;">
                     </div>
 
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 800; color: var(--brand-navy); margin-bottom: 6px;">
+                        <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">
                             {{ __('Category') }} <span style="color: var(--brand-crimson);">*</span>
                         </label>
                         <select name="category_id" id="item-category-id" required class="form-input" style="width: 100%; padding: 11px 14px; border-radius: 12px; font-weight: 700; font-size: 13px;">
@@ -243,17 +243,17 @@
 
                 <!-- Modern Interactive Image Dropzone with Live Preview -->
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 800; color: var(--brand-navy); margin-bottom: 6px;">
+                    <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">
                         🖼️ {{ __('Sprite / Texture Image (PNG, WebP, SVG)') }}
                     </label>
-                    <div id="dropzone-box" style="position: relative; border: 2px dashed rgba(0, 180, 179, 0.4); background: #f8fafc; border-radius: 16px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s;">
+                    <div id="dropzone-box" style="position: relative; border: 2px dashed var(--border-color); background: var(--bg-input); border-radius: 16px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s;">
                         <input type="file" name="image" id="item-image-file" accept="image/*" onchange="previewUploadImage(this)" style="position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; z-index: 5;">
                         
                         <div id="dropzone-prompt" style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                            <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(0, 180, 179, 0.1); color: var(--brand-teal); display: flex; align-items: center; justify-content: center; font-size: 22px;">
+                            <div style="width: 48px; height: 48px; border-radius: 50%; background: rgba(59, 130, 246, 0.15); color: var(--brand-teal); display: flex; align-items: center; justify-content: center; font-size: 22px;">
                                 ☁️
                             </div>
-                            <div style="font-size: 13px; font-weight: 800; color: var(--brand-navy);">
+                            <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);">
                                 {{ __('Click or Drag image here to upload') }}
                             </div>
                             <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">
@@ -263,10 +263,10 @@
 
                         <!-- Image Preview Box -->
                         <div id="image-preview-container" style="display: none; flex-direction: column; align-items: center; gap: 8px; z-index: 10; position: relative;">
-                            <div style="padding: 10px; background: #ffffff; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(1, 44, 65, 0.05); display: inline-flex; align-items: center; justify-content: center; min-width: 120px; min-height: 90px;">
+                            <div style="padding: 10px; background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-card); display: inline-flex; align-items: center; justify-content: center; min-width: 120px; min-height: 90px;">
                                 <img id="image-preview-img" src="#" alt="Preview" style="max-height: 90px; max-width: 180px; object-fit: contain;">
                             </div>
-                            <span style="font-size: 11px; font-weight: 700; color: var(--brand-teal); background: rgba(0, 180, 179, 0.1); padding: 3px 10px; border-radius: 6px;">
+                            <span style="font-size: 11px; font-weight: 700; color: var(--brand-teal); background: rgba(59, 130, 246, 0.15); padding: 3px 10px; border-radius: 6px;">
                                 🔄 {{ __('Click to change image') }}
                             </span>
                         </div>
@@ -274,10 +274,10 @@
                 </div>
 
                 <!-- Row 2: Grid Footprint Dimensions (Interactive Steppers) -->
-                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 16px; padding: 14px 18px;">
+                <div style="background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 16px; padding: 14px 18px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <span style="font-size: 12px; font-weight: 800; color: var(--brand-navy);">📐 {{ __('Floor Grid Footprint') }}</span>
-                        <span id="grid-dimensions-badge" style="font-size: 11px; font-weight: 800; color: var(--brand-teal); background: rgba(0, 180, 179, 0.1); padding: 3px 8px; border-radius: 6px;">
+                        <span style="font-size: 12px; font-weight: 800; color: var(--text-primary);">📐 {{ __('Floor Grid Footprint') }}</span>
+                        <span id="grid-dimensions-badge" style="font-size: 11px; font-weight: 800; color: var(--brand-teal); background: rgba(59, 130, 246, 0.15); padding: 3px 8px; border-radius: 6px;">
                             1 × 1 Tiles (32 × 32 px)
                         </span>
                     </div>
@@ -287,9 +287,9 @@
                         <div>
                             <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">{{ __('Tile Width (Columns)') }}</label>
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <button type="button" onclick="stepDimension('width', -1)" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border-color); background: #ffffff; font-size: 16px; font-weight: 800; color: var(--brand-navy); cursor: pointer;">−</button>
+                                <button type="button" onclick="stepDimension('width', -1)" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); font-size: 16px; font-weight: 800; color: var(--text-primary); cursor: pointer;">−</button>
                                 <input type="number" name="width" id="item-width" value="1" min="1" max="10" required class="form-input" style="text-align: center; font-weight: 800; font-size: 14px; padding: 6px;" oninput="updateDimensionBadge()">
-                                <button type="button" onclick="stepDimension('width', 1)" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border-color); background: #ffffff; font-size: 16px; font-weight: 800; color: var(--brand-navy); cursor: pointer;">+</button>
+                                <button type="button" onclick="stepDimension('width', 1)" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); font-size: 16px; font-weight: 800; color: var(--text-primary); cursor: pointer;">+</button>
                             </div>
                         </div>
 
@@ -297,9 +297,9 @@
                         <div>
                             <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;">{{ __('Tile Height (Rows)') }}</label>
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <button type="button" onclick="stepDimension('height', -1)" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border-color); background: #ffffff; font-size: 16px; font-weight: 800; color: var(--brand-navy); cursor: pointer;">−</button>
+                                <button type="button" onclick="stepDimension('height', -1)" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); font-size: 16px; font-weight: 800; color: var(--text-primary); cursor: pointer;">−</button>
                                 <input type="number" name="height" id="item-height" value="1" min="1" max="10" required class="form-input" style="text-align: center; font-weight: 800; font-size: 14px; padding: 6px;" oninput="updateDimensionBadge()">
-                                <button type="button" onclick="stepDimension('height', 1)" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border-color); background: #ffffff; font-size: 16px; font-weight: 800; color: var(--brand-navy); cursor: pointer;">+</button>
+                                <button type="button" onclick="stepDimension('height', 1)" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); font-size: 16px; font-weight: 800; color: var(--text-primary); cursor: pointer;">+</button>
                             </div>
                         </div>
                     </div>
@@ -308,7 +308,7 @@
                 <!-- Row 3: Fallback Icon & Color Variants -->
                 <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 16px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 800; color: var(--brand-navy); margin-bottom: 6px;">
+                        <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">
                             {{ __('Fallback Emoji') }}
                         </label>
                         <div style="display: flex; gap: 6px;">
@@ -316,7 +316,7 @@
                             <!-- Quick Emoji Buttons -->
                             <div style="display: flex; gap: 4px; flex-wrap: wrap; align-items: center;">
                                 @foreach(['🛋️', '🪑', '🖥️', '🪴', '📺', '🚰', '💡', '🏓'] as $em)
-                                    <button type="button" onclick="document.getElementById('item-icon').value='{{ $em }}'" style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 4px 6px; font-size: 13px; cursor: pointer;">
+                                    <button type="button" onclick="document.getElementById('item-icon').value='{{ $em }}'" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 4px 6px; font-size: 13px; cursor: pointer;">
                                         {{ $em }}
                                     </button>
                                 @endforeach
@@ -325,7 +325,7 @@
                     </div>
 
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 800; color: var(--brand-navy); margin-bottom: 6px;">
+                        <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">
                             🎨 {{ __('Color Variants (Click presets or enter Hex)') }}
                         </label>
                         <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 6px;">
@@ -333,7 +333,7 @@
                                 $palette = ['#00b4b3', '#00726c', '#012c41', '#006847', '#ffd136', '#f57b36', '#d20005', '#64748b'];
                             @endphp
                             @foreach($palette as $pColor)
-                                <span class="preset-color-dot" onclick="togglePresetColor('{{ $pColor }}')" style="width: 18px; height: 18px; border-radius: 50%; background: {{ $pColor }}; cursor: pointer; border: 2px solid #ffffff; box-shadow: 0 0 0 1px rgba(0,0,0,0.15); transition: transform 0.15s;" title="{{ $pColor }}"></span>
+                                <span class="preset-color-dot" onclick="togglePresetColor('{{ $pColor }}')" style="width: 18px; height: 18px; border-radius: 50%; background: {{ $pColor }}; cursor: pointer; border: 2px solid var(--bg-card); box-shadow: 0 0 0 1px rgba(255,255,255,0.15); transition: transform 0.15s;" title="{{ $pColor }}"></span>
                             @endforeach
                         </div>
                         <input type="text" name="colors" id="item-colors" placeholder="#00b4b3, #012c41, #ffd136" class="form-input" style="width: 100%; font-size: 12px; padding: 8px 12px;">
@@ -341,11 +341,11 @@
                 </div>
 
                 <!-- Row 4: Physical Collision Toggle Card -->
-                <div style="display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, rgba(0, 180, 179, 0.06), rgba(0, 104, 71, 0.03)); border: 1px solid rgba(0, 180, 179, 0.2); border-radius: 14px; padding: 12px 18px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), var(--bg-card)); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px 18px;">
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <span style="font-size: 22px;">🧱</span>
                         <div>
-                            <div style="font-size: 13px; font-weight: 800; color: var(--brand-navy);">{{ __('Physical Collision Boundary') }}</div>
+                            <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);">{{ __('Physical Collision Boundary') }}</div>
                             <div style="font-size: 11px; color: var(--text-muted);">{{ __('Solid object that blocks avatar movement (uncheck for rugs/walkable decor)') }}</div>
                         </div>
                     </div>
@@ -358,7 +358,7 @@
                 </div>
 
                 <!-- Save Action Button -->
-                <button type="submit" class="btn-action btn-primary" style="margin-top: 6px; padding: 14px; font-size: 15px; font-weight: 800; justify-content: center; border-radius: 12px; box-shadow: 0 6px 18px rgba(0, 180, 179, 0.3);">
+                <button type="submit" class="btn-action btn-primary" style="margin-top: 6px; padding: 14px; font-size: 15px; font-weight: 800; justify-content: center; border-radius: 12px; box-shadow: 0 6px 18px rgba(59, 130, 246, 0.3);">
                     💾 {{ __('Save Furniture Item') }}
                 </button>
             </form>
@@ -366,20 +366,20 @@
     </div>
 
     <!-- Modal 2: Create / Edit Category (Ultra Premium UX) -->
-    <div id="category-modal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(1, 44, 65, 0.55); backdrop-filter: blur(10px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
-        <div style="background: #ffffff; border: 1px solid rgba(0, 180, 179, 0.25); border-radius: 24px; padding: 32px; width: 100%; max-width: 480px; box-shadow: 0 25px 60px -10px rgba(1, 44, 65, 0.25); position: relative;">
+    <div id="category-modal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(1, 44, 65, 0.7); backdrop-filter: blur(10px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 24px; padding: 32px; width: 100%; max-width: 480px; box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.5); position: relative;">
             
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(0, 104, 71, 0.12); color: var(--brand-green); display: flex; align-items: center; justify-content: center; font-size: 22px;">
+                    <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(16, 185, 129, 0.15); color: #34d399; display: flex; align-items: center; justify-content: center; font-size: 22px;">
                         📂
                     </div>
                     <div>
-                        <h3 style="font-size: 18px; font-weight: 900; color: var(--brand-navy);" id="cat-modal-title">{{ __('New Category') }}</h3>
+                        <h3 style="font-size: 18px; font-weight: 900; color: var(--text-primary);" id="cat-modal-title">{{ __('New Category') }}</h3>
                         <p style="font-size: 11px; color: var(--text-muted); font-weight: 600;">{{ __('Drawer accordion section for grouping assets.') }}</p>
                     </div>
                 </div>
-                <button onclick="closeCategoryModal()" style="background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 10px; font-size: 15px; color: var(--brand-navy); cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
+                <button onclick="closeCategoryModal()" style="background: var(--bg-input); border: 1px solid var(--border-color); width: 32px; height: 32px; border-radius: 10px; font-size: 15px; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
             </div>
 
             <form id="category-form" method="POST" action="{{ route('superadmin.furniture.category.store') }}" style="display: flex; flex-direction: column; gap: 16px;">
@@ -387,18 +387,18 @@
                 <div id="cat-method-field"></div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 800; color: var(--brand-navy); margin-bottom: 6px;">{{ __('Category Name') }} *</label>
+                    <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">{{ __('Category Name') }} *</label>
                     <input type="text" name="name" id="cat-name" required placeholder="e.g. Seating, Tables, Electronics, Plants" class="form-input" style="width: 100%; padding: 11px 14px; border-radius: 12px; font-weight: 600; font-size: 13px;">
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 800; color: var(--brand-navy); margin-bottom: 6px;">{{ __('Emoji Icon') }}</label>
+                        <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">{{ __('Emoji Icon') }}</label>
                         <div style="display: flex; gap: 6px;">
                             <input type="text" name="icon" id="cat-icon" value="🪑" class="form-input" style="width: 50px; text-align: center; font-size: 18px; padding: 8px;">
                             <div style="display: flex; gap: 4px; flex-wrap: wrap; align-items: center;">
                                 @foreach(['🪑', '🖥️', '🪴', '📺', '🗄️', '☕'] as $em)
-                                    <button type="button" onclick="document.getElementById('cat-icon').value='{{ $em }}'" style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 6px; padding: 4px 6px; font-size: 13px; cursor: pointer;">
+                                    <button type="button" onclick="document.getElementById('cat-icon').value='{{ $em }}'" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 4px 6px; font-size: 13px; cursor: pointer;">
                                         {{ $em }}
                                     </button>
                                 @endforeach
@@ -406,7 +406,7 @@
                         </div>
                     </div>
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 800; color: var(--brand-navy); margin-bottom: 6px;">{{ __('Display Order') }}</label>
+                        <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">{{ __('Display Order') }}</label>
                         <input type="number" name="order" id="cat-order" value="0" class="form-input" style="width: 100%; padding: 11px 14px; border-radius: 12px; font-weight: 700;">
                     </div>
                 </div>

@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Domains\Workspace\Models\FurnitureCategory;
 use App\Domains\Workspace\Models\FurnitureItem;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
 
 class FurnitureSeeder extends Seeder
 {
@@ -92,5 +94,73 @@ class FurnitureSeeder extends Seeder
                 'is_active' => true,
             ]);
         }
+
+        // 4. Import 3D Furniture Catalog from database/data/furniture_catalog.json
+        $catalogPath = database_path('data/furniture_catalog.json');
+        if (File::exists($catalogPath)) {
+            $catalog = json_decode(File::get($catalogPath), true);
+            if (is_array($catalog)) {
+                $categoryMeta = [
+                    'desks' => ['name' => 'Desks & Workstations', 'icon' => '🖥️', 'order' => 1],
+                    'chairs' => ['name' => 'Office Chairs & Seating', 'icon' => '🪑', 'order' => 2],
+                    'conference_tables' => ['name' => 'Meeting & Conference Tables', 'icon' => '🤝', 'order' => 3],
+                    'lounge' => ['name' => 'Lounge & Sofas', 'icon' => '🛋️', 'order' => 4],
+                    'storage' => ['name' => 'Storage & Cabinets', 'icon' => '🗄️', 'order' => 5],
+                    'reception' => ['name' => 'Reception & Counters', 'icon' => '🛎️', 'order' => 6],
+                    'hardware' => ['name' => 'Technology & Hardware', 'icon' => '💻', 'order' => 7],
+                    'presentation' => ['name' => 'Whiteboards & AV Screens', 'icon' => '📊', 'order' => 8],
+                    'pods' => ['name' => 'Focus Pods & Booths', 'icon' => '🎧', 'order' => 9],
+                    'dividers' => ['name' => 'Partitions & Dividers', 'icon' => '🧱', 'order' => 10],
+                    'lamps' => ['name' => 'Lighting & Lamps', 'icon' => '💡', 'order' => 11],
+                    'plants' => ['name' => 'Indoor Plants & Greenery', 'icon' => '🪴', 'order' => 12],
+                    'kitchen' => ['name' => 'Breakroom & Kitchen', 'icon' => '☕', 'order' => 13],
+                    'facilities' => ['name' => 'Safety & Facilities', 'icon' => '🧯', 'order' => 14],
+                    'doors' => ['name' => 'Doors & Entryways', 'icon' => '🚪', 'order' => 15],
+                    'windows' => ['name' => 'Windows & Blinds', 'icon' => '🪟', 'order' => 16],
+                    'walls' => ['name' => 'Walls & Partitions', 'icon' => '🧱', 'order' => 17],
+                    'zones' => ['name' => 'Virtual Markers & HUDs', 'icon' => '📍', 'order' => 18],
+                ];
+
+                foreach ($catalog as $entry) {
+                    $catSlug = $entry['subcategory'] ?? ($entry['category'] ?? 'desks');
+                    $meta = $categoryMeta[$catSlug] ?? [
+                        'name' => ucwords(str_replace('_', ' ', $catSlug)),
+                        'icon' => '🪑',
+                        'order' => 20
+                    ];
+
+                    $category = FurnitureCategory::firstOrCreate(
+                        ['slug' => $catSlug],
+                        ['name' => $meta['name'], 'icon' => $meta['icon'], 'order' => $meta['order']]
+                    );
+                    $category->update([
+                        'name' => $meta['name'],
+                        'icon' => $meta['icon'],
+                        'order' => $meta['order']
+                    ]);
+
+                    FurnitureItem::updateOrCreate(
+                        ['slug' => $entry['id']],
+                        [
+                            'category_id' => $category->id,
+                            'name' => $entry['name'],
+                            'image_url' => $entry['asset']['image'] ?? null,
+                            'icon' => $meta['icon'],
+                            'width' => $entry['footprint']['width_tiles'] ?? 2,
+                            'height' => $entry['footprint']['height_tiles'] ?? 1,
+                            'collision' => $entry['behavior']['collision'] ?? true,
+                            'colors' => [$entry['appearance']['color'] ?? '#3b82f6'],
+                            'is_active' => true,
+                        ]
+                    );
+                }
+            }
+        }
+
+        Cache::forget('furniture_catalog_active');
+        Cache::forget('furniture_categories_with_items');
+        Cache::flush();
     }
 }
+
+

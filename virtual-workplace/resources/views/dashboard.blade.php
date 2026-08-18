@@ -571,8 +571,8 @@
             <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 20px;">
                 <div class="stat-card" style="border-top: 3px solid var(--brand-teal);">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
-                        <div class="stat-lbl" style="font-size: 12px; font-weight: 800; color: var(--brand-ocean);">👥 {{ __('Workplace Presence') }}</div>
-                        <span style="font-size: 10px; font-weight: 800; color: var(--brand-green); background: rgba(0, 104, 71, 0.1); padding: 2px 6px; border-radius: 6px;">▲ +14%</span>
+                        <div class="stat-lbl" style="font-size: 12px; font-weight: 800; color: var(--text-secondary);">👥 {{ __('Workplace Presence') }}</div>
+                        <span style="font-size: 10px; font-weight: 800; color: #34d399; background: rgba(16, 185, 129, 0.15); padding: 2px 6px; border-radius: 6px;">▲ +14%</span>
                     </div>
                     <div class="stat-val" style="color: var(--brand-teal); font-size: 28px; font-weight: 900; margin-bottom: 4px;">{{ $stats['presence_rate'] }}%</div>
                     <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">{{ $stats['members'] }} {{ __('Registered team members') }}</div>
@@ -580,8 +580,8 @@
 
                 <div class="stat-card" style="border-top: 3px solid var(--brand-pine);">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
-                        <div class="stat-lbl" style="font-size: 12px; font-weight: 800; color: var(--brand-ocean);">🎙️ {{ __('Meetings & Sessions') }}</div>
-                        <span style="font-size: 10px; font-weight: 800; color: var(--brand-teal); background: rgba(0, 180, 179, 0.1); padding: 2px 6px; border-radius: 6px;">{{ $stats['collaboration_hours'] }}h</span>
+                        <div class="stat-lbl" style="font-size: 12px; font-weight: 800; color: var(--text-secondary);">🎙️ {{ __('Meetings & Sessions') }}</div>
+                        <span style="font-size: 10px; font-weight: 800; color: var(--brand-teal); background: rgba(6, 182, 212, 0.15); padding: 2px 6px; border-radius: 6px;">{{ $stats['collaboration_hours'] }}h</span>
                     </div>
                     <div class="stat-val" style="color: var(--brand-pine); font-size: 28px; font-weight: 900; margin-bottom: 4px;">{{ $stats['meetings_count'] }}</div>
                     <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">{{ __('Spatial audio & video sessions') }}</div>
@@ -589,39 +589,39 @@
 
                 <div class="stat-card" style="border-top: 3px solid var(--brand-orange);">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
-                        <div class="stat-lbl" style="font-size: 12px; font-weight: 800; color: var(--brand-ocean);">🏢 {{ __('Room Occupancy') }}</div>
-                        <span style="font-size: 10px; font-weight: 800; color: var(--brand-orange); background: rgba(245, 123, 54, 0.1); padding: 2px 6px; border-radius: 6px;">{{ $rooms->count() }} {{ __('Rooms') }}</span>
+                        <div class="stat-lbl" style="font-size: 12px; font-weight: 800; color: var(--text-secondary);">🏢 {{ __('Room Occupancy') }}</div>
+                        <span style="font-size: 10px; font-weight: 800; color: var(--brand-orange); background: rgba(249, 115, 22, 0.15); padding: 2px 6px; border-radius: 6px;">{{ $rooms->count() }} {{ __('Rooms') }}</span>
                     </div>
                     <div class="stat-val" style="color: var(--brand-orange); font-size: 28px; font-weight: 900; margin-bottom: 4px;">{{ $stats['occupancy_rate'] }}%</div>
                     <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">{{ __('Active collaborative spaces') }}</div>
                 </div>
 
-                <div class="stat-card" style="border-top: 3px solid var(--brand-navy);">
+                <div class="stat-card" style="border-top: 3px solid var(--brand-primary);">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
-                        <div class="stat-lbl" style="font-size: 12px; font-weight: 800; color: var(--brand-ocean);">💎 {{ __('Company Plan') }}</div>
-                        <span style="font-size: 10px; font-weight: 800; color: var(--brand-teal); background: rgba(0, 180, 179, 0.1); padding: 2px 6px; border-radius: 6px;">{{ $stats['guests'] }} {{ __('Guests') }}</span>
+                        <div class="stat-lbl" style="font-size: 12px; font-weight: 800; color: var(--text-secondary);">💎 {{ __('Company Plan') }}</div>
+                        <span style="font-size: 10px; font-weight: 800; color: var(--brand-teal); background: rgba(6, 182, 212, 0.15); padding: 2px 6px; border-radius: 6px;">{{ $stats['guests'] }} {{ __('Guests') }}</span>
                     </div>
-                    <div class="stat-val" style="color: var(--brand-navy); font-size: 22px; font-weight: 900; margin-bottom: 4px;">{{ $organization->plan->name ?? 'Enterprise' }}</div>
+                    <div class="stat-val" style="color: var(--text-primary); font-size: 22px; font-weight: 900; margin-bottom: 4px;">{{ $organization->plan->name ?? 'Enterprise' }}</div>
                     <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">{{ __('Capacity up to') }} {{ $organization->plan->max_users ?? '500' }} {{ __('Users') }}</div>
                 </div>
             </div>
 
             <!-- Productivity Health Score & System Metrics Strip -->
-            <div class="card" style="margin-bottom: 20px; padding: 16px 20px; background: linear-gradient(135deg, rgba(0, 180, 179, 0.05), rgba(0, 104, 71, 0.03)); border: 1px solid rgba(0, 180, 179, 0.2);">
+            <div class="card" style="margin-bottom: 20px; padding: 16px 20px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), var(--bg-card)); border: 1px solid var(--border-color);">
                 <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, var(--brand-green), var(--brand-teal)); color: white; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900;">
+                        <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #10b981, #3b82f6); color: white; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 900;">
                             ⚡
                         </div>
                         <div>
-                            <div style="font-size: 14px; font-weight: 900; color: var(--brand-navy);">{{ __('Workplace Health & Productivity Index') }}</div>
+                            <div style="font-size: 14px; font-weight: 900; color: var(--text-primary);">{{ __('Workplace Health & Productivity Index') }}</div>
                             <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">{{ __('Real-time collaboration metrics and system uptime') }}</div>
                         </div>
                     </div>
                     <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: center;">
                         <div>
                             <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">{{ __('Health Score') }}</div>
-                            <div style="font-size: 16px; font-weight: 900; color: var(--brand-green);">{{ $stats['productivity_score'] }} <span style="font-size: 11px; color: var(--text-muted);">/ 100</span></div>
+                            <div style="font-size: 16px; font-weight: 900; color: #34d399;">{{ $stats['productivity_score'] }} <span style="font-size: 11px; color: var(--text-muted);">/ 100</span></div>
                         </div>
                         <div style="width: 1px; height: 30px; background: var(--border-panel);"></div>
                         <div>
@@ -638,11 +638,11 @@
             </div>
 
             <!-- Two Analytics Widgets: Department Breakdown & Room Utilization -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 20px;">
                 <!-- Widget 1: Department Staff Allocation -->
                 <div class="card" style="margin-bottom: 0;">
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                        <h3 class="card-title" style="font-size: 14px; font-weight: 800; color: var(--brand-navy);">📊 {{ __('Staff Distribution by Department') }}</h3>
+                        <h3 class="card-title" style="font-size: 14px; font-weight: 800; color: var(--text-primary);">📊 {{ __('Staff Distribution by Department') }}</h3>
                         <span style="font-size: 11px; color: var(--brand-teal); font-weight: 800;">{{ $departments->count() }} {{ __('Departments') }}</span>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 12px;">
@@ -656,10 +656,10 @@
                             @endphp
                             <div>
                                 <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; margin-bottom: 4px;">
-                                    <span style="color: var(--brand-navy);">🏛️ {{ $d->name }}</span>
+                                    <span style="color: var(--text-primary);">🏛️ {{ $d->name }}</span>
                                     <span style="color: var(--text-muted);">{{ $dMems->count() }} {{ __('Staff') }} ({{ $pct }}%)</span>
                                 </div>
-                                <div style="width: 100%; height: 8px; background: #f1f5f9; border-radius: 4px; overflow: hidden;">
+                                <div style="width: 100%; height: 8px; background: var(--bg-elevated); border-radius: 4px; overflow: hidden; border: 1px solid var(--border-color);">
                                     <div style="width: {{ max(8, $pct) }}%; height: 100%; background: linear-gradient(90deg, var(--brand-teal), var(--brand-pine)); border-radius: 4px;"></div>
                                 </div>
                             </div>
@@ -674,16 +674,16 @@
                 <!-- Widget 2: Room Occupancy & Capacity -->
                 <div class="card" style="margin-bottom: 0;">
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                        <h3 class="card-title" style="font-size: 14px; font-weight: 800; color: var(--brand-navy);">🏢 {{ __('Room Occupancy & Status') }}</h3>
+                        <h3 class="card-title" style="font-size: 14px; font-weight: 800; color: var(--text-primary);">🏢 {{ __('Room Occupancy & Status') }}</h3>
                         <span style="font-size: 11px; color: var(--brand-green); font-weight: 800;">{{ $rooms->count() }} {{ __('Live Spaces') }}</span>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 10px;">
                         @forelse($rooms->take(4) as $r)
-                            <div style="display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid var(--border-panel); padding: 8px 12px; border-radius: 10px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-elevated); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 10px;">
                                 <div style="display: flex; align-items: center; gap: 10px;">
                                     <div style="width: 12px; height: 12px; border-radius: 50%; background: {{ $r->color ?? 'var(--brand-teal)' }};"></div>
                                     <div>
-                                        <div style="font-size: 13px; font-weight: 800; color: var(--brand-navy);">{{ $r->name }}</div>
+                                        <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);">{{ $r->name }}</div>
                                         <div style="font-size: 10px; color: var(--text-muted);">{{ __('Capacity') }}: {{ $r->capacity ?? 10 }} {{ __('seats') }}</div>
                                     </div>
                                 </div>
@@ -701,31 +701,31 @@
             </div>
 
             <!-- Content Grid (Quick Actions & Recent Activity) -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
                 <!-- Quick Actions -->
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">{{ __('Quick Actions') }}</h3>
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                        <a href="{{ route('office') }}" style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; text-decoration: none; color: var(--brand-navy); display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; transition: all 0.2s;">
+                        <a href="{{ route('office') }}" style="background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; text-decoration: none; color: var(--text-primary); display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; transition: all 0.2s;">
                             <span style="font-size: 26px;">🚀</span>
-                            <strong style="font-size: 13px;">{{ __('Virtual Workplace') }}</strong>
+                            <strong style="font-size: 13px; color: var(--text-primary);">{{ __('Virtual Workplace') }}</strong>
                             <span style="font-size: 11px; color: var(--text-muted);">{{ __('Spatial voice & video') }}</span>
                         </a>
-                        <a href="{{ route('editor') }}" style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; text-decoration: none; color: var(--brand-navy); display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; transition: all 0.2s;">
+                        <a href="{{ route('editor') }}" style="background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; text-decoration: none; color: var(--text-primary); display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; transition: all 0.2s;">
                             <span style="font-size: 26px;">🎨</span>
-                            <strong style="font-size: 13px;">{{ __('Floor Designer') }}</strong>
+                            <strong style="font-size: 13px; color: var(--text-primary);">{{ __('Floor Designer') }}</strong>
                             <span style="font-size: 11px; color: var(--text-muted);">{{ __('Furniture & partitions') }}</span>
                         </a>
-                        <div onclick="openInviteModal()" style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; color: var(--brand-navy); display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; cursor: pointer; transition: all 0.2s;">
+                        <div onclick="openInviteModal()" style="background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; color: var(--text-primary); display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; cursor: pointer; transition: all 0.2s;">
                             <span style="font-size: 26px;">🔗</span>
-                            <strong style="font-size: 13px;">{{ __('Instant Guest Link') }}</strong>
+                            <strong style="font-size: 13px; color: var(--text-primary);">{{ __('Instant Guest Link') }}</strong>
                             <span style="font-size: 11px; color: var(--text-muted);">{{ __('No login needed') }}</span>
                         </div>
-                        <div onclick="switchAdminTab('rooms')" style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; color: var(--brand-navy); display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; cursor: pointer; transition: all 0.2s;">
+                        <div onclick="switchAdminTab('rooms')" style="background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 12px; padding: 18px; color: var(--text-primary); display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; cursor: pointer; transition: all 0.2s;">
                             <span style="font-size: 26px;">🚪</span>
-                            <strong style="font-size: 13px;">{{ __('Manage Room Doors') }}</strong>
+                            <strong style="font-size: 13px; color: var(--text-primary);">{{ __('Manage Room Doors') }}</strong>
                             <span style="font-size: 11px; color: var(--text-muted);">{{ __('Lock & permissions') }}</span>
                         </div>
                     </div>
@@ -740,7 +740,7 @@
                         @forelse($auditLogs as $log)
                             <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
                                 <div>
-                                    <strong style="color: var(--brand-navy);">{{ $log->action }}</strong>
+                                    <strong style="color: var(--text-primary);">{{ $log->action }}</strong>
                                     <span style="color: var(--text-muted);">on {{ class_basename($log->auditable_type) }}</span>
                                 </div>
                                 <span style="color: var(--text-muted); font-size: 11px;">{{ $log->created_at->diffForHumans() }}</span>
@@ -792,7 +792,7 @@
                                             {{ strtoupper(substr($m->user->name, 0, 2)) }}
                                         </div>
                                         <div>
-                                            <strong style="color: var(--brand-navy); font-size: 13px;">{{ $m->user->name }}</strong>
+                                            <strong style="color: var(--text-primary); font-size: 13px;">{{ $m->user->name }}</strong>
                                         </div>
                                     </div>
                                 </td>
@@ -809,7 +809,7 @@
                                         <span style="color: var(--text-dim); font-size: 11px; font-style: italic;">— {{ __('Not Assigned') }} —</span>
                                     @endif
                                 </td>
-                                <td style="font-size: 12px; font-weight: 600; color: var(--brand-ocean);">
+                                <td style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">
                                     {{ $profile?->job_title ?? '—' }}
                                 </td>
                                 <td>
@@ -848,17 +848,17 @@
             @endphp
 
             <!-- Current Plan Card -->
-            <div class="card" style="margin-bottom: 28px; background: linear-gradient(135deg, rgba(0, 180, 179, 0.08), rgba(255, 255, 255, 0.9)); border: 1px solid var(--border-color);">
+            <div class="card" style="margin-bottom: 28px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), var(--bg-card)); border: 1px solid var(--border-color);">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
                     <div>
                         <span style="font-size: 11px; font-weight: 800; color: var(--brand-teal); text-transform: uppercase; letter-spacing: 0.5px;">{{ __('Current Plan') }}</span>
-                        <h2 style="font-size: 24px; font-weight: 900; color: var(--brand-navy); margin-top: 4px;">💎 {{ $currentPlan->name ?? __('Free Plan') }}</h2>
+                        <h2 style="font-size: 24px; font-weight: 900; color: var(--text-primary); margin-top: 4px;">💎 {{ $currentPlan->name ?? __('Free Plan') }}</h2>
                         <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
                             ${{ number_format($currentPlan->price ?? 0, 2) }}/month &bull; {{ $isUnlimited ? __('Unlimited Seats') : $seatLimit . ' ' . __('Total Seats') }}
                         </p>
                     </div>
                     <div style="text-align: {{ app()->getLocale() === 'ar' ? 'left' : 'right' }};">
-                        <div style="font-size: 24px; font-weight: 900; color: var(--brand-green);">
+                        <div style="font-size: 24px; font-weight: 900; color: #34d399;">
                             {{ $usedSeats }} / {{ $isUnlimited ? '∞' : $seatLimit }}
                         </div>
                         <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">{{ __('Seats used') }}</div>
@@ -866,36 +866,36 @@
                 </div>
 
                 <!-- Progress Bar -->
-                <div style="background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 16px;">
+                <div style="background: var(--bg-elevated); height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 16px; border: 1px solid var(--border-color);">
                     <div style="width: {{ $seatPercent }}%; background: {{ $seatPercent > 90 ? 'var(--brand-crimson)' : 'var(--brand-teal)' }}; height: 100%; border-radius: 4px;"></div>
                 </div>
             </div>
 
             <!-- Available Upgrade Plans Grid -->
-            <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 16px; color: var(--brand-navy);">{{ __('Available Subscription Plans') }}</h3>
+            <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 16px; color: var(--text-primary);">{{ __('Available Subscription Plans') }}</h3>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px;">
                 @foreach($allPlans as $p)
                 @php
                     $isCurrent = ($organization->plan_id == $p->id);
                 @endphp
-                <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; border-color: {{ $isCurrent ? 'var(--brand-teal)' : 'var(--border-color)' }}; background: {{ $isCurrent ? 'rgba(0, 180, 179, 0.05)' : '#ffffff' }};">
+                <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; border-color: {{ $isCurrent ? 'var(--brand-primary)' : 'var(--border-color)' }}; background: {{ $isCurrent ? 'rgba(59, 130, 246, 0.1)' : 'var(--bg-card)' }}; box-shadow: var(--shadow-card);">
                     <div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <strong style="font-size: 16px; color: var(--brand-navy);">💎 {{ $p->name }}</strong>
+                            <strong style="font-size: 16px; color: var(--text-primary);">💎 {{ $p->name }}</strong>
                             @if($isCurrent)
                                 <span class="badge badge-green">{{ __('Current') }}</span>
                             @endif
                         </div>
 
-                        <div style="font-size: 24px; font-weight: 900; color: var(--brand-navy); margin-bottom: 14px;">
+                        <div style="font-size: 24px; font-weight: 900; color: var(--text-primary); margin-bottom: 14px;">
                             ${{ number_format($p->price, 2) }}
                             <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">/mo</span>
                         </div>
 
                         <div style="font-size: 13px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
-                            <div>👥 <strong>{{ $p->seat_limit === 0 ? __('Unlimited') : $p->seat_limit }}</strong> {{ __('Users / Seats') }}</div>
-                            <div>🚪 <strong>{{ $p->room_limit === 0 ? __('Unlimited') : $p->room_limit }}</strong> {{ __('Meeting Rooms') }}</div>
-                            <div>💾 <strong>{{ $p->storage_limit_gb === 0 ? __('Unlimited') : $p->storage_limit_gb . ' GB' }}</strong> {{ __('Storage') }}</div>
+                            <div>👥 <strong style="color: var(--text-primary);">{{ $p->seat_limit === 0 ? __('Unlimited') : $p->seat_limit }}</strong> {{ __('Users / Seats') }}</div>
+                            <div>🚪 <strong style="color: var(--text-primary);">{{ $p->room_limit === 0 ? __('Unlimited') : $p->room_limit }}</strong> {{ __('Meeting Rooms') }}</div>
+                            <div>💾 <strong style="color: var(--text-primary);">{{ $p->storage_limit_gb === 0 ? __('Unlimited') : $p->storage_limit_gb . ' GB' }}</strong> {{ __('Storage') }}</div>
                         </div>
                     </div>
 
@@ -948,7 +948,7 @@
                         @foreach($rooms as $r)
                             <tr>
                                 <td>
-                                    <strong style="color: var(--brand-navy);">🏢 {{ $r->name }}</strong>
+                                    <strong style="color: var(--text-primary);">🏢 {{ $r->name }}</strong>
                                 </td>
                                 <td>{{ ucfirst($r->type) }}</td>
                                 <td>{{ $r->capacity }}</td>
@@ -1004,12 +1004,12 @@
                         @forelse($guestInvitations as $inv)
                             <tr>
                                 <td>
-                                    <strong style="color: var(--brand-green);">👤 {{ $inv->guest_name }}</strong>
+                                    <strong style="color: #34d399;">👤 {{ $inv->guest_name }}</strong>
                                 </td>
                                 <td>🏢 {{ $inv->room->name ?? 'Main Conference' }}</td>
                                 <td>{{ $inv->expires_at ? $inv->expires_at->diffForHumans() : __('Never') }}</td>
                                 <td>
-                                    <code style="background: #f8fafc; border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 4px; font-size: 11px; color: var(--brand-teal);">
+                                    <code style="background: var(--bg-elevated); border: 1px solid var(--border-color); padding: 4px 8px; border-radius: 4px; font-size: 11px; color: var(--brand-teal);">
                                         /guest/join/{{ substr($inv->token, 0, 16) }}...
                                     </code>
                                 </td>
@@ -1051,43 +1051,43 @@
                             return $prof && $prof->department_id == $dept->id;
                         });
                     @endphp
-                    <div class="card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--border-panel); box-shadow: 0 4px 15px rgba(1, 44, 65, 0.04);">
+                    <div class="card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--border-color); box-shadow: var(--shadow-card);">
                         <div>
                             <!-- Department Header -->
                             <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
                                 <div style="display: flex; align-items: center; gap: 10px;">
-                                    <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(0, 180, 179, 0.1); color: var(--brand-teal); display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                                    <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(59, 130, 246, 0.15); color: var(--brand-teal); display: flex; align-items: center; justify-content: center; font-size: 20px;">
                                         🏛️
                                     </div>
                                     <div>
-                                        <h3 style="font-size: 16px; font-weight: 800; color: var(--brand-navy); margin-bottom: 2px;">{{ $dept->name }}</h3>
+                                        <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-bottom: 2px;">{{ $dept->name }}</h3>
                                         <span style="font-size: 11px; color: var(--text-muted); font-weight: 700;">{{ $dept->teams->count() }} {{ __('Teams') }} • {{ $deptMembers->count() }} {{ __('Members') }}</span>
                                     </div>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 6px;">
-                                    <button onclick="editDepartment('{{ $dept->id }}', '{{ addslashes($dept->name) }}')" style="background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 6px; padding: 5px 8px; cursor: pointer; color: var(--brand-navy);" title="{{ __('Edit Department') }}">✏️</button>
+                                    <button onclick="editDepartment('{{ $dept->id }}', '{{ addslashes($dept->name) }}')" style="background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 6px; padding: 5px 8px; cursor: pointer; color: var(--text-primary);" title="{{ __('Edit Department') }}">✏️</button>
                                     <form action="{{ route('departments.delete', $dept->id) }}" method="POST" onsubmit="return confirm('{{ __('Are you sure you want to delete this department?') }}');" style="display: inline;">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" style="background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 6px; padding: 5px 8px; cursor: pointer; color: var(--brand-crimson);" title="{{ __('Delete Department') }}">🗑️</button>
+                                        <button type="submit" style="background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 6px; padding: 5px 8px; cursor: pointer; color: var(--brand-crimson);" title="{{ __('Delete Department') }}">🗑️</button>
                                     </form>
                                 </div>
                             </div>
 
                             <!-- Sub-Teams Section -->
-                            <div style="background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 10px; padding: 12px; margin-bottom: 14px;">
+                            <div style="background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; margin-bottom: 14px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                                    <span style="font-size: 11px; font-weight: 800; color: var(--brand-ocean); text-transform: uppercase;">{{ __('Sub-Teams') }}</span>
+                                    <span style="font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase;">{{ __('Sub-Teams') }}</span>
                                     <button onclick="openTeamModal('{{ $dept->id }}', '{{ addslashes($dept->name) }}')" style="background: none; border: none; font-size: 11px; font-weight: 800; color: var(--brand-teal); cursor: pointer;">+ {{ __('Add Team') }}</button>
                                 </div>
                                 <div style="display: flex; flex-wrap: wrap; gap: 6px;">
                                     @forelse($dept->teams as $t)
-                                        <div style="background: #ffffff; border: 1px solid var(--border-panel); border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: 700; color: var(--brand-navy); display: flex; align-items: center; gap: 6px;">
+                                        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 4px 8px; font-size: 11px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
                                             <span>👥 {{ $t->name }}</span>
                                             <form action="{{ route('teams.delete', $t->id) }}" method="POST" onsubmit="return confirm('{{ __('Are you sure you want to delete this team?') }}');" style="display: inline; margin: 0;">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" style="background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 11px; padding: 0; line-height: 1;" title="{{ __('Delete Team') }}">✕</button>
+                                                <button type="submit" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 11px; padding: 0; line-height: 1;" title="{{ __('Delete Team') }}">✕</button>
                                             </form>
                                         </div>
                                     @empty
@@ -1098,31 +1098,31 @@
 
                             <!-- Assigned Department Members -->
                             <div>
-                                <span style="font-size: 11px; font-weight: 800; color: var(--brand-ocean); text-transform: uppercase; display: block; margin-bottom: 8px;">{{ __('Assigned Staff') }} ({{ $deptMembers->count() }})</span>
+                                <span style="font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; display: block; margin-bottom: 8px;">{{ __('Assigned Staff') }} ({{ $deptMembers->count() }})</span>
                                 <div style="display: flex; flex-direction: column; gap: 6px;">
                                     @forelse($deptMembers->take(4) as $dm)
                                         @php
                                             $prof = $dm->user->profiles->where('organization_id', $organization->id)->first();
                                             $tObj = $teams->where('id', $prof?->team_id)->first();
                                         @endphp
-                                        <div style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; border: 1px solid #f1f5f9; padding: 6px 10px; border-radius: 8px;">
+                                        <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-card); border: 1px solid var(--border-color); padding: 6px 10px; border-radius: 8px;">
                                             <div style="display: flex; align-items: center; gap: 8px;">
-                                                <div style="width: 24px; height: 24px; border-radius: 6px; background: var(--brand-navy); color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800;">
+                                                <div style="width: 24px; height: 24px; border-radius: 6px; background: var(--accent-gradient); color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800;">
                                                     {{ strtoupper(substr($dm->user->name, 0, 2)) }}
                                                 </div>
                                                 <div>
-                                                    <span style="font-size: 12px; font-weight: 800; color: var(--brand-navy);">{{ $dm->user->name }}</span>
+                                                    <span style="font-size: 12px; font-weight: 800; color: var(--text-primary);">{{ $dm->user->name }}</span>
                                                     @if($prof?->job_title)
                                                         <span style="font-size: 10px; color: var(--text-muted);"> • {{ $prof->job_title }}</span>
                                                     @endif
                                                 </div>
                                             </div>
                                             @if($tObj)
-                                                <span style="font-size: 10px; background: rgba(0, 180, 179, 0.1); color: var(--brand-teal); font-weight: 700; padding: 2px 6px; border-radius: 4px;">{{ $tObj->name }}</span>
+                                                <span style="font-size: 10px; background: rgba(59, 130, 246, 0.15); color: var(--brand-teal); font-weight: 700; padding: 2px 6px; border-radius: 4px;">{{ $tObj->name }}</span>
                                             @endif
                                         </div>
                                     @empty
-                                        <div style="text-align: center; padding: 10px; font-size: 11px; color: var(--text-dim); background: #ffffff; border: 1px dashed var(--border-panel); border-radius: 8px;">
+                                        <div style="text-align: center; padding: 10px; font-size: 11px; color: var(--text-dim); background: var(--bg-card); border: 1px dashed var(--border-color); border-radius: 8px;">
                                             {{ __('No members assigned to this department yet.') }}
                                         </div>
                                     @endforelse
@@ -1133,7 +1133,7 @@
                 @empty
                     <div class="card" style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 40px;">
                         <div style="font-size: 32px; margin-bottom: 8px;">🏛️</div>
-                        <h3 style="font-size: 16px; font-weight: 800; color: var(--brand-navy); margin-bottom: 6px;">{{ __('No departments found') }}</h3>
+                        <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px;">{{ __('No departments found') }}</h3>
                         <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">{{ __('Create departments and divide your organization into structured functional teams.') }}</p>
                         <button onclick="openDepartmentModal()" class="header-btn btn-primary">
                             <span>+</span> {{ __('New Department') }}
@@ -1206,16 +1206,16 @@
             <div class="card" style="max-width: 600px;">
                 <div style="display: flex; flex-direction: column; gap: 16px;">
                     <div>
-                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--brand-ocean); margin-bottom: 6px; text-transform: uppercase;">{{ __('Workspace Name') }}</label>
-                        <input type="text" value="{{ $organization->name }}" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--brand-navy); font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase;">{{ __('Workspace Name') }}</label>
+                        <input type="text" value="{{ $organization->name }}" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); font-size: 13px; font-weight: 600;">
                     </div>
                     <div>
-                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--brand-ocean); margin-bottom: 6px; text-transform: uppercase;">{{ __('URL Slug') }}</label>
-                        <input type="text" value="{{ $organization->slug }}" readonly style="width: 100%; background: #f1f5f9; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--brand-teal); font-size: 13px; font-family: monospace; font-weight: 700;">
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase;">{{ __('URL Slug') }}</label>
+                        <input type="text" value="{{ $organization->slug }}" readonly style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--brand-teal); font-size: 13px; font-family: monospace; font-weight: 700;">
                     </div>
                     <div>
-                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--brand-ocean); margin-bottom: 6px; text-transform: uppercase;">{{ __('Timezone') }}</label>
-                        <input type="text" value="{{ $organization->timezone }}" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--brand-navy); font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase;">{{ __('Timezone') }}</label>
+                        <input type="text" value="{{ $organization->timezone }}" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); font-size: 13px; font-weight: 600;">
                     </div>
                     <button class="header-btn btn-primary" style="margin-top: 10px; width: fit-content;">{{ __('Save Workspace Changes') }}</button>
                 </div>
@@ -1246,8 +1246,8 @@
             <div id="guest-tab-content">
                 <div style="display: flex; flex-direction: column; gap: 14px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 6px;">{{ __('Destination Room') }}</label>
-                        <select id="invite-room-select" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Destination Room') }}</label>
+                        <select id="invite-room-select" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             @foreach($rooms as $r)
                                 <option value="{{ $r->id }}">🏢 {{ $r->name }} ({{ ucfirst($r->type) }})</option>
                             @endforeach
@@ -1255,13 +1255,13 @@
                     </div>
 
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 6px;">{{ __('Guest Name / Label') }}</label>
-                        <input type="text" id="invite-guest-name" value="Investor / Partner" placeholder="e.g. Sarah Miller" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Guest Name / Label') }}</label>
+                        <input type="text" id="invite-guest-name" value="Investor / Partner" placeholder="e.g. Sarah Miller" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                     </div>
 
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 6px;">{{ __('Link Expiration') }}</label>
-                        <select id="invite-guest-hours" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Link Expiration') }}</label>
+                        <select id="invite-guest-hours" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             <option value="1">1 Hour</option>
                             <option value="12">12 Hours</option>
                             <option value="24" selected>24 Hours (1 Day)</option>
@@ -1269,18 +1269,18 @@
                         </select>
                     </div>
 
-                    <button onclick="generateGuestLink()" id="btn-generate-guest" style="margin-top: 6px; background: linear-gradient(135deg, var(--brand-green), #004d34); color: white; font-weight: 800; border: none; border-radius: 10px; padding: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; box-shadow: 0 4px 14px rgba(0, 104, 71, 0.25);">
+                    <button onclick="generateGuestLink()" id="btn-generate-guest" style="margin-top: 6px; background: linear-gradient(135deg, #10b981, #059669); color: white; font-weight: 800; border: none; border-radius: 10px; padding: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);">
                         <span>⚡</span> {{ __('Generate Instant Guest Link') }}
                     </button>
 
-                    <div id="guest-result-box" style="display: none; background: rgba(0, 104, 71, 0.08); border: 1px solid rgba(0, 104, 71, 0.25); border-radius: 10px; padding: 12px; margin-top: 10px;">
-                        <div style="font-size: 11px; font-weight: 800; color: var(--brand-green); text-transform: uppercase; margin-bottom: 6px;">✅ Invitation Link Ready!</div>
-                        <input type="text" id="guest-link-output" readonly style="width: 100%; background: #ffffff; border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; color: var(--brand-navy); font-size: 12px; font-family: monospace; margin-bottom: 8px;">
+                    <div id="guest-result-box" style="display: none; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 12px; margin-top: 10px;">
+                        <div style="font-size: 11px; font-weight: 800; color: #34d399; text-transform: uppercase; margin-bottom: 6px;">✅ Invitation Link Ready!</div>
+                        <input type="text" id="guest-link-output" readonly style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; color: var(--brand-teal); font-size: 12px; font-family: monospace; margin-bottom: 8px;">
                         <div style="display: flex; gap: 8px;">
-                            <button onclick="copyGuestLink()" id="btn-copy-link" style="flex: 1; background: var(--brand-teal); color: white; font-weight: 700; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-size: 12px;">
+                            <button onclick="copyGuestLink()" id="btn-copy-link" style="flex: 1; background: var(--brand-primary); color: white; font-weight: 700; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-size: 12px;">
                                 📋 {{ __('Copy Link') }}
                             </button>
-                            <a id="guest-open-link" href="#" target="_blank" style="background: #ffffff; border: 1px solid var(--border-color); color: var(--brand-navy); font-weight: 700; text-decoration: none; border-radius: 6px; padding: 8px 12px; font-size: 12px; display: flex; align-items: center;">
+                            <a id="guest-open-link" href="#" target="_blank" style="background: var(--bg-elevated); border: 1px solid var(--border-color); color: var(--text-primary); font-weight: 700; text-decoration: none; border-radius: 6px; padding: 8px 12px; font-size: 12px; display: flex; align-items: center;">
                                 👁️ {{ __('Open') }}
                             </a>
                         </div>
@@ -1292,20 +1292,20 @@
             <div id="member-tab-content" style="display: none;">
                 <div style="display: flex; flex-direction: column; gap: 14px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 6px;">{{ __('Email Address') }}</label>
-                        <input type="email" id="invite-member-email" placeholder="colleague@company.com" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Email Address') }}</label>
+                        <input type="email" id="invite-member-email" placeholder="colleague@company.com" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                     </div>
 
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 6px;">{{ __('Role') }}</label>
-                        <select id="invite-member-role" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Role') }}</label>
+                        <select id="invite-member-role" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             @foreach($roles as $role)
                                 <option value="{{ $role->id }}">{{ $role->name }}</option>
                             @endforeach
                         </select>
                     </div>
 
-                    <button onclick="sendMemberInvite()" id="btn-send-member-invite" style="margin-top: 6px; background: var(--brand-teal); color: white; font-weight: 800; border: none; border-radius: 10px; padding: 12px; cursor: pointer; font-size: 14px;">
+                    <button onclick="sendMemberInvite()" id="btn-send-member-invite" style="margin-top: 6px; background: var(--brand-primary); color: white; font-weight: 800; border: none; border-radius: 10px; padding: 12px; cursor: pointer; font-size: 14px;">
                         📨 {{ __('Send Invitation Email') }}
                     </button>
                     <div id="member-invite-status" style="display: none; font-size: 12px; text-align: center; margin-top: 6px;"></div>
@@ -1325,8 +1325,8 @@
                 @csrf
                 <div id="department-method-field"></div>
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 6px;">{{ __('Department Name') }}</label>
-                    <input type="text" name="name" id="department-name-input" required placeholder="e.g. Engineering & IT, Marketing, Sales" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Department Name') }}</label>
+                    <input type="text" name="name" id="department-name-input" required placeholder="e.g. Engineering & IT, Marketing, Sales" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
                 <button type="submit" class="header-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px; justify-content: center;">
                     💾 {{ __('Save Department') }}
@@ -1346,8 +1346,8 @@
                 @csrf
                 <input type="hidden" name="department_id" id="team-department-id">
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 6px;">{{ __('Team Name') }}</label>
-                    <input type="text" name="name" required placeholder="e.g. Frontend Team, Enterprise Sales, UI/UX Design" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Team Name') }}</label>
+                    <input type="text" name="name" required placeholder="e.g. Frontend Team, Enterprise Sales, UI/UX Design" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
                 <button type="submit" class="header-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px; justify-content: center;">
                     💾 {{ __('Add Team') }}
@@ -1366,15 +1366,15 @@
             <form id="assign-form" method="POST" action="" style="display: flex; flex-direction: column; gap: 14px;">
                 @csrf
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 4px;">{{ __('Employee / Member') }}</label>
-                    <div id="assign-member-name" style="font-size: 14px; font-weight: 800; color: var(--brand-navy); background: #f8fafc; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-panel);">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Employee / Member') }}</label>
+                    <div id="assign-member-name" style="font-size: 14px; font-weight: 800; color: var(--text-primary); background: var(--bg-elevated); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color);">
                         Member Name
                     </div>
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 4px;">{{ __('Department') }}</label>
-                    <select name="department_id" id="assign-dept-select" onchange="filterTeamsForAssign(this.value)" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Department') }}</label>
+                    <select name="department_id" id="assign-dept-select" onchange="filterTeamsForAssign(this.value)" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         <option value="">— {{ __('No Department') }} —</option>
                         @foreach($departments as $d)
                             <option value="{{ $d->id }}">{{ $d->name }}</option>
@@ -1383,20 +1383,20 @@
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 4px;">{{ __('Sub-Team') }}</label>
-                    <select name="team_id" id="assign-team-select" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Sub-Team') }}</label>
+                    <select name="team_id" id="assign-team-select" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         <option value="">— {{ __('No Team') }} —</option>
                     </select>
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 4px;">{{ __('Job Title') }}</label>
-                    <input type="text" name="job_title" id="assign-job-title" placeholder="e.g. Lead Software Architect, Growth Specialist" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Job Title') }}</label>
+                    <input type="text" name="job_title" id="assign-job-title" placeholder="e.g. Lead Software Architect, Growth Specialist" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 4px;">{{ __('Access Role') }}</label>
-                    <select name="role_id" id="assign-role-select" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Access Role') }}</label>
+                    <select name="role_id" id="assign-role-select" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         @foreach($roles as $role)
                             <option value="{{ $role->id }}">{{ $role->name }}</option>
                         @endforeach

@@ -21,6 +21,7 @@ class SyncMapObjectsRequest extends FormRequest
             'objects.*.position' => ['required', 'array'],
             'objects.*.position.x' => ['required', 'numeric'],
             'objects.*.position.y' => ['required', 'numeric'],
+            'objects.*.position.rotation' => ['nullable', 'numeric'],
             'objects.*.size' => ['nullable', 'array'],
             'objects.*.collision' => ['nullable', 'boolean'],
             'objects.*.interaction_config' => ['nullable', 'array'],

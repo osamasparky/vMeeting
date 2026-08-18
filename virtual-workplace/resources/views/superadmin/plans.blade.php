@@ -6,7 +6,7 @@
 @section('content')
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
     <div>
-        <h2 style="font-size: 18px; font-weight: 800; color: var(--brand-navy);">{{ __('Plans & Pricing Tiers') }}</h2>
+        <h2 style="font-size: 18px; font-weight: 800; color: var(--text-primary);">{{ __('Plans & Pricing Tiers') }}</h2>
         <p style="font-size: 13px; color: var(--text-secondary);">
             {{ __('Configure seat capacity tiers, room limits, and recurring pricing for companies') }}
         </p>
@@ -23,7 +23,7 @@
         <div>
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
                 <div>
-                    <h3 style="font-size: 18px; font-weight: 800; color: var(--brand-navy);">{{ $plan->name }}</h3>
+                    <h3 style="font-size: 18px; font-weight: 800; color: var(--text-primary);">{{ $plan->name }}</h3>
                     <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">{{ $plan->slug }}</span>
                 </div>
                 <span class="badge-status {{ $plan->is_active ? 'badge-active' : 'badge-suspended' }}">
@@ -31,8 +31,8 @@
                 </span>
             </div>
 
-            <div style="margin: 16px 0; padding: 14px; background: #f8fafc; border-radius: 12px; border: 1px solid var(--border-color);">
-                <div style="font-size: 28px; font-weight: 900; color: var(--brand-navy);">
+            <div style="margin: 16px 0; padding: 14px; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border-color);">
+                <div style="font-size: 28px; font-weight: 900; color: var(--text-primary);">
                     ${{ number_format($plan->price, 2) }}
                     <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">/mo</span>
                 </div>
@@ -41,15 +41,15 @@
             <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px; margin-bottom: 20px;">
                 <div style="display: flex; justify-content: space-between;">
                     <span style="color: var(--text-secondary); font-weight: 600;">👥 {{ __('Max Seats (Users)') }}:</span>
-                    <strong style="color: var(--brand-navy);">{{ $plan->seat_limit === 0 ? __('Unlimited') : $plan->seat_limit }}</strong>
+                    <strong style="color: var(--text-primary);">{{ $plan->seat_limit === 0 ? __('Unlimited') : $plan->seat_limit }}</strong>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
                     <span style="color: var(--text-secondary); font-weight: 600;">🚪 {{ __('Max Rooms') }}:</span>
-                    <strong style="color: var(--brand-navy);">{{ $plan->room_limit === 0 ? __('Unlimited') : $plan->room_limit }}</strong>
+                    <strong style="color: var(--text-primary);">{{ $plan->room_limit === 0 ? __('Unlimited') : $plan->room_limit }}</strong>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
                     <span style="color: var(--text-secondary); font-weight: 600;">💾 {{ __('Storage Limit (GB)') }}:</span>
-                    <strong style="color: var(--brand-navy);">{{ $plan->storage_limit_gb === 0 ? __('Unlimited') : $plan->storage_limit_gb . ' GB' }}</strong>
+                    <strong style="color: var(--text-primary);">{{ $plan->storage_limit_gb === 0 ? __('Unlimited') : $plan->storage_limit_gb . ' GB' }}</strong>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
                     <span style="color: var(--text-secondary); font-weight: 600;">🏢 {{ __('Active Companies') }}:</span>
@@ -82,8 +82,8 @@
 <div id="planModal" class="modal-overlay">
     <div class="modal-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3 style="font-size: 16px; font-weight: 800; color: var(--brand-navy);" id="planModalTitle">✨ {{ __('Create New Plan') }}</h3>
-            <button onclick="closePlanModal()" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary);" id="planModalTitle">✨ {{ __('Create New Plan') }}</h3>
+            <button onclick="closePlanModal()" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">✕</button>
         </div>
 
         <form id="planForm" method="POST" action="{{ route('superadmin.plans.store') }}">
@@ -93,36 +93,36 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
                 <div>
                     <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Plan Name') }}</label>
-                    <input type="text" id="inputPlanName" name="name" required style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                    <input type="text" id="inputPlanName" name="name" required style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
                 <div>
                     <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Monthly Price ($)') }}</label>
-                    <input type="number" step="0.01" id="inputPlanPrice" name="price" required style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                    <input type="number" step="0.01" id="inputPlanPrice" name="price" required style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px;">
                 <div>
                     <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Seats (Users)') }}</label>
-                    <input type="number" id="inputPlanSeats" name="seat_limit" required placeholder="0 = Unlimited" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                    <input type="number" id="inputPlanSeats" name="seat_limit" required placeholder="0 = Unlimited" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
                 <div>
                     <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Max Rooms') }}</label>
-                    <input type="number" id="inputPlanRooms" name="room_limit" required placeholder="0 = Unlimited" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                    <input type="number" id="inputPlanRooms" name="room_limit" required placeholder="0 = Unlimited" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
                 <div>
                     <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Storage (GB)') }}</label>
-                    <input type="number" id="inputPlanStorage" name="storage_limit_gb" required placeholder="0 = Unlimited" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                    <input type="number" id="inputPlanStorage" name="storage_limit_gb" required placeholder="0 = Unlimited" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
             </div>
 
             <div style="margin-bottom: 14px;">
                 <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Features (Comma-separated)') }}</label>
-                <input type="text" id="inputPlanFeatures" name="features" placeholder="basic_chat, basic_audio, video, screen_share, analytics" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                <input type="text" id="inputPlanFeatures" name="features" placeholder="basic_chat, basic_audio, video, screen_share, analytics" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
             </div>
 
             <div style="margin-bottom: 20px;">
-                <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; cursor: pointer; color: var(--brand-navy);">
+                <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; cursor: pointer; color: var(--text-primary);">
                     <input type="checkbox" id="inputPlanActive" name="is_active" value="1" checked style="accent-color: var(--brand-teal); width: 16px; height: 16px;">
                     <span>{{ __('Plan is active and available for registration') }}</span>
                 </label>

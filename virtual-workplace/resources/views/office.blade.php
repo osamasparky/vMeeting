@@ -6,101 +6,158 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>{{ $organization->name }} — Virtual Workplace</title>
+    <title>{{ $organization->name }} — {{ __('Virtual Workplace') }}</title>
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        // Synchronous theme initializer to prevent flash of unstyled content
+        const savedTheme = localStorage.getItem('vw_theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+
     <style>
         :root {
-            /* Modern Digital Workplace OS Palette */
+            /* Futuristic Digital Workplace OS Tokens (Dark Mode Default) */
             --bg-canvas: #090d16;
-            --bg-sidebar: #111827;
-            --bg-panel: rgba(17, 24, 39, 0.90);
-            --border-panel: rgba(255, 255, 255, 0.10);
-
-            --brand-teal: #06b6d4;
-            --brand-pine: #0d9488;
-            --brand-ocean: #0284c7;
-            --brand-navy: #f8fafc;
-            --brand-green: #10b981;
-            --brand-lime: #84cc16;
-            --brand-gold: #f59e0b;
-            --brand-orange: #f97316;
-            --brand-coral: #fb7185;
-            --brand-crimson: #ef4444;
+            --bg-base: #0b0f19;
+            --bg-surface: rgba(17, 24, 39, 0.92);
+            --bg-sidebar: rgba(15, 23, 42, 0.95);
+            --bg-card: rgba(30, 41, 59, 0.85);
+            --bg-input: #1e293b;
+            --bg-dock: rgba(15, 23, 42, 0.88);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --border-glow: rgba(59, 130, 246, 0.35);
 
             --brand-primary: #3b82f6;
             --brand-secondary: #8b5cf6;
-            --accent-green: #10b981;
-            --accent-glow: rgba(59, 130, 246, 0.45);
-            --text-main: #f8fafc;
+            --brand-teal: #06b6d4;
+            --brand-green: #10b981;
+            --brand-orange: #f97316;
+            --brand-crimson: #ef4444;
+            --brand-gold: #f59e0b;
+
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
             --text-muted: #94a3b8;
             --text-dim: #64748b;
 
-            --font-family: {{ app()->getLocale() === 'ar' ? "'IBM Plex Sans Arabic', 'Cairo', 'Plus Jakarta Sans', sans-serif" : "'Plus Jakarta Sans', 'Inter', 'IBM Plex Sans Arabic', sans-serif" }};
+            --shadow-card: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+            --shadow-dock: 0 20px 45px -10px rgba(0, 0, 0, 0.6), 0 0 1px 1px rgba(255, 255, 255, 0.1);
+            --shadow-hover: 0 12px 30px rgba(59, 130, 246, 0.25);
+
+            --font-family: {{ app()->getLocale() === 'ar' ? "'Cairo', 'IBM Plex Sans Arabic', 'Plus Jakarta Sans', sans-serif" : "'Plus Jakarta Sans', 'Inter', sans-serif" }};
         }
 
         [data-theme="light"] {
-            --bg-canvas: #f8fafc;
-            --bg-sidebar: #ffffff;
-            --bg-panel: rgba(255, 255, 255, 0.95);
-            --border-panel: #e2e8f0;
-            --brand-navy: #0f172a;
-            --text-main: #0f172a;
+            --bg-canvas: #f1f5f9;
+            --bg-base: #f8fafc;
+            --bg-surface: rgba(255, 255, 255, 0.95);
+            --bg-sidebar: rgba(255, 255, 255, 0.98);
+            --bg-card: #ffffff;
+            --bg-input: #f1f5f9;
+            --bg-dock: rgba(255, 255, 255, 0.92);
+            --border-color: #e2e8f0;
+            --border-glow: rgba(59, 130, 246, 0.2);
+
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
             --text-muted: #64748b;
             --text-dim: #94a3b8;
+
+            --shadow-card: 0 10px 30px -5px rgba(15, 23, 42, 0.08);
+            --shadow-dock: 0 20px 45px -10px rgba(15, 23, 42, 0.15), 0 0 1px 1px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 12px 30px rgba(59, 130, 246, 0.15);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-family); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-family);
+        }
+
         body {
             background: var(--bg-canvas);
-            color: var(--text-main);
+            color: var(--text-primary);
             height: 100vh;
             overflow: hidden;
             user-select: none;
             display: flex;
+            transition: background 0.3s, color 0.3s;
         }
 
-        /* ── Sidebar ── */
+        /* ── Glassmorphism Sidebar ── */
         .sidebar {
-            width: 280px;
+            width: 320px;
             height: 100vh;
             background: var(--bg-sidebar);
-            border-inline-end: 1px solid var(--border-panel);
+            backdrop-filter: blur(20px);
+            border-inline-end: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
             z-index: 50;
-            box-shadow: 2px 0 16px rgba(1, 44, 65, 0.05);
-            transition: transform 0.25s ease;
+            box-shadow: 4px 0 25px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .sidebar.collapsed {
-            transform: translateX({{ app()->getLocale() === 'ar' ? '280px' : '-280px' }});
-            margin-inline-end: -280px;
+            transform: translateX({{ app()->getLocale() === 'ar' ? '320px' : '-320px' }});
+            margin-inline-end: -320px;
         }
 
         .sidebar-header {
-            padding: 16px;
-            border-bottom: 1px solid var(--border-panel);
-            background: #f8fafc;
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background: var(--bg-surface);
         }
         .org-switcher {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 10px;
         }
         .org-title {
             font-weight: 900;
             font-size: 15px;
-            color: var(--brand-navy);
+            color: var(--text-primary);
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             cursor: pointer;
+            text-decoration: none;
+            transition: opacity 0.2s;
         }
+        .org-title:hover { opacity: 0.85; }
+
+        .role-badge {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .badge-host {
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+        .badge-guest {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
         .space-subtitle {
             font-size: 11px;
             color: var(--text-muted);
-            margin-top: 2px;
+            margin-top: 3px;
             font-weight: 600;
         }
         .header-btn-row {
@@ -108,160 +165,219 @@
             align-items: center;
             gap: 6px;
         }
-        .btn-invite-pill {
-            background: linear-gradient(135deg, var(--brand-green), #004d34);
-            color: white;
-            font-size: 11px;
-            font-weight: 800;
-            padding: 5px 12px;
-            border-radius: 12px;
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            box-shadow: 0 4px 10px rgba(0, 104, 71, 0.25);
-        }
         .btn-icon-square {
-            width: 30px;
-            height: 30px;
-            background: #ffffff;
-            border: 1px solid var(--border-panel);
+            width: 32px;
+            height: 32px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
-            color: var(--brand-navy);
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             text-decoration: none;
             font-size: 13px;
+            transition: all 0.2s;
+        }
+        .btn-icon-square:hover {
+            border-color: var(--brand-primary);
+            transform: translateY(-1px);
         }
 
+        /* ── Sidebar Tabs ── */
         .sidebar-tabs {
             display: flex;
-            padding: 10px 16px;
-            border-bottom: 1px solid var(--border-panel);
-            gap: 16px;
-            font-size: 12px;
-            font-weight: 700;
-            background: #ffffff;
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border-color);
+            gap: 8px;
+            background: var(--bg-surface);
         }
         .sidebar-tab {
+            flex: 1;
+            text-align: center;
             color: var(--text-muted);
             cursor: pointer;
-            padding-bottom: 4px;
-            transition: color 0.2s;
+            padding: 8px 6px;
+            font-size: 12px;
+            font-weight: 800;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
         .sidebar-tab:hover {
-            color: var(--brand-navy);
+            color: var(--text-primary);
+            background: var(--bg-input);
         }
         .sidebar-tab.active {
-            color: var(--brand-teal);
-            border-bottom: 2px solid var(--brand-teal);
+            color: white;
+            background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
         }
 
-        .sidebar-content {
+        .sidebar-tab-content {
             flex: 1;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            background: #ffffff;
+            background: transparent;
         }
 
+        /* ── Chat Container ── */
         .chat-container {
             display: flex;
             flex-direction: column;
-            height: 250px;
-            border-bottom: 1px solid var(--border-panel);
-            background: #f8fafc;
+            height: 100%;
         }
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 10px 14px;
+            padding: 14px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
             font-size: 12px;
-            text-align: {{ app()->getLocale() === 'ar' ? 'right' : 'left' }};
         }
-        .chat-input-area {
-            padding: 8px 12px;
-            border-top: 1px solid var(--border-panel);
+        .chat-bubble {
+            padding: 10px 14px;
+            border-radius: 12px;
+            max-width: 85%;
+            font-size: 12px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+        .chat-bubble.mine {
+            background: linear-gradient(135deg, var(--brand-primary), #2563eb);
+            color: white;
+            align-self: flex-end;
+            border-bottom-inline-end-radius: 2px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+        .chat-bubble.peer {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            align-self: flex-start;
+            border-bottom-inline-start-radius: 2px;
+        }
+        .chat-sender {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--brand-teal);
+            margin-bottom: 3px;
             display: flex;
             align-items: center;
-            gap: 6px;
-            background: #ffffff;
+            gap: 4px;
+        }
+        .chat-input-area {
+            padding: 12px 14px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-surface);
         }
         .chat-input-area input[type="text"] {
             flex: 1;
-            background: #f8fafc;
-            border: 1px solid var(--border-panel);
-            border-radius: 8px;
-            padding: 8px 10px;
-            color: var(--brand-navy);
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 12px;
+            color: var(--text-primary);
             font-size: 12px;
             font-weight: 600;
             outline: none;
-            text-align: {{ app()->getLocale() === 'ar' ? 'right' : 'left' }};
+            transition: border-color 0.2s;
+        }
+        .chat-input-area input[type="text"]:focus {
+            border-color: var(--brand-primary);
         }
         .chat-input-area button, .chat-input-area label {
-            background: #f1f5f9;
-            border: 1px solid var(--border-panel);
-            color: var(--brand-navy);
-            border-radius: 8px;
-            width: 30px;
-            height: 30px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            border-radius: 10px;
+            width: 36px;
+            height: 36px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .chat-input-area button:hover, .chat-input-area label:hover {
+            border-color: var(--brand-primary);
+            background: var(--bg-card);
         }
 
-        .sidebar-section-title {
-            padding: 12px 14px 6px;
-            font-size: 11px;
-            font-weight: 800;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            display: flex;
-            justify-content: space-between;
-        }
-        .occupant-list {
-            padding: 4px 10px;
+        /* ── Occupants & Rooms Directory ── */
+        .directory-container {
+            padding: 14px;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 16px;
+        }
+        .room-group-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            box-shadow: var(--shadow-card);
+        }
+        .room-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--text-primary);
         }
         .user-occupant-item {
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: space-between;
             padding: 8px 10px;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 12px;
             font-weight: 700;
-            color: var(--brand-navy);
-            background: #f8fafc;
-            border: 1px solid var(--border-panel);
+            color: var(--text-primary);
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            transition: transform 0.15s;
+        }
+        .user-occupant-item:hover {
+            transform: translateX(2px);
+        }
+        .user-occupant-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .status-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
             background: var(--brand-green);
-            box-shadow: 0 0 6px var(--brand-green);
+            box-shadow: 0 0 8px var(--brand-green);
+            flex-shrink: 0;
         }
 
-        /* ── Main Viewport ── */
+        /* ── Main Viewport Canvas ── */
         .viewport {
             flex: 1;
             height: 100vh;
             position: relative;
             overflow: hidden;
-            background: #f1f5f9;
+            background: var(--bg-canvas);
         }
         canvas#office-canvas {
             display: block;
@@ -270,7 +386,7 @@
             cursor: crosshair;
         }
 
-        /* ── Floating Top Language & Navigation Bar ── */
+        /* ── Floating Top Glass Bar ── */
         .floating-top-bar {
             position: fixed;
             top: 18px;
@@ -280,25 +396,27 @@
             gap: 10px;
             z-index: 90;
         }
-        .btn-lang-float {
-            background: #ffffff;
-            border: 1px solid var(--border-panel);
-            color: var(--brand-navy);
+        .btn-glass-pill {
+            background: var(--bg-surface);
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
             font-size: 12px;
             font-weight: 800;
             padding: 8px 14px;
-            border-radius: 10px;
+            border-radius: 12px;
             text-decoration: none;
             display: flex;
             align-items: center;
             gap: 6px;
-            box-shadow: 0 4px 14px rgba(1, 44, 65, 0.08);
+            box-shadow: var(--shadow-card);
+            cursor: pointer;
             transition: all 0.2s;
         }
-        .btn-lang-float:hover {
-            border-color: var(--brand-teal);
+        .btn-glass-pill:hover {
+            border-color: var(--brand-primary);
             transform: translateY(-1px);
-            box-shadow: 0 6px 18px rgba(0, 180, 179, 0.2);
+            box-shadow: var(--shadow-hover);
         }
 
         /* ── Floating Room Door Control Pill ── */
@@ -307,25 +425,27 @@
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: #ffffff;
-            border: 1px solid var(--border-panel);
-            border-radius: 14px;
-            padding: 8px 16px;
+            background: var(--bg-surface);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 8px 18px;
             display: none;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             z-index: 90;
-            box-shadow: 0 10px 30px rgba(1, 44, 65, 0.12);
-            font-size: 12px;
+            box-shadow: var(--shadow-dock);
+            font-size: 13px;
             font-weight: 800;
-            color: var(--brand-navy);
+            color: var(--text-primary);
+            animation: fadeInDown 0.3s ease;
         }
         .btn-door-toggle {
-            background: rgba(210, 0, 5, 0.1);
-            border: 1px solid rgba(210, 0, 5, 0.3);
-            color: var(--brand-crimson);
-            padding: 4px 12px;
-            border-radius: 8px;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #f87171;
+            padding: 6px 14px;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 800;
             font-size: 12px;
@@ -335,30 +455,31 @@
             transition: all 0.2s;
         }
         .btn-door-toggle.unlocked {
-            background: rgba(0, 104, 71, 0.1);
-            border-color: rgba(0, 104, 71, 0.3);
-            color: var(--brand-green);
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.4);
+            color: #34d399;
         }
 
-        /* ── Right Toolbar ── */
+        /* ── Right Floating Toolbar ── */
         .right-toolbar {
             position: fixed;
             top: 18px;
             inset-inline-end: 20px;
-            background: #ffffff;
-            border: 1px solid var(--border-panel);
-            border-radius: 12px;
+            background: var(--bg-surface);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 6px;
             padding: 6px;
             z-index: 90;
-            box-shadow: 0 10px 25px rgba(1, 44, 65, 0.08);
+            box-shadow: var(--shadow-card);
         }
         .tool-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
             border: none;
             background: transparent;
             color: var(--text-muted);
@@ -367,25 +488,30 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.2s;
         }
-        .tool-btn:hover { background: #f1f5f9; color: var(--brand-navy); }
+        .tool-btn:hover {
+            background: var(--bg-input);
+            color: var(--text-primary);
+            transform: scale(1.05);
+        }
 
-        /* ── Bottom Control Dock ── */
+        /* ── Bottom Control Dock (Ultra Modern Glassmorphism) ── */
         .bottom-dock {
             position: fixed;
-            bottom: 20px;
+            bottom: 24px;
             left: 50%;
             transform: translateX(-50%);
-            background: #ffffff;
-            border: 1px solid var(--border-panel);
-            border-radius: 18px;
-            padding: 8px 14px;
+            background: var(--bg-dock);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 8px 16px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             z-index: 100;
-            box-shadow: 0 15px 35px rgba(1, 44, 65, 0.15);
+            box-shadow: var(--shadow-dock);
         }
         .dock-btn {
             display: flex;
@@ -393,65 +519,77 @@
             align-items: center;
             justify-content: center;
             background: transparent;
-            border: none;
+            border: 1px solid transparent;
             color: var(--text-secondary);
-            padding: 6px 12px;
-            border-radius: 10px;
+            padding: 8px 14px;
+            border-radius: 14px;
             cursor: pointer;
             font-size: 11px;
-            font-weight: 700;
-            gap: 3px;
-            transition: all 0.15s;
-            min-width: 60px;
+            font-weight: 800;
+            gap: 4px;
+            transition: all 0.2s;
+            min-width: 68px;
         }
-        .dock-btn .icon { font-size: 17px; }
-        .dock-btn:hover { background: #f1f5f9; color: var(--brand-navy); }
+        .dock-btn .icon { font-size: 18px; transition: transform 0.2s; }
+        .dock-btn:hover {
+            background: var(--bg-input);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
         .dock-btn.active {
-            background: rgba(0, 180, 179, 0.12);
-            color: var(--brand-teal);
-            border: 1px solid rgba(0, 180, 179, 0.3);
+            background: rgba(59, 130, 246, 0.15);
+            color: #60a5fa;
+            border-color: rgba(59, 130, 246, 0.4);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+        }
+        .dock-btn.active-green {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border-color: rgba(16, 185, 129, 0.4);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
         }
 
-        /* ── Video Stage ── */
+        /* ── Floating Video Grid ── */
         .video-grid {
             position: fixed;
             top: 24px;
-            inset-inline-start: 300px;
+            inset-inline-start: 340px;
             display: none;
-            gap: 10px;
+            gap: 12px;
             z-index: 95;
             flex-wrap: wrap;
             max-width: 650px;
         }
         .video-tile {
-            width: 170px;
-            height: 120px;
-            background: #012c41;
-            border: 2px solid var(--brand-teal);
-            border-radius: 12px;
+            width: 180px;
+            height: 125px;
+            background: #0f172a;
+            border: 2px solid var(--brand-primary);
+            border-radius: 14px;
             overflow: hidden;
             position: relative;
-            box-shadow: 0 10px 25px rgba(1, 44, 65, 0.2);
+            box-shadow: var(--shadow-card);
         }
         .video-tile video { width: 100%; height: 100%; object-fit: cover; }
         .video-tile-name {
             position: absolute;
-            bottom: 4px;
-            inset-inline-start: 6px;
-            background: rgba(1, 44, 65, 0.85);
-            padding: 2px 6px;
-            border-radius: 4px;
+            bottom: 6px;
+            inset-inline-start: 8px;
+            background: rgba(15, 23, 42, 0.85);
+            padding: 3px 8px;
+            border-radius: 6px;
             font-size: 10px;
             font-weight: 800;
             color: #ffffff;
+            backdrop-filter: blur(4px);
         }
 
-        /* ── Modals ── */
+        /* ── Modals & Drawers ── */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(1, 44, 65, 0.5);
-            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(12px);
             display: none;
             align-items: center;
             justify-content: center;
@@ -459,76 +597,180 @@
             padding: 20px;
         }
         .modal-box {
-            background: #ffffff;
-            border: 1px solid var(--border-panel);
-            border-radius: 20px;
-            padding: 24px;
+            background: var(--bg-surface);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 28px;
             width: 100%;
             max-width: 520px;
-            box-shadow: 0 25px 60px rgba(1, 44, 65, 0.25);
-            color: var(--brand-navy);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+            color: var(--text-primary);
+            animation: zoomIn 0.25s ease;
+        }
+
+        /* Avatar Picker Cards */
+        .avatar-card-picker {
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 14px;
+            cursor: pointer;
+            text-align: center;
+            background: var(--bg-input);
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .avatar-card-picker:hover {
+            border-color: var(--brand-primary);
+            transform: translateY(-2px);
+        }
+        .avatar-card-picker.selected {
+            border-color: var(--brand-primary);
+            background: rgba(59, 130, 246, 0.12);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.25);
+        }
+        .avatar-preview-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: var(--bg-card);
+            border: 3px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .avatar-preview-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translate(-50%, -15px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
     </style>
 </head>
 <body>
 
-    <!-- Left / Right Sidebar -->
+    <!-- Left / Right Glassmorphic Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="org-switcher">
                 <div>
-                    <div class="org-title" onclick="window.location.href='{{ route('dashboard') }}'">
+                    <a href="{{ route('dashboard') }}" class="org-title">
+                        <span>🏢</span>
                         <span>{{ $organization->name }}</span>
+                    </a>
+                    <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
                         @if(!empty($user->is_guest))
-                            <span style="background: rgba(0, 104, 71, 0.1); border: 1px solid var(--brand-green); color: var(--brand-green); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; margin-inline-start: 6px;">GUEST ACCESS</span>
+                            <span class="role-badge badge-guest">
+                                👤 GUEST ACCESS
+                            </span>
+                        @else
+                            <span class="role-badge badge-host">
+                                👑 {{ __('Host / Member') }}
+                            </span>
                         @endif
+                        <span class="space-subtitle">• {{ $floor->name }}</span>
                     </div>
-                    <div class="space-subtitle">{{ $floor->name }} {{ __('Floor') }}</div>
                 </div>
                 <div class="header-btn-row">
+                    <!-- Theme Toggle in Sidebar -->
+                    <button class="btn-icon-square" onclick="toggleAppTheme()" title="{{ __('Toggle Dark / Light Mode') }}">
+                        <span id="sidebar-theme-icon">🌙</span>
+                    </button>
+
+                    <!-- Language Switcher -->
                     @if(app()->getLocale() === 'ar')
-                        <a href="{{ route('lang.switch', 'en') }}" class="btn-icon-square" title="English" style="font-weight: 800; font-size: 11px;">EN</a>
+                        <a href="{{ route('lang.switch', 'en') }}" class="btn-icon-square" title="Switch to English" style="font-weight: 800; font-size: 11px;">EN</a>
                     @else
-                        <a href="{{ route('lang.switch', 'ar') }}" class="btn-icon-square" title="العربية" style="font-weight: 800; font-size: 11px;">عربي</a>
+                        <a href="{{ route('lang.switch', 'ar') }}" class="btn-icon-square" title="التبديل إلى العربية" style="font-weight: 800; font-size: 11px;">عربي</a>
                     @endif
 
                     @if(empty($user->is_guest))
-                        <button class="btn-invite-pill" onclick="openInviteModal()">+ {{ __('Invite') }}</button>
-                        <a href="{{ route('editor') }}" class="btn-icon-square" title="Office Editor">⚙️</a>
+                        <button class="btn-icon-square" onclick="openInviteModal()" title="{{ __('Invite Guests & Members') }}">🔗</button>
+                        <a href="{{ route('editor') }}" class="btn-icon-square" title="{{ __('Floor Map Designer') }}">🎨</a>
                     @endif
                 </div>
             </div>
         </div>
 
+        <!-- Sidebar Navigation Tabs -->
         <div class="sidebar-tabs">
-            <span class="sidebar-tab active">{{ __('Chat') }}</span>
-            <span class="sidebar-tab" onclick="alert('📅 Scheduled Meetings:\n1. All-Hands Sync (10:00 AM)\n2. Product Review (2:00 PM)')">{{ __('Calendar') }}</span>
-            <span class="sidebar-tab" onclick="alert('Virtual Workplace Shortcuts:\n• Arrow Keys / WASD: Move Avatar\n• Click Floor: Move to Location\n• Scroll: Zoom In/Out\n• Doors: Click room tag or door to lock/unlock')">{{ __('Help') }}</span>
+            <div class="sidebar-tab active" onclick="switchSidebarTab('chat')" id="tab-btn-chat">
+                <span>💬</span>
+                <span>{{ __('Live Chat') }}</span>
+            </div>
+            <div class="sidebar-tab" onclick="switchSidebarTab('occupants')" id="tab-btn-occupants">
+                <span>👥</span>
+                <span>{{ __('People & Rooms') }}</span>
+            </div>
+            <div class="sidebar-tab" onclick="switchSidebarTab('help')" id="tab-btn-help">
+                <span>ℹ️</span>
+                <span>{{ __('Shortcuts') }}</span>
+            </div>
         </div>
 
-        <div class="sidebar-content">
-            <!-- Chat -->
+        <!-- Tab 1: Live Chat -->
+        <div class="sidebar-tab-content" id="tab-content-chat">
             <div class="chat-container">
                 <div class="chat-messages" id="chat-messages-container">
-                    <div style="color: #64748b; font-size: 11px; text-align: center; padding: 4px 0;">{{ __('Welcome to') }} {{ $organization->name }} {{ __('team chat!') }}</div>
+                    <div style="color: var(--text-muted); font-size: 11px; text-align: center; padding: 6px 0;">
+                        🔒 {{ __('Spatial audio and realtime messages active for') }} {{ $organization->name }}.
+                    </div>
                 </div>
                 <div class="chat-input-area">
-                    <input type="text" id="chat-text-input" placeholder="{{ __('Type a message...') }}" onkeydown="if(event.key==='Enter') sendChatMessage()">
-                    <label for="chat-file-input" title="Attach Image or File">📎</label>
+                    <input type="text" id="chat-text-input" placeholder="{{ __('Type message...') }}" onkeydown="if(event.key==='Enter') sendChatMessage()">
+                    <label for="chat-file-input" title="{{ __('Attach File / Image') }}">📎</label>
                     <input type="file" id="chat-file-input" style="display: none;" onchange="handleChatFileUpload(this)">
-                    <button onclick="sendChatMessage()" title="Send">➤</button>
+                    <button onclick="sendChatMessage()" title="{{ __('Send') }}">➤</button>
                 </div>
             </div>
+        </div>
 
-            <!-- Online Occupants -->
-            <div class="sidebar-section-title">
-                <span>{{ __('Online Colleagues') }}</span>
-                <span id="sidebar-online-count" style="color: var(--brand-teal);">1</span>
+        <!-- Tab 2: Occupants & Room Directory -->
+        <div class="sidebar-tab-content" id="tab-content-occupants" style="display: none;">
+            <div class="directory-container" id="occupants-directory">
+                <!-- Dynamically populated room directory with occupants -->
+                <div class="room-group-card">
+                    <div class="room-group-header">
+                        <span>🏢 {{ __('Main Floor') }}</span>
+                        <span id="floor-occupants-count" style="color: var(--brand-teal); font-size: 11px;">1 Online</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;" id="sidebar-floor-occupants">
+                        <div class="user-occupant-item">
+                            <div class="user-occupant-left">
+                                <span class="status-dot"></span>
+                                <span>{{ $user->name }}</span>
+                            </div>
+                            <span class="role-badge {{ !empty($user->is_guest) ? 'badge-guest' : 'badge-host' }}" style="font-size: 9px;">
+                                {{ !empty($user->is_guest) ? __('Guest') : __('You') }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="occupant-list" id="sidebar-online-list">
-                <div class="user-occupant-item">
-                    <span class="status-dot"></span>
-                    <strong>{{ $user->name }} ({{ __('You') }})</strong>
+        </div>
+
+        <!-- Tab 3: Interactive Shortcuts & Help -->
+        <div class="sidebar-tab-content" id="tab-content-help" style="display: none; padding: 20px;">
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+                <h4 style="font-size: 13px; font-weight: 800; color: var(--text-primary);">⌨️ {{ __('Movement & Controls') }}</h4>
+                <div style="font-size: 12px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 8px; line-height: 1.5;">
+                    <div>• <strong>WASD / Arrow Keys:</strong> {{ __('Walk your avatar across the office floor.') }}</div>
+                    <div>• <strong>Floor Click:</strong> {{ __('Instant navigation path to target position.') }}</div>
+                    <div>• <strong>Proximity Audio:</strong> {{ __('Approach colleagues to automatically hear and see them.') }}</div>
+                    <div>• <strong>Room Doors:</strong> {{ __('Walk inside or click room pill to lock/unlock private meetings.') }}</div>
+                    <div>• <strong>Scroll Wheel:</strong> {{ __('Zoom in and out on the office canvas.') }}</div>
                 </div>
             </div>
         </div>
@@ -538,23 +780,31 @@
     <main class="viewport">
         <canvas id="office-canvas"></canvas>
 
-        <!-- Floating Top Bar with Language Switcher and Dashboard Link -->
+        <!-- Floating Top Bar -->
         <div class="floating-top-bar">
+            <!-- Theme Toggle Button -->
+            <button class="btn-glass-pill" onclick="toggleAppTheme()" title="{{ __('Toggle Dark / Light Mode') }}">
+                <span id="floating-theme-icon">🌙</span>
+                <span id="floating-theme-text">{{ __('Dark Mode') }}</span>
+            </button>
+
+            <!-- Language Switcher -->
             @if(app()->getLocale() === 'ar')
-                <a href="{{ route('lang.switch', 'en') }}" class="btn-lang-float" title="Switch to English">🌐 English</a>
+                <a href="{{ route('lang.switch', 'en') }}" class="btn-glass-pill" title="Switch to English">🌐 English</a>
             @else
-                <a href="{{ route('lang.switch', 'ar') }}" class="btn-lang-float" title="التبديل إلى العربية">🌐 العربية</a>
+                <a href="{{ route('lang.switch', 'ar') }}" class="btn-glass-pill" title="التبديل إلى العربية">🌐 العربية</a>
             @endif
 
-            <a href="{{ route('dashboard') }}" class="btn-lang-float" style="background: var(--brand-teal); color: white; border-color: var(--brand-teal);" title="{{ __('Dashboard') }}">
+            <!-- Return to Executive Dashboard -->
+            <a href="{{ route('dashboard') }}" class="btn-glass-pill" style="background: linear-gradient(135deg, var(--brand-primary), #2563eb); color: white; border-color: var(--brand-primary);" title="{{ __('Dashboard') }}">
                 <span>🏢</span>
-                <span>{{ __('Dashboard') }}</span>
+                <span>{{ __('Executive Dashboard') }}</span>
             </a>
         </div>
 
         <!-- Floating Room Door Control Pill -->
         <div class="room-door-pill" id="room-door-pill">
-            <span id="room-door-name">🏢 Executive Room</span>
+            <span id="room-door-name">🏢 Executive Conference</span>
             <button class="btn-door-toggle" id="btn-toggle-room-door" onclick="toggleCurrentRoomDoor()">
                 <span>🔒</span>
                 <span id="room-door-status-text">{{ __('Lock Door') }}</span>
@@ -563,14 +813,15 @@
 
         <!-- Right Tool Dock -->
         <div class="right-toolbar">
-            <button class="tool-btn" onclick="openWhiteboard()" title="{{ __('Whiteboard') }}">📋</button>
+            <button class="tool-btn" onclick="openAvatarPickerModal()" title="{{ __('Choose Avatar Character') }}">🎭</button>
+            <button class="tool-btn" onclick="openWhiteboard()" title="{{ __('Team Whiteboard') }}">📋</button>
             @if(empty($user->is_guest))
-            <a href="{{ route('editor') }}" class="tool-btn" title="{{ __('Edit Furniture & Floor') }}">🪑</a>
+            <a href="{{ route('editor') }}" class="tool-btn" title="{{ __('Edit Floor Furniture') }}">🪑</a>
             @endif
             <button class="tool-btn" id="btn-toggle-sidebar" title="{{ __('Toggle Sidebar') }}">🔲</button>
             <button class="tool-btn" id="btn-reset-view" title="{{ __('Reset View') }}">🏠</button>
             <button class="tool-btn" id="btn-center-avatar" title="{{ __('Center on Me') }}">🎯</button>
-            <div style="height: 1px; background: var(--border-panel); margin: 2px 0;"></div>
+            <div style="height: 1px; background: var(--border-color); margin: 2px 0;"></div>
             <button class="tool-btn" id="btn-zoom-in" title="{{ __('Zoom In') }}">➕</button>
             <button class="tool-btn" id="btn-zoom-out" title="{{ __('Zoom Out') }}">➖</button>
         </div>
@@ -585,44 +836,84 @@
 
         <!-- Bottom Floating Control Dock -->
         <div class="bottom-dock">
-            <button class="dock-btn" id="cam-btn" title="{{ __('Camera') }}">
-                <span class="icon">📹</span>
-                <span>{{ __('Camera') }}</span>
-            </button>
-            <button class="dock-btn" id="mic-btn" title="{{ __('Mic') }}">
+            <button class="dock-btn" id="mic-btn" onclick="toggleMicrophone()" title="{{ __('Microphone') }}">
                 <span class="icon">🎤</span>
                 <span>{{ __('Mic') }}</span>
             </button>
-            <button class="dock-btn" id="status-dock-btn" title="{{ __('Available') }}">
+            <button class="dock-btn" id="cam-btn" onclick="toggleCamera()" title="{{ __('Camera') }}">
+                <span class="icon">📹</span>
+                <span>{{ __('Camera') }}</span>
+            </button>
+            <button class="dock-btn" id="avatar-dock-btn" onclick="openAvatarPickerModal()" title="{{ __('Change Avatar') }}">
+                <span class="icon">🎭</span>
+                <span>{{ __('Avatar') }}</span>
+            </button>
+            <button class="dock-btn" id="present-btn" onclick="toggleScreenShare()" title="{{ __('Screen Share') }}">
+                <span class="icon">🖥️</span>
+                <span id="present-btn-text">{{ __('Present') }}</span>
+            </button>
+            <button class="dock-btn" id="record-btn" onclick="toggleMeetingRecording()" title="{{ __('Record Session to Server') }}">
+                <span class="icon" id="record-icon">⏺️</span>
+                <span id="record-btn-text">{{ __('Record') }}</span>
+            </button>
+            <button class="dock-btn" id="gallery-btn" onclick="openRecordingsGallery()" title="{{ __('Saved Recordings Gallery') }}">
+                <span class="icon">📼</span>
+                <span>{{ __('Gallery') }}</span>
+            </button>
+            <button class="dock-btn" id="status-dock-btn" title="{{ __('Status') }}">
                 <span class="icon">🟢</span>
                 <span>{{ __('Available') }}</span>
             </button>
-            <button class="dock-btn" id="whiteboard-dock-btn" onclick="openWhiteboard()" title="{{ __('Whiteboard') }}">
+            <button class="dock-btn" onclick="openWhiteboard()" title="{{ __('Whiteboard') }}">
                 <span class="icon">📋</span>
                 <span>{{ __('Whiteboard') }}</span>
             </button>
-            <button class="dock-btn" id="present-btn" title="{{ __('Present') }}">
-                <span class="icon">🖥️</span>
-                <span>{{ __('Present') }}</span>
-            </button>
-            @if(empty($user->is_guest))
-            <button class="dock-btn" id="record-btn" title="{{ __('Record') }}">
-                <span class="icon">⭕</span>
-                <span>{{ __('Record') }}</span>
-            </button>
-            @endif
-            <button class="dock-btn" id="gallery-btn" title="{{ __('Gallery') }}">
-                <span class="icon">🪟</span>
-                <span>{{ __('Gallery') }}</span>
-            </button>
-            <button class="dock-btn" onclick="window.location.href='{{ route('dashboard') }}'" title="{{ __('Dashboard') }}">
-                <span class="icon">↗️</span>
+            <button class="dock-btn" onclick="window.location.href='{{ route('dashboard') }}'" title="{{ __('Exit to Dashboard') }}" style="color: var(--brand-crimson);">
+                <span class="icon">🚪</span>
                 <span>{{ __('Exit') }}</span>
             </button>
         </div>
     </main>
 
-    <!-- 🚪 Knock on Door Prompt Modal (When entering a locked room) -->
+    <!-- 🎭 Avatar Customizer & Character Selector Modal -->
+    <div id="avatar-picker-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-size: 17px; font-weight: 900; color: var(--text-primary);">🎭 {{ __('Choose Your Avatar Character') }}</h3>
+                <button onclick="closeAvatarPickerModal()" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">✕</button>
+            </div>
+
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 18px;">
+                {{ __('Select a 2.5D character avatar sprite to represent you on the virtual office floor.') }}
+            </p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+                <!-- Male Avatar Card -->
+                <div class="avatar-card-picker" id="picker-male" onclick="selectAvatarGender('male')">
+                    <div class="avatar-preview-circle">
+                        <img src="/images/avatars/male.jpg" alt="Male Character">
+                    </div>
+                    <strong style="font-size: 14px; color: var(--text-primary);">👨 {{ __('Male Avatar') }}</strong>
+                    <span style="font-size: 11px; color: var(--text-muted);">{{ __('Modern Business Suit') }}</span>
+                </div>
+
+                <!-- Female Avatar Card -->
+                <div class="avatar-card-picker" id="picker-female" onclick="selectAvatarGender('female')">
+                    <div class="avatar-preview-circle">
+                        <img src="/images/avatars/female.jpg" alt="Female Character">
+                    </div>
+                    <strong style="font-size: 14px; color: var(--text-primary);">👩 {{ __('Female Avatar') }}</strong>
+                    <span style="font-size: 11px; color: var(--text-muted);">{{ __('Executive Teal Blazer') }}</span>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                <button onclick="closeAvatarPickerModal()" class="btn-glass-pill" style="padding: 10px 18px;">{{ __('Done') }}</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🚪 Knock on Door Prompt Modal -->
     <div id="knock-prompt-modal" class="modal-overlay">
         <div class="modal-box" style="max-width: 440px; text-align: center;">
             <div style="font-size: 40px; margin-bottom: 10px;">🔒</div>
@@ -631,10 +922,10 @@
                 {{ __('This room is currently in a private session. You must knock to request entry permission.') }}
             </p>
             <div style="display: flex; gap: 10px;">
-                <button onclick="confirmKnock()" id="btn-knock-send" style="flex: 1; background: var(--brand-teal); color: white; font-weight: 800; border: none; border-radius: 12px; padding: 12px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <button onclick="confirmKnock()" id="btn-knock-send" style="flex: 1; background: var(--brand-primary); color: white; font-weight: 800; border: none; border-radius: 12px; padding: 12px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center; gap: 6px;">
                     <span>🔔</span> {{ __('Knock on Door') }}
                 </button>
-                <button onclick="closeKnockPrompt()" style="background: rgba(255,255,255,0.08); border: 1px solid var(--border-panel); color: #94a3b8; border-radius: 12px; padding: 12px 18px; cursor: pointer; font-size: 13px;">
+                <button onclick="closeKnockPrompt()" class="btn-glass-pill" style="padding: 12px 18px;">
                     {{ __('Cancel') }}
                 </button>
             </div>
@@ -642,16 +933,16 @@
         </div>
     </div>
 
-    <!-- 🔔 Knock Request Alert Modal (For occupants inside the locked room) -->
+    <!-- 🔔 Knock Request Alert Modal -->
     <div id="knock-alert-modal" class="modal-overlay">
-        <div class="modal-box" style="max-width: 440px; text-align: center; border: 2px solid var(--brand-teal);">
-            <div style="font-size: 42px; margin-bottom: 10px; animation: bounce 0.6s infinite alternate;">🔔</div>
+        <div class="modal-box" style="max-width: 440px; text-align: center; border: 2px solid var(--brand-primary);">
+            <div style="font-size: 42px; margin-bottom: 10px;">🔔</div>
             <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 6px;">{{ __('Knock Knock! Request to Enter') }}</h3>
-            <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 20px;" id="knock-alert-desc">
+            <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px;" id="knock-alert-desc">
                 <strong>John Doe</strong> {{ __('is knocking on the door to enter') }} <strong>Executive Room</strong>.
             </p>
             <div style="display: flex; gap: 10px;">
-                <button onclick="respondToKnock(true)" style="flex: 1; background: var(--brand-teal); color: white; font-weight: 800; border: none; border-radius: 12px; padding: 12px; cursor: pointer; font-size: 13px;">
+                <button onclick="respondToKnock(true)" style="flex: 1; background: var(--brand-green); color: white; font-weight: 800; border: none; border-radius: 12px; padding: 12px; cursor: pointer; font-size: 13px;">
                     ✅ {{ __('Allow Entry') }}
                 </button>
                 <button onclick="respondToKnock(false)" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; font-weight: 700; border-radius: 12px; padding: 12px 18px; cursor: pointer; font-size: 13px;">
@@ -661,82 +952,82 @@
         </div>
     </div>
 
-    <!-- Comprehensive Invitation & Team Member Modal -->
+    <!-- Invitation & Member Modal -->
     <div id="invite-modal" class="modal-overlay">
         <div class="modal-box">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <h3 style="font-size: 16px; font-weight: 800; color: var(--brand-navy);">👥 {{ __('Invite & Guest Access') }}</h3>
-                <button onclick="closeInviteModal()" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
+                <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary);">👥 {{ __('Invite & Guest Access') }}</h3>
+                <button onclick="closeInviteModal()" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer;">✕</button>
             </div>
 
             <!-- Tab Switcher -->
-            <div style="display: flex; gap: 8px; margin-bottom: 18px; background: #f1f5f9; padding: 4px; border-radius: 10px;">
-                <button class="modal-tab-btn active" id="modal-tab-guest" onclick="switchInviteTab('guest')" style="flex: 1; padding: 8px; border-radius: 8px; border: none; font-size: 12px; font-weight: 700; cursor: pointer; background: var(--brand-teal); color: white;">🔗 {{ __('Guest Meeting Link') }}</button>
+            <div style="display: flex; gap: 8px; margin-bottom: 18px; background: var(--bg-input); padding: 4px; border-radius: 12px;">
+                <button class="modal-tab-btn active" id="modal-tab-guest" onclick="switchInviteTab('guest')" style="flex: 1; padding: 8px; border-radius: 8px; border: none; font-size: 12px; font-weight: 700; cursor: pointer; background: var(--brand-primary); color: white;">🔗 {{ __('Guest Meeting Link') }}</button>
                 <button class="modal-tab-btn" id="modal-tab-member" onclick="switchInviteTab('member')" style="flex: 1; padding: 8px; border-radius: 8px; border: none; font-size: 12px; font-weight: 700; cursor: pointer; background: none; color: var(--text-muted);">👤 {{ __('Add Team Member') }}</button>
             </div>
 
             <!-- Section 1: Guest Link -->
             <div id="tab-section-guest" style="display: flex; flex-direction: column; gap: 12px;">
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 4px;">{{ __('Destination Room') }}</label>
-                    <select id="invite-room-select" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Destination Room') }}</label>
+                    <select id="invite-room-select" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         @foreach($map->rooms as $r)
                             <option value="{{ $r->id }}">🏢 {{ $r->name }} ({{ ucfirst($r->type) }})</option>
                         @endforeach
                     </select>
                 </div>
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 4px;">{{ __('Guest Name / Label') }}</label>
-                    <input type="text" id="invite-guest-name" value="Guest / Partner" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Guest Name / Label') }}</label>
+                    <input type="text" id="invite-guest-name" value="Investor / Partner" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 4px;">{{ __('Link Expiration') }}</label>
-                    <select id="invite-guest-hours" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Link Expiration') }}</label>
+                    <select id="invite-guest-hours" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         <option value="1">1 {{ __('Hour') }}</option>
                         <option value="24" selected>24 {{ __('Hours') }} (1 Day)</option>
                         <option value="72">72 {{ __('Hours') }} (3 Days)</option>
                     </select>
                 </div>
-                <button onclick="generateGuestLink()" id="btn-gen-guest" style="margin-top: 4px; background: linear-gradient(135deg, var(--brand-green), #004d34); color: white; font-weight: 800; border: none; border-radius: 10px; padding: 12px; cursor: pointer; font-size: 13px; box-shadow: 0 4px 12px rgba(0, 104, 71, 0.2);">
+                <button onclick="generateGuestLink()" id="btn-gen-guest" style="margin-top: 4px; background: linear-gradient(135deg, var(--brand-green), #059669); color: white; font-weight: 800; border: none; border-radius: 10px; padding: 12px; cursor: pointer; font-size: 13px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
                     ⚡ {{ __('Generate Instant Guest Link') }}
                 </button>
-                <div id="guest-result-box" style="display: none; background: rgba(0, 104, 71, 0.08); border: 1px solid rgba(0, 104, 71, 0.25); border-radius: 10px; padding: 12px;">
-                    <div style="font-size: 11px; font-weight: 800; color: var(--brand-green); margin-bottom: 6px;">✅ {{ __('Invitation Link Ready!') }}</div>
-                    <input type="text" id="guest-link-output" readonly style="width: 100%; background: #ffffff; border: 1px solid var(--border-panel); border-radius: 6px; padding: 8px; color: var(--brand-navy); font-size: 12px; font-family: monospace; margin-bottom: 8px;">
+                <div id="guest-result-box" style="display: none; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 12px;">
+                    <div style="font-size: 11px; font-weight: 800; color: #34d399; margin-bottom: 6px;">✅ {{ __('Invitation Link Ready!') }}</div>
+                    <input type="text" id="guest-link-output" readonly style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; color: var(--brand-teal); font-size: 12px; font-family: monospace; margin-bottom: 8px;">
                     <div style="display: flex; gap: 8px;">
-                        <button onclick="copyGuestLink()" id="btn-copy-link" style="flex: 1; background: var(--brand-teal); color: white; font-weight: 700; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-size: 12px;">📋 {{ __('Copy Link') }}</button>
-                        <a id="guest-open-link" href="#" target="_blank" style="background: #ffffff; border: 1px solid var(--border-panel); color: var(--brand-navy); font-weight: 700; text-decoration: none; border-radius: 6px; padding: 8px 12px; font-size: 12px;">👁️ {{ __('Open') }}</a>
+                        <button onclick="copyGuestLink()" id="btn-copy-link" style="flex: 1; background: var(--brand-primary); color: white; font-weight: 700; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-size: 12px;">📋 {{ __('Copy Link') }}</button>
+                        <a id="guest-open-link" href="#" target="_blank" style="background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); font-weight: 700; text-decoration: none; border-radius: 6px; padding: 8px 12px; font-size: 12px;">👁️ {{ __('Open') }}</a>
                     </div>
                 </div>
             </div>
 
-            <!-- Section 2: Permanent Team Member with Password -->
+            <!-- Section 2: Permanent Team Member -->
             <div id="tab-section-member" style="display: none; flex-direction: column; gap: 12px;">
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 4px;">{{ __('Full Name') }}</label>
-                    <input type="text" id="member-name" placeholder="e.g. John Doe" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Full Name') }}</label>
+                    <input type="text" id="member-name" placeholder="e.g. Sarah Miller" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 4px;">{{ __('Email Address') }}</label>
-                    <input type="email" id="member-email" placeholder="john@example.com" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Email Address') }}</label>
+                    <input type="email" id="member-email" placeholder="sarah@example.com" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 4px;">{{ __('Password') }}</label>
-                    <input type="text" id="member-password" placeholder="e.g. Secret123" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Password') }}</label>
+                    <input type="text" id="member-password" placeholder="e.g. Secret123" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--brand-ocean); margin-bottom: 4px;">{{ __('Role') }}</label>
-                    <select id="member-role" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-panel); border-radius: 8px; padding: 10px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Role') }}</label>
+                    <select id="member-role" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         <option value="employee" selected>{{ __('Member') }}</option>
                         <option value="manager">{{ __('Manager') }}</option>
                         <option value="company_admin">{{ __('Company Admin') }}</option>
                     </select>
                 </div>
-                <button onclick="createTeamMember()" id="btn-create-member" style="margin-top: 4px; background: var(--brand-teal); color: white; font-weight: 800; border: none; border-radius: 10px; padding: 12px; cursor: pointer; font-size: 13px;">
+                <button onclick="createTeamMember()" id="btn-create-member" style="margin-top: 4px; background: var(--brand-primary); color: white; font-weight: 800; border: none; border-radius: 10px; padding: 12px; cursor: pointer; font-size: 13px;">
                     ✨ {{ __('Add Member to Team') }}
                 </button>
-                <div id="member-result-box" style="display: none; background: rgba(0, 180, 179, 0.1); border: 1px solid rgba(0, 180, 179, 0.3); border-radius: 10px; padding: 12px; font-size: 12px; color: var(--brand-navy);">
-                    <div style="font-weight: 800; margin-bottom: 4px; color: var(--brand-teal);">✅ {{ __('Member Created Successfully!') }}</div>
+                <div id="member-result-box" style="display: none; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 10px; padding: 12px; font-size: 12px; color: var(--text-primary);">
+                    <div style="font-weight: 800; margin-bottom: 4px; color: #60a5fa;">✅ {{ __('Member Created Successfully!') }}</div>
                     <div>{{ __('The member can now login directly at /login') }}</div>
                 </div>
             </div>
@@ -745,24 +1036,24 @@
 
     <!-- Whiteboard Modal -->
     <div id="whiteboard-modal" class="modal-overlay">
-        <div style="background: #ffffff; border: 1px solid var(--border-panel); border-radius: 20px; width: 90vw; max-width: 1000px; height: 80vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 25px 60px rgba(1, 44, 65, 0.25);">
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: #f8fafc; border-bottom: 1px solid var(--border-panel);">
-                <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; color: var(--brand-navy);">
-                    <span>📋</span> {{ __('Team Whiteboard') }}
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 24px; width: 90vw; max-width: 1000px; height: 80vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow-dock);">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 22px; background: var(--bg-input); border-bottom: 1px solid var(--border-color);">
+                <div style="display: flex; align-items: center; gap: 8px; font-weight: 800; color: var(--text-primary);">
+                    <span>📋</span> {{ __('Team Collaborative Whiteboard') }}
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <button class="tool-btn active" id="wb-tool-pen" onclick="setWbTool('pen')" title="Pen">✏️</button>
                     <button class="tool-btn" id="wb-tool-highlighter" onclick="setWbTool('highlighter')" title="Highlighter">🖍️</button>
                     <button class="tool-btn" id="wb-tool-eraser" onclick="setWbTool('eraser')" title="Eraser">🧹</button>
-                    <div style="display: flex; gap: 4px; margin: 0 6px;">
-                        <span onclick="setWbColor('#00b4b3')" style="width: 20px; height: 20px; border-radius: 50%; background: #00b4b3; cursor: pointer;"></span>
-                        <span onclick="setWbColor('#006847')" style="width: 20px; height: 20px; border-radius: 50%; background: #006847; cursor: pointer;"></span>
-                        <span onclick="setWbColor('#f57b36')" style="width: 20px; height: 20px; border-radius: 50%; background: #f57b36; cursor: pointer;"></span>
-                        <span onclick="setWbColor('#d20005')" style="width: 20px; height: 20px; border-radius: 50%; background: #d20005; cursor: pointer;"></span>
+                    <div style="display: flex; gap: 6px; margin: 0 6px;">
+                        <span onclick="setWbColor('#3b82f6')" style="width: 20px; height: 20px; border-radius: 50%; background: #3b82f6; cursor: pointer;"></span>
+                        <span onclick="setWbColor('#10b981')" style="width: 20px; height: 20px; border-radius: 50%; background: #10b981; cursor: pointer;"></span>
+                        <span onclick="setWbColor('#f59e0b')" style="width: 20px; height: 20px; border-radius: 50%; background: #f59e0b; cursor: pointer;"></span>
+                        <span onclick="setWbColor('#ef4444')" style="width: 20px; height: 20px; border-radius: 50%; background: #ef4444; cursor: pointer;"></span>
                     </div>
                     <button class="tool-btn" onclick="clearWhiteboard()" title="Clear Board" style="color: var(--brand-crimson);">🗑️</button>
                     <button class="tool-btn" onclick="exportWhiteboard()" title="Download PNG">💾</button>
-                    <button onclick="closeWhiteboard()" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; margin-inline-start: 10px;">✕</button>
+                    <button onclick="closeWhiteboard()" style="background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; margin-inline-start: 10px;">✕</button>
                 </div>
             </div>
             <div style="flex: 1; position: relative; background: #ffffff;" id="wb-container">
@@ -773,8 +1064,8 @@
 
     <!-- Presentation Modal -->
     <div id="presentation-modal" class="modal-overlay">
-        <div style="background: rgba(15, 23, 42, 0.98); border: 1px solid var(--border-panel); border-radius: 20px; width: 85vw; max-width: 1100px; height: 80vh; display: flex; flex-direction: column; overflow: hidden;">
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--border-panel); background: rgba(0,0,0,0.4);">
+        <div style="background: rgba(15, 23, 42, 0.98); border: 1px solid var(--border-color); border-radius: 20px; width: 85vw; max-width: 1100px; height: 80vh; display: flex; flex-direction: column; overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.4);">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <span>🖥️</span> <strong>Presentation / Screen Share</strong>
                 </div>
@@ -789,8 +1080,56 @@
         </div>
     </div>
 
-    <!-- JavaScript Engine with Room Lock, Knocking, Full WebRTC Mesh & Spatial Audio -->
+    <!-- 📼 Recordings & Media Gallery Modal -->
+    <div id="recordings-gallery-modal" class="modal-overlay">
+        <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 24px; width: 90vw; max-width: 1000px; height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow-dock);">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; background: var(--bg-input); border-bottom: 1px solid var(--border-color);">
+                <div style="display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 16px; color: var(--text-primary);">
+                    <span>📼</span> {{ __('Session Recordings & Gallery') }}
+                </div>
+                <button onclick="closeRecordingsGallery()" style="background: none; border: none; color: var(--text-muted); font-size: 22px; cursor: pointer;">✕</button>
+            </div>
+            <div style="flex: 1; overflow-y: auto; padding: 22px;" id="recordings-gallery-content">
+                <div style="display: flex; justify-content: center; padding: 40px 0; color: var(--text-muted);">
+                    ⏳ {{ __('Loading saved recordings from server...') }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Realtime Engine & High-Fidelity Canvas Rendering -->
     <script>
+        // ── Global Theme Toggle Engine ──
+        function toggleAppTheme() {
+            const current = document.documentElement.getAttribute('data-theme') || 'dark';
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem('vw_theme', next);
+            updateThemeIcons(next);
+            if (typeof draw === 'function') draw();
+        }
+
+        function updateThemeIcons(theme) {
+            const sideIcon = document.getElementById('sidebar-theme-icon');
+            const floatIcon = document.getElementById('floating-theme-icon');
+            const floatText = document.getElementById('floating-theme-text');
+            if (sideIcon) sideIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+            if (floatIcon) floatIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+            if (floatText) floatText.textContent = theme === 'dark' ? '{{ __("Light Mode") }}' : '{{ __("Dark Mode") }}';
+        }
+        updateThemeIcons(savedTheme);
+
+        // ── Sidebar Tabs ──
+        function switchSidebarTab(tab) {
+            ['chat', 'occupants', 'help'].forEach(t => {
+                const btn = document.getElementById(`tab-btn-${t}`);
+                const content = document.getElementById(`tab-content-${t}`);
+                if (btn) btn.classList.toggle('active', t === tab);
+                if (content) content.style.display = t === tab ? 'flex' : 'none';
+            });
+        }
+
+        // ── Realtime & Map Configuration ──
         const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const wsHost = window.location.hostname || '127.0.0.1';
         const wsPort = 8080;
@@ -808,60 +1147,74 @@
         const ctx = canvas.getContext('2d');
         const container = canvas.parentElement;
 
-        let width = canvas.width = container.clientWidth;
-        let height = canvas.height = container.clientHeight;
+        let width = canvas.width = (container?.clientWidth) || window.innerWidth || 1200;
+        let height = canvas.height = (container?.clientHeight) || window.innerHeight || 800;
 
-        window.addEventListener('resize', () => {
-            width = canvas.width = container.clientWidth;
-            height = canvas.height = container.clientHeight;
-        });
+        function resizeCanvas() {
+            if (canvas) {
+                width = canvas.width = (container?.clientWidth) || window.innerWidth || 1200;
+                height = canvas.height = (container?.clientHeight) || window.innerHeight || 800;
+            }
+        }
+        window.addEventListener('resize', resizeCanvas);
+        setTimeout(resizeCanvas, 150);
+
+        // ── Preloaded 2.5D Avatars (Nanobanana Sprites) ──
+        const AVATAR_SPRITES = {
+            male: new Image(),
+            female: new Image()
+        };
+        AVATAR_SPRITES.male.src = '/images/avatars/male.jpg';
+        AVATAR_SPRITES.female.src = '/images/avatars/female.jpg';
+
+        let chosenAvatarGender = localStorage.getItem('vw_avatar_gender') || 'male';
+
+        function openAvatarPickerModal() {
+            selectAvatarGender(chosenAvatarGender);
+            document.getElementById('avatar-picker-modal').style.display = 'flex';
+        }
+        function closeAvatarPickerModal() {
+            document.getElementById('avatar-picker-modal').style.display = 'none';
+        }
 
         // ── Distinct Spawn & Color Engine ──
-        const AVATAR_PALETTE = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#f43f5e', '#6366f1'];
-        function getUserColor(uid, isG) {
-            if (isG) return '#22c55e';
-            let hash = 0;
-            const str = String(uid || '');
-            for (let i = 0; i < str.length; i++) hash = ((hash << 5) - hash) + str.charCodeAt(i);
-            return AVATAR_PALETTE[Math.abs(hash) % AVATAR_PALETTE.length];
-        }
+        const isGuest = {{ !empty($user->is_guest) ? 'true' : 'false' }};
+        const overrideSpawn = @json($initialSpawn ?? null);
 
         function calculateInitialSpawn(uid, isG, override) {
             if (override && typeof override.x === 'number') return override;
-            if (isG) return { x: 220, y: 220 };
+            if (isG) return { x: 260, y: 260 };
             let hash = 0;
             const str = String(uid || '');
             for (let i = 0; i < str.length; i++) hash = ((hash << 5) - hash) + str.charCodeAt(i);
             const col = Math.abs(hash) % 4;
             const row = Math.abs(hash >> 3) % 3;
             return {
-                x: 360 + col * 130,
-                y: 360 + row * 110
+                x: 380 + col * 130,
+                y: 380 + row * 110
             };
         }
 
-        const isGuest = {{ !empty($user->is_guest) ? 'true' : 'false' }};
-        const overrideSpawn = @json($initialSpawn ?? null);
         const mySpawn = calculateInitialSpawn(String(CONFIG.currentUser.id), isGuest, overrideSpawn);
 
         const localAvatar = {
             id: String(CONFIG.currentUser.id),
             name: CONFIG.currentUser.name || 'User',
+            isGuest: isGuest,
             x: mySpawn.x,
             y: mySpawn.y,
             targetX: mySpawn.x,
             targetY: mySpawn.y,
-            speed: 5.0,
+            speed: 5.2,
             radius: 24,
-            color: getUserColor(String(CONFIG.currentUser.id), isGuest),
-            proximityRadius: 160,
-            currentRoom: null,
+            proximityRadius: 170,
+            currentRoomId: null,
             status: 'available'
         };
 
-        const remoteAvatars = new Map(); // userId -> { id, name, x, y, targetX, targetY, color, status, currentRoom, videoElement }
+        const remoteAvatars = new Map();
         const rooms = CONFIG.map.rooms || [];
-        const roomDoorStates = new Map(); // roomId -> boolean (true: locked/closed, false: open)
+        const roomDoorStates = new Map();
 
         const FURNITURE_CATALOG = @json($furnitureItems ?? []);
         const CUSTOM_FURNITURE_SPRITES = {};
@@ -876,20 +1229,24 @@
 
         let zoomLevel = 1.0;
         let cameraOffset = { x: 0, y: 0 };
+        setTimeout(() => {
+            if (width && height && localAvatar) {
+                cameraOffset.x = (width / 2) - localAvatar.x * zoomLevel;
+                cameraOffset.y = (height / 2) - localAvatar.y * zoomLevel;
+            }
+        }, 150);
 
-        // ── Web Audio Synthesizer (Knock & Chime) ──
+        // ── Web Audio Synthesizer ──
         let audioCtx = null;
         function getAudioContext() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             return audioCtx;
         }
 
         function playKnockSound() {
             try {
                 const ctx = getAudioContext();
-                [0, 0.15].forEach(delay => {
+                [0, 0.14].forEach(delay => {
                     const osc = ctx.createOscillator();
                     const gain = ctx.createGain();
                     osc.type = 'triangle';
@@ -923,19 +1280,20 @@
             } catch(e) {}
         }
 
-        // ── WebRTC Peer Mesh State ──
+        // ── WebRTC Peer Mesh & Spatial Audio ──
         const RTC_CONFIG = {
             iceServers: [
                 { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' },
-                { urls: 'stun:stun.services.mozilla.com' }
+                { urls: 'stun:stun1.l.google.com:19302' }
             ]
         };
-        const peerConnections = new Map(); // userId -> RTCPeerConnection
-        const peerAudioElements = new Map(); // userId -> Audio
+        const peerConnections = new Map();
+        const peerAudioElements = new Map();
         let isCamActive = false;
         let isMicActive = false;
         let localMediaStream = null;
+        let presentStream = null;
+        let activeRemotePresenterId = null;
 
         async function getLocalMediaStream() {
             if (!localMediaStream) {
@@ -953,39 +1311,86 @@
                         localVid.play().catch(() => {});
                     }
                 } catch (e) {
-                    console.log('[Media] Device access request:', e.message);
+                    console.log('[Media] Device access note:', e.message);
                 }
             }
             return localMediaStream;
         }
 
-        function createPeerConnection(peerUserId) {
-            if (peerConnections.has(peerUserId)) {
-                return peerConnections.get(peerUserId);
+        async function toggleMicrophone() {
+            isMicActive = !isMicActive;
+            const btn = document.getElementById('mic-btn');
+            if (!localMediaStream) {
+                await getLocalMediaStream();
             }
+            if (localMediaStream) {
+                localMediaStream.getAudioTracks().forEach(t => t.enabled = isMicActive);
+                peerConnections.forEach(pc => {
+                    const senders = pc.getSenders();
+                    const audioTrack = localMediaStream.getAudioTracks()[0];
+                    if (audioTrack && !senders.find(s => s.track && s.track.kind === 'audio')) {
+                        pc.addTrack(audioTrack, localMediaStream);
+                    }
+                });
+            }
+            if (isMicActive) {
+                btn?.classList.add('active');
+                showToast('🎙️ {{ __("Microphone Unmuted") }}');
+            } else {
+                btn?.classList.remove('active');
+                showToast('🔇 {{ __("Microphone Muted") }}');
+            }
+        }
+
+        async function toggleCamera() {
+            isCamActive = !isCamActive;
+            const btn = document.getElementById('cam-btn');
+            const localCont = document.getElementById('local-video-container');
+            const grid = document.getElementById('office-video-grid');
+
+            if (!localMediaStream) {
+                await getLocalMediaStream();
+            }
+            if (localMediaStream) {
+                localMediaStream.getVideoTracks().forEach(t => t.enabled = isCamActive);
+                peerConnections.forEach(pc => {
+                    const senders = pc.getSenders();
+                    const videoTrack = localMediaStream.getVideoTracks()[0];
+                    if (videoTrack) {
+                        const s = senders.find(s => s.track && s.track.kind === 'video');
+                        if (s) s.replaceTrack(isCamActive ? videoTrack : null);
+                        else if (isCamActive) pc.addTrack(videoTrack, localMediaStream);
+                    }
+                });
+            }
+
+            if (isCamActive) {
+                btn?.classList.add('active');
+                if (localCont) localCont.style.display = 'block';
+                if (grid) grid.style.display = 'flex';
+                showToast('📹 {{ __("Camera Turned ON") }}');
+            } else {
+                btn?.classList.remove('active');
+                if (localCont) localCont.style.display = 'none';
+                showToast('📷 {{ __("Camera Turned OFF") }}');
+            }
+        }
+
+        function createPeerConnection(peerUserId) {
+            if (peerConnections.has(peerUserId)) return peerConnections.get(peerUserId);
 
             const pc = new RTCPeerConnection(RTC_CONFIG);
             peerConnections.set(peerUserId, pc);
 
             if (localMediaStream) {
-                localMediaStream.getTracks().forEach(track => {
-                    pc.addTrack(track, localMediaStream);
-                });
-            }
-            if (presentStream) {
-                presentStream.getTracks().forEach(track => {
-                    pc.addTrack(track, presentStream);
-                });
+                localMediaStream.getTracks().forEach(track => pc.addTrack(track, localMediaStream));
             }
 
             pc.onicecandidate = (e) => {
                 if (e.candidate && ws && ws.readyState === WebSocket.OPEN) {
                     ws.send(JSON.stringify({
                         type: 'webrtc.signal',
-                        payload: {
-                            targetUserId: peerUserId,
-                            signal: { type: 'candidate', candidate: e.candidate }
-                        }
+                        payload: { targetUserId: peerUserId, signal: { type: 'candidate', candidate: e.candidate } }
                     }));
                 }
             };
@@ -993,7 +1398,6 @@
             pc.ontrack = (e) => {
                 const remoteStream = e.streams[0] || new MediaStream([e.track]);
 
-                // 1. Audio element for spatial audio
                 if (e.track.kind === 'audio') {
                     let audioEl = peerAudioElements.get(peerUserId);
                     if (!audioEl) {
@@ -1006,17 +1410,7 @@
                     }
                 }
 
-                // 2. Screen Presentation or Video Camera
-                if (activeRemotePresenterId === peerUserId || e.track.label.toLowerCase().includes('screen') || e.track.label.toLowerCase().includes('window')) {
-                    const presModal = document.getElementById('presentation-modal');
-                    const presVid = document.getElementById('presentation-video');
-                    if (presVid && presModal) {
-                        presVid.srcObject = remoteStream;
-                        presVid.play().catch(() => {});
-                        presModal.style.display = 'flex';
-                    }
-                } else {
-                    // Regular Camera Video Tile
+                if (e.track.kind === 'video') {
                     let remoteVidTile = document.getElementById(`peer-video-tile-${peerUserId}`);
                     const grid = document.getElementById('office-video-grid');
                     if (!remoteVidTile && grid) {
@@ -1037,12 +1431,8 @@
                         vidEl.srcObject = remoteStream;
                         vidEl.play().catch(() => {});
                     }
-
-                    // Store reference for canvas rendering
                     const av = remoteAvatars.get(peerUserId);
-                    if (av) {
-                        av.videoElement = vidEl;
-                    }
+                    if (av) av.videoElement = vidEl;
                 }
             };
 
@@ -1057,15 +1447,10 @@
                 if (ws && ws.readyState === WebSocket.OPEN) {
                     ws.send(JSON.stringify({
                         type: 'webrtc.signal',
-                        payload: {
-                            targetUserId: peerUserId,
-                            signal: { type: 'offer', sdp: pc.localDescription }
-                        }
+                        payload: { targetUserId: peerUserId, signal: { type: 'offer', sdp: pc.localDescription } }
                     }));
                 }
-            } catch(err) {
-                console.error('[WebRTC] Call peer error:', err);
-            }
+            } catch(err) { console.error('[WebRTC] Call peer error:', err); }
         }
 
         // ── WebSocket Realtime Connection ──
@@ -1075,11 +1460,13 @@
                 ws = new WebSocket(`${CONFIG.wsUrl}?token=${CONFIG.token}`);
 
                 ws.onopen = () => {
-                    console.log('[WS] Connected to Virtual Workplace Realtime server.');
+                    console.log('[WS] Virtual Workplace live connected.');
                     ws.send(JSON.stringify({
                         type: 'map.join',
                         payload: {
                             mapId: CONFIG.map.id,
+                            gender: chosenAvatarGender,
+                            isGuest: isGuest,
                             initialPosition: { x: Math.round(localAvatar.x), y: Math.round(localAvatar.y), direction: 'down' }
                         }
                     }));
@@ -1113,28 +1500,27 @@
         let pendingKnockRoomId = null;
         let activeTargetKnockRoom = null;
 
-        function handleWebSocketMessage(event) {
+        async function handleWebSocketMessage(event) {
             switch(event.type) {
                 case 'welcome': {
                     const { occupants } = event.payload || {};
                     (occupants || []).forEach(u => {
                         const uid = String(u.userId || u.id || '');
                         if (uid && uid !== String(localAvatar.id)) {
-                            const isG = (u.name && u.name.includes('(Guest)')) || u.role === 'Guest';
+                            const isG = (u.name && u.name.includes('(Guest)')) || u.role === 'Guest' || u.isGuest;
                             const defaultSpawn = calculateInitialSpawn(uid, isG, null);
                             const px = (typeof u.position?.x === 'number' && !isNaN(u.position.x) && u.position.x > 0) ? u.position.x : defaultSpawn.x;
                             const py = (typeof u.position?.y === 'number' && !isNaN(u.position.y) && u.position.y > 0) ? u.position.y : defaultSpawn.y;
                             remoteAvatars.set(uid, {
                                 id: uid,
                                 name: u.name || 'Colleague',
+                                isGuest: isG,
+                                gender: u.gender || (Math.random() > 0.5 ? 'female' : 'male'),
                                 x: px, y: py, targetX: px, targetY: py,
-                                color: getUserColor(uid, isG),
                                 status: u.status || 'available',
-                                currentRoom: u.currentRoomId || null
+                                currentRoomId: u.currentRoomId || null
                             });
-                            if (localMediaStream) {
-                                callPeer(uid);
-                            }
+                            if (localMediaStream) callPeer(uid);
                         }
                     });
                     updateOccupantsUI();
@@ -1145,17 +1531,18 @@
                     if (u) {
                         const uid = String(u.userId || u.id || '');
                         if (uid && uid !== String(localAvatar.id)) {
-                            const isG = (u.name && u.name.includes('(Guest)')) || u.role === 'Guest';
+                            const isG = (u.name && u.name.includes('(Guest)')) || u.role === 'Guest' || u.isGuest;
                             const defaultSpawn = calculateInitialSpawn(uid, isG, null);
                             const px = (typeof u.position?.x === 'number' && !isNaN(u.position.x) && u.position.x > 0) ? u.position.x : defaultSpawn.x;
                             const py = (typeof u.position?.y === 'number' && !isNaN(u.position.y) && u.position.y > 0) ? u.position.y : defaultSpawn.y;
                             remoteAvatars.set(uid, {
                                 id: uid,
                                 name: u.name || 'Colleague',
+                                isGuest: isG,
+                                gender: u.gender || (Math.random() > 0.5 ? 'female' : 'male'),
                                 x: px, y: py, targetX: px, targetY: py,
-                                color: getUserColor(uid, isG),
                                 status: u.status || 'available',
-                                currentRoom: u.currentRoomId || null
+                                currentRoomId: u.currentRoomId || null
                             });
                             updateOccupantsUI();
                             callPeer(uid);
@@ -1185,21 +1572,6 @@
                     const uid = String(userId || '');
                     if (uid && uid !== String(localAvatar.id)) {
                         let av = remoteAvatars.get(uid);
-                        if (!av && position) {
-                            av = {
-                                id: uid,
-                                name: 'Colleague',
-                                x: Number(position.x) || 300,
-                                y: Number(position.y) || 300,
-                                targetX: Number(position.x) || 300,
-                                targetY: Number(position.y) || 300,
-                                color: '#8b5cf6',
-                                status: 'available',
-                                currentRoom: null
-                            };
-                            remoteAvatars.set(uid, av);
-                            updateOccupantsUI();
-                        }
                         if (av && position) {
                             av.targetX = Number(position.x) || av.targetX;
                             av.targetY = Number(position.y) || av.targetY;
@@ -1208,7 +1580,7 @@
                     break;
                 }
                 case 'room.door_updated': {
-                    const { roomId, isClosed, toggledBy } = event.payload || {};
+                    const { roomId, isClosed } = event.payload || {};
                     if (roomId) {
                         roomDoorStates.set(roomId, !!isClosed);
                         updateRoomDoorPill();
@@ -1220,14 +1592,13 @@
                     if (requesterUserId === String(localAvatar.id)) break;
 
                     const myCurrentRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
-                    // Show alert if occupant is inside the room or on the workplace floor
                     if (!myCurrentRoom || myCurrentRoom.id === roomId || roomDoorStates.get(roomId)) {
                         pendingKnockRequesterId = requesterUserId;
                         pendingKnockRoomId = roomId;
                         playKnockSound();
                         
                         document.getElementById('knock-alert-desc').innerHTML = `
-                            <strong>${escapeHtml(requesterName || 'A colleague')}</strong> is knocking at the door of <strong>${escapeHtml(roomName || 'this room')}</strong>.
+                            <strong>${escapeHtml(requesterName || 'A colleague')}</strong> {{ __('is knocking on the door to enter') }} <strong>${escapeHtml(roomName || 'this room')}</strong>.
                         `;
                         document.getElementById('knock-alert-modal').style.display = 'flex';
                     }
@@ -1240,10 +1611,9 @@
                         playChimeSound();
                         if (msgEl) {
                             msgEl.style.display = 'block';
-                            msgEl.style.color = '#86efac';
-                            msgEl.innerHTML = `✅ <strong>Entry Approved!</strong> Door opened by ${escapeHtml(responderName || 'host')}.`;
+                            msgEl.style.color = '#34d399';
+                            msgEl.innerHTML = `✅ <strong>{{ __('Entry Approved!') }}</strong> {{ __('Door opened by') }} ${escapeHtml(responderName || 'host')}.`;
                         }
-                        // Move avatar inside room!
                         const targetR = rooms.find(r => r.id === roomId);
                         if (targetR) {
                             const cx = (targetR.bounds.x + targetR.bounds.width / 2) * 32;
@@ -1251,57 +1621,14 @@
                             localAvatar.targetX = cx;
                             localAvatar.targetY = cy;
                         }
-                        setTimeout(() => { closeKnockPrompt(); }, 1200);
+                        setTimeout(closeKnockPrompt, 1500);
                     } else {
                         if (msgEl) {
                             msgEl.style.display = 'block';
-                            msgEl.style.color = '#fca5a5';
-                            msgEl.innerHTML = `❌ <strong>Entry Denied.</strong> The occupant is in a private meeting.`;
+                            msgEl.style.color = '#f87171';
+                            msgEl.innerHTML = `❌ <strong>{{ __('Knock Denied') }}</strong>. {{ __('Occupants are in a confidential session.') }}`;
                         }
                     }
-                    break;
-                }
-                case 'webrtc.signal': {
-                    const { senderUserId, signal } = event.payload || {};
-                    if (!senderUserId || senderUserId === String(localAvatar.id)) break;
-
-                    let pc = peerConnections.get(senderUserId);
-                    if (!pc) {
-                        pc = createPeerConnection(senderUserId);
-                    }
-
-                    if (signal.type === 'offer') {
-                        pc.setRemoteDescription(new RTCSessionDescription(signal.sdp)).then(async () => {
-                            if (localMediaStream) {
-                                localMediaStream.getTracks().forEach(track => {
-                                    const senders = pc.getSenders();
-                                    if (!senders.some(s => s.track === track)) {
-                                        pc.addTrack(track, localMediaStream);
-                                    }
-                                });
-                            }
-                            const answer = await pc.createAnswer();
-                            await pc.setLocalDescription(answer);
-                            ws.send(JSON.stringify({
-                                type: 'webrtc.signal',
-                                payload: {
-                                    targetUserId: senderUserId,
-                                    signal: { type: 'answer', sdp: pc.localDescription }
-                                }
-                            }));
-                        }).catch(e => console.error('Offer handling error:', e));
-                    } else if (signal.type === 'answer') {
-                        pc.setRemoteDescription(new RTCSessionDescription(signal.sdp)).catch(e => console.error('Answer error:', e));
-                    } else if (signal.type === 'candidate' && signal.candidate) {
-                        pc.addIceCandidate(new RTCIceCandidate(signal.candidate)).catch(() => {});
-                    }
-                    break;
-                }
-                case 'presence.updated': {
-                    const { userId, status } = event.payload || {};
-                    const uid = String(userId || '');
-                    const av = remoteAvatars.get(uid);
-                    if (av) { av.status = status; updateOccupantsUI(); }
                     break;
                 }
                 case 'chat.message': {
@@ -1311,62 +1638,166 @@
                     }
                     break;
                 }
+                case 'webrtc.signal': {
+                    const { senderUserId, signal } = event.payload || {};
+                    if (!senderUserId || !signal) break;
+                    let pc = peerConnections.get(senderUserId);
+                    if (!pc) {
+                        pc = createPeerConnection(senderUserId);
+                    }
+                    if (signal.type === 'offer') {
+                        try {
+                            await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
+                            if (localMediaStream) {
+                                const senders = pc.getSenders();
+                                localMediaStream.getTracks().forEach(track => {
+                                    if (!senders.find(s => s.track && s.track.kind === track.kind)) {
+                                        pc.addTrack(track, localMediaStream);
+                                    }
+                                });
+                            }
+                            const answer = await pc.createAnswer();
+                            await pc.setLocalDescription(answer);
+                            if (ws && ws.readyState === WebSocket.OPEN) {
+                                ws.send(JSON.stringify({
+                                    type: 'webrtc.signal',
+                                    payload: {
+                                        targetUserId: senderUserId,
+                                        signal: { type: 'answer', sdp: pc.localDescription }
+                                    }
+                                }));
+                            }
+                        } catch(err) { console.warn('[WebRTC] Offer error:', err); }
+                    } else if (signal.type === 'answer') {
+                        try {
+                            await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
+                        } catch(err) { console.warn('[WebRTC] Answer error:', err); }
+                    } else if (signal.type === 'candidate' && signal.candidate) {
+                        try {
+                            await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
+                        } catch(err) { console.warn('[WebRTC] Candidate error:', err); }
+                    }
+                    break;
+                }
+                case 'avatar.updated': {
+                    const { userId, gender } = event.payload || {};
+                    if (userId && remoteAvatars.has(userId)) {
+                        remoteAvatars.get(userId).gender = gender;
+                        if (typeof draw === 'function') draw();
+                    }
+                    break;
+                }
                 case 'presentation.started': {
                     const { presenterId, presenterName } = event.payload || {};
                     activeRemotePresenterId = presenterId;
-                    const presModal = document.getElementById('presentation-modal');
-                    if (presModal) {
-                        presModal.style.display = 'flex';
-                        const titleEl = presModal.querySelector('strong');
-                        if (titleEl) titleEl.textContent = `🖥️ ${escapeHtml(presenterName || 'Colleague')}'s Screen Share`;
-                    }
-                    // Trigger peer renegotiation to receive presentation track
-                    if (presenterId) callPeer(presenterId);
+                    showToast(`🖥️ ${escapeHtml(presenterName || 'Colleague')} {{ __('started screen presentation') }}`);
                     break;
                 }
                 case 'presentation.stopped': {
                     activeRemotePresenterId = null;
-                    const presModal = document.getElementById('presentation-modal');
-                    const presVid = document.getElementById('presentation-video');
-                    if (presVid) presVid.srcObject = null;
-                    if (presModal) presModal.style.display = 'none';
+                    closePresentationModal();
+                    showToast('⏹️ {{ __('Screen presentation ended') }}');
                     break;
                 }
             }
         }
 
         function updateOccupantsUI() {
-            const countEl = document.getElementById('sidebar-online-count');
-            if (countEl) countEl.textContent = remoteAvatars.size + 1;
+            const countEl = document.getElementById('floor-occupants-count');
+            if (countEl) countEl.textContent = `${remoteAvatars.size + 1} {{ __('Online') }}`;
 
-            const listEl = document.getElementById('sidebar-online-list');
-            if (listEl) {
-                let html = `
-                    <div class="user-occupant-item">
-                        <span class="status-dot"></span>
-                        <strong>${escapeHtml(localAvatar.name)} (You)</strong>
+            const dir = document.getElementById('occupants-directory');
+            if (!dir) return;
+
+            // Group occupants by rooms
+            let roomsMap = { 'floor': [] };
+            rooms.forEach(r => { roomsMap[r.id] = []; });
+
+            // Add local user
+            const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+            const myRoomKey = myRoom ? myRoom.id : 'floor';
+            if (!roomsMap[myRoomKey]) roomsMap[myRoomKey] = [];
+            roomsMap[myRoomKey].push({ name: localAvatar.name, isGuest: localAvatar.isGuest, isMe: true });
+
+            // Add remote users
+            remoteAvatars.forEach(av => {
+                const r = getCurrentRoom(av.x, av.y);
+                const rKey = r ? r.id : 'floor';
+                if (!roomsMap[rKey]) roomsMap[rKey] = [];
+                roomsMap[rKey].push({ name: av.name, isGuest: av.isGuest, isMe: false });
+            });
+
+            let html = `
+                <div class="room-group-card">
+                    <div class="room-group-header">
+                        <span>🏢 {{ __('Open Office Floor') }}</span>
+                        <span style="color: var(--brand-teal); font-size: 11px;">${roomsMap['floor'].length}</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        ${roomsMap['floor'].map(u => `
+                            <div class="user-occupant-item">
+                                <div class="user-occupant-left">
+                                    <span class="status-dot"></span>
+                                    <span>${escapeHtml(u.name)}</span>
+                                </div>
+                                <span class="role-badge ${u.isGuest ? 'badge-guest' : 'badge-host'}" style="font-size: 9px;">
+                                    ${u.isGuest ? '👤 {{ __("Guest") }}' : (u.isMe ? '👑 {{ __("You") }}' : '👑 {{ __("Host") }}')}
+                                </span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            rooms.forEach(r => {
+                const occupants = roomsMap[r.id] || [];
+                const isLocked = !!roomDoorStates.get(r.id);
+                html += `
+                    <div class="room-group-card">
+                        <div class="room-group-header">
+                            <span>${isLocked ? '🔒' : '🚪'} ${escapeHtml(r.name)}</span>
+                            <span style="color: var(--brand-teal); font-size: 11px;">${occupants.length}</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                            ${occupants.length === 0 ? `<div style="font-size: 11px; color: var(--text-dim); padding: 4px;">— {{ __('Room is empty') }} —</div>` : occupants.map(u => `
+                                <div class="user-occupant-item">
+                                    <div class="user-occupant-left">
+                                        <span class="status-dot"></span>
+                                        <span>${escapeHtml(u.name)}</span>
+                                    </div>
+                                    <span class="role-badge ${u.isGuest ? 'badge-guest' : 'badge-host'}" style="font-size: 9px;">
+                                        ${u.isGuest ? '👤 {{ __("Guest") }}' : (u.isMe ? '👑 {{ __("You") }}' : '👑 {{ __("Host") }}')}
+                                    </span>
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
                 `;
-                remoteAvatars.forEach(av => {
-                    html += `
-                        <div class="user-occupant-item">
-                            <span class="status-dot" style="background: ${av.color}; box-shadow: 0 0 6px ${av.color};"></span>
-                            <span>${escapeHtml(av.name)}</span>
-                        </div>
-                    `;
-                });
-                listEl.innerHTML = html;
-            }
+            });
+
+            dir.innerHTML = html;
         }
 
-        // ── Room Lock & Door Functions ──
-        function getCurrentRoom(x, y) {
+        // ── Smooth Room Detection with Hysteresis & Edge Protection ──
+        function getCurrentRoom(x, y, activeRoom = null) {
+            // Check active room first with generous 4px buffer to eliminate jitter
+            if (activeRoom) {
+                const rx = activeRoom.bounds.x * 32 - 4;
+                const ry = activeRoom.bounds.y * 32 - 4;
+                const rw = activeRoom.bounds.width * 32 + 8;
+                const rh = activeRoom.bounds.height * 32 + 8;
+                if (x >= rx && x <= rx + rw && y >= ry && y <= ry + rh) {
+                    return activeRoom;
+                }
+            }
+
+            const margin = 2;
             for (const r of rooms) {
                 const rx = r.bounds.x * 32;
                 const ry = r.bounds.y * 32;
                 const rw = r.bounds.width * 32;
                 const rh = r.bounds.height * 32;
-                if (x >= rx && x <= rx + rw && y >= ry && y <= ry + rh) {
+                if (x >= rx + margin && x < rx + rw - margin && y >= ry + margin && y < ry + rh - margin) {
                     return r;
                 }
             }
@@ -1376,7 +1807,7 @@
         function updateRoomDoorPill() {
             const pill = document.getElementById('room-door-pill');
             if (!pill) return;
-            const currentRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+            const currentRoom = getCurrentRoom(localAvatar.x, localAvatar.y, localAvatar.currentRoomObject);
             if (currentRoom) {
                 pill.style.display = 'flex';
                 document.getElementById('room-door-name').textContent = `🏢 ${currentRoom.name}`;
@@ -1386,11 +1817,11 @@
                 if (isLocked) {
                     btn.classList.remove('unlocked');
                     btn.querySelector('span:first-child').textContent = '🔒';
-                    txt.textContent = 'Unlock Door';
+                    txt.textContent = '{{ __("Unlock Door") }}';
                 } else {
                     btn.classList.add('unlocked');
                     btn.querySelector('span:first-child').textContent = '🔓';
-                    txt.textContent = 'Lock Door';
+                    txt.textContent = '{{ __("Lock Door") }}';
                 }
             } else {
                 pill.style.display = 'none';
@@ -1398,7 +1829,7 @@
         }
 
         function toggleCurrentRoomDoor() {
-            const currentRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+            const currentRoom = getCurrentRoom(localAvatar.x, localAvatar.y, localAvatar.currentRoomObject);
             if (!currentRoom) return;
             const isCurrentlyLocked = !!roomDoorStates.get(currentRoom.id);
             const nextState = !isCurrentlyLocked;
@@ -1413,12 +1844,317 @@
             }
         }
 
+        function selectAvatarGender(gender) {
+            chosenAvatarGender = gender;
+            localStorage.setItem('vw_avatar_gender', gender);
+            document.querySelectorAll('.avatar-card-picker').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`picker-${gender}`)?.classList.add('selected');
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'avatar.update',
+                    payload: { gender: gender }
+                }));
+            }
+            if (typeof draw === 'function') draw();
+            showToast(`🎭 {{ __('Avatar set to') }} ${gender === 'female' ? '👩 {{ __("Executive Female") }}' : '👨 {{ __("Business Male") }}'}`);
+        }
+
+        // ── Screen Sharing Engine ──
+        let screenMediaStream = null;
+        let isScreenSharing = false;
+
+        async function toggleScreenShare() {
+            if (isScreenSharing) {
+                stopPresentation();
+                return;
+            }
+
+            try {
+                screenMediaStream = await navigator.mediaDevices.getDisplayMedia({
+                    video: { cursor: "always" },
+                    audio: true
+                });
+
+                isScreenSharing = true;
+                document.getElementById('present-btn')?.classList.add('active');
+                document.getElementById('present-btn-text').textContent = '{{ __("Stop Share") }}';
+
+                const presVid = document.getElementById('presentation-video');
+                if (presVid) {
+                    presVid.srcObject = screenMediaStream;
+                    presVid.play().catch(() => {});
+                    document.getElementById('presentation-modal').style.display = 'flex';
+                }
+
+                const screenTrack = screenMediaStream.getVideoTracks()[0];
+                if (screenTrack) {
+                    screenTrack.onended = () => stopPresentation();
+
+                    peerConnections.forEach((pc) => {
+                        const senders = pc.getSenders();
+                        const videoSender = senders.find(s => s.track && s.track.kind === 'video');
+                        if (videoSender) {
+                            videoSender.replaceTrack(screenTrack);
+                        } else {
+                            pc.addTrack(screenTrack, screenMediaStream);
+                        }
+                    });
+                }
+
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ type: 'presentation.start', payload: {} }));
+                }
+
+                showToast('🖥️ {{ __("Screen sharing active") }}');
+            } catch (err) {
+                console.log('[ScreenShare] Cancelled or denied:', err.message);
+            }
+        }
+
+        function stopPresentation() {
+            if (screenMediaStream) {
+                screenMediaStream.getTracks().forEach(t => t.stop());
+                screenMediaStream = null;
+            }
+            isScreenSharing = false;
+            document.getElementById('present-btn')?.classList.remove('active');
+            document.getElementById('present-btn-text').textContent = '{{ __("Present") }}';
+            closePresentationModal();
+
+            if (localMediaStream) {
+                const camTrack = localMediaStream.getVideoTracks()[0];
+                peerConnections.forEach((pc) => {
+                    const senders = pc.getSenders();
+                    const videoSender = senders.find(s => s.track && s.track.kind === 'video');
+                    if (videoSender && camTrack) {
+                        videoSender.replaceTrack(camTrack);
+                    }
+                });
+            }
+
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'presentation.stop', payload: {} }));
+            }
+        }
+
+        function closePresentationModal() {
+            document.getElementById('presentation-modal').style.display = 'none';
+        }
+
+        // ── Meeting Recording Engine (Saved Directly to Server Gallery) ──
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let isRecording = false;
+        let recordStartTime = 0;
+        let recordTimerInterval = null;
+
+        async function toggleMeetingRecording() {
+            if (isRecording) {
+                stopMeetingRecording();
+            } else {
+                startMeetingRecording();
+            }
+        }
+
+        async function startMeetingRecording() {
+            try {
+                const canvasStream = canvas.captureStream ? canvas.captureStream(30) : (canvas.mozCaptureStream ? canvas.mozCaptureStream(30) : null);
+                if (!canvasStream) throw new Error('Canvas capture not supported in this browser');
+
+                const combinedStream = new MediaStream();
+                canvasStream.getVideoTracks().forEach(t => combinedStream.addTrack(t));
+
+                if (localMediaStream && localMediaStream.getAudioTracks().length > 0) {
+                    combinedStream.addTrack(localMediaStream.getAudioTracks()[0]);
+                }
+
+                let options = {};
+                if (typeof MediaRecorder.isTypeSupported === 'function') {
+                    if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')) {
+                        options = { mimeType: 'video/webm;codecs=vp9,opus' };
+                    } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')) {
+                        options = { mimeType: 'video/webm;codecs=vp8,opus' };
+                    } else if (MediaRecorder.isTypeSupported('video/webm')) {
+                        options = { mimeType: 'video/webm' };
+                    } else if (MediaRecorder.isTypeSupported('video/mp4')) {
+                        options = { mimeType: 'video/mp4' };
+                    }
+                }
+
+                mediaRecorder = new MediaRecorder(combinedStream, options);
+                recordedChunks = [];
+
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = async () => {
+                    await uploadRecordedSession();
+                };
+
+                mediaRecorder.start(1000);
+                isRecording = true;
+                recordStartTime = Date.now();
+
+                document.getElementById('record-btn')?.classList.add('active');
+                document.getElementById('record-icon').textContent = '🔴';
+
+                recordTimerInterval = setInterval(() => {
+                    const elapsed = Math.floor((Date.now() - recordStartTime) / 1000);
+                    const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+                    const s = String(elapsed % 60).padStart(2, '0');
+                    document.getElementById('record-btn-text').textContent = `REC ${m}:${s}`;
+                }, 1000);
+
+                showToast('🔴 {{ __("Session recording started...") }}');
+            } catch(err) {
+                console.error('Recording start error:', err);
+                showToast('❌ {{ __("Could not start recording") }}: ' + err.message, '#ef4444');
+            }
+        }
+
+        function stopMeetingRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                clearInterval(recordTimerInterval);
+                document.getElementById('record-btn')?.classList.remove('active');
+                document.getElementById('record-icon').textContent = '⏺️';
+                document.getElementById('record-btn-text').textContent = '{{ __("Record") }}';
+                showToast('⏳ {{ __("Processing & uploading recording to server...") }}');
+            }
+        }
+
+        async function uploadRecordedSession() {
+            if (recordedChunks.length === 0) return;
+            const mime = mediaRecorder?.mimeType || 'video/webm';
+            const ext = mime.includes('mp4') ? 'mp4' : 'webm';
+            const blob = new Blob(recordedChunks, { type: mime });
+            const duration = Math.max(1, Math.round((Date.now() - recordStartTime) / 1000));
+            const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y, localAvatar.currentRoomObject);
+
+            const formData = new FormData();
+            formData.append('video', blob, `session_${Date.now()}.${ext}`);
+            formData.append('title', `Office Session ${new Date().toLocaleTimeString()} — ${myRoom ? myRoom.name : 'Main Floor'}`);
+            formData.append('room_id', myRoom ? myRoom.id : '');
+            formData.append('duration_seconds', duration);
+            formData.append('recorded_by_name', localAvatar.name || 'Member');
+
+            try {
+                const res = await fetch(`/organizations/${CONFIG.org.id}/recordings`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'same-origin',
+                    body: formData
+                });
+
+                if (res.ok) {
+                    showToast('✅ {{ __("Recording saved to server gallery!") }}');
+                    if (document.getElementById('recordings-gallery-modal').style.display === 'flex') {
+                        loadRecordingsList();
+                    }
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    showToast('❌ {{ __("Error saving recording") }}: ' + (err.message || res.statusText), '#ef4444');
+                }
+            } catch (e) {
+                console.error('Upload recording failed:', e);
+                showToast('❌ {{ __("Upload failed") }}: ' + e.message, '#ef4444');
+            }
+        }
+
+        // ── Recordings Gallery ──
+        async function openRecordingsGallery() {
+            document.getElementById('recordings-gallery-modal').style.display = 'flex';
+            await loadRecordingsList();
+        }
+
+        function closeRecordingsGallery() {
+            document.getElementById('recordings-gallery-modal').style.display = 'none';
+        }
+
+        async function loadRecordingsList() {
+            const container = document.getElementById('recordings-gallery-content');
+            container.innerHTML = `<div style="display: flex; justify-content: center; padding: 40px 0; color: var(--text-muted);">⏳ {{ __("Loading saved recordings from server...") }}</div>`;
+
+            try {
+                const res = await fetch(`/organizations/${CONFIG.org.id}/recordings`, {
+                    headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    credentials: 'same-origin'
+                });
+                const data = await res.json();
+                const recs = data.recordings || [];
+
+                if (recs.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+                            <div style="font-size: 48px; margin-bottom: 12px;">📼</div>
+                            <strong style="font-size: 16px; color: var(--text-primary); display: block; margin-bottom: 6px;">{{ __("No Recordings Yet") }}</strong>
+                            <span>{{ __("Click the Record button on the bottom bar to record meetings and save them securely on the server.") }}</span>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = `<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px;">`;
+                recs.forEach(r => {
+                    const dateStr = new Date(r.created_at).toLocaleString();
+                    const durM = Math.floor((r.duration_seconds || 0) / 60);
+                    const durS = (r.duration_seconds || 0) % 60;
+                    const durStr = `${durM}:${String(durS).padStart(2, '0')}`;
+                    const sizeMb = (r.file_size / (1024 * 1024)).toFixed(1);
+
+                    html += `
+                        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                            <div style="background: #000; position: relative; height: 160px; display: flex; align-items: center; justify-content: center;">
+                                <video src="${r.file_url}" controls style="width: 100%; height: 100%; object-fit: contain;"></video>
+                            </div>
+                            <div style="padding: 14px; display: flex; flex-direction: column; gap: 6px; flex: 1;">
+                                <strong style="font-size: 13px; color: var(--text-primary); line-height: 1.4;">${escapeHtml(r.title)}</strong>
+                                <div style="font-size: 11px; color: var(--text-muted); display: flex; justify-content: space-between;">
+                                    <span>⏱️ ${durStr} (${sizeMb} MB)</span>
+                                    <span>📅 ${dateStr}</span>
+                                </div>
+                                <div style="font-size: 11px; color: var(--brand-teal); font-weight: 600;">👤 ${escapeHtml(r.recorded_by_name || 'Member')}</div>
+                                <div style="margin-top: auto; padding-top: 10px; display: flex; gap: 8px;">
+                                    <a href="${r.file_url}" download style="flex: 1; text-align: center; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 12px; font-weight: 700; text-decoration: none; padding: 8px; border-radius: 8px;">💾 {{ __("Download") }}</a>
+                                    <button onclick="deleteRecording('${r.id}')" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5; font-size: 12px; font-weight: 700; padding: 8px 12px; border-radius: 8px; cursor: pointer;">🗑️</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+                container.innerHTML = html;
+            } catch(err) {
+                container.innerHTML = `<div style="color: #ef4444; text-align: center; padding: 30px;">❌ {{ __("Failed to load recordings.") }}</div>`;
+            }
+        }
+
+        async function deleteRecording(id) {
+            if (!confirm('{{ __("Are you sure you want to delete this recording from the server?") }}')) return;
+            try {
+                await fetch(`/organizations/${CONFIG.org.id}/recordings/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                    credentials: 'same-origin'
+                });
+                showToast('🗑️ {{ __("Recording deleted") }}');
+                loadRecordingsList();
+            } catch (e) {
+                showToast('❌ {{ __("Delete failed") }}', '#ef4444');
+            }
+        }
+
         function openKnockPrompt(room) {
             activeTargetKnockRoom = room;
-            document.getElementById('knock-room-title').textContent = `🚪 ${room.name} is Locked`;
+            document.getElementById('knock-room-title').textContent = `🚪 ${room.name} {{ __('is Locked') }}`;
             document.getElementById('knock-room-desc').innerHTML = `
-                This meeting room door is locked for a private session.<br>
-                Click below to knock and request entry permission from the occupants.
+                {{ __('This meeting room door is locked for a private session.') }}<br>
+                {{ __('Click below to knock and request entry permission from the occupants.') }}
             `;
             document.getElementById('knock-status-msg').style.display = 'none';
             document.getElementById('knock-prompt-modal').style.display = 'flex';
@@ -1434,8 +2170,8 @@
             playKnockSound();
             const msgEl = document.getElementById('knock-status-msg');
             msgEl.style.display = 'block';
-            msgEl.style.color = '#e2e8f0';
-            msgEl.innerHTML = `⏳ <em>Knocking on door... waiting for occupant response.</em>`;
+            msgEl.style.color = 'var(--text-secondary)';
+            msgEl.innerHTML = `⏳ <em>{{ __('Knocking on door... waiting for occupant response.') }}</em>`;
 
             if (ws && ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({
@@ -1457,7 +2193,6 @@
                     }
                 }));
 
-                // If approved, automatically unlock room door
                 if (approved) {
                     roomDoorStates.set(pendingKnockRoomId, false);
                     updateRoomDoorPill();
@@ -1471,7 +2206,7 @@
             pendingKnockRoomId = null;
         }
 
-        // ── User Input & Movement ──
+        // ── Input & Movement ──
         const keys = {};
         window.addEventListener('keydown', (e) => {
             const k = e.key.toLowerCase();
@@ -1489,7 +2224,6 @@
             const clickX = (e.clientX - rect.left - cameraOffset.x) / zoomLevel;
             const clickY = (e.clientY - rect.top - cameraOffset.y) / zoomLevel;
 
-            // Check if clicking locked room tag to toggle or knock
             const clickedRoom = getCurrentRoom(clickX, clickY);
             const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
 
@@ -1532,12 +2266,11 @@
                 }
             }
 
-            // Check Door Lock Collision Boundary
+            // Check Door Lock Collision
             const currentR = getCurrentRoom(localAvatar.x, localAvatar.y);
             const targetR = getCurrentRoom(nextX, nextY);
 
             if (targetR && targetR !== currentR && roomDoorStates.get(targetR.id)) {
-                // Block entry into locked room
                 nextX = localAvatar.x;
                 nextY = localAvatar.y;
                 localAvatar.targetX = localAvatar.x;
@@ -1554,40 +2287,50 @@
 
             updateRoomDoorPill();
 
-            // Track Room Enter / Leave transitions
-            const curRNow = getCurrentRoom(localAvatar.x, localAvatar.y);
+            // Track Room Enter / Leave with Hysteresis Stability
+            const curRNow = getCurrentRoom(localAvatar.x, localAvatar.y, localAvatar.currentRoomObject);
+            localAvatar.currentRoomObject = curRNow;
             const curRId = curRNow ? curRNow.id : null;
             if (curRId !== localAvatar.currentRoomId) {
                 const prevRId = localAvatar.currentRoomId;
                 localAvatar.currentRoomId = curRId;
+                updateOccupantsUI();
                 if (ws && ws.readyState === WebSocket.OPEN) {
-                    if (curRId) {
-                        ws.send(JSON.stringify({ type: 'room.enter', payload: { roomId: curRId } }));
-                    } else if (prevRId) {
-                        ws.send(JSON.stringify({ type: 'room.leave', payload: { roomId: prevRId } }));
-                    }
+                    if (curRId) ws.send(JSON.stringify({ type: 'room.enter', payload: { roomId: curRId } }));
+                    else if (prevRId) ws.send(JSON.stringify({ type: 'room.leave', payload: { roomId: prevRId } }));
                 }
             }
 
-            // Smooth remote avatar interpolation & Dynamic Spatial Audio
+            // Smooth remote avatar interpolation & Dynamic Spatial Audio Isolation Engine
+            const localRoom = curRNow;
+
             remoteAvatars.forEach(av => {
                 av.x += (av.targetX - av.x) * 0.25;
                 av.y += (av.targetY - av.y) * 0.25;
 
-                // Anti-overlap separation
-                const dxx = localAvatar.x - av.x;
-                const dyy = localAvatar.y - av.y;
-                const sepDist = Math.hypot(dxx, dyy);
-                if (sepDist < 36 && sepDist > 0) {
-                    const pushAmount = (36 - sepDist) * 0.1;
-                    localAvatar.x += (dxx / sepDist) * pushAmount;
-                    localAvatar.y += (dyy / sepDist) * pushAmount;
-                }
-
                 const audioEl = peerAudioElements.get(av.id);
                 if (audioEl) {
+                    const remoteRoom = getCurrentRoom(av.x, av.y, av.currentRoomObject);
+                    av.currentRoomObject = remoteRoom;
+
+                    // ── Strict Acoustic Room Isolation ──
+                    // If local user is inside a room, only hear users in the SAME room
+                    if (localRoom) {
+                        if (!remoteRoom || remoteRoom.id !== localRoom.id) {
+                            audioEl.volume = 0;
+                            return;
+                        }
+                    } else {
+                        // If local user is in the open office / hallway, never hear users inside rooms
+                        if (remoteRoom) {
+                            audioEl.volume = 0;
+                            return;
+                        }
+                    }
+
+                    // Spatial distance falloff within the shared acoustic space
                     const dist = Math.hypot(localAvatar.x - av.x, localAvatar.y - av.y);
-                    const maxDist = localAvatar.proximityRadius || 160;
+                    const maxDist = localRoom ? 500 : (localAvatar.proximityRadius || 170);
                     if (dist > maxDist) {
                         audioEl.volume = 0;
                     } else {
@@ -1614,621 +2357,304 @@
             }
         }
 
-        // ── Ultra-High-Fidelity Procedural Office Furniture Rendering Engine ──
+        const IMAGE_CACHE_MAP = {};
+        function getLoadedImage(url) {
+            if (!url) return null;
+            if (!IMAGE_CACHE_MAP[url]) {
+                const img = new Image();
+                img.src = url;
+                img.onload = () => { if (typeof draw === 'function') draw(); };
+                IMAGE_CACHE_MAP[url] = img;
+            }
+            return IMAGE_CACHE_MAP[url];
+        }
+
+        // ── Ultra-High-Fidelity 3D Top-Down Office Furniture Rendering Engine ──
         function drawEnhancedOfficeFurniture(ctx, obj, ox, oy, objW, objH) {
             ctx.save();
+            const rot = (obj.position && typeof obj.position.rotation === 'number') ? obj.position.rotation : (obj.rotation || 0);
 
-            // 1. Check custom uploaded sprite image first
-            const customSprite = CUSTOM_FURNITURE_SPRITES[obj.type] || (obj.image_url ? { img: (function(){ const i = new Image(); i.src = obj.image_url; return i; })() } : null);
+            ctx.translate(ox + objW / 2, oy + objH / 2);
+            if (rot !== 0) {
+                ctx.rotate((rot * Math.PI) / 180);
+            }
+
+            const imgUrl = obj.image_url || (obj.interaction_config && obj.interaction_config.image_url) || null;
+            const customSprite = CUSTOM_FURNITURE_SPRITES[obj.type] || (imgUrl ? { img: getLoadedImage(imgUrl) } : null);
+
             if (customSprite && customSprite.img && customSprite.img.complete && customSprite.img.naturalWidth > 0) {
-                // Soft drop shadow
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
-                ctx.beginPath();
-                if (ctx.roundRect) ctx.roundRect(ox + 2, oy + 4, objW - 4, objH - 4, 6);
-                else ctx.rect(ox + 2, oy + 4, objW - 4, objH - 4);
-                ctx.fill();
-
-                ctx.drawImage(customSprite.img, ox, oy, objW, objH);
+                ctx.drawImage(customSprite.img, -objW / 2, -objH / 2, objW, objH);
                 ctx.restore();
                 return;
             }
 
             const type = String(obj.type || '').toLowerCase();
-            const primaryColor = obj.color || '#00b4b3';
+            const primaryColor = obj.color || '#334155';
 
-            function roundRect(x, y, w, h, r) {
+            function roundRectCentered(w, h, r) {
+                const hx = -w / 2;
+                const hy = -h / 2;
                 if (ctx.roundRect) {
-                    ctx.roundRect(x, y, w, h, r);
+                    ctx.roundRect(hx, hy, w, h, r);
                 } else {
                     ctx.beginPath();
-                    ctx.moveTo(x + r, y);
-                    ctx.lineTo(x + w - r, y);
-                    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-                    ctx.lineTo(x + w, y + h - r);
-                    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-                    ctx.lineTo(x + r, y + h);
-                    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-                    ctx.lineTo(x, y + r);
-                    ctx.quadraticCurveTo(x, y, x + r, y);
+                    ctx.moveTo(hx + r, hy);
+                    ctx.lineTo(hx + w - r, hy);
+                    ctx.quadraticCurveTo(hx + w, hy, hx + w, hy + r);
+                    ctx.lineTo(hx + w, hy + h - r);
+                    ctx.quadraticCurveTo(hx + w, hy + h, hx + w - r, hy + h);
+                    ctx.lineTo(hx + r, hy + h);
+                    ctx.quadraticCurveTo(hx, hy + h, hx, hy + h - r);
+                    ctx.lineTo(hx, hy + r);
+                    ctx.quadraticCurveTo(hx, hy, hx + r, hy);
                     ctx.closePath();
                 }
             }
 
-            // ── 1. ERGONOMIC OFFICE CHAIR / BEANBAG ──
-            if (type === 'chair' || type === 'ergo_chair' || type === 'beanbag') {
-                if (type === 'beanbag') {
-                    // Soft Bean Bag Chair
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
-                    ctx.beginPath();
-                    ctx.arc(ox + objW/2, oy + objH/2 + 3, objW/2 - 2, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    const bbGrad = ctx.createRadialGradient(ox + objW/2 - 3, oy + objH/2 - 3, 2, ox + objW/2, oy + objH/2, objW/2 - 2);
-                    bbGrad.addColorStop(0, primaryColor);
-                    bbGrad.addColorStop(1, '#d97706');
-                    ctx.fillStyle = bbGrad;
-                    ctx.beginPath();
-                    ctx.arc(ox + objW/2, oy + objH/2, objW/2 - 3, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = 'rgba(0,0,0,0.15)';
-                    ctx.beginPath();
-                    ctx.arc(ox + objW/2, oy + objH/2 + 2, objW/4, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#ffffff';
-                    ctx.beginPath();
-                    ctx.arc(ox + objW/2, oy + objH/2 - 4, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                } else {
-                    // Ergonomic Task Chair
-                    const cx = ox + objW / 2;
-                    const cy = oy + objH / 2;
-
-                    // 5-Star Caster Base (Wheel Spokes)
-                    ctx.strokeStyle = '#475569';
-                    ctx.lineWidth = 2.5;
-                    for (let a = 0; a < 5; a++) {
-                        const angle = (a * 2 * Math.PI) / 5 - Math.PI / 2;
-                        ctx.beginPath();
-                        ctx.moveTo(cx, cy);
-                        ctx.lineTo(cx + Math.cos(angle) * 11, cy + Math.sin(angle) * 11);
-                        ctx.stroke();
-
-                        // Caster wheel dot
-                        ctx.fillStyle = '#1e293b';
-                        ctx.beginPath();
-                        ctx.arc(cx + Math.cos(angle) * 11, cy + Math.sin(angle) * 11, 2, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-
-                    // Seat Drop Shadow
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
-                    ctx.beginPath();
-                    ctx.arc(cx, cy + 2, 10, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    // Contoured Seat Cushion
-                    const seatGrad = ctx.createRadialGradient(cx - 2, cy - 2, 2, cx, cy, 10);
-                    seatGrad.addColorStop(0, primaryColor);
-                    seatGrad.addColorStop(1, '#004862');
-                    ctx.fillStyle = seatGrad;
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, 9, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-
-                    // Curved Mesh Backrest
-                    ctx.fillStyle = '#0f172a';
-                    roundRect(cx - 8, cy - 11, 16, 5, 2.5);
-                    ctx.fill();
-                    ctx.fillStyle = primaryColor;
-                    roundRect(cx - 6, cy - 10, 12, 3, 1.5);
-                    ctx.fill();
-
-                    // Lumbar chrome bar
-                    ctx.strokeStyle = '#94a3b8';
-                    ctx.lineWidth = 1.5;
-                    ctx.beginPath();
-                    ctx.moveTo(cx - 7, cy - 9);
-                    ctx.lineTo(cx + 7, cy - 9);
-                    ctx.stroke();
-
-                    // Dual Armrests
-                    ctx.fillStyle = '#1e293b';
-                    roundRect(cx - 12, cy - 4, 3, 8, 1.5);
-                    ctx.fill();
-                    roundRect(cx + 9, cy - 4, 3, 8, 1.5);
-                    ctx.fill();
-                }
-            }
-
-            // ── 2. EXECUTIVE & STANDARD WORKSTATION DESKS ──
-            else if (type === 'desk' || type === 'executive_desk' || type === 'workstation') {
-                const isExec = type === 'executive_desk' || (objW >= 64 && objH >= 64);
-
-                // Shadow under desk
+            if (type.includes('chair') || type.includes('beanbag')) {
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-                roundRect(ox + 2, oy + 4, objW - 4, objH - 4, 6);
+                ctx.beginPath();
+                ctx.arc(0, 2, 10, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Main Desk Surface (Polished Walnut / Warm Oak)
-                const deskGrad = ctx.createLinearGradient(ox, oy, ox, oy + objH);
-                if (isExec) {
-                    deskGrad.addColorStop(0, '#331c12');
-                    deskGrad.addColorStop(0.5, '#4a2818');
-                    deskGrad.addColorStop(1, '#27140b');
-                } else {
-                    deskGrad.addColorStop(0, '#78350f');
-                    deskGrad.addColorStop(0.5, '#92400e');
-                    deskGrad.addColorStop(1, '#662d0b');
-                }
-                ctx.fillStyle = deskGrad;
-                roundRect(ox + 1, oy + 1, objW - 2, objH - 2, 4);
+                const seatGrad = ctx.createRadialGradient(-2, -2, 2, 0, 0, 10);
+                seatGrad.addColorStop(0, primaryColor);
+                seatGrad.addColorStop(1, '#0f172a');
+                ctx.fillStyle = seatGrad;
+                ctx.beginPath();
+                ctx.arc(0, 0, 9, 0, Math.PI * 2);
                 ctx.fill();
-
-                // Bevel highlight border
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-
-                // Leather Desk Mat / Blotter
-                const padW = Math.min(objW - 12, 38);
-                const padH = Math.min(objH - 10, 20);
-                const padX = ox + (objW - padW) / 2;
-                const padY = oy + (objH - padH) / 2 + (isExec ? 4 : 2);
 
                 ctx.fillStyle = '#0f172a';
-                roundRect(padX, padY, padW, padH, 2);
+                if (ctx.roundRect) ctx.roundRect(-8, -11, 16, 5, 2.5);
+                else ctx.rect(-8, -11, 16, 5);
                 ctx.fill();
-                ctx.strokeStyle = '#334155';
-                ctx.lineWidth = 0.5;
-                ctx.stroke();
+            } else if (type.includes('desk') || type.includes('workstation') || type.includes('table')) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
+                roundRectCentered(objW - 4, objH - 4, 6);
+                ctx.fill();
 
-                // Ultra-wide Curved Monitor & Stand
+                const deskGrad = ctx.createLinearGradient(0, -objH / 2, 0, objH / 2);
+                deskGrad.addColorStop(0, '#2b211b');
+                deskGrad.addColorStop(1, '#1c1511');
+                ctx.fillStyle = deskGrad;
+                roundRectCentered(objW - 2, objH - 2, 4);
+                ctx.fill();
+
                 const monW = Math.min(objW - 14, 30);
-                const monH = 4;
-                const monX = ox + (objW - monW) / 2;
-                const monY = oy + 4;
-
-                // Stand base
-                ctx.fillStyle = '#94a3b8';
-                ctx.fillRect(ox + objW/2 - 4, monY + monH, 8, 2);
-
-                // Monitor body
                 ctx.fillStyle = '#020617';
-                roundRect(monX, monY, monW, monH, 1.5);
-                ctx.fill();
-
-                // Glowing screen reflection (Active IDE / Workplace UI)
-                const screenGrad = ctx.createLinearGradient(monX + 2, monY, monX + monW - 2, monY);
-                screenGrad.addColorStop(0, '#00b4b3');
-                screenGrad.addColorStop(0.5, '#38bdf8');
-                screenGrad.addColorStop(1, '#006847');
-                ctx.fillStyle = screenGrad;
-                ctx.fillRect(monX + 2, monY + 1, monW - 4, 2);
-
-                // Keyboard with glowing spacebar & Mouse
-                const kbW = Math.min(padW - 14, 18);
-                const kbH = 6;
-                const kbX = padX + (padW - kbW) / 2 - 4;
-                const kbY = padY + padH - kbH - 2;
-
-                ctx.fillStyle = '#1e293b';
-                roundRect(kbX, kbY, kbW, kbH, 1);
+                if (ctx.roundRect) ctx.roundRect(-monW / 2, -objH / 2 + 4, monW, 4, 1.5);
+                else ctx.rect(-monW / 2, -objH / 2 + 4, monW, 4);
                 ctx.fill();
                 ctx.fillStyle = '#38bdf8';
-                ctx.fillRect(kbX + 2, kbY + 2, kbW - 4, 2);
-
-                // Mouse
-                ctx.fillStyle = '#334155';
-                roundRect(kbX + kbW + 3, kbY + 1, 4, 5, 1.5);
-                ctx.fill();
-
-                // Ceramic Coffee Mug
-                ctx.fillStyle = '#f8fafc';
-                ctx.beginPath();
-                ctx.arc(ox + 8, oy + objH - 8, 3, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = '#78350f';
-                ctx.beginPath();
-                ctx.arc(ox + 8, oy + objH - 8, 2, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Executive Extras (Lamp & Document Binder)
-                if (isExec) {
-                    ctx.fillStyle = '#d20005';
-                    roundRect(ox + objW - 16, oy + 8, 10, 14, 1.5);
-                    ctx.fill();
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(ox + objW - 14, oy + 10, 6, 2);
-
-                    const lampGrad = ctx.createRadialGradient(ox + 10, oy + 8, 2, ox + 10, oy + 8, 16);
-                    lampGrad.addColorStop(0, 'rgba(254, 240, 138, 0.4)');
-                    lampGrad.addColorStop(1, 'rgba(254, 240, 138, 0)');
-                    ctx.fillStyle = lampGrad;
-                    ctx.beginPath();
-                    ctx.arc(ox + 10, oy + 8, 16, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#ffd136';
-                    ctx.beginPath();
-                    ctx.arc(ox + 10, oy + 8, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-
-            // ── 3. CONFERENCE & MEETING TABLES ──
-            else if (type === 'dining_table' || type === 'conference_table' || type === 'meeting_table') {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
-                roundRect(ox + 3, oy + 5, objW - 6, objH - 6, 8);
-                ctx.fill();
-
-                const confGrad = ctx.createLinearGradient(ox, oy, ox, oy + objH);
-                confGrad.addColorStop(0, '#2b170e');
-                confGrad.addColorStop(0.5, '#452618');
-                confGrad.addColorStop(1, '#23120a');
-                ctx.fillStyle = confGrad;
-                roundRect(ox + 2, oy + 2, objW - 4, objH - 4, 8);
-                ctx.fill();
-
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
-                roundRect(ox + 10, oy + (objH - 12) / 2, objW - 20, 12, 3);
-                ctx.fill();
-
-                const numPods = Math.max(2, Math.floor(objW / 28));
-                for (let i = 0; i < numPods; i++) {
-                    const px = ox + 14 + (i * (objW - 28)) / (numPods - 1);
-                    const py = oy + objH / 2;
-
-                    ctx.fillStyle = '#334155';
-                    ctx.beginPath();
-                    ctx.arc(px, py, 3, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#22c55e';
-                    ctx.beginPath();
-                    ctx.arc(px, py, 1, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
-                const chairsCount = Math.max(2, Math.floor((objW - 16) / 22));
-                for (let i = 0; i < chairsCount; i++) {
-                    const cx = ox + 12 + i * 22;
-                    ctx.fillStyle = '#1e293b';
-                    roundRect(cx, oy - 2, 14, 4, 2);
-                    ctx.fill();
-                    roundRect(cx, oy + objH - 2, 14, 4, 2);
-                    ctx.fill();
-                }
-            }
-
-            // ── 4. MODERN SOFAS & BOOTHS ──
-            else if (type === 'sofa' || type === 'lounge_sofa' || type === 'booth') {
+                ctx.fillRect(-monW / 2 + 2, -objH / 2 + 5, monW - 4, 2);
+            } else if (type.includes('plant')) {
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-                roundRect(ox + 2, oy + 4, objW - 4, objH - 4, 6);
+                ctx.beginPath(); ctx.arc(0, 2, 10, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#64748b';
+                ctx.beginPath(); ctx.arc(0, 0, 9, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#10b981';
+                ctx.beginPath(); ctx.arc(0, 0, 7, 0, Math.PI * 2); ctx.fill();
+            } else {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                roundRectCentered(objW - 4, objH - 4, 4);
                 ctx.fill();
-
-                const sofaGrad = ctx.createLinearGradient(ox, oy, ox, oy + objH);
-                sofaGrad.addColorStop(0, primaryColor);
-                sofaGrad.addColorStop(1, '#002535');
-                ctx.fillStyle = sofaGrad;
-                roundRect(ox + 1, oy + 1, objW - 2, objH - 2, 6);
-                ctx.fill();
-
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
-                roundRect(ox + 3, oy + 3, objW - 6, 7, 3);
-                ctx.fill();
-
-                const numCushions = objW > 48 ? 2 : 1;
-                const cW = (objW - 12) / numCushions;
-                for (let i = 0; i < numCushions; i++) {
-                    const cx = ox + 5 + i * cW + (i > 0 ? 2 : 0);
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
-                    roundRect(cx, oy + 11, cW - 2, objH - 14, 3);
-                    ctx.fill();
-                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                }
-
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
-                roundRect(ox + 1, oy + 2, 4, objH - 4, 2);
-                ctx.fill();
-                roundRect(ox + objW - 5, oy + 2, 4, objH - 4, 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#ffd136';
-                roundRect(ox + 5, oy + 12, 6, 6, 2);
-                ctx.fill();
-
-                if (objW > 48) {
-                    ctx.fillStyle = '#f57b36';
-                    roundRect(ox + objW - 11, oy + 12, 6, 6, 2);
-                    ctx.fill();
-                }
-            }
-
-            // ── 5. POTTED TROPICAL OFFICE PLANTS ──
-            else if (type === 'plant' || type === 'decor_plant') {
-                const cx = ox + objW / 2;
-                const cy = oy + objH / 2;
-
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
-                ctx.beginPath();
-                ctx.arc(cx, cy + 3, 11, 0, Math.PI * 2);
-                ctx.fill();
-
-                const potGrad = ctx.createRadialGradient(cx - 3, cy - 3, 2, cx, cy, 10);
-                potGrad.addColorStop(0, '#f8fafc');
-                potGrad.addColorStop(1, '#94a3b8');
-                ctx.fillStyle = potGrad;
-                ctx.beginPath();
-                ctx.arc(cx, cy, 10, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#451a03';
-                ctx.beginPath();
-                ctx.arc(cx, cy, 7.5, 0, Math.PI * 2);
-                ctx.fill();
-
-                const leafAngles = [0, 0.78, 1.57, 2.35, 3.14, 3.92, 4.71, 5.49];
-                leafAngles.forEach((angle, idx) => {
-                    const lx = cx + Math.cos(angle) * 11;
-                    const ly = cy + Math.sin(angle) * 11;
-
-                    const leafGrad = ctx.createRadialGradient(cx, cy, 2, lx, ly, 7);
-                    leafGrad.addColorStop(0, idx % 2 === 0 ? '#006847' : '#00b4b3');
-                    leafGrad.addColorStop(1, idx % 2 === 0 ? '#004d34' : '#00726c');
-                    ctx.fillStyle = leafGrad;
-
-                    ctx.beginPath();
-                    ctx.arc(lx, ly, 4.5, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.strokeStyle = '#a7c545';
-                    ctx.lineWidth = 1;
-                    ctx.beginPath();
-                    ctx.moveTo(cx, cy);
-                    ctx.lineTo(lx, ly);
-                    ctx.stroke();
-                });
-
-                ctx.fillStyle = '#a7c545';
-                ctx.beginPath();
-                ctx.arc(cx, cy, 3, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // ── 6. GLASS & MAGNETIC WHITEBOARDS ──
-            else if (type === 'whiteboard') {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
-                roundRect(ox + 2, oy + 3, objW - 4, objH - 4, 3);
-                ctx.fill();
-
-                ctx.fillStyle = '#94a3b8';
-                roundRect(ox + 1, oy + 1, objW - 2, objH - 2, 3);
-                ctx.fill();
-
-                const boardGrad = ctx.createLinearGradient(ox, oy, ox, oy + objH);
-                boardGrad.addColorStop(0, '#ffffff');
-                boardGrad.addColorStop(1, '#f1f5f9');
-                ctx.fillStyle = boardGrad;
-                roundRect(ox + 3, oy + 3, objW - 6, objH - 6, 2);
-                ctx.fill();
-
-                ctx.strokeStyle = '#00b4b3';
-                ctx.lineWidth = 1.5;
-                ctx.beginPath();
-                ctx.moveTo(ox + 8, oy + 8);
-                ctx.lineTo(ox + 18, oy + 8);
-                ctx.lineTo(ox + 24, oy + 14);
-                ctx.stroke();
-
-                ctx.strokeStyle = '#d20005';
-                ctx.beginPath();
-                ctx.arc(ox + objW - 12, oy + 11, 3, 0, Math.PI * 2);
-                ctx.stroke();
-
-                ctx.fillStyle = '#475569';
-                ctx.fillRect(ox + (objW - 24) / 2, oy + objH - 3, 24, 2);
-                ctx.fillStyle = '#00b4b3'; ctx.fillRect(ox + (objW - 20) / 2, oy + objH - 3, 4, 1.5);
-                ctx.fillStyle = '#d20005'; ctx.fillRect(ox + (objW - 20) / 2 + 6, oy + objH - 3, 4, 1.5);
-                ctx.fillStyle = '#012c41'; ctx.fillRect(ox + (objW - 20) / 2 + 12, oy + objH - 3, 4, 1.5);
-            }
-
-            // ── 7. LARGE PRESENTATION AV SCREEN ──
-            else if (type === 'screen' || type === 'tv') {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
-                roundRect(ox + 2, oy + 3, objW - 4, objH - 4, 3);
-                ctx.fill();
-
-                ctx.fillStyle = '#020617';
-                roundRect(ox + 1, oy + 1, objW - 2, objH - 2, 2);
-                ctx.fill();
-
-                const scrGrad = ctx.createLinearGradient(ox, oy, ox + objW, oy + objH);
-                scrGrad.addColorStop(0, '#004862');
-                scrGrad.addColorStop(0.5, '#00b4b3');
-                scrGrad.addColorStop(1, '#012c41');
-                ctx.fillStyle = scrGrad;
-                roundRect(ox + 3, oy + 3, objW - 6, objH - 6, 1);
-                ctx.fill();
-
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-                ctx.fillRect(ox + 6, oy + 6, 8, 2);
-                ctx.fillRect(ox + 6, oy + 10, 14, 2);
-                ctx.fillStyle = '#ffd136';
-                ctx.beginPath();
-                ctx.arc(ox + objW - 10, oy + objH / 2, 4, 0, Math.PI * 1.4);
-                ctx.lineTo(ox + objW - 10, oy + objH / 2);
-                ctx.fill();
-            }
-
-            // ── 8. PING PONG / GAME TABLE ──
-            else if (type === 'pingpong') {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
-                roundRect(ox + 3, oy + 5, objW - 6, objH - 6, 4);
-                ctx.fill();
-
-                ctx.fillStyle = '#00726c';
-                roundRect(ox + 2, oy + 2, objW - 4, objH - 4, 3);
-                ctx.fill();
-
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 1.5;
-                ctx.strokeRect(ox + 4, oy + 4, objW - 8, objH - 8);
-
-                ctx.beginPath();
-                ctx.moveTo(ox + 4, oy + objH / 2);
-                ctx.lineTo(ox + objW - 4, oy + objH / 2);
-                ctx.stroke();
-
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-                ctx.fillRect(ox + objW / 2 - 1, oy + 2, 2, objH - 4);
-                ctx.fillStyle = '#0f172a';
-                ctx.fillRect(ox + objW / 2 - 2, oy + 1, 4, 2);
-                ctx.fillRect(ox + objW / 2 - 2, oy + objH - 3, 4, 2);
-
-                ctx.fillStyle = '#d20005';
-                ctx.beginPath(); ctx.arc(ox + 12, oy + 10, 3, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#004862';
-                ctx.beginPath(); ctx.arc(ox + objW - 12, oy + objH - 10, 3, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath(); ctx.arc(ox + objW / 2 + 4, oy + 8, 1.5, 0, Math.PI * 2); ctx.fill();
-            }
-
-            // ── 9. WATER COOLER ──
-            else if (type === 'water_cooler') {
-                const cx = ox + objW / 2;
-                const cy = oy + objH / 2;
-
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
-                ctx.beginPath();
-                ctx.arc(cx, cy + 2, 9, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#f8fafc';
-                roundRect(ox + 4, oy + 6, objW - 8, objH - 8, 3);
-                ctx.fill();
-                ctx.strokeStyle = '#cbd5e1';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-
-                const waterGrad = ctx.createRadialGradient(cx - 2, cy - 2, 1, cx, cy, 6);
-                waterGrad.addColorStop(0, '#38bdf8');
-                waterGrad.addColorStop(1, '#0284c7');
-                ctx.fillStyle = waterGrad;
-                ctx.beginPath();
-                ctx.arc(cx, cy - 1, 6, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(cx - 3, cy + 6, 1.5, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(cx + 3, cy + 6, 1.5, 0, Math.PI * 2); ctx.fill();
-            }
-
-            // ── 10. FILING CABINET ──
-            else if (type === 'cabinet' || type === 'storage') {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
-                roundRect(ox + 2, oy + 3, objW - 4, objH - 4, 3);
-                ctx.fill();
-
-                ctx.fillStyle = '#334155';
-                roundRect(ox + 2, oy + 2, objW - 4, objH - 4, 2);
-                ctx.fill();
-
-                const numDrawers = Math.max(2, Math.floor(objH / 14));
-                const dH = (objH - 6) / numDrawers;
-                for (let i = 0; i < numDrawers; i++) {
-                    const dy = oy + 3 + i * dH;
-                    ctx.fillStyle = '#475569';
-                    roundRect(ox + 4, dy + 1, objW - 8, dH - 2, 1.5);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#cbd5e1';
-                    ctx.fillRect(ox + objW / 2 - 4, dy + dH / 2 - 1, 8, 2);
-                }
-            }
-
-            // ── 11. FLOOR LAMP ──
-            else if (type === 'lamp') {
-                const cx = ox + objW / 2;
-                const cy = oy + objH / 2;
-
-                const lightGrad = ctx.createRadialGradient(cx, cy, 4, cx, cy, 28);
-                lightGrad.addColorStop(0, 'rgba(254, 240, 138, 0.5)');
-                lightGrad.addColorStop(0.5, 'rgba(254, 240, 138, 0.2)');
-                lightGrad.addColorStop(1, 'rgba(254, 240, 138, 0)');
-                ctx.fillStyle = lightGrad;
-                ctx.beginPath();
-                ctx.arc(cx, cy, 28, 0, Math.PI * 2);
-                ctx.fill();
-
                 ctx.fillStyle = '#1e293b';
-                ctx.beginPath();
-                ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+                roundRectCentered(objW - 2, objH - 2, 3);
                 ctx.fill();
-
-                ctx.fillStyle = '#ffd136';
-                ctx.beginPath();
-                ctx.arc(cx, cy, 4.5, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // ── 12. GENERIC FALLBACK ──
-            else {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
-                roundRect(ox + 2, oy + 3, objW - 4, objH - 4, 4);
-                ctx.fill();
-
-                const genGrad = ctx.createLinearGradient(ox, oy, ox, oy + objH);
-                genGrad.addColorStop(0, '#ffffff');
-                genGrad.addColorStop(1, '#f1f5f9');
-                ctx.fillStyle = genGrad;
-                roundRect(ox + 2, oy + 2, objW - 4, objH - 4, 3);
-                ctx.fill();
-
-                ctx.fillStyle = primaryColor;
-                roundRect(ox + 2, oy + 2, objW - 4, 4, 2);
-                ctx.fill();
-
-                ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
                 ctx.lineWidth = 1;
+                roundRectCentered(objW - 2, objH - 2, 3);
                 ctx.stroke();
             }
 
             ctx.restore();
         }
 
-        // ── Canvas Rendering Loop ──
+        // ── Render Avatar with Nanobanana 2.5D Sprites ──
+        function drawAvatarCharacter(ctx, av, isSelf) {
+            const x = Number(av.x) || 400;
+            const y = Number(av.y) || 400;
+            const isGuestUser = !!av.isGuest;
+            const gender = isSelf ? chosenAvatarGender : (av.gender || 'male');
+            const spriteImg = AVATAR_SPRITES[gender] || AVATAR_SPRITES.male;
+
+            // 1. Spatial Audio Hearing Aura
+            const auraRadius = isSelf ? (localAvatar.proximityRadius || 170) : 150;
+            const auraGrad = ctx.createRadialGradient(x, y, 10, x, y, auraRadius);
+            if (isSelf) {
+                auraGrad.addColorStop(0, 'rgba(59, 130, 246, 0.25)');
+                auraGrad.addColorStop(0.7, 'rgba(59, 130, 246, 0.08)');
+                auraGrad.addColorStop(1, 'rgba(59, 130, 246, 0)');
+            } else {
+                auraGrad.addColorStop(0, 'rgba(16, 185, 129, 0.20)');
+                auraGrad.addColorStop(1, 'rgba(16, 185, 129, 0)');
+            }
+            ctx.fillStyle = auraGrad;
+            ctx.beginPath();
+            ctx.arc(x, y, auraRadius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 2. Soft Floor Drop Shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.28)';
+            ctx.beginPath();
+            ctx.ellipse(x, y + 14, 16, 7, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 3. Avatar Portrait Image or Fallback Circle
+            if (spriteImg && spriteImg.complete && spriteImg.naturalWidth > 0) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(x, y, 18, 0, Math.PI * 2);
+                ctx.closePath();
+                ctx.clip();
+                ctx.drawImage(spriteImg, x - 18, y - 18, 36, 36);
+                ctx.restore();
+
+                ctx.strokeStyle = isSelf ? '#3b82f6' : (isGuestUser ? '#10b981' : '#f59e0b');
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.arc(x, y, 18, 0, Math.PI * 2);
+                ctx.stroke();
+            } else {
+                ctx.fillStyle = isSelf ? '#3b82f6' : '#10b981';
+                ctx.beginPath();
+                ctx.arc(x, y, 18, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(String(av.name || 'U').charAt(0).toUpperCase(), x, y);
+            }
+
+            // 4. Role Crown or Guest Icon
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            if (!isGuestUser) {
+                ctx.fillText('👑', x + 16, y - 16);
+            } else {
+                ctx.fillText('👤', x + 16, y - 16);
+            }
+
+            // 5. Name Badge & Status Pill
+            const displayName = isSelf ? `${av.name} ({{ __("You") }})` : av.name;
+            ctx.font = 'bold 11px sans-serif';
+            const nameMetrics = ctx.measureText(displayName);
+            const pillW = Math.max(70, nameMetrics.width + 18);
+            const pillH = 20;
+
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+            ctx.beginPath();
+            if (ctx.roundRect) ctx.roundRect(x - pillW / 2, y + 24, pillW, pillH, 6);
+            else ctx.rect(x - pillW / 2, y + 24, pillW, pillH);
+            ctx.fill();
+
+            ctx.strokeStyle = isSelf ? 'rgba(59, 130, 246, 0.6)' : 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            ctx.fillStyle = isSelf ? '#60a5fa' : (isGuestUser ? '#34d399' : '#f8fafc');
+            ctx.textBaseline = 'middle';
+            ctx.fillText(displayName, x, y + 34);
+        }
+
+        // ── High Performance Offscreen Background Buffer ──
+        let bgCanvas = null;
+        let bgThemeCached = null;
+
+        function renderStaticBackground() {
+            const isDark = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark';
+            const mapW = (CONFIG.map.width || 32) * 32;
+            const mapH = (CONFIG.map.height || 24) * 32;
+
+            if (!bgCanvas) {
+                bgCanvas = document.createElement('canvas');
+                bgCanvas.width = mapW;
+                bgCanvas.height = mapH;
+            }
+            const bctx = bgCanvas.getContext('2d');
+            bctx.clearRect(0, 0, mapW, mapH);
+
+            // 1. Digital Workplace Main Floor
+            bctx.fillStyle = isDark ? '#0b0f19' : '#f1f5f9';
+            bctx.fillRect(0, 0, mapW, mapH);
+
+            // Subtle Floor Grid Pattern
+            bctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.035)' : 'rgba(0, 0, 0, 0.04)';
+            bctx.lineWidth = 1;
+            for (let x = 0; x <= mapW; x += 32) {
+                bctx.beginPath(); bctx.moveTo(x, 0); bctx.lineTo(x, mapH); bctx.stroke();
+            }
+            for (let y = 0; y <= mapH; y += 32) {
+                bctx.beginPath(); bctx.moveTo(0, y); bctx.lineTo(mapW, y); bctx.stroke();
+            }
+
+            // Outer Floor Boundary
+            bctx.strokeStyle = isDark ? '#1e293b' : '#cbd5e1';
+            bctx.lineWidth = 3;
+            bctx.strokeRect(0, 0, mapW, mapH);
+
+            // 2. Rooms
+            rooms.forEach(r => {
+                const rx = r.bounds.x * 32;
+                const ry = r.bounds.y * 32;
+                const rw = r.bounds.width * 32;
+                const rh = r.bounds.height * 32;
+
+                bctx.fillStyle = isDark ? 'rgba(17, 24, 39, 0.90)' : 'rgba(255, 255, 255, 0.90)';
+                bctx.fillRect(rx, ry, rw, rh);
+
+                bctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.025)' : 'rgba(0, 0, 0, 0.03)';
+                bctx.lineWidth = 1;
+                for (let gx = rx; gx <= rx + rw; gx += 32) {
+                    bctx.beginPath(); bctx.moveTo(gx, ry); bctx.lineTo(gx, ry + rh); bctx.stroke();
+                }
+                for (let gy = ry; gy <= ry + rh; gy += 32) {
+                    bctx.beginPath(); bctx.moveTo(rx, gy); bctx.lineTo(rx + rw, gy); bctx.stroke();
+                }
+
+                bctx.strokeStyle = isDark ? '#334155' : '#cbd5e1';
+                bctx.lineWidth = 2.5;
+                bctx.strokeRect(rx, ry, rw, rh);
+
+                // Room Title Badge
+                const badgeW = Math.min(rw - 16, 160);
+                bctx.fillStyle = isDark ? 'rgba(15, 23, 42, 0.95)' : 'rgba(241, 245, 249, 0.95)';
+                if (bctx.roundRect) bctx.roundRect(rx + 8, ry + 8, badgeW, 24, 6);
+                else bctx.rect(rx + 8, ry + 8, badgeW, 24);
+                bctx.fill();
+
+                bctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.1)';
+                bctx.lineWidth = 1;
+                if (bctx.roundRect) bctx.roundRect(rx + 8, ry + 8, badgeW, 24, 6);
+                else bctx.rect(rx + 8, ry + 8, badgeW, 24);
+                bctx.stroke();
+
+                bctx.fillStyle = isDark ? '#f8fafc' : '#0f172a';
+                bctx.font = 'bold 11px sans-serif';
+                bctx.fillText(`🏢 ${r.name}`, rx + 14, ry + 24);
+            });
+
+            bgThemeCached = isDark;
+        }
+
+        // ── Canvas Main Draw Loop ──
         function draw() {
             try {
+                const isDark = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark';
                 ctx.clearRect(0, 0, width, height);
                 ctx.save();
                 ctx.translate(cameraOffset.x, cameraOffset.y);
                 ctx.scale(zoomLevel, zoomLevel);
 
-                const mapW = 1200;
-                const mapH = 900;
-
-                // 1. Wood Plank Floor
-                ctx.fillStyle = '#b8a68f';
-                ctx.fillRect(80, 80, mapW, mapH);
-                ctx.fillStyle = '#ad9a82';
-                for (let x = 80; x < 80 + mapW; x += 64) {
-                    for (let y = 80; y < 80 + mapH; y += 18) {
-                        if ((Math.floor(x / 64) + Math.floor(y / 18)) % 2 === 0) {
-                            ctx.fillRect(x, y, 62, 16);
-                        }
-                    }
+                // 1. Draw Pre-rendered Background Buffer
+                if (!bgCanvas || bgThemeCached !== isDark) {
+                    renderStaticBackground();
                 }
-                ctx.strokeStyle = '#1e293b';
-                ctx.lineWidth = 8;
-                ctx.strokeRect(80, 80, mapW, mapH);
+                ctx.drawImage(bgCanvas, 0, 0);
 
-                // 2. Rooms with Dynamic Door Lock Visualization
+                // 2. Door Thresholds & Locks
                 rooms.forEach(r => {
                     const rx = r.bounds.x * 32;
                     const ry = r.bounds.y * 32;
@@ -2236,225 +2662,48 @@
                     const rh = r.bounds.height * 32;
                     const isLocked = !!roomDoorStates.get(r.id);
 
-                    ctx.fillStyle = '#788288';
-                    ctx.fillRect(rx, ry, rw, rh);
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-                    for (let cx = rx; cx < rx + rw; cx += 8) { ctx.fillRect(cx, ry, 4, rh); }
-
-                    ctx.fillStyle = isLocked ? 'rgba(239, 68, 68, 0.15)' : 'rgba(226, 232, 240, 0.12)';
-                    ctx.fillRect(rx, ry, rw, rh);
-
-                    ctx.strokeStyle = isLocked ? '#ef4444' : '#1e293b';
-                    ctx.lineWidth = 4;
-                    ctx.strokeRect(rx, ry, rw, rh);
-
-                    // Door Threshold / Barrier at Bottom of Room
                     const doorW = 54;
                     const doorX = rx + rw / 2 - doorW / 2;
                     const doorY = ry + rh - 4;
 
                     if (isLocked) {
-                        // Glowing Red Laser Barrier
                         ctx.fillStyle = '#ef4444';
-                        ctx.fillRect(doorX, doorY - 2, doorW, 8);
-                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-                        ctx.lineWidth = 1.5;
-                        ctx.strokeRect(doorX, doorY - 2, doorW, 8);
+                        ctx.fillRect(doorX, doorY - 2, doorW, 6);
                         ctx.fillStyle = '#fee2e2';
-                        ctx.font = 'bold 9px Inter, sans-serif';
-                        ctx.fillText('🔒 LOCKED', doorX + 4, doorY + 5);
+                        ctx.font = 'bold 9px sans-serif';
+                        ctx.fillText('🔒 LOCKED', doorX + 4, doorY + 3);
                     } else {
-                        // Open Welcome Threshold
-                        ctx.fillStyle = '#22c55e';
+                        ctx.fillStyle = '#10b981';
                         ctx.fillRect(doorX, doorY, doorW, 4);
                     }
-
-                    // Room Tag Pill
-                    ctx.fillStyle = isLocked ? 'rgba(30, 10, 15, 0.95)' : 'rgba(15, 23, 42, 0.92)';
-                    ctx.fillRect(rx + 8, ry + 8, 150, 26);
-                    ctx.strokeStyle = isLocked ? 'rgba(239, 68, 68, 0.5)' : 'rgba(255, 255, 255, 0.2)';
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(rx + 8, ry + 8, 150, 26);
-                    ctx.fillStyle = isLocked ? '#fca5a5' : '#f8fafc';
-                    ctx.font = '700 11px Inter, sans-serif';
-                    ctx.fillText(`${isLocked ? '🔒' : '🏢'} ${r.name}`, rx + 14, ry + 25);
                 });
 
-                // 3. Furniture Objects
+                // 3. Furniture Objects (With 3D sprites & rotation)
                 (CONFIG.map.objects || []).forEach(obj => {
-                    const ox = obj.position.x * 32;
-                    const oy = obj.position.y * 32;
+                    const ox = (obj.position ? obj.position.x : 0) * 32;
+                    const oy = (obj.position ? obj.position.y : 0) * 32;
                     const objW = (obj.width || (obj.size ? obj.size.width : 1)) * 32;
                     const objH = (obj.height || (obj.size ? obj.size.height : 1)) * 32;
-
                     drawEnhancedOfficeFurniture(ctx, obj, ox, oy, objW, objH);
                 });
 
-                // 4. Remote Avatars with Live Video Texture / Circle
-                remoteAvatars.forEach(av => {
-                    const ax = Number(av.x) || 400;
-                    const ay = Number(av.y) || 400;
-
-                    // Range Aura
-                    const grad = ctx.createRadialGradient(ax, ay, 10, ax, ay, 160);
-                    grad.addColorStop(0, 'rgba(34, 197, 94, 0.25)');
-                    grad.addColorStop(1, 'rgba(34, 197, 94, 0)');
-                    ctx.fillStyle = grad;
-                    ctx.beginPath();
-                    ctx.arc(ax, ay, 160, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    // Check if peer has active live video
-                    const peerVid = av.videoElement || document.getElementById(`peer-vid-${av.id}`);
-                    const hasPeerVid = peerVid && peerVid.readyState >= 2 && !peerVid.paused;
-
-                    if (hasPeerVid) {
-                        ctx.save();
-                        ctx.beginPath();
-                        ctx.arc(ax, ay, 22, 0, Math.PI * 2);
-                        ctx.clip();
-                        ctx.drawImage(peerVid, ax - 22, ay - 22, 44, 44);
-                        ctx.restore();
-                    } else {
-                        ctx.fillStyle = av.color || '#8b5cf6';
-                        ctx.beginPath();
-                        ctx.arc(ax, ay, 22, 0, Math.PI * 2);
-                        ctx.fill();
-
-                        ctx.fillStyle = '#ffffff';
-                        ctx.font = 'bold 16px Inter, sans-serif';
-                        ctx.textAlign = 'center';
-                        ctx.textBaseline = 'middle';
-                        ctx.fillText(String(av.name || 'U').charAt(0).toUpperCase(), ax, ay);
-                    }
-
-                    // Border (Glowing green when video is live, white otherwise)
-                    ctx.strokeStyle = hasPeerVid ? '#22c55e' : '#ffffff';
-                    ctx.lineWidth = 3;
-                    ctx.beginPath();
-                    ctx.arc(ax, ay, 22, 0, Math.PI * 2);
-                    ctx.stroke();
-
-                    // Name Tag
-                    ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
-                    ctx.fillRect(ax - 50, ay + 26, 100, 20);
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-                    ctx.lineWidth = 1;
-                    ctx.strokeRect(ax - 50, ay + 26, 100, 20);
-                    ctx.fillStyle = '#f8fafc';
-                    ctx.font = 'bold 11px Inter, sans-serif';
-                    ctx.fillText(String(av.name || 'Colleague'), ax, ay + 36);
-                });
+                // 4. Remote Avatars
+                remoteAvatars.forEach(av => drawAvatarCharacter(ctx, av, false));
 
                 // 5. Local Avatar
-                const lx = Number(localAvatar.x) || 450;
-                const ly = Number(localAvatar.y) || 450;
-
-                // Golden Hearing Aura
-                const myGrad = ctx.createRadialGradient(lx, ly, 10, lx, ly, localAvatar.proximityRadius || 160);
-                myGrad.addColorStop(0, 'rgba(254, 240, 138, 0.4)');
-                myGrad.addColorStop(0.7, 'rgba(254, 240, 138, 0.15)');
-                myGrad.addColorStop(1, 'rgba(254, 240, 138, 0)');
-                ctx.fillStyle = myGrad;
-                ctx.beginPath();
-                ctx.arc(lx, ly, localAvatar.proximityRadius || 160, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Local Avatar Circle
-                const localVid = document.getElementById('local-video-preview');
-                const hasLocalVid = isCamActive && localVid && localVid.readyState >= 2;
-
-                if (hasLocalVid) {
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.arc(lx, ly, 22, 0, Math.PI * 2);
-                    ctx.clip();
-                    ctx.drawImage(localVid, lx - 22, ly - 22, 44, 44);
-                    ctx.restore();
-                } else {
-                    ctx.fillStyle = localAvatar.color || '#3b82f6';
-                    ctx.beginPath();
-                    ctx.arc(lx, ly, 22, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#ffffff';
-                    ctx.font = 'bold 17px Inter, sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(String(localAvatar.name || 'U').charAt(0).toUpperCase(), lx, ly);
-                }
-
-                // Glowing White Border
-                ctx.strokeStyle = hasLocalVid ? '#22c55e' : '#ffffff';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(lx, ly, 22, 0, Math.PI * 2);
-                ctx.stroke();
-
-                // Name Badge Pill
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
-                ctx.fillRect(lx - 55, ly + 26, 110, 20);
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.25)';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(lx - 55, ly + 26, 110, 20);
-                ctx.fillStyle = '#4ade80';
-                ctx.font = 'bold 11px Inter, sans-serif';
-                ctx.fillText(`${String(localAvatar.name || 'You')} (You)`, lx, ly + 36);
+                drawAvatarCharacter(ctx, localAvatar, true);
 
                 ctx.restore();
             } catch(e) { console.error('Render error:', e); }
-
-            requestAnimationFrame(() => {
-                update();
-                draw();
-            });
-        }
-        draw();
-
-        // ── Camera & Microphone Toggles ──
-        async function toggleCamera() {
-            const btn = document.getElementById('cam-btn');
-            const videoGrid = document.getElementById('office-video-grid');
-
-            if (!isCamActive) {
-                isCamActive = true;
-                btn.classList.add('active');
-                videoGrid.style.display = 'flex';
-                document.getElementById('local-video-container').style.display = 'block';
-                await getLocalMediaStream();
-                if (localMediaStream) {
-                    localMediaStream.getVideoTracks().forEach(t => t.enabled = true);
-                }
-                remoteAvatars.forEach((_, peerId) => callPeer(peerId));
-            } else {
-                isCamActive = false;
-                btn.classList.remove('active');
-                if (localMediaStream) {
-                    localMediaStream.getVideoTracks().forEach(t => t.enabled = false);
-                }
-                document.getElementById('local-video-container').style.display = 'none';
-                if (!peerConnections.size) videoGrid.style.display = 'none';
-            }
         }
 
-        async function toggleMicrophone() {
-            const btn = document.getElementById('mic-btn');
-            if (!isMicActive) {
-                isMicActive = true;
-                btn.classList.add('active');
-                await getLocalMediaStream();
-                if (localMediaStream) {
-                    localMediaStream.getAudioTracks().forEach(t => t.enabled = true);
-                }
-                remoteAvatars.forEach((_, peerId) => callPeer(peerId));
-            } else {
-                isMicActive = false;
-                btn.classList.remove('active');
-                if (localMediaStream) {
-                    localMediaStream.getAudioTracks().forEach(t => t.enabled = false);
-                }
-            }
+        // ── Main Game Loop ──
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
         }
+        requestAnimationFrame(gameLoop);
 
         const STATUS_MODES = [
             { label: 'Available', icon: '🟢', value: 'available' },
@@ -2477,14 +2726,8 @@
             }
         }
 
-        // Attach dock listeners
-        document.getElementById('cam-btn')?.addEventListener('click', toggleCamera);
-        document.getElementById('mic-btn')?.addEventListener('click', toggleMicrophone);
+        // Attach listeners
         document.getElementById('status-dock-btn')?.addEventListener('click', toggleStatus);
-        document.getElementById('gallery-btn')?.addEventListener('click', () => {
-            const g = document.getElementById('office-video-grid');
-            g.style.display = g.style.display === 'flex' ? 'none' : 'flex';
-        });
 
         // Navigation Toolbar
         document.getElementById('btn-toggle-sidebar')?.addEventListener('click', () => {
@@ -2492,307 +2735,109 @@
             setTimeout(() => {
                 width = canvas.width = container.clientWidth;
                 height = canvas.height = container.clientHeight;
-            }, 260);
+            }, 320);
         });
         document.getElementById('btn-zoom-in')?.addEventListener('click', () => { zoomLevel = Math.min(2.0, zoomLevel + 0.15); });
         document.getElementById('btn-zoom-out')?.addEventListener('click', () => { zoomLevel = Math.max(0.6, zoomLevel - 0.15); });
         document.getElementById('btn-reset-view')?.addEventListener('click', () => { zoomLevel = 1.0; cameraOffset = { x: 0, y: 0 }; });
         document.getElementById('btn-center-avatar')?.addEventListener('click', () => {
-            cameraOffset.x = (width / 2) - (localAvatar.x * zoomLevel);
-            cameraOffset.y = (height / 2) - (localAvatar.y * zoomLevel);
+            cameraOffset.x = (width / 2) - localAvatar.x * zoomLevel;
+            cameraOffset.y = (height / 2) - localAvatar.y * zoomLevel;
         });
 
-        // ── Whiteboard Logic ──
-        const wbCanvas = document.getElementById('wb-canvas');
-        const wbCtx = wbCanvas?.getContext('2d');
-        let wbDrawing = false, wbTool = 'pen', wbColor = '#38bdf8', wbLastX = 0, wbLastY = 0;
-
-        function openWhiteboard() {
-            const modal = document.getElementById('whiteboard-modal');
-            if (modal) {
-                modal.style.display = 'flex';
-                setTimeout(() => {
-                    const cont = document.getElementById('wb-container');
-                    if (cont && wbCanvas) {
-                        wbCanvas.width = cont.clientWidth;
-                        wbCanvas.height = cont.clientHeight;
-                    }
-                }, 50);
-            }
-        }
-        function closeWhiteboard() {
-            const modal = document.getElementById('whiteboard-modal');
-            if (modal) modal.style.display = 'none';
-        }
-        function setWbTool(t) {
-            wbTool = t;
-            document.querySelectorAll('#whiteboard-modal .tool-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`wb-tool-${t}`)?.classList.add('active');
-        }
-        function setWbColor(c) { wbColor = c; }
-        function clearWhiteboard() { if(wbCanvas && wbCtx) wbCtx.clearRect(0, 0, wbCanvas.width, wbCanvas.height); }
-        function exportWhiteboard() {
-            if(!wbCanvas) return;
-            const a = document.createElement('a');
-            a.download = `whiteboard-${Date.now()}.png`;
-            a.href = wbCanvas.toDataURL();
-            a.click();
-        }
-
-        wbCanvas?.addEventListener('mousedown', (e) => {
-            const r = wbCanvas.getBoundingClientRect();
-            wbDrawing = true; wbLastX = e.clientX - r.left; wbLastY = e.clientY - r.top;
-        });
-        wbCanvas?.addEventListener('mousemove', (e) => {
-            if (!wbDrawing || !wbCtx) return;
-            const r = wbCanvas.getBoundingClientRect();
-            const cx = e.clientX - r.left, cy = e.clientY - r.top;
-            wbCtx.beginPath();
-            wbCtx.moveTo(wbLastX, wbLastY);
-            wbCtx.lineTo(cx, cy);
-            wbCtx.strokeStyle = wbTool === 'eraser' ? '#0b0f19' : wbColor;
-            wbCtx.lineWidth = wbTool === 'eraser' ? 24 : (wbTool === 'highlighter' ? 14 : 3);
-            wbCtx.lineCap = 'round';
-            wbCtx.stroke();
-            wbLastX = cx; wbLastY = cy;
-        });
-        wbCanvas?.addEventListener('mouseup', () => { wbDrawing = false; });
-        wbCanvas?.addEventListener('mouseleave', () => { wbDrawing = false; });
-
-        // ── Presentation / Screen Sharing ──
-        let presentStream = null;
-        let activeRemotePresenterId = null;
-        const presentBtn = document.getElementById('present-btn');
-        const presentModal = document.getElementById('presentation-modal');
-        const presentVideo = document.getElementById('presentation-video');
-
-        presentBtn?.addEventListener('click', async () => {
-            if (presentStream) {
-                stopPresentation();
-            } else {
-                try {
-                    presentStream = await navigator.mediaDevices.getDisplayMedia({ video: { cursor: 'always' }, audio: true });
-                    if (presentVideo) {
-                        presentVideo.srcObject = presentStream;
-                        presentVideo.play().catch(() => {});
-                    }
-                    if (presentModal) {
-                        presentModal.style.display = 'flex';
-                        const titleEl = presentModal.querySelector('strong');
-                        if (titleEl) titleEl.textContent = `🖥️ You are sharing your screen`;
-                    }
-                    presentBtn.classList.add('active');
-
-                    // Add screen share tracks to all active peer connections
-                    presentStream.getTracks().forEach(track => {
-                        peerConnections.forEach(pc => {
-                            try { pc.addTrack(track, presentStream); } catch(e) {}
-                        });
-                        track.onended = () => { stopPresentation(); };
-                    });
-
-                    // Broadcast offer to peers so they receive screen stream
-                    remoteAvatars.forEach((_, peerId) => callPeer(peerId));
-
-                    if (ws && ws.readyState === WebSocket.OPEN) {
-                        ws.send(JSON.stringify({ type: 'presentation.start', payload: {} }));
-                    }
-                } catch(e) { console.log('Screen sharing cancelled:', e); }
-            }
-        });
-
-        function stopPresentation() {
-            if (presentStream) {
-                presentStream.getTracks().forEach(t => t.stop());
-                presentStream = null;
-            }
-            if (presentVideo && !activeRemotePresenterId) presentVideo.srcObject = null;
-            if (presentModal && !activeRemotePresenterId) presentModal.style.display = 'none';
-            if (presentBtn) presentBtn.classList.remove('active');
-
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ type: 'presentation.stop', payload: {} }));
-            }
-            remoteAvatars.forEach((_, peerId) => callPeer(peerId));
-        }
-
-        function closePresentationModal() {
-            if (presentModal) presentModal.style.display = 'none';
-        }
-
-        // ── Recording Studio ──
-        let mediaRecorder = null;
-        let recordChunks = [];
-        const recordBtn = document.getElementById('record-btn');
-        recordBtn?.addEventListener('click', () => {
-            if (mediaRecorder && mediaRecorder.state === 'recording') {
-                mediaRecorder.stop();
-                recordBtn.classList.remove('active');
-                recordBtn.querySelector('.icon').textContent = '⭕';
-            } else {
-                try {
-                    const stream = canvas.captureStream(30);
-                    recordChunks = [];
-                    mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
-                    mediaRecorder.ondataavailable = (e) => { if(e.data.size > 0) recordChunks.push(e.data); };
-                    mediaRecorder.onstop = () => {
-                        const blob = new Blob(recordChunks, { type: 'video/webm' });
-                        const a = document.createElement('a');
-                        a.href = URL.createObjectURL(blob);
-                        a.download = `office-recording-${Date.now()}.webm`;
-                        a.click();
-                    };
-                    mediaRecorder.start(1000);
-                    recordBtn.classList.add('active');
-                    recordBtn.querySelector('.icon').textContent = '⏹️';
-                } catch(e) { alert('Recording not supported.'); }
-            }
-        });
-
-        // ── Invite Modal & Member Creation ──
-        function openInviteModal() { document.getElementById('invite-modal').style.display = 'flex'; }
-        function closeInviteModal() { document.getElementById('invite-modal').style.display = 'none'; }
-
-        function switchInviteTab(tab) {
-            document.getElementById('modal-tab-guest').classList.toggle('active', tab === 'guest');
-            document.getElementById('modal-tab-member').classList.toggle('active', tab === 'member');
-            document.getElementById('tab-section-guest').style.display = tab === 'guest' ? 'flex' : 'none';
-            document.getElementById('tab-section-member').style.display = tab === 'member' ? 'flex' : 'none';
-        }
-
-        async function generateGuestLink() {
-            const roomId = document.getElementById('invite-room-select').value;
-            const guestName = document.getElementById('invite-guest-name').value.trim() || 'Guest';
-            const hours = parseInt(document.getElementById('invite-guest-hours').value) || 24;
-            const btn = document.getElementById('btn-gen-guest');
-            btn.textContent = '⏳ Generating...';
-
-            try {
-                const res = await fetch(`/api/v1/organizations/${CONFIG.org.id}/rooms/${roomId}/guest-invitations`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({ guest_name: guestName, expires_in_hours: hours })
-                });
-                const data = await res.json();
-                if (data.join_url) {
-                    document.getElementById('guest-link-output').value = data.join_url;
-                    document.getElementById('guest-open-link').href = data.join_url;
-                    document.getElementById('guest-result-box').style.display = 'block';
-                } else {
-                    alert(data.message || 'Failed to generate link');
-                }
-            } catch(e) { alert('Error creating invitation'); }
-            finally { btn.textContent = '⚡ Generate Instant Link'; }
-        }
-
-        function copyGuestLink() {
-            const input = document.getElementById('guest-link-output');
-            input.select();
-            navigator.clipboard.writeText(input.value);
-            const btn = document.getElementById('btn-copy-link');
-            btn.textContent = '✅ Copied!';
-            setTimeout(() => { btn.textContent = '📋 Copy Link'; }, 2000);
-        }
-
-        async function createTeamMember() {
-            const name = document.getElementById('member-name').value.trim();
-            const email = document.getElementById('member-email').value.trim();
-            const password = document.getElementById('member-password').value.trim();
-            const role = document.getElementById('member-role').value;
-            const btn = document.getElementById('btn-create-member');
-
-            if (!email) {
-                alert('Please enter an email address.');
-                return;
-            }
-            if (!password || password.length < 6) {
-                alert('Password must be at least 6 characters.');
-                return;
-            }
-
-            btn.textContent = '⏳ Creating Member...';
-            try {
-                const res = await fetch(`/api/v1/organizations/${CONFIG.org.id}/members/invite`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    credentials: 'same-origin',
-                    body: JSON.stringify({ name, email, password, role })
-                });
-
-                const data = await res.json();
-                if (res.ok) {
-                    document.getElementById('member-result-box').style.display = 'block';
-                    document.getElementById('member-name').value = '';
-                    document.getElementById('member-email').value = '';
-                    document.getElementById('member-password').value = '';
-                } else {
-                    alert(data.message || 'Failed to create member.');
-                }
-            } catch(e) {
-                alert('Error creating team member.');
-            } finally {
-                btn.textContent = '✨ Add Member to Team';
-            }
-        }
-
-        // ── Chat Functions ──
+        // ── Live Chat Functions ──
         function sendChatMessage() {
             const input = document.getElementById('chat-text-input');
             const text = input.value.trim();
             if (!text) return;
             input.value = '';
 
-            renderChatMessage(`${localAvatar.name} (You)`, text);
+            renderChatMessage(localAvatar.name + ' ({{ __("You") }})', text);
             if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ type: 'chat.send', payload: { channelId: 'general', body: text } }));
+                ws.send(JSON.stringify({
+                    type: 'chat.message',
+                    payload: { senderName: localAvatar.name, body: text }
+                }));
             }
+        }
+
+        function renderChatMessage(sender, body, fileUrl = null, fileName = null) {
+            const container = document.getElementById('chat-messages-container');
+            const isMe = sender.includes('(You)') || sender.includes(localAvatar.name);
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble ${isMe ? 'mine' : 'peer'}`;
+
+            let content = `<div class="chat-sender">${escapeHtml(sender)}</div><div>${escapeHtml(body)}</div>`;
+            if (fileUrl) {
+                content += `<div style="margin-top: 6px;"><a href="${fileUrl}" target="_blank" style="color: #38bdf8; font-weight: 700;">📎 ${escapeHtml(fileName || 'Attachment')}</a></div>`;
+            }
+            bubble.innerHTML = content;
+            container.appendChild(bubble);
+            container.scrollTop = container.scrollHeight;
         }
 
         function handleChatFileUpload(input) {
             const file = input.files[0];
             if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const dataUrl = e.target.result;
-                const isImg = file.type.startsWith('image/');
-                renderChatMessage(`${localAvatar.name} (You)`, isImg ? '' : `File: ${file.name}`, isImg ? dataUrl : null, file.name);
-                if (ws && ws.readyState === WebSocket.OPEN) {
-                    ws.send(JSON.stringify({
-                        type: 'chat.send',
-                        payload: { channelId: 'general', body: isImg ? 'Shared an image' : `File: ${file.name}`, fileUrl: isImg ? dataUrl : null, fileName: file.name }
-                    }));
-                }
-            };
-            reader.readAsDataURL(file);
-            input.value = '';
+            const url = URL.createObjectURL(file);
+            renderChatMessage(localAvatar.name + ' ({{ __("You") }})', `[Sent file: ${file.name}]`, url, file.name);
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'chat.message',
+                    payload: { senderName: localAvatar.name, body: `[Shared a file: ${file.name}]` }
+                }));
+            }
         }
 
-        function renderChatMessage(sender, text, fileUrl, fileName) {
-            const box = document.getElementById('chat-messages-container');
-            if (!box) return;
-            const div = document.createElement('div');
-            div.style.background = 'rgba(255,255,255,0.04)';
-            div.style.borderRadius = '8px';
-            div.style.padding = '6px 8px';
-            div.style.border = '1px solid rgba(255,255,255,0.06)';
+        // ── Whiteboard Logic ──
+        let wbTool = 'pen';
+        let wbColor = '#3b82f6';
+        let isDrawing = false;
+        const wbCanvas = document.getElementById('wb-canvas');
+        const wbCtx = wbCanvas?.getContext('2d');
 
-            let h = `<div style="font-size: 10px; font-weight: 700; color: #818cf8; margin-bottom: 2px;">${escapeHtml(sender)}</div>`;
-            if (text) h += `<div style="color: #e2e8f0; word-break: break-word;">${escapeHtml(text)}</div>`;
-            if (fileUrl) h += `<img src="${fileUrl}" style="max-width: 100%; border-radius: 6px; margin-top: 4px; border: 1px solid rgba(255,255,255,0.1);">`;
-            div.innerHTML = h;
-            box.appendChild(div);
-            box.scrollTop = box.scrollHeight;
+        function openWhiteboard() {
+            const modal = document.getElementById('whiteboard-modal');
+            modal.style.display = 'flex';
+            if (wbCanvas) {
+                wbCanvas.width = wbCanvas.parentElement.clientWidth;
+                wbCanvas.height = wbCanvas.parentElement.clientHeight;
+                wbCtx.lineCap = 'round';
+                wbCtx.lineJoin = 'round';
+            }
+        }
+        function closeWhiteboard() { document.getElementById('whiteboard-modal').style.display = 'none'; }
+        function setWbTool(t) {
+            wbTool = t;
+            ['pen', 'highlighter', 'eraser'].forEach(x => document.getElementById(`wb-tool-${x}`)?.classList.toggle('active', x === t));
+        }
+        function setWbColor(c) { wbColor = c; }
+        function clearWhiteboard() { wbCtx?.clearRect(0, 0, wbCanvas.width, wbCanvas.height); }
+        function exportWhiteboard() {
+            const link = document.createElement('a');
+            link.download = 'whiteboard.png';
+            link.href = wbCanvas.toDataURL();
+            link.click();
         }
 
+        wbCanvas?.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            wbCtx.beginPath();
+            wbCtx.moveTo(e.offsetX, e.offsetY);
+        });
+        wbCanvas?.addEventListener('mousemove', (e) => {
+            if (!isDrawing) return;
+            wbCtx.strokeStyle = wbTool === 'eraser' ? '#ffffff' : wbColor;
+            wbCtx.lineWidth = wbTool === 'highlighter' ? 14 : (wbTool === 'eraser' ? 24 : 3);
+            wbCtx.globalAlpha = wbTool === 'highlighter' ? 0.35 : 1.0;
+            wbCtx.lineTo(e.offsetX, e.offsetY);
+            wbCtx.stroke();
+        });
+        window.addEventListener('mouseup', () => { isDrawing = false; });
+
+        // ── Helper ──
         function escapeHtml(str) {
-            const d = document.createElement('div');
-            d.textContent = str || '';
-            return d.innerHTML;
+            return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
         }
     </script>
 </body>

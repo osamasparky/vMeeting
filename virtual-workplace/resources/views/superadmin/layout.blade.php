@@ -441,6 +441,18 @@
             border-color: var(--brand-primary);
         }
 
+        .form-input {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-input:focus {
+            border-color: var(--brand-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
         /* ── Alerts ── */
         .alert-box {
             padding: 14px 20px;

@@ -131,6 +131,22 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
           break;
         }
 
+        case 'avatar.update': {
+          const { gender } = event.payload || {};
+          const user = conn.user;
+          if (!user || !user.mapId) break;
+
+          presence.broadcastToMap(user.organizationId, user.mapId, {
+            type: 'avatar.updated',
+            payload: {
+              userId: user.userId,
+              gender: gender,
+            },
+          });
+          console.log(`[WS] ${user.name} switched avatar character to ${gender}`);
+          break;
+        }
+
         case 'room.enter': {
           const { roomId } = event.payload;
           const user = presence.setRoom(ws, roomId);

@@ -24,7 +24,7 @@
                     type="text"
                     name="platform_name"
                     value="Virtual Workplace SaaS"
-                    style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;"
+                    style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;"
                 >
             </div>
 
@@ -32,7 +32,7 @@
                 <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">
                     {{ __('Default Registration Plan') }}
                 </label>
-                <select name="default_plan_id" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; color: var(--brand-navy); outline: none; font-size: 13px; font-weight: 600;">
+                <select name="default_plan_id" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                     @foreach($plans as $p)
                         <option value="{{ $p->id }}" {{ $p->slug === 'free' ? 'selected' : '' }}>
                             💎 {{ $p->name }} ({{ $p->seat_limit === 0 ? __('Unlimited') : $p->seat_limit }} Users)
@@ -49,7 +49,7 @@
                     type="text"
                     name="ws_url"
                     value="ws://127.0.0.1:8080"
-                    style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; color: var(--brand-navy); outline: none; font-size: 13px; font-family: monospace;"
+                    style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; color: var(--text-primary); outline: none; font-size: 13px; font-family: monospace;"
                 >
             </div>
 
@@ -61,7 +61,7 @@
                     type="text"
                     name="stun_server"
                     value="stun:stun.l.google.com:19302"
-                    style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; color: var(--brand-navy); outline: none; font-size: 13px; font-family: monospace;"
+                    style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; color: var(--text-primary); outline: none; font-size: 13px; font-family: monospace;"
                 >
             </div>
         </div>

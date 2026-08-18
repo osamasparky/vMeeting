@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,40 +10,36 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Modern Digital Workplace OS Palette */
-            --bg-body: #0b0f19;
-            --bg-panel: #111827;
+            --bg-body: #090d16;
+            --bg-panel: #0f172a;
             --bg-card: #1e293b;
-            --border-panel: rgba(255, 255, 255, 0.10);
-            --border-hover: rgba(255, 255, 255, 0.20);
-
-            --brand-teal: #06b6d4;
-            --brand-pine: #0d9488;
-            --brand-ocean: #0284c7;
-            --brand-navy: #f8fafc;
-            --brand-green: #10b981;
-            --brand-lime: #84cc16;
-            --brand-gold: #f59e0b;
-            --brand-orange: #f97316;
-            --brand-coral: #fb7185;
-            --brand-crimson: #ef4444;
+            --bg-card-hover: #334155;
+            --bg-input: rgba(15, 23, 42, 0.85);
+            --border-panel: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.18);
 
             --brand-primary: #3b82f6;
-            --brand-secondary: #8b5cf6;
+            --brand-teal: #06b6d4;
+            --brand-pine: #0d9488;
+            --brand-green: #10b981;
+            --brand-gold: #f59e0b;
+            --brand-crimson: #ef4444;
+
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --text-dim: #64748b;
 
-            --font-family: {{ app()->getLocale() === 'ar' ? "'IBM Plex Sans Arabic', 'Cairo', 'Plus Jakarta Sans', sans-serif" : "'Plus Jakarta Sans', 'Inter', 'IBM Plex Sans Arabic', sans-serif" }};
+            --font-family: {{ app()->getLocale() === 'ar' ? "'Cairo', sans-serif" : "'Inter', 'Cairo', sans-serif" }};
         }
 
         [data-theme="light"] {
-            --bg-body: #f8fafc;
+            --bg-body: #f1f5f9;
             --bg-panel: #ffffff;
-            --bg-card: #f1f5f9;
+            --bg-card: #f8fafc;
+            --bg-card-hover: #e2e8f0;
+            --bg-input: #ffffff;
             --border-panel: #e2e8f0;
             --border-hover: #cbd5e1;
-            --brand-navy: #0f172a;
             --text-main: #0f172a;
             --text-muted: #64748b;
             --text-dim: #94a3b8;
@@ -62,27 +58,27 @@
 
         /* ── Top Bar ── */
         .editor-header {
-            height: 62px;
+            height: 60px;
             background: var(--bg-panel);
             border-bottom: 1px solid var(--border-panel);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 0 18px;
             z-index: 50;
-            box-shadow: 0 2px 10px rgba(1, 44, 65, 0.04);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
         }
 
         .header-left {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 12px;
         }
 
         .back-btn {
-            background: #f8fafc;
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid var(--border-panel);
-            color: var(--brand-navy);
+            color: var(--text-main);
             padding: 7px 14px;
             border-radius: 10px;
             font-size: 13px;
@@ -94,9 +90,9 @@
             transition: all 0.2s;
         }
         .back-btn:hover {
-            border-color: var(--brand-teal);
-            background: #ffffff;
-            color: var(--brand-teal);
+            border-color: var(--brand-primary);
+            background: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
         }
 
         .map-title-group {
@@ -106,17 +102,17 @@
         }
 
         .map-name {
-            font-size: 16px;
-            font-weight: 900;
-            color: var(--brand-navy);
-            letter-spacing: -0.3px;
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.2px;
         }
 
         .version-badge {
-            background: rgba(0, 180, 179, 0.1);
-            border: 1px solid rgba(0, 180, 179, 0.3);
-            color: var(--brand-teal);
-            padding: 3px 10px;
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.35);
+            color: #60a5fa;
+            padding: 3px 9px;
             border-radius: 6px;
             font-size: 11px;
             font-weight: 800;
@@ -126,7 +122,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            background: #f8fafc;
+            background: var(--bg-body);
             padding: 4px 6px;
             border-radius: 12px;
             border: 1px solid var(--border-panel);
@@ -147,14 +143,14 @@
             transition: all 0.18s;
         }
         .tool-chip:hover {
-            color: var(--brand-navy);
-            background: #ffffff;
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
         }
         .tool-chip.active {
-            background: var(--brand-teal);
+            background: var(--brand-primary);
             color: white;
-            border-color: var(--brand-teal);
-            box-shadow: 0 2px 8px rgba(0, 180, 179, 0.3);
+            border-color: var(--brand-primary);
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.35);
         }
 
         .header-right {
@@ -163,198 +159,189 @@
             gap: 10px;
         }
 
-        .btn-lang-toggle {
-            background: #f8fafc;
-            border: 1px solid var(--border-panel);
-            color: var(--brand-navy);
-            padding: 7px 12px;
+        .action-btn {
+            padding: 7px 14px;
             border-radius: 10px;
             font-size: 12px;
-            font-weight: 800;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s;
-        }
-        .btn-lang-toggle:hover {
-            border-color: var(--brand-teal);
-            color: var(--brand-teal);
-        }
-
-        .action-btn {
-            padding: 8px 16px;
-            border-radius: 10px;
-            font-size: 13px;
             font-weight: 800;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 6px;
+            border: none;
             transition: all 0.2s;
             text-decoration: none;
-            border: none;
         }
-
-        .action-btn.secondary {
-            background: #ffffff;
-            border: 1px solid var(--border-panel);
-            color: var(--brand-navy);
-        }
-        .action-btn.secondary:hover {
-            border-color: var(--brand-teal);
-            background: #f8fafc;
-        }
-
         .action-btn.primary {
-            background: var(--brand-teal);
+            background: var(--brand-primary);
             color: white;
-            box-shadow: 0 4px 12px rgba(0, 180, 179, 0.3);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
         }
-        .action-btn.primary:hover {
-            background: var(--brand-pine);
-        }
-
         .action-btn.success {
-            background: linear-gradient(135deg, var(--brand-green), #004d34);
+            background: linear-gradient(135deg, var(--brand-green), #059669);
             color: white;
-            box-shadow: 0 4px 12px rgba(0, 104, 71, 0.25);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
         }
-        .action-btn.success:hover {
-            opacity: 0.95;
+        .action-btn.secondary {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-panel);
+            color: var(--text-main);
+        }
+        .action-btn:hover {
+            transform: translateY(-1px);
+            opacity: 0.92;
         }
 
-        /* ── Main Workspace ── */
+        /* ── Workspace ── */
         .editor-workspace {
-            flex: 1;
             display: flex;
+            flex: 1;
             position: relative;
             overflow: hidden;
         }
 
-        /* ── Canvas Viewport ── */
         .canvas-container {
             flex: 1;
             position: relative;
-            background: #edf2f7;
+            background: var(--bg-body);
             overflow: hidden;
-            cursor: crosshair;
-        }
-
-        canvas#editor-canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* ── Floating Canvas View Controls (Zoom, Reset, Center) ── */
-        .canvas-view-tools {
-            position: absolute;
-            top: 20px;
-            inset-inline-start: 20px;
-            background: #ffffff;
-            border: 1px solid var(--border-panel);
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            padding: 6px;
-            z-index: 45;
-            box-shadow: 0 10px 25px rgba(1, 44, 65, 0.08);
-        }
-        .canvas-tool-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            border: none;
-            background: transparent;
-            color: var(--text-muted);
-            font-size: 15px;
-            font-weight: 800;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+
+        #editor-canvas {
+            display: block;
+            cursor: crosshair;
+        }
+
+        /* ── Floating Controls ── */
+        .canvas-view-tools {
+            position: absolute;
+            bottom: 20px;
+            inset-inline-start: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            padding: 6px 10px;
+            border-radius: 14px;
+            border: 1px solid var(--border-panel);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+            z-index: 40;
+        }
+        .canvas-tool-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-panel);
+            color: var(--text-main);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
             cursor: pointer;
             transition: all 0.15s;
         }
         .canvas-tool-btn:hover {
-            background: #f1f5f9;
-            color: var(--brand-navy);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--brand-primary);
         }
 
-        /* ── Kumospace-Style Right Customizer Drawer ── */
+        /* Floating Quick Action Bar (Over Selected Item) */
+        .floating-item-actions {
+            position: absolute;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--brand-primary);
+            padding: 4px 8px;
+            border-radius: 10px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+            z-index: 45;
+            transform: translate(-50%, -100%);
+            margin-top: -10px;
+        }
+        .float-act-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-panel);
+            color: var(--text-main);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s;
+        }
+        .float-act-btn:hover {
+            background: var(--brand-primary);
+            color: white;
+        }
+
+        /* ── Right Customizer Drawer ── */
         .customize-drawer {
-            width: 340px;
+            width: 360px;
             background: var(--bg-panel);
             border-inline-start: 1px solid var(--border-panel);
             display: flex;
             flex-direction: column;
             z-index: 40;
-            box-shadow: -4px 0 20px rgba(1, 44, 65, 0.05);
-            transition: transform 0.25s ease;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.25);
         }
         .customize-drawer.collapsed {
-            transform: translateX({{ app()->getLocale() === 'ar' ? '-340px' : '340px' }});
-            margin-inline-end: -340px;
+            transform: translateX(100%);
+        }
+        [dir="rtl"] .customize-drawer.collapsed {
+            transform: translateX(-100%);
         }
 
         .drawer-header {
-            padding: 16px 20px;
+            padding: 14px 18px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid var(--border-panel);
-            background: #ffffff;
         }
-        .drawer-title-dropdown {
-            font-size: 15px;
-            font-weight: 900;
-            color: var(--brand-navy);
+        .drawer-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-main);
             display: flex;
             align-items: center;
-            gap: 6px;
-            cursor: pointer;
-        }
-        .drawer-close-btn {
-            background: none;
-            border: none;
-            color: var(--text-dim);
-            font-size: 18px;
-            cursor: pointer;
-            padding: 4px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .drawer-close-btn:hover {
-            background: #f1f5f9;
-            color: var(--brand-navy);
+            gap: 8px;
         }
 
-        /* ── Sub Navigation Tabs (Furniture / Rooms / Settings) ── */
         .drawer-tabs {
             display: flex;
-            padding: 0 16px;
             border-bottom: 1px solid var(--border-panel);
-            background: #ffffff;
-            gap: 20px;
+            background: var(--bg-body);
         }
         .drawer-tab {
-            padding: 12px 4px;
-            font-size: 13px;
-            font-weight: 800;
+            flex: 1;
+            text-align: center;
+            padding: 10px 4px;
+            font-size: 12px;
+            font-weight: 700;
             color: var(--text-muted);
             cursor: pointer;
-            position: relative;
+            border-bottom: 2px solid transparent;
             transition: all 0.2s;
         }
         .drawer-tab:hover {
-            color: var(--brand-navy);
+            color: var(--text-main);
         }
         .drawer-tab.active {
-            color: var(--brand-teal);
-            border-bottom: 2px solid var(--brand-teal);
+            color: var(--brand-primary);
+            border-bottom-color: var(--brand-primary);
+            background: rgba(59, 130, 246, 0.06);
         }
 
         .drawer-content {
@@ -366,143 +353,134 @@
             gap: 16px;
         }
 
-        /* ── Search Furniture Input ── */
-        .search-box-wrapper {
-            position: relative;
-            width: 100%;
-        }
         .search-input {
             width: 100%;
-            background: #f8fafc;
+            background: var(--bg-input);
             border: 1px solid var(--border-panel);
             border-radius: 10px;
-            padding: 10px 14px;
+            padding: 9px 12px;
+            color: var(--text-main);
             font-size: 12px;
             font-weight: 600;
-            color: var(--brand-navy);
             outline: none;
-            transition: all 0.2s;
+            transition: border-color 0.2s;
         }
         .search-input:focus {
-            border-color: var(--brand-teal);
-            background: #ffffff;
-            box-shadow: 0 0 0 3px rgba(0, 180, 179, 0.12);
+            border-color: var(--brand-primary);
         }
 
-        /* ── Accordion Category Section ── */
+        .category-filter-bar {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: thin;
+        }
+        .category-filter-bar::-webkit-scrollbar {
+            height: 4px;
+        }
+        .category-filter-bar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        .cat-filter-chip {
+            background: var(--bg-card);
+            border: 1px solid var(--border-panel);
+            color: var(--text-muted);
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .cat-filter-chip:hover {
+            color: var(--text-main);
+            border-color: var(--brand-primary);
+        }
+        .cat-filter-chip.active {
+            background: var(--brand-primary);
+            color: white;
+            border-color: var(--brand-primary);
+        }
+
         .category-accordion {
+            background: var(--bg-card);
             border: 1px solid var(--border-panel);
             border-radius: 12px;
             overflow: hidden;
-            background: #ffffff;
         }
         .category-header {
             padding: 12px 14px;
-            background: #f8fafc;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-main);
             display: flex;
             align-items: center;
             justify-content: space-between;
             cursor: pointer;
-            font-size: 12px;
-            font-weight: 800;
-            color: var(--brand-navy);
-            user-select: none;
+            background: rgba(255, 255, 255, 0.02);
+            transition: background 0.2s;
         }
         .category-header:hover {
-            background: #f1f5f9;
+            background: rgba(255, 255, 255, 0.05);
         }
         .category-body {
-            padding: 12px;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+            gap: 8px;
+            padding: 10px;
+            border-top: 1px solid var(--border-panel);
         }
 
-        /* ── 2-Column Furniture Cards (Matching Kumospace Reference) ── */
         .furn-card {
-            background: #ffffff;
+            background: var(--bg-panel);
             border: 1px solid var(--border-panel);
-            border-radius: 12px;
-            padding: 12px 8px 10px;
+            border-radius: 10px;
+            padding: 10px 8px;
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
+            gap: 6px;
             cursor: pointer;
             transition: all 0.2s;
-            position: relative;
         }
         .furn-card:hover {
-            border-color: var(--brand-teal);
+            border-color: var(--brand-primary);
+            background: var(--bg-card-hover);
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 180, 179, 0.12);
         }
         .furn-card.active {
-            border-color: var(--brand-teal);
-            background: rgba(0, 180, 179, 0.04);
-            box-shadow: 0 0 0 2px var(--brand-teal);
+            border-color: var(--brand-primary);
+            background: rgba(59, 130, 246, 0.15);
+            box-shadow: 0 0 0 1.5px var(--brand-primary);
         }
         .furn-preview-icon {
-            font-size: 28px;
-            margin-bottom: 6px;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 38px;
+        }
+        .furn-preview-icon img {
+            max-height: 44px;
+            max-width: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
         }
         .furn-name {
             font-size: 11px;
-            font-weight: 800;
-            color: var(--brand-navy);
-            margin-bottom: 6px;
-            white-space: nowrap;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.3;
+            max-height: 28px;
             overflow: hidden;
-            text-overflow: ellipsis;
-            width: 100%;
-        }
-        .color-swatches {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-        }
-        .swatch-dot {
-            width: 9px;
-            height: 9px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: transform 0.15s;
-        }
-        .swatch-dot:hover {
-            transform: scale(1.3);
         }
 
-        /* ── Room Template Cards ── */
-        .room-card {
-            background: #ffffff;
-            border: 1px solid var(--border-panel);
-            border-radius: 12px;
-            padding: 14px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .room-card:hover {
-            border-color: var(--brand-teal);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 180, 179, 0.1);
-        }
-        .room-card.active {
-            border-color: var(--brand-teal);
-            background: rgba(0, 180, 179, 0.05);
-            box-shadow: 0 0 0 2px var(--brand-teal);
-        }
-
-        /* ── Selected Item Properties Panel ── */
+        /* ── Properties Box ── */
         .properties-box {
-            background: #ffffff;
+            background: var(--bg-card);
             border: 1px solid var(--border-panel);
             border-radius: 12px;
             padding: 14px;
@@ -518,22 +496,45 @@
         .prop-label {
             font-size: 11px;
             font-weight: 800;
-            color: var(--brand-ocean);
+            color: var(--text-muted);
             text-transform: uppercase;
         }
         .prop-input {
             width: 100%;
-            background: #f8fafc;
+            background: var(--bg-input);
             border: 1px solid var(--border-panel);
             border-radius: 8px;
             padding: 8px 10px;
-            color: var(--brand-navy);
+            color: var(--text-main);
             font-size: 12px;
             font-weight: 600;
             outline: none;
         }
         .prop-input:focus {
-            border-color: var(--brand-teal);
+            border-color: var(--brand-primary);
+        }
+
+        .rotation-pill-group {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+        .rot-pill {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-panel);
+            color: var(--text-main);
+            padding: 6px 0;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .rot-pill:hover, .rot-pill.active {
+            background: var(--brand-primary);
+            border-color: var(--brand-primary);
+            color: white;
         }
 
         /* ── Notification Toast ── */
@@ -547,7 +548,7 @@
             border-radius: 12px;
             font-size: 13px;
             font-weight: 800;
-            box-shadow: 0 10px 25px -5px rgba(0, 104, 71, 0.4);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
             display: none;
             z-index: 1000;
             animation: slideUp 0.3s ease;
@@ -563,9 +564,9 @@
     <!-- Header -->
     <header class="editor-header">
         <div class="header-left">
-            <a href="{{ route('dashboard') }}" class="back-btn">
-                <span>←</span>
-                <span>{{ __('Dashboard') }}</span>
+            <a href="{{ route('office') }}" class="back-btn">
+                <span>🏢</span>
+                <span>{{ __('Virtual Office') }}</span>
             </a>
             <div class="map-title-group">
                 <div class="map-name">{{ __('Map Editor') }}: {{ $map->name }} <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);">({{ $organization->name }})</span></div>
@@ -575,7 +576,7 @@
 
         <div class="header-center">
             <button class="tool-chip active" id="tool-select" onclick="setTool('select')">
-                <span>🖱️</span> {{ __('Select') }}
+                <span>🖱️</span> {{ __('Select / Edit') }}
             </button>
             <button class="tool-chip" id="tool-room" onclick="setTool('room')">
                 <span>🏢</span> {{ __('Add Room') }}
@@ -586,6 +587,9 @@
             <button class="tool-chip" id="tool-object" onclick="setTool('object')">
                 <span>🪑</span> {{ __('Furniture') }}
             </button>
+            <button class="tool-chip" id="btn-rotate-top" onclick="rotateSelectedItem(90)" title="{{ __('Rotate 90° (R)') }}">
+                <span>🔄</span> {{ __('Rotate') }}
+            </button>
             <button class="tool-chip" id="btn-delete-selected" onclick="deleteSelectedItem()" style="color: var(--brand-crimson);">
                 <span>🗑️</span> {{ __('Delete') }}
             </button>
@@ -593,9 +597,9 @@
 
         <div class="header-right">
             @if(app()->getLocale() === 'ar')
-                <a href="{{ route('lang.switch', 'en') }}" class="btn-lang-toggle" title="Switch to English">🌐 English</a>
+                <a href="{{ route('lang.switch', 'en') }}" class="back-btn" title="Switch to English">🌐 English</a>
             @else
-                <a href="{{ route('lang.switch', 'ar') }}" class="btn-lang-toggle" title="التبديل إلى العربية">🌐 العربية</a>
+                <a href="{{ route('lang.switch', 'ar') }}" class="back-btn" title="التبديل إلى العربية">🌐 العربية</a>
             @endif
 
             <button class="action-btn secondary" id="btn-save-draft" onclick="saveMapDraft()">
@@ -604,8 +608,8 @@
             <button class="action-btn success" id="btn-publish" onclick="publishMap()">
                 <span>🚀</span> {{ __('Publish Map') }}
             </button>
-            <a href="{{ route('office') }}" class="action-btn primary" target="_blank">
-                <span>👁️</span> {{ __('Test Live') }}
+            <a href="{{ route('office') }}" class="action-btn primary">
+                <span>👁️</span> {{ __('Live View') }}
             </a>
         </div>
     </header>
@@ -617,9 +621,16 @@
         <div class="canvas-container" id="canvas-container">
             <canvas id="editor-canvas"></canvas>
 
-            <!-- Floating Canvas View Controls (Kumospace Style) -->
+            <!-- Floating Selected Object Action Bar -->
+            <div class="floating-item-actions" id="floating-actions">
+                <button class="float-act-btn" onclick="rotateSelectedItem(90)">🔄 +90°</button>
+                <button class="float-act-btn" onclick="duplicateSelectedItem()">📋 {{ __('Clone') }}</button>
+                <button class="float-act-btn" onclick="deleteSelectedItem()" style="color: #f87171;">🗑️</button>
+            </div>
+
+            <!-- Floating View Controls -->
             <div class="canvas-view-tools">
-                <button class="canvas-tool-btn" onclick="toggleCustomizeDrawer()" title="{{ __('Toggle Customize Drawer') }}">🪑</button>
+                <button class="canvas-tool-btn" onclick="toggleCustomizeDrawer()" title="{{ __('Toggle Drawer') }}">🪑</button>
                 <button class="canvas-tool-btn" onclick="zoomIn()" title="{{ __('Zoom In') }}">➕</button>
                 <button class="canvas-tool-btn" onclick="zoomOut()" title="{{ __('Zoom Out') }}">➖</button>
                 <button class="canvas-tool-btn" onclick="resetView()" title="{{ __('Reset View') }}">🏠</button>
@@ -627,62 +638,60 @@
             </div>
         </div>
 
-        <!-- Kumospace-Style Right Customizer Drawer -->
+        <!-- Right Customizer Drawer -->
         <aside class="customize-drawer" id="customize-drawer">
             <div class="drawer-header">
-                <div class="drawer-title-dropdown">
+                <div class="drawer-title">
                     <span>✨</span>
-                    <span>{{ __('Customize') }} ▾</span>
+                    <span>{{ __('Customize Floor & Furniture') }}</span>
                 </div>
-                <button class="drawer-close-btn" onclick="toggleCustomizeDrawer()" title="{{ __('Close') }}">✕</button>
+                <button onclick="toggleCustomizeDrawer()" style="background:none; border:none; color:var(--text-muted); font-size:16px; cursor:pointer;">✕</button>
             </div>
 
-            <!-- Sub Navigation Tabs -->
+            <!-- Sub Tabs -->
             <div class="drawer-tabs">
                 <div class="drawer-tab active" id="tab-btn-furniture" onclick="switchDrawerTab('furniture')">
-                    {{ __('Furniture') }}
+                    {{ __('3D Furniture') }}
+                </div>
+                <div class="drawer-tab" id="tab-btn-inspector" onclick="switchDrawerTab('inspector')">
+                    {{ __('Selected Item') }}
                 </div>
                 <div class="drawer-tab" id="tab-btn-rooms" onclick="switchDrawerTab('rooms')">
                     {{ __('Rooms') }}
-                </div>
-                <div class="drawer-tab" id="tab-btn-settings" onclick="switchDrawerTab('settings')">
-                    {{ __('Settings') }}
                 </div>
             </div>
 
             <div class="drawer-content">
 
                 <!-- 1. FURNITURE TAB -->
-                <div id="drawer-view-furniture" style="display: flex; flex-direction: column; gap: 14px;">
-                    <!-- Search Input -->
-                    <div class="search-box-wrapper">
-                        <input type="text" id="furniture-search" class="search-input" placeholder="🔍 {{ __('Search furniture, seating, tables...') }}" oninput="filterFurniture(this.value)">
+                <div id="drawer-view-furniture" style="display: flex; flex-direction: column; gap: 12px;">
+                    <input type="text" id="furniture-search" class="search-input" placeholder="🔍 {{ __('Search 3D furniture, desks, chairs...') }}" oninput="filterFurniture(this.value)">
+
+                    <!-- Quick Category Filter Pills -->
+                    <div class="category-filter-bar" id="category-filter-bar">
+                        <button class="cat-filter-chip active" onclick="filterByCategory('all')">🌟 {{ __('All Categories') }}</button>
+                        @foreach($furnitureCategories as $cat)
+                            <button class="cat-filter-chip" onclick="filterByCategory('{{ $cat->slug }}')">{{ $cat->icon }} {{ $cat->name }}</button>
+                        @endforeach
                     </div>
 
-                    @foreach($furnitureCategories as $cat)
+                    @foreach($furnitureCategories as $idx => $cat)
                     <div class="category-accordion" id="cat-{{ $cat->slug }}">
                         <div class="category-header" onclick="toggleAccordion('cat-{{ $cat->slug }}')">
-                            <span>{{ $cat->icon }} {{ $cat->name }}</span>
-                            <span class="acc-icon">▴</span>
+                            <span>{{ $cat->icon }} {{ $cat->name }} ({{ $cat->items->count() }})</span>
+                            <span>▾</span>
                         </div>
-                        <div class="category-body">
+                        <div class="category-body" style="{{ $idx === 0 ? 'display: grid;' : 'display: none;' }}">
                             @foreach($cat->items as $item)
-                                <div class="furn-card" onclick="selectFurnitureItem('{{ $item->slug }}', '{{ $item->colors[0] ?? '#00b4b3' }}', '{{ $item->image_url }}', {{ $item->width }}, {{ $item->height }}, {{ $item->collision ? 'true' : 'false' }})">
+                                <div class="furn-card" onclick="selectFurnitureItem('{{ $item->slug }}', '{{ $item->colors[0] ?? '#3b82f6' }}', '{{ $item->image_url }}', {{ $item->width }}, {{ $item->height }}, {{ $item->collision ? 'true' : 'false' }})">
                                     <div class="furn-preview-icon">
                                         @if($item->image_url)
-                                            <img src="{{ $item->image_url }}" alt="{{ $item->name }}" style="max-height: 36px; max-width: 100%; object-fit: contain;">
+                                            <img src="{{ $item->image_url }}" alt="{{ $item->name }}" loading="lazy" decoding="async">
                                         @else
-                                            {{ $item->icon }}
+                                            <span style="font-size: 24px;">{{ $item->icon }}</span>
                                         @endif
                                     </div>
                                     <div class="furn-name">{{ $item->name }}</div>
-                                    @if(!empty($item->colors))
-                                    <div class="color-swatches">
-                                        @foreach($item->colors as $col)
-                                            <span class="swatch-dot" style="background: {{ $col }};" onclick="event.stopPropagation(); selectFurnitureItem('{{ $item->slug }}', '{{ $col }}', '{{ $item->image_url }}', {{ $item->width }}, {{ $item->height }}, {{ $item->collision ? 'true' : 'false' }})"></span>
-                                        @endforeach
-                                    </div>
-                                    @endif
                                 </div>
                             @endforeach
                         </div>
@@ -690,90 +699,87 @@
                     @endforeach
                 </div>
 
-                <!-- 2. ROOMS TAB -->
+                <!-- 2. SELECTED ITEM INSPECTOR -->
+                <div id="drawer-view-inspector" style="display: none; flex-direction: column; gap: 14px;">
+                    <div class="properties-box" id="inspector-empty-msg">
+                        <div style="font-size: 13px; color: var(--text-muted); text-align: center; padding: 20px 0;">
+                            👆 {{ __('Click any object or room on the map to edit its position, rotation, dimensions and settings.') }}
+                        </div>
+                    </div>
+
+                    <div class="properties-box" id="inspector-content" style="display: none;">
+                        <strong style="font-size: 13px; color: var(--text-main);">{{ __('Object Properties') }}</strong>
+                        
+                        <div class="prop-field">
+                            <label class="prop-label">{{ __('Name') }}</label>
+                            <input type="text" class="prop-input" id="prop-name" oninput="updateSelectedProp('name', this.value)">
+                        </div>
+
+                        <div class="prop-field" id="prop-rotation-group">
+                            <label class="prop-label">{{ __('Rotation (Degrees)') }}</label>
+                            <div class="rotation-pill-group">
+                                <div class="rot-pill" onclick="setRotation(0)">0°</div>
+                                <div class="rot-pill" onclick="setRotation(90)">90°</div>
+                                <div class="rot-pill" onclick="setRotation(180)">180°</div>
+                                <div class="rot-pill" onclick="setRotation(270)">270°</div>
+                            </div>
+                            <button onclick="rotateSelectedItem(90)" class="action-btn secondary" style="margin-top: 6px; justify-content: center;">
+                                🔄 {{ __('Rotate +90°') }}
+                            </button>
+                        </div>
+
+                        <div class="prop-field" id="prop-size-group">
+                            <label class="prop-label">{{ __('Grid Footprint (Tiles)') }}</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="number" class="prop-input" id="prop-width" placeholder="W" min="1" max="10" oninput="updateSelectedProp('width', parseInt(this.value) || 1)">
+                                <input type="number" class="prop-input" id="prop-height" placeholder="H" min="1" max="10" oninput="updateSelectedProp('height', parseInt(this.value) || 1)">
+                            </div>
+                        </div>
+
+                        <div class="prop-field" id="prop-color-group" style="display: none;">
+                            <label class="prop-label">{{ __('Theme Color') }}</label>
+                            <input type="color" class="prop-input" id="prop-color" value="#3b82f6" style="height: 38px; padding: 2px;" oninput="updateSelectedProp('color', this.value)">
+                        </div>
+
+                        <div style="display: flex; gap: 8px; margin-top: 10px;">
+                            <button onclick="duplicateSelectedItem()" class="action-btn secondary" style="flex: 1; justify-content: center;">
+                                📋 {{ __('Clone') }}
+                            </button>
+                            <button onclick="deleteSelectedItem()" class="action-btn" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; justify-content: center;">
+                                🗑️ {{ __('Delete') }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. ROOMS TAB -->
                 <div id="drawer-view-rooms" style="display: none; flex-direction: column; gap: 14px;">
                     <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;">
                         {{ __('Choose a room template, then click and drag on the floor canvas to draw.') }}
                     </div>
 
-                    <div class="room-card active" onclick="setRoomTemplate('meeting', '#00b4b3')">
-                        <div style="font-size: 26px;">👥</div>
+                    <div class="furn-card" onclick="setRoomTemplate('meeting', '#6366F1')" style="flex-direction: row; justify-content: flex-start; text-align: left; padding: 12px;">
+                        <span style="font-size: 24px;">👥</span>
                         <div>
-                            <strong style="font-size: 13px; color: var(--brand-navy);">{{ __('Meeting Room') }}</strong>
-                            <div style="font-size: 11px; color: var(--text-muted);">{{ __('Open collaboration area for teams') }}</div>
+                            <strong style="font-size: 13px; color: var(--text-main);">{{ __('Meeting Room') }}</strong>
+                            <div style="font-size: 11px; color: var(--text-muted);">{{ __('Open collaborative team area') }}</div>
                         </div>
                     </div>
 
-                    <div class="room-card" onclick="setRoomTemplate('private', '#f57b36')">
-                        <div style="font-size: 26px;">🔒</div>
+                    <div class="furn-card" onclick="setRoomTemplate('private', '#F59E0B')" style="flex-direction: row; justify-content: flex-start; text-align: left; padding: 12px;">
+                        <span style="font-size: 24px;">🔒</span>
                         <div>
-                            <strong style="font-size: 13px; color: var(--brand-navy);">{{ __('Private Office') }}</strong>
-                            <div style="font-size: 11px; color: var(--text-muted);">{{ __('Locked door with knock-to-enter approval') }}</div>
+                            <strong style="font-size: 13px; color: var(--text-main);">{{ __('Private Office') }}</strong>
+                            <div style="font-size: 11px; color: var(--text-muted);">{{ __('Locked door with knock approval') }}</div>
                         </div>
                     </div>
 
-                    <div class="room-card" onclick="setRoomTemplate('reception', '#006847')">
-                        <div style="font-size: 26px;">🛎️</div>
+                    <div class="furn-card" onclick="setRoomTemplate('reception', '#10B981')" style="flex-direction: row; justify-content: flex-start; text-align: left; padding: 12px;">
+                        <span style="font-size: 24px;">🛎️</span>
                         <div>
-                            <strong style="font-size: 13px; color: var(--brand-navy);">{{ __('Reception & Lobby') }}</strong>
-                            <div style="font-size: 11px; color: var(--text-muted);">{{ __('Welcoming area for guests & visitors') }}</div>
+                            <strong style="font-size: 13px; color: var(--text-main);">{{ __('Reception Lobby') }}</strong>
+                            <div style="font-size: 11px; color: var(--text-muted);">{{ __('Welcoming area for guests') }}</div>
                         </div>
-                    </div>
-
-                    <div class="room-card" onclick="setRoomTemplate('lounge', '#004862')">
-                        <div style="font-size: 26px;">☕</div>
-                        <div>
-                            <strong style="font-size: 13px; color: var(--brand-navy);">{{ __('Breakout Lounge') }}</strong>
-                            <div style="font-size: 11px; color: var(--text-muted);">{{ __('Casual coffee and social zone') }}</div>
-                        </div>
-                    </div>
-
-                    <!-- Selected Properties Inspector -->
-                    <div class="properties-box" style="margin-top: 10px;">
-                        <strong style="font-size: 12px; color: var(--brand-navy);">{{ __('Selected Item Properties') }}</strong>
-                        <div class="prop-field">
-                            <label class="prop-label">{{ __('Name') }}</label>
-                            <input type="text" class="prop-input" id="prop-name" value="" oninput="updateSelectedProp('name', this.value)">
-                        </div>
-                        <div class="prop-field" id="prop-color-group">
-                            <label class="prop-label">{{ __('Theme Color') }}</label>
-                            <input type="color" class="prop-input" id="prop-color" value="#00b4b3" style="height: 38px; padding: 2px;" oninput="updateSelectedProp('color', this.value)">
-                        </div>
-                        <div class="prop-field" id="prop-capacity-group">
-                            <label class="prop-label">{{ __('Seat Capacity') }}</label>
-                            <input type="number" class="prop-input" id="prop-capacity" value="10" min="1" max="100" oninput="updateSelectedProp('capacity', parseInt(this.value) || 1)">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3. SETTINGS TAB -->
-                <div id="drawer-view-settings" style="display: none; flex-direction: column; gap: 14px;">
-                    <div class="properties-box">
-                        <strong style="font-size: 12px; color: var(--brand-navy);">{{ __('Floor Metrics') }}</strong>
-                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--border-panel); padding-bottom: 6px;">
-                            <span>{{ __('Total Rooms') }}:</span>
-                            <strong style="color: var(--brand-navy);" id="stat-rooms-count">0</strong>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); border-bottom: 1px solid var(--border-panel); padding-bottom: 6px;">
-                            <span>{{ __('Audio Zones') }}:</span>
-                            <strong style="color: var(--brand-navy);" id="stat-zones-count">0</strong>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);">
-                            <span>{{ __('Furniture Placed') }}:</span>
-                            <strong style="color: var(--brand-navy);" id="stat-objects-count">0</strong>
-                        </div>
-                    </div>
-
-                    <div class="properties-box">
-                        <strong style="font-size: 12px; color: var(--brand-navy);">{{ __('Version History') }}</strong>
-                        @forelse($map->versions as $ver)
-                            <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); padding: 4px 0; border-bottom: 1px solid #f1f5f9;">
-                                <span>v{{ $ver->version }} Snapshot</span>
-                                <span>{{ $ver->created_at->format('M d, H:i') }}</span>
-                            </div>
-                        @empty
-                            <div style="font-size: 11px; color: var(--text-muted);">No snapshots saved yet.</div>
-                        @endforelse
                     </div>
                 </div>
 
@@ -784,7 +790,7 @@
     <!-- Notification Toast -->
     <div class="toast" id="toast-msg">Map Saved Successfully!</div>
 
-    <!-- Map Editor Script -->
+    <!-- JavaScript Map Editor Engine -->
     <script>
         const MAP_DATA = @json($map);
         const ORG_ID = "{{ $organization->id }}";
@@ -792,25 +798,27 @@
 
         const canvas = document.getElementById('editor-canvas');
         const ctx = canvas.getContext('2d');
-        let width = canvas.width = window.innerWidth - 340;
-        let height = canvas.height = window.innerHeight - 62;
+        let width = canvas.width = window.innerWidth - 360;
+        let height = canvas.height = window.innerHeight - 60;
 
         window.addEventListener('resize', () => {
             const drawer = document.getElementById('customize-drawer');
-            const drawerWidth = drawer.classList.contains('collapsed') ? 0 : 340;
+            const drawerWidth = drawer.classList.contains('collapsed') ? 0 : 360;
             width = canvas.width = window.innerWidth - drawerWidth;
-            height = canvas.height = window.innerHeight - 62;
+            height = canvas.height = window.innerHeight - 60;
             draw();
         });
 
         const TILE_SIZE = 32;
         let currentTool = 'select'; // select | room | zone | object
         let currentRoomType = 'meeting';
-        let currentRoomColor = '#00b4b3';
-        let currentObjectType = 'desk';
-        let currentObjectColor = '#00b4b3';
+        let currentRoomColor = '#6366F1';
+        let currentObjectType = 'FUR-DESK-EMP-001';
+        let currentObjectColor = '#3b82f6';
+        let currentObjectCustom = null;
+
         let zoomLevel = 1.0;
-        let panOffset = { x: 40, y: 30 };
+        let panOffset = { x: 50, y: 40 };
         let showGrid = true;
 
         let rooms = MAP_DATA.rooms || [];
@@ -829,23 +837,7 @@
         let currentRect = null;
         let attachedObjects = [];
 
-        const OBJECT_CONFIGS = {
-            desk: { icon: '💻', name: 'Workstation', collision: true, width: 2, height: 1 },
-            executive_desk: { icon: '🖥️', name: 'Executive Desk', collision: true, width: 2, height: 2 },
-            chair: { icon: '🪑', name: 'Ergo Chair', collision: false, width: 1, height: 1 },
-            sofa: { icon: '🛋️', name: 'Lounge Sofa', collision: true, width: 2, height: 1 },
-            beanbag: { icon: '🟡', name: 'Bean Bag Chair', collision: false, width: 1, height: 1 },
-            booth: { icon: '🟥', name: 'Booth Corner', collision: true, width: 2, height: 2 },
-            whiteboard: { icon: '📋', name: 'Whiteboard', collision: true, width: 2, height: 1 },
-            screen: { icon: '📺', name: 'AV Screen', collision: true, width: 2, height: 1 },
-            plant: { icon: '🪴', name: 'Decor Plant', collision: false, width: 1, height: 1 },
-            lamp: { icon: '💡', name: 'Floor Lamp', collision: false, width: 1, height: 1 },
-            pingpong: { icon: '🏓', name: 'Ping Pong Table', collision: true, width: 3, height: 2 },
-            water_cooler: { icon: '🚰', name: 'Water Cooler', collision: true, width: 1, height: 1 },
-            cabinet: { icon: '🗄️', name: 'Filing Cabinet', collision: true, width: 1, height: 1 },
-            dining_table: { icon: '🍽️', name: 'Conference Table', collision: true, width: 3, height: 2 }
-        };
-
+        // ── 3D Sprite Cache Map ──
         const ALL_FURNITURE_ITEMS = @json($furnitureItems ?? []);
         const CUSTOM_IMAGE_CACHE = {};
         ALL_FURNITURE_ITEMS.forEach(it => {
@@ -854,38 +846,40 @@
                 img.src = it.image_url;
                 img.onload = () => draw();
                 CUSTOM_IMAGE_CACHE[it.slug] = { img, width: it.width || 1, height: it.height || 1 };
+                CUSTOM_IMAGE_CACHE[it.image_url] = { img, width: it.width || 1, height: it.height || 1 };
             }
-            OBJECT_CONFIGS[it.slug] = {
-                icon: it.icon || '🪑',
-                name: it.name,
-                collision: it.collision,
-                width: it.width || 1,
-                height: it.height || 1,
-                image_url: it.image_url
-            };
         });
 
-        let currentObjectCustom = null;
+        function getLoadedImage(url) {
+            if (!url) return null;
+            if (!CUSTOM_IMAGE_CACHE[url]) {
+                const img = new Image();
+                img.src = url;
+                img.onload = () => draw();
+                CUSTOM_IMAGE_CACHE[url] = { img, width: 1, height: 1 };
+            }
+            return CUSTOM_IMAGE_CACHE[url].img;
+        }
 
+        // ── Tool Selection ──
         function setTool(tool) {
             currentTool = tool;
             document.querySelectorAll('.tool-chip').forEach(el => el.classList.remove('active'));
             document.getElementById(`tool-${tool}`)?.classList.add('active');
             canvas.style.cursor = tool === 'select' ? 'default' : 'crosshair';
+            if (tool !== 'select') hideFloatingActions();
         }
 
         function setRoomTemplate(type, color) {
             setTool('room');
             currentRoomType = type;
             currentRoomColor = color;
-            document.querySelectorAll('.room-card').forEach(el => el.classList.remove('active'));
-            event.currentTarget.classList.add('active');
         }
 
-        function selectFurnitureItem(type, color, imageUrl = null, w = 1, h = 1, collision = true) {
+        function selectFurnitureItem(slug, color, imageUrl = null, w = 1, h = 1, collision = true) {
             setTool('object');
-            currentObjectType = type;
-            currentObjectColor = color || '#00b4b3';
+            currentObjectType = slug;
+            currentObjectColor = color || '#3b82f6';
             currentObjectCustom = {
                 imageUrl: imageUrl || null,
                 width: w || 1,
@@ -894,63 +888,66 @@
             };
             document.querySelectorAll('.furn-card').forEach(el => el.classList.remove('active'));
             if (event && event.currentTarget) {
-                event.currentTarget.closest('.furn-card')?.classList.add('active');
+                event.currentTarget.classList.add('active');
             }
         }
 
+        // ── Navigation & Zoom ──
+        function zoomIn() { zoomLevel = Math.min(2.5, zoomLevel + 0.15); draw(); }
+        function zoomOut() { zoomLevel = Math.max(0.4, zoomLevel - 0.15); draw(); }
+        function resetView() { zoomLevel = 1.0; panOffset = { x: 50, y: 40 }; draw(); }
+        function toggleGrid() { showGrid = !showGrid; draw(); }
         function toggleCustomizeDrawer() {
             const drawer = document.getElementById('customize-drawer');
             drawer.classList.toggle('collapsed');
-            const drawerWidth = drawer.classList.contains('collapsed') ? 0 : 340;
+            const drawerWidth = drawer.classList.contains('collapsed') ? 0 : 360;
             width = canvas.width = window.innerWidth - drawerWidth;
             draw();
         }
 
         function switchDrawerTab(tab) {
             document.querySelectorAll('.drawer-tab').forEach(el => el.classList.remove('active'));
-            document.getElementById(`tab-btn-${tab}`).classList.add('active');
-
+            document.getElementById(`tab-btn-${tab}`)?.classList.add('active');
             document.getElementById('drawer-view-furniture').style.display = tab === 'furniture' ? 'flex' : 'none';
+            document.getElementById('drawer-view-inspector').style.display = tab === 'inspector' ? 'flex' : 'none';
             document.getElementById('drawer-view-rooms').style.display = tab === 'rooms' ? 'flex' : 'none';
-            document.getElementById('drawer-view-settings').style.display = tab === 'settings' ? 'flex' : 'none';
         }
 
-        function toggleAccordion(catId) {
-            const el = document.getElementById(catId);
-            const body = el.querySelector('.category-body');
-            const icon = el.querySelector('.acc-icon');
-            if (body.style.display === 'none') {
-                body.style.display = 'grid';
-                icon.textContent = '▴';
-            } else {
-                body.style.display = 'none';
-                icon.textContent = '▾';
-            }
+        function toggleAccordion(id) {
+            const body = document.querySelector(`#${id} .category-body`);
+            if (body) body.style.display = body.style.display === 'none' ? 'grid' : 'none';
         }
 
-        function filterFurniture(q) {
-            const query = q.toLowerCase();
-            document.querySelectorAll('.furn-card').forEach(card => {
-                const name = card.querySelector('.furn-name').textContent.toLowerCase();
-                card.style.display = name.includes(query) ? 'flex' : 'none';
+        function filterByCategory(slug) {
+            document.querySelectorAll('.cat-filter-chip').forEach(c => c.classList.remove('active'));
+            if (event && event.currentTarget) event.currentTarget.classList.add('active');
+
+            document.querySelectorAll('.category-accordion').forEach(acc => {
+                if (slug === 'all' || acc.id === `cat-${slug}`) {
+                    acc.style.display = 'block';
+                    const body = acc.querySelector('.category-body');
+                    if (body) body.style.display = 'grid';
+                } else {
+                    acc.style.display = 'none';
+                }
             });
         }
 
-        function zoomIn() { zoomLevel = Math.min(2.0, zoomLevel + 0.15); draw(); }
-        function zoomOut() { zoomLevel = Math.max(0.6, zoomLevel - 0.15); draw(); }
-        function resetView() { zoomLevel = 1.0; panOffset = { x: 40, y: 30 }; draw(); }
-        function toggleGrid() { showGrid = !showGrid; draw(); }
+        function filterFurniture(q) {
+            const term = q.toLowerCase();
+            document.querySelectorAll('.furn-card').forEach(card => {
+                const name = card.querySelector('.furn-name')?.textContent.toLowerCase() || '';
+                card.style.display = name.includes(term) ? 'flex' : 'none';
+            });
+            document.querySelectorAll('.category-accordion').forEach(acc => {
+                const visibleCards = acc.querySelectorAll('.furn-card[style*="display: flex"], .furn-card:not([style*="display: none"])');
+                acc.style.display = (visibleCards.length > 0 || !term) ? 'block' : 'none';
+            });
+        }
 
-        // ── Keyboard Shortcuts ──
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Delete' || e.key === 'Backspace') {
-                if (document.activeElement.tagName !== 'INPUT') {
-                    deleteSelectedItem();
-                }
-            }
-        });
+        let roomContainedObjects = [];
 
-        // ── Mouse Canvas Interaction ──
+        // ── Canvas Interaction Handlers ──
         canvas.addEventListener('mousedown', (e) => {
             const rect = canvas.getBoundingClientRect();
             const mouseX = (e.clientX - rect.left - panOffset.x) / zoomLevel;
@@ -960,42 +957,32 @@
             const tileY = Math.floor(mouseY / TILE_SIZE);
 
             if (currentTool === 'select') {
-                selectedItem = null;
-                attachedObjects = [];
-
-                // 1. Objects first
+                // Find clicked object
+                let clicked = null;
                 for (let i = objects.length - 1; i >= 0; i--) {
                     const obj = objects[i];
-                    if (obj.position.x === tileX && obj.position.y === tileY) {
-                        selectedItem = { type: 'object', item: obj };
+                    const ow = obj.width || (obj.size ? obj.size.width : 1);
+                    const oh = obj.height || (obj.size ? obj.size.height : 1);
+                    if (tileX >= obj.position.x && tileX < obj.position.x + ow &&
+                        tileY >= obj.position.y && tileY < obj.position.y + oh) {
+                        clicked = { type: 'object', item: obj };
                         break;
                     }
                 }
 
-                // 2. Zones
-                if (!selectedItem) {
-                    for (let i = zones.length - 1; i >= 0; i--) {
-                        const z = zones[i];
-                        if (tileX >= z.shape_data.x && tileX < z.shape_data.x + z.shape_data.width &&
-                            tileY >= z.shape_data.y && tileY < z.shape_data.y + z.shape_data.height) {
-                            selectedItem = { type: 'zone', item: z };
-                            break;
-                        }
-                    }
-                }
-
-                // 3. Rooms
-                if (!selectedItem) {
+                // If no object, check room
+                if (!clicked) {
                     for (let i = rooms.length - 1; i >= 0; i--) {
                         const r = rooms[i];
                         if (tileX >= r.bounds.x && tileX < r.bounds.x + r.bounds.width &&
                             tileY >= r.bounds.y && tileY < r.bounds.y + r.bounds.height) {
-                            selectedItem = { type: 'room', item: r };
+                            clicked = { type: 'room', item: r };
                             break;
                         }
                     }
                 }
 
+                selectedItem = clicked;
                 if (selectedItem) {
                     isDragging = true;
                     dragStartTileX = tileX;
@@ -1004,28 +991,28 @@
                     if (selectedItem.type === 'object') {
                         dragOrigX = selectedItem.item.position.x;
                         dragOrigY = selectedItem.item.position.y;
+                        roomContainedObjects = [];
                     } else if (selectedItem.type === 'room') {
                         dragOrigX = selectedItem.item.bounds.x;
                         dragOrigY = selectedItem.item.bounds.y;
+                        const rb = selectedItem.item.bounds;
 
-                        const rx = dragOrigX;
-                        const ry = dragOrigY;
-                        const rw = selectedItem.item.bounds.width;
-                        const rh = selectedItem.item.bounds.height;
-
-                        attachedObjects = objects.filter(obj =>
-                            obj.position.x >= rx && obj.position.x < rx + rw &&
-                            obj.position.y >= ry && obj.position.y < ry + rh
-                        ).map(obj => ({
+                        // Find and link all furniture contained within this room
+                        roomContainedObjects = objects.filter(obj => {
+                            const ox = (obj.position ? obj.position.x : 0);
+                            const oy = (obj.position ? obj.position.y : 0);
+                            return (ox >= rb.x && ox < rb.x + rb.width && oy >= rb.y && oy < rb.y + rb.height);
+                        }).map(obj => ({
                             obj: obj,
-                            origX: obj.position.x,
-                            origY: obj.position.y
+                            relX: (obj.position ? obj.position.x : 0) - rb.x,
+                            relY: (obj.position ? obj.position.y : 0) - rb.y
                         }));
                     }
                     canvas.style.cursor = 'grabbing';
                 }
 
                 updateInspector();
+                updateFloatingActions();
                 draw();
             } else if (currentTool === 'room' || currentTool === 'zone') {
                 isDrawing = true;
@@ -1033,21 +1020,21 @@
                 startY = tileY;
                 currentRect = { x: tileX, y: tileY, width: 1, height: 1 };
             } else if (currentTool === 'object') {
-                const conf = OBJECT_CONFIGS[currentObjectType] || { name: 'Object', collision: false, width: 1, height: 1 };
                 const newObj = {
                     type: currentObjectType,
-                    name: `${conf.name} #${objects.length + 1}`,
-                    position: { x: tileX, y: tileY },
+                    name: `Object #${objects.length + 1}`,
+                    position: { x: tileX, y: tileY, rotation: 0 },
                     color: currentObjectColor,
-                    image_url: currentObjectCustom?.imageUrl || conf.image_url || null,
-                    width: currentObjectCustom?.width || conf.width || 1,
-                    height: currentObjectCustom?.height || conf.height || 1,
-                    collision: currentObjectCustom ? currentObjectCustom.collision : conf.collision
+                    image_url: currentObjectCustom?.imageUrl || null,
+                    width: currentObjectCustom?.width || 1,
+                    height: currentObjectCustom?.height || 1,
+                    collision: currentObjectCustom ? currentObjectCustom.collision : true
                 };
                 objects.push(newObj);
                 selectedItem = { type: 'object', item: newObj };
+                setTool('select');
                 updateInspector();
-                updateStats();
+                updateFloatingActions();
                 draw();
             }
         });
@@ -1066,23 +1053,32 @@
 
                 if (selectedItem.type === 'object') {
                     selectedItem.item.position.x = Math.max(0, Math.min(31, dragOrigX + dx));
-                    selectedItem.item.position.y = Math.max(0, Math.min(23, dragOrigY + dy));
+                    selectedItem.item.position.y = Math.max(0, Math.min(31, dragOrigY + dy));
                 } else if (selectedItem.type === 'room') {
                     const newRoomX = Math.max(0, Math.min(32 - selectedItem.item.bounds.width, dragOrigX + dx));
-                    const newRoomY = Math.max(0, Math.min(24 - selectedItem.item.bounds.height, dragOrigY + dy));
-                    const actualDeltaX = newRoomX - dragOrigX;
-                    const actualDeltaY = newRoomY - dragOrigY;
-
+                    const newRoomY = Math.max(0, Math.min(32 - selectedItem.item.bounds.height, dragOrigY + dy));
                     selectedItem.item.bounds.x = newRoomX;
                     selectedItem.item.bounds.y = newRoomY;
 
-                    if (attachedObjects && attachedObjects.length > 0) {
-                        attachedObjects.forEach(att => {
-                            att.obj.position.x = Math.max(0, Math.min(31, att.origX + actualDeltaX));
-                            att.obj.position.y = Math.max(0, Math.min(23, att.origY + actualDeltaY));
+                    // Automatically move all contained furniture together!
+                    if (roomContainedObjects && roomContainedObjects.length > 0) {
+                        roomContainedObjects.forEach(entry => {
+                            if (entry.obj && entry.obj.position) {
+                                entry.obj.position.x = Math.max(0, Math.min(31, newRoomX + entry.relX));
+                                entry.obj.position.y = Math.max(0, Math.min(31, newRoomY + entry.relY));
+                            }
                         });
                     }
+
+                    // Move associated audio zone
+                    const associatedZone = zones.find(z => z.room_id === selectedItem.item.id || (z.metadata && z.metadata.room_id === selectedItem.item.id));
+                    if (associatedZone && associatedZone.shape_data) {
+                        associatedZone.shape_data.x = newRoomX;
+                        associatedZone.shape_data.y = newRoomY;
+                    }
+                    invalidateEditorBg();
                 }
+                updateFloatingActions();
                 draw();
                 return;
             }
@@ -1101,8 +1097,10 @@
         canvas.addEventListener('mouseup', () => {
             if (isDragging) {
                 isDragging = false;
-                attachedObjects = [];
+                roomContainedObjects = [];
                 canvas.style.cursor = currentTool === 'select' ? 'default' : 'crosshair';
+                invalidateEditorBg();
+                updateFloatingActions();
                 draw();
             }
 
@@ -1114,72 +1112,107 @@
                         access_mode: currentRoomType === 'private' ? 'private' : 'public',
                         capacity: 10,
                         color: currentRoomColor,
-                        bounds: currentRect
+                        bounds: { ...currentRect }
                     };
                     rooms.push(newRoom);
                     selectedItem = { type: 'room', item: newRoom };
-                } else if (currentTool === 'zone') {
-                    const newZone = {
-                        name: 'Audio Zone',
+
+                    // Automatically create an acoustic audio zone for this room
+                    const newAudioZone = {
+                        name: `Audio Zone — ${newRoom.name}`,
                         type: 'audio',
                         shape_type: 'rectangle',
-                        shape_data: currentRect,
-                        audible_radius: 160
+                        shape_data: { ...currentRect },
+                        audible_radius: 200,
+                        metadata: { auto_created: true, room_name: newRoom.name }
                     };
-                    zones.push(newZone);
-                    selectedItem = { type: 'zone', item: newZone };
+                    zones.push(newAudioZone);
+
+                    invalidateEditorBg();
+                    showToast('🏢 Room & Isolated Audio Zone created!');
                 }
                 isDrawing = false;
                 currentRect = null;
+                setTool('select');
                 updateInspector();
-                updateStats();
+                updateFloatingActions();
                 draw();
             }
         });
 
-        function updateInspector() {
-            const nameInput = document.getElementById('prop-name');
-            const colorInput = document.getElementById('prop-color');
-            const capInput = document.getElementById('prop-capacity');
-            const colorGroup = document.getElementById('prop-color-group');
-            const capGroup = document.getElementById('prop-capacity-group');
-
-            if (selectedItem) {
-                nameInput.value = selectedItem.item.name || '';
-                if (selectedItem.type === 'room') {
-                    colorGroup.style.display = 'flex';
-                    capGroup.style.display = 'flex';
-                    colorInput.value = selectedItem.item.color || '#00b4b3';
-                    capInput.value = selectedItem.item.capacity || 10;
-                } else {
-                    colorGroup.style.display = 'none';
-                    capGroup.style.display = 'none';
-                }
-            } else {
-                nameInput.value = 'Office Layout';
-                colorGroup.style.display = 'none';
-                capGroup.style.display = 'none';
+        // Keyboard Shortcuts
+        window.addEventListener('keydown', (e) => {
+            if (['input', 'textarea'].includes(document.activeElement.tagName.toLowerCase())) return;
+            const k = e.key.toLowerCase();
+            if (k === 'r' && selectedItem && selectedItem.type === 'object') {
+                rotateSelectedItem(90);
+            } else if ((k === 'delete' || k === 'backspace') && selectedItem) {
+                deleteSelectedItem();
+            } else if (k === 'd' && selectedItem && selectedItem.type === 'object') {
+                duplicateSelectedItem();
+            } else if (k === 'escape') {
+                selectedItem = null;
+                updateInspector();
+                hideFloatingActions();
+                draw();
             }
+        });
+
+        // ── Rotation & Object Modification Engine ──
+        function rotateSelectedItem(degrees = 90) {
+            if (!selectedItem || selectedItem.type !== 'object') return;
+            const obj = selectedItem.item;
+            if (!obj.position) obj.position = { x: 0, y: 0, rotation: 0 };
+            const currentRot = typeof obj.position.rotation === 'number' ? obj.position.rotation : (obj.rotation || 0);
+            obj.position.rotation = (currentRot + degrees) % 360;
+            obj.rotation = obj.position.rotation;
+
+            updateInspector();
+            updateFloatingActions();
+            draw();
+            showToast(`🔄 Rotated to ${obj.position.rotation}°`);
         }
 
-        function updateSelectedProp(prop, val) {
-            if (!selectedItem) return;
-            if (prop === 'name') selectedItem.item.name = val;
-            if (prop === 'color') selectedItem.item.color = val;
-            if (prop === 'capacity') selectedItem.item.capacity = parseInt(val);
+        function setRotation(deg) {
+            if (!selectedItem || selectedItem.type !== 'object') return;
+            const obj = selectedItem.item;
+            if (!obj.position) obj.position = { x: 0, y: 0, rotation: 0 };
+            obj.position.rotation = deg;
+            obj.rotation = deg;
+
+            updateInspector();
+            updateFloatingActions();
             draw();
         }
 
-        function deleteSelectedItem() {
-            if (!selectedItem) {
-                showToast('ℹ️ Please click on an item to select it first.', '#f57b36');
-                return;
-            }
+        function duplicateSelectedItem() {
+            if (!selectedItem || selectedItem.type !== 'object') return;
+            const orig = selectedItem.item;
+            const cloned = JSON.parse(JSON.stringify(orig));
+            delete cloned.id;
+            cloned.position.x = Math.min(30, (cloned.position.x || 0) + 1);
+            cloned.position.y = Math.min(22, (cloned.position.y || 0) + 1);
+            cloned.name = `${cloned.name || 'Object'} (Copy)`;
+            objects.push(cloned);
+            selectedItem = { type: 'object', item: cloned };
 
+            updateInspector();
+            updateFloatingActions();
+            draw();
+            showToast('📋 Item Duplicated!');
+        }
+
+        function deleteSelectedItem() {
+            if (!selectedItem) return;
             const item = selectedItem.item;
-            if (selectedItem.type === 'room') {
+            if (selectedItem.type === 'object') {
+                const idx = objects.indexOf(item);
+                if (idx > -1) objects.splice(idx, 1);
+                showToast('🗑️ Furniture removed');
+            } else if (selectedItem.type === 'room') {
                 const idx = rooms.indexOf(item);
                 if (idx > -1) rooms.splice(idx, 1);
+                invalidateEditorBg();
                 if (item.id) {
                     fetch(`/api/v1/organizations/${ORG_ID}/rooms/${item.id}`, {
                         method: 'DELETE',
@@ -1188,651 +1221,167 @@
                     }).catch(console.error);
                 }
                 showToast('🗑️ Room removed');
-            } else if (selectedItem.type === 'zone') {
-                const idx = zones.indexOf(item);
-                if (idx > -1) zones.splice(idx, 1);
-                showToast('🗑️ Audio zone removed');
-            } else if (selectedItem.type === 'object') {
-                const idx = objects.indexOf(item);
-                if (idx > -1) objects.splice(idx, 1);
-                showToast('🗑️ Furniture removed');
             }
-
             selectedItem = null;
             updateInspector();
-            updateStats();
+            hideFloatingActions();
             draw();
         }
 
-        function updateStats() {
-            document.getElementById('stat-rooms-count').textContent = rooms.length;
-            document.getElementById('stat-zones-count').textContent = zones.length;
-            document.getElementById('stat-objects-count').textContent = objects.length;
+        function updateSelectedProp(prop, val) {
+            if (!selectedItem) return;
+            if (prop === 'name') selectedItem.item.name = val;
+            if (prop === 'color') { selectedItem.item.color = val; invalidateEditorBg(); }
+            if (prop === 'width') selectedItem.item.width = val;
+            if (prop === 'height') selectedItem.item.height = val;
+            draw();
         }
 
-        // ── Top-Down Furniture Sprites ──
-        const FURN_SHEET1 = new Image();
-        FURN_SHEET1.src = '/images/furniture/furniture_sheet1.webp';
-        let furnSheet1Loaded = false;
-        FURN_SHEET1.onload = () => { furnSheet1Loaded = true; draw(); };
-
-        const FURN_SHEET2 = new Image();
-        FURN_SHEET2.src = '/images/furniture/furniture_sheet2.webp';
-        let furnSheet2Loaded = false;
-        FURN_SHEET2.onload = () => { furnSheet2Loaded = true; draw(); };
-
-        const EDITOR_3D_FURNITURE = {
-            desk: (x, y) => {
-                if (furnSheet1Loaded) {
-                    ctx.drawImage(FURN_SHEET1, 40, 205, 260, 215, x - 4, y - 6, 40, 38);
-                } else {
-                    ctx.fillStyle = '#5c4033'; ctx.fillRect(x + 2, y + 4, 28, 22);
-                }
-            },
-            executive_desk: (x, y) => {
-                if (furnSheet2Loaded) {
-                    ctx.drawImage(FURN_SHEET2, 500, 70, 340, 500, x - 8, y - 10, 48, 52);
-                } else {
-                    ctx.fillStyle = '#271610'; ctx.fillRect(x + 2, y + 3, 28, 24);
-                }
-            },
-            chair: (x, y) => {
-                if (furnSheet1Loaded) {
-                    ctx.drawImage(FURN_SHEET1, 50, 68, 120, 105, x + 2, y + 2, 28, 28);
-                } else {
-                    ctx.fillStyle = '#00b4b3'; ctx.beginPath(); ctx.arc(x + 16, y + 16, 10, 0, Math.PI * 2); ctx.fill();
-                }
-            },
-            sofa: (x, y) => {
-                if (furnSheet1Loaded) {
-                    ctx.drawImage(FURN_SHEET1, 400, 830, 245, 115, x - 4, y - 2, 40, 28);
-                } else {
-                    ctx.fillStyle = '#012c41'; ctx.fillRect(x + 2, y + 4, 28, 22);
-                }
-            },
-            plant: (x, y) => {
-                if (furnSheet1Loaded) {
-                    ctx.drawImage(FURN_SHEET1, 310, 68, 110, 110, x + 2, y + 2, 28, 28);
-                } else {
-                    ctx.fillStyle = '#006847'; ctx.beginPath(); ctx.arc(x + 16, y + 16, 8, 0, Math.PI * 2); ctx.fill();
-                }
-            },
-            dining_table: (x, y) => {
-                if (furnSheet1Loaded) {
-                    ctx.drawImage(FURN_SHEET1, 600, 80, 360, 320, x - 8, y - 8, 48, 48);
-                } else {
-                    ctx.fillStyle = '#3e2723'; ctx.fillRect(x + 2, y + 2, 28, 28);
-                }
-            }
-        };
-
-        // ── Ultra-High-Fidelity Procedural Office Furniture Rendering Engine ──
-        function drawEnhancedOfficeFurniture(ctx, obj, ox, oy, objW, objH) {
-            ctx.save();
-
-            // 1. Check custom uploaded sprite image first
-            const customSprite = CUSTOM_IMAGE_CACHE[obj.type] || (obj.image_url ? { img: (function(){ const i = new Image(); i.src = obj.image_url; return i; })() } : null);
-            if (customSprite && customSprite.img && customSprite.img.complete && customSprite.img.naturalWidth > 0) {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
-                ctx.beginPath();
-                if (ctx.roundRect) ctx.roundRect(ox + 2, oy + 4, objW - 4, objH - 4, 6);
-                else ctx.rect(ox + 2, oy + 4, objW - 4, objH - 4);
-                ctx.fill();
-
-                ctx.drawImage(customSprite.img, ox, oy, objW, objH);
-                ctx.restore();
+        function updateInspector() {
+            const emptyBox = document.getElementById('inspector-empty-msg');
+            const contentBox = document.getElementById('inspector-content');
+            if (!selectedItem) {
+                emptyBox.style.display = 'block';
+                contentBox.style.display = 'none';
                 return;
             }
 
-            const type = String(obj.type || '').toLowerCase();
-            const primaryColor = obj.color || '#00b4b3';
+            emptyBox.style.display = 'none';
+            contentBox.style.display = 'flex';
 
-            function roundRect(x, y, w, h, r) {
-                if (ctx.roundRect) {
-                    ctx.roundRect(x, y, w, h, r);
-                } else {
-                    ctx.beginPath();
-                    ctx.moveTo(x + r, y);
-                    ctx.lineTo(x + w - r, y);
-                    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-                    ctx.lineTo(x + w, y + h - r);
-                    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-                    ctx.lineTo(x + r, y + h);
-                    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-                    ctx.lineTo(x, y + r);
-                    ctx.quadraticCurveTo(x, y, x + r, y);
-                    ctx.closePath();
-                }
-            }
+            const item = selectedItem.item;
+            document.getElementById('prop-name').value = item.name || '';
+            
+            if (selectedItem.type === 'object') {
+                document.getElementById('prop-rotation-group').style.display = 'flex';
+                document.getElementById('prop-size-group').style.display = 'flex';
+                document.getElementById('prop-color-group').style.display = 'none';
+                document.getElementById('prop-width').value = item.width || (item.size ? item.size.width : 1);
+                document.getElementById('prop-height').value = item.height || (item.size ? item.size.height : 1);
 
-            // ── 1. ERGONOMIC OFFICE CHAIR / BEANBAG ──
-            if (type === 'chair' || type === 'ergo_chair' || type === 'beanbag') {
-                if (type === 'beanbag') {
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
-                    ctx.beginPath();
-                    ctx.arc(ox + objW/2, oy + objH/2 + 3, objW/2 - 2, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    const bbGrad = ctx.createRadialGradient(ox + objW/2 - 3, oy + objH/2 - 3, 2, ox + objW/2, oy + objH/2, objW/2 - 2);
-                    bbGrad.addColorStop(0, primaryColor);
-                    bbGrad.addColorStop(1, '#d97706');
-                    ctx.fillStyle = bbGrad;
-                    ctx.beginPath();
-                    ctx.arc(ox + objW/2, oy + objH/2, objW/2 - 3, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = 'rgba(0,0,0,0.15)';
-                    ctx.beginPath();
-                    ctx.arc(ox + objW/2, oy + objH/2 + 2, objW/4, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#ffffff';
-                    ctx.beginPath();
-                    ctx.arc(ox + objW/2, oy + objH/2 - 4, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                } else {
-                    const cx = ox + objW / 2;
-                    const cy = oy + objH / 2;
-
-                    ctx.strokeStyle = '#475569';
-                    ctx.lineWidth = 2.5;
-                    for (let a = 0; a < 5; a++) {
-                        const angle = (a * 2 * Math.PI) / 5 - Math.PI / 2;
-                        ctx.beginPath();
-                        ctx.moveTo(cx, cy);
-                        ctx.lineTo(cx + Math.cos(angle) * 11, cy + Math.sin(angle) * 11);
-                        ctx.stroke();
-
-                        ctx.fillStyle = '#1e293b';
-                        ctx.beginPath();
-                        ctx.arc(cx + Math.cos(angle) * 11, cy + Math.sin(angle) * 11, 2, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
-                    ctx.beginPath();
-                    ctx.arc(cx, cy + 2, 10, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    const seatGrad = ctx.createRadialGradient(cx - 2, cy - 2, 2, cx, cy, 10);
-                    seatGrad.addColorStop(0, primaryColor);
-                    seatGrad.addColorStop(1, '#004862');
-                    ctx.fillStyle = seatGrad;
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, 9, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.strokeStyle = 'rgba(255,255,255,0.4)';
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-
-                    ctx.fillStyle = '#0f172a';
-                    roundRect(cx - 8, cy - 11, 16, 5, 2.5);
-                    ctx.fill();
-                    ctx.fillStyle = primaryColor;
-                    roundRect(cx - 6, cy - 10, 12, 3, 1.5);
-                    ctx.fill();
-
-                    ctx.strokeStyle = '#94a3b8';
-                    ctx.lineWidth = 1.5;
-                    ctx.beginPath();
-                    ctx.moveTo(cx - 7, cy - 9);
-                    ctx.lineTo(cx + 7, cy - 9);
-                    ctx.stroke();
-
-                    ctx.fillStyle = '#1e293b';
-                    roundRect(cx - 12, cy - 4, 3, 8, 1.5);
-                    ctx.fill();
-                    roundRect(cx + 9, cy - 4, 3, 8, 1.5);
-                    ctx.fill();
-                }
-            }
-
-            // ── 2. EXECUTIVE & STANDARD WORKSTATION DESKS ──
-            else if (type === 'desk' || type === 'executive_desk' || type === 'workstation') {
-                const isExec = type === 'executive_desk' || (objW >= 64 && objH >= 64);
-
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-                roundRect(ox + 2, oy + 4, objW - 4, objH - 4, 6);
-                ctx.fill();
-
-                const deskGrad = ctx.createLinearGradient(ox, oy, ox, oy + objH);
-                if (isExec) {
-                    deskGrad.addColorStop(0, '#331c12');
-                    deskGrad.addColorStop(0.5, '#4a2818');
-                    deskGrad.addColorStop(1, '#27140b');
-                } else {
-                    deskGrad.addColorStop(0, '#78350f');
-                    deskGrad.addColorStop(0.5, '#92400e');
-                    deskGrad.addColorStop(1, '#662d0b');
-                }
-                ctx.fillStyle = deskGrad;
-                roundRect(ox + 1, oy + 1, objW - 2, objH - 2, 4);
-                ctx.fill();
-
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-
-                const padW = Math.min(objW - 12, 38);
-                const padH = Math.min(objH - 10, 20);
-                const padX = ox + (objW - padW) / 2;
-                const padY = oy + (objH - padH) / 2 + (isExec ? 4 : 2);
-
-                ctx.fillStyle = '#0f172a';
-                roundRect(padX, padY, padW, padH, 2);
-                ctx.fill();
-                ctx.strokeStyle = '#334155';
-                ctx.lineWidth = 0.5;
-                ctx.stroke();
-
-                const monW = Math.min(objW - 14, 30);
-                const monH = 4;
-                const monX = ox + (objW - monW) / 2;
-                const monY = oy + 4;
-
-                ctx.fillStyle = '#94a3b8';
-                ctx.fillRect(ox + objW/2 - 4, monY + monH, 8, 2);
-
-                ctx.fillStyle = '#020617';
-                roundRect(monX, monY, monW, monH, 1.5);
-                ctx.fill();
-
-                const screenGrad = ctx.createLinearGradient(monX + 2, monY, monX + monW - 2, monY);
-                screenGrad.addColorStop(0, '#00b4b3');
-                screenGrad.addColorStop(0.5, '#38bdf8');
-                screenGrad.addColorStop(1, '#006847');
-                ctx.fillStyle = screenGrad;
-                ctx.fillRect(monX + 2, monY + 1, monW - 4, 2);
-
-                const kbW = Math.min(padW - 14, 18);
-                const kbH = 6;
-                const kbX = padX + (padW - kbW) / 2 - 4;
-                const kbY = padY + padH - kbH - 2;
-
-                ctx.fillStyle = '#1e293b';
-                roundRect(kbX, kbY, kbW, kbH, 1);
-                ctx.fill();
-                ctx.fillStyle = '#38bdf8';
-                ctx.fillRect(kbX + 2, kbY + 2, kbW - 4, 2);
-
-                ctx.fillStyle = '#334155';
-                roundRect(kbX + kbW + 3, kbY + 1, 4, 5, 1.5);
-                ctx.fill();
-
-                ctx.fillStyle = '#f8fafc';
-                ctx.beginPath();
-                ctx.arc(ox + 8, oy + objH - 8, 3, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = '#78350f';
-                ctx.beginPath();
-                ctx.arc(ox + 8, oy + objH - 8, 2, 0, Math.PI * 2);
-                ctx.fill();
-
-                if (isExec) {
-                    ctx.fillStyle = '#d20005';
-                    roundRect(ox + objW - 16, oy + 8, 10, 14, 1.5);
-                    ctx.fill();
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(ox + objW - 14, oy + 10, 6, 2);
-
-                    const lampGrad = ctx.createRadialGradient(ox + 10, oy + 8, 2, ox + 10, oy + 8, 16);
-                    lampGrad.addColorStop(0, 'rgba(254, 240, 138, 0.4)');
-                    lampGrad.addColorStop(1, 'rgba(254, 240, 138, 0)');
-                    ctx.fillStyle = lampGrad;
-                    ctx.beginPath();
-                    ctx.arc(ox + 10, oy + 8, 16, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#ffd136';
-                    ctx.beginPath();
-                    ctx.arc(ox + 10, oy + 8, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
-
-            // ── 3. CONFERENCE & MEETING TABLES ──
-            else if (type === 'dining_table' || type === 'conference_table' || type === 'meeting_table') {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
-                roundRect(ox + 3, oy + 5, objW - 6, objH - 6, 8);
-                ctx.fill();
-
-                const confGrad = ctx.createLinearGradient(ox, oy, ox, oy + objH);
-                confGrad.addColorStop(0, '#2b170e');
-                confGrad.addColorStop(0.5, '#452618');
-                confGrad.addColorStop(1, '#23120a');
-                ctx.fillStyle = confGrad;
-                roundRect(ox + 2, oy + 2, objW - 4, objH - 4, 8);
-                ctx.fill();
-
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
-                roundRect(ox + 10, oy + (objH - 12) / 2, objW - 20, 12, 3);
-                ctx.fill();
-
-                const numPods = Math.max(2, Math.floor(objW / 28));
-                for (let i = 0; i < numPods; i++) {
-                    const px = ox + 14 + (i * (objW - 28)) / (numPods - 1);
-                    const py = oy + objH / 2;
-
-                    ctx.fillStyle = '#334155';
-                    ctx.beginPath();
-                    ctx.arc(px, py, 3, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#22c55e';
-                    ctx.beginPath();
-                    ctx.arc(px, py, 1, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-
-                const chairsCount = Math.max(2, Math.floor((objW - 16) / 22));
-                for (let i = 0; i < chairsCount; i++) {
-                    const cx = ox + 12 + i * 22;
-                    ctx.fillStyle = '#1e293b';
-                    roundRect(cx, oy - 2, 14, 4, 2);
-                    ctx.fill();
-                    roundRect(cx, oy + objH - 2, 14, 4, 2);
-                    ctx.fill();
-                }
-            }
-
-            // ── 4. MODERN SOFAS & BOOTHS ──
-            else if (type === 'sofa' || type === 'lounge_sofa' || type === 'booth') {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-                roundRect(ox + 2, oy + 4, objW - 4, objH - 4, 6);
-                ctx.fill();
-
-                const sofaGrad = ctx.createLinearGradient(ox, oy, ox, oy + objH);
-                sofaGrad.addColorStop(0, primaryColor);
-                sofaGrad.addColorStop(1, '#002535');
-                ctx.fillStyle = sofaGrad;
-                roundRect(ox + 1, oy + 1, objW - 2, objH - 2, 6);
-                ctx.fill();
-
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
-                roundRect(ox + 3, oy + 3, objW - 6, 7, 3);
-                ctx.fill();
-
-                const numCushions = objW > 48 ? 2 : 1;
-                const cW = (objW - 12) / numCushions;
-                for (let i = 0; i < numCushions; i++) {
-                    const cx = ox + 5 + i * cW + (i > 0 ? 2 : 0);
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
-                    roundRect(cx, oy + 11, cW - 2, objH - 14, 3);
-                    ctx.fill();
-                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                }
-
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
-                roundRect(ox + 1, oy + 2, 4, objH - 4, 2);
-                ctx.fill();
-                roundRect(ox + objW - 5, oy + 2, 4, objH - 4, 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#ffd136';
-                roundRect(ox + 5, oy + 12, 6, 6, 2);
-                ctx.fill();
-
-                if (objW > 48) {
-                    ctx.fillStyle = '#f57b36';
-                    roundRect(ox + objW - 11, oy + 12, 6, 6, 2);
-                    ctx.fill();
-                }
-            }
-
-            // ── 5. POTTED TROPICAL OFFICE PLANTS ──
-            else if (type === 'plant' || type === 'decor_plant') {
-                const cx = ox + objW / 2;
-                const cy = oy + objH / 2;
-
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
-                ctx.beginPath();
-                ctx.arc(cx, cy + 3, 11, 0, Math.PI * 2);
-                ctx.fill();
-
-                const potGrad = ctx.createRadialGradient(cx - 3, cy - 3, 2, cx, cy, 10);
-                potGrad.addColorStop(0, '#f8fafc');
-                potGrad.addColorStop(1, '#94a3b8');
-                ctx.fillStyle = potGrad;
-                ctx.beginPath();
-                ctx.arc(cx, cy, 10, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#451a03';
-                ctx.beginPath();
-                ctx.arc(cx, cy, 7.5, 0, Math.PI * 2);
-                ctx.fill();
-
-                const leafAngles = [0, 0.78, 1.57, 2.35, 3.14, 3.92, 4.71, 5.49];
-                leafAngles.forEach((angle, idx) => {
-                    const lx = cx + Math.cos(angle) * 11;
-                    const ly = cy + Math.sin(angle) * 11;
-
-                    const leafGrad = ctx.createRadialGradient(cx, cy, 2, lx, ly, 7);
-                    leafGrad.addColorStop(0, idx % 2 === 0 ? '#006847' : '#00b4b3');
-                    leafGrad.addColorStop(1, idx % 2 === 0 ? '#004d34' : '#00726c');
-                    ctx.fillStyle = leafGrad;
-
-                    ctx.beginPath();
-                    ctx.arc(lx, ly, 4.5, 0, Math.PI * 2);
-                    ctx.fill();
-
-                    ctx.strokeStyle = '#a7c545';
-                    ctx.lineWidth = 1;
-                    ctx.beginPath();
-                    ctx.moveTo(cx, cy);
-                    ctx.lineTo(lx, ly);
-                    ctx.stroke();
+                const rot = (item.position && typeof item.position.rotation === 'number') ? item.position.rotation : (item.rotation || 0);
+                document.querySelectorAll('.rot-pill').forEach(pill => {
+                    pill.classList.toggle('active', pill.textContent.includes(`${rot}°`));
                 });
-
-                ctx.fillStyle = '#a7c545';
-                ctx.beginPath();
-                ctx.arc(cx, cy, 3, 0, Math.PI * 2);
-                ctx.fill();
+            } else if (selectedItem.type === 'room') {
+                document.getElementById('prop-rotation-group').style.display = 'none';
+                document.getElementById('prop-size-group').style.display = 'none';
+                document.getElementById('prop-color-group').style.display = 'flex';
+                document.getElementById('prop-color').value = item.color || '#6366F1';
             }
-
-            // ── 6. GLASS & MAGNETIC WHITEBOARDS ──
-            else if (type === 'whiteboard') {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
-                roundRect(ox + 2, oy + 3, objW - 4, objH - 4, 3);
-                ctx.fill();
-
-                ctx.fillStyle = '#94a3b8';
-                roundRect(ox + 1, oy + 1, objW - 2, objH - 2, 3);
-                ctx.fill();
-
-                const boardGrad = ctx.createLinearGradient(ox, oy, ox, oy + objH);
-                boardGrad.addColorStop(0, '#ffffff');
-                boardGrad.addColorStop(1, '#f1f5f9');
-                ctx.fillStyle = boardGrad;
-                roundRect(ox + 3, oy + 3, objW - 6, objH - 6, 2);
-                ctx.fill();
-
-                ctx.strokeStyle = '#00b4b3';
-                ctx.lineWidth = 1.5;
-                ctx.beginPath();
-                ctx.moveTo(ox + 8, oy + 8);
-                ctx.lineTo(ox + 18, oy + 8);
-                ctx.lineTo(ox + 24, oy + 14);
-                ctx.stroke();
-
-                ctx.strokeStyle = '#d20005';
-                ctx.beginPath();
-                ctx.arc(ox + objW - 12, oy + 11, 3, 0, Math.PI * 2);
-                ctx.stroke();
-
-                ctx.fillStyle = '#475569';
-                ctx.fillRect(ox + (objW - 24) / 2, oy + objH - 3, 24, 2);
-                ctx.fillStyle = '#00b4b3'; ctx.fillRect(ox + (objW - 20) / 2, oy + objH - 3, 4, 1.5);
-                ctx.fillStyle = '#d20005'; ctx.fillRect(ox + (objW - 20) / 2 + 6, oy + objH - 3, 4, 1.5);
-                ctx.fillStyle = '#012c41'; ctx.fillRect(ox + (objW - 20) / 2 + 12, oy + objH - 3, 4, 1.5);
-            }
-
-            // ── 7. LARGE PRESENTATION AV SCREEN ──
-            else if (type === 'screen' || type === 'tv') {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
-                roundRect(ox + 2, oy + 3, objW - 4, objH - 4, 3);
-                ctx.fill();
-
-                ctx.fillStyle = '#020617';
-                roundRect(ox + 1, oy + 1, objW - 2, objH - 2, 2);
-                ctx.fill();
-
-                const scrGrad = ctx.createLinearGradient(ox, oy, ox + objW, oy + objH);
-                scrGrad.addColorStop(0, '#004862');
-                scrGrad.addColorStop(0.5, '#00b4b3');
-                scrGrad.addColorStop(1, '#012c41');
-                ctx.fillStyle = scrGrad;
-                roundRect(ox + 3, oy + 3, objW - 6, objH - 6, 1);
-                ctx.fill();
-
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-                ctx.fillRect(ox + 6, oy + 6, 8, 2);
-                ctx.fillRect(ox + 6, oy + 10, 14, 2);
-                ctx.fillStyle = '#ffd136';
-                ctx.beginPath();
-                ctx.arc(ox + objW - 10, oy + objH / 2, 4, 0, Math.PI * 1.4);
-                ctx.lineTo(ox + objW - 10, oy + objH / 2);
-                ctx.fill();
-            }
-
-            // ── 8. PING PONG / GAME TABLE ──
-            else if (type === 'pingpong') {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.22)';
-                roundRect(ox + 3, oy + 5, objW - 6, objH - 6, 4);
-                ctx.fill();
-
-                ctx.fillStyle = '#00726c';
-                roundRect(ox + 2, oy + 2, objW - 4, objH - 4, 3);
-                ctx.fill();
-
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 1.5;
-                ctx.strokeRect(ox + 4, oy + 4, objW - 8, objH - 8);
-
-                ctx.beginPath();
-                ctx.moveTo(ox + 4, oy + objH / 2);
-                ctx.lineTo(ox + objW - 4, oy + objH / 2);
-                ctx.stroke();
-
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-                ctx.fillRect(ox + objW / 2 - 1, oy + 2, 2, objH - 4);
-                ctx.fillStyle = '#0f172a';
-                ctx.fillRect(ox + objW / 2 - 2, oy + 1, 4, 2);
-                ctx.fillRect(ox + objW / 2 - 2, oy + objH - 3, 4, 2);
-
-                ctx.fillStyle = '#d20005';
-                ctx.beginPath(); ctx.arc(ox + 12, oy + 10, 3, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#004862';
-                ctx.beginPath(); ctx.arc(ox + objW - 12, oy + objH - 10, 3, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath(); ctx.arc(ox + objW / 2 + 4, oy + 8, 1.5, 0, Math.PI * 2); ctx.fill();
-            }
-
-            // ── 9. WATER COOLER ──
-            else if (type === 'water_cooler') {
-                const cx = ox + objW / 2;
-                const cy = oy + objH / 2;
-
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
-                ctx.beginPath();
-                ctx.arc(cx, cy + 2, 9, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#f8fafc';
-                roundRect(ox + 4, oy + 6, objW - 8, objH - 8, 3);
-                ctx.fill();
-                ctx.strokeStyle = '#cbd5e1';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-
-                const waterGrad = ctx.createRadialGradient(cx - 2, cy - 2, 1, cx, cy, 6);
-                waterGrad.addColorStop(0, '#38bdf8');
-                waterGrad.addColorStop(1, '#0284c7');
-                ctx.fillStyle = waterGrad;
-                ctx.beginPath();
-                ctx.arc(cx, cy - 1, 6, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(cx - 3, cy + 6, 1.5, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(cx + 3, cy + 6, 1.5, 0, Math.PI * 2); ctx.fill();
-            }
-
-            // ── 10. FILING CABINET ──
-            else if (type === 'cabinet' || type === 'storage') {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
-                roundRect(ox + 2, oy + 3, objW - 4, objH - 4, 3);
-                ctx.fill();
-
-                ctx.fillStyle = '#334155';
-                roundRect(ox + 2, oy + 2, objW - 4, objH - 4, 2);
-                ctx.fill();
-
-                const numDrawers = Math.max(2, Math.floor(objH / 14));
-                const dH = (objH - 6) / numDrawers;
-                for (let i = 0; i < numDrawers; i++) {
-                    const dy = oy + 3 + i * dH;
-                    ctx.fillStyle = '#475569';
-                    roundRect(ox + 4, dy + 1, objW - 8, dH - 2, 1.5);
-                    ctx.fill();
-
-                    ctx.fillStyle = '#cbd5e1';
-                    ctx.fillRect(ox + objW / 2 - 4, dy + dH / 2 - 1, 8, 2);
-                }
-            }
-
-            // ── 11. FLOOR LAMP ──
-            else if (type === 'lamp') {
-                const cx = ox + objW / 2;
-                const cy = oy + objH / 2;
-
-                const lightGrad = ctx.createRadialGradient(cx, cy, 4, cx, cy, 28);
-                lightGrad.addColorStop(0, 'rgba(254, 240, 138, 0.5)');
-                lightGrad.addColorStop(0.5, 'rgba(254, 240, 138, 0.2)');
-                lightGrad.addColorStop(1, 'rgba(254, 240, 138, 0)');
-                ctx.fillStyle = lightGrad;
-                ctx.beginPath();
-                ctx.arc(cx, cy, 28, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#1e293b';
-                ctx.beginPath();
-                ctx.arc(cx, cy, 7, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#ffd136';
-                ctx.beginPath();
-                ctx.arc(cx, cy, 4.5, 0, Math.PI * 2);
-                ctx.fill();
-            }
-
-            // ── 12. GENERIC FALLBACK ──
-            else {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.18)';
-                roundRect(ox + 2, oy + 3, objW - 4, objH - 4, 4);
-                ctx.fill();
-
-                const genGrad = ctx.createLinearGradient(ox, oy, ox, oy + objH);
-                genGrad.addColorStop(0, '#ffffff');
-                genGrad.addColorStop(1, '#f1f5f9');
-                ctx.fillStyle = genGrad;
-                roundRect(ox + 2, oy + 2, objW - 4, objH - 4, 3);
-                ctx.fill();
-
-                ctx.fillStyle = primaryColor;
-                roundRect(ox + 2, oy + 2, objW - 4, 4, 2);
-                ctx.fill();
-
-                ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
-                ctx.lineWidth = 1;
-                ctx.stroke();
-            }
-
-            ctx.restore();
         }
 
-        // ── Main Draw Loop ──
+        function updateFloatingActions() {
+            const floatBox = document.getElementById('floating-actions');
+            if (!selectedItem || selectedItem.type !== 'object') {
+                floatBox.style.display = 'none';
+                return;
+            }
+
+            const obj = selectedItem.item;
+            const ox = (obj.position ? obj.position.x : 0) * TILE_SIZE;
+            const oy = (obj.position ? obj.position.y : 0) * TILE_SIZE;
+            const ow = (obj.width || (obj.size ? obj.size.width : 1)) * TILE_SIZE;
+
+            const screenX = ox * zoomLevel + panOffset.x + (ow * zoomLevel) / 2;
+            const screenY = oy * zoomLevel + panOffset.y;
+
+            floatBox.style.left = `${screenX}px`;
+            floatBox.style.top = `${screenY}px`;
+            floatBox.style.display = 'flex';
+        }
+
+        function hideFloatingActions() {
+            document.getElementById('floating-actions').style.display = 'none';
+        }
+
+        // ── High Performance Offscreen Background Buffer ──
+        let editorBgCanvas = null;
+        let editorBgDirty = true;
+
+        function invalidateEditorBg() {
+            editorBgDirty = true;
+        }
+
+        function renderEditorStaticBackground() {
+            const mapW = (MAP_DATA.width || 32) * TILE_SIZE;
+            const mapH = (MAP_DATA.height || 24) * TILE_SIZE;
+
+            if (!editorBgCanvas) {
+                editorBgCanvas = document.createElement('canvas');
+                editorBgCanvas.width = mapW;
+                editorBgCanvas.height = mapH;
+            }
+            const bctx = editorBgCanvas.getContext('2d');
+            bctx.clearRect(0, 0, mapW, mapH);
+
+            // 1. Digital Workplace Main Floor
+            bctx.fillStyle = '#0b0f19';
+            bctx.fillRect(0, 0, mapW, mapH);
+
+            // Floor Grid Lines
+            if (showGrid) {
+                bctx.strokeStyle = 'rgba(255, 255, 255, 0.035)';
+                bctx.lineWidth = 1;
+                for (let x = 0; x <= mapW; x += TILE_SIZE) {
+                    bctx.beginPath(); bctx.moveTo(x, 0); bctx.lineTo(x, mapH); bctx.stroke();
+                }
+                for (let y = 0; y <= mapH; y += TILE_SIZE) {
+                    bctx.beginPath(); bctx.moveTo(0, y); bctx.lineTo(mapW, y); bctx.stroke();
+                }
+            }
+
+            // Floor Outer Boundary
+            bctx.strokeStyle = '#1e293b';
+            bctx.lineWidth = 3;
+            bctx.strokeRect(0, 0, mapW, mapH);
+
+            // 2. Rooms
+            rooms.forEach((r) => {
+                const rx = r.bounds.x * TILE_SIZE;
+                const ry = r.bounds.y * TILE_SIZE;
+                const rw = r.bounds.width * TILE_SIZE;
+                const rh = r.bounds.height * TILE_SIZE;
+
+                bctx.fillStyle = 'rgba(17, 24, 39, 0.90)';
+                bctx.fillRect(rx, ry, rw, rh);
+
+                // Room Grid
+                bctx.strokeStyle = 'rgba(255, 255, 255, 0.025)';
+                bctx.lineWidth = 1;
+                for (let gx = rx; gx <= rx + rw; gx += TILE_SIZE) {
+                    bctx.beginPath(); bctx.moveTo(gx, ry); bctx.lineTo(gx, ry + rh); bctx.stroke();
+                }
+                for (let gy = ry; gy <= ry + rh; gy += TILE_SIZE) {
+                    bctx.beginPath(); bctx.moveTo(rx, gy); bctx.lineTo(rx + rw, gy); bctx.stroke();
+                }
+
+                bctx.strokeStyle = r.color || '#334155';
+                bctx.lineWidth = 2;
+                bctx.strokeRect(rx, ry, rw, rh);
+
+                // Room Title Badge
+                const badgeW = Math.min(rw - 16, 160);
+                bctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
+                if (bctx.roundRect) bctx.roundRect(rx + 8, ry + 8, badgeW, 24, 6);
+                else bctx.rect(rx + 8, ry + 8, badgeW, 24);
+                bctx.fill();
+
+                bctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+                bctx.lineWidth = 1;
+                if (bctx.roundRect) bctx.roundRect(rx + 8, ry + 8, badgeW, 24, 6);
+                else bctx.rect(rx + 8, ry + 8, badgeW, 24);
+                bctx.stroke();
+
+                bctx.fillStyle = '#f8fafc';
+                bctx.font = 'bold 11px Cairo, Inter';
+                bctx.fillText(`🏢 ${r.name}`, rx + 14, ry + 24);
+            });
+
+            editorBgDirty = false;
+        }
+
+        // ── Ultra-High-Fidelity 3D Canvas Rendering Loop ──
         function draw() {
             ctx.clearRect(0, 0, width, height);
 
@@ -1840,109 +1389,80 @@
             ctx.translate(panOffset.x, panOffset.y);
             ctx.scale(zoomLevel, zoomLevel);
 
-            const mapW = 1024;
-            const mapH = 768;
-
-            // 1. Floor Base
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, mapW, mapH);
-
-            // Subtle Wood / Tile Pattern
-            ctx.fillStyle = '#f8fafc';
-            for (let x = 0; x < mapW; x += 64) {
-                for (let y = 0; y < mapH; y += 32) {
-                    if ((Math.floor(x / 64) + Math.floor(y / 32)) % 2 === 0) {
-                        ctx.fillRect(x, y, 64, 32);
-                    }
-                }
+            // 1. Draw Pre-rendered Background Buffer
+            if (!editorBgCanvas || editorBgDirty) {
+                renderEditorStaticBackground();
             }
+            ctx.drawImage(editorBgCanvas, 0, 0);
 
-            // Floor Border
-            ctx.strokeStyle = '#cbd5e1';
-            ctx.lineWidth = 4;
-            ctx.strokeRect(0, 0, mapW, mapH);
-
-            // 2. Grid Lines
-            if (showGrid) {
-                ctx.strokeStyle = 'rgba(1, 44, 65, 0.06)';
-                ctx.lineWidth = 1;
-                for (let x = 0; x <= mapW; x += TILE_SIZE) {
-                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, mapH); ctx.stroke();
-                }
-                for (let y = 0; y <= mapH; y += TILE_SIZE) {
-                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(mapW, y); ctx.stroke();
-                }
-            }
-
-            // 3. Audio Zones
-            zones.forEach(z => {
-                const zx = z.shape_data.x * TILE_SIZE;
-                const zy = z.shape_data.y * TILE_SIZE;
-                const zw = z.shape_data.width * TILE_SIZE;
-                const zh = z.shape_data.height * TILE_SIZE;
-
-                ctx.fillStyle = 'rgba(0, 180, 179, 0.08)';
-                ctx.fillRect(zx, zy, zw, zh);
-
-                const isSelected = selectedItem && selectedItem.type === 'zone' && selectedItem.item === z;
-                ctx.strokeStyle = isSelected ? 'var(--brand-navy)' : 'rgba(0, 180, 179, 0.4)';
-                ctx.lineWidth = isSelected ? 3 : 1.5;
-                ctx.setLineDash([4, 4]);
-                ctx.strokeRect(zx, zy, zw, zh);
-                ctx.setLineDash([]);
-
-                ctx.fillStyle = '#00726c';
-                ctx.font = '700 11px Cairo, Inter';
-                ctx.fillText(`🎙️ ${z.name}`, zx + 6, zy + 16);
-            });
-
-            // 4. Rooms
-            rooms.forEach((r) => {
+            // 2. Selected Room Highlight
+            if (selectedItem && selectedItem.type === 'room') {
+                const r = selectedItem.item;
                 const rx = r.bounds.x * TILE_SIZE;
                 const ry = r.bounds.y * TILE_SIZE;
                 const rw = r.bounds.width * TILE_SIZE;
                 const rh = r.bounds.height * TILE_SIZE;
-
-                ctx.fillStyle = 'rgba(241, 245, 249, 0.85)';
-                ctx.fillRect(rx, ry, rw, rh);
-
-                const isSelected = selectedItem && selectedItem.type === 'room' && selectedItem.item === r;
-                ctx.strokeStyle = isSelected ? '#012c41' : (r.color || '#00b4b3');
-                ctx.lineWidth = isSelected ? 4 : 2;
+                ctx.strokeStyle = '#3b82f6';
+                ctx.lineWidth = 3;
                 ctx.strokeRect(rx, ry, rw, rh);
+            }
 
-                ctx.fillStyle = '#012c41';
-                ctx.font = '800 12px Cairo, Inter';
-                ctx.fillText(`🏢 ${r.name}`, rx + 8, ry + 18);
-            });
-
-            // 5. Furniture Objects
+            // 3. 3D Furniture Objects (with full Rotation & Sprites)
             objects.forEach((obj) => {
-                const ox = obj.position.x * TILE_SIZE;
-                const oy = obj.position.y * TILE_SIZE;
+                const ox = (obj.position ? obj.position.x : 0) * TILE_SIZE;
+                const oy = (obj.position ? obj.position.y : 0) * TILE_SIZE;
                 const objW = (obj.width || (obj.size ? obj.size.width : 1)) * TILE_SIZE;
                 const objH = (obj.height || (obj.size ? obj.size.height : 1)) * TILE_SIZE;
+                const rot = (obj.position && typeof obj.position.rotation === 'number') ? obj.position.rotation : (obj.rotation || 0);
 
-                drawEnhancedOfficeFurniture(ctx, obj, ox, oy, objW, objH);
+                ctx.save();
+                ctx.translate(ox + objW / 2, oy + objH / 2);
+                if (rot !== 0) ctx.rotate((rot * Math.PI) / 180);
 
+                const imgUrl = obj.image_url || (obj.interaction_config && obj.interaction_config.image_url) || null;
+                const spriteObj = CUSTOM_IMAGE_CACHE[obj.type] || (imgUrl ? { img: getLoadedImage(imgUrl) } : null);
+
+                if (spriteObj && spriteObj.img && spriteObj.img.complete && spriteObj.img.naturalWidth > 0) {
+                    ctx.drawImage(spriteObj.img, -objW / 2, -objH / 2, objW, objH);
+                } else {
+                    // Stylish Dark Fallback Block
+                    ctx.fillStyle = '#1e293b';
+                    if (ctx.roundRect) ctx.roundRect(-objW / 2 + 2, -objH / 2 + 2, objW - 4, objH - 4, 4);
+                    else ctx.rect(-objW / 2 + 2, -objH / 2 + 2, objW - 4, objH - 4);
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+
+                ctx.restore();
+
+                // Selection Box & Rotation Indicator
                 const isSelected = selectedItem && selectedItem.type === 'object' && selectedItem.item === obj;
                 if (isSelected) {
-                    ctx.strokeStyle = '#00b4b3';
-                    ctx.lineWidth = 2.5;
-                    ctx.strokeRect(ox - 1, oy - 1, objW + 2, objH + 2);
+                    ctx.strokeStyle = '#3b82f6';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(ox - 2, oy - 2, objW + 4, objH + 4);
+
+                    // Glowing Corners
+                    ctx.fillStyle = '#60a5fa';
+                    ctx.fillRect(ox - 4, oy - 4, 6, 6);
+                    ctx.fillRect(ox + objW - 2, oy - 4, 6, 6);
+                    ctx.fillRect(ox - 4, oy + objH - 2, 6, 6);
+                    ctx.fillRect(ox + objW - 2, oy + objH - 2, 6, 6);
                 }
             });
 
-            // 6. Drawing Preview
+            // 4. Drawing Drag Preview
             if (isDrawing && currentRect) {
                 const dx = currentRect.x * TILE_SIZE;
                 const dy = currentRect.y * TILE_SIZE;
                 const dw = currentRect.width * TILE_SIZE;
                 const dh = currentRect.height * TILE_SIZE;
 
-                ctx.fillStyle = currentTool === 'room' ? 'rgba(0, 180, 179, 0.2)' : 'rgba(0, 104, 71, 0.2)';
+                ctx.fillStyle = 'rgba(59, 130, 246, 0.2)';
                 ctx.fillRect(dx, dy, dw, dh);
-                ctx.strokeStyle = currentTool === 'room' ? '#00b4b3' : '#006847';
+                ctx.strokeStyle = '#3b82f6';
                 ctx.lineWidth = 2;
                 ctx.strokeRect(dx, dy, dw, dh);
             }
@@ -1953,6 +1473,7 @@
         // ── API Actions (Save Draft & Publish) ──
         async function saveMapDraft() {
             try {
+                // Save Rooms
                 for (const r of rooms) {
                     const payload = {
                         map_id: MAP_DATA.id,
@@ -1960,7 +1481,7 @@
                         type: r.type || 'meeting',
                         access_mode: r.access_mode || 'public',
                         capacity: r.capacity || 10,
-                        color: r.color || '#00b4b3',
+                        color: r.color || '#6366F1',
                         bounds: r.bounds
                     };
 
@@ -1983,18 +1504,62 @@
                     }
                 }
 
+                // Save Zones
+                for (const z of (zones || [])) {
+                    if (!z.id && z.shape_data) {
+                        try {
+                            const res = await fetch(`/api/v1/organizations/${ORG_ID}/zones`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                                credentials: 'same-origin',
+                                body: JSON.stringify({
+                                    map_id: MAP_DATA.id,
+                                    name: z.name || 'Audio Zone',
+                                    type: z.type || 'audio',
+                                    shape_type: z.shape_type || 'rectangle',
+                                    shape_data: z.shape_data,
+                                    audible_radius: z.audible_radius || 200,
+                                    metadata: z.metadata || null
+                                })
+                            });
+                            const data = await res.json();
+                            if (data.zone?.id) z.id = data.zone.id;
+                        } catch (e) {
+                            console.warn('Zone save error:', e);
+                        }
+                    }
+                }
+
+                // Format Objects with rotation & size
+                const syncObjectsPayload = objects.map(o => ({
+                    id: o.id || undefined,
+                    type: o.type,
+                    name: o.name || 'Office Object',
+                    position: {
+                        x: o.position ? o.position.x : 0,
+                        y: o.position ? o.position.y : 0,
+                        rotation: (o.position && typeof o.position.rotation === 'number') ? o.position.rotation : (o.rotation || 0)
+                    },
+                    size: {
+                        width: o.width || (o.size ? o.size.width : 1),
+                        height: o.height || (o.size ? o.size.height : 1)
+                    },
+                    collision: o.collision ?? true,
+                    interaction_config: o.interaction_config || (o.image_url ? { image_url: o.image_url } : null)
+                }));
+
                 await fetch(`/api/v1/organizations/${ORG_ID}/maps/${MAP_DATA.id}/objects/sync`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
                     credentials: 'same-origin',
-                    body: JSON.stringify({ objects })
+                    body: JSON.stringify({ objects: syncObjectsPayload })
                 });
 
                 showToast('✅ {{ __('Map Draft & Furniture Saved!') }}');
                 return true;
             } catch (err) {
                 console.error(err);
-                showToast('❌ Error saving draft', '#d20005');
+                showToast('❌ Error saving draft', '#ef4444');
                 return false;
             }
         }
@@ -2017,10 +1582,10 @@
 
                 const data = await res.json();
                 document.getElementById('header-version-badge').textContent = `v${data.map.version} (Published)`;
-                showToast(`🚀 {{ __('Map Published! Snapshot is now live.') }}`);
+                showToast(`🚀 {{ __('Map Published! Floor is live.') }}`);
             } catch (err) {
                 console.error(err);
-                showToast(`❌ Error: ${err.message || 'Could not publish map'}`, '#d20005');
+                showToast(`❌ Error: ${err.message || 'Could not publish map'}`, '#ef4444');
             }
         }
 
@@ -2030,10 +1595,9 @@
             if (bg) toast.style.background = bg;
             else toast.style.background = 'var(--brand-green)';
             toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 3500);
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
         }
 
-        updateStats();
         draw();
     </script>
 </body>
