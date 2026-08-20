@@ -137,6 +137,61 @@
             margin-bottom: 6px;
         }
 
+        /* ── Sidebar Accordions ── */
+        .sidebar-accordion {
+            margin-bottom: 10px;
+        }
+
+        .sidebar-accordion-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-accordion-header:hover {
+            color: var(--text-primary);
+            background: var(--bg-elevated);
+        }
+
+        .sidebar-accordion-chevron {
+            font-size: 9px;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-muted);
+            display: inline-block;
+        }
+
+        .sidebar-accordion.collapsed .sidebar-accordion-chevron {
+            transform: rotate({{ app()->getLocale() === 'ar' ? '90deg' : '-90deg' }});
+        }
+
+        .sidebar-accordion-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+            max-height: 500px;
+            opacity: 1;
+            padding-top: 4px;
+        }
+
+        .sidebar-accordion.collapsed .sidebar-accordion-content {
+            max-height: 0;
+            opacity: 0;
+            padding-top: 0;
+            pointer-events: none;
+        }
+
         .nav-tab-btn {
             width: 100%;
             display: flex;
@@ -613,76 +668,112 @@
 <body>
 
     <!-- Left Admin Sidebar -->
-    <aside class="sidebar" id="dashboardSidebar">
+    <aside class="sidebar" id="dashboardSidebar" style="overflow-y: auto;">
         <div class="sidebar-logo" onclick="switchAdminTab('overview')">
             <div class="sidebar-logo-icon">🏢</div>
             <div class="sidebar-logo-text">{{ $organization->name }}</div>
         </div>
 
-        <div class="sidebar-section">
-            <div class="sidebar-section-title">Workspace</div>
-            <button class="nav-tab-btn active" onclick="switchAdminTab('overview')">
-                <span>📊</span> Overview
-            </button>
-            <a href="{{ route('office') }}" class="nav-tab-btn" style="text-decoration: none;">
-                <span>🚀</span> Virtual Office
-            </a>
-            <a href="{{ route('editor') }}" class="nav-tab-btn" style="text-decoration: none;">
-                <span>🎨</span> Floor Map Editor
-            </a>
-        </div>
-
-        <div class="sidebar-section">
-            <div class="sidebar-section-title">{{ __('Project Management') }}</div>
-            <button class="nav-tab-btn" onclick="switchAdminTab('projects')">
-                <span>📁</span> {{ __('Projects Portfolio') }} ({{ $projects->count() }})
-            </button>
-            <button class="nav-tab-btn" onclick="switchAdminTab('all-tasks')">
-                <span>📑</span> {{ __('All Tasks Manager') }} ({{ $tasks->count() }})
-            </button>
-            <button class="nav-tab-btn" onclick="switchAdminTab('my-tasks')">
-                <span>✅</span> {{ __('My Tasks') }} ({{ $myTasks->where('status', '!=', 'done')->count() }})
-            </button>
-            <button class="nav-tab-btn" onclick="switchAdminTab('timesheets')">
-                <span>⏱️</span> {{ __('Timesheets & Time') }}
-            </button>
-            <button class="nav-tab-btn" onclick="switchAdminTab('workload')">
-                <span>👥</span> {{ __('Team Workload') }}
-            </button>
-        </div>
-
-        <div class="sidebar-section">
-            <div class="sidebar-section-title">{{ __('Administration') }}</div>
-            <button class="nav-tab-btn" onclick="switchAdminTab('members')">
-                <span>👥</span> {{ __('Team Members') }} ({{ $members->count() }})
-            </button>
-            <button class="nav-tab-btn" onclick="switchAdminTab('billing')">
-                <span>💎</span> {{ __('Billing & Subscription') }}
-            </button>
-            <button class="nav-tab-btn" onclick="switchAdminTab('rooms')">
-                <span>🏢</span> {{ __('Rooms & Doors') }} ({{ $rooms->count() }})
-            </button>
-            <button class="nav-tab-btn" onclick="switchAdminTab('guests')">
-                <span>🔗</span> {{ __('Guest Links') }} ({{ $guestInvitations->count() }})
-            </button>
-            <button class="nav-tab-btn" onclick="switchAdminTab('departments')">
-                <span>🏛️</span> {{ __('Departments & Teams') }}
-            </button>
-            <button class="nav-tab-btn" onclick="switchAdminTab('audit')">
-                <span>📋</span> {{ __('Audit Logs') }}
-            </button>
-            <button class="nav-tab-btn" onclick="switchAdminTab('settings')">
-                <span>⚙️</span> {{ __('Settings') }}
-            </button>
-
-            @if($user->isSuperAdmin())
-            <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color);">
-                <a href="{{ route('superadmin.dashboard') }}" class="nav-tab-btn" style="background: rgba(99, 102, 241, 0.15); color: #c7d2fe; border: 1px solid rgba(99, 102, 241, 0.3); text-decoration: none;">
-                    <span>⚡</span> <strong>{{ __('Super Admin Portal') }}</strong>
+        <!-- 1. Workspace Section (Accordion) -->
+        <div class="sidebar-accordion" id="sec-workspace">
+            <div class="sidebar-accordion-header" onclick="toggleSidebarSection('sec-workspace')">
+                <span style="display: flex; align-items: center; gap: 6px;">
+                    <span>🏢</span> {{ __('Workspace') }}
+                </span>
+                <span class="sidebar-accordion-chevron">▼</span>
+            </div>
+            <div class="sidebar-accordion-content">
+                <button class="nav-tab-btn active" onclick="switchAdminTab('overview')">
+                    <span>📊</span> {{ __('Overview') }}
+                </button>
+                <a href="{{ route('office') }}" class="nav-tab-btn" style="text-decoration: none;">
+                    <span>🚀</span> {{ __('Virtual Office') }}
+                </a>
+                <a href="{{ route('editor') }}" class="nav-tab-btn" style="text-decoration: none;">
+                    <span>🎨</span> {{ __('Floor Map Editor') }}
                 </a>
             </div>
-            @endif
         </div>
+
+        <!-- 2. Project Management Section (Accordion) -->
+        <div class="sidebar-accordion" id="sec-projects">
+            <div class="sidebar-accordion-header" onclick="toggleSidebarSection('sec-projects')">
+                <span style="display: flex; align-items: center; gap: 6px;">
+                    <span>📋</span> {{ __('Project Management') }}
+                </span>
+                <span class="sidebar-accordion-chevron">▼</span>
+            </div>
+            <div class="sidebar-accordion-content">
+                <button class="nav-tab-btn" onclick="switchAdminTab('projects')">
+                    <span>📁</span> {{ __('Projects Portfolio') }} ({{ $projects->count() }})
+                </button>
+                <button class="nav-tab-btn" onclick="switchAdminTab('all-tasks')">
+                    <span>📑</span> {{ __('All Tasks Manager') }} ({{ $tasks->count() }})
+                </button>
+                <button class="nav-tab-btn" onclick="switchAdminTab('my-tasks')">
+                    <span>✅</span> {{ __('My Tasks') }} ({{ $myTasks->where('status', '!=', 'done')->count() }})
+                </button>
+                <button class="nav-tab-btn" onclick="switchAdminTab('timesheets')">
+                    <span>⏱️</span> {{ __('Timesheets & Time') }}
+                </button>
+                <button class="nav-tab-btn" onclick="switchAdminTab('workload')">
+                    <span>👥</span> {{ __('Team Workload') }}
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. Administration Section (Accordion) -->
+        <div class="sidebar-accordion" id="sec-admin">
+            <div class="sidebar-accordion-header" onclick="toggleSidebarSection('sec-admin')">
+                <span style="display: flex; align-items: center; gap: 6px;">
+                    <span>🛡️</span> {{ __('Administration') }}
+                </span>
+                <span class="sidebar-accordion-chevron">▼</span>
+            </div>
+            <div class="sidebar-accordion-content">
+                <button class="nav-tab-btn" onclick="switchAdminTab('members')">
+                    <span>👥</span> {{ __('Team Members') }} ({{ $members->count() }})
+                </button>
+                <button class="nav-tab-btn" onclick="switchAdminTab('rooms')">
+                    <span>🏢</span> {{ __('Rooms & Doors') }} ({{ $rooms->count() }})
+                </button>
+                <button class="nav-tab-btn" onclick="switchAdminTab('guests')">
+                    <span>🔗</span> {{ __('Guest Links') }} ({{ $guestInvitations->count() }})
+                </button>
+                <button class="nav-tab-btn" onclick="switchAdminTab('departments')">
+                    <span>🏛️</span> {{ __('Departments & Teams') }}
+                </button>
+                <button class="nav-tab-btn" onclick="switchAdminTab('audit')">
+                    <span>📋</span> {{ __('Audit Logs') }}
+                </button>
+            </div>
+        </div>
+
+        <!-- 4. Settings & Preferences Section (Accordion) -->
+        <div class="sidebar-accordion" id="sec-settings">
+            <div class="sidebar-accordion-header" onclick="toggleSidebarSection('sec-settings')">
+                <span style="display: flex; align-items: center; gap: 6px;">
+                    <span>⚙️</span> {{ __('Settings & Billing') }}
+                </span>
+                <span class="sidebar-accordion-chevron">▼</span>
+            </div>
+            <div class="sidebar-accordion-content">
+                <button class="nav-tab-btn" onclick="switchAdminTab('billing')">
+                    <span>💎</span> {{ __('Billing & Subscription') }}
+                </button>
+                <button class="nav-tab-btn" onclick="switchAdminTab('settings')">
+                    <span>⚙️</span> {{ __('Workspace Settings') }}
+                </button>
+            </div>
+        </div>
+
+        @if($user->isSuperAdmin())
+        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-color);">
+            <a href="{{ route('superadmin.dashboard') }}" class="nav-tab-btn" style="background: rgba(99, 102, 241, 0.15); color: #c7d2fe; border: 1px solid rgba(99, 102, 241, 0.3); text-decoration: none;">
+                <span>⚡</span> <strong>{{ __('Super Admin Portal') }}</strong>
+            </a>
+        </div>
+        @endif
 
         <div style="padding: 10px; margin-bottom: 10px; display: flex; gap: 8px;">
             @if(app()->getLocale() === 'ar')
@@ -2838,6 +2929,13 @@
         const CSRF_TOKEN = "{{ csrf_token() }}";
         const ALL_TEAMS = @json($teams);
 
+        function toggleSidebarSection(sectionId) {
+            const sec = document.getElementById(sectionId);
+            if (sec) {
+                sec.classList.toggle('collapsed');
+            }
+        }
+
         function switchAdminTab(tabName) {
             document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-tab-btn').forEach(el => el.classList.remove('active'));
@@ -2851,11 +2949,15 @@
                 }
             }
 
-            // Highlight corresponding sidebar button
+            // Highlight corresponding sidebar button & expand its parent accordion if collapsed
             document.querySelectorAll('.nav-tab-btn').forEach(btn => {
                 const onclickAttr = btn.getAttribute('onclick') || '';
                 if (onclickAttr.includes(`'${tabName}'`) || onclickAttr.includes(`"${tabName}"`)) {
                     btn.classList.add('active');
+                    const parentAccordion = btn.closest('.sidebar-accordion');
+                    if (parentAccordion && parentAccordion.classList.contains('collapsed')) {
+                        parentAccordion.classList.remove('collapsed');
+                    }
                 }
             });
         }
