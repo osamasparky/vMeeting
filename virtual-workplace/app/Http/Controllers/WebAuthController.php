@@ -154,7 +154,19 @@ class WebAuthController extends Controller
         $guestInvitations = \App\Domains\Guests\Models\GuestInvitation::where('organization_id', $organization->id)->with('room')->latest()->take(20)->get();
         $allPlans = \App\Domains\Tenancy\Models\Plan::where('is_active', true)->orderBy('price', 'asc')->get();
 
-        return view('dashboard', compact('user', 'membership', 'organization', 'stats', 'rooms', 'roles', 'members', 'departments', 'teams', 'auditLogs', 'guestInvitations', 'allPlans'));
+        // Project Management entities
+        $projects = $organization->projects()->with(['owner', 'manager', 'department'])->withCount('tasks')->latest()->get();
+        $tasks = $organization->tasks()->with(['project', 'assignee', 'reporter', 'phase', 'milestone'])->orderBy('order')->latest()->get();
+        $myTasks = $tasks->where('assignee_id', $user->id)->values();
+        $activeTimer = \App\Domains\Projects\Models\ActiveTimer::where('user_id', $user->id)->with(['project', 'task'])->first();
+        $recentTimeEntries = $organization->timeEntries()->where('user_id', $user->id)->with(['project', 'task'])->latest()->take(30)->get();
+        $allTimesheets = $organization->timesheets()->with(['user', 'reviewer'])->latest()->take(15)->get();
+
+        return view('dashboard', compact(
+            'user', 'membership', 'organization', 'stats', 'rooms', 'roles', 'members',
+            'departments', 'teams', 'auditLogs', 'guestInvitations', 'allPlans',
+            'projects', 'tasks', 'myTasks', 'activeTimer', 'recentTimeEntries', 'allTimesheets'
+        ));
     }
 
     /**

@@ -84,6 +84,43 @@ class User extends Authenticatable
         return $this->hasMany(\App\Domains\People\Models\UserProfile::class);
     }
 
+    public function projectMemberships(): HasMany
+    {
+        return $this->hasMany(\App\Domains\Projects\Models\ProjectMember::class);
+    }
+
+    public function projects(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(\App\Domains\Projects\Models\Project::class, 'project_members')
+            ->withPivot('project_role', 'cost_rate', 'billing_rate')
+            ->withTimestamps();
+    }
+
+    public function assignedTasks(): HasMany
+    {
+        return $this->hasMany(\App\Domains\Projects\Models\Task::class, 'assignee_id');
+    }
+
+    public function createdTasks(): HasMany
+    {
+        return $this->hasMany(\App\Domains\Projects\Models\Task::class, 'reporter_id');
+    }
+
+    public function timeEntries(): HasMany
+    {
+        return $this->hasMany(\App\Domains\Projects\Models\TimeEntry::class);
+    }
+
+    public function activeTimer(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Domains\Projects\Models\ActiveTimer::class);
+    }
+
+    public function timesheets(): HasMany
+    {
+        return $this->hasMany(\App\Domains\Projects\Models\Timesheet::class);
+    }
+
     // ── Helpers ──
 
     public function membershipFor(string $organizationId): ?OrganizationMember

@@ -44,6 +44,34 @@ class RolesAndPermissionsSeeder extends Seeder
 
             // Guests
             ['key' => 'guests.invite', 'description' => 'Invite guests to rooms', 'group' => 'Guests'],
+
+            // Project Management: Projects
+            ['key' => 'projects.view', 'description' => 'View projects', 'group' => 'Projects'],
+            ['key' => 'projects.create', 'description' => 'Create projects', 'group' => 'Projects'],
+            ['key' => 'projects.edit', 'description' => 'Edit projects', 'group' => 'Projects'],
+            ['key' => 'projects.delete', 'description' => 'Delete projects', 'group' => 'Projects'],
+
+            // Project Management: Tasks
+            ['key' => 'tasks.view', 'description' => 'View tasks', 'group' => 'Tasks'],
+            ['key' => 'tasks.create', 'description' => 'Create tasks and subtasks', 'group' => 'Tasks'],
+            ['key' => 'tasks.edit', 'description' => 'Edit tasks and update status', 'group' => 'Tasks'],
+            ['key' => 'tasks.assign', 'description' => 'Assign tasks to team members', 'group' => 'Tasks'],
+            ['key' => 'tasks.delete', 'description' => 'Delete tasks', 'group' => 'Tasks'],
+
+            // Project Management: Time Tracking & Timers
+            ['key' => 'time.view', 'description' => 'View time entries', 'group' => 'Time'],
+            ['key' => 'time.create', 'description' => 'Start timer / log manual time', 'group' => 'Time'],
+            ['key' => 'time.edit', 'description' => 'Edit own time entries', 'group' => 'Time'],
+            ['key' => 'time.delete', 'description' => 'Delete time entries', 'group' => 'Time'],
+
+            // Project Management: Timesheets
+            ['key' => 'timesheets.view', 'description' => 'View timesheets', 'group' => 'Timesheets'],
+            ['key' => 'timesheets.submit', 'description' => 'Submit timesheets for approval', 'group' => 'Timesheets'],
+            ['key' => 'timesheets.approve', 'description' => 'Approve or reject timesheets', 'group' => 'Timesheets'],
+
+            // Project Management: Reports & Financials
+            ['key' => 'reports.view', 'description' => 'View project & workload reports', 'group' => 'Reports'],
+            ['key' => 'reports.financials', 'description' => 'View project financial metrics & rates', 'group' => 'Reports'],
         ];
 
         foreach ($permissions as $perm) {
@@ -66,6 +94,11 @@ class RolesAndPermissionsSeeder extends Seeder
                     'maps.manage', 'maps.view',
                     'analytics.view', 'audit.view',
                     'billing.manage', 'guests.invite',
+                    'projects.view', 'projects.create', 'projects.edit', 'projects.delete',
+                    'tasks.view', 'tasks.create', 'tasks.edit', 'tasks.assign', 'tasks.delete',
+                    'time.view', 'time.create', 'time.edit', 'time.delete',
+                    'timesheets.view', 'timesheets.submit', 'timesheets.approve',
+                    'reports.view', 'reports.financials',
                 ],
             ],
             'manager' => [
@@ -78,6 +111,11 @@ class RolesAndPermissionsSeeder extends Seeder
                     'maps.view',
                     'analytics.view',
                     'guests.invite',
+                    'projects.view', 'projects.create', 'projects.edit',
+                    'tasks.view', 'tasks.create', 'tasks.edit', 'tasks.assign', 'tasks.delete',
+                    'time.view', 'time.create', 'time.edit', 'time.delete',
+                    'timesheets.view', 'timesheets.submit', 'timesheets.approve',
+                    'reports.view',
                 ],
             ],
             'employee' => [
@@ -86,6 +124,10 @@ class RolesAndPermissionsSeeder extends Seeder
                     'organizations.view',
                     'members.view',
                     'maps.view',
+                    'projects.view',
+                    'tasks.view', 'tasks.create', 'tasks.edit',
+                    'time.view', 'time.create', 'time.edit',
+                    'timesheets.view', 'timesheets.submit',
                 ],
             ],
             'guest' => [

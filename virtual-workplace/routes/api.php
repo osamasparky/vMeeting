@@ -150,6 +150,74 @@ Route::prefix('v1')->group(function () {
                 Route::get('/recordings', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'index']);
                 Route::post('/recordings', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'store']);
                 Route::delete('/recordings/{recording}', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'destroy']);
+
+                // ── Projects Domain ──
+                Route::get('/projects', [\App\Domains\Projects\Controllers\ProjectController::class, 'index'])
+                    ->middleware('permission:projects.view');
+                Route::post('/projects', [\App\Domains\Projects\Controllers\ProjectController::class, 'store'])
+                    ->middleware('permission:projects.create');
+                Route::get('/projects/{project}', [\App\Domains\Projects\Controllers\ProjectController::class, 'show'])
+                    ->middleware('permission:projects.view');
+                Route::patch('/projects/{project}', [\App\Domains\Projects\Controllers\ProjectController::class, 'update'])
+                    ->middleware('permission:projects.edit');
+                Route::delete('/projects/{project}', [\App\Domains\Projects\Controllers\ProjectController::class, 'destroy'])
+                    ->middleware('permission:projects.delete');
+
+                // ── Tasks Domain ──
+                Route::get('/tasks', [\App\Domains\Projects\Controllers\TaskController::class, 'index'])
+                    ->middleware('permission:tasks.view');
+                Route::get('/tasks/my-tasks', [\App\Domains\Projects\Controllers\TaskController::class, 'myTasks'])
+                    ->middleware('permission:tasks.view');
+                Route::post('/tasks', [\App\Domains\Projects\Controllers\TaskController::class, 'store'])
+                    ->middleware('permission:tasks.create');
+                Route::get('/tasks/{task}', [\App\Domains\Projects\Controllers\TaskController::class, 'show'])
+                    ->middleware('permission:tasks.view');
+                Route::patch('/tasks/{task}', [\App\Domains\Projects\Controllers\TaskController::class, 'update'])
+                    ->middleware('permission:tasks.edit');
+                Route::patch('/tasks/{task}/status', [\App\Domains\Projects\Controllers\TaskController::class, 'updateStatus'])
+                    ->middleware('permission:tasks.edit');
+                Route::patch('/tasks/{task}/assign', [\App\Domains\Projects\Controllers\TaskController::class, 'assign'])
+                    ->middleware('permission:tasks.assign');
+                Route::delete('/tasks/{task}', [\App\Domains\Projects\Controllers\TaskController::class, 'destroy'])
+                    ->middleware('permission:tasks.delete');
+                Route::post('/tasks/{task}/checklist', [\App\Domains\Projects\Controllers\TaskController::class, 'addChecklistItem'])
+                    ->middleware('permission:tasks.edit');
+                Route::patch('/tasks/{task}/checklist/{item}', [\App\Domains\Projects\Controllers\TaskController::class, 'toggleChecklistItem'])
+                    ->middleware('permission:tasks.edit');
+                Route::post('/tasks/{task}/comments', [\App\Domains\Projects\Controllers\TaskController::class, 'addComment'])
+                    ->middleware('permission:tasks.view');
+                Route::post('/tasks/{task}/dependencies', [\App\Domains\Projects\Controllers\TaskController::class, 'addDependency'])
+                    ->middleware('permission:tasks.edit');
+
+                // ── Time Tracking & Live Timers ──
+                Route::get('/time/active-timer', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'getActiveTimer'])
+                    ->middleware('permission:time.view');
+                Route::post('/time/timer/start', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'startTimer'])
+                    ->middleware('permission:time.create');
+                Route::post('/time/timer/stop', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'stopTimer'])
+                    ->middleware('permission:time.create');
+                Route::post('/time/entries/manual', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'logManual'])
+                    ->middleware('permission:time.create');
+                Route::get('/time/entries', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'index'])
+                    ->middleware('permission:time.view');
+                Route::patch('/time/entries/{timeEntry}', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'update'])
+                    ->middleware('permission:time.edit');
+                Route::delete('/time/entries/{timeEntry}', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'destroy'])
+                    ->middleware('permission:time.delete');
+
+                // ── Timesheets Domain ──
+                Route::get('/timesheets', [\App\Domains\Projects\Controllers\TimesheetController::class, 'index'])
+                    ->middleware('permission:timesheets.view');
+                Route::get('/timesheets/my-current', [\App\Domains\Projects\Controllers\TimesheetController::class, 'myCurrent'])
+                    ->middleware('permission:timesheets.view');
+                Route::get('/timesheets/{timesheet}', [\App\Domains\Projects\Controllers\TimesheetController::class, 'show'])
+                    ->middleware('permission:timesheets.view');
+                Route::post('/timesheets/submit', [\App\Domains\Projects\Controllers\TimesheetController::class, 'submit'])
+                    ->middleware('permission:timesheets.submit');
+                Route::post('/timesheets/{timesheet}/approve', [\App\Domains\Projects\Controllers\TimesheetController::class, 'approve'])
+                    ->middleware('permission:timesheets.approve');
+                Route::post('/timesheets/{timesheet}/reject', [\App\Domains\Projects\Controllers\TimesheetController::class, 'reject'])
+                    ->middleware('permission:timesheets.approve');
             });
 
         // ── Plans (public listing) ──

@@ -13,10 +13,16 @@ class OrganizationMember extends Model
         'user_id',
         'role_id',
         'status',
+        'cost_rate',
+        'billing_rate',
+        'weekly_capacity_hours',
         'joined_at',
     ];
 
     protected $casts = [
+        'cost_rate' => 'decimal:2',
+        'billing_rate' => 'decimal:2',
+        'weekly_capacity_hours' => 'decimal:2',
         'joined_at' => 'datetime',
     ];
 

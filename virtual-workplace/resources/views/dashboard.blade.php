@@ -377,6 +377,94 @@
         .badge-purple { background: rgba(139, 92, 246, 0.15); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.3); }
         .badge-teal { background: rgba(6, 182, 212, 0.15); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.3); }
         .badge-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge-blue { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .badge-crimson { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .badge-gray { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
+
+        /* ── Live Timer Topbar ── */
+        .live-timer-strip {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(139, 92, 246, 0.12));
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: var(--radius-lg);
+            padding: 12px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .timer-pulse-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #10b981;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulseDot 1.5s infinite;
+        }
+        @keyframes pulseDot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4); opacity: 0.6; }
+        }
+
+        /* ── Kanban Board ── */
+        .kanban-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            align-items: start;
+        }
+
+        .kanban-column {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .kanban-col-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .kanban-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .kanban-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--brand-primary);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.2);
+        }
+
+        /* ── Progress Bar ── */
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-elevated);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.3s ease;
+        }
 
         /* ── Modal Overlay ── */
         .modal, .modal-overlay {
@@ -463,6 +551,63 @@
                 display: block;
             }
         }
+
+        /* Toast Notification System */
+        #toast-container {
+            position: fixed;
+            bottom: 24px;
+            inset-inline-end: 24px;
+            z-index: 999999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast-popup {
+            pointer-events: auto;
+            background: rgba(15, 23, 42, 0.94);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #ffffff;
+            border: 1px solid rgba(16, 185, 129, 0.5);
+            box-shadow: 0 12px 32px -5px rgba(0, 0, 0, 0.6), 0 0 20px rgba(16, 185, 129, 0.3);
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: toastSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transition: all 0.3s ease;
+        }
+
+        .toast-popup.toast-fadeout {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+        }
+
+        @keyframes toastSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .btn-copied-pulse {
+            animation: copyPulseAnim 0.6s ease;
+        }
+
+        @keyframes copyPulseAnim {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.12); box-shadow: 0 0 15px rgba(16, 185, 129, 0.6); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
@@ -485,6 +630,25 @@
             <a href="{{ route('editor') }}" class="nav-tab-btn" style="text-decoration: none;">
                 <span>🎨</span> Floor Map Editor
             </a>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-title">{{ __('Project Management') }}</div>
+            <button class="nav-tab-btn" onclick="switchAdminTab('projects')">
+                <span>📁</span> {{ __('Projects Portfolio') }} ({{ $projects->count() }})
+            </button>
+            <button class="nav-tab-btn" onclick="switchAdminTab('all-tasks')">
+                <span>📑</span> {{ __('All Tasks Manager') }} ({{ $tasks->count() }})
+            </button>
+            <button class="nav-tab-btn" onclick="switchAdminTab('my-tasks')">
+                <span>✅</span> {{ __('My Tasks') }} ({{ $myTasks->where('status', '!=', 'done')->count() }})
+            </button>
+            <button class="nav-tab-btn" onclick="switchAdminTab('timesheets')">
+                <span>⏱️</span> {{ __('Timesheets & Time') }}
+            </button>
+            <button class="nav-tab-btn" onclick="switchAdminTab('workload')">
+                <span>👥</span> {{ __('Team Workload') }}
+            </button>
         </div>
 
         <div class="sidebar-section">
@@ -546,6 +710,30 @@
 
     <!-- Main Content Area -->
     <main class="main-content">
+
+        <!-- Universal Live Timer Banner Strip -->
+        <div id="universal-timer-strip" class="live-timer-strip" style="{{ $activeTimer ? '' : 'display: none;' }}">
+            <div style="display: flex; align-items: center; gap: 14px;">
+                <div class="timer-pulse-dot"></div>
+                <div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--brand-teal); letter-spacing: 0.5px;">{{ __('Active Timer Running') }}</span>
+                        <span id="timer-project-tag" class="badge badge-blue" style="font-size: 10px;">{{ $activeTimer->project->name ?? 'Project' }}</span>
+                    </div>
+                    <div id="timer-task-title" style="font-size: 14px; font-weight: 800; color: var(--text-primary);">
+                        {{ $activeTimer->task->title ?? ($activeTimer->description ?? 'General Work Session') }}
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <div id="live-timer-clock" style="font-size: 22px; font-weight: 900; font-family: monospace; color: #34d399; letter-spacing: 1px;">
+                    00:00:00
+                </div>
+                <button onclick="stopGlobalTimer()" class="header-btn" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 7px 14px;">
+                    ⏹ {{ __('Stop Timer') }}
+                </button>
+            </div>
+        </div>
 
         <!-- 1. OVERVIEW TAB -->
         <div id="tab-overview" class="tab-view active">
@@ -1014,9 +1202,14 @@
                                     </code>
                                 </td>
                                 <td>
-                                    <a href="{{ url('/guest/join/' . $inv->token) }}" target="_blank" class="header-btn btn-outline" style="padding: 4px 10px; font-size: 11px; text-decoration: none;">
-                                        👁️ {{ __('Open') }}
-                                    </a>
+                                    <div style="display: flex; gap: 6px; align-items: center;">
+                                        <button type="button" onclick="copyTableGuestLink('{{ url('/guest/join/' . $inv->token) }}', this)" class="header-btn btn-primary" style="padding: 4px 10px; font-size: 11px; cursor: pointer;">
+                                            📋 {{ __('Copy Link') }}
+                                        </button>
+                                        <a href="{{ url('/guest/join/' . $inv->token) }}" target="_blank" class="header-btn btn-outline" style="padding: 4px 10px; font-size: 11px; text-decoration: none;">
+                                            👁️ {{ __('Open') }}
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -1222,7 +1415,1237 @@
             </div>
         </div>
 
+        <!-- 8. PROJECTS PORTFOLIO TAB -->
+        <div id="tab-projects" class="tab-view">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">📁 {{ __('Projects Portfolio') }}</h1>
+                    <p class="page-subtitle">{{ __('Manage company initiatives, milestones, tasks, and budgets.') }}</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="openNewProjectModal()" class="header-btn btn-primary">
+                        <span>+</span> {{ __('New Project') }}
+                    </button>
+                </div>
+            </div>
+
+            <!-- Project KPI Metrics -->
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                <div class="stat-card" style="border-top: 3px solid var(--brand-primary);">
+                    <div class="stat-lbl">📁 {{ __('Total Projects') }}</div>
+                    <div class="stat-val" style="color: var(--brand-primary);">{{ $projects->count() }}</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">{{ $projects->where('status', 'active')->count() }} {{ __('Active initiatives') }}</div>
+                </div>
+                <div class="stat-card" style="border-top: 3px solid var(--brand-teal);">
+                    <div class="stat-lbl">✅ {{ __('Total Tasks') }}</div>
+                    <div class="stat-val" style="color: var(--brand-teal);">{{ $tasks->count() }}</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">{{ $tasks->where('status', '!=', 'done')->count() }} {{ __('In progress / Backlog') }}</div>
+                </div>
+                <div class="stat-card" style="border-top: 3px solid var(--brand-pine);">
+                    <div class="stat-lbl">⏱️ {{ __('Logged Hours') }}</div>
+                    <div class="stat-val" style="color: var(--brand-pine);">{{ round($projects->sum(fn($p) => $p->actualHours()), 1) }}h</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">{{ __('Tracked across all tasks') }}</div>
+                </div>
+                <div class="stat-card" style="border-top: 3px solid var(--brand-gold);">
+                    <div class="stat-lbl">💰 {{ __('Total Budget') }}</div>
+                    <div class="stat-val" style="color: var(--brand-gold);">${{ number_format($projects->sum('budget_amount'), 0) }}</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">{{ __('Allocated capital') }}</div>
+                </div>
+            </div>
+
+            <!-- Projects Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">📋 {{ __('Active Initiatives') }} ({{ $projects->count() }})</h3>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>{{ __('Code') }}</th>
+                                <th>{{ __('Project Name') }}</th>
+                                <th>{{ __('Manager') }}</th>
+                                <th>{{ __('Status') }}</th>
+                                <th>{{ __('Priority') }}</th>
+                                <th>{{ __('Progress') }}</th>
+                                <th>{{ __('Due Date') }}</th>
+                                <th>{{ __('Budget') }}</th>
+                                <th>{{ __('Actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($projects as $p)
+                                <tr onclick="openProjectHub('{{ $p->id }}')" style="cursor: pointer;" title="{{ __('Click to open project dashboard & tasks') }}">
+                                    <td><span class="badge badge-blue" style="font-family: monospace;">{{ $p->code ?? 'PRJ' }}</span></td>
+                                    <td>
+                                        <div style="font-weight: 800; color: var(--text-primary);">{{ $p->name }}</div>
+                                        <div style="font-size: 11px; color: var(--text-muted);">{{ Str::limit($p->description, 50) }}</div>
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <div style="width: 24px; height: 24px; border-radius: 6px; background: var(--accent-gradient); color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800;">
+                                                {{ strtoupper(substr($p->manager->name ?? 'NA', 0, 2)) }}
+                                            </div>
+                                            <span>{{ $p->manager->name ?? 'Unassigned' }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if($p->status === 'active')
+                                            <span class="badge badge-green">{{ __('Active') }}</span>
+                                        @elseif($p->status === 'completed')
+                                            <span class="badge badge-teal">{{ __('Completed') }}</span>
+                                        @elseif($p->status === 'on_hold')
+                                            <span class="badge badge-amber">{{ __('On Hold') }}</span>
+                                        @else
+                                            <span class="badge badge-gray">{{ ucfirst($p->status) }}</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($p->priority === 'urgent')
+                                            <span class="badge badge-crimson">🔥 {{ __('Urgent') }}</span>
+                                        @elseif($p->priority === 'high')
+                                            <span class="badge badge-amber">⚡ {{ __('High') }}</span>
+                                        @else
+                                            <span class="badge badge-gray">{{ ucfirst($p->priority) }}</span>
+                                        @endif
+                                    </td>
+                                    <td style="min-width: 140px;">
+                                        @php $pct = $p->progressPercentage(); @endphp
+                                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; font-weight: 700;">
+                                            <span>{{ $pct }}%</span>
+                                            <span style="color: var(--text-muted);">{{ $p->tasks_count }} {{ __('tasks') }}</span>
+                                        </div>
+                                        <div class="progress-bar-bg">
+                                            <div class="progress-bar-fill" style="width: {{ $pct }}%; background: {{ $pct === 100 ? '#10b981' : 'var(--brand-primary)' }};"></div>
+                                        </div>
+                                    </td>
+                                    <td style="font-size: 12px; font-weight: 600;">{{ $p->due_date ? $p->due_date->format('M d, Y') : '—' }}</td>
+                                    <td style="font-weight: 700; color: var(--brand-teal);">${{ number_format($p->budget_amount ?? 0, 0) }}</td>
+                                    <td>
+                                        <button onclick="event.stopPropagation(); openProjectHub('{{ $p->id }}');" class="header-btn btn-primary" style="padding: 4px 10px; font-size: 11px;">
+                                            📊 {{ __('Open Hub') }}
+                                        </button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="9" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                                        📁 {{ __('No projects created yet. Click "+ New Project" to get started.') }}
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 9. ALL TASKS MANAGER TAB (Project Manager View) -->
+        <div id="tab-all-tasks" class="tab-view">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">📑 {{ __('All Tasks & Work Orders') }}</h1>
+                    <p class="page-subtitle">{{ __('Workspace-wide task tracking, workload distribution, and Kanban workflow control.') }}</p>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <div style="display: flex; gap: 4px; background: var(--bg-elevated); padding: 3px; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <button onclick="switchAllTasksView('table')" id="alltasks-btn-table" class="header-btn btn-primary" style="padding: 6px 12px; font-size: 12px;">
+                            📋 {{ __('Table View') }}
+                        </button>
+                        <button onclick="switchAllTasksView('kanban')" id="alltasks-btn-kanban" class="header-btn btn-outline" style="padding: 6px 12px; font-size: 12px;">
+                            📌 {{ __('Kanban Board') }}
+                        </button>
+                    </div>
+                    <button onclick="openNewTaskModal()" class="header-btn btn-primary">
+                        <span>+</span> {{ __('New Task') }}
+                    </button>
+                </div>
+            </div>
+
+            <!-- Task KPIs Summary -->
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                <div class="stat-card" style="padding: 14px; border-top: 3px solid var(--brand-primary);">
+                    <div class="stat-lbl">📑 {{ __('Total Tasks') }}</div>
+                    <div class="stat-val" style="font-size: 22px; color: var(--brand-primary);">{{ $tasks->count() }}</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">{{ __('Across all active projects') }}</div>
+                </div>
+                <div class="stat-card" style="padding: 14px; border-top: 3px solid var(--brand-teal);">
+                    <div class="stat-lbl">⚡ {{ __('In Progress') }}</div>
+                    <div class="stat-val" style="font-size: 22px; color: var(--brand-teal);">{{ $tasks->where('status', 'in_progress')->count() }}</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">{{ __('Active work execution') }}</div>
+                </div>
+                <div class="stat-card" style="padding: 14px; border-top: 3px solid var(--brand-gold);">
+                    <div class="stat-lbl">🔍 {{ __('Under Review / QA') }}</div>
+                    <div class="stat-val" style="font-size: 22px; color: var(--brand-gold);">{{ $tasks->whereIn('status', ['review', 'qa'])->count() }}</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">{{ __('Pending approval') }}</div>
+                </div>
+                <div class="stat-card" style="padding: 14px; border-top: 3px solid #10b981;">
+                    <div class="stat-lbl">🎉 {{ __('Completed') }}</div>
+                    <div class="stat-val" style="font-size: 22px; color: #10b981;">{{ $tasks->where('status', 'done')->count() }}</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">{{ __('Delivered features & fixes') }}</div>
+                </div>
+                <div class="stat-card" style="padding: 14px; border-top: 3px solid var(--brand-crimson);">
+                    <div class="stat-lbl">⏱️ {{ __('Estimated vs Actual') }}</div>
+                    <div class="stat-val" style="font-size: 22px; color: var(--text-primary); font-family: monospace;">{{ $tasks->sum('estimated_hours') }}h / {{ round($projects->sum(fn($p) => $p->actualHours()), 1) }}h</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">{{ __('Total tracked effort') }}</div>
+                </div>
+            </div>
+
+            <!-- Filter Toolbar -->
+            <div class="card" style="padding: 16px; margin-bottom: 20px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; align-items: center;">
+                    <div>
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">🔍 {{ __('Search Tasks') }}</label>
+                        <input type="text" id="alltasks-filter-search" oninput="filterAllTasksTable()" placeholder="Task title or #..." style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 10px; color: var(--text-primary); outline: none; font-size: 12px;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">📁 {{ __('Project') }}</label>
+                        <select id="alltasks-filter-project" onchange="filterAllTasksTable()" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 10px; color: var(--text-primary); outline: none; font-size: 12px;">
+                            <option value="">— {{ __('All Projects') }} —</option>
+                            @foreach($projects as $p)
+                                <option value="{{ $p->id }}">{{ $p->name }} ({{ $p->code }})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">⚡ {{ __('Status') }}</label>
+                        <select id="alltasks-filter-status" onchange="filterAllTasksTable()" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 10px; color: var(--text-primary); outline: none; font-size: 12px;">
+                            <option value="">— {{ __('All Statuses') }} —</option>
+                            <option value="backlog">📌 Backlog</option>
+                            <option value="ready">🎯 Ready</option>
+                            <option value="in_progress">⚡ In Progress</option>
+                            <option value="review">🔍 Review / QA</option>
+                            <option value="done">🎉 Done</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">⚡ {{ __('Priority') }}</label>
+                        <select id="alltasks-filter-priority" onchange="filterAllTasksTable()" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 10px; color: var(--text-primary); outline: none; font-size: 12px;">
+                            <option value="">— {{ __('All Priorities') }} —</option>
+                            <option value="urgent">🔥 Urgent</option>
+                            <option value="high">⚡ High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">👤 {{ __('Assignee') }}</label>
+                        <select id="alltasks-filter-assignee" onchange="filterAllTasksTable()" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 10px; color: var(--text-primary); outline: none; font-size: 12px;">
+                            <option value="">— {{ __('All Members') }} —</option>
+                            @foreach($members as $m)
+                                <option value="{{ $m->user_id }}">{{ $m->user->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View 1: Tasks Table / List -->
+            <div id="alltasks-view-table" class="card" style="display: block;">
+                <div class="card-header">
+                    <h3 class="card-title">📋 {{ __('All Organization Tasks') }} (<span id="alltasks-filtered-count">{{ $tasks->count() }}</span>)</h3>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>{{ __('Task Title') }}</th>
+                                <th>{{ __('Project') }}</th>
+                                <th>{{ __('Assignee') }}</th>
+                                <th>{{ __('Status') }}</th>
+                                <th>{{ __('Priority') }}</th>
+                                <th>{{ __('Estimated / Actual') }}</th>
+                                <th>{{ __('Due Date') }}</th>
+                                <th>{{ __('Actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody id="alltasks-table-body">
+                            @forelse($tasks as $t)
+                                <tr class="alltask-row" 
+                                    data-id="{{ $t->id }}"
+                                    data-title="{{ strtolower($t->title) }}"
+                                    data-project-id="{{ $t->project_id }}"
+                                    data-status="{{ $t->status }}"
+                                    data-priority="{{ $t->priority }}"
+                                    data-assignee-id="{{ $t->assignee_id }}"
+                                    onclick="openTaskDetails('{{ $t->id }}')" 
+                                    style="cursor: pointer;">
+                                    <td><span class="badge badge-blue" style="font-family: monospace;">#{{ $t->task_number ?? 1 }}</span></td>
+                                    <td>
+                                        <div style="font-weight: 800; color: var(--text-primary);">{{ $t->title }}</div>
+                                        @if($t->description)
+                                            <div style="font-size: 11px; color: var(--text-muted);">{{ Str::limit($t->description, 45) }}</div>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-gray" style="font-weight: 700;">📁 {{ $t->project->name ?? 'General' }}</span>
+                                    </td>
+                                    <td>
+                                        @if($t->assignee)
+                                            <div style="display: flex; align-items: center; gap: 6px;">
+                                                <div style="width: 22px; height: 22px; border-radius: 6px; background: var(--accent-gradient); color: white; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800;">
+                                                    {{ strtoupper(substr($t->assignee->name, 0, 2)) }}
+                                                </div>
+                                                <span style="font-weight: 600;">{{ $t->assignee->name }}</span>
+                                            </div>
+                                        @else
+                                            <span style="color: var(--text-muted); font-size: 11px;">— {{ __('Unassigned') }} —</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <select onchange="event.stopPropagation(); updateTaskStatusDirect('${t.id}', this.value)" style="background: var(--bg-elevated); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 11px; font-weight: 700; border-radius: 6px; padding: 3px 6px;">
+                                            <option value="backlog" {{ $t->status === 'backlog' ? 'selected' : '' }}>📌 Backlog</option>
+                                            <option value="ready" {{ $t->status === 'ready' ? 'selected' : '' }}>🎯 Ready</option>
+                                            <option value="in_progress" {{ $t->status === 'in_progress' ? 'selected' : '' }}>⚡ In Progress</option>
+                                            <option value="review" {{ $t->status === 'review' || $t->status === 'qa' ? 'selected' : '' }}>🔍 Review</option>
+                                            <option value="done" {{ $t->status === 'done' ? 'selected' : '' }}>🎉 Done</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        @if($t->priority === 'urgent')
+                                            <span class="badge badge-crimson">🔥 {{ __('Urgent') }}</span>
+                                        @elseif($t->priority === 'high')
+                                            <span class="badge badge-amber">⚡ {{ __('High') }}</span>
+                                        @else
+                                            <span class="badge badge-gray">{{ ucfirst($t->priority) }}</span>
+                                        @endif
+                                    </td>
+                                    <td style="font-family: monospace; font-weight: 700;">
+                                        {{ $t->estimated_hours ?? 0 }}h / {{ $t->actualHours() }}h
+                                    </td>
+                                    <td>
+                                        @php
+                                            $isOverdue = $t->due_date && $t->due_date->isPast() && $t->status !== 'done';
+                                        @endphp
+                                        <span style="font-size: 12px; font-weight: 700; color: {{ $isOverdue ? '#ef4444' : 'var(--text-secondary)' }};">
+                                            {{ $t->due_date ? $t->due_date->format('M d, Y') : '—' }}
+                                            @if($isOverdue) <span class="badge badge-crimson" style="font-size: 9px;">Overdue</span> @endif
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div style="display: flex; gap: 6px;" onclick="event.stopPropagation();">
+                                            <button onclick="startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="header-btn" style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 3px 8px; font-size: 11px;">
+                                                ▶ {{ __('Timer') }}
+                                            </button>
+                                            <button onclick="openTaskDetails('{{ $t->id }}')" class="header-btn btn-outline" style="padding: 3px 8px; font-size: 11px;">
+                                                🔍 {{ __('Inspect') }}
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="9" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                                        📑 {{ __('No tasks created yet. Click "+ New Task" to create one.') }}
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- View 2: Global Kanban Board -->
+            <div id="alltasks-view-kanban" style="display: none;">
+                <div class="kanban-grid" style="grid-template-columns: repeat(5, minmax(220px, 1fr));">
+                    <!-- Backlog -->
+                    <div class="kanban-column">
+                        <div class="kanban-col-header" style="color: var(--text-secondary);">
+                            <span>📌 Backlog</span>
+                            <span class="badge badge-gray">{{ $tasks->where('status', 'backlog')->count() }}</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            @foreach($tasks->where('status', 'backlog') as $t)
+                                <div class="kanban-card" onclick="openTaskDetails('{{ $t->id }}')">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                        <span class="badge badge-blue" style="font-size: 9px;">#{{ $t->task_number }}</span>
+                                        <span class="badge {{ $t->priority === 'urgent' ? 'badge-crimson' : ($t->priority === 'high' ? 'badge-amber' : 'badge-gray') }}" style="font-size: 9px;">{{ $t->priority }}</span>
+                                    </div>
+                                    <div style="font-weight: 800; font-size: 13px; color: var(--text-primary); margin-bottom: 4px;">{{ $t->title }}</div>
+                                    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">📁 {{ $t->project->name ?? 'General' }}</div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 6px; font-size: 11px;">
+                                        <span>👤 {{ $t->assignee ? explode(' ', $t->assignee->name)[0] : 'Unassigned' }}</span>
+                                        <button onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="header-btn" style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 2px 6px; font-size: 10px;">▶</button>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <!-- Ready -->
+                    <div class="kanban-column">
+                        <div class="kanban-col-header" style="color: #60a5fa;">
+                            <span>🎯 Ready</span>
+                            <span class="badge badge-blue">{{ $tasks->where('status', 'ready')->count() }}</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            @foreach($tasks->where('status', 'ready') as $t)
+                                <div class="kanban-card" onclick="openTaskDetails('{{ $t->id }}')">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                        <span class="badge badge-blue" style="font-size: 9px;">#{{ $t->task_number }}</span>
+                                        <span class="badge {{ $t->priority === 'urgent' ? 'badge-crimson' : ($t->priority === 'high' ? 'badge-amber' : 'badge-gray') }}" style="font-size: 9px;">{{ $t->priority }}</span>
+                                    </div>
+                                    <div style="font-weight: 800; font-size: 13px; color: var(--text-primary); margin-bottom: 4px;">{{ $t->title }}</div>
+                                    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">📁 {{ $t->project->name ?? 'General' }}</div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 6px; font-size: 11px;">
+                                        <span>👤 {{ $t->assignee ? explode(' ', $t->assignee->name)[0] : 'Unassigned' }}</span>
+                                        <button onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="header-btn" style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 2px 6px; font-size: 10px;">▶</button>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <!-- In Progress -->
+                    <div class="kanban-column">
+                        <div class="kanban-col-header" style="color: #22d3ee;">
+                            <span>⚡ In Progress</span>
+                            <span class="badge badge-teal">{{ $tasks->where('status', 'in_progress')->count() }}</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            @foreach($tasks->where('status', 'in_progress') as $t)
+                                <div class="kanban-card" onclick="openTaskDetails('{{ $t->id }}')">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                        <span class="badge badge-blue" style="font-size: 9px;">#{{ $t->task_number }}</span>
+                                        <span class="badge {{ $t->priority === 'urgent' ? 'badge-crimson' : ($t->priority === 'high' ? 'badge-amber' : 'badge-gray') }}" style="font-size: 9px;">{{ $t->priority }}</span>
+                                    </div>
+                                    <div style="font-weight: 800; font-size: 13px; color: var(--text-primary); margin-bottom: 4px;">{{ $t->title }}</div>
+                                    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">📁 {{ $t->project->name ?? 'General' }}</div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 6px; font-size: 11px;">
+                                        <span>👤 {{ $t->assignee ? explode(' ', $t->assignee->name)[0] : 'Unassigned' }}</span>
+                                        <button onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="header-btn" style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 2px 6px; font-size: 10px;">▶</button>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <!-- Review / QA -->
+                    <div class="kanban-column">
+                        <div class="kanban-col-header" style="color: #fbbf24;">
+                            <span>🔍 Review / QA</span>
+                            <span class="badge badge-amber">{{ $tasks->whereIn('status', ['review', 'qa'])->count() }}</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            @foreach($tasks->whereIn('status', ['review', 'qa']) as $t)
+                                <div class="kanban-card" onclick="openTaskDetails('{{ $t->id }}')">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                        <span class="badge badge-blue" style="font-size: 9px;">#{{ $t->task_number }}</span>
+                                        <span class="badge {{ $t->priority === 'urgent' ? 'badge-crimson' : ($t->priority === 'high' ? 'badge-amber' : 'badge-gray') }}" style="font-size: 9px;">{{ $t->priority }}</span>
+                                    </div>
+                                    <div style="font-weight: 800; font-size: 13px; color: var(--text-primary); margin-bottom: 4px;">{{ $t->title }}</div>
+                                    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">📁 {{ $t->project->name ?? 'General' }}</div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 6px; font-size: 11px;">
+                                        <span>👤 {{ $t->assignee ? explode(' ', $t->assignee->name)[0] : 'Unassigned' }}</span>
+                                        <button onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="header-btn" style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 2px 6px; font-size: 10px;">▶</button>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <!-- Done -->
+                    <div class="kanban-column">
+                        <div class="kanban-col-header" style="color: #34d399;">
+                            <span>🎉 Done</span>
+                            <span class="badge badge-green">{{ $tasks->where('status', 'done')->count() }}</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            @foreach($tasks->where('status', 'done') as $t)
+                                <div class="kanban-card" onclick="openTaskDetails('{{ $t->id }}')" style="opacity: 0.85;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                                        <span class="badge badge-blue" style="font-size: 9px;">#{{ $t->task_number }}</span>
+                                        <span class="badge badge-green" style="font-size: 9px;">Done</span>
+                                    </div>
+                                    <div style="font-weight: 800; font-size: 13px; color: var(--text-primary); margin-bottom: 4px;">{{ $t->title }}</div>
+                                    <div style="font-size: 11px; color: var(--text-muted);">📁 {{ $t->project->name ?? 'General' }}</div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 10. MY TASKS TAB -->
+        <div id="tab-my-tasks" class="tab-view">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">✅ {{ __('My Tasks & Action Items') }}</h1>
+                    <p class="page-subtitle">{{ __('Track and log time against your personal assigned tasks.') }}</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="openNewTaskModal()" class="header-btn btn-primary">
+                        <span>+</span> {{ __('New Task') }}
+                    </button>
+                </div>
+            </div>
+
+            <!-- Task Status Columns Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+                <!-- Due Today / In Progress -->
+                <div class="card">
+                    <div class="card-header" style="border-bottom: 2px solid var(--brand-teal); padding-bottom: 10px;">
+                        <h3 class="card-title" style="font-size: 14px;">⚡ {{ __('In Progress & Active') }}</h3>
+                        <span class="badge badge-teal">{{ $myTasks->where('status', 'in_progress')->count() }}</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
+                        @forelse($myTasks->where('status', 'in_progress') as $t)
+                            <div class="kanban-card">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                                    <span class="badge badge-blue" style="font-size: 10px;">{{ $t->project->code ?? 'PRJ' }}-{{ $t->task_number }}</span>
+                                    <span class="badge {{ $t->priority === 'urgent' ? 'badge-crimson' : ($t->priority === 'high' ? 'badge-amber' : 'badge-gray') }}" style="font-size: 10px;">{{ ucfirst($t->priority) }}</span>
+                                </div>
+                                <div style="font-weight: 800; font-size: 14px; margin-bottom: 4px; color: var(--text-primary);">{{ $t->title }}</div>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">📁 {{ $t->project->name }}</div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 10px;">
+                                    <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">📅 {{ $t->due_date ? $t->due_date->format('M d') : 'No date' }}</span>
+                                    <button onclick="startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name) }}')" class="header-btn" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 4px 10px; font-size: 11px;">
+                                        ▶ {{ __('Start Timer') }}
+                                    </button>
+                                </div>
+                            </div>
+                        @empty
+                            <div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 12px;">
+                                {{ __('No tasks currently in progress.') }}
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- Backlog / Ready -->
+                <div class="card">
+                    <div class="card-header" style="border-bottom: 2px solid var(--brand-primary); padding-bottom: 10px;">
+                        <h3 class="card-title" style="font-size: 14px;">📌 {{ __('Ready & Backlog') }}</h3>
+                        <span class="badge badge-blue">{{ $myTasks->whereIn('status', ['backlog', 'ready'])->count() }}</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
+                        @forelse($myTasks->whereIn('status', ['backlog', 'ready']) as $t)
+                            <div class="kanban-card">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                                    <span class="badge badge-blue" style="font-size: 10px;">{{ $t->project->code ?? 'PRJ' }}-{{ $t->task_number }}</span>
+                                    <span class="badge {{ $t->priority === 'urgent' ? 'badge-crimson' : ($t->priority === 'high' ? 'badge-amber' : 'badge-gray') }}" style="font-size: 10px;">{{ ucfirst($t->priority) }}</span>
+                                </div>
+                                <div style="font-weight: 800; font-size: 14px; margin-bottom: 4px; color: var(--text-primary);">{{ $t->title }}</div>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">📁 {{ $t->project->name }}</div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 10px;">
+                                    <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">📅 {{ $t->due_date ? $t->due_date->format('M d') : 'No date' }}</span>
+                                    <button onclick="startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name) }}')" class="header-btn btn-outline" style="padding: 4px 10px; font-size: 11px;">
+                                        ▶ {{ __('Start Timer') }}
+                                    </button>
+                                </div>
+                            </div>
+                        @empty
+                            <div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 12px;">
+                                {{ __('No pending tasks.') }}
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- Review / QA / Done -->
+                <div class="card">
+                    <div class="card-header" style="border-bottom: 2px solid #10b981; padding-bottom: 10px;">
+                        <h3 class="card-title" style="font-size: 14px;">🎉 {{ __('Completed & Under Review') }}</h3>
+                        <span class="badge badge-green">{{ $myTasks->whereIn('status', ['review', 'qa', 'done'])->count() }}</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px;">
+                        @forelse($myTasks->whereIn('status', ['review', 'qa', 'done']) as $t)
+                            <div class="kanban-card" style="opacity: 0.85;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                                    <span class="badge badge-blue" style="font-size: 10px;">{{ $t->project->code ?? 'PRJ' }}-{{ $t->task_number }}</span>
+                                    <span class="badge badge-green" style="font-size: 10px;">{{ ucfirst($t->status) }}</span>
+                                </div>
+                                <div style="font-weight: 800; font-size: 14px; margin-bottom: 4px; color: var(--text-primary);">{{ $t->title }}</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">📁 {{ $t->project->name }}</div>
+                            </div>
+                        @empty
+                            <div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 12px;">
+                                {{ __('No completed tasks yet.') }}
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 10. TIMESHEETS & TIME TRACKING TAB -->
+        <div id="tab-timesheets" class="tab-view">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">⏱️ {{ __('Timesheets & Time Tracking') }}</h1>
+                    <p class="page-subtitle">{{ __('Log working hours, view weekly timesheets, and review employee submissions.') }}</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="openManualTimeModal()" class="header-btn btn-outline">
+                        <span>✍️</span> {{ __('Manual Time Entry') }}
+                    </button>
+                    <button onclick="submitMyCurrentTimesheet()" class="header-btn btn-primary">
+                        <span>📤</span> {{ __('Submit Weekly Timesheet') }}
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recent Time Entries -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">🕒 {{ __('My Recent Time Log') }}</h3>
+                    <span style="font-size: 12px; font-weight: 700; color: var(--brand-teal);">
+                        {{ round($recentTimeEntries->sum('duration_seconds') / 3600, 1) }} {{ __('Hours logged recently') }}
+                    </span>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>{{ __('Date') }}</th>
+                                <th>{{ __('Project') }}</th>
+                                <th>{{ __('Task') }}</th>
+                                <th>{{ __('Description') }}</th>
+                                <th>{{ __('Duration') }}</th>
+                                <th>{{ __('Type') }}</th>
+                                <th>{{ __('Status') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($recentTimeEntries as $te)
+                                <tr>
+                                    <td style="font-weight: 600;">{{ $te->started_at->format('M d, Y') }}</td>
+                                    <td><span class="badge badge-blue">{{ $te->project->name ?? 'General' }}</span></td>
+                                    <td style="font-weight: 700; color: var(--text-primary);">{{ $te->task->title ?? '—' }}</td>
+                                    <td style="color: var(--text-secondary); font-size: 12px;">{{ $te->description ?? 'Work session' }}</td>
+                                    <td style="font-weight: 800; color: #34d399; font-family: monospace; font-size: 14px;">{{ $te->hours() }}h</td>
+                                    <td><span class="badge badge-gray">{{ ucfirst($te->entry_type) }}</span></td>
+                                    <td>
+                                        @if($te->status === 'approved')
+                                            <span class="badge badge-green">🔒 {{ __('Approved') }}</span>
+                                        @elseif($te->status === 'submitted')
+                                            <span class="badge badge-amber">⏳ {{ __('Submitted') }}</span>
+                                        @elseif($te->status === 'rejected')
+                                            <span class="badge badge-crimson">❌ {{ __('Rejected') }}</span>
+                                        @else
+                                            <span class="badge badge-gray">{{ __('Draft') }}</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="7" style="text-align: center; padding: 24px; color: var(--text-muted);">
+                                        ⏱️ {{ __('No time entries logged yet.') }}
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Manager Timesheet Review Queue -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">📋 {{ __('Timesheet Submissions Review Queue') }}</h3>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>{{ __('Employee') }}</th>
+                                <th>{{ __('Period') }}</th>
+                                <th>{{ __('Total Hours') }}</th>
+                                <th>{{ __('Billable') }}</th>
+                                <th>{{ __('Status') }}</th>
+                                <th>{{ __('Action') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($allTimesheets as $ts)
+                                <tr>
+                                    <td style="font-weight: 800; color: var(--text-primary);">{{ $ts->user->name ?? 'Member' }}</td>
+                                    <td>{{ $ts->period_start->format('M d') }} — {{ $ts->period_end->format('M d, Y') }}</td>
+                                    <td style="font-weight: 900; color: var(--text-primary); font-family: monospace;">{{ $ts->total_hours }}h</td>
+                                    <td style="color: var(--brand-teal); font-weight: 800; font-family: monospace;">{{ $ts->billable_hours }}h</td>
+                                    <td>
+                                        @if($ts->status === 'approved')
+                                            <span class="badge badge-green">✅ {{ __('Approved') }}</span>
+                                        @elseif($ts->status === 'submitted')
+                                            <span class="badge badge-amber">⏳ {{ __('Pending Review') }}</span>
+                                        @elseif($ts->status === 'rejected')
+                                            <span class="badge badge-crimson">❌ {{ __('Rejected') }}</span>
+                                        @else
+                                            <span class="badge badge-gray">{{ ucfirst($ts->status) }}</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($ts->status === 'submitted' && ($membership->hasPermission('timesheets.approve') || $user->isSuperAdmin()))
+                                            <div style="display: flex; gap: 6px;">
+                                                <button onclick="approveTimesheet('{{ $ts->id }}')" class="header-btn" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); padding: 4px 8px; font-size: 11px;">
+                                                    ✓ {{ __('Approve') }}
+                                                </button>
+                                                <button onclick="openRejectModal('{{ $ts->id }}')" class="header-btn" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 4px 8px; font-size: 11px;">
+                                                    ✕ {{ __('Reject') }}
+                                                </button>
+                                            </div>
+                                        @else
+                                            <span style="font-size: 11px; color: var(--text-muted);">—</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">
+                                        {{ __('No timesheets submitted for review.') }}
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 11. TEAM WORKLOAD TAB -->
+        <div id="tab-workload" class="tab-view">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">👥 {{ __('Team Capacity & Workload Matrix') }}</h1>
+                    <p class="page-subtitle">{{ __('Monitor weekly employee availability, assigned hours, and capacity utilization.') }}</p>
+                </div>
+            </div>
+
+            <!-- Team Capacity Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">📊 {{ __('Employee Workload Distribution') }}</h3>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>{{ __('Team Member') }}</th>
+                                <th>{{ __('Role') }}</th>
+                                <th>{{ __('Weekly Capacity') }}</th>
+                                <th>{{ __('Assigned Tasks') }}</th>
+                                <th>{{ __('Estimated Hours') }}</th>
+                                <th>{{ __('Capacity Utilization') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($members as $m)
+                                @php
+                                    $capacity = $m->weekly_capacity_hours ?? 40.00;
+                                    $memberTasks = $tasks->where('assignee_id', $m->user_id)->where('status', '!=', 'done');
+                                    $assignedHours = $memberTasks->sum('estimated_hours');
+                                    $utilization = ($capacity > 0) ? round(($assignedHours / $capacity) * 100) : 0;
+                                @endphp
+                                <tr>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--accent-gradient); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px;">
+                                                {{ strtoupper(substr($m->user->name ?? 'M', 0, 2)) }}
+                                            </div>
+                                            <div>
+                                                <div style="font-weight: 800; color: var(--text-primary);">{{ $m->user->name ?? 'Member' }}</div>
+                                                <div style="font-size: 11px; color: var(--text-muted);">{{ $m->user->email }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><span class="badge badge-purple">{{ $m->role->name ?? 'Member' }}</span></td>
+                                    <td style="font-weight: 800; font-family: monospace;">{{ $capacity }}h / wk</td>
+                                    <td style="font-weight: 700;">{{ $memberTasks->count() }} {{ __('active') }}</td>
+                                    <td style="font-weight: 800; color: var(--brand-teal); font-family: monospace;">{{ $assignedHours }}h</td>
+                                    <td style="min-width: 180px;">
+                                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px; font-weight: 800;">
+                                            <span style="color: {{ $utilization > 100 ? '#ef4444' : ($utilization > 80 ? '#fbbf24' : '#34d399') }};">{{ $utilization }}%</span>
+                                            <span style="color: var(--text-muted);">{{ $assignedHours }} / {{ $capacity }}h</span>
+                                        </div>
+                                        <div class="progress-bar-bg">
+                                            <div class="progress-bar-fill" style="width: {{ min(100, $utilization) }}%; background: {{ $utilization > 100 ? '#ef4444' : ($utilization > 80 ? '#fbbf24' : '#10b981') }};"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </main>
+
+    <!-- Modal: New Project -->
+    <div id="new-project-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 540px;">
+            <div class="modal-header">
+                <h3 class="modal-title">📁 {{ __('Create New Project') }}</h3>
+                <button onclick="closeNewProjectModal()" class="modal-close">✕</button>
+            </div>
+            <form id="new-project-form" onsubmit="createProjectSubmit(event)" style="display: flex; flex-direction: column; gap: 14px;">
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Project Name') }} *</label>
+                    <input type="text" name="name" required placeholder="e.g. Mobile App Redesign, Cloud Migration" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Project Code') }}</label>
+                        <input type="text" name="code" placeholder="e.g. MOB-01" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Priority') }}</label>
+                        <select name="priority" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                            <option value="medium">{{ __('Medium') }}</option>
+                            <option value="low">{{ __('Low') }}</option>
+                            <option value="high">{{ __('High') }}</option>
+                            <option value="urgent">{{ __('Urgent') }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Project Manager') }}</label>
+                        <select name="manager_id" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                            <option value="">— {{ __('Select Manager') }} —</option>
+                            @foreach($members as $m)
+                                <option value="{{ $m->user_id }}">{{ $m->user->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Department') }}</label>
+                        <select name="department_id" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                            <option value="">— {{ __('No Department') }} —</option>
+                            @foreach($departments as $d)
+                                <option value="{{ $d->id }}">{{ $d->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Budget ($)') }}</label>
+                        <input type="number" step="0.01" name="budget_amount" placeholder="10000" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Planned Hours') }}</label>
+                        <input type="number" step="0.5" name="planned_hours" placeholder="160" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    </div>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Due Date') }}</label>
+                    <input type="date" name="due_date" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Description') }}</label>
+                    <textarea name="description" rows="2" placeholder="Brief project summary..." style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;"></textarea>
+                </div>
+                <button type="submit" class="header-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px; justify-content: center;">
+                    🚀 {{ __('Create Project') }}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: New Task -->
+    <div id="new-task-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 540px;">
+            <div class="modal-header">
+                <h3 class="modal-title">✅ {{ __('Create New Task') }}</h3>
+                <button onclick="closeNewTaskModal()" class="modal-close">✕</button>
+            </div>
+            <form id="new-task-form" onsubmit="createTaskSubmit(event)" style="display: flex; flex-direction: column; gap: 14px;">
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Project') }} *</label>
+                    <select name="project_id" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        @foreach($projects as $p)
+                            <option value="{{ $p->id }}">📁 {{ $p->name }} ({{ $p->code }})</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Task Title') }} *</label>
+                    <input type="text" name="title" required placeholder="e.g. Implement authentication middleware" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Assignee') }}</label>
+                        <select name="assignee_id" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                            <option value="">— {{ __('Unassigned') }} —</option>
+                            @foreach($members as $m)
+                                <option value="{{ $m->user_id }}">{{ $m->user->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Priority') }}</label>
+                        <select name="priority" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                            <option value="medium">{{ __('Medium') }}</option>
+                            <option value="low">{{ __('Low') }}</option>
+                            <option value="high">{{ __('High') }}</option>
+                            <option value="urgent">{{ __('Urgent') }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Estimated Hours') }}</label>
+                        <input type="number" step="0.5" name="estimated_hours" placeholder="4.0" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Due Date') }}</label>
+                        <input type="date" name="due_date" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    </div>
+                </div>
+                <button type="submit" class="header-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px; justify-content: center;">
+                    💾 {{ __('Create Task') }}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Manual Time Entry -->
+    <div id="manual-time-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3 class="modal-title">✍️ {{ __('Log Manual Time Entry') }}</h3>
+                <button onclick="closeManualTimeModal()" class="modal-close">✕</button>
+            </div>
+            <form id="manual-time-form" onsubmit="logManualTimeSubmit(event)" style="display: flex; flex-direction: column; gap: 14px;">
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Project') }} *</label>
+                    <select name="project_id" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        @foreach($projects as $p)
+                            <option value="{{ $p->id }}">📁 {{ $p->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Start Time') }} *</label>
+                        <input type="datetime-local" name="started_at" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 12px; font-weight: 600;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('End Time') }} *</label>
+                        <input type="datetime-local" name="ended_at" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 12px; font-weight: 600;">
+                    </div>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Description') }}</label>
+                    <input type="text" name="description" placeholder="What did you work on?" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                </div>
+                <button type="submit" class="header-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px; justify-content: center;">
+                    ⏱️ {{ __('Log Time') }}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Reject Timesheet -->
+    <div id="reject-timesheet-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 480px;">
+            <div class="modal-header">
+                <h3 class="modal-title">❌ {{ __('Reject Timesheet') }}</h3>
+                <button onclick="closeRejectModal()" class="modal-close">✕</button>
+            </div>
+            <form onsubmit="rejectTimesheetSubmit(event)" style="display: flex; flex-direction: column; gap: 14px;">
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Feedback Reason for Employee') }} *</label>
+                    <textarea id="reject-reason-input" required rows="3" placeholder="Please clarify the 6 hours logged on Friday..." style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;"></textarea>
+                </div>
+                <button type="submit" class="header-btn" style="margin-top: 6px; padding: 12px; font-size: 14px; justify-content: center; background: #ef4444; color: white;">
+                    ❌ {{ __('Confirm Rejection & Send Feedback') }}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Project Hub & KPI Dashboard Drawer -->
+    <div id="project-hub-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 1100px; width: 95vw; max-height: 90vh; display: flex; flex-direction: column; padding: 24px; overflow: hidden;">
+            <!-- Hub Header -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 14px;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                        <span id="hub-proj-code" class="badge badge-blue" style="font-family: monospace; font-size: 12px;">PRJ-01</span>
+                        <h2 id="hub-proj-name" style="font-size: 20px; font-weight: 900; margin: 0; color: var(--text-primary);">Project Name</h2>
+                        <span id="hub-proj-status" class="badge badge-green">Active</span>
+                        <span id="hub-proj-priority" class="badge badge-amber">High</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 16px; font-size: 12px; color: var(--text-muted);">
+                        <span>👤 {{ __('Manager') }}: <strong id="hub-proj-manager" style="color: var(--text-primary);">Name</strong></span>
+                        <span>🏛️ {{ __('Department') }}: <strong id="hub-proj-dept" style="color: var(--text-primary);">Dept</strong></span>
+                        <span>📅 {{ __('Due Date') }}: <strong id="hub-proj-due" style="color: var(--text-primary);">Date</strong></span>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <button onclick="openNewTaskForCurrentProject()" class="header-btn btn-primary" style="padding: 6px 14px; font-size: 12px;">
+                        <span>+</span> {{ __('Add Task') }}
+                    </button>
+                    <button onclick="closeProjectHub()" class="modal-close" style="font-size: 22px;">✕</button>
+                </div>
+            </div>
+
+            <!-- Hub KPI Stats Bar -->
+            <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px;">
+                <!-- Progress KPI -->
+                <div class="stat-card" style="padding: 14px; border-top: 3px solid var(--brand-teal);">
+                    <div class="stat-lbl">{{ __('Progress') }}</div>
+                    <div id="hub-kpi-progress-pct" class="stat-val" style="font-size: 20px; color: var(--brand-teal);">0%</div>
+                    <div id="hub-kpi-tasks-ratio" style="font-size: 11px; color: var(--text-muted);">0 / 0 tasks done</div>
+                </div>
+                <!-- Hours & Effort KPI -->
+                <div class="stat-card" style="padding: 14px; border-top: 3px solid var(--brand-primary);">
+                    <div class="stat-lbl">{{ __('Actual vs Planned Hours') }}</div>
+                    <div id="hub-kpi-hours" class="stat-val" style="font-size: 20px; color: var(--brand-primary);">0 / 0 h</div>
+                    <div id="hub-kpi-hours-var" style="font-size: 11px; color: var(--text-muted);">Variance: 0h</div>
+                </div>
+                <!-- Financials & Margin KPI -->
+                <div class="stat-card" style="padding: 14px; border-top: 3px solid var(--brand-gold);">
+                    <div class="stat-lbl">{{ __('Budget & Labor Cost') }}</div>
+                    <div id="hub-kpi-budget" class="stat-val" style="font-size: 20px; color: var(--brand-gold);">$0 / $0</div>
+                    <div id="hub-kpi-margin" style="font-size: 11px; color: #34d399;">Margin: $0 (0%)</div>
+                </div>
+                <!-- Health & Overdue KPI -->
+                <div class="stat-card" style="padding: 14px; border-top: 3px solid var(--brand-crimson);">
+                    <div class="stat-lbl">{{ __('Active & Overdue') }}</div>
+                    <div id="hub-kpi-active-tasks" class="stat-val" style="font-size: 20px; color: #f87171;">0 Active</div>
+                    <div id="hub-kpi-overdue-tasks" style="font-size: 11px; color: #f87171;">0 Overdue</div>
+                </div>
+            </div>
+
+            <!-- Hub Inner Navigation Tabs -->
+            <div style="display: flex; gap: 8px; margin-bottom: 14px; background: var(--bg-elevated); padding: 4px; border-radius: 10px; border: 1px solid var(--border-color);">
+                <button onclick="switchHubTab('kanban')" id="hub-tab-btn-kanban" class="header-btn btn-primary" style="flex: 1; padding: 7px; font-size: 12px; justify-content: center;">
+                    📌 {{ __('Kanban Board') }}
+                </button>
+                <button onclick="switchHubTab('tasks')" id="hub-tab-btn-tasks" class="header-btn btn-outline" style="flex: 1; padding: 7px; font-size: 12px; justify-content: center;">
+                    📋 {{ __('Task Table') }}
+                </button>
+                <button onclick="switchHubTab('timelog')" id="hub-tab-btn-timelog" class="header-btn btn-outline" style="flex: 1; padding: 7px; font-size: 12px; justify-content: center;">
+                    ⏱️ {{ __('Time Entries Log') }}
+                </button>
+            </div>
+
+            <!-- Hub Content Area (Scrollable) -->
+            <div style="flex: 1; overflow-y: auto; padding-right: 4px;">
+                <!-- 1. Kanban View -->
+                <div id="hub-view-kanban" style="display: block;">
+                    <div style="display: grid; grid-template-columns: repeat(5, minmax(200px, 1fr)); gap: 12px; align-items: start;">
+                        <!-- Backlog -->
+                        <div class="kanban-column">
+                            <div class="kanban-col-header" style="color: var(--text-secondary);">
+                                <span>📌 Backlog</span>
+                                <span id="col-count-backlog" class="badge badge-gray">0</span>
+                            </div>
+                            <div id="kanban-col-backlog" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                        </div>
+                        <!-- Ready -->
+                        <div class="kanban-column">
+                            <div class="kanban-col-header" style="color: #60a5fa;">
+                                <span>🎯 Ready</span>
+                                <span id="col-count-ready" class="badge badge-blue">0</span>
+                            </div>
+                            <div id="kanban-col-ready" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                        </div>
+                        <!-- In Progress -->
+                        <div class="kanban-column">
+                            <div class="kanban-col-header" style="color: #22d3ee;">
+                                <span>⚡ In Progress</span>
+                                <span id="col-count-in_progress" class="badge badge-teal">0</span>
+                            </div>
+                            <div id="kanban-col-in_progress" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                        </div>
+                        <!-- Review / QA -->
+                        <div class="kanban-column">
+                            <div class="kanban-col-header" style="color: #fbbf24;">
+                                <span>🔍 Review / QA</span>
+                                <span id="col-count-review" class="badge badge-amber">0</span>
+                            </div>
+                            <div id="kanban-col-review" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                        </div>
+                        <!-- Done -->
+                        <div class="kanban-column">
+                            <div class="kanban-col-header" style="color: #34d399;">
+                                <span>🎉 Done</span>
+                                <span id="col-count-done" class="badge badge-green">0</span>
+                            </div>
+                            <div id="kanban-col-done" style="display: flex; flex-direction: column; gap: 8px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Task Table View -->
+                <div id="hub-view-tasks" style="display: none;">
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>{{ __('Task Title') }}</th>
+                                    <th>{{ __('Assignee') }}</th>
+                                    <th>{{ __('Status') }}</th>
+                                    <th>{{ __('Priority') }}</th>
+                                    <th>{{ __('Hours (Est/Act)') }}</th>
+                                    <th>{{ __('Due Date') }}</th>
+                                    <th>{{ __('Action') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hub-task-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 3. Time Log View -->
+                <div id="hub-view-timelog" style="display: none;">
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>{{ __('Date') }}</th>
+                                    <th>{{ __('Employee') }}</th>
+                                    <th>{{ __('Task') }}</th>
+                                    <th>{{ __('Duration') }}</th>
+                                    <th>{{ __('Description') }}</th>
+                                    <th>{{ __('Type') }}</th>
+                                    <th>{{ __('Status') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hub-timelog-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Task Inspector & Activity Drawer -->
+    <div id="task-details-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 850px; width: 95vw; max-height: 90vh; display: flex; flex-direction: column; padding: 24px; overflow: hidden;">
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                        <span id="task-modal-code" class="badge badge-blue" style="font-family: monospace;">#1</span>
+                        <h2 id="task-modal-title" style="font-size: 18px; font-weight: 900; margin: 0; color: var(--text-primary);">Task Title</h2>
+                        <span id="task-modal-status-badge" class="badge badge-teal">In Progress</span>
+                        <span id="task-modal-priority-badge" class="badge badge-crimson">Urgent</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--text-muted);">
+                        <span>📁 {{ __('Project') }}: <strong id="task-modal-project" style="color: var(--text-primary);">Project Name</strong></span>
+                        <span>👤 {{ __('Assignee') }}: <strong id="task-modal-assignee" style="color: var(--text-primary);">Assignee</strong></span>
+                        <span>📅 {{ __('Due Date') }}: <strong id="task-modal-due" style="color: var(--text-primary);">Date</strong></span>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <button id="task-modal-timer-btn" class="header-btn" style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 6px 12px; font-size: 12px;">
+                        ▶ {{ __('Start Timer') }}
+                    </button>
+                    <button onclick="closeTaskDetailsModal()" class="modal-close" style="font-size: 22px;">✕</button>
+                </div>
+            </div>
+
+            <!-- Task Quick Status Changer Bar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-elevated); padding: 8px 14px; border-radius: 8px; margin-bottom: 14px; border: 1px solid var(--border-color);">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">⚡ {{ __('Quick Status Update') }}:</span>
+                    <select id="task-modal-status-select" onchange="updateCurrentTaskStatus(this.value)" style="background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 12px; font-weight: 700; border-radius: 6px; padding: 4px 10px;">
+                        <option value="backlog">📌 Backlog</option>
+                        <option value="ready">🎯 Ready</option>
+                        <option value="in_progress">⚡ In Progress</option>
+                        <option value="review">🔍 In Review / QA</option>
+                        <option value="done">🎉 Done / Completed</option>
+                    </select>
+                </div>
+                <div style="font-size: 12px; font-family: monospace; font-weight: 700; color: var(--text-primary);">
+                    ⏱️ <span id="task-modal-hours">0h / 0h</span>
+                </div>
+            </div>
+
+            <!-- Sub-Tabs -->
+            <div style="display: flex; gap: 6px; margin-bottom: 14px; background: var(--bg-elevated); padding: 4px; border-radius: 8px;">
+                <button onclick="switchTaskInspectorTab('details')" id="task-tab-btn-details" class="header-btn btn-primary" style="flex: 1; padding: 6px; font-size: 12px; justify-content: center;">
+                    📝 {{ __('Details') }}
+                </button>
+                <button onclick="switchTaskInspectorTab('checklist')" id="task-tab-btn-checklist" class="header-btn btn-outline" style="flex: 1; padding: 6px; font-size: 12px; justify-content: center;">
+                    ☑️ {{ __('Checklist') }} (<span id="task-checklist-count">0</span>)
+                </button>
+                <button onclick="switchTaskInspectorTab('comments')" id="task-tab-btn-comments" class="header-btn btn-outline" style="flex: 1; padding: 6px; font-size: 12px; justify-content: center;">
+                    💬 {{ __('Discussions') }} (<span id="task-comments-count">0</span>)
+                </button>
+                <button onclick="switchTaskInspectorTab('dependencies')" id="task-tab-btn-dependencies" class="header-btn btn-outline" style="flex: 1; padding: 6px; font-size: 12px; justify-content: center;">
+                    🔗 {{ __('Dependencies') }}
+                </button>
+                <button onclick="switchTaskInspectorTab('timelog')" id="task-tab-btn-timelog" class="header-btn btn-outline" style="flex: 1; padding: 6px; font-size: 12px; justify-content: center;">
+                    ⏱️ {{ __('Time Log') }}
+                </button>
+            </div>
+
+            <!-- Tab Contents -->
+            <div style="flex: 1; overflow-y: auto; padding-right: 4px;">
+                <!-- 1. Details -->
+                <div id="task-inspector-details" style="display: block;">
+                    <div style="margin-bottom: 14px;">
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 4px;">{{ __('Description') }}</label>
+                        <div id="task-modal-description" style="background: var(--bg-elevated); padding: 12px; border-radius: 8px; font-size: 13px; color: var(--text-primary); line-height: 1.5; border: 1px solid var(--border-color);">
+                            —
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Checklist -->
+                <div id="task-inspector-checklist" style="display: none;">
+                    <form onsubmit="addTaskChecklistItem(event)" style="display: flex; gap: 8px; margin-bottom: 14px;">
+                        <input type="text" id="new-checklist-title-input" required placeholder="{{ __('Add checklist sub-item (e.g. Write unit tests, create migration)...') }}" style="flex: 1; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; color: var(--text-primary); outline: none; font-size: 12px;">
+                        <button type="submit" class="header-btn btn-primary" style="padding: 8px 14px; font-size: 12px;">
+                            <span>+</span> {{ __('Add Item') }}
+                        </button>
+                    </form>
+                    <div id="task-checklist-items-container" style="display: flex; flex-direction: column; gap: 6px;"></div>
+                </div>
+
+                <!-- 3. Comments -->
+                <div id="task-inspector-comments" style="display: none;">
+                    <div id="task-comments-feed" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; max-height: 280px; overflow-y: auto;"></div>
+                    <form onsubmit="addTaskCommentSubmit(event)" style="display: flex; gap: 8px;">
+                        <input type="text" id="new-comment-body-input" required placeholder="{{ __('Write a comment or status update...') }}" style="flex: 1; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; color: var(--text-primary); outline: none; font-size: 12px;">
+                        <button type="submit" class="header-btn btn-primary" style="padding: 8px 14px; font-size: 12px;">
+                            💬 {{ __('Post') }}
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 4. Dependencies -->
+                <div id="task-inspector-dependencies" style="display: none;">
+                    <div style="background: var(--bg-elevated); padding: 12px; border-radius: 8px; margin-bottom: 14px; border: 1px solid var(--border-color);">
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">🔗 {{ __('Add Predecessor / Blocker Task') }}</label>
+                        <form onsubmit="addTaskDependencySubmit(event)" style="display: flex; gap: 8px;">
+                            <select id="dependency-blocker-select" required style="flex: 1; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; color: var(--text-primary); font-size: 12px;">
+                                <option value="">— {{ __('Select Blocker Task') }} —</option>
+                                @foreach($tasks as $oth)
+                                    <option value="{{ $oth->id }}">#{{ $oth->task_number }} {{ $oth->title }} ({{ $oth->project->code ?? 'PRJ' }})</option>
+                                @endforeach
+                            </select>
+                            <button type="submit" class="header-btn btn-primary" style="padding: 8px 14px; font-size: 12px;">
+                                <span>+</span> {{ __('Add Blocker') }}
+                            </button>
+                        </form>
+                    </div>
+                    <div id="task-dependencies-container" style="display: flex; flex-direction: column; gap: 6px;"></div>
+                </div>
+
+                <!-- 5. Time Log -->
+                <div id="task-inspector-timelog" style="display: none;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>{{ __('Date') }}</th>
+                                <th>{{ __('Member') }}</th>
+                                <th>{{ __('Duration') }}</th>
+                                <th>{{ __('Description') }}</th>
+                                <th>{{ __('Status') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody id="task-modal-timelog-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Invite Modal -->
     <div id="invite-modal" class="modal">
@@ -1277,7 +2700,7 @@
                         <div style="font-size: 11px; font-weight: 800; color: #34d399; text-transform: uppercase; margin-bottom: 6px;">✅ Invitation Link Ready!</div>
                         <input type="text" id="guest-link-output" readonly style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; color: var(--brand-teal); font-size: 12px; font-family: monospace; margin-bottom: 8px;">
                         <div style="display: flex; gap: 8px;">
-                            <button onclick="copyGuestLink()" id="btn-copy-link" style="flex: 1; background: var(--brand-primary); color: white; font-weight: 700; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-size: 12px;">
+                            <button type="button" onclick="copyModalGuestLink(this)" id="btn-copy-link" style="flex: 1; background: var(--brand-primary); color: white; font-weight: 700; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-size: 12px;">
                                 📋 {{ __('Copy Link') }}
                             </button>
                             <a id="guest-open-link" href="#" target="_blank" style="background: var(--bg-elevated); border: 1px solid var(--border-color); color: var(--text-primary); font-weight: 700; text-decoration: none; border-radius: 6px; padding: 8px 12px; font-size: 12px; display: flex; align-items: center;">
@@ -1420,10 +2843,30 @@
             document.querySelectorAll('.nav-tab-btn').forEach(el => el.classList.remove('active'));
 
             const targetTab = document.getElementById(`tab-${tabName}`);
-            if (targetTab) targetTab.classList.add('active');
+            if (targetTab) {
+                targetTab.classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (window.history && window.history.pushState) {
+                    window.history.pushState(null, null, '#' + tabName);
+                }
+            }
 
-            event?.target?.closest('.nav-tab-btn')?.classList.add('active');
+            // Highlight corresponding sidebar button
+            document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+                const onclickAttr = btn.getAttribute('onclick') || '';
+                if (onclickAttr.includes(`'${tabName}'`) || onclickAttr.includes(`"${tabName}"`)) {
+                    btn.classList.add('active');
+                }
+            });
         }
+
+        // Auto-open tab from URL hash on load (e.g. /dashboard#projects)
+        window.addEventListener('DOMContentLoaded', () => {
+            const hash = window.location.hash.replace('#', '');
+            if (hash && document.getElementById(`tab-${hash}`)) {
+                switchAdminTab(hash);
+            }
+        });
 
         // ── Department Modals ──
         function openDepartmentModal() {
@@ -1522,6 +2965,121 @@
             }
         }
 
+        function showToastNotification(message, type = 'success') {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                document.body.appendChild(container);
+            }
+
+            const toast = document.createElement('div');
+            toast.className = 'toast-popup';
+            toast.innerHTML = message;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('toast-fadeout');
+                setTimeout(() => {
+                    if (toast.parentNode) toast.parentNode.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        function triggerCopySuccess(btn) {
+            if (btn) {
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✅ {{ __('Copied!') }}';
+                btn.style.background = '#10b981';
+                btn.style.borderColor = '#10b981';
+                btn.style.color = '#ffffff';
+                btn.classList.remove('btn-copied-pulse');
+                void btn.offsetWidth; // Force CSS reflow to re-trigger pulse animation
+                btn.classList.add('btn-copied-pulse');
+
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = '';
+                    btn.style.borderColor = '';
+                    btn.style.color = '';
+                    btn.classList.remove('btn-copied-pulse');
+                }, 2200);
+            }
+            showToastNotification('📋 <strong>' + "{{ __('Link Copied!') }}" + '</strong> — ' + "{{ __('Guest meeting link copied to clipboard.') }}", 'success');
+        }
+
+        function executeClipboardCopy(text) {
+            if (!text) return false;
+            let copied = false;
+
+            // Strategy 1: Firefox Native Copy Event Interceptor
+            try {
+                const onCopy = function(e) {
+                    if (e.clipboardData) {
+                        e.clipboardData.setData('text/plain', text);
+                        e.preventDefault();
+                        copied = true;
+                    }
+                };
+                document.addEventListener('copy', onCopy, { once: true });
+                document.execCommand('copy');
+                document.removeEventListener('copy', onCopy);
+            } catch (err) {}
+
+            // Strategy 2: DOM Textarea selection fallback
+            if (!copied) {
+                try {
+                    const temp = document.createElement('textarea');
+                    temp.value = text;
+                    temp.style.position = 'fixed';
+                    temp.style.top = '10px';
+                    temp.style.left = '10px';
+                    temp.style.width = '100px';
+                    temp.style.height = '40px';
+                    temp.style.padding = '0';
+                    temp.style.border = 'none';
+                    temp.style.outline = 'none';
+                    temp.style.boxShadow = 'none';
+                    temp.style.background = 'transparent';
+                    temp.style.opacity = '0.01';
+                    temp.style.zIndex = '-9999';
+                    document.body.appendChild(temp);
+                    temp.focus();
+                    temp.select();
+                    temp.setSelectionRange(0, text.length);
+                    copied = document.execCommand('copy');
+                    document.body.removeChild(temp);
+                } catch (e) {}
+            }
+
+            // Strategy 3: Async Clipboard API
+            if (!copied && navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).catch(() => {});
+                copied = true;
+            }
+
+            return copied;
+        }
+
+        function copyTableGuestLink(url, btn) {
+            if (!url) return;
+            // Ensure origin is current
+            if (url.startsWith('http://') || url.startsWith('https://')) {
+                const path = url.replace(/^https?:\/\/[^\/]+/, '');
+                url = window.location.origin + path;
+            }
+            executeClipboardCopy(url);
+            triggerCopySuccess(btn);
+        }
+
+        function copyModalGuestLink(btn) {
+            const input = document.getElementById('guest-link-output');
+            const text = input ? input.value : '';
+            if (!text) return;
+            executeClipboardCopy(text);
+            triggerCopySuccess(btn);
+        }
+
         async function generateGuestLink() {
             const roomId = document.getElementById('invite-room-select').value;
             const guestName = document.getElementById('invite-guest-name').value.trim() || 'Guest';
@@ -1570,15 +3128,6 @@
             }
         }
 
-        function copyGuestLink() {
-            const input = document.getElementById('guest-link-output');
-            input.select();
-            navigator.clipboard.writeText(input.value);
-            const btn = document.getElementById('btn-copy-link');
-            btn.textContent = '✅ Copied!';
-            setTimeout(() => { btn.textContent = '📋 Copy Link'; }, 2000);
-        }
-
         async function sendMemberInvite() {
             const email = document.getElementById('invite-member-email').value.trim();
             const roleId = document.getElementById('invite-member-role').value;
@@ -1620,13 +3169,794 @@
             document.getElementById('theme-icon').textContent = next === 'dark' ? '🌙' : '☀️';
         }
 
-        // Initialize theme on page load
-        (function() {
-            const saved = localStorage.getItem('vw_theme') || 'dark';
-            document.documentElement.setAttribute('data-theme', saved);
-            const icon = document.getElementById('theme-icon');
-            if (icon) icon.textContent = saved === 'dark' ? '🌙' : '☀️';
-        })();
+        // ── PROJECT MANAGEMENT CLIENT CONTROLLERS ──
+        let activeTimerSeconds = {{ $activeTimer ? $activeTimer->elapsedSeconds() : 0 }};
+        let activeTimerInterval = null;
+
+        function formatTimerClock(totalSeconds) {
+            const h = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+            const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+            const s = String(totalSeconds % 60).padStart(2, '0');
+            return `${h}:${m}:${s}`;
+        }
+
+        function initLiveTimerTicker() {
+            if (activeTimerInterval) clearInterval(activeTimerInterval);
+            const clockEl = document.getElementById('live-timer-clock');
+            if (clockEl) clockEl.textContent = formatTimerClock(activeTimerSeconds);
+
+            @if($activeTimer)
+                activeTimerInterval = setInterval(() => {
+                    activeTimerSeconds++;
+                    if (clockEl) clockEl.textContent = formatTimerClock(activeTimerSeconds);
+                }, 1000);
+            @endif
+        }
+        initLiveTimerTicker();
+
+        async function startTaskTimer(projectId, taskId, taskTitle, projectName) {
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/time/timer/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ project_id: projectId, task_id: taskId })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.message || 'Failed to start timer.');
+                    return;
+                }
+
+                // Update UI timer strip
+                document.getElementById('universal-timer-strip').style.display = 'flex';
+                document.getElementById('timer-project-tag').textContent = projectName;
+                document.getElementById('timer-task-title').textContent = taskTitle;
+                activeTimerSeconds = 0;
+                if (activeTimerInterval) clearInterval(activeTimerInterval);
+                activeTimerInterval = setInterval(() => {
+                    activeTimerSeconds++;
+                    const clock = document.getElementById('live-timer-clock');
+                    if (clock) clock.textContent = formatTimerClock(activeTimerSeconds);
+                }, 1000);
+            } catch (e) {
+                console.error(e);
+                alert('Network error starting timer.');
+            }
+        }
+
+        async function stopGlobalTimer() {
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/time/timer/stop`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({})
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.message || 'Failed to stop timer.');
+                    return;
+                }
+
+                if (activeTimerInterval) clearInterval(activeTimerInterval);
+                document.getElementById('universal-timer-strip').style.display = 'none';
+                alert('✅ Timer stopped and work session logged successfully!');
+                window.location.reload();
+            } catch (e) {
+                console.error(e);
+                alert('Network error stopping timer.');
+            }
+        }
+
+        // New Project Modal
+        function openNewProjectModal() { document.getElementById('new-project-modal').style.display = 'flex'; }
+        function closeNewProjectModal() { document.getElementById('new-project-modal').style.display = 'none'; }
+
+        async function createProjectSubmit(e) {
+            e.preventDefault();
+            const form = document.getElementById('new-project-form');
+            const formData = new FormData(form);
+            const payload = Object.fromEntries(formData.entries());
+
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/projects`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.message || 'Error creating project.');
+                    return;
+                }
+                closeNewProjectModal();
+                alert('✅ Project created successfully!');
+                window.location.reload();
+            } catch (err) {
+                alert('Network error creating project.');
+            }
+        }
+
+        // New Task Modal
+        function openNewTaskModal() { document.getElementById('new-task-modal').style.display = 'flex'; }
+        function closeNewTaskModal() { document.getElementById('new-task-modal').style.display = 'none'; }
+
+        async function createTaskSubmit(e) {
+            e.preventDefault();
+            const form = document.getElementById('new-task-form');
+            const formData = new FormData(form);
+            const payload = Object.fromEntries(formData.entries());
+
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.message || 'Error creating task.');
+                    return;
+                }
+                closeNewTaskModal();
+                alert('✅ Task created successfully!');
+                window.location.reload();
+            } catch (err) {
+                alert('Network error creating task.');
+            }
+        }
+
+        // Manual Time Entry
+        function openManualTimeModal() { document.getElementById('manual-time-modal').style.display = 'flex'; }
+        function closeManualTimeModal() { document.getElementById('manual-time-modal').style.display = 'none'; }
+
+        async function logManualTimeSubmit(e) {
+            e.preventDefault();
+            const form = document.getElementById('manual-time-form');
+            const formData = new FormData(form);
+            const payload = Object.fromEntries(formData.entries());
+
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/time/entries/manual`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.message || 'Error logging time.');
+                    return;
+                }
+                closeManualTimeModal();
+                alert('✅ Time entry logged successfully!');
+                window.location.reload();
+            } catch (err) {
+                alert('Network error logging time.');
+            }
+        }
+
+        // Timesheets Actions
+        async function submitMyCurrentTimesheet() {
+            if (!confirm('Submit your weekly timesheet for manager review? Logged entries will be locked.')) return;
+            const now = new Date();
+            const first = now.getDate() - now.getDay() + 1;
+            const monday = new Date(now.setDate(first)).toISOString().split('T')[0];
+            const sunday = new Date(now.setDate(first + 6)).toISOString().split('T')[0];
+
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/timesheets/submit`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ period_start: monday, period_end: sunday })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.message || 'Error submitting timesheet.');
+                    return;
+                }
+                alert('✅ Timesheet submitted successfully!');
+                window.location.reload();
+            } catch (e) {
+                alert('Network error submitting timesheet.');
+            }
+        }
+
+        async function approveTimesheet(timesheetId) {
+            if (!confirm('Approve and permanently lock this timesheet?')) return;
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/timesheets/${timesheetId}/approve`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin'
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.message || 'Error approving timesheet.');
+                    return;
+                }
+                alert('✅ Timesheet approved!');
+                window.location.reload();
+            } catch (e) {
+                alert('Network error approving timesheet.');
+            }
+        }
+
+        let currentRejectTimesheetId = null;
+        function openRejectModal(id) {
+            currentRejectTimesheetId = id;
+            document.getElementById('reject-timesheet-modal').style.display = 'flex';
+        }
+        function closeRejectModal() { document.getElementById('reject-timesheet-modal').style.display = 'none'; }
+
+        async function rejectTimesheetSubmit(e) {
+            e.preventDefault();
+            const reason = document.getElementById('reject-reason-input').value;
+            if (!reason) return alert('Please enter a feedback reason.');
+
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/timesheets/${currentRejectTimesheetId}/reject`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ rejection_reason: reason })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.message || 'Error rejecting timesheet.');
+                    return;
+                }
+                closeRejectModal();
+                alert('✅ Timesheet rejected and feedback returned to employee.');
+                window.location.reload();
+            } catch (e) {
+                alert('Network error rejecting timesheet.');
+            }
+        }
+
+        // ── PROJECT HUB & KPI DASHBOARD CONTROLLER ──
+        let activeHubProjectId = null;
+
+        async function openProjectHub(projectId) {
+            activeHubProjectId = projectId;
+            const modal = document.getElementById('project-hub-modal');
+            modal.style.display = 'flex';
+
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/projects/${projectId}`, {
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'same-origin'
+                });
+                if (!res.ok) {
+                    alert('Error loading project details.');
+                    return;
+                }
+                const data = await res.json();
+                renderProjectHub(data);
+            } catch (e) {
+                console.error(e);
+                alert('Network error loading project hub.');
+            }
+        }
+
+        function closeProjectHub() {
+            document.getElementById('project-hub-modal').style.display = 'none';
+            activeHubProjectId = null;
+        }
+
+        function switchHubTab(tab) {
+            ['kanban', 'tasks', 'timelog'].forEach(t => {
+                const view = document.getElementById(`hub-view-${t}`);
+                const btn = document.getElementById(`hub-tab-btn-${t}`);
+                if (view) view.style.display = (t === tab) ? 'block' : 'none';
+                if (btn) {
+                    if (t === tab) {
+                        btn.className = 'header-btn btn-primary';
+                    } else {
+                        btn.className = 'header-btn btn-outline';
+                    }
+                }
+            });
+        }
+
+        function openNewTaskForCurrentProject() {
+            if (!activeHubProjectId) return;
+            const select = document.querySelector('#new-task-form select[name="project_id"]');
+            if (select) select.value = activeHubProjectId;
+            openNewTaskModal();
+        }
+
+        async function updateHubTaskStatus(taskId, newStatus) {
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${taskId}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ status: newStatus })
+                });
+                if (!res.ok) {
+                    alert('Error updating task status.');
+                    return;
+                }
+                // Refresh project hub
+                if (activeHubProjectId) openProjectHub(activeHubProjectId);
+            } catch (e) {
+                alert('Network error updating task.');
+            }
+        }
+
+        function renderProjectHub(data) {
+            const p = data.project;
+            const k = data.kpis || {};
+
+            // Header info
+            document.getElementById('hub-proj-code').textContent = p.code || 'PRJ';
+            document.getElementById('hub-proj-name').textContent = p.name;
+            document.getElementById('hub-proj-status').textContent = (p.status || 'active').toUpperCase();
+            document.getElementById('hub-proj-priority').textContent = (p.priority || 'medium').toUpperCase();
+            document.getElementById('hub-proj-manager').textContent = p.manager ? p.manager.name : 'Unassigned';
+            document.getElementById('hub-proj-dept').textContent = p.department ? p.department.name : 'General';
+            document.getElementById('hub-proj-due').textContent = p.due_date ? new Date(p.due_date).toLocaleDateString() : '—';
+
+            // KPI Cards
+            document.getElementById('hub-kpi-progress-pct').textContent = `${k.progress_pct || 0}%`;
+            document.getElementById('hub-kpi-tasks-ratio').textContent = `${k.completed_tasks || 0} / ${k.total_tasks || 0} tasks done`;
+            
+            document.getElementById('hub-kpi-hours').textContent = `${k.actual_hours || 0} / ${k.planned_hours || 0} h`;
+            document.getElementById('hub-kpi-hours-var').textContent = `Variance: ${k.hours_variance || 0}h`;
+
+            document.getElementById('hub-kpi-budget').textContent = `$${Number(k.budget_amount || 0).toLocaleString()} / $${Number(k.labor_cost || 0).toLocaleString()}`;
+            document.getElementById('hub-kpi-margin').textContent = `Margin: $${Number(k.gross_margin || 0).toLocaleString()} (${k.gross_margin_pct || 0}%)`;
+
+            document.getElementById('hub-kpi-active-tasks').textContent = `${k.in_progress_tasks || 0} Active`;
+            document.getElementById('hub-kpi-overdue-tasks').textContent = `${k.overdue_tasks || 0} Overdue`;
+
+            // Clear Kanban columns
+            const cols = ['backlog', 'ready', 'in_progress', 'review', 'done'];
+            cols.forEach(c => {
+                const el = document.getElementById(`kanban-col-${c}`);
+                if (el) el.innerHTML = '';
+                const cnt = document.getElementById(`col-count-${c}`);
+                if (cnt) cnt.textContent = '0';
+            });
+
+            // Populate Kanban Cards & Task Table
+            const tasks = p.tasks || [];
+            const taskCounts = { backlog: 0, ready: 0, in_progress: 0, review: 0, done: 0 };
+            const taskTableBody = document.getElementById('hub-task-table-body');
+            if (taskTableBody) taskTableBody.innerHTML = '';
+
+            tasks.forEach(t => {
+                const status = (t.status === 'qa') ? 'review' : t.status;
+                if (taskCounts[status] !== undefined) taskCounts[status]++;
+
+                // Kanban Card HTML
+                const colEl = document.getElementById(`kanban-col-${status}`);
+                if (colEl) {
+                    const card = document.createElement('div');
+                    card.className = 'kanban-card';
+                    card.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                            <span class="badge badge-blue" style="font-size: 10px;">#${t.task_number || 1}</span>
+                            <select onchange="updateHubTaskStatus('${t.id}', this.value)" style="background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 10px; font-weight: 700; border-radius: 4px; padding: 2px;">
+                                <option value="backlog" ${t.status === 'backlog' ? 'selected' : ''}>Backlog</option>
+                                <option value="ready" ${t.status === 'ready' ? 'selected' : ''}>Ready</option>
+                                <option value="in_progress" ${t.status === 'in_progress' ? 'selected' : ''}>In Progress</option>
+                                <option value="review" ${t.status === 'review' || t.status === 'qa' ? 'selected' : ''}>Review</option>
+                                <option value="done" ${t.status === 'done' ? 'selected' : ''}>Done</option>
+                            </select>
+                        </div>
+                        <div style="font-weight: 800; font-size: 13px; margin-bottom: 4px; color: var(--text-primary);">${t.title}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; border-top: 1px solid var(--border-color); padding-top: 6px; font-size: 11px;">
+                            <span style="color: var(--text-muted);">👤 ${t.assignee ? t.assignee.name.split(' ')[0] : 'Unassigned'}</span>
+                            <button onclick="startTaskTimer('${p.id}', '${t.id}', '${t.title.replace(/'/g, "\\'")}', '${p.name.replace(/'/g, "\\'")}')" class="header-btn" style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 2px 6px; font-size: 10px;">
+                                ▶ Timer
+                            </button>
+                        </div>
+                    `;
+                    colEl.appendChild(card);
+                }
+
+                // Task Table Row
+                if (taskTableBody) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td style="font-family: monospace; font-weight: 700;">#${t.task_number || 1}</td>
+                        <td style="font-weight: 800; color: var(--text-primary);">${t.title}</td>
+                        <td>${t.assignee ? t.assignee.name : '<span style="color: var(--text-muted);">Unassigned</span>'}</td>
+                        <td><span class="badge ${t.status === 'done' ? 'badge-green' : (t.status === 'in_progress' ? 'badge-teal' : 'badge-gray')}">${t.status}</span></td>
+                        <td><span class="badge ${t.priority === 'urgent' ? 'badge-crimson' : (t.priority === 'high' ? 'badge-amber' : 'badge-gray')}">${t.priority}</span></td>
+                        <td style="font-family: monospace;">${t.estimated_hours || 0}h / ${t.actual_hours || 0}h</td>
+                        <td>${t.due_date ? new Date(t.due_date).toLocaleDateString() : '—'}</td>
+                        <td>
+                            <button onclick="startTaskTimer('${p.id}', '${t.id}', '${t.title.replace(/'/g, "\\'")}', '${p.name.replace(/'/g, "\\'")}')" class="header-btn btn-outline" style="padding: 3px 8px; font-size: 10px;">
+                                ▶ Timer
+                            </button>
+                        </td>
+                    `;
+                    taskTableBody.appendChild(row);
+                }
+            });
+
+            // Update column count badges
+            cols.forEach(c => {
+                const cnt = document.getElementById(`col-count-${c}`);
+                if (cnt) cnt.textContent = taskCounts[c] || 0;
+            });
+
+            // Populate Time Log Table
+            const timelogBody = document.getElementById('hub-timelog-table-body');
+            if (timelogBody) {
+                timelogBody.innerHTML = '';
+                const entries = p.time_entries || [];
+                if (entries.length === 0) {
+                    timelogBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--text-muted);">No time tracked on this project yet.</td></tr>';
+                } else {
+                    entries.forEach(e => {
+                        const tr = document.createElement('tr');
+                        const hrs = (e.duration_seconds / 3600).toFixed(2);
+                        tr.innerHTML = `
+                            <td>${new Date(e.started_at).toLocaleDateString()}</td>
+                            <td style="font-weight: 700;">${e.user ? e.user.name : 'Member'}</td>
+                            <td>${e.task ? e.task.title : '—'}</td>
+                            <td style="font-weight: 800; color: #34d399; font-family: monospace;">${hrs}h</td>
+                            <td style="font-size: 11px; color: var(--text-secondary);">${e.description || 'Work session'}</td>
+                            <td><span class="badge badge-gray">${e.entry_type}</span></td>
+                            <td><span class="badge ${e.status === 'approved' ? 'badge-green' : (e.status === 'submitted' ? 'badge-amber' : 'badge-gray')}">${e.status}</span></td>
+                        `;
+                        timelogBody.appendChild(tr);
+                    });
+                }
+            }
+        }
+
+        // ── ALL TASKS MANAGER CONTROLLER ──
+        function switchAllTasksView(view) {
+            const tblView = document.getElementById('alltasks-view-table');
+            const knbView = document.getElementById('alltasks-view-kanban');
+            const tblBtn = document.getElementById('alltasks-btn-table');
+            const knbBtn = document.getElementById('alltasks-btn-kanban');
+
+            if (view === 'table') {
+                tblView.style.display = 'block';
+                knbView.style.display = 'none';
+                tblBtn.className = 'header-btn btn-primary';
+                knbBtn.className = 'header-btn btn-outline';
+            } else {
+                tblView.style.display = 'none';
+                knbView.style.display = 'block';
+                tblBtn.className = 'header-btn btn-outline';
+                knbBtn.className = 'header-btn btn-primary';
+            }
+        }
+
+        function filterAllTasksTable() {
+            const query = (document.getElementById('alltasks-filter-search')?.value || '').toLowerCase().trim();
+            const proj = document.getElementById('alltasks-filter-project')?.value || '';
+            const status = document.getElementById('alltasks-filter-status')?.value || '';
+            const priority = document.getElementById('alltasks-filter-priority')?.value || '';
+            const assignee = document.getElementById('alltasks-filter-assignee')?.value || '';
+
+            const rows = document.querySelectorAll('.alltask-row');
+            let visibleCount = 0;
+
+            rows.forEach(r => {
+                const title = r.dataset.title || '';
+                const rProj = r.dataset.projectId || '';
+                const rStatus = r.dataset.status || '';
+                const rPriority = r.dataset.priority || '';
+                const rAssignee = r.dataset.assigneeId || '';
+
+                const matchesQuery = !query || title.includes(query);
+                const matchesProj = !proj || rProj === proj;
+                const matchesStatus = !status || rStatus === status;
+                const matchesPriority = !priority || rPriority === priority;
+                const matchesAssignee = !assignee || rAssignee === assignee;
+
+                if (matchesQuery && matchesProj && matchesStatus && matchesPriority && matchesAssignee) {
+                    r.style.display = '';
+                    visibleCount++;
+                } else {
+                    r.style.display = 'none';
+                }
+            });
+
+            const cntEl = document.getElementById('alltasks-filtered-count');
+            if (cntEl) cntEl.textContent = visibleCount;
+        }
+
+        async function updateTaskStatusDirect(taskId, newStatus) {
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${taskId}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ status: newStatus })
+                });
+                if (!res.ok) {
+                    alert('Error updating task status.');
+                    return;
+                }
+                window.location.reload();
+            } catch (e) {
+                alert('Network error updating task.');
+            }
+        }
+
+        // ── TASK INSPECTOR / DETAILS DRAWER ──
+        let activeInspectorTaskId = null;
+        let currentInspectorTask = null;
+
+        async function openTaskDetails(taskId) {
+            activeInspectorTaskId = taskId;
+            const modal = document.getElementById('task-details-modal');
+            modal.style.display = 'flex';
+
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${taskId}`, {
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'same-origin'
+                });
+                if (!res.ok) {
+                    alert('Error loading task details.');
+                    return;
+                }
+                const data = await res.json();
+                currentInspectorTask = data.task || data;
+                renderTaskDetails(currentInspectorTask);
+            } catch (e) {
+                console.error(e);
+                alert('Network error loading task details.');
+            }
+        }
+
+        function closeTaskDetailsModal() {
+            document.getElementById('task-details-modal').style.display = 'none';
+            activeInspectorTaskId = null;
+            currentInspectorTask = null;
+        }
+
+        function switchTaskInspectorTab(tab) {
+            ['details', 'checklist', 'comments', 'dependencies', 'timelog'].forEach(t => {
+                const view = document.getElementById(`task-inspector-${t}`);
+                const btn = document.getElementById(`task-tab-btn-${t}`);
+                if (view) view.style.display = (t === tab) ? 'block' : 'none';
+                if (btn) {
+                    btn.className = (t === tab) ? 'header-btn btn-primary' : 'header-btn btn-outline';
+                }
+            });
+        }
+
+        async function updateCurrentTaskStatus(newStatus) {
+            if (!activeInspectorTaskId) return;
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${activeInspectorTaskId}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ status: newStatus })
+                });
+                if (!res.ok) {
+                    alert('Error updating status.');
+                    return;
+                }
+                openTaskDetails(activeInspectorTaskId);
+            } catch (e) {
+                alert('Network error updating status.');
+            }
+        }
+
+        async function addTaskChecklistItem(e) {
+            e.preventDefault();
+            const input = document.getElementById('new-checklist-title-input');
+            const title = input.value.trim();
+            if (!title || !activeInspectorTaskId) return;
+
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${activeInspectorTaskId}/checklist`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ title: title })
+                });
+                if (!res.ok) {
+                    alert('Error adding checklist item.');
+                    return;
+                }
+                input.value = '';
+                openTaskDetails(activeInspectorTaskId);
+            } catch (err) {
+                alert('Network error adding checklist item.');
+            }
+        }
+
+        async function toggleTaskChecklistItem(itemId) {
+            if (!activeInspectorTaskId) return;
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${activeInspectorTaskId}/checklist/${itemId}/toggle`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin'
+                });
+                if (!res.ok) {
+                    alert('Error toggling checklist item.');
+                    return;
+                }
+                openTaskDetails(activeInspectorTaskId);
+            } catch (err) {
+                alert('Network error toggling checklist item.');
+            }
+        }
+
+        async function addTaskCommentSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('new-comment-body-input');
+            const body = input.value.trim();
+            if (!body || !activeInspectorTaskId) return;
+
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${activeInspectorTaskId}/comments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ body: body })
+                });
+                if (!res.ok) {
+                    alert('Error posting comment.');
+                    return;
+                }
+                input.value = '';
+                openTaskDetails(activeInspectorTaskId);
+            } catch (err) {
+                alert('Network error posting comment.');
+            }
+        }
+
+        async function addTaskDependencySubmit(e) {
+            e.preventDefault();
+            const select = document.getElementById('dependency-blocker-select');
+            const blockerId = select.value;
+            if (!blockerId || !activeInspectorTaskId) return;
+
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${activeInspectorTaskId}/dependencies`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ depends_on_task_id: blockerId })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.message || 'Error adding dependency.');
+                    return;
+                }
+                select.value = '';
+                alert('✅ Dependency linked successfully!');
+                openTaskDetails(activeInspectorTaskId);
+            } catch (err) {
+                alert('Network error linking dependency.');
+            }
+        }
+
+        function renderTaskDetails(t) {
+            // Header
+            document.getElementById('task-modal-code').textContent = `#${t.task_number || 1}`;
+            document.getElementById('task-modal-title').textContent = t.title;
+            document.getElementById('task-modal-status-badge').textContent = (t.status || 'backlog').toUpperCase();
+            document.getElementById('task-modal-priority-badge').textContent = (t.priority || 'medium').toUpperCase();
+            document.getElementById('task-modal-project').textContent = t.project ? t.project.name : 'General';
+            document.getElementById('task-modal-assignee').textContent = t.assignee ? t.assignee.name : 'Unassigned';
+            document.getElementById('task-modal-due').textContent = t.due_date ? new Date(t.due_date).toLocaleDateString() : '—';
+            document.getElementById('task-modal-status-select').value = t.status || 'backlog';
+            document.getElementById('task-modal-description').textContent = t.description || 'No description provided.';
+            document.getElementById('task-modal-hours').textContent = `${t.estimated_hours || 0}h est / ${t.actual_hours || 0}h act`;
+
+            // Timer Button
+            const timerBtn = document.getElementById('task-modal-timer-btn');
+            if (timerBtn) {
+                const pId = t.project_id || '';
+                const pName = t.project ? t.project.name : 'Project';
+                timerBtn.onclick = () => startTaskTimer(pId, t.id, t.title, pName);
+            }
+
+            // Checklist
+            const items = t.checklist_items || [];
+            document.getElementById('task-checklist-count').textContent = items.length;
+            const checkContainer = document.getElementById('task-checklist-items-container');
+            if (checkContainer) {
+                checkContainer.innerHTML = '';
+                if (items.length === 0) {
+                    checkContainer.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 8px;">No checklist items yet. Add sub-items above.</div>';
+                } else {
+                    items.forEach(item => {
+                        const div = document.createElement('div');
+                        div.style = 'display: flex; align-items: center; justify-content: space-between; background: var(--bg-elevated); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color);';
+                        div.innerHTML = `
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: var(--text-primary); text-decoration: ${item.is_completed ? 'line-through' : 'none'}; opacity: ${item.is_completed ? 0.6 : 1};">
+                                <input type="checkbox" onchange="toggleTaskChecklistItem('${item.id}')" ${item.is_completed ? 'checked' : ''}>
+                                <span>${item.title}</span>
+                            </label>
+                            <span class="badge ${item.is_completed ? 'badge-green' : 'badge-gray'}" style="font-size: 10px;">${item.is_completed ? 'Done' : 'Pending'}</span>
+                        `;
+                        checkContainer.appendChild(div);
+                    });
+                }
+            }
+
+            // Comments
+            const comments = t.comments || [];
+            document.getElementById('task-comments-count').textContent = comments.length;
+            const commContainer = document.getElementById('task-comments-feed');
+            if (commContainer) {
+                commContainer.innerHTML = '';
+                if (comments.length === 0) {
+                    commContainer.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 8px;">No discussions or comments yet.</div>';
+                } else {
+                    comments.forEach(c => {
+                        const box = document.createElement('div');
+                        box.style = 'background: var(--bg-elevated); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;';
+                        const author = c.user ? c.user.name : 'Team Member';
+                        const time = new Date(c.created_at).toLocaleString();
+                        box.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11px;">
+                                <strong style="color: var(--brand-teal);">👤 ${author}</strong>
+                                <span style="color: var(--text-muted);">${time}</span>
+                            </div>
+                            <div style="color: var(--text-primary); line-height: 1.4;">${c.body || ''}</div>
+                        `;
+                        commContainer.appendChild(box);
+                    });
+                }
+            }
+
+            // Dependencies
+            const deps = t.dependencies || [];
+            const depContainer = document.getElementById('task-dependencies-container');
+            if (depContainer) {
+                depContainer.innerHTML = '';
+                if (deps.length === 0) {
+                    depContainer.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 8px;">No blocker dependencies. This task can be started immediately.</div>';
+                } else {
+                    deps.forEach(d => {
+                        const item = document.createElement('div');
+                        item.style = 'background: var(--bg-elevated); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 12px; display: flex; justify-content: space-between; align-items: center;';
+                        const depTask = d.depends_on_task || {};
+                        item.innerHTML = `
+                            <span>🔒 <strong>Depends On:</strong> #${depTask.task_number || ''} ${depTask.title || 'Predecessor Task'}</span>
+                            <span class="badge ${depTask.status === 'done' ? 'badge-green' : 'badge-crimson'}">${depTask.status || 'pending'}</span>
+                        `;
+                        depContainer.appendChild(item);
+                    });
+                }
+            }
+
+            // Time Log
+            const timeBody = document.getElementById('task-modal-timelog-body');
+            if (timeBody) {
+                timeBody.innerHTML = '';
+                const entries = t.time_entries || [];
+                if (entries.length === 0) {
+                    timeBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 14px; color: var(--text-muted);">No time tracked on this task yet.</td></tr>';
+                } else {
+                    entries.forEach(e => {
+                        const tr = document.createElement('tr');
+                        const hrs = (e.duration_seconds / 3600).toFixed(2);
+                        tr.innerHTML = `
+                            <td>${new Date(e.started_at).toLocaleDateString()}</td>
+                            <td style="font-weight: 700;">${e.user ? e.user.name : 'Member'}</td>
+                            <td style="font-weight: 800; color: #34d399; font-family: monospace;">${hrs}h</td>
+                            <td style="font-size: 11px;">${e.description || 'Work session'}</td>
+                            <td><span class="badge ${e.status === 'approved' ? 'badge-green' : 'badge-gray'}">${e.status}</span></td>
+                        `;
+                        timeBody.appendChild(tr);
+                    });
+                }
+            }
+        }
     </script>
 </body>
 </html>

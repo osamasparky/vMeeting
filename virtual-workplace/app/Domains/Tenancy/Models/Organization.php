@@ -80,6 +80,26 @@ class Organization extends Model
         return $this->hasMany(\App\Domains\Workspace\Models\Room::class);
     }
 
+    public function projects(): HasMany
+    {
+        return $this->hasMany(\App\Domains\Projects\Models\Project::class);
+    }
+
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(\App\Domains\Projects\Models\Task::class);
+    }
+
+    public function timeEntries(): HasMany
+    {
+        return $this->hasMany(\App\Domains\Projects\Models\TimeEntry::class);
+    }
+
+    public function timesheets(): HasMany
+    {
+        return $this->hasMany(\App\Domains\Projects\Models\Timesheet::class);
+    }
+
 
     // ── Helpers ──
 
