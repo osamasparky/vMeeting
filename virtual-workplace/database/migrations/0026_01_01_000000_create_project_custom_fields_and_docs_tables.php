@@ -14,8 +14,8 @@ return new class extends Migration
         // 1. Custom Field Definitions (ClickUp Custom Fields)
         Schema::create('custom_field_definitions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('organization_id')->constrained('organizations')->cascadeOnDelete();
-            $table->foreignId('project_id')->nullable()->constrained('projects')->cascadeOnDelete();
+            $table->foreignUuid('organization_id')->constrained('organizations')->cascadeOnDelete();
+            $table->foreignUuid('project_id')->nullable()->constrained('projects')->cascadeOnDelete();
             $table->string('name');
             $table->string('field_type', 30)->default('text'); // text, number, dropdown, currency, date, checkbox, rating, url
             $table->json('options')->nullable(); // For dropdown options, currency symbol, rating max, etc.
@@ -30,7 +30,7 @@ return new class extends Migration
         // 2. Task Custom Field Values
         Schema::create('task_custom_field_values', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('task_id')->constrained('tasks')->cascadeOnDelete();
+            $table->foreignUuid('task_id')->constrained('tasks')->cascadeOnDelete();
             $table->foreignId('custom_field_definition_id')->constrained('custom_field_definitions')->cascadeOnDelete();
             $table->text('value_text')->nullable();
             $table->decimal('value_number', 14, 4)->nullable();
@@ -45,9 +45,9 @@ return new class extends Migration
         // 3. Project Documents & Knowledge Wiki (ClickUp Docs)
         Schema::create('project_documents', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('organization_id')->constrained('organizations')->cascadeOnDelete();
-            $table->foreignId('project_id')->constrained('projects')->cascadeOnDelete();
-            $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
+            $table->foreignUuid('organization_id')->constrained('organizations')->cascadeOnDelete();
+            $table->foreignUuid('project_id')->constrained('projects')->cascadeOnDelete();
+            $table->foreignUuid('created_by')->constrained('users')->cascadeOnDelete();
             $table->foreignId('parent_document_id')->nullable()->constrained('project_documents')->nullOnDelete();
             $table->string('title');
             $table->string('slug')->nullable();
@@ -63,9 +63,9 @@ return new class extends Migration
         // 4. Project Goals & Target Metrics (ClickUp Goals)
         Schema::create('project_goals', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('organization_id')->constrained('organizations')->cascadeOnDelete();
-            $table->foreignId('project_id')->constrained('projects')->cascadeOnDelete();
-            $table->foreignId('owner_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignUuid('organization_id')->constrained('organizations')->cascadeOnDelete();
+            $table->foreignUuid('project_id')->constrained('projects')->cascadeOnDelete();
+            $table->foreignUuid('owner_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('color', 20)->default('#245C3A');
@@ -93,8 +93,8 @@ return new class extends Migration
         // 5. Project Sprints (ClickUp Sprints)
         Schema::create('project_sprints', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('organization_id')->constrained('organizations')->cascadeOnDelete();
-            $table->foreignId('project_id')->constrained('projects')->cascadeOnDelete();
+            $table->foreignUuid('organization_id')->constrained('organizations')->cascadeOnDelete();
+            $table->foreignUuid('project_id')->constrained('projects')->cascadeOnDelete();
             $table->string('name');
             $table->dateTime('start_date');
             $table->dateTime('end_date');
