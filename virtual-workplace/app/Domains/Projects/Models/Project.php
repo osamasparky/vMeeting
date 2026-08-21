@@ -135,6 +135,26 @@ class Project extends Model
         );
     }
 
+    public function customFieldDefinitions(): HasMany
+    {
+        return $this->hasMany(CustomFieldDefinition::class)->orderBy('sort_order');
+    }
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(ProjectDocument::class)->latest();
+    }
+
+    public function goals(): HasMany
+    {
+        return $this->hasMany(ProjectGoal::class)->with('targets');
+    }
+
+    public function sprints(): HasMany
+    {
+        return $this->hasMany(ProjectSprint::class)->latest('start_date');
+    }
+
     public function progressPercentage(): int
     {
         $total = $this->tasks()->count();

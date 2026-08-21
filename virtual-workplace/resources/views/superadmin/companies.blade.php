@@ -16,9 +16,9 @@
                 name="search"
                 value="{{ request('search') }}"
                 placeholder="{{ __('Search by name or slug...') }}"
-                style="background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 14px; color: var(--text-primary); font-size: 13px; outline: none; width: 220px;"
+                style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px 14px; color: var(--text-primary); font-size: 13px; outline: none; width: 220px; box-shadow: var(--shadow-inset-3d); font-weight: 600;"
             >
-            <button type="submit" class="btn-action">🔍 {{ __('Search') }}</button>
+            <button type="submit" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px;">🔍 {{ __('Search') }}</button>
         </form>
     </div>
 
@@ -47,28 +47,28 @@
                 <tr>
                     <td>
                         <strong style="color: var(--text-primary); font-size: 14px;">{{ $comp->name }}</strong>
-                        <div style="font-size: 11px; color: var(--text-muted);">{{ $comp->slug }}</div>
+                        <div style="font-size: 11px; color: var(--text-muted); font-family: monospace;">{{ $comp->slug }}</div>
                     </td>
                     <td>
-                        <div style="font-weight: 700; color: var(--text-primary);">{{ $owner?->name ?? 'Administrator' }}</div>
+                        <div style="font-weight: 800; color: var(--text-primary);">{{ $owner?->name ?? 'Administrator' }}</div>
                         <div style="font-size: 11px; color: var(--text-muted);">{{ $owner?->email }}</div>
                     </td>
                     <td>
                         <span class="badge-status badge-plan">
                             💎 {{ $comp->plan?->name ?? 'Free' }}
                         </span>
-                        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">
+                        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px; font-weight: 700;">
                             ${{ number_format($comp->plan?->price ?? 0, 2) }}/mo
                         </div>
                     </td>
                     <td>
-                        <div style="font-weight: 800; color: {{ !$isUnlimited && $memberCount >= $seatLimit ? 'var(--brand-crimson)' : 'var(--brand-green)' }}; font-size: 13px;">
+                        <div style="font-weight: 800; color: {{ !$isUnlimited && $memberCount >= $seatLimit ? '#D96B5F' : 'var(--brand-forest)' }}; font-size: 13px;">
                             {{ $memberCount }} / {{ $isUnlimited ? '∞' : $seatLimit }}
                         </div>
                         <div style="font-size: 10px; color: var(--text-muted);">{{ __('Seats used') }}</div>
                     </td>
                     <td>
-                        <span style="font-weight: 700; color: var(--text-secondary);">{{ $comp->rooms->count() }} {{ __('Rooms') }}</span>
+                        <span style="font-weight: 800; color: var(--text-secondary);">{{ $comp->rooms->count() }} {{ __('Rooms') }}</span>
                     </td>
                     <td>
                         @if($isSuspended)
@@ -81,7 +81,8 @@
                         <div style="display: flex; gap: 6px;">
                             <button
                                 onclick="openChangePlanModal('{{ $comp->id }}', '{{ $comp->name }}', '{{ $comp->plan_id }}')"
-                                class="btn-action"
+                                class="tactile-btn btn-secondary"
+                                style="padding: 6px 12px; font-size: 11px;"
                                 title="{{ __('Change Plan') }}"
                             >
                                 💎 {{ __('Change Plan') }}
@@ -89,7 +90,7 @@
 
                             <form method="POST" action="{{ route('superadmin.companies.toggle', $comp) }}" style="display: inline;">
                                 @csrf
-                                <button type="submit" class="btn-action" style="color: {{ $isSuspended ? 'var(--brand-green)' : 'var(--brand-crimson)' }};">
+                                <button type="submit" class="tactile-btn" style="padding: 6px 12px; font-size: 11px; color: {{ $isSuspended ? 'var(--brand-forest)' : '#D96B5F' }};">
                                     {{ $isSuspended ? '▶️ ' . __('Activate') : '⏸️ ' . __('Suspend') }}
                                 </button>
                             </form>
@@ -98,8 +99,8 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 32px;">
-                        No organizations found matching search criteria.
+                    <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                        {{ __('No organizations found matching search criteria.') }}
                     </td>
                 </tr>
                 @endforelse
@@ -114,19 +115,19 @@
 
 <!-- Change Plan Modal -->
 <div id="changePlanModal" class="modal-overlay">
-    <div class="modal-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
-            <h3 style="font-size: 16px; font-weight: 800; color: var(--brand-navy);" id="modalCompanyTitle">💎 {{ __('Change Subscription Plan') }}</h3>
-            <button onclick="closeChangePlanModal()" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
+    <div class="modal-card" style="border-radius: 24px; padding: 26px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="font-size: 17px; font-weight: 900; color: var(--text-primary);" id="modalCompanyTitle">💎 {{ __('Change Subscription Plan') }}</h3>
+            <button onclick="closeChangePlanModal()" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-primary); font-weight: 800;">✕</button>
         </div>
 
         <form id="changePlanForm" method="POST" action="">
             @csrf
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">
+            <div style="margin-bottom: 22px;">
+                <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-secondary); margin-bottom: 8px;">
                     {{ __('Select New Subscription Tier (Seats)') }}
                 </label>
-                <select name="plan_id" id="modalPlanSelect" style="width: 100%; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; color: var(--brand-navy); font-size: 13px; outline: none; font-weight: 600;">
+                <select name="plan_id" id="modalPlanSelect" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; color: var(--text-primary); font-size: 13px; outline: none; font-weight: 700; box-shadow: var(--shadow-inset-3d);">
                     @foreach($plans as $plan)
                         <option value="{{ $plan->id }}">
                             💎 {{ $plan->name }} — {{ $plan->seat_limit === 0 ? 'Unlimited' : $plan->seat_limit }} Users (${{ number_format($plan->price, 2) }}/mo)
@@ -136,8 +137,8 @@
             </div>
 
             <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                <button type="button" onclick="closeChangePlanModal()" class="btn-action">{{ __('Cancel') }}</button>
-                <button type="submit" class="btn-action" style="background: var(--brand-teal); border-color: var(--brand-teal); color: white;">
+                <button type="button" onclick="closeChangePlanModal()" class="tactile-btn btn-secondary">{{ __('Cancel') }}</button>
+                <button type="submit" class="tactile-btn btn-primary">
                     💾 {{ __('Save Changes') }}
                 </button>
             </div>

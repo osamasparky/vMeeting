@@ -166,6 +166,16 @@ class Task extends Model
         return $this->hasMany(TimeEntry::class);
     }
 
+    public function sprint(): BelongsTo
+    {
+        return $this->belongsTo(ProjectSprint::class, 'sprint_id');
+    }
+
+    public function customFieldValues(): HasMany
+    {
+        return $this->hasMany(TaskCustomFieldValue::class, 'task_id')->with('definition');
+    }
+
     public function activeTimers(): HasMany
     {
         return $this->hasMany(ActiveTimer::class);

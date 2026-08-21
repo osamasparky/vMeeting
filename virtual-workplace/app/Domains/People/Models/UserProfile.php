@@ -22,6 +22,17 @@ class UserProfile extends Model
         'team_id',
         'bio',
         'phone',
+        'date_of_birth',
+        'hobbies',
+        'skills',
+        'social_links',
+        'notes',
+        'work_mode',
+    ];
+
+    protected $casts = [
+        'date_of_birth' => 'date',
+        'social_links' => 'array',
     ];
 
     public function user(): BelongsTo

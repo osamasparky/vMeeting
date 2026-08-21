@@ -113,6 +113,8 @@ Route::prefix('v1')->group(function () {
                     ->middleware('permission:organizations.manage');
                 Route::post('/maps/{map}/publish', [\App\Domains\Workspace\Controllers\WorkspaceController::class, 'publishMap'])
                     ->middleware('permission:organizations.manage');
+                Route::post('/maps/{map}/background', [\App\Domains\Workspace\Controllers\WorkspaceController::class, 'uploadBackground'])
+                    ->middleware('permission:organizations.manage');
                 Route::get('/maps/{map}/versions', [\App\Domains\Workspace\Controllers\WorkspaceController::class, 'getMapVersions']);
 
                 // Workspace: Rooms & Zones & Objects
@@ -163,6 +165,44 @@ Route::prefix('v1')->group(function () {
                 Route::delete('/projects/{project}', [\App\Domains\Projects\Controllers\ProjectController::class, 'destroy'])
                     ->middleware('permission:projects.delete');
 
+                // ClickUp Multi-Views & Advance Modules
+                Route::get('/projects/{project}/gantt', [\App\Domains\Projects\Controllers\ProjectController::class, 'gantt'])
+                    ->middleware('permission:projects.view');
+                Route::get('/projects/{project}/workload', [\App\Domains\Projects\Controllers\ProjectController::class, 'workload'])
+                    ->middleware('permission:projects.view');
+
+                // ClickUp Custom Fields
+                Route::get('/projects/{project}/custom-fields', [\App\Domains\Projects\Controllers\ProjectController::class, 'customFields'])
+                    ->middleware('permission:projects.view');
+                Route::post('/projects/{project}/custom-fields', [\App\Domains\Projects\Controllers\ProjectController::class, 'storeCustomField'])
+                    ->middleware('permission:projects.edit');
+
+                // ClickUp Docs / Wiki
+                Route::get('/projects/{project}/docs', [\App\Domains\Projects\Controllers\ProjectController::class, 'documents'])
+                    ->middleware('permission:projects.view');
+                Route::post('/projects/{project}/docs', [\App\Domains\Projects\Controllers\ProjectController::class, 'storeDocument'])
+                    ->middleware('permission:projects.edit');
+                Route::put('/projects/{project}/docs/{document}', [\App\Domains\Projects\Controllers\ProjectController::class, 'updateDocument'])
+                    ->middleware('permission:projects.edit');
+                Route::delete('/projects/{project}/docs/{document}', [\App\Domains\Projects\Controllers\ProjectController::class, 'destroyDocument'])
+                    ->middleware('permission:projects.delete');
+
+                // ClickUp Goals & Targets
+                Route::get('/projects/{project}/goals', [\App\Domains\Projects\Controllers\ProjectController::class, 'goals'])
+                    ->middleware('permission:projects.view');
+                Route::post('/projects/{project}/goals', [\App\Domains\Projects\Controllers\ProjectController::class, 'storeGoal'])
+                    ->middleware('permission:projects.edit');
+                Route::post('/projects/{project}/goals/{goal}/targets', [\App\Domains\Projects\Controllers\ProjectController::class, 'storeGoalTarget'])
+                    ->middleware('permission:projects.edit');
+                Route::patch('/projects/{project}/goals/{goal}/targets/{target}', [\App\Domains\Projects\Controllers\ProjectController::class, 'updateGoalTarget'])
+                    ->middleware('permission:projects.edit');
+
+                // ClickUp Sprints
+                Route::get('/projects/{project}/sprints', [\App\Domains\Projects\Controllers\ProjectController::class, 'sprints'])
+                    ->middleware('permission:projects.view');
+                Route::post('/projects/{project}/sprints', [\App\Domains\Projects\Controllers\ProjectController::class, 'storeSprint'])
+                    ->middleware('permission:projects.edit');
+
                 // ── Tasks Domain ──
                 Route::get('/tasks', [\App\Domains\Projects\Controllers\TaskController::class, 'index'])
                     ->middleware('permission:tasks.view');
@@ -187,6 +227,14 @@ Route::prefix('v1')->group(function () {
                 Route::post('/tasks/{task}/comments', [\App\Domains\Projects\Controllers\TaskController::class, 'addComment'])
                     ->middleware('permission:tasks.view');
                 Route::post('/tasks/{task}/dependencies', [\App\Domains\Projects\Controllers\TaskController::class, 'addDependency'])
+                    ->middleware('permission:tasks.edit');
+                Route::post('/tasks/{task}/duplicate', [\App\Domains\Projects\Controllers\TaskController::class, 'duplicate'])
+                    ->middleware('permission:tasks.create');
+                Route::post('/tasks/{task}/move', [\App\Domains\Projects\Controllers\TaskController::class, 'move'])
+                    ->middleware('permission:tasks.edit');
+                Route::post('/tasks/{task}/custom-fields', [\App\Domains\Projects\Controllers\TaskController::class, 'setCustomFieldValue'])
+                    ->middleware('permission:tasks.edit');
+                Route::patch('/tasks/{task}/sprint', [\App\Domains\Projects\Controllers\TaskController::class, 'setSprint'])
                     ->middleware('permission:tasks.edit');
 
                 // ── Time Tracking & Live Timers ──

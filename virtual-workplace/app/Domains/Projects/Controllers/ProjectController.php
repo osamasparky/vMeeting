@@ -183,4 +183,335 @@ class ProjectController extends Controller
             'message' => 'Project deleted successfully.',
         ]);
     }
+
+    // ══════════════════════════════════════════════════════════════
+    // CLICKUP MULTI-VIEWS & ADVANCED MODULES
+    // ══════════════════════════════════════════════════════════════
+
+    /**
+     * Gantt Chart timeline data with dependencies and milestone flags.
+     */
+    public function gantt(Organization $organization, Project $project): JsonResponse
+    {
+        if ($project->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Project not found.'], 404);
+        }
+
+        $tasks = $project->tasks()
+            ->with(['assignee:id,name', 'dependencies.dependsOnTask:id,title'])
+            ->get()
+            ->map(function ($t) use ($project) {
+                $start = $t->start_date ?? ($t->due_date ? $t->due_date->copy()->subDays(max(1, (int) ceil(($t->estimated_hours ?? 8) / 8))) : $project->created_at);
+                $end = $t->due_date ?? $start->copy()->addDays(2);
+                return [
+                    'id' => $t->id,
+                    'title' => '#' . $t->task_number . ' ' . $t->title,
+                    'status' => $t->status,
+                    'priority' => $t->priority,
+                    'assignee' => $t->assignee ? $t->assignee->name : 'Unassigned',
+                    'start_date' => $start->format('Y-m-d'),
+                    'due_date' => $end->format('Y-m-d'),
+                    'progress' => $t->status === 'done' ? 100 : ($t->status === 'in_progress' ? 50 : 0),
+                    'dependencies' => $t->dependencies->pluck('depends_on_task_id')->toArray(),
+                ];
+            });
+
+        $milestones = $project->milestones()->get()->map(fn ($m) => [
+            'id' => $m->id,
+            'title' => '🚩 ' . $m->title,
+            'target_date' => $m->due_date ? $m->due_date->format('Y-m-d') : null,
+            'status' => $m->status,
+        ]);
+
+        return response()->json([
+            'project_name' => $project->name,
+            'tasks' => $tasks,
+            'milestones' => $milestones,
+        ]);
+    }
+
+    /**
+     * Team Workload & Capacity Matrix.
+     */
+    public function workload(Organization $organization, Project $project): JsonResponse
+    {
+        if ($project->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Project not found.'], 404);
+        }
+
+        $members = $organization->members()->with(['user:id,name,email', 'role'])->get();
+        $tasks = $project->tasks()->where('status', '!=', 'done')->get();
+
+        $workload = $members->map(function ($m) use ($tasks) {
+            $assignedTasks = $tasks->where('assignee_id', $m->user_id);
+            $totalEstHours = (float) $assignedTasks->sum('estimated_hours');
+            $capacity = $m->weekly_capacity_hours ?? 40.0;
+            $utilization = $capacity > 0 ? round(($totalEstHours / $capacity) * 100, 1) : 0;
+
+            return [
+                'user_id' => $m->user_id,
+                'name' => $m->user->name,
+                'email' => $m->user->email,
+                'role' => $m->role?->name ?? 'Member',
+                'weekly_capacity' => (float) $capacity,
+                'assigned_hours' => $totalEstHours,
+                'assigned_tasks_count' => $assignedTasks->count(),
+                'utilization_percentage' => (float) $utilization,
+                'status' => $utilization > 100 ? 'overloaded' : ($utilization > 75 ? 'optimal' : 'underutilized'),
+            ];
+        });
+
+        return response()->json([
+            'workload' => $workload,
+        ]);
+    }
+
+    /**
+     * Custom field definitions.
+     */
+    public function customFields(Organization $organization, Project $project): JsonResponse
+    {
+        if ($project->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Project not found.'], 404);
+        }
+
+        $fields = $project->customFieldDefinitions()->get();
+        return response()->json(['custom_fields' => $fields]);
+    }
+
+    public function storeCustomField(Request $request, Organization $organization, Project $project): JsonResponse
+    {
+        if ($project->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Project not found.'], 404);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'field_type' => 'required|string|in:text,number,dropdown,currency,date,checkbox,rating,url',
+            'options' => 'nullable|array',
+            'is_required' => 'boolean',
+            'color' => 'nullable|string|max:20',
+        ]);
+
+        $field = $project->customFieldDefinitions()->create([
+            'organization_id' => $organization->id,
+            'name' => $validated['name'],
+            'field_type' => $validated['field_type'],
+            'options' => $validated['options'] ?? null,
+            'is_required' => $validated['is_required'] ?? false,
+            'color' => $validated['color'] ?? '#245C3A',
+            'sort_order' => $project->customFieldDefinitions()->count() + 1,
+        ]);
+
+        return response()->json([
+            'message' => 'Custom field created successfully.',
+            'custom_field' => $field,
+        ], 201);
+    }
+
+    /**
+     * Project Documents (ClickUp Docs).
+     */
+    public function documents(Organization $organization, Project $project): JsonResponse
+    {
+        if ($project->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Project not found.'], 404);
+        }
+
+        $docs = $project->documents()->with('author:id,name,email')->get();
+        return response()->json(['documents' => $docs]);
+    }
+
+    public function storeDocument(Request $request, Organization $organization, Project $project): JsonResponse
+    {
+        if ($project->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Project not found.'], 404);
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'nullable|string',
+            'icon' => 'nullable|string|max:30',
+            'is_pinned' => 'boolean',
+            'parent_document_id' => 'nullable|exists:project_documents,id',
+        ]);
+
+        $doc = $project->documents()->create([
+            'organization_id' => $organization->id,
+            'created_by' => Auth::id(),
+            'title' => $validated['title'],
+            'content' => $validated['content'] ?? '',
+            'icon' => $validated['icon'] ?? '📄',
+            'is_pinned' => $validated['is_pinned'] ?? false,
+            'parent_document_id' => $validated['parent_document_id'] ?? null,
+        ]);
+
+        return response()->json([
+            'message' => 'Document created successfully.',
+            'document' => $doc->load('author:id,name,email'),
+        ], 201);
+    }
+
+    public function updateDocument(Request $request, Organization $organization, Project $project, \App\Domains\Projects\Models\ProjectDocument $document): JsonResponse
+    {
+        if ($project->organization_id !== $organization->id || $document->project_id !== $project->id) {
+            return response()->json(['message' => 'Document not found.'], 404);
+        }
+
+        $validated = $request->validate([
+            'title' => 'sometimes|required|string|max:255',
+            'content' => 'nullable|string',
+            'icon' => 'nullable|string|max:30',
+            'is_pinned' => 'boolean',
+        ]);
+
+        $document->update($validated);
+        $document->increment('version');
+
+        return response()->json([
+            'message' => 'Document updated successfully.',
+            'document' => $document->fresh(['author:id,name,email']),
+        ]);
+    }
+
+    public function destroyDocument(Organization $organization, Project $project, \App\Domains\Projects\Models\ProjectDocument $document): JsonResponse
+    {
+        if ($project->organization_id !== $organization->id || $document->project_id !== $project->id) {
+            return response()->json(['message' => 'Document not found.'], 404);
+        }
+
+        $document->delete();
+
+        return response()->json([
+            'message' => 'Document deleted successfully.',
+        ]);
+    }
+
+    /**
+     * Goals & Target Metrics (ClickUp Goals).
+     */
+    public function goals(Organization $organization, Project $project): JsonResponse
+    {
+        if ($project->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Project not found.'], 404);
+        }
+
+        $goals = $project->goals()->with(['owner:id,name', 'targets'])->get();
+        return response()->json(['goals' => $goals]);
+    }
+
+    public function storeGoal(Request $request, Organization $organization, Project $project): JsonResponse
+    {
+        if ($project->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Project not found.'], 404);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'color' => 'nullable|string|max:20',
+            'due_date' => 'nullable|date',
+        ]);
+
+        $goal = $project->goals()->create([
+            'organization_id' => $organization->id,
+            'owner_id' => Auth::id(),
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'color' => $validated['color'] ?? '#245C3A',
+            'due_date' => $validated['due_date'] ?? null,
+        ]);
+
+        return response()->json([
+            'message' => 'Goal created successfully.',
+            'goal' => $goal->load('targets'),
+        ], 201);
+    }
+
+    public function storeGoalTarget(Request $request, Organization $organization, Project $project, \App\Domains\Projects\Models\ProjectGoal $goal): JsonResponse
+    {
+        if ($project->organization_id !== $organization->id || $goal->project_id !== $project->id) {
+            return response()->json(['message' => 'Goal not found.'], 404);
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'target_type' => 'required|string|in:number,currency,tasks,percentage,boolean',
+            'start_value' => 'nullable|numeric',
+            'target_value' => 'required|numeric',
+            'current_value' => 'nullable|numeric',
+            'unit' => 'nullable|string|max:30',
+        ]);
+
+        $target = $goal->targets()->create($validated);
+        $goal->recalculateProgress();
+
+        return response()->json([
+            'message' => 'Goal target added successfully.',
+            'target' => $target,
+            'goal' => $goal->fresh('targets'),
+        ], 201);
+    }
+
+    public function updateGoalTarget(Request $request, Organization $organization, Project $project, \App\Domains\Projects\Models\ProjectGoal $goal, \App\Domains\Projects\Models\ProjectGoalTarget $target): JsonResponse
+    {
+        if ($project->organization_id !== $organization->id || $target->goal_id !== $goal->id) {
+            return response()->json(['message' => 'Target not found.'], 404);
+        }
+
+        $validated = $request->validate([
+            'current_value' => 'sometimes|numeric',
+            'is_completed' => 'sometimes|boolean',
+        ]);
+
+        $target->update($validated);
+        $goal->recalculateProgress();
+
+        return response()->json([
+            'message' => 'Target updated.',
+            'target' => $target,
+            'goal' => $goal->fresh('targets'),
+        ]);
+    }
+
+    /**
+     * Sprints (ClickUp Sprints).
+     */
+    public function sprints(Organization $organization, Project $project): JsonResponse
+    {
+        if ($project->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Project not found.'], 404);
+        }
+
+        $sprints = $project->sprints()->withCount('tasks')->get();
+        return response()->json(['sprints' => $sprints]);
+    }
+
+    public function storeSprint(Request $request, Organization $organization, Project $project): JsonResponse
+    {
+        if ($project->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Project not found.'], 404);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+            'planned_points' => 'nullable|integer',
+        ]);
+
+        $sprint = $project->sprints()->create([
+            'organization_id' => $organization->id,
+            'name' => $validated['name'],
+            'start_date' => $validated['start_date'],
+            'end_date' => $validated['end_date'],
+            'planned_points' => $validated['planned_points'] ?? 0,
+            'status' => 'planned',
+        ]);
+
+        return response()->json([
+            'message' => 'Sprint created successfully.',
+            'sprint' => $sprint,
+        ], 201);
+    }
 }

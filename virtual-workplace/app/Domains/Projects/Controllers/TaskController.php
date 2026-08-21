@@ -314,4 +314,139 @@ class TaskController extends Controller
             return response()->json(['message' => $e->getMessage()], 422);
         }
     }
+
+    /**
+     * Set / update custom field value on task.
+     */
+    public function setCustomFieldValue(Request $request, Organization $organization, Task $task): JsonResponse
+    {
+        if ($task->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Task not found.'], 404);
+        }
+
+        $validated = $request->validate([
+            'custom_field_definition_id' => 'required|exists:custom_field_definitions,id',
+            'value_text' => 'nullable|string',
+            'value_number' => 'nullable|numeric',
+            'value_date' => 'nullable|date',
+            'value_boolean' => 'nullable|boolean',
+            'value_json' => 'nullable|array',
+        ]);
+
+        $customValue = \App\Domains\Projects\Models\TaskCustomFieldValue::updateOrCreate(
+            [
+                'task_id' => $task->id,
+                'custom_field_definition_id' => $validated['custom_field_definition_id'],
+            ],
+            [
+                'value_text' => $validated['value_text'] ?? null,
+                'value_number' => $validated['value_number'] ?? null,
+                'value_date' => $validated['value_date'] ?? null,
+                'value_boolean' => $validated['value_boolean'] ?? null,
+                'value_json' => $validated['value_json'] ?? null,
+            ]
+        );
+
+        return response()->json([
+            'message' => 'Custom field updated successfully.',
+            'value' => $customValue->load('definition'),
+        ]);
+    }
+
+    /**
+     * Assign task to sprint.
+     */
+    public function setSprint(Request $request, Organization $organization, Task $task): JsonResponse
+    {
+        if ($task->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Task not found.'], 404);
+        }
+
+        $validated = $request->validate([
+            'sprint_id' => 'nullable|exists:project_sprints,id',
+            'story_points' => 'nullable|integer|min:0',
+        ]);
+
+        $task->update($validated);
+
+        return response()->json([
+            'message' => 'Task sprint updated.',
+            'task' => $task->fresh('sprint'),
+        ]);
+    }
+
+    /**
+     * Duplicate a task with its checklist items and settings.
+     */
+    public function duplicate(Request $request, Organization $organization, Task $task): JsonResponse
+    {
+        if ($task->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Task not found.'], 404);
+        }
+
+        $user = Auth::user();
+
+        $clone = $task->replicate([
+            'completed_at',
+            'created_at',
+            'updated_at',
+        ]);
+        $clone->title = $task->title . ' (Copy)';
+        $clone->reporter_id = $user->id;
+        $clone->order = Task::where('project_id', $task->project_id)->max('order') + 1;
+        $clone->save();
+
+        // Replicate checklist items if any
+        foreach ($task->checklistItems as $item) {
+            $cloneItem = $item->replicate(['created_at', 'updated_at']);
+            $cloneItem->task_id = $clone->id;
+            $cloneItem->is_completed = false;
+            $cloneItem->completed_at = null;
+            $cloneItem->save();
+        }
+
+        // Replicate custom field values if any
+        foreach ($task->customFieldValues as $cfv) {
+            $cloneCfv = $cfv->replicate(['created_at', 'updated_at']);
+            $cloneCfv->task_id = $clone->id;
+            $cloneCfv->save();
+        }
+
+        return response()->json([
+            'message' => 'Task duplicated successfully.',
+            'task' => $clone->load(['project:id,name,code', 'assignee:id,name,email', 'checklistItems']),
+        ], 201);
+    }
+
+    /**
+     * Move task to a different project or milestone.
+     */
+    public function move(Request $request, Organization $organization, Task $task): JsonResponse
+    {
+        if ($task->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Task not found.'], 404);
+        }
+
+        $validated = $request->validate([
+            'project_id' => 'required|exists:projects,id',
+            'milestone_id' => 'nullable|exists:milestones,id',
+            'phase_id' => 'nullable|exists:project_phases,id',
+        ]);
+
+        // Verify project belongs to same organization
+        $targetProject = Project::where('id', $validated['project_id'])
+            ->where('organization_id', $organization->id)
+            ->firstOrFail();
+
+        $task->update([
+            'project_id' => $targetProject->id,
+            'milestone_id' => $validated['milestone_id'] ?? null,
+            'phase_id' => $validated['phase_id'] ?? null,
+        ]);
+
+        return response()->json([
+            'message' => 'Task moved successfully.',
+            'task' => $task->fresh(['project:id,name,code', 'assignee:id,name,email']),
+        ]);
+    }
 }

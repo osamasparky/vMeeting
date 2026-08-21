@@ -23,25 +23,42 @@ class SuperAdminController extends Controller
     {
         $user = Auth::user();
 
+        $totalCompanies = Organization::count();
+        $totalUsers = User::count();
+        $activeSubscriptions = Organization::whereHas('plan', function ($q) {
+            $q->where('price', '>', 0);
+        })->count();
+        $estimatedMrr = (float) Organization::join('plans', 'organizations.plan_id', '=', 'plans.id')
+            ->sum('plans.price');
+
         $stats = [
-            'total_companies' => Organization::count(),
-            'total_users' => User::count(),
-            'active_subscriptions' => Organization::whereHas('plan', function ($q) {
-                $q->where('price', '>', 0);
-            })->count(),
-            'estimated_mrr' => Organization::join('plans', 'organizations.plan_id', '=', 'plans.id')
-                ->sum('plans.price'),
+            'total_companies' => $totalCompanies,
+            'new_companies_month' => Organization::where('created_at', '>=', now()->startOfMonth())->count(),
+            'active_companies' => Organization::whereDoesntHave('settings', fn($q) => $q->where('is_suspended', true))->count(),
+            'suspended_companies' => Organization::whereHas('settings', fn($q) => $q->where('is_suspended', true))->count(),
+            'total_users' => $totalUsers,
+            'new_users_month' => User::where('created_at', '>=', now()->startOfMonth())->count(),
+            'active_subscriptions' => $activeSubscriptions,
+            'conversion_rate' => $totalCompanies > 0 ? round(($activeSubscriptions / $totalCompanies) * 100, 1) : 0,
+            'estimated_mrr' => $estimatedMrr,
+            'estimated_arr' => $estimatedMrr * 12,
+            'estimated_mrr_sar' => $estimatedMrr * 3.75,
             'total_rooms' => \App\Domains\Workspace\Models\Room::count(),
+            'total_projects' => \App\Domains\Projects\Models\Project::count(),
+            'total_tasks' => \App\Domains\Projects\Models\Task::count(),
+            'total_logged_hours' => round((\App\Domains\Projects\Models\TimeEntry::sum('duration_minutes') ?? 0) / 60, 1),
+            'total_audit_events' => AuditLog::count(),
         ];
 
-        $recentCompanies = Organization::with(['plan', 'members.user'])
+        $recentCompanies = Organization::with(['plan', 'members.user', 'rooms'])
             ->latest()
             ->take(8)
             ->get();
 
-        $plans = Plan::where('is_active', true)->get();
+        $plans = Plan::withCount('organizations')->where('is_active', true)->orderBy('price', 'desc')->get();
+        $recentAuditLogs = AuditLog::with(['actor', 'organization'])->latest()->take(6)->get();
 
-        return view('superadmin.dashboard', compact('user', 'stats', 'recentCompanies', 'plans'));
+        return view('superadmin.dashboard', compact('user', 'stats', 'recentCompanies', 'plans', 'recentAuditLogs'));
     }
 
     /**
@@ -239,6 +256,28 @@ class SuperAdminController extends Controller
     public function updateSettings(Request $request)
     {
         return back()->with('success', 'System settings saved successfully.');
+    }
+
+    /**
+     * Upload global default office blueprint for the platform.
+     */
+    public function uploadDefaultBlueprint(Request $request)
+    {
+        $request->validate([
+            'image' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:15360'],
+        ]);
+
+        $file = $request->file('image');
+        $dest = public_path('images');
+        if (!file_exists($dest)) {
+            mkdir($dest, 0755, true);
+        }
+
+        // Copy to both default locations so all views pick it up immediately
+        $file->move($dest, 'office_floorplan.jpg');
+        copy($dest . '/office_floorplan.jpg', $dest . '/isometric_office_blueprint.jpg');
+
+        return back()->with('success', 'Global system default office blueprint updated successfully for all organizations.');
     }
 
     /**

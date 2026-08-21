@@ -19,7 +19,7 @@
             --text-muted: #94a3b8;
             --success: #10b981;
             --danger: #ef4444;
-            --font-family: {{ app()->getLocale() === 'ar' ? "'Cairo', 'Inter', sans-serif" : "'Inter', 'Cairo', sans-serif" }};
+            --font-family: 'Cairo', 'Inter', sans-serif;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-family); }

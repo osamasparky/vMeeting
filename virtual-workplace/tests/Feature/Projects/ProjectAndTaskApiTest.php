@@ -220,4 +220,28 @@ class ProjectAndTaskApiTest extends TestCase
             ->assertJsonPath('summary.total', 3)
             ->assertJsonPath('summary.overdue', 1);
     }
+
+    public function test_authenticated_user_can_access_project_hub_view(): void
+    {
+        $project = Project::create([
+            'organization_id' => $this->orgA->id,
+            'name' => 'Project Alpha Hub',
+            'code' => 'PAH',
+            'status' => 'active',
+            'owner_id' => $this->adminA->id,
+            'budget_amount' => 50000,
+            'planned_hours' => 200,
+        ]);
+
+        // 1. Authenticated member of same tenant can view Project Hub
+        $res = $this->actingAs($this->adminA)->get(route('projects.hub', $project->id));
+        $res->assertStatus(200)
+            ->assertSee('Project Alpha Hub')
+            ->assertSee('PAH')
+            ->assertSee('Kanban Board');
+
+        // 2. Member of another tenant cannot access
+        $resB = $this->actingAs($this->adminB)->get(route('projects.hub', $project->id));
+        $resB->assertStatus(404);
+    }
 }

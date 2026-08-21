@@ -15,11 +15,13 @@ class OrganizationSetting extends Model
         'organization_id',
         'branding',
         'policies',
+        'smtp_settings',
     ];
 
     protected $casts = [
         'branding' => 'array',
         'policies' => 'array',
+        'smtp_settings' => 'array',
     ];
 
     public function organization(): BelongsTo

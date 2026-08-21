@@ -143,6 +143,41 @@ class WorkspaceController extends Controller
         ]);
     }
 
+    public function uploadBackground(\Illuminate\Http\Request $request, Organization $organization, Map $map): JsonResponse
+    {
+        if ($map->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Unauthorized map access.'], 403);
+        }
+
+        $request->validate([
+            'image' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:10240'],
+        ]);
+
+        $file = $request->file('image');
+        $filename = 'floorplan_' . $map->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('maps', $filename, 'public');
+        $url = \Illuminate\Support\Facades\Storage::url($path);
+
+        $layoutData = $map->layout_data ?? [];
+        $layoutData['background_image_url'] = $url;
+
+        $imageSize = @getimagesize($file->getRealPath());
+        if ($imageSize) {
+            $layoutData['background_width'] = $imageSize[0];
+            $layoutData['background_height'] = $imageSize[1];
+        }
+
+        $map->update([
+            'layout_data' => $layoutData,
+        ]);
+
+        return response()->json([
+            'message' => 'Background floorplan uploaded successfully.',
+            'image_url' => $url,
+            'map' => $map->fresh(['floor', 'rooms', 'zones', 'objects']),
+        ]);
+    }
+
     // ══════════════════════════════════════════════════════════════
     // ROOMS
     // ══════════════════════════════════════════════════════════════

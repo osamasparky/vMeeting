@@ -5,13 +5,20 @@ namespace App\Http\Controllers;
 use App\Domains\Administration\Models\Role;
 use App\Domains\Identity\Models\User;
 use App\Domains\Identity\Services\RealtimeTokenService;
+use App\Domains\Meetings\Models\Meeting;
+use App\Domains\Projects\Models\Project;
 use App\Domains\Tenancy\Actions\CreateOrganizationAction;
 use App\Domains\Tenancy\Models\OrganizationMember;
+use App\Domains\Tenancy\Models\OrganizationSetting;
+use App\Mail\MeetingInvitationMail;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class WebAuthController extends Controller
 {
@@ -109,7 +116,7 @@ class WebAuthController extends Controller
         // Get the active/invited membership
         $membership = OrganizationMember::where('user_id', $user->id)
             ->whereIn('status', ['active', 'invited'])
-            ->with(['organization.plan', 'role'])
+            ->with(['organization.plan', 'organization.subscription', 'role'])
             ->first();
 
         if (!$membership) {
@@ -161,11 +168,211 @@ class WebAuthController extends Controller
         $activeTimer = \App\Domains\Projects\Models\ActiveTimer::where('user_id', $user->id)->with(['project', 'task'])->first();
         $recentTimeEntries = $organization->timeEntries()->where('user_id', $user->id)->with(['project', 'task'])->latest()->take(30)->get();
         $allTimesheets = $organization->timesheets()->with(['user', 'reviewer'])->latest()->take(15)->get();
+        $currentMember = $members->firstWhere('user_id', $user->id);
+        $myProfile = $currentMember?->user?->profiles?->first() ?? new \App\Domains\People\Models\UserProfile([
+            'user_id' => $user->id,
+            'organization_id' => $organization->id,
+        ]);
+
+        // Scheduled Meetings (Eager Loaded & Collection Filtered)
+        $allMeetings = Meeting::where('organization_id', $organization->id)
+            ->with(['room', 'project', 'creator', 'participants.user'])
+            ->latest()
+            ->take(50)
+            ->get();
+
+        $upcomingMeetings = $allMeetings->filter(function ($m) {
+            return in_array($m->status, ['scheduled', 'pending', 'active'])
+                && (is_null($m->scheduled_at) || $m->scheduled_at->gte(now()->subHours(2)));
+        })->sortBy(function ($m) {
+            $statusWeight = $m->status === 'active' ? 0 : ($m->status === 'pending' ? 1 : 2);
+            $timeWeight = $m->scheduled_at ? $m->scheduled_at->timestamp : 0;
+            return sprintf('%d-%012d', $statusWeight, $timeWeight);
+        })->take(10)->values();
+
+        $smtpSettings = $organization->settings?->smtp_settings ?? [];
+
+        $upcomingMeetingsJson = $upcomingMeetings->map(function ($m) {
+            return [
+                'id' => $m->id,
+                'title' => $m->title,
+                'scope' => $m->scope,
+                'project_name' => $m->project?->name,
+                'room_name' => $m->room?->name ?? 'Meeting Room',
+                'scheduled_at' => $m->scheduled_at ? $m->scheduled_at->toIso8601String() : null,
+                'status' => $m->status,
+            ];
+        })->values();
 
         return view('dashboard', compact(
             'user', 'membership', 'organization', 'stats', 'rooms', 'roles', 'members',
             'departments', 'teams', 'auditLogs', 'guestInvitations', 'allPlans',
-            'projects', 'tasks', 'myTasks', 'activeTimer', 'recentTimeEntries', 'allTimesheets'
+            'projects', 'tasks', 'myTasks', 'activeTimer', 'recentTimeEntries', 'allTimesheets', 'myProfile',
+            'upcomingMeetings', 'allMeetings', 'smtpSettings', 'upcomingMeetingsJson'
+        ));
+    }
+
+    /**
+     * Dedicated Project Hub Page with comprehensive KPIs, Kanban, Tasks, Timelogs, Meetings, Team, and Roadmap.
+     */
+    public function projectHub(Project $project)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)
+            ->whereIn('status', ['active', 'invited'])
+            ->with(['organization.plan', 'role.permissions'])
+            ->first();
+
+        if (!$membership || $project->organization_id !== $membership->organization_id) {
+            abort(404);
+        }
+
+        $organization = $membership->organization;
+
+        // Eager load project relations
+        $project->load([
+            'owner:id,name,email',
+            'manager:id,name,email',
+            'department:id,name',
+            'members.user.profiles',
+            'phases',
+            'milestones',
+            'customFieldDefinitions',
+            'documents.author',
+            'goals.targets',
+            'sprints.tasks',
+            'tasks' => function ($q) {
+                $q->with([
+                    'assignee.profiles',
+                    'subtasks',
+                    'checklistItems',
+                    'dependencies.dependsOnTask',
+                    'customFieldValues.definition',
+                    'sprint',
+                    'timeEntries',
+                ])->orderBy('order')->orderBy('created_at');
+            },
+            'timeEntries' => function ($q) {
+                $q->with(['user', 'task'])->latest()->take(100);
+            },
+        ]);
+
+        $tasks = $project->tasks;
+        $totalTasks = $tasks->count();
+        $completedTasks = $tasks->where('status', 'done')->count();
+        $inProgressTasks = $tasks->where('status', 'in_progress')->count();
+        $reviewTasks = $tasks->whereIn('status', ['review', 'qa'])->count();
+        $backlogTasks = $tasks->whereIn('status', ['backlog', 'ready'])->count();
+
+        $today = now()->toDateString();
+        $overdueTasks = $tasks->filter(function ($t) use ($today) {
+            return $t->due_date && $t->due_date->toDateString() < $today && $t->status !== 'done';
+        })->count();
+
+        $progressPct = $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100) : 0;
+
+        $actualHours = $project->actualHours();
+        $billableHours = $project->billableHours();
+        $plannedHours = (float) ($project->planned_hours ?? 0);
+        $hoursVariance = $plannedHours > 0 ? round($plannedHours - $actualHours, 1) : 0;
+
+        $laborCost = $project->laborCost();
+        $billableRevenue = $project->billableAmount();
+        $budget = (float) ($project->budget_amount ?? 0);
+        $budgetVariance = $budget > 0 ? round($budget - $laborCost, 2) : 0;
+        $grossMargin = round($billableRevenue - $laborCost, 2);
+        $grossMarginPct = $billableRevenue > 0 ? round(($grossMargin / $billableRevenue) * 100, 1) : 0;
+
+        $kpis = [
+            'total_tasks' => $totalTasks,
+            'completed_tasks' => $completedTasks,
+            'in_progress_tasks' => $inProgressTasks,
+            'review_tasks' => $reviewTasks,
+            'backlog_tasks' => $backlogTasks,
+            'overdue_tasks' => $overdueTasks,
+            'progress_pct' => $progressPct,
+            'actual_hours' => $actualHours,
+            'billable_hours' => $billableHours,
+            'planned_hours' => $plannedHours,
+            'hours_variance' => $hoursVariance,
+            'budget' => $budget,
+            'labor_cost' => $laborCost,
+            'budget_variance' => $budgetVariance,
+            'billable_revenue' => $billableRevenue,
+            'gross_margin' => $grossMargin,
+            'gross_margin_pct' => $grossMarginPct,
+        ];
+
+        // ClickUp Workload Matrix Calculation
+        $allMembers = $organization->members()->with(['user.profiles', 'role'])->get();
+        $workloadMatrix = $allMembers->map(function ($m) use ($tasks) {
+            $assignedTasks = $tasks->where('assignee_id', $m->user_id);
+            $totalEstHours = (float) $assignedTasks->sum('estimated_hours');
+            $capacity = (float) ($m->weekly_capacity_hours ?? 40.0);
+            $utilization = $capacity > 0 ? round(($totalEstHours / $capacity) * 100, 1) : 0;
+
+            return [
+                'member' => $m,
+                'assigned_hours' => $totalEstHours,
+                'tasks_count' => $assignedTasks->count(),
+                'capacity' => $capacity,
+                'utilization' => $utilization,
+                'status' => $utilization > 100 ? 'overloaded' : ($utilization > 75 ? 'optimal' : 'underutilized'),
+            ];
+        });
+
+        // ClickUp Gantt Timeline Tasks
+        $ganttTasks = $tasks->map(function ($t) use ($project) {
+            $start = $t->start_date ?? ($t->due_date ? $t->due_date->copy()->subDays(max(1, (int) ceil(($t->estimated_hours ?? 8) / 8))) : $project->created_at);
+            $end = $t->due_date ?? $start->copy()->addDays(2);
+            return [
+                'id' => $t->id,
+                'title' => '#' . $t->task_number . ' ' . $t->title,
+                'status' => $t->status,
+                'priority' => $t->priority,
+                'assignee' => $t->assignee ? $t->assignee->name : 'Unassigned',
+                'start_date' => $start->format('Y-m-d'),
+                'due_date' => $end->format('Y-m-d'),
+                'progress' => $t->status === 'done' ? 100 : ($t->status === 'in_progress' ? 50 : 0),
+                'dependencies' => $t->dependencies->pluck('depends_on_task_id')->toArray(),
+            ];
+        });
+
+        // Project Meetings
+        $projectMeetings = Meeting::where('project_id', $project->id)
+            ->with(['room', 'creator', 'participants.user'])
+            ->latest()
+            ->get();
+
+        $upcomingProjectMeetings = $projectMeetings->filter(function ($m) {
+            return in_array($m->status, ['scheduled', 'pending', 'active'])
+                && (is_null($m->scheduled_at) || $m->scheduled_at->gte(now()->subHours(2)));
+        })->sortBy(function ($m) {
+            $statusWeight = $m->status === 'active' ? 0 : ($m->status === 'pending' ? 1 : 2);
+            $timeWeight = $m->scheduled_at ? $m->scheduled_at->timestamp : 0;
+            return sprintf('%d-%012d', $statusWeight, $timeWeight);
+        })->values();
+
+        $rooms = $organization->rooms()->get();
+        $activeTimer = \App\Domains\Projects\Models\ActiveTimer::where('user_id', $user->id)->with(['project', 'task'])->first();
+
+        $stats = [
+            'active_members' => $allMembers->where('status', 'active')->count(),
+            'total_rooms' => $rooms->count(),
+            'total_departments' => $organization->departments()->count(),
+            'total_projects' => $organization->projects()->count(),
+            'total_tasks' => $organization->tasks()->count(),
+        ];
+        $allProjects = $organization->projects()->select('id', 'name', 'code', 'status')->latest()->get();
+        $departments = $organization->departments()->withCount('teams')->get();
+        $teams = $organization->teams()->with('department')->get();
+        $myTasks = $organization->tasks()->where('assignee_id', $user->id)->get();
+
+        return view('projects.hub', compact(
+            'user', 'membership', 'organization', 'project', 'tasks', 'kpis',
+            'projectMeetings', 'upcomingProjectMeetings', 'rooms', 'allMembers', 'activeTimer',
+            'stats', 'allProjects', 'departments', 'teams', 'myTasks',
+            'workloadMatrix', 'ganttTasks'
         ));
     }
 
@@ -281,110 +488,333 @@ class WebAuthController extends Controller
     }
 
     /**
-     * Helper to guarantee default floor, map, and Meem meeting rooms exist.
+     * Upload custom floorplan background image via web session.
      */
-    private function ensureDefaultWorkspace(\App\Domains\Tenancy\Models\Organization $organization): void
+    public function uploadMapBackground(Request $request, \App\Domains\Workspace\Models\Map $map)
     {
-        $floor = $organization->floors()->firstOrCreate(
-            ['name' => 'الدور الرئيسي - Main Floor'],
-            ['order' => 1]
-        );
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)
+            ->where('organization_id', $map->organization_id)
+            ->first();
 
-        $map = $organization->maps()->where('floor_id', $floor->id)->first();
-        if (!$map) {
-            $map = \App\Domains\Workspace\Models\Map::create([
-                'organization_id' => $organization->id,
-                'floor_id' => $floor->id,
-                'name' => 'مكتب ميم الافتراضي - Meem Default Office',
-                'status' => 'published',
-                'version' => 1,
-                'width' => 32,
-                'height' => 32,
-                'tile_size' => 32,
-                'layout_data' => [
-                    'theme' => 'modern_dark',
-                ],
-                'published_at' => now(),
+        if (!$membership) {
+            return response()->json(['message' => 'Unauthorized access.'], 403);
+        }
+
+        $request->validate([
+            'image' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:15360'],
+        ]);
+
+        $file = $request->file('image');
+        $filename = 'floorplan_' . $map->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+        
+        $destDir = public_path('images/maps');
+        if (!file_exists($destDir)) {
+            mkdir($destDir, 0755, true);
+        }
+        $file->move($destDir, $filename);
+        $url = '/images/maps/' . $filename;
+
+        $layoutData = $map->layout_data ?? [];
+        $layoutData['background_image_url'] = $url;
+
+        $imageSize = @getimagesize(public_path('images/maps/' . $filename));
+        if ($imageSize) {
+            $layoutData['background_width'] = $imageSize[0];
+            $layoutData['background_height'] = $imageSize[1];
+        }
+
+        $map->update([
+            'layout_data' => $layoutData,
+        ]);
+
+        return response()->json([
+            'message' => 'Floorplan uploaded successfully.',
+            'image_url' => $url,
+            'map' => $map->fresh(['floor', 'rooms', 'zones', 'objects']),
+        ]);
+    }
+
+    /**
+     * Remove custom floorplan and revert to system default.
+     */
+    public function deleteMapBackground(Request $request, \App\Domains\Workspace\Models\Map $map)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)
+            ->where('organization_id', $map->organization_id)
+            ->first();
+
+        if (!$membership) {
+            return response()->json(['message' => 'Unauthorized access.'], 403);
+        }
+
+        $layoutData = $map->layout_data ?? [];
+        unset($layoutData['background_image_url']);
+        unset($layoutData['background_width']);
+        unset($layoutData['background_height']);
+
+        $map->update([
+            'layout_data' => $layoutData,
+        ]);
+
+        return response()->json([
+            'message' => 'Floorplan removed successfully. Reverted to default.',
+            'map' => $map->fresh(['floor', 'rooms', 'zones', 'objects']),
+        ]);
+    }
+
+    /**
+     * Completely clear all furniture objects and reset floorplan for a fresh canvas.
+     */
+    public function clearEditorMap(Request $request, \App\Domains\Workspace\Models\Map $map)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)
+            ->where('organization_id', $map->organization_id)
+            ->first();
+
+        if (!$membership) {
+            return response()->json(['message' => 'Unauthorized access.'], 403);
+        }
+
+        // Delete all furniture objects
+        \App\Domains\Workspace\Models\MapObject::where('map_id', $map->id)->delete();
+
+        // Clear custom background image
+        $layoutData = $map->layout_data ?? [];
+        unset($layoutData['background_image_url']);
+        unset($layoutData['background_width']);
+        unset($layoutData['background_height']);
+
+        $map->update([
+            'layout_data' => $layoutData,
+        ]);
+
+        return response()->json([
+            'message' => 'Canvas completely cleared. Ready for new layout.',
+            'map' => $map->fresh(['floor', 'rooms', 'zones', 'objects']),
+        ]);
+    }
+
+    /**
+     * Save draft map objects and layout data via web session.
+     */
+    public function saveEditorMap(Request $request, \App\Domains\Workspace\Models\Map $map)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)
+            ->where('organization_id', $map->organization_id)
+            ->first();
+
+        if (!$membership) {
+            return response()->json(['message' => 'Unauthorized access.'], 403);
+        }
+
+        $validated = $request->validate([
+            'name' => 'nullable|string|max:120',
+            'layout_data' => 'nullable|array',
+            'rooms' => 'nullable|array',
+            'objects' => 'nullable|array',
+        ]);
+
+        if (!empty($validated['name'])) {
+            $map->name = $validated['name'];
+        }
+        if (isset($validated['layout_data'])) {
+            $map->layout_data = array_merge($map->layout_data ?? [], $validated['layout_data']);
+        }
+        $map->tile_size = 16;
+        $map->save();
+
+        if (isset($validated['rooms'])) {
+            \App\Domains\Workspace\Models\Room::where('map_id', $map->id)->delete();
+            foreach ($validated['rooms'] as $r) {
+                \App\Domains\Workspace\Models\Room::create([
+                    'id' => (!empty($r['id']) && strlen($r['id']) === 36 && str_contains($r['id'], '-')) ? $r['id'] : (string) \Illuminate\Support\Str::uuid(),
+                    'organization_id' => $map->organization_id,
+                    'map_id' => $map->id,
+                    'name' => $r['name'] ?? 'Meeting Room',
+                    'type' => $r['type'] ?? 'meeting',
+                    'access_mode' => $r['access_mode'] ?? 'public',
+                    'capacity' => $r['capacity'] ?? 10,
+                    'color' => $r['color'] ?? '#4F9B5F',
+                    'bounds' => $r['bounds'] ?? ['x' => 1, 'y' => 1, 'width' => 8, 'height' => 6],
+                    'metadata' => $r['metadata'] ?? [],
+                ]);
+            }
+        }
+
+        if (isset($validated['objects'])) {
+            \App\Domains\Workspace\Models\MapObject::where('map_id', $map->id)->delete();
+            foreach ($validated['objects'] as $obj) {
+                \App\Domains\Workspace\Models\MapObject::create([
+                    'map_id' => $map->id,
+                    'type' => $obj['type'] ?? 'desk',
+                    'name' => $obj['name'] ?? null,
+                    'position' => $obj['position'] ?? ['x' => 0, 'y' => 0],
+                    'size' => $obj['size'] ?? ['width' => 1, 'height' => 1],
+                    'rotation' => $obj['rotation'] ?? 0,
+                    'color' => $obj['color'] ?? null,
+                    'interaction_config' => $obj['interaction_config'] ?? null,
+                ]);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Map saved successfully.',
+            'map' => $map->fresh(['floor', 'rooms', 'zones', 'objects']),
+        ]);
+    }
+
+    /**
+     * Publish map via web session.
+     */
+    public function publishEditorMap(Request $request, \App\Domains\Workspace\Models\Map $map, \App\Domains\Workspace\Actions\PublishMapAction $action)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)
+            ->where('organization_id', $map->organization_id)
+            ->first();
+
+        if (!$membership) {
+            return response()->json(['message' => 'Unauthorized access.'], 403);
+        }
+
+        $publishedMap = $action->execute($map, $user);
+
+        return response()->json([
+            'message' => 'Map published successfully.',
+            'map' => $publishedMap,
+        ]);
+    }
+
+    /**
+     * Create room via web session.
+     */
+    public function saveEditorRoom(Request $request)
+    {
+        $user = Auth::user();
+        $orgId = $request->input('organization_id');
+        $membership = OrganizationMember::where('user_id', $user->id)
+            ->where('organization_id', $orgId)
+            ->first();
+
+        if (!$membership) {
+            return response()->json(['message' => 'Unauthorized access.'], 403);
+        }
+
+        $validated = $request->validate([
+            'organization_id' => 'required|uuid',
+            'map_id' => 'required|uuid',
+            'name' => 'required|string|max:100',
+            'type' => 'required|string',
+            'access_mode' => 'nullable|string|in:public,private',
+            'capacity' => 'nullable|integer|min:1|max:200',
+            'color' => 'nullable|string|max:20',
+            'bounds' => 'required|array',
+            'metadata' => 'nullable|array',
+        ]);
+
+        $room = \App\Domains\Workspace\Models\Room::create($validated);
+
+        return response()->json([
+            'message' => 'Room created successfully.',
+            'room' => $room,
+        ], 201);
+    }
+
+    /**
+     * Update or create room via web session.
+     */
+    public function updateEditorRoom(Request $request, $room)
+    {
+        $user = Auth::user();
+        $roomModel = $room instanceof \App\Domains\Workspace\Models\Room ? $room : \App\Domains\Workspace\Models\Room::find($room);
+
+        if (!$roomModel) {
+            $orgId = $request->input('organization_id');
+            $membership = OrganizationMember::where('user_id', $user->id)
+                ->where('organization_id', $orgId)
+                ->first();
+
+            if (!$membership) {
+                return response()->json(['message' => 'Unauthorized access.'], 403);
+            }
+
+            $validated = $request->validate([
+                'organization_id' => 'required|uuid',
+                'map_id' => 'required|uuid',
+                'name' => 'required|string|max:100',
+                'type' => 'required|string',
+                'access_mode' => 'nullable|string',
+                'capacity' => 'nullable|integer',
+                'color' => 'nullable|string',
+                'bounds' => 'required|array',
+                'metadata' => 'nullable|array',
+            ]);
+
+            $roomModel = \App\Domains\Workspace\Models\Room::create($validated);
+
+            return response()->json([
+                'message' => 'Room created successfully.',
+                'room' => $roomModel,
             ]);
         }
 
-        if ($organization->rooms()->count() === 0) {
-            \App\Domains\Workspace\Models\Room::create([
-                'organization_id' => $organization->id,
-                'map_id' => $map->id,
-                'name' => 'مكتب خاص 1 - Private Office 1',
-                'type' => 'private',
-                'access_mode' => 'private',
-                'capacity' => 2,
-                'color' => '#3b82f6',
-                'bounds' => ['x' => 1, 'y' => 1, 'width' => 5, 'height' => 7],
-            ]);
+        $membership = OrganizationMember::where('user_id', $user->id)
+            ->where('organization_id', $roomModel->organization_id)
+            ->first();
 
-            \App\Domains\Workspace\Models\Room::create([
-                'organization_id' => $organization->id,
-                'map_id' => $map->id,
-                'name' => 'مكتب خاص 2 - Private Office 2',
-                'type' => 'private',
-                'access_mode' => 'private',
-                'capacity' => 2,
-                'color' => '#3b82f6',
-                'bounds' => ['x' => 6, 'y' => 1, 'width' => 5, 'height' => 7],
-            ]);
+        if (!$membership) {
+            return response()->json(['message' => 'Unauthorized access.'], 403);
+        }
 
-            \App\Domains\Workspace\Models\Room::create([
-                'organization_id' => $organization->id,
-                'map_id' => $map->id,
-                'name' => 'كبسولة اجتماعات زجاجية - Glass Pod',
-                'type' => 'meeting',
-                'access_mode' => 'public',
-                'capacity' => 6,
-                'color' => '#06b6d4',
-                'bounds' => ['x' => 12, 'y' => 1, 'width' => 7, 'height' => 9],
-            ]);
+        $roomModel->update($request->only([
+            'name',
+            'type',
+            'access_mode',
+            'capacity',
+            'color',
+            'bounds',
+            'metadata'
+        ]));
 
-            \App\Domains\Workspace\Models\Room::create([
-                'organization_id' => $organization->id,
-                'map_id' => $map->id,
-                'name' => 'المسرح وقاعة العرض - Auditorium & Stage',
-                'type' => 'meeting',
-                'access_mode' => 'public',
-                'capacity' => 25,
-                'color' => '#8b5cf6',
-                'bounds' => ['x' => 20, 'y' => 1, 'width' => 11, 'height' => 19],
-            ]);
+        return response()->json([
+            'message' => 'Room updated successfully.',
+            'room' => $roomModel->fresh(),
+        ]);
+    }
 
-            \App\Domains\Workspace\Models\Room::create([
-                'organization_id' => $organization->id,
-                'map_id' => $map->id,
-                'name' => 'استوديو العمل الجماعي - Collab Studio',
-                'type' => 'meeting',
-                'access_mode' => 'public',
-                'capacity' => 8,
-                'color' => '#10b981',
-                'bounds' => ['x' => 1, 'y' => 9, 'width' => 10, 'height' => 8],
-            ]);
+    /**
+     * Delete room via web session.
+     */
+    public function deleteEditorRoom(Request $request, \App\Domains\Workspace\Models\Room $room)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)
+            ->where('organization_id', $room->organization_id)
+            ->first();
 
-            \App\Domains\Workspace\Models\Room::create([
-                'organization_id' => $organization->id,
-                'map_id' => $map->id,
-                'name' => 'استقبال ولوبي ميم - Meem Welcome Lounge',
-                'type' => 'reception',
-                'access_mode' => 'public',
-                'capacity' => 10,
-                'color' => '#0d9488',
-                'bounds' => ['x' => 1, 'y' => 23, 'width' => 11, 'height' => 8],
-            ]);
+        if (!$membership) {
+            return response()->json(['message' => 'Unauthorized access.'], 403);
+        }
 
-            \App\Domains\Workspace\Models\Room::create([
-                'organization_id' => $organization->id,
-                'map_id' => $map->id,
-                'name' => 'قاعة مجلس الإدارة - Executive Boardroom',
-                'type' => 'meeting',
-                'access_mode' => 'public',
-                'capacity' => 10,
-                'color' => '#3b82f6',
-                'bounds' => ['x' => 20, 'y' => 21, 'width' => 11, 'height' => 10],
-            ]);
+        $room->delete();
+
+        return response()->json([
+            'message' => 'Room deleted successfully.'
+        ]);
+    }
+
+    /**
+     * Helper to guarantee default floor, map, and Nanobanaba isometric blueprint layout exist.
+     */
+    private function ensureDefaultWorkspace(\App\Domains\Tenancy\Models\Organization $organization): void
+    {
+        if ($organization->floors()->count() === 0) {
+            $seeder = new \Database\Seeders\BlueprintOfficeSeeder();
+            $seeder->seedOrganizationOffice($organization);
         }
 
         if ($organization->departments()->count() === 0) {
@@ -693,6 +1123,357 @@ class WebAuthController extends Controller
         \App\Domains\Administration\Models\AuditLog::where('organization_id', $membership->organization_id)->delete();
 
         return back()->with('success', __('All audit logs have been cleared successfully.'));
+    }
+
+    /**
+     * Update Workspace / Organization Settings (including Logo upload).
+     */
+    public function updateOrganizationSettings(Request $request)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions', 'organization')->first();
+        if (!$membership) abort(403);
+
+        if (!$membership->hasPermission('organizations.manage') && $membership->role?->slug !== 'company_admin') {
+            abort(403, 'Unauthorized: insufficient permissions.');
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'timezone' => 'required|string|max:100',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:4096',
+            'mail_driver' => 'nullable|string|max:50',
+            'mail_host' => 'nullable|string|max:255',
+            'mail_port' => 'nullable|numeric',
+            'mail_username' => 'nullable|string|max:255',
+            'mail_password' => 'nullable|string|max:255',
+            'mail_encryption' => 'nullable|string|max:50',
+            'mail_from_address' => 'nullable|email|max:255',
+            'mail_from_name' => 'nullable|string|max:255',
+        ]);
+
+        $organization = $membership->organization;
+        $organization->name = $validated['name'];
+        $organization->timezone = $validated['timezone'];
+
+        if ($request->hasFile('logo')) {
+            $file = $request->file('logo');
+            $filename = 'org_logo_' . $organization->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('logos', $filename, 'public');
+            $organization->logo_url = '/storage/' . $path;
+        }
+
+        $organization->save();
+
+        // Update SMTP Mail Settings
+        $orgSettings = $organization->settings ?? OrganizationSetting::firstOrCreate([
+            'organization_id' => $organization->id,
+        ], [
+            'branding' => [],
+            'policies' => [],
+            'smtp_settings' => [],
+        ]);
+
+        $currentSmtp = $orgSettings->smtp_settings ?? [];
+        $newSmtp = array_merge($currentSmtp, array_filter([
+            'mail_driver' => $request->input('mail_driver', 'smtp'),
+            'mail_host' => $request->input('mail_host'),
+            'mail_port' => $request->input('mail_port'),
+            'mail_username' => $request->input('mail_username'),
+            'mail_password' => $request->filled('mail_password') ? $request->input('mail_password') : ($currentSmtp['mail_password'] ?? null),
+            'mail_encryption' => $request->input('mail_encryption', 'tls'),
+            'mail_from_address' => $request->input('mail_from_address'),
+            'mail_from_name' => $request->input('mail_from_name'),
+        ], function ($val) {
+            return !is_null($val);
+        }));
+
+        $orgSettings->smtp_settings = $newSmtp;
+        $orgSettings->save();
+
+        return redirect('/dashboard#settings')->with('success', __('Workspace settings, company logo, and SMTP email configuration updated successfully!'));
+    }
+
+    /**
+     * Apply organization SMTP settings dynamically to Laravel mailer.
+     */
+    protected function applyOrganizationSmtp($organization): void
+    {
+        $smtp = $organization->settings?->smtp_settings;
+        if (!empty($smtp['mail_host'])) {
+            config([
+                'mail.default' => 'smtp',
+                'mail.mailers.smtp.host' => $smtp['mail_host'],
+                'mail.mailers.smtp.port' => (int)($smtp['mail_port'] ?? 587),
+                'mail.mailers.smtp.encryption' => !empty($smtp['mail_encryption']) && $smtp['mail_encryption'] !== 'none' ? $smtp['mail_encryption'] : null,
+                'mail.mailers.smtp.username' => $smtp['mail_username'] ?? null,
+                'mail.mailers.smtp.password' => $smtp['mail_password'] ?? null,
+                'mail.from.address' => $smtp['mail_from_address'] ?? config('mail.from.address'),
+                'mail.from.name' => $smtp['mail_from_name'] ?? $organization->name,
+            ]);
+        }
+    }
+
+    /**
+     * Store and schedule a new meeting (Project Meeting or General Administration Meeting).
+     */
+    public function storeScheduledMeeting(Request $request)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        if (!$membership) abort(403);
+        $organization = $membership->organization;
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'scope' => 'required|string|in:project,general',
+            'project_id' => 'nullable|exists:projects,id',
+            'room_id' => 'nullable|exists:rooms,id',
+            'scheduled_at' => 'required|date',
+            'duration_minutes' => 'nullable|integer|min:5|max:480',
+            'attendee_ids' => 'nullable|array',
+            'attendee_ids.*' => 'exists:users,id',
+        ]);
+
+        $project = null;
+        if ($validated['scope'] === 'project' && !empty($validated['project_id'])) {
+            $project = $organization->projects()->findOrFail($validated['project_id']);
+        }
+
+        $room = null;
+        if (!empty($validated['room_id'])) {
+            $room = $organization->rooms()->find($validated['room_id']);
+        }
+        if (!$room) {
+            $room = $organization->rooms()->first();
+        }
+
+        $meeting = Meeting::create([
+            'organization_id' => $organization->id,
+            'room_id' => $room?->id,
+            'project_id' => $project?->id,
+            'created_by' => $user->id,
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'type' => 'scheduled',
+            'scope' => $validated['scope'],
+            'status' => 'scheduled',
+            'scheduled_at' => Carbon::parse($validated['scheduled_at']),
+            'duration_minutes' => (int)($validated['duration_minutes'] ?? 30),
+            'livekit_room_name' => "meeting_{$organization->id}_" . uniqid(),
+            'settings' => [
+                'allow_screen_share' => true,
+                'allow_chat' => true,
+            ],
+        ]);
+
+        // Host participant
+        $meeting->participants()->create([
+            'user_id' => $user->id,
+            'role' => 'host',
+            'joined_at' => now(),
+        ]);
+
+        // Collect recipient users
+        $recipients = collect();
+
+        if ($validated['scope'] === 'project' && $project) {
+            if ($project->owner_id && $project->owner) $recipients->push($project->owner);
+            if ($project->manager_id && $project->manager) $recipients->push($project->manager);
+            $taskAssigneeIds = $project->tasks()->whereNotNull('assignee_id')->pluck('assignee_id')->unique();
+            $taskUsers = User::whereIn('id', $taskAssigneeIds)->get();
+            $recipients = $recipients->concat($taskUsers)->unique('id');
+        } elseif (!empty($validated['attendee_ids'])) {
+            $recipients = User::whereIn('id', $validated['attendee_ids'])->get();
+        }
+
+        foreach ($recipients as $recipient) {
+            if ($recipient->id !== $user->id) {
+                $meeting->participants()->firstOrCreate([
+                    'user_id' => $recipient->id,
+                ], [
+                    'role' => 'participant',
+                    'joined_at' => now(),
+                ]);
+            }
+        }
+
+        // Send Email Invitations
+        $this->applyOrganizationSmtp($organization);
+        $joinUrl = route('office');
+        $sentCount = 0;
+
+        foreach ($recipients as $recipient) {
+            if (!empty($recipient->email)) {
+                try {
+                    Mail::to($recipient->email)->send(
+                        new MeetingInvitationMail($meeting, $recipient, $joinUrl)
+                    );
+                    $sentCount++;
+                } catch (\Throwable $e) {
+                    Log::warning("Could not send meeting invitation email to {$recipient->email}: " . $e->getMessage());
+                }
+            }
+        }
+
+        $tabRedirect = $validated['scope'] === 'project' ? 'projects' : 'meetings';
+        $emailMsg = $sentCount > 0 ? " (" . __(':count invitations emailed', ['count' => $sentCount]) . ")" : "";
+        return redirect("/dashboard#{$tabRedirect}")->with('success', __('Meeting ":title" scheduled successfully!', ['title' => $meeting->title]) . $emailMsg);
+    }
+
+    /**
+     * Cancel an upcoming scheduled meeting.
+     */
+    public function cancelMeeting(Meeting $meeting)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        if (!$membership || $meeting->organization_id !== $membership->organization_id) {
+            abort(403);
+        }
+
+        $meeting->update(['status' => 'ended']);
+
+        return back()->with('success', __('Meeting ":title" has been cancelled.', ['title' => $meeting->title]));
+    }
+
+    /**
+     * Test SMTP Mail Server connection and dispatch a test email.
+     */
+    public function testSmtpConnection(Request $request)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        if (!$membership) abort(403);
+        $organization = $membership->organization;
+
+        $validated = $request->validate([
+            'mail_host' => 'required|string',
+            'mail_port' => 'required|numeric',
+            'mail_username' => 'nullable|string',
+            'mail_password' => 'nullable|string',
+            'mail_encryption' => 'nullable|string',
+            'mail_from_address' => 'required|email',
+            'mail_from_name' => 'nullable|string',
+        ]);
+
+        config([
+            'mail.default' => 'smtp',
+            'mail.mailers.smtp.host' => $validated['mail_host'],
+            'mail.mailers.smtp.port' => (int)$validated['mail_port'],
+            'mail.mailers.smtp.encryption' => !empty($validated['mail_encryption']) && $validated['mail_encryption'] !== 'none' ? $validated['mail_encryption'] : null,
+            'mail.mailers.smtp.username' => $validated['mail_username'] ?? null,
+            'mail.mailers.smtp.password' => $validated['mail_password'] ?? null,
+            'mail.from.address' => $validated['mail_from_address'],
+            'mail.from.name' => $validated['mail_from_name'] ?? $organization->name,
+        ]);
+
+        try {
+            Mail::raw("Hello {$user->name},\n\nThis is a test email confirming that your SMTP settings for {$organization->name} on vMeeting Virtual Workplace are configured and working properly!\n\nDelivered at: " . now(), function ($msg) use ($user, $validated, $organization) {
+                $msg->to($user->email)
+                    ->subject("✅ [SMTP Test] Successful connection on {$organization->name}");
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => __('SMTP Connection Successful! Test email delivered to :email', ['email' => $user->email]),
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => __('SMTP Connection Failed: ') . $e->getMessage(),
+            ], 422);
+        }
+    }
+
+    /**
+     * Update user personal profile, professional details, avatar image, hobbies, skills, social links, and notes.
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        if (!$membership) abort(403);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'nickname' => 'nullable|string|max:100',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'date_of_birth' => 'nullable|date',
+            'phone' => 'nullable|string|max:50',
+            'job_title' => 'nullable|string|max:150',
+            'work_mode' => 'nullable|string|in:remote,hybrid,onsite',
+            'bio' => 'nullable|string|max:1000',
+            'hobbies' => 'nullable|string|max:1000',
+            'skills' => 'nullable|string|max:1000',
+            'notes' => 'nullable|string|max:2000',
+            'linkedin' => 'nullable|string|max:255',
+            'github' => 'nullable|string|max:255',
+            'twitter' => 'nullable|string|max:255',
+            'website' => 'nullable|string|max:255',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:4096',
+        ]);
+
+        // 1. Update user fields
+        $user->name = $validated['name'];
+        $user->nickname = $validated['nickname'] ?? null;
+        $user->email = $validated['email'];
+
+        // Handle avatar upload
+        if ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
+            $filename = 'user_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('avatars', $filename, 'public');
+            $user->avatar_url = '/storage/' . $path;
+        }
+
+        $user->save();
+
+        // 2. Update user profile
+        $profile = \App\Domains\People\Models\UserProfile::firstOrNew([
+            'user_id' => $user->id,
+            'organization_id' => $membership->organization_id,
+        ]);
+
+        $profile->job_title = $validated['job_title'] ?? null;
+        $profile->phone = $validated['phone'] ?? null;
+        $profile->date_of_birth = $validated['date_of_birth'] ?? null;
+        $profile->work_mode = $validated['work_mode'] ?? 'remote';
+        $profile->bio = $validated['bio'] ?? null;
+        $profile->hobbies = $validated['hobbies'] ?? null;
+        $profile->skills = $validated['skills'] ?? null;
+        $profile->notes = $validated['notes'] ?? null;
+
+        $socialLinks = [
+            'linkedin' => $validated['linkedin'] ?? '',
+            'github' => $validated['github'] ?? '',
+            'twitter' => $validated['twitter'] ?? '',
+            'website' => $validated['website'] ?? '',
+        ];
+        $profile->social_links = array_filter($socialLinks);
+
+        $profile->save();
+
+        return redirect('/dashboard#profile')->with('success', __('Your personal profile and details have been updated successfully!'));
+    }
+
+    /**
+     * Update user account security / password.
+     */
+    public function updatePassword(Request $request)
+    {
+        $user = Auth::user();
+
+        $validated = $request->validate([
+            'current_password' => 'required|current_password',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user->password = Hash::make($validated['password']);
+        $user->save();
+
+        return redirect('/dashboard#profile')->with('success', __('Your password has been changed successfully!'));
     }
 
     /**

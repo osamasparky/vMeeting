@@ -32,8 +32,20 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [WebAuthController::class, 'dashboard'])->name('dashboard');
     Route::post('/organization/upgrade-plan', [WebAuthController::class, 'upgradePlan'])->name('organization.upgrade_plan');
+    Route::post('/organization/settings', [WebAuthController::class, 'updateOrganizationSettings'])->name('organization.settings.update');
+    Route::post('/profile', [WebAuthController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/profile/password', [WebAuthController::class, 'updatePassword'])->name('profile.password.update');
     Route::get('/office', [WebAuthController::class, 'office'])->name('office');
     Route::get('/editor', [WebAuthController::class, 'editor'])->name('editor');
+    Route::post('/editor/maps/{map}/background', [WebAuthController::class, 'uploadMapBackground'])->name('editor.maps.background');
+    Route::delete('/editor/maps/{map}/background', [WebAuthController::class, 'deleteMapBackground'])->name('editor.maps.background.delete');
+    Route::post('/editor/maps/{map}/save', [WebAuthController::class, 'saveEditorMap'])->name('editor.maps.save');
+    Route::post('/editor/maps/{map}/clear', [WebAuthController::class, 'clearEditorMap'])->name('editor.maps.clear');
+    Route::post('/editor/maps/{map}/publish', [WebAuthController::class, 'publishEditorMap'])->name('editor.maps.publish');
+    Route::post('/editor/rooms', [WebAuthController::class, 'saveEditorRoom'])->name('editor.rooms.store');
+    Route::patch('/editor/rooms/{room}', [WebAuthController::class, 'updateEditorRoom'])->name('editor.rooms.update');
+    Route::delete('/editor/rooms/{room}', [WebAuthController::class, 'deleteEditorRoom'])->name('editor.rooms.delete');
+    Route::get('/projects/{project}', [WebAuthController::class, 'projectHub'])->name('projects.hub');
 
     // Departments & Teams Management
     Route::post('/departments', [WebAuthController::class, 'storeDepartment'])->name('departments.store');
@@ -48,6 +60,11 @@ Route::middleware('auth')->group(function () {
     // Bulk Clear Routes
     Route::post('/organization/guest-invitations/clear', [WebAuthController::class, 'clearGuestInvitations'])->name('guest_invitations.clear');
     Route::post('/organization/audit-logs/clear', [WebAuthController::class, 'clearAuditLogs'])->name('audit_logs.clear');
+
+    // Scheduled Meetings & SMTP Test Routes
+    Route::post('/meetings/schedule', [WebAuthController::class, 'storeScheduledMeeting'])->name('meetings.schedule');
+    Route::post('/meetings/{meeting}/cancel', [WebAuthController::class, 'cancelMeeting'])->name('meetings.cancel');
+    Route::post('/organization/smtp/test', [WebAuthController::class, 'testSmtpConnection'])->name('organization.smtp.test');
 
     // Recordings Gallery Routes (Web Session)
     Route::get('/organizations/{organization}/recordings', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'index'])->name('recordings.index');
@@ -76,6 +93,7 @@ Route::prefix('superadmin')->middleware(['auth', 'superadmin'])->name('superadmi
 
     Route::get('/settings', [\App\Http\Controllers\SuperAdminController::class, 'settings'])->name('settings');
     Route::post('/settings', [\App\Http\Controllers\SuperAdminController::class, 'updateSettings'])->name('settings.update');
+    Route::post('/settings/default-blueprint', [\App\Http\Controllers\SuperAdminController::class, 'uploadDefaultBlueprint'])->name('settings.blueprint');
 
     // Furniture & Assets Catalog Management
     Route::get('/furniture', [\App\Http\Controllers\SuperAdminController::class, 'furniture'])->name('furniture');

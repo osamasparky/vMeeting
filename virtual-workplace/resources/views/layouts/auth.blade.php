@@ -10,52 +10,68 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Clean White & Saudi Brand Theme */
-            --bg-primary: #f8fafc;
-            --bg-secondary: #ffffff;
-            --bg-card: #ffffff;
-            --bg-card-hover: #ffffff;
-            --bg-input: #f8fafc;
-            --bg-input-focus: #ffffff;
+            /* 🌿 Virtual Workplace 3D Spatial Palette */
+            --bg-primary: #F5F3E8;
+            --bg-secondary: #FFFDF6;
+            --bg-card: #FFFDF6;
+            --bg-card-hover: #FFFDF6;
+            --bg-input: #E8EFE2;
+            --bg-input-focus: #FFFDF6;
 
-            /* Brand Colors from color.webp */
-            --brand-teal: #00b4b3;
-            --brand-pine: #00726c;
-            --brand-ocean: #004862;
-            --brand-navy: #012c41;
-            --brand-green: #006847;
-            --brand-lime: #a7c545;
-            --brand-gold: #ffd136;
-            --brand-orange: #f57b36;
-            --brand-coral: #ff3600;
-            --brand-crimson: #d20005;
+            /* Brand Colors */
+            --brand-teal: #245C3A;
+            --brand-pine: #3F7D4F;
+            --brand-ocean: #245C3A;
+            --brand-navy: #26352A;
+            --brand-green: #3F7D4F;
+            --brand-lime: #719B73;
+            --brand-gold: #D6A23A;
+            --brand-orange: #D6A23A;
+            --brand-coral: #D96B5F;
+            --brand-crimson: #D96B5F;
 
-            --accent-primary: #00b4b3;
-            --accent-primary-hover: #00726c;
-            --accent-gradient: linear-gradient(135deg, #00b4b3, #00726c, #004862);
+            --accent-primary: #245C3A;
+            --accent-primary-hover: #1E4E31;
+            --accent-gradient: linear-gradient(180deg, #2D6C45 0%, #245C3A 100%);
 
-            --text-primary: #012c41;
-            --text-secondary: #004862;
-            --text-muted: #64748b;
-            --text-accent: #00726c;
+            --text-primary: #26352A;
+            --text-secondary: #66756A;
+            --text-muted: #8B9B8F;
+            --text-accent: #245C3A;
 
-            --border-color: #e2e8f0;
-            --border-focus: #00b4b3;
+            --border-color: #D5DED0;
+            --border-focus: #245C3A;
 
-            --success: #006847;
-            --error: #d20005;
-            --warning: #f57b36;
+            --success: #4F9B5F;
+            --error: #D96B5F;
+            --warning: #D6A23A;
 
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 20px;
+            --radius-sm: 10px;
+            --radius-md: 14px;
+            --radius-lg: 20px;
+            --radius-xl: 24px;
 
-            --shadow-card: 0 10px 30px -5px rgba(1, 44, 65, 0.08), 0 4px 10px -2px rgba(1, 44, 65, 0.04);
-            --shadow-glow: 0 0 40px rgba(0, 180, 179, 0.12);
-            --shadow-input: 0 2px 6px rgba(1, 44, 65, 0.04);
+            --shadow-card: 0 10px 28px rgba(36, 92, 58, 0.06), 0 2px 6px rgba(36, 92, 58, 0.03);
+            --shadow-glow: 0 0 30px rgba(36, 92, 58, 0.12);
+            --shadow-input: inset 2px 2px 5px rgba(36, 92, 58, 0.05);
 
-            --font-family: {{ app()->getLocale() === 'ar' ? "'Cairo', 'Inter', sans-serif" : "'Inter', 'Cairo', sans-serif" }};
+            --font-family: 'Cairo', 'Inter', sans-serif;
+        }
+
+        [data-theme="dark"], html.dark, body.dark-mode {
+            --bg-primary: #07100C;
+            --bg-secondary: #0B1510;
+            --bg-card: #101C15;
+            --bg-card-hover: #101C15;
+            --bg-input: #15251B;
+            --bg-input-focus: #101C15;
+            --text-primary: #F1F5EF;
+            --text-secondary: #9AA99D;
+            --text-muted: #718077;
+            --border-color: #26382B;
+            --brand-navy: #F1F5EF;
+            --brand-ocean: #9AA99D;
+            --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.28);
         }
 
         * {
