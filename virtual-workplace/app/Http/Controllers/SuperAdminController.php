@@ -46,7 +46,7 @@ class SuperAdminController extends Controller
             'total_rooms' => \App\Domains\Workspace\Models\Room::count(),
             'total_projects' => \App\Domains\Projects\Models\Project::count(),
             'total_tasks' => \App\Domains\Projects\Models\Task::count(),
-            'total_logged_hours' => round((\App\Domains\Projects\Models\TimeEntry::sum('duration_minutes') ?? 0) / 60, 1),
+            'total_logged_hours' => round((\App\Domains\Projects\Models\TimeEntry::sum('duration_seconds') ?? 0) / 3600, 1),
             'total_audit_events' => AuditLog::count(),
         ];
 

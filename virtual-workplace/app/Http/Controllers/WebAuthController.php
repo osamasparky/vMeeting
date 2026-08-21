@@ -1280,7 +1280,7 @@ class WebAuthController extends Controller
                     'id' => $te->id,
                     'date' => $te->started_at ? $te->started_at->format('M d, Y') : '—',
                     'time_range' => ($te->started_at ? $te->started_at->format('h:i A') : '') . ($te->ended_at ? ' - ' . $te->ended_at->format('h:i A') : ''),
-                    'duration_hours' => round(($te->duration_minutes ?? 0) / 60, 2),
+                    'duration_hours' => round(($te->duration_seconds ?? 0) / 3600, 2),
                     'description' => $te->description ?? __('Work execution'),
                     'project_name' => $te->project?->name ?? 'General',
                     'task_title' => $te->task ? ('#' . $te->task->task_number . ' ' . $te->task->title) : '—',
@@ -1288,10 +1288,10 @@ class WebAuthController extends Controller
                 ];
             });
 
-        $totalDurationMinutes = \App\Domains\Projects\Models\TimeEntry::where('organization_id', $member->organization_id)
+        $totalDurationSeconds = \App\Domains\Projects\Models\TimeEntry::where('organization_id', $member->organization_id)
             ->where('user_id', $targetUser->id)
-            ->sum('duration_minutes');
-        $totalHoursLogged = round($totalDurationMinutes / 60, 1);
+            ->sum('duration_seconds');
+        $totalHoursLogged = round($totalDurationSeconds / 3600, 1);
 
         $activeTimer = \App\Domains\Projects\Models\ActiveTimer::where('user_id', $targetUser->id)
             ->with(['project:id,name,code', 'task:id,task_number,title'])
