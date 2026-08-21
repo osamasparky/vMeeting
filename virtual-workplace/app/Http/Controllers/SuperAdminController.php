@@ -34,8 +34,8 @@ class SuperAdminController extends Controller
         $stats = [
             'total_companies' => $totalCompanies,
             'new_companies_month' => Organization::where('created_at', '>=', now()->startOfMonth())->count(),
-            'active_companies' => Organization::whereDoesntHave('settings', fn($q) => $q->where('is_suspended', true))->count(),
-            'suspended_companies' => Organization::whereHas('settings', fn($q) => $q->where('is_suspended', true))->count(),
+            'active_companies' => Organization::where('status', '!=', 'suspended')->count(),
+            'suspended_companies' => Organization::where('status', 'suspended')->count(),
             'total_users' => $totalUsers,
             'new_users_month' => User::where('created_at', '>=', now()->startOfMonth())->count(),
             'active_subscriptions' => $activeSubscriptions,
@@ -112,13 +112,19 @@ class SuperAdminController extends Controller
      */
     public function toggleCompanyStatus(Organization $organization)
     {
-        $current = $organization->settings?->is_suspended ?? false;
-        $next = !$current;
+        $newStatus = $organization->status === 'suspended' ? 'active' : 'suspended';
+        $organization->update(['status' => $newStatus]);
 
-        $settings = $organization->settings()->firstOrCreate(['organization_id' => $organization->id]);
-        $settings->update(['is_suspended' => $next]);
+        AuditLog::create([
+            'organization_id' => $organization->id,
+            'actor_id' => Auth::id(),
+            'event' => 'superadmin.company_status_toggled',
+            'details' => ['status' => $newStatus],
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
 
-        return back()->with('success', "Company {$organization->name} " . ($next ? 'suspended' : 'activated') . ' successfully.');
+        return back()->with('success', "Company {$organization->name} " . ($newStatus === 'suspended' ? 'suspended' : 'activated') . ' successfully.');
     }
 
     /**

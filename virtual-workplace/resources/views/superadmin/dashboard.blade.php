@@ -252,7 +252,7 @@
                     $memberCount = $comp->members->count();
                     $isUnlimited = $seatLimit === 0;
                     $owner = $comp->members->first()?->user;
-                    $isSuspended = $comp->settings?->is_suspended ?? false;
+                    $isSuspended = $comp->status === 'suspended';
                 @endphp
                 <tr>
                     <td>
