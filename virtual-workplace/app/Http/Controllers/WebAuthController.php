@@ -465,6 +465,10 @@ class WebAuthController extends Controller
             $membership->update(['status' => 'active']);
         }
 
+        if (!$membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin') {
+            return redirect()->route('dashboard')->with('error', __('Unauthorized: You do not have permission to access the Floor Map Editor.'));
+        }
+
         $organization = $membership->organization;
         $this->ensureDefaultWorkspace($organization);
 
@@ -1090,6 +1094,254 @@ class WebAuthController extends Controller
     }
 
     /**
+     * Update complete Organization Member details (Name, Email, Job Title, Department, Team, Role, Status).
+     */
+    public function updateOrganizationMember(Request $request, OrganizationMember $member)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
+        if (!$membership) abort(403);
+
+        if ($member->organization_id !== $membership->organization_id) {
+            abort(403, 'Unauthorized member access.');
+        }
+
+        if (!$membership->hasPermission('members.manage') && $membership->role?->slug !== 'company_admin') {
+            abort(403, 'Unauthorized: insufficient permissions to manage members.');
+        }
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $member->user_id],
+            'job_title' => ['nullable', 'string', 'max:255'],
+            'department_id' => ['nullable', 'uuid', 'exists:departments,id'],
+            'team_id' => ['nullable', 'uuid', 'exists:teams,id'],
+            'role_id' => ['required', 'uuid', 'exists:roles,id'],
+            'status' => ['required', 'in:active,invited,suspended'],
+        ]);
+
+        if (!empty($validated['department_id'])) {
+            $dept = \App\Domains\People\Models\Department::findOrFail($validated['department_id']);
+            if ($dept->organization_id !== $membership->organization_id) {
+                abort(403, 'Invalid department selection.');
+            }
+        }
+
+        if (!empty($validated['team_id'])) {
+            $team = \App\Domains\People\Models\Team::findOrFail($validated['team_id']);
+            if ($team->organization_id !== $membership->organization_id) {
+                abort(403, 'Invalid team selection.');
+            }
+        }
+
+        $member->user->update([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+        ]);
+
+        $member->update([
+            'role_id' => $validated['role_id'],
+            'status' => $validated['status'],
+        ]);
+
+        $profile = \App\Domains\People\Models\UserProfile::firstOrNew([
+            'user_id' => $member->user_id,
+            'organization_id' => $member->organization_id,
+        ]);
+
+        $profile->department_id = $validated['department_id'] ?? null;
+        $profile->team_id = $validated['team_id'] ?? null;
+        $profile->job_title = $validated['job_title'] ?? null;
+        $profile->save();
+
+        return back()->with('success', __('Member details updated successfully.'));
+    }
+
+    /**
+     * Update Member Password by Company Admin.
+     */
+    public function updateMemberPassword(Request $request, OrganizationMember $member)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
+        if (!$membership) abort(403);
+
+        if ($member->organization_id !== $membership->organization_id) {
+            abort(403, 'Unauthorized member access.');
+        }
+
+        if (!$membership->hasPermission('members.manage') && $membership->role?->slug !== 'company_admin') {
+            abort(403, 'Unauthorized: insufficient permissions to manage members.');
+        }
+
+        $validated = $request->validate([
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $member->user->update([
+            'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
+        ]);
+
+        return back()->with('success', __('Member password has been updated successfully.'));
+    }
+
+    /**
+     * Remove Member from Organization.
+     */
+    public function deleteOrganizationMember(OrganizationMember $member)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
+        if (!$membership) abort(403);
+
+        if ($member->organization_id !== $membership->organization_id) {
+            abort(403, 'Unauthorized member access.');
+        }
+
+        if (!$membership->hasPermission('members.manage') && $membership->role?->slug !== 'company_admin') {
+            abort(403, 'Unauthorized: insufficient permissions to manage members.');
+        }
+
+        if ($member->user_id === $user->id) {
+            return back()->with('error', __('You cannot remove yourself from the organization.'));
+        }
+
+        \App\Domains\People\Models\UserProfile::where('user_id', $member->user_id)
+            ->where('organization_id', $member->organization_id)
+            ->delete();
+
+        $member->delete();
+
+        return back()->with('success', __('Member has been removed from organization.'));
+    }
+
+    /**
+     * Fetch full Team Member Profile Details (Bio, Skills, Contact, Assigned Tasks, Work Time Logs).
+     */
+    public function getMemberProfileDetails(OrganizationMember $member): \Illuminate\Http\JsonResponse
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)
+            ->whereIn('status', ['active', 'invited'])
+            ->first();
+
+        if (!$membership || $member->organization_id !== $membership->organization_id) {
+            return response()->json(['message' => 'Unauthorized member access.'], 403);
+        }
+
+        $targetUser = $member->user;
+        $profile = \App\Domains\People\Models\UserProfile::where('user_id', $targetUser->id)
+            ->where('organization_id', $member->organization_id)
+            ->first();
+
+        $dept = $profile && $profile->department_id ? \App\Domains\People\Models\Department::find($profile->department_id) : null;
+        $team = $profile && $profile->team_id ? \App\Domains\People\Models\Team::find($profile->team_id) : null;
+
+        // Fetch tasks assigned to this member in this organization
+        $tasks = \App\Domains\Projects\Models\Task::where('organization_id', $member->organization_id)
+            ->where('assignee_id', $targetUser->id)
+            ->with(['project:id,name,code', 'checklistItems'])
+            ->orderBy('due_date')
+            ->latest()
+            ->get()
+            ->map(function ($t) {
+                $totalChecklist = $t->checklistItems->count();
+                $doneChecklist = $t->checklistItems->where('is_completed', true)->count();
+
+                return [
+                    'id' => $t->id,
+                    'task_number' => $t->task_number,
+                    'title' => $t->title,
+                    'status' => $t->status,
+                    'priority' => $t->priority,
+                    'project' => $t->project ? [
+                        'id' => $t->project->id,
+                        'name' => $t->project->name,
+                        'code' => $t->project->code ?? 'PRJ',
+                    ] : null,
+                    'due_date' => $t->due_date ? $t->due_date->format('M d, Y') : null,
+                    'is_overdue' => $t->due_date && $t->due_date->isPast() && $t->status !== 'done',
+                    'estimated_hours' => (float)($t->estimated_hours ?? 0),
+                    'actual_hours' => (float)($t->actual_hours ?? 0),
+                    'checklist_count' => $totalChecklist,
+                    'checklist_done' => $doneChecklist,
+                ];
+            });
+
+        // Fetch time entries logged by this member in this organization
+        $timeEntries = \App\Domains\Projects\Models\TimeEntry::where('organization_id', $member->organization_id)
+            ->where('user_id', $targetUser->id)
+            ->with(['project:id,name,code', 'task:id,task_number,title'])
+            ->latest('started_at')
+            ->take(50)
+            ->get()
+            ->map(function ($te) {
+                return [
+                    'id' => $te->id,
+                    'date' => $te->started_at ? $te->started_at->format('M d, Y') : '—',
+                    'time_range' => ($te->started_at ? $te->started_at->format('h:i A') : '') . ($te->ended_at ? ' - ' . $te->ended_at->format('h:i A') : ''),
+                    'duration_hours' => round(($te->duration_minutes ?? 0) / 60, 2),
+                    'description' => $te->description ?? __('Work execution'),
+                    'project_name' => $te->project?->name ?? 'General',
+                    'task_title' => $te->task ? ('#' . $te->task->task_number . ' ' . $te->task->title) : '—',
+                    'is_billable' => (bool)$te->is_billable,
+                ];
+            });
+
+        $totalDurationMinutes = \App\Domains\Projects\Models\TimeEntry::where('organization_id', $member->organization_id)
+            ->where('user_id', $targetUser->id)
+            ->sum('duration_minutes');
+        $totalHoursLogged = round($totalDurationMinutes / 60, 1);
+
+        $activeTimer = \App\Domains\Projects\Models\ActiveTimer::where('user_id', $targetUser->id)
+            ->with(['project:id,name,code', 'task:id,task_number,title'])
+            ->first();
+
+        return response()->json([
+            'member' => [
+                'id' => $member->id,
+                'user_id' => $targetUser->id,
+                'name' => $targetUser->name,
+                'nickname' => $targetUser->nickname,
+                'email' => $targetUser->email,
+                'avatar_url' => $targetUser->avatar_url,
+                'role_name' => $member->role?->name ?? 'Member',
+                'role_slug' => $member->role?->slug ?? 'employee',
+                'status' => $member->status,
+                'joined_at' => $member->joined_at ? $member->joined_at->format('M d, Y') : ($member->created_at ? $member->created_at->format('M d, Y') : '—'),
+            ],
+            'profile' => [
+                'job_title' => $profile?->job_title ?? $member->role?->name ?? 'Team Member',
+                'department_name' => $dept?->name,
+                'team_name' => $team?->name,
+                'work_mode' => $profile?->work_mode ?? 'remote',
+                'phone' => $profile?->phone,
+                'date_of_birth' => $profile?->date_of_birth ? $profile->date_of_birth->format('M d, Y') : null,
+                'bio' => $profile?->bio,
+                'skills' => $profile?->skills ? array_filter(array_map('trim', explode(',', $profile->skills))) : [],
+                'hobbies' => $profile?->hobbies ? array_filter(array_map('trim', explode(',', $profile->hobbies))) : [],
+                'notes' => $profile?->notes,
+                'social_links' => (array)($profile?->social_links ?? []),
+            ],
+            'stats' => [
+                'total_tasks' => $tasks->count(),
+                'completed_tasks' => $tasks->where('status', 'done')->count(),
+                'in_progress_tasks' => $tasks->where('status', 'in_progress')->count(),
+                'pending_tasks' => $tasks->whereNotIn('status', ['done', 'in_progress'])->count(),
+                'total_hours_logged' => $totalHoursLogged,
+                'active_timer' => $activeTimer ? [
+                    'id' => $activeTimer->id,
+                    'started_at' => $activeTimer->started_at->toIso8601String(),
+                    'project_name' => $activeTimer->project?->name,
+                    'task_title' => $activeTimer->task ? ('#' . $activeTimer->task->task_number . ' ' . $activeTimer->task->title) : null,
+                ] : null,
+            ],
+            'tasks' => $tasks,
+            'time_entries' => $timeEntries,
+        ]);
+    }
+
+    /**
      * Clear all guest meeting links for the organization.
      */
     public function clearGuestInvitations(Request $request)
@@ -1477,6 +1729,100 @@ class WebAuthController extends Controller
     }
 
     /**
+     * List all persistent documents and files for a specific room.
+     */
+    public function listRoomFiles(\App\Domains\Tenancy\Models\Organization $organization, \App\Domains\Workspace\Models\Room $room)
+    {
+        $files = \App\Domains\Workspace\Models\RoomFile::where('organization_id', $organization->id)
+            ->where('room_id', $room->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'files' => $files,
+        ]);
+    }
+
+    /**
+     * Upload a persistent document or file to a specific room.
+     */
+    public function uploadRoomFile(Request $request, \App\Domains\Tenancy\Models\Organization $organization, \App\Domains\Workspace\Models\Room $room)
+    {
+        $request->validate([
+            'file' => 'required|file|max:51200', // max 50MB
+        ]);
+
+        $uploadedFile = $request->file('file');
+        $originalName = $uploadedFile->getClientOriginalName();
+        $mime = $uploadedFile->getMimeType();
+        $size = $uploadedFile->getSize();
+        $filename = 'room_file_' . \Illuminate\Support\Str::uuid() . '.' . ($uploadedFile->getClientOriginalExtension() ?: 'bin');
+        $path = $uploadedFile->storeAs("public/room_files/{$organization->id}/{$room->id}", $filename);
+        $url = \Illuminate\Support\Facades\Storage::url($path);
+
+        $user = Auth::user();
+
+        $roomFile = \App\Domains\Workspace\Models\RoomFile::create([
+            'organization_id' => $organization->id,
+            'room_id' => $room->id,
+            'uploaded_by_user_id' => $user?->id,
+            'uploader_name' => $user?->name ?: 'Team Member',
+            'name' => $originalName,
+            'file_path' => $path,
+            'file_url' => $url,
+            'file_size' => $size,
+            'mime_type' => $mime,
+        ]);
+
+        return response()->json([
+            'message' => 'File uploaded successfully.',
+            'file' => $roomFile,
+        ], 201);
+    }
+
+    /**
+     * Delete a persistent file from a room.
+     */
+    public function deleteRoomFile(\App\Domains\Tenancy\Models\Organization $organization, \App\Domains\Workspace\Models\Room $room, \App\Domains\Workspace\Models\RoomFile $file)
+    {
+        if ($file->organization_id !== $organization->id || $file->room_id !== $room->id) {
+            return response()->json(['message' => 'Unauthorized.'], 403);
+        }
+
+        \Illuminate\Support\Facades\Storage::delete($file->file_path);
+        $file->delete();
+
+        return response()->json([
+            'message' => 'File deleted successfully.',
+        ]);
+    }
+
+    /**
+     * Upload an attachment for office/room chat.
+     */
+    public function uploadChatAttachment(Request $request, \App\Domains\Tenancy\Models\Organization $organization)
+    {
+        $request->validate([
+            'file' => 'required|file|max:20480', // max 20MB
+        ]);
+
+        $uploadedFile = $request->file('file');
+        $originalName = $uploadedFile->getClientOriginalName();
+        $mime = $uploadedFile->getMimeType();
+        $size = $uploadedFile->getSize();
+        $filename = 'chat_' . \Illuminate\Support\Str::uuid() . '.' . ($uploadedFile->getClientOriginalExtension() ?: 'bin');
+        $path = $uploadedFile->storeAs("public/chat_files/{$organization->id}", $filename);
+        $url = \Illuminate\Support\Facades\Storage::url($path);
+
+        return response()->json([
+            'name' => $originalName,
+            'url' => $url,
+            'size' => $size,
+            'mime_type' => $mime,
+        ]);
+    }
+
+    /**
      * Logout.
      */
     public function logout(Request $request)
@@ -1488,6 +1834,7 @@ class WebAuthController extends Controller
         return redirect()->route('login');
     }
 }
+
 
 
 

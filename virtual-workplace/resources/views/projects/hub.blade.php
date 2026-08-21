@@ -864,6 +864,7 @@
                     <span class="sidebar-badge-pill">{{ $stats['total_projects'] ?? 0 }}</span>
                 </a>
             </li>
+            @if($membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || $membership->role?->slug === 'company_admin')
             <li>
                 <a href="{{ route('dashboard') }}#all-tasks" class="sidebar-link-btn">
                     <span class="nav-icon">📑</span>
@@ -871,6 +872,7 @@
                     <span class="sidebar-badge-pill">{{ $stats['total_tasks'] ?? 0 }}</span>
                 </a>
             </li>
+            @endif
             <li>
                 <a href="{{ route('dashboard') }}#my-tasks" class="sidebar-link-btn">
                     <span class="nav-icon">⚡</span>
@@ -879,9 +881,16 @@
                 </a>
             </li>
             <li>
-                <a href="{{ route('dashboard') }}#timetracker" class="sidebar-link-btn">
+                <a href="{{ route('dashboard') }}#chat" class="sidebar-link-btn">
+                    <span class="nav-icon">💬</span>
+                    <span class="nav-label-text">{{ __('Team Chat & DMs') }}</span>
+                    <span class="sidebar-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #7EE092;">LIVE</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('dashboard') }}#timesheets" class="sidebar-link-btn">
                     <span class="nav-icon">⏱️</span>
-                    <span class="nav-label-text">{{ __('Time Tracker') }}</span>
+                    <span class="nav-label-text">{{ __('Timesheets & Time') }}</span>
                 </a>
             </li>
             <li>
@@ -893,7 +902,12 @@
             </li>
 
             <!-- Administration -->
+            @php
+                $canSeeAdmin = $membership->hasPermission('members.view') || $membership->hasPermission('rooms.manage') || $membership->hasPermission('departments.manage') || $membership->hasPermission('organizations.manage') || $membership->role?->slug === 'company_admin';
+            @endphp
+            @if($canSeeAdmin)
             <li class="nav-category-title">{{ __('Administration') }}</li>
+            @if($membership->hasPermission('members.view') || $membership->hasPermission('members.manage'))
             <li>
                 <a href="{{ route('dashboard') }}#members" class="sidebar-link-btn">
                     <span class="nav-icon">👥</span>
@@ -901,6 +915,8 @@
                     <span class="sidebar-badge-pill">{{ $stats['active_members'] ?? 0 }}</span>
                 </a>
             </li>
+            @endif
+            @if($membership->hasPermission('rooms.manage'))
             <li>
                 <a href="{{ route('dashboard') }}#rooms" class="sidebar-link-btn">
                     <span class="nav-icon">🚪</span>
@@ -908,6 +924,8 @@
                     <span class="sidebar-badge-pill">{{ $stats['total_rooms'] ?? 0 }}</span>
                 </a>
             </li>
+            @endif
+            @if($membership->hasPermission('departments.manage') || $membership->hasPermission('teams.manage'))
             <li>
                 <a href="{{ route('dashboard') }}#departments" class="sidebar-link-btn">
                     <span class="nav-icon">🏛️</span>
@@ -915,12 +933,16 @@
                     <span class="sidebar-badge-pill">{{ $stats['total_departments'] ?? 0 }}</span>
                 </a>
             </li>
+            @endif
+            @if($membership->hasPermission('organizations.manage'))
             <li>
                 <a href="{{ route('dashboard') }}#settings" class="sidebar-link-btn">
                     <span class="nav-icon">⚙️</span>
                     <span class="nav-label-text">{{ __('Workspace Settings') }}</span>
                 </a>
             </li>
+            @endif
+            @endif
 
             @if($user->is_superadmin ?? false)
                 <li class="nav-category-title" style="color: #E5B54F;">{{ __('Super Admin') }}</li>
@@ -1219,14 +1241,20 @@
 
                             <div style="display: flex; flex-direction: column; gap: 10px; flex: 1;">
                                 @forelse($colTasks as $t)
+                                    @php
+                                        $canEditThisTask = ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || ($project && $project->manager_id === $user->id) || $t->assignee_id === $user->id || $t->creator_id === $user->id);
+                                    @endphp
                                     <div class="kanban-card" 
                                          onclick="openTaskInspector('{{ $t->id }}')"
                                          oncontextmenu="event.preventDefault(); event.stopPropagation(); openTaskContextMenu(event, '{{ $t->id }}', '{{ $project->id }}', '{{ addslashes($t->title) }}')">
                                         
                                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
-                                            <div style="display: flex; gap: 4px; align-items: center;">
-                                                <span class="badge-pill badge-neutral" style="font-family: monospace; font-size: 10px;">
+                                            <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                                                <span class="badge-pill badge-neutral" style="font-family: monospace; font-size: 10px; font-weight: 800;">
                                                     #{{ $t->task_number }}
+                                                </span>
+                                                <span class="badge-pill" style="font-size: 9px; font-weight: 700; color: var(--brand-forest); background: rgba(79, 155, 95, 0.12);">
+                                                    📁 {{ $project->code }}
                                                 </span>
                                                 @if($t->checklistItems && $t->checklistItems->count() > 0)
                                                     <span class="badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.15); color: #4F9B5F;" title="{{ __('Checklist Progress') }}">
@@ -1236,8 +1264,8 @@
                                             </div>
 
                                             <div style="display: flex; align-items: center; gap: 4px;">
-                                                <span class="badge-pill {{ $t->priority === 'urgent' ? 'badge-danger' : ($t->priority === 'high' ? 'badge-gold' : 'badge-neutral') }}" style="font-size: 9px;">
-                                                    {{ $t->priority === 'urgent' ? '🚩 ' . __('Urgent') : ($t->priority === 'high' ? '⚡ ' . __('High') : ucfirst($t->priority)) }}
+                                                <span class="badge-pill {{ $t->priority === 'urgent' ? 'badge-danger' : ($t->priority === 'high' ? 'badge-gold' : 'badge-neutral') }}" style="font-size: 9px; font-weight: 800;">
+                                                    {{ $t->priority === 'urgent' ? '🔥 ' . __('Urgent') : ($t->priority === 'high' ? '⚡ ' . __('High') : ($t->priority === 'medium' ? '⚖️ ' . __('Med') : '🌱 ' . ucfirst($t->priority))) }}
                                                 </span>
                                                 <button onclick="event.stopPropagation(); openTaskContextMenu(event, '{{ $t->id }}', '{{ $project->id }}', '{{ addslashes($t->title) }}')" class="tactile-btn btn-secondary" style="padding: 2px 6px; font-size: 10px; line-height: 1;" title="{{ __('Task Actions') }}">
                                                     •••
@@ -1245,31 +1273,36 @@
                                             </div>
                                         </div>
 
-                                        <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; line-height: 1.4;">
+                                        <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; line-height: 1.4; {{ $t->status === 'done' ? 'text-decoration: line-through; opacity: 0.6;' : '' }}">
                                             {{ $t->title }}
                                         </div>
 
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 11px; color: var(--text-muted);">
                                             <div style="display: flex; align-items: center; gap: 6px;">
                                                 <div style="width: 22px; height: 22px; border-radius: 50%; background: var(--accent-gradient); color: white; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800;">
-                                                    {{ strtoupper(substr($t->assignee->name ?? 'U', 0, 1)) }}
+                                                    {{ strtoupper(substr($t->assignee->name ?? 'U', 0, 2)) }}
                                                 </div>
-                                                <span style="font-weight: 700; color: var(--text-secondary);">{{ $t->assignee->name ?? __('Unassigned') }}</span>
+                                                <span style="font-weight: 700; color: var(--text-secondary);">{{ $t->assignee ? explode(' ', $t->assignee->name)[0] : __('Unassigned') }}</span>
                                             </div>
 
-                                            <span style="font-family: monospace; font-weight: 800; color: var(--brand-forest);">
-                                                {{ $t->actual_hours ?? 0 }}h / {{ $t->estimated_hours ?? 0 }}h
-                                            </span>
+                                            <div style="display: flex; align-items: center; gap: 6px;">
+                                                <span style="font-family: monospace; font-weight: 800; font-size: 10px; color: var(--brand-forest);">
+                                                    ⏱️ {{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h{{ $t->estimated_hours ? ' / ' . $t->estimated_hours . 'h' : '' }}
+                                                </span>
+                                                <button onclick="event.stopPropagation(); startHubTaskTimerDirect('{{ $project->id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($project->name) }}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--brand-forest); border: 1px solid rgba(79, 155, 95, 0.3); padding: 3px 8px; font-size: 10px;" title="{{ __('Start Timer') }}">
+                                                    ▶
+                                                </button>
+                                            </div>
                                         </div>
 
                                         <!-- Quick status shift selector -->
                                         <div style="margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center;" onclick="event.stopPropagation();">
-                                            <select onchange="updateTaskStatusFast('{{ $t->id }}', this.value)" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); color: var(--text-secondary); font-size: 10px; font-weight: 700; border-radius: 6px; padding: 2px 6px; outline: none;">
+                                            <select onchange="updateTaskStatusFast('{{ $t->id }}', this.value)" {{ $canEditThisTask ? '' : 'disabled' }} title="{{ $canEditThisTask ? __('Change Task Status') : __('Only assigned member or manager can edit') }}" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); color: var(--text-secondary); font-size: 10px; font-weight: 700; border-radius: 6px; padding: 2px 6px; outline: none; cursor: {{ $canEditThisTask ? 'pointer' : 'not-allowed' }}; {{ $canEditThisTask ? '' : 'opacity: 0.7;' }}">
                                                 @foreach($columns as $optKey => $optMeta)
                                                     <option value="{{ $optKey }}" {{ $t->status === $optKey ? 'selected' : '' }}>{{ $optMeta['title'] }}</option>
                                                 @endforeach
                                             </select>
-                                            <span style="font-size: 10px; color: var(--text-muted);">
+                                            <span style="font-size: 10px; color: var(--text-muted); {{ $t->due_date && $t->due_date->isPast() && $t->status !== 'done' ? 'color: #D96B5F; font-weight: 800;' : '' }}">
                                                 📅 {{ $t->due_date ? $t->due_date->format('M d') : '—' }}
                                             </span>
                                         </div>
@@ -2732,7 +2765,13 @@
                 document.getElementById('task-modal-code').textContent = '#' + (t.task_number || '');
                 document.getElementById('task-modal-title').textContent = t.title || '';
                 document.getElementById('task-modal-description').textContent = t.description || '—';
-                document.getElementById('task-modal-status-select').value = t.status || 'backlog';
+                const statusSelect = document.getElementById('task-modal-status-select');
+                if (statusSelect) {
+                    statusSelect.value = t.status || 'backlog';
+                    const canEdit = {{ ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || ($project && $project->manager_id === $user->id)) ? 'true' : 'false' }} || (t.assignee_id == '{{ $user->id }}') || (t.creator_id == '{{ $user->id }}');
+                    statusSelect.disabled = !canEdit;
+                    statusSelect.title = canEdit ? '' : '{{ __('Only assigned member or manager can edit') }}';
+                }
 
                 // Render checklist
                 const checkCont = document.getElementById('task-checklist-container');
@@ -2764,6 +2803,29 @@
                 });
             } catch (e) {
                 console.error(e);
+            }
+        }
+
+        async function startHubTaskTimerDirect(projectId, taskId, taskTitle, projectName) {
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/time-entries/timer/start`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+                    body: JSON.stringify({
+                        project_id: projectId,
+                        task_id: taskId,
+                        description: `${taskTitle} (${projectName})`
+                    })
+                });
+                if (res.ok) {
+                    showHubToast('⏱️ {{ __('Timer started successfully!') }}');
+                    setTimeout(() => window.location.reload(), 400);
+                } else {
+                    const err = await res.json();
+                    showHubToast(err.message || 'Error starting timer.');
+                }
+            } catch (e) {
+                showHubToast('Network error starting timer.');
             }
         }
 

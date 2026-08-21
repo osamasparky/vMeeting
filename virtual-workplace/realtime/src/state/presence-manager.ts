@@ -51,7 +51,7 @@ export class PresenceManager {
     return connection;
   }
 
-  public joinMap(ws: WebSocket, mapId: string, initialPos?: UserPosition): OfficeUser | null {
+  public joinMap(ws: WebSocket, mapId: string, initialPos?: UserPosition, gender?: string): OfficeUser | null {
     const conn = this.clients.get(ws);
     if (!conn) return null;
 
@@ -61,6 +61,9 @@ export class PresenceManager {
     }
 
     conn.user.mapId = mapId;
+    if (gender) {
+      conn.user.gender = gender;
+    }
     if (initialPos) {
       conn.user.position = { ...initialPos };
     }

@@ -60,8 +60,8 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
 
       switch (event.type) {
         case 'map.join': {
-          const { mapId, initialPosition } = event.payload;
-          const user = presence.joinMap(ws, mapId, initialPosition);
+          const { mapId, initialPosition, gender } = event.payload || {};
+          const user = presence.joinMap(ws, mapId, initialPosition, gender);
           if (!user) break;
 
           const occupants = presence.getMapOccupants(user.organizationId, mapId);
@@ -83,7 +83,7 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
             ws
           );
 
-          console.log(`[WS] ${user.name} joined map ${mapId} (total occupants: ${occupants.length})`);
+          console.log(`[WS] ${user.name} joined map ${mapId} (gender: ${user.gender || 'male'}, total occupants: ${occupants.length})`);
           break;
         }
 
@@ -136,14 +136,16 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
           const user = conn.user;
           if (!user || !user.mapId) break;
 
+          user.gender = gender || 'male';
+
           presence.broadcastToMap(user.organizationId, user.mapId, {
             type: 'avatar.updated',
             payload: {
               userId: user.userId,
-              gender: gender,
+              gender: user.gender,
             },
           });
-          console.log(`[WS] ${user.name} switched avatar character to ${gender}`);
+          console.log(`[WS] ${user.name} switched avatar character to ${user.gender}`);
           break;
         }
 
@@ -315,6 +317,25 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
             ws
           );
           console.log(`[WS] ${user.name} stopped screen presentation`);
+          break;
+        }
+
+        case 'media.state': {
+          const user = conn.user;
+          if (!user.mapId) break;
+          presence.broadcastToMap(
+            user.organizationId,
+            user.mapId,
+            {
+              type: 'media.state_updated',
+              payload: {
+                userId: user.userId,
+                camActive: !!event.payload.camActive,
+                micActive: !!event.payload.micActive,
+              },
+            },
+            ws
+          );
           break;
         }
 

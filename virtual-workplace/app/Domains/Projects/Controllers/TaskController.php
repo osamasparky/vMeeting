@@ -140,6 +140,48 @@ class TaskController extends Controller
     }
 
     /**
+     * Determine if authenticated user is authorized to edit or update the given task.
+     * Non-admin members can only modify tasks assigned to them or created by them.
+     */
+    protected function authorizeTaskEdit(Organization $organization, Task $task): void
+    {
+        $user = Auth::user();
+        if (!$user) {
+            abort(401, 'Unauthenticated.');
+        }
+
+        if (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin()) {
+            return;
+        }
+
+        // Direct assignee or creator can edit
+        if ($task->assignee_id === $user->id || $task->creator_id === $user->id) {
+            return;
+        }
+
+        // Project manager can edit all tasks in their project
+        if ($task->project && $task->project->manager_id === $user->id) {
+            return;
+        }
+
+        $membership = \App\Domains\Tenancy\Models\OrganizationMember::where('organization_id', $organization->id)
+            ->where('user_id', $user->id)
+            ->with('role.permissions')
+            ->first();
+
+        if (!$membership) {
+            abort(403, 'Unauthorized.');
+        }
+
+        // Company admins, or roles with tasks.assign / tasks.delete can edit any task
+        if ($membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete')) {
+            return;
+        }
+
+        abort(403, 'Unauthorized. Members can only modify tasks assigned to them.');
+    }
+
+    /**
      * Update task details.
      */
     public function update(
@@ -151,6 +193,8 @@ class TaskController extends Controller
         if ($task->organization_id !== $organization->id) {
             return response()->json(['message' => 'Task not found.'], 404);
         }
+
+        $this->authorizeTaskEdit($organization, $task);
 
         $updated = $action->execute($task, $request->validated());
 
@@ -172,6 +216,8 @@ class TaskController extends Controller
         if ($task->organization_id !== $organization->id) {
             return response()->json(['message' => 'Task not found.'], 404);
         }
+
+        $this->authorizeTaskEdit($organization, $task);
 
         $updated = $action->execute($task, $request->validated('status'));
 
@@ -231,6 +277,8 @@ class TaskController extends Controller
             return response()->json(['message' => 'Task not found.'], 404);
         }
 
+        $this->authorizeTaskEdit($organization, $task);
+
         $request->validate(['title' => 'required|string|max:255']);
         $item = $action->addItem($task, $request->input('title'));
 
@@ -252,6 +300,8 @@ class TaskController extends Controller
         if ($task->organization_id !== $organization->id || $item->task_id !== $task->id) {
             return response()->json(['message' => 'Not found.'], 404);
         }
+
+        $this->authorizeTaskEdit($organization, $task);
 
         $updated = $action->toggleItem($item);
 
@@ -300,6 +350,8 @@ class TaskController extends Controller
             return response()->json(['message' => 'Task not found.'], 404);
         }
 
+        $this->authorizeTaskEdit($organization, $task);
+
         $request->validate(['depends_on_task_id' => 'required|exists:tasks,id']);
         $dependsOnTask = Task::findOrFail($request->input('depends_on_task_id'));
 
@@ -323,6 +375,8 @@ class TaskController extends Controller
         if ($task->organization_id !== $organization->id) {
             return response()->json(['message' => 'Task not found.'], 404);
         }
+
+        $this->authorizeTaskEdit($organization, $task);
 
         $validated = $request->validate([
             'custom_field_definition_id' => 'required|exists:custom_field_definitions,id',
@@ -362,6 +416,8 @@ class TaskController extends Controller
             return response()->json(['message' => 'Task not found.'], 404);
         }
 
+        $this->authorizeTaskEdit($organization, $task);
+
         $validated = $request->validate([
             'sprint_id' => 'nullable|exists:project_sprints,id',
             'story_points' => 'nullable|integer|min:0',
@@ -383,6 +439,8 @@ class TaskController extends Controller
         if ($task->organization_id !== $organization->id) {
             return response()->json(['message' => 'Task not found.'], 404);
         }
+
+        $this->authorizeTaskEdit($organization, $task);
 
         $user = Auth::user();
 
@@ -426,6 +484,8 @@ class TaskController extends Controller
         if ($task->organization_id !== $organization->id) {
             return response()->json(['message' => 'Task not found.'], 404);
         }
+
+        $this->authorizeTaskEdit($organization, $task);
 
         $validated = $request->validate([
             'project_id' => 'required|exists:projects,id',

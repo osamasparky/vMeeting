@@ -224,4 +224,51 @@ class CollaborationTest extends TestCase
         $listAfter = $this->getJson("/api/v1/organizations/{$this->organization->id}/recordings");
         $listAfter->assertJsonCount(0, 'recordings');
     }
+
+    public function test_web_chat_conversations_and_messaging_flow(): void
+    {
+        $this->actingAs($this->user);
+
+        // 1. Fetch conversations roster
+        $rosterResp = $this->getJson('/chat/conversations');
+        $rosterResp->assertStatus(200)
+            ->assertJsonStructure(['channels', 'members', 'current_user_id']);
+
+        // 2. Open DM with colleague
+        $dmResp = $this->getJson("/chat/dm/{$this->colleague->id}");
+        $dmResp->assertStatus(200)
+            ->assertJsonPath('channel.type', 'dm');
+
+        $channelId = $dmResp->json('channel.id');
+
+        // 3. Send message via web route
+        $sendResp = $this->postJson("/chat/channels/{$channelId}/messages", [
+            'body' => 'Hello team from the web interface!',
+        ]);
+        $sendResp->assertStatus(201)
+            ->assertJsonPath('message.body', 'Hello team from the web interface!');
+
+        // 4. List messages
+        $messagesResp = $this->getJson("/chat/channels/{$channelId}/messages");
+        $messagesResp->assertStatus(200)
+            ->assertJsonPath('messages.0.body', 'Hello team from the web interface!');
+    }
+
+    public function test_can_fetch_team_member_profile_details(): void
+    {
+        $this->actingAs($this->user);
+
+        $member = $this->organization->members()->where('user_id', $this->colleague->id)->first();
+
+        $resp = $this->getJson("/organization/members/{$member->id}/details");
+        $resp->assertStatus(200)
+            ->assertJsonStructure([
+                'member' => ['id', 'user_id', 'name', 'email', 'role_name', 'status'],
+                'profile' => ['job_title', 'work_mode', 'skills', 'hobbies'],
+                'stats' => ['total_tasks', 'total_hours_logged'],
+                'tasks',
+                'time_entries',
+            ]);
+    }
 }
+

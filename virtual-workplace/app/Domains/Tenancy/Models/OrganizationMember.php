@@ -60,6 +60,18 @@ class OrganizationMember extends Model
 
     public function hasPermission(string $permissionKey): bool
     {
+        if (!$this->role) {
+            return false;
+        }
+
+        if ($this->role->slug === 'company_admin' || $this->role->slug === 'super_admin') {
+            return true;
+        }
+
+        if ($this->relationLoaded('role') && $this->role->relationLoaded('permissions')) {
+            return $this->role->permissions->contains('key', $permissionKey);
+        }
+
         return $this->role->permissions()->where('key', $permissionKey)->exists();
     }
 }

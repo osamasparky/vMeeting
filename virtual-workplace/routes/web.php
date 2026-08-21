@@ -55,7 +55,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/teams', [WebAuthController::class, 'storeTeam'])->name('teams.store');
     Route::delete('/teams/{team}', [WebAuthController::class, 'deleteTeam'])->name('teams.delete');
 
+    Route::get('/organization/members/{member}/details', [WebAuthController::class, 'getMemberProfileDetails'])->name('organization.members.details');
     Route::post('/members/{member}/assign', [WebAuthController::class, 'assignMemberDepartment'])->name('members.assign_department');
+    Route::put('/organization/members/{member}', [WebAuthController::class, 'updateOrganizationMember'])->name('organization.members.update');
+    Route::post('/organization/members/{member}/password', [WebAuthController::class, 'updateMemberPassword'])->name('organization.members.password');
+    Route::delete('/organization/members/{member}', [WebAuthController::class, 'deleteOrganizationMember'])->name('organization.members.delete');
+
+    // Web Chat & Direct Messaging Routes
+    Route::get('/chat/conversations', [\App\Domains\Chat\Controllers\ChatController::class, 'webConversations'])->name('chat.conversations');
+    Route::get('/chat/dm/{targetUser}', [\App\Domains\Chat\Controllers\ChatController::class, 'webGetOrCreateDm'])->name('chat.dm');
+    Route::get('/chat/channels/{channel}/messages', [\App\Domains\Chat\Controllers\ChatController::class, 'webListMessages'])->name('chat.messages.list');
+    Route::post('/chat/channels/{channel}/messages', [\App\Domains\Chat\Controllers\ChatController::class, 'webSendMessage'])->name('chat.messages.send');
 
     // Bulk Clear Routes
     Route::post('/organization/guest-invitations/clear', [WebAuthController::class, 'clearGuestInvitations'])->name('guest_invitations.clear');
@@ -69,7 +79,14 @@ Route::middleware('auth')->group(function () {
     // Recordings Gallery Routes (Web Session)
     Route::get('/organizations/{organization}/recordings', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'index'])->name('recordings.index');
     Route::post('/organizations/{organization}/recordings', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'store'])->name('recordings.store');
+    Route::get('/organizations/{organization}/recordings/{recording}/download', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'download'])->name('recordings.download');
     Route::delete('/organizations/{organization}/recordings/{recording}', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'destroy'])->name('recordings.destroy');
+
+    // Room Files Vault & Chat File Uploads (Web Session)
+    Route::get('/organizations/{organization}/rooms/{room}/files', [WebAuthController::class, 'listRoomFiles'])->name('room_files.index');
+    Route::post('/organizations/{organization}/rooms/{room}/files', [WebAuthController::class, 'uploadRoomFile'])->name('room_files.store');
+    Route::delete('/organizations/{organization}/rooms/{room}/files/{file}', [WebAuthController::class, 'deleteRoomFile'])->name('room_files.destroy');
+    Route::post('/organizations/{organization}/chat/upload', [WebAuthController::class, 'uploadChatAttachment'])->name('chat.upload');
 });
 
 // Guest Access Routes (Public / Unauthenticated)

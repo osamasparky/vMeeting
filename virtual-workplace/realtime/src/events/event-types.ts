@@ -29,6 +29,7 @@ export interface OfficeUser {
   mapId: string;
   name: string;
   avatarUrl?: string;
+  gender?: string;
   status: UserStatus;
   position: UserPosition;
   currentRoomId?: string | null;
@@ -43,6 +44,7 @@ export interface InboundJoinMap {
   payload: {
     mapId: string;
     initialPosition?: UserPosition;
+    gender?: string;
   };
 }
 
@@ -130,6 +132,14 @@ export interface InboundPresentationStop {
   payload?: any;
 }
 
+export interface InboundMediaState {
+  type: 'media.state';
+  payload: {
+    camActive: boolean;
+    micActive: boolean;
+  };
+}
+
 export type InboundEvent =
   | InboundJoinMap
   | InboundPositionUpdate
@@ -137,6 +147,7 @@ export type InboundEvent =
   | InboundAvatarUpdate
   | InboundPresentationStart
   | InboundPresentationStop
+  | InboundMediaState
   | InboundRoomEnter
   | InboundRoomLeave
   | InboundChatMessage
@@ -287,6 +298,15 @@ export interface OutboundError {
   };
 }
 
+export interface OutboundMediaStateUpdated {
+  type: 'media.state_updated';
+  payload: {
+    userId: string;
+    camActive: boolean;
+    micActive: boolean;
+  };
+}
+
 export type OutboundEvent =
   | OutboundWelcome
   | OutboundUserJoined
@@ -296,6 +316,7 @@ export type OutboundEvent =
   | OutboundAvatarUpdated
   | OutboundPresentationStarted
   | OutboundPresentationStopped
+  | OutboundMediaStateUpdated
   | OutboundRoomEntered
   | OutboundRoomLeft
   | OutboundProximityChanged

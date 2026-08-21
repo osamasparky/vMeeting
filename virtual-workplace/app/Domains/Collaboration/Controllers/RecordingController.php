@@ -46,10 +46,15 @@ class RecordingController extends Controller
 
         $url = Storage::url($path);
 
+        $roomId = $request->filled('room_id') ? $request->input('room_id') : null;
+        if ($roomId && !\App\Domains\Workspace\Models\Room::where('id', $roomId)->exists()) {
+            $roomId = null;
+        }
+
         $recording = Recording::create([
             'organization_id' => $organization->id,
             'user_id' => $request->user()?->id,
-            'room_id' => $request->input('room_id'),
+            'room_id' => $roomId,
             'title' => $request->input('title') ?: ('Session Recording — ' . now()->toFormattedDateString()),
             'file_path' => $path,
             'file_url' => $url,
@@ -81,6 +86,27 @@ class RecordingController extends Controller
 
         return response()->json([
             'message' => 'Recording deleted successfully',
+        ]);
+    }
+
+    /**
+     * Download a recording file with mp4/webm headers.
+     */
+    public function download(Organization $organization, Recording $recording)
+    {
+        if ($recording->organization_id !== $organization->id) {
+            abort(403, 'Unauthorized');
+        }
+
+        if (!Storage::exists($recording->file_path)) {
+            abort(404, 'Recording file not found');
+        }
+
+        $safeTitle = \Illuminate\Support\Str::slug($recording->title) ?: 'session_recording';
+        $downloadName = "{$safeTitle}.mp4";
+
+        return Storage::download($recording->file_path, $downloadName, [
+            'Content-Type' => 'video/mp4',
         ]);
     }
 }

@@ -558,12 +558,19 @@
                 <span>🏢</span>
                 <span>{{ __('Virtual Office') }}</span>
             </a>
-            <div class="map-meta">
-                <div class="map-name">
-                    {{ __('Map Editor') }}: {{ $map->name }}
-                    <span style="color: var(--text-muted); font-size: 11px;">({{ $organization->name }})</span>
+            <div class="map-meta" style="display: flex; align-items: center; gap: 8px;">
+                @if(!empty($organization->logo_url))
+                    <img src="{{ $organization->logo_url }}" alt="{{ $organization->name }}" style="width: 28px; height: 28px; border-radius: 6px; object-fit: contain; background: rgba(255,255,255,0.08); padding: 2px;">
+                @elseif(!empty($organization->settings?->logo_url))
+                    <img src="{{ $organization->settings->logo_url }}" alt="{{ $organization->name }}" style="width: 28px; height: 28px; border-radius: 6px; object-fit: contain; background: rgba(255,255,255,0.08); padding: 2px;">
+                @endif
+                <div>
+                    <div class="map-name">
+                        {{ __('Map Editor') }}: {{ $map->name }}
+                        <span style="color: var(--text-muted); font-size: 11px;">({{ $organization->name }})</span>
+                    </div>
+                    <span class="map-version-badge" id="header-version-badge">v{{ $map->version }} ({{ ucfirst($map->status) }})</span>
                 </div>
-                <span class="map-version-badge" id="header-version-badge">v{{ $map->version }} ({{ ucfirst($map->status) }})</span>
             </div>
         </div>
 

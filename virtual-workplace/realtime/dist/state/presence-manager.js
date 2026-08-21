@@ -33,7 +33,7 @@ class PresenceManager {
         this.clients.set(ws, connection);
         return connection;
     }
-    joinMap(ws, mapId, initialPos) {
+    joinMap(ws, mapId, initialPos, gender) {
         const conn = this.clients.get(ws);
         if (!conn)
             return null;
@@ -42,6 +42,9 @@ class PresenceManager {
             this.leaveMap(ws);
         }
         conn.user.mapId = mapId;
+        if (gender) {
+            conn.user.gender = gender;
+        }
         if (initialPos) {
             conn.user.position = { ...initialPos };
         }

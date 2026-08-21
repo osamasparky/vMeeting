@@ -492,7 +492,7 @@
             gap: 3px;
             overflow: hidden;
             transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
-            max-height: 500px;
+            max-height: 2000px;
             opacity: 1;
             padding: 4px 2px;
         }
@@ -1288,7 +1288,7 @@
         </div>
 
         <!-- 1. Workspace Section (Accordion) -->
-        <div class="sidebar-accordion collapsed" id="sec-workspace">
+        <div class="sidebar-accordion" id="sec-workspace">
             <div class="sidebar-accordion-header" onclick="toggleSidebarSection('sec-workspace')" data-tooltip="{{ __('Workspace') }}">
                 <span style="display: flex; align-items: center; gap: 8px;">
                     <span class="nav-icon-tile">🏢</span>
@@ -1310,17 +1310,26 @@
                     </span>
                     <span class="nav-badge-pill">3D</span>
                 </a>
+                <button class="nav-tab-btn" id="nav-btn-chat" onclick="switchAdminTab('chat')" data-tooltip="{{ __('Team Chat & DMs') }}">
+                    <span style="display: flex; align-items: center; gap: 8px;">
+                        <span class="nav-icon-tile">💬</span>
+                        <span>{{ __('Team Chat & DMs') }}</span>
+                    </span>
+                    <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F;">Live</span>
+                </button>
+                @if($membership->hasPermission('maps.manage'))
                 <a href="{{ route('editor') }}" class="nav-tab-btn" style="text-decoration: none;" data-tooltip="{{ __('Floor Map Editor') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
                         <span class="nav-icon-tile">🎨</span>
                         <span>{{ __('Floor Map Editor') }}</span>
                     </span>
                 </a>
+                @endif
             </div>
         </div>
 
         <!-- 2. Project Management Section (Accordion) -->
-        <div class="sidebar-accordion collapsed" id="sec-projects">
+        <div class="sidebar-accordion" id="sec-projects">
             <div class="sidebar-accordion-header" onclick="toggleSidebarSection('sec-projects')" data-tooltip="{{ __('Project Management') }}">
                 <span style="display: flex; align-items: center; gap: 8px;">
                     <span class="nav-icon-tile">📋</span>
@@ -1336,6 +1345,7 @@
                     </span>
                     <span class="nav-badge-pill">{{ $projects->count() }}</span>
                 </button>
+                @if($membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || $membership->role?->slug === 'company_admin')
                 <button class="nav-tab-btn" id="nav-btn-all-tasks" onclick="switchAdminTab('all-tasks')" data-tooltip="{{ __('All Tasks Manager') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
                         <span class="nav-icon-tile">📑</span>
@@ -1343,6 +1353,7 @@
                     </span>
                     <span class="nav-badge-pill">{{ $tasks->count() }}</span>
                 </button>
+                @endif
                 <button class="nav-tab-btn" id="nav-btn-my-tasks" onclick="switchAdminTab('my-tasks')" data-tooltip="{{ __('My Tasks') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
                         <span class="nav-icon-tile">✅</span>
@@ -1356,17 +1367,23 @@
                         <span>{{ __('Timesheets & Time') }}</span>
                     </span>
                 </button>
+                @if($membership->hasPermission('reports.view') || $membership->role?->slug === 'company_admin')
                 <button class="nav-tab-btn" id="nav-btn-workload" onclick="switchAdminTab('workload')" data-tooltip="{{ __('Team Workload') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
                         <span class="nav-icon-tile">👥</span>
                         <span>{{ __('Team Workload') }}</span>
                     </span>
                 </button>
+                @endif
             </div>
         </div>
 
         <!-- 3. Administration Section (Accordion) -->
-        <div class="sidebar-accordion collapsed" id="sec-admin">
+        @php
+            $canSeeAdminSec = $membership->hasPermission('members.view') || $membership->hasPermission('rooms.manage') || $membership->hasPermission('guests.invite') || $membership->hasPermission('departments.manage') || $membership->hasPermission('audit.view') || $membership->role?->slug === 'company_admin';
+        @endphp
+        @if($canSeeAdminSec)
+        <div class="sidebar-accordion" id="sec-admin">
             <div class="sidebar-accordion-header" onclick="toggleSidebarSection('sec-admin')" data-tooltip="{{ __('Administration') }}">
                 <span style="display: flex; align-items: center; gap: 8px;">
                     <span class="nav-icon-tile">🛡️</span>
@@ -1375,6 +1392,7 @@
                 <span class="sidebar-accordion-chevron">▼</span>
             </div>
             <div class="sidebar-accordion-content">
+                @if($membership->hasPermission('members.view') || $membership->hasPermission('members.manage'))
                 <button class="nav-tab-btn" id="nav-btn-members" onclick="switchAdminTab('members')" data-tooltip="{{ __('Team Members') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
                         <span class="nav-icon-tile">👥</span>
@@ -1382,6 +1400,8 @@
                     </span>
                     <span class="nav-badge-pill">{{ $members->count() }}</span>
                 </button>
+                @endif
+                @if($membership->hasPermission('rooms.manage'))
                 <button class="nav-tab-btn" id="nav-btn-rooms" onclick="switchAdminTab('rooms')" data-tooltip="{{ __('Rooms & Doors') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
                         <span class="nav-icon-tile">🚪</span>
@@ -1389,6 +1409,7 @@
                     </span>
                     <span class="nav-badge-pill">{{ $rooms->count() }}</span>
                 </button>
+                @endif
                 <button class="nav-tab-btn" id="nav-btn-meetings" onclick="switchAdminTab('meetings')" data-tooltip="{{ __('Meetings & Schedule') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
                         <span class="nav-icon-tile">📅</span>
@@ -1396,6 +1417,7 @@
                     </span>
                     <span class="nav-badge-pill">{{ $upcomingMeetings->count() }}</span>
                 </button>
+                @if($membership->hasPermission('guests.invite'))
                 <button class="nav-tab-btn" id="nav-btn-guests" onclick="switchAdminTab('guests')" data-tooltip="{{ __('Guest Links') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
                         <span class="nav-icon-tile">🔗</span>
@@ -1403,23 +1425,40 @@
                     </span>
                     <span class="nav-badge-pill">{{ $guestInvitations->count() }}</span>
                 </button>
+                @endif
+                @if($membership->hasPermission('departments.manage') || $membership->hasPermission('teams.manage'))
                 <button class="nav-tab-btn" id="nav-btn-departments" onclick="switchAdminTab('departments')" data-tooltip="{{ __('Departments & Teams') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
                         <span class="nav-icon-tile">🏛️</span>
                         <span>{{ __('Departments & Teams') }}</span>
                     </span>
                 </button>
+                @endif
+                @if($membership->hasPermission('audit.view'))
                 <button class="nav-tab-btn" id="nav-btn-audit" onclick="switchAdminTab('audit')" data-tooltip="{{ __('Audit Logs') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
                         <span class="nav-icon-tile">📋</span>
                         <span>{{ __('Audit Logs') }}</span>
                     </span>
                 </button>
+                @endif
             </div>
         </div>
+        @else
+        <!-- Standalone Meetings Button for Non-Admins -->
+        <div style="padding: 0 10px; margin-bottom: 8px;">
+            <button class="nav-tab-btn" id="nav-btn-meetings" onclick="switchAdminTab('meetings')" data-tooltip="{{ __('Meetings & Schedule') }}">
+                <span style="display: flex; align-items: center; gap: 8px;">
+                    <span class="nav-icon-tile">📅</span>
+                    <span>{{ __('Meetings & Schedule') }}</span>
+                </span>
+                <span class="nav-badge-pill">{{ $upcomingMeetings->count() }}</span>
+            </button>
+        </div>
+        @endif
 
         <!-- 4. Settings & Profile Section (Accordion) -->
-        <div class="sidebar-accordion collapsed" id="sec-settings">
+        <div class="sidebar-accordion" id="sec-settings">
             <div class="sidebar-accordion-header" onclick="toggleSidebarSection('sec-settings')" data-tooltip="{{ __('Settings & Profile') }}">
                 <span style="display: flex; align-items: center; gap: 8px;">
                     <span class="nav-icon-tile">⚙️</span>
@@ -1434,18 +1473,22 @@
                         <span>{{ __('My User Profile') }}</span>
                     </span>
                 </button>
+                @if($membership->hasPermission('billing.manage'))
                 <button class="nav-tab-btn" id="nav-btn-billing" onclick="switchAdminTab('billing')" data-tooltip="{{ __('Billing & Subscription') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
                         <span class="nav-icon-tile">💎</span>
                         <span>{{ __('Billing & Subscription') }}</span>
                     </span>
                 </button>
+                @endif
+                @if($membership->hasPermission('organizations.manage'))
                 <button class="nav-tab-btn" id="nav-btn-settings" onclick="switchAdminTab('settings')" data-tooltip="{{ __('Workspace Settings') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
                         <span class="nav-icon-tile">⚙️</span>
                         <span>{{ __('Workspace Settings') }}</span>
                     </span>
                 </button>
+                @endif
             </div>
         </div>
 
@@ -1634,9 +1677,11 @@
                             <div style="font-size: 15px; font-weight: 900; color: var(--text-primary);">{{ __('Your Workspace') }}</div>
                             <div style="font-size: 11px; color: var(--brand-sage); font-weight: 700;">🟢 {{ $stats['members'] }} {{ __('Members Online') }} • {{ $rooms->count() }} {{ __('Rooms') }}</div>
                         </div>
+                        @if($membership->hasPermission('maps.manage'))
                         <a href="{{ route('editor') }}" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 11px;">
                             <span>🛠️</span> {{ __('Customize Space') }}
                         </a>
+                        @endif
                     </div>
                     <div style="width: 100%; height: 130px; border-radius: 14px; overflow: hidden; position: relative; box-shadow: var(--shadow-inset-3d); border: 1px solid var(--border-color);">
                         <img src="/images/isometric_office_preview.jpg" alt="3D Office Preview" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
@@ -1693,18 +1738,19 @@
 
                 <!-- 4. Tasks -->
                 @php
-                    $pendingTasksCount = $tasks->where('status', '!=', 'done')->count();
-                    $dueTodayCount = $tasks->filter(fn($t) => $t->due_date && $t->due_date->isToday() && $t->status !== 'done')->count();
+                    $isTaskManager = ($membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete'));
+                    $relevantPendingTasks = $isTaskManager ? $tasks->where('status', '!=', 'done')->count() : $myTasks->where('status', '!=', 'done')->count();
+                    $relevantDueToday = $isTaskManager ? $tasks->filter(fn($t) => $t->due_date && $t->due_date->isToday() && $t->status !== 'done')->count() : $myTasks->filter(fn($t) => $t->due_date && $t->due_date->isToday() && $t->status !== 'done')->count();
                 @endphp
-                <div class="kpi-card">
+                <div class="kpi-card" onclick="switchAdminTab('{{ $isTaskManager ? 'all-tasks' : 'my-tasks' }}')" style="cursor: pointer;">
                     <div class="icon-box-3d">
                         📋
                     </div>
                     <div class="kpi-info">
-                        <div class="kpi-title">{{ __('Tasks') }}</div>
-                        <div class="kpi-value">{{ $pendingTasksCount }}</div>
-                        <div class="kpi-sub" style="color: {{ $dueTodayCount > 0 ? 'var(--status-warning)' : 'var(--text-muted)' }};">
-                            {{ $dueTodayCount }} {{ __('due today') }}
+                        <div class="kpi-title">{{ $isTaskManager ? __('Workspace Tasks') : __('My Tasks') }}</div>
+                        <div class="kpi-value">{{ $relevantPendingTasks }}</div>
+                        <div class="kpi-sub" style="color: {{ $relevantDueToday > 0 ? 'var(--status-warning)' : 'var(--text-muted)' }};">
+                            {{ $relevantDueToday }} {{ __('due today') }}
                         </div>
                     </div>
                 </div>
@@ -1901,16 +1947,32 @@
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 10px;">
                         @forelse($projects->take(3) as $p)
-                            <a href="{{ route('projects.hub', $p->id) }}" style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface-subtle); padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border-color); text-decoration: none; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-                                <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-                                    <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(79, 155, 95, 0.15); color: var(--brand-forest); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; flex-shrink: 0;">📁</div>
-                                    <div style="min-width: 0;">
-                                        <div style="font-size: 12px; font-weight: 800; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $p->name }}</div>
-                                        <div style="font-size: 10px; color: var(--text-muted);">{{ $p->code ?? 'PRJ' }} • {{ $p->tasks_count ?? $p->tasks->count() }} {{ __('tasks') }}</div>
+                            @php
+                                $canOpenHub = ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || $membership->hasPermission('projects.manage') || $p->manager_id === $user->id || $p->owner_id === $user->id);
+                            @endphp
+                            @if($canOpenHub)
+                                <a href="{{ route('projects.hub', $p->id) }}" style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface-subtle); padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border-color); text-decoration: none; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" title="{{ __('Click to open project dashboard & tasks') }}">
+                                    <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                                        <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(79, 155, 95, 0.15); color: var(--brand-forest); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; flex-shrink: 0;">📁</div>
+                                        <div style="min-width: 0;">
+                                            <div style="font-size: 12px; font-weight: 800; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $p->name }}</div>
+                                            <div style="font-size: 10px; color: var(--text-muted);">{{ $p->code ?? 'PRJ' }} • {{ $p->tasks_count ?? $p->tasks->count() }} {{ __('tasks') }}</div>
+                                        </div>
                                     </div>
+                                    <span class="nav-badge-pill" style="font-size: 10px; flex-shrink: 0;">{{ __($p->status) }}</span>
+                                </a>
+                            @else
+                                <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface-subtle); padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border-color);">
+                                    <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                                        <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(79, 155, 95, 0.15); color: var(--brand-forest); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; flex-shrink: 0;">📁</div>
+                                        <div style="min-width: 0;">
+                                            <div style="font-size: 12px; font-weight: 800; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $p->name }}</div>
+                                            <div style="font-size: 10px; color: var(--text-muted);">{{ $p->code ?? 'PRJ' }} • {{ $p->tasks_count ?? $p->tasks->count() }} {{ __('tasks') }}</div>
+                                        </div>
+                                    </div>
+                                    <span class="nav-badge-pill" style="font-size: 10px; flex-shrink: 0;">{{ __($p->status) }}</span>
                                 </div>
-                                <span class="nav-badge-pill" style="font-size: 10px; flex-shrink: 0;">{{ __($p->status) }}</span>
-                            </a>
+                            @endif
                         @empty
                             <div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 12px; background: var(--bg-surface-subtle); border-radius: 12px; border: 1px dashed var(--border-color);">
                                 <div style="font-size: 22px; margin-bottom: 4px;">📁</div>
@@ -1930,7 +1992,7 @@
                         @forelse($myTasks->take(4) as $t)
                             <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface-subtle); padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border-color);">
                                 <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-                                    <input type="checkbox" {{ $t->status === 'done' ? 'checked' : '' }} onchange="toggleTaskDone({{ $t->id }}, this.checked)" style="width: 16px; height: 16px; accent-color: var(--brand-forest); cursor: pointer;">
+                                    <input type="checkbox" {{ $t->status === 'done' ? 'checked' : '' }} onchange="toggleTaskDone('{{ $t->id }}', this.checked)" style="width: 16px; height: 16px; accent-color: var(--brand-forest); cursor: pointer;">
                                     <div style="min-width: 0;">
                                         <div style="font-size: 12px; font-weight: 800; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; {{ $t->status === 'done' ? 'text-decoration: line-through; opacity: 0.6;' : '' }}">
                                             {{ $t->title }}
@@ -1960,20 +2022,34 @@
                         <h3 class="card-title">{{ __('Quick Actions') }}</h3>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                        @if($membership->hasPermission('rooms.manage'))
                         <div onclick="switchAdminTab('rooms')" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px 6px; text-align: center; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-soft-3d);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
                             <div style="font-size: 20px; margin-bottom: 3px;">🏢</div>
                             <div style="font-size: 11px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">{{ __('Create Room') }}</div>
                         </div>
+                        @else
+                        <div onclick="window.location.href='{{ route('office') }}'" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px 6px; text-align: center; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-soft-3d);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <div style="font-size: 20px; margin-bottom: 3px;">🚀</div>
+                            <div style="font-size: 11px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">{{ __('Enter Office') }}</div>
+                        </div>
+                        @endif
 
-                        <div onclick="openInviteModal()" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px 6px; text-align: center; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-soft-3d);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div onclick="openScheduleMeetingModal()" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px 6px; text-align: center; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-soft-3d);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
                             <div style="font-size: 20px; margin-bottom: 3px;">📅</div>
                             <div style="font-size: 11px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">{{ __('Schedule') }}</div>
                         </div>
 
+                        @if($membership->hasPermission('members.manage') || $membership->role?->slug === 'company_admin')
                         <div onclick="openInviteModal()" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px 6px; text-align: center; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-soft-3d);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
                             <div style="font-size: 20px; margin-bottom: 3px;">👥</div>
                             <div style="font-size: 11px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">{{ __('Invite People') }}</div>
                         </div>
+                        @else
+                        <div onclick="switchAdminTab('profile')" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px 6px; text-align: center; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-soft-3d);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <div style="font-size: 20px; margin-bottom: 3px;">👤</div>
+                            <div style="font-size: 11px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">{{ __('My Profile') }}</div>
+                        </div>
+                        @endif
 
                         <div onclick="switchAdminTab('projects')" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px 6px; text-align: center; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-soft-3d);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
                             <div style="font-size: 20px; margin-bottom: 3px;">📎</div>
@@ -1981,8 +2057,8 @@
                         </div>
 
                         <div onclick="switchAdminTab('my-tasks')" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px 6px; text-align: center; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-soft-3d);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-                            <div style="font-size: 20px; margin-bottom: 3px;">✏️</div>
-                            <div style="font-size: 11px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">{{ __('Add Task') }}</div>
+                            <div style="font-size: 20px; margin-bottom: 3px;">⚡</div>
+                            <div style="font-size: 11px; font-weight: 800; color: var(--text-primary); line-height: 1.2;">{{ __('My Tasks') }}</div>
                         </div>
 
                         <div onclick="toggleFocusMode()" id="quick-action-focus" style="background: linear-gradient(145deg, #42774C 0%, #2A5D37 100%); color: #FFFDF6; border: 1px solid #1E4E31; border-radius: 14px; padding: 12px 6px; text-align: center; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow-tactile-btn);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
@@ -2014,16 +2090,149 @@
             </div>
         </div>
 
+        <!-- 1.5 TEAM CHAT & DMS TAB -->
+        <div id="tab-chat" class="tab-view">
+            <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
+                <div>
+                    <h1 class="page-title" style="font-size: 22px; font-weight: 900; color: var(--text-primary); margin-bottom: 4px;">💬 {{ __('Team Chat & Direct Messages') }}</h1>
+                    <p class="page-subtitle" style="font-size: 13px; color: var(--text-secondary);">{{ __('Realtime company communication, direct colleague messaging, and team collaboration channels.') }}</p>
+                </div>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button onclick="loadChatConversations(true)" class="tactile-btn btn-secondary" style="padding: 8px 16px; font-size: 12px;" title="{{ __('Refresh Messages') }}">
+                        🔄 {{ __('Refresh') }}
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Split Container (3D Tactile Glass Layout) -->
+            <div class="card" style="padding: 0; border-radius: var(--radius-xl); overflow: hidden; display: flex; height: 720px; border: 1px solid var(--border-color); box-shadow: var(--shadow-card); background: var(--bg-surface);">
+                
+                <!-- Left Pane: Channels & Colleagues Roster -->
+                <div style="width: 320px; flex-shrink: 0; border-inline-end: 1px solid var(--border-color); background: var(--bg-surface-subtle); display: flex; flex-direction: column;">
+                    
+                    <!-- Search Bar -->
+                    <div style="padding: 16px; border-bottom: 1px solid var(--border-color);">
+                        <div style="position: relative;">
+                            <input type="text" id="chat-search-input" onkeyup="filterChatRoster()" placeholder="{{ __('Search colleagues & channels...') }}" style="width: 100%; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 10px; padding: 9px 12px 9px 34px; font-size: 12px; color: var(--text-primary); outline: none; box-shadow: var(--shadow-inset-3d);">
+                            <span style="position: absolute; inset-inline-start: 10px; top: 50%; transform: translateY(-50%); font-size: 14px; color: var(--text-muted);">🔍</span>
+                        </div>
+                    </div>
+
+                    <!-- Scrollable Roster Lists -->
+                    <div style="flex: 1; overflow-y: auto; padding: 12px 8px; display: flex; flex-direction: column; gap: 16px;">
+                        
+                        <!-- Channels Section -->
+                        <div>
+                            <div style="font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; padding: 0 8px 6px 8px; display: flex; justify-content: space-between; align-items: center;">
+                                <span>📢 {{ __('Company Channels') }}</span>
+                            </div>
+                            <div id="chat-channels-list" style="display: flex; flex-direction: column; gap: 4px;">
+                                <div style="padding: 10px 12px; font-size: 11px; color: var(--text-muted); text-align: center;">
+                                    {{ __('Loading channels...') }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Direct Messages Section -->
+                        <div>
+                            <div style="font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; padding: 0 8px 6px 8px; display: flex; justify-content: space-between; align-items: center;">
+                                <span>👥 {{ __('Direct Messages') }}</span>
+                                <span class="nav-badge-pill" id="chat-roster-count" style="font-size: 9px;">0</span>
+                            </div>
+                            <div id="chat-members-list" style="display: flex; flex-direction: column; gap: 4px;">
+                                <div style="padding: 10px 12px; font-size: 11px; color: var(--text-muted); text-align: center;">
+                                    {{ __('Loading colleagues...') }}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Right Pane: Active Chat Conversation -->
+                <div style="flex: 1; display: flex; flex-direction: column; background: var(--bg-surface);">
+                    
+                    <!-- Empty State (No Chat Selected) -->
+                    <div id="chat-empty-state" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center;">
+                        <div style="width: 80px; height: 80px; border-radius: 24px; background: rgba(79, 155, 95, 0.12); display: flex; align-items: center; justify-content: center; font-size: 36px; margin-bottom: 16px; border: 1px solid rgba(79, 155, 95, 0.3); box-shadow: var(--shadow-soft-3d);">
+                            💬
+                        </div>
+                        <h3 style="font-size: 18px; font-weight: 900; color: var(--text-primary); margin-bottom: 6px;">{{ __('Welcome to Company Workplace Chat') }}</h3>
+                        <p style="font-size: 13px; color: var(--text-secondary); max-width: 380px; margin-bottom: 20px;">
+                            {{ __('Select a colleague from the list on the left to start a direct 1-on-1 conversation or join a company collaboration channel.') }}
+                        </p>
+                        <button onclick="selectFirstColleagueChat()" class="tactile-btn btn-primary" style="padding: 10px 20px; font-size: 13px;">
+                            🚀 {{ __('Start First Conversation') }}
+                        </button>
+                    </div>
+
+                    <!-- Active Conversation Container (Hidden by default until selected) -->
+                    <div id="chat-active-state" style="display: none; flex: 1; flex-direction: column; height: 100%;">
+                        
+                        <!-- Chat Conversation Top Header -->
+                        <div style="padding: 14px 20px; border-bottom: 1px solid var(--border-color); background: var(--bg-surface); display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+                                <div id="chat-active-avatar-box" style="position: relative; width: 42px; height: 42px; border-radius: 12px; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 16px; color: white; flex-shrink: 0; box-shadow: var(--shadow-soft-3d);">
+                                    <span id="chat-active-avatar-initials">AB</span>
+                                    <div style="position: absolute; bottom: -2px; inset-inline-end: -2px; width: 12px; height: 12px; border-radius: 50%; background: #4F9B5F; border: 2px solid var(--bg-surface);" title="Online"></div>
+                                </div>
+                                <div style="min-width: 0;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <h3 id="chat-active-title" style="font-size: 15px; font-weight: 900; color: var(--text-primary); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Colleague Name</h3>
+                                        <span id="chat-active-badge" class="nav-badge-pill" style="font-size: 10px;">Member</span>
+                                    </div>
+                                    <div id="chat-active-subtitle" style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">Senior Engineer • Active Now</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <button id="chat-view-profile-btn" onclick="viewActiveChatUserProfile()" class="tactile-btn btn-secondary" style="padding: 6px 14px; font-size: 11px; font-weight: 800;" title="{{ __('View Member Profile') }}">
+                                    <span>👤</span> {{ __('Profile') }}
+                                </button>
+                                <a href="{{ route('office') }}" class="tactile-btn btn-primary" style="padding: 6px 14px; font-size: 11px; text-decoration: none;" title="{{ __('Meet in Virtual Office') }}">
+                                    <span>🚀</span> {{ __('Meet in Office') }}
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Chat Messages History Feed -->
+                        <div id="chat-messages-container" style="flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 14px; background: var(--bg-surface-subtle);">
+                            <div style="text-align: center; color: var(--text-muted); font-size: 12px; padding: 20px;">
+                                {{ __('Loading message history...') }}
+                            </div>
+                        </div>
+
+                        <!-- Chat Composer Bar -->
+                        <div style="padding: 14px 20px; border-top: 1px solid var(--border-color); background: var(--bg-surface);">
+                            <form onsubmit="handleSendChatMessage(event)" style="display: flex; gap: 10px; align-items: flex-end;">
+                                <div style="flex: 1; position: relative; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 14px; padding: 8px 12px; box-shadow: var(--shadow-inset-3d);">
+                                    <textarea id="chat-message-input" rows="1" onkeydown="handleChatInputKeydown(event)" placeholder="{{ __('Type a message... (Press Enter to send, Shift+Enter for new line)') }}" style="width: 100%; background: transparent; border: none; outline: none; color: var(--text-primary); font-size: 13px; font-weight: 500; resize: none; max-height: 120px; font-family: inherit;"></textarea>
+                                </div>
+                                <button type="submit" id="chat-send-btn" class="tactile-btn btn-primary" style="padding: 11px 20px; font-size: 13px; flex-shrink: 0; border-radius: 12px;">
+                                    <span>{{ __('Send') }}</span>
+                                    <span>🚀</span>
+                                </button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
         <!-- 2. TEAM MEMBERS TAB -->
+        @if($membership->hasPermission('members.view') || $membership->hasPermission('members.manage') || $membership->role?->slug === 'company_admin')
         <div id="tab-members" class="tab-view">
-            <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+            <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: gap; gap: 14px;">
                 <div>
                     <h1 class="page-title" style="font-size: 22px; font-weight: 900; color: var(--text-primary); margin-bottom: 4px;">👥 {{ __('Team Members & Roles') }}</h1>
                     <p class="page-subtitle" style="font-size: 13px; color: var(--text-secondary);">{{ __('Manage organization membership, departments, teams, and security roles.') }}</p>
                 </div>
+                @if($membership->hasPermission('members.manage') || $membership->role?->slug === 'company_admin')
                 <button onclick="openInviteModal()" class="tactile-btn btn-primary" style="padding: 10px 18px; font-size: 13px;">
                     <span>+</span> {{ __('Invite Member') }}
                 </button>
+                @endif
             </div>
 
             <div class="card" style="border-radius: var(--radius-lg); overflow: hidden; padding: 0;">
@@ -2040,7 +2249,9 @@
                                 <th>{{ __('Job Title') }}</th>
                                 <th>{{ __('Role') }}</th>
                                 <th>{{ __('Status') }}</th>
+                                @if($membership->hasPermission('members.manage') || $membership->role?->slug === 'company_admin')
                                 <th>{{ __('Actions') }}</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -2052,12 +2263,18 @@
                                 @endphp
                                 <tr>
                                     <td>
-                                        <div style="display: flex; align-items: center; gap: 10px;">
-                                            <div style="width: 32px; height: 32px; border-radius: 10px; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; color: white; box-shadow: var(--shadow-soft-3d);">
+                                        <div onclick="openMemberProfileModal('{{ $m->id }}')" style="display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="{{ __('Click to view member profile, tasks & work time') }}">
+                                            <div style="width: 34px; height: 34px; border-radius: 10px; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; color: white; box-shadow: var(--shadow-soft-3d); flex-shrink: 0;">
                                                 {{ strtoupper(substr($m->user->name, 0, 2)) }}
                                             </div>
                                             <div>
-                                                <strong style="color: var(--text-primary); font-size: 13px;">{{ $m->user->name }}</strong>
+                                                <div style="color: var(--brand-forest); font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 4px;">
+                                                    <span>{{ $m->user->name }}</span>
+                                                    <span style="font-size: 10px; opacity: 0.7;">👁️</span>
+                                                </div>
+                                                @if($m->user->nickname)
+                                                    <div style="font-size: 10px; color: var(--text-muted); font-family: monospace;">{{ $m->user->nickname }}</div>
+                                                @endif
                                             </div>
                                         </div>
                                     </td>
@@ -2083,11 +2300,27 @@
                                     <td>
                                         <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F;">{{ __('Active') }}</span>
                                     </td>
+                                    @if($membership->hasPermission('members.manage') || $membership->role?->slug === 'company_admin')
                                     <td>
-                                        <button onclick="openAssignModal('{{ $m->id }}', '{{ addslashes($m->user->name) }}', '{{ $profile?->department_id }}', '{{ $profile?->team_id }}', '{{ $m->role_id }}', '{{ addslashes($profile?->job_title ?? '') }}')" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 11px; font-weight: 800;">
-                                            <span>⚙️</span> {{ __('Assign Department / Role') }}
-                                        </button>
+                                        <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                                            <button onclick="openEditMemberModal('{{ $m->id }}', '{{ addslashes($m->user->name) }}', '{{ addslashes($m->user->email) }}', '{{ $profile?->department_id }}', '{{ $profile?->team_id }}', '{{ $m->role_id }}', '{{ addslashes($profile?->job_title ?? '') }}', '{{ $m->status }}')" class="tactile-btn btn-secondary" style="padding: 5px 10px; font-size: 11px; font-weight: 800;" title="{{ __('Edit Member Data (تعديل البيانات)') }}">
+                                                <span>✏️</span> {{ __('Edit') }}
+                                            </button>
+                                            <button onclick="openChangeMemberPasswordModal('{{ $m->id }}', '{{ addslashes($m->user->name) }}')" class="tactile-btn" style="background: rgba(214, 162, 58, 0.15); color: #D6A23A; border: 1px solid rgba(214, 162, 58, 0.3); padding: 5px 10px; font-size: 11px; font-weight: 800;" title="{{ __('Change Password (تغيير كلمة المرور)') }}">
+                                                <span>🔑</span> {{ __('Password') }}
+                                            </button>
+                                            @if($m->user_id !== $user->id)
+                                                <form method="POST" action="{{ route('organization.members.delete', $m->id) }}" onsubmit="return confirm('{{ __('Are you sure you want to remove this member from your company?') }}');" style="display: inline;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.3); padding: 5px 8px; font-size: 11px;" title="{{ __('Remove Member (حذف)') }}">
+                                                        🗑️
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
                                     </td>
+                                    @endif
                                 </tr>
                             @endforeach
                         </tbody>
@@ -2095,8 +2328,10 @@
                 </div>
             </div>
         </div>
+        @endif
 
         <!-- 2.5 BILLING & SUBSCRIPTION TAB -->
+        @if($membership->hasPermission('billing.manage'))
         <div id="tab-billing" class="tab-view">
             <div class="page-header" style="margin-bottom: 24px;">
                 <h1 class="page-title" style="font-size: 22px; font-weight: 900; color: var(--text-primary); margin-bottom: 4px;">💎 {{ __('Billing & Subscription') }}</h1>
@@ -2209,52 +2444,57 @@
                     $pPriceUSD = (float)$p->price;
                     $pPriceSAR = round($pPriceUSD * 3.75, 2);
                 @endphp
-                <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; border-radius: var(--radius-xl); padding: 22px; border-color: {{ $isCurrent ? 'var(--brand-forest)' : 'var(--border-color)' }}; background: {{ $isCurrent ? 'rgba(79, 155, 95, 0.08)' : 'var(--bg-surface)' }}; box-shadow: var(--shadow-card);">
-                    <div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <strong style="font-size: 18px; font-weight: 900; color: var(--text-primary);">💎 {{ $p->name }}</strong>
-                            @if($isCurrent)
-                                <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F;">{{ __('Current') }}</span>
-                            @endif
+                <div class="card plan-selection-card" style="padding: 24px; border-radius: var(--radius-xl); border: 2px solid {{ $isCurrent ? 'var(--brand-forest)' : 'var(--border-color)' }}; position: relative; display: flex; flex-direction: column; justify-content: space-between; box-shadow: {{ $isCurrent ? 'var(--shadow-hover)' : 'var(--shadow-card)' }}; background: var(--bg-surface);">
+                    @if($isCurrent)
+                        <div style="position: absolute; top: -12px; right: 20px; background: var(--brand-forest); color: white; padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 800; text-transform: uppercase; box-shadow: 0 4px 10px rgba(36,92,58,0.3);">
+                            ⭐ {{ __('Current Active') }}
                         </div>
-
+                    @endif
+                    <div>
+                        <div style="font-size: 12px; font-weight: 800; color: var(--brand-forest); text-transform: uppercase; margin-bottom: 6px;">{{ $p->slug }}</div>
+                        <h4 style="font-size: 20px; font-weight: 900; color: var(--text-primary); margin-bottom: 10px;">{{ $p->name }}</h4>
                         <div style="margin-bottom: 16px;">
-                            <div style="font-size: 24px; font-weight: 900; color: var(--brand-forest);">
-                                {{ number_format($pPriceSAR, 2) }} <span style="font-size: 13px; font-weight: 700; color: var(--text-secondary);">{{ __('SAR (ر.س)') }}</span>
-                            </div>
-                            <div style="font-size: 12px; font-weight: 600; color: var(--text-muted);">
-                                (${{ number_format($pPriceUSD, 2) }} USD / {{ __('mo') }})
-                            </div>
+                            <span style="font-size: 28px; font-weight: 900; color: var(--text-primary);">
+                                {{ number_format($pPriceSAR, 2) }} <span style="font-size: 13px; font-weight: 700; color: var(--text-secondary);">SAR</span>
+                            </span>
+                            <span style="font-size: 12px; color: var(--text-muted);">
+                                (${{ number_format($pPriceUSD, 2) }} / {{ __('mo') }})
+                            </span>
                         </div>
-
-                        <div style="font-size: 13px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;">
-                            <div>👥 <strong style="color: var(--text-primary);">{{ $p->seat_limit === 0 ? __('Unlimited') : $p->seat_limit }}</strong> {{ __('Users / Seats') }}</div>
-                            <div>🚪 <strong style="color: var(--text-primary);">{{ $p->room_limit === 0 ? __('Unlimited') : $p->room_limit }}</strong> {{ __('Meeting Rooms') }}</div>
-                            <div>💾 <strong style="color: var(--text-primary);">{{ $p->storage_limit_gb === 0 ? __('Unlimited') : $p->storage_limit_gb . ' GB' }}</strong> {{ __('Storage') }}</div>
-                        </div>
+                        <ul style="list-style: none; padding: 0; margin: 0 0 20px 0; font-size: 13px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 8px;">
+                            <li style="display: flex; align-items: center; gap: 8px;">
+                                <span>👥</span> <strong>{{ $p->seat_limit === 0 ? __('Unlimited') : $p->seat_limit }}</strong> {{ __('Team Members') }}
+                            </li>
+                            <li style="display: flex; align-items: center; gap: 8px;">
+                                <span>🏢</span> <strong>{{ $p->room_limit === 0 ? __('Unlimited') : $p->room_limit }}</strong> {{ __('Meeting Rooms') }}
+                            </li>
+                            <li style="display: flex; align-items: center; gap: 8px;">
+                                <span>💾</span> <strong>{{ $p->storage_limit_gb === 0 ? __('Unlimited') : $p->storage_limit_gb . ' GB' }}</strong> {{ __('Storage') }}
+                            </li>
+                        </ul>
                     </div>
 
-                    <div>
-                        @if($isCurrent)
-                            <button disabled class="tactile-btn" style="width: 100%; justify-content: center; opacity: 0.6; padding: 10px;">
-                                ✅ {{ __('Active Plan') }}
+                    @if($isCurrent)
+                        <button disabled class="tactile-btn btn-secondary" style="width: 100%; padding: 12px; opacity: 0.6; cursor: not-allowed;">
+                            ✓ {{ __('Current Plan') }}
+                        </button>
+                    @else
+                        <form method="POST" action="{{ route('organization.upgrade_plan') }}">
+                            @csrf
+                            <input type="hidden" name="plan_id" value="{{ $p->id }}">
+                            <button type="submit" class="tactile-btn btn-primary" style="width: 100%; padding: 12px; font-weight: 800;">
+                                🚀 {{ __('Switch to') }} {{ $p->name }}
                             </button>
-                        @else
-                            <form method="POST" action="{{ route('organization.upgrade_plan') }}">
-                                @csrf
-                                <input type="hidden" name="plan_id" value="{{ $p->id }}">
-                                <button type="submit" class="tactile-btn btn-primary" style="width: 100%; justify-content: center; padding: 10px;">
-                                    🚀 {{ __('Upgrade to') }} {{ $p->name }}
-                                </button>
-                            </form>
-                        @endif
-                    </div>
+                        </form>
+                    @endif
                 </div>
                 @endforeach
             </div>
         </div>
+        @endif
 
         <!-- 3. ROOMS TAB -->
+        @if($membership->hasPermission('rooms.manage'))
         <div id="tab-rooms" class="tab-view">
             <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
                 <div>
@@ -2306,6 +2546,7 @@
                 </div>
             </div>
         </div>
+        @endif
 
         <!-- 3.5 SCHEDULED MEETINGS TAB (Administration -> Meetings & Schedule) -->
         <div id="tab-meetings" class="tab-view">
@@ -2486,6 +2727,7 @@
         </div>
 
         <!-- 4. GUEST INVITATIONS TAB -->
+        @if($membership->hasPermission('guests.invite'))
         <div id="tab-guests" class="tab-view">
             <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
                 <div>
@@ -2558,8 +2800,10 @@
                 </div>
             </div>
         </div>
+        @endif
 
         <!-- 5. DEPARTMENTS & TEAMS TAB -->
+        @if($membership->hasPermission('departments.manage') || $membership->hasPermission('teams.manage'))
         <div id="tab-departments" class="tab-view">
             <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
                 <div>
@@ -2670,8 +2914,10 @@
                 @endforelse
             </div>
         </div>
+        @endif
 
         <!-- 6. AUDIT LOGS TAB -->
+        @if($membership->hasPermission('audit.view'))
         <div id="tab-audit" class="tab-view">
             <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
                 <div>
@@ -2726,8 +2972,10 @@
                 </div>
             </div>
         </div>
+        @endif
 
         <!-- 7. SETTINGS TAB -->
+        @if($membership->hasPermission('organizations.manage'))
         <div id="tab-settings" class="tab-view">
             <div class="page-header" style="margin-bottom: 24px;">
                 <h1 class="page-title" style="font-size: 22px; font-weight: 900; color: var(--text-primary); margin-bottom: 4px;">⚙️ {{ __('Workspace Settings') }}</h1>
@@ -2904,6 +3152,7 @@
                 </form>
             </div>
         </div>
+        @endif
 
         <!-- 7.5 USER PROFILE TAB -->
         <div id="tab-profile" class="tab-view">
@@ -3170,11 +3419,13 @@
                     <h1 class="page-title" style="font-size: 22px; font-weight: 900; color: var(--text-primary); margin-bottom: 4px;">📁 {{ __('Projects Portfolio') }}</h1>
                     <p class="page-subtitle" style="font-size: 13px; color: var(--text-secondary);">{{ __('Manage company initiatives, milestones, tasks, and budgets.') }}</p>
                 </div>
+                @if($membership->hasPermission('projects.manage') || $membership->role?->slug === 'company_admin')
                 <div style="display: flex; gap: 10px;">
                     <button onclick="openNewProjectModal()" class="tactile-btn btn-primary" style="padding: 10px 18px; font-size: 13px;">
                         <span>+</span> {{ __('New Project') }}
                     </button>
                 </div>
+                @endif
             </div>
 
             <!-- Project KPI Metrics (3D Soft Neumorphic) -->
@@ -3243,7 +3494,10 @@
                         </thead>
                         <tbody>
                             @forelse($projects as $p)
-                                <tr onclick="window.location.href='{{ route('projects.hub', $p->id) }}'" style="cursor: pointer;" title="{{ __('Click to open project dashboard & tasks') }}">
+                                @php
+                                    $canOpenHub = ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || $membership->hasPermission('projects.manage') || $p->manager_id === $user->id || $p->owner_id === $user->id);
+                                @endphp
+                                <tr @if($canOpenHub) onclick="window.location.href='{{ route('projects.hub', $p->id) }}'" style="cursor: pointer;" title="{{ __('Click to open project dashboard & tasks') }}" @endif>
                                     <td><span class="nav-badge-pill" style="font-family: monospace;">{{ $p->code ?? 'PRJ' }}</span></td>
                                     <td>
                                         <div style="font-weight: 800; color: var(--text-primary);">{{ $p->name }}</div>
@@ -3290,15 +3544,21 @@
                                     <td style="font-size: 12px; font-weight: 600;">{{ $p->due_date ? $p->due_date->format('M d, Y') : '—' }}</td>
                                     <td style="font-weight: 800; color: var(--brand-forest);">${{ number_format($p->budget_amount ?? 0, 0) }}</td>
                                     <td>
-                                        <a href="{{ route('projects.hub', $p->id) }}" onclick="event.stopPropagation();" class="tactile-btn btn-primary" style="padding: 6px 12px; font-size: 11px; text-decoration: none;">
-                                            📊 {{ __('Open Hub') }}
-                                        </a>
+                                        @if($canOpenHub)
+                                            <a href="{{ route('projects.hub', $p->id) }}" onclick="event.stopPropagation();" class="tactile-btn btn-primary" style="padding: 6px 12px; font-size: 11px; text-decoration: none;">
+                                                📊 {{ __('Open Hub') }}
+                                            </a>
+                                        @else
+                                            <span class="nav-badge-pill" style="font-size: 10px; color: var(--text-muted);">
+                                                👁️ {{ __('View Details') }}
+                                            </span>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
                                     <td colspan="9" style="text-align: center; padding: 36px; color: var(--text-muted);">
-                                        📁 {{ __('No projects created yet. Click "+ New Project" to get started.') }}
+                                        📁 {{ __('No projects created yet.') }}
                                     </td>
                                 </tr>
                             @endforelse
@@ -3309,6 +3569,7 @@
         </div>
 
         <!-- 9. ALL TASKS MANAGER TAB (Project Manager View) -->
+        @if($membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || $membership->role?->slug === 'company_admin')
         <div id="tab-all-tasks" class="tab-view">
             <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
                 <div>
@@ -3464,7 +3725,6 @@
                                     data-assignee-id="{{ $t->assignee_id }}"
                                     onclick="openTaskDetails('{{ $t->id }}')"
                                     oncontextmenu="event.preventDefault(); event.stopPropagation(); openTaskContextMenu(event, '{{ $t->id }}', '{{ $t->project_id }}', '{{ addslashes($t->title) }}')"
-                                    style="cursor: pointer;">
                                     <td><span class="nav-badge-pill" style="font-family: monospace;">#{{ $t->task_number ?? 1 }}</span></td>
                                     <td>
                                         <div style="font-weight: 800; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
@@ -3680,6 +3940,7 @@
                 </div>
             </div>
         </div>
+        @endif
 
         <!-- 10. MY TASKS TAB -->
         <div id="tab-my-tasks" class="tab-view">
@@ -3701,20 +3962,57 @@
                 <div class="card" style="border-radius: var(--radius-lg); padding: 18px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--brand-forest); padding-bottom: 12px; margin-bottom: 14px;">
                         <h3 style="font-size: 15px; font-weight: 900; color: var(--text-primary);">⚡ {{ __('In Progress & Active') }}</h3>
-                        <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F;">{{ $myTasks->where('status', 'in_progress')->count() }}</span>
+                        <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F; font-weight: 800;">{{ $myTasks->where('status', 'in_progress')->count() }}</span>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 12px;">
                         @forelse($myTasks->where('status', 'in_progress') as $t)
-                            <div class="kanban-card" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; box-shadow: var(--shadow-card);">
-                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
-                                    <span class="nav-badge-pill" style="font-size: 10px;">{{ $t->project->code ?? 'PRJ' }}-{{ $t->task_number }}</span>
-                                    <span class="nav-badge-pill" style="{{ $t->priority === 'urgent' ? 'background: rgba(217, 107, 95, 0.15); color: #D96B5F;' : ($t->priority === 'high' ? 'background: rgba(214, 162, 58, 0.15); color: #D6A23A;' : '') }} font-size: 10px;">{{ ucfirst($t->priority) }}</span>
+                            @php
+                                $canEditThisTask = ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || ($t->project && $t->project->manager_id === $user->id) || $t->assignee_id === $user->id || $t->creator_id === $user->id);
+                            @endphp
+                            <div class="kanban-task-card" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 14px; box-shadow: var(--shadow-card); cursor: pointer;" onclick="openTaskDetails('{{ $t->id }}')">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 6px;">
+                                    <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                                        <span class="nav-badge-pill" style="font-family: monospace; font-size: 10px; font-weight: 800;">#{{ $t->task_number ?? 1 }}</span>
+                                        <span class="nav-badge-pill" style="font-size: 9px; font-weight: 700; color: var(--brand-forest); background: rgba(79, 155, 95, 0.12);">
+                                            📁 {{ $t->project->code ?? 'PRJ' }}
+                                        </span>
+                                        @if($t->checklistItems && $t->checklistItems->count() > 0)
+                                            <span class="nav-badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.15); color: #4F9B5F;">
+                                                ⊞ {{ $t->checklistItems->where('is_completed', true)->count() }}/{{ $t->checklistItems->count() }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 4px;">
+                                        <span class="nav-badge-pill" style="{{ $t->priority === 'urgent' ? 'background: rgba(217, 107, 95, 0.15); color: #D96B5F;' : ($t->priority === 'high' ? 'background: rgba(214, 162, 58, 0.15); color: #D6A23A;' : '') }} font-size: 9px; font-weight: 800;">
+                                            {{ $t->priority === 'urgent' ? '🔥 ' . __('Urgent') : ($t->priority === 'high' ? '⚡ ' . __('High') : ucfirst($t->priority)) }}
+                                        </span>
+                                        <select onclick="event.stopPropagation()" onchange="updateTaskStatusDirect('{{ $t->id }}', this.value)" {{ $canEditThisTask ? '' : 'disabled' }} style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 10px; font-weight: 700; border-radius: 6px; padding: 2px 4px; outline: none; cursor: {{ $canEditThisTask ? 'pointer' : 'not-allowed' }};">
+                                            <option value="backlog" {{ $t->status === 'backlog' ? 'selected' : '' }}>📌 Backlog</option>
+                                            <option value="ready" {{ $t->status === 'ready' ? 'selected' : '' }}>🎯 Ready</option>
+                                            <option value="in_progress" {{ $t->status === 'in_progress' ? 'selected' : '' }}>⚡ In Progress</option>
+                                            <option value="review" {{ $t->status === 'review' || $t->status === 'qa' ? 'selected' : '' }}>🔍 Review</option>
+                                            <option value="done" {{ $t->status === 'done' ? 'selected' : '' }}>🎉 Done</option>
+                                        </select>
+                                        <button onclick="event.stopPropagation(); openTaskContextMenu(event, '{{ $t->id }}', '{{ $t->project_id }}', '{{ addslashes($t->title) }}')" class="tactile-btn btn-secondary" style="padding: 2px 6px; font-size: 10px; line-height: 1;" title="{{ __('Task Actions') }}">
+                                            •••
+                                        </button>
+                                    </div>
                                 </div>
-                                <div style="font-weight: 800; font-size: 14px; margin-bottom: 4px; color: var(--text-primary);">{{ $t->title }}</div>
-                                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">📁 {{ $t->project->name }}</div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 10px;">
-                                    <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">📅 {{ $t->due_date ? $t->due_date->format('M d') : 'No date' }}</span>
-                                    <button onclick="startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name) }}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--brand-forest); border: 1px solid rgba(79, 155, 95, 0.3); padding: 5px 12px; font-size: 11px;">
+                                <div style="font-weight: 800; font-size: 13px; margin-bottom: 6px; color: var(--text-primary); line-height: 1.4;">{{ $t->title }}</div>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                                    <span>📁 {{ $t->project->name ?? 'General' }}</span>
+                                    @if($t->due_date)
+                                        <span>•</span>
+                                        <span style="{{ $t->due_date->isPast() && $t->status !== 'done' ? 'color: #D96B5F; font-weight: 800;' : '' }}">
+                                            📅 {{ $t->due_date->format('M d') }}
+                                        </span>
+                                    @endif
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 8px; font-size: 11px;">
+                                    <span style="font-family: monospace; font-size: 10px; font-weight: 700; color: var(--brand-forest);">
+                                        ⏱️ {{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h{{ $t->estimated_hours ? ' / ' . $t->estimated_hours . 'h' : '' }}
+                                    </span>
+                                    <button onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--brand-forest); border: 1px solid rgba(79, 155, 95, 0.3); padding: 4px 10px; font-size: 11px; font-weight: 800;">
                                         ▶ {{ __('Start Timer') }}
                                     </button>
                                 </div>
@@ -3731,20 +4029,57 @@
                 <div class="card" style="border-radius: var(--radius-lg); padding: 18px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--brand-sage); padding-bottom: 12px; margin-bottom: 14px;">
                         <h3 style="font-size: 15px; font-weight: 900; color: var(--text-primary);">📌 {{ __('Ready & Backlog') }}</h3>
-                        <span class="nav-badge-pill">{{ $myTasks->whereIn('status', ['backlog', 'ready'])->count() }}</span>
+                        <span class="nav-badge-pill" style="font-weight: 800;">{{ $myTasks->whereIn('status', ['backlog', 'ready'])->count() }}</span>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 12px;">
                         @forelse($myTasks->whereIn('status', ['backlog', 'ready']) as $t)
-                            <div class="kanban-card" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; box-shadow: var(--shadow-card);">
-                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
-                                    <span class="nav-badge-pill" style="font-size: 10px;">{{ $t->project->code ?? 'PRJ' }}-{{ $t->task_number }}</span>
-                                    <span class="nav-badge-pill" style="{{ $t->priority === 'urgent' ? 'background: rgba(217, 107, 95, 0.15); color: #D96B5F;' : ($t->priority === 'high' ? 'background: rgba(214, 162, 58, 0.15); color: #D6A23A;' : '') }} font-size: 10px;">{{ ucfirst($t->priority) }}</span>
+                            @php
+                                $canEditThisTask = ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || ($t->project && $t->project->manager_id === $user->id) || $t->assignee_id === $user->id || $t->creator_id === $user->id);
+                            @endphp
+                            <div class="kanban-task-card" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 14px; box-shadow: var(--shadow-card); cursor: pointer;" onclick="openTaskDetails('{{ $t->id }}')">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 6px;">
+                                    <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                                        <span class="nav-badge-pill" style="font-family: monospace; font-size: 10px; font-weight: 800;">#{{ $t->task_number ?? 1 }}</span>
+                                        <span class="nav-badge-pill" style="font-size: 9px; font-weight: 700; color: var(--brand-forest); background: rgba(79, 155, 95, 0.12);">
+                                            📁 {{ $t->project->code ?? 'PRJ' }}
+                                        </span>
+                                        @if($t->checklistItems && $t->checklistItems->count() > 0)
+                                            <span class="nav-badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.15); color: #4F9B5F;">
+                                                ⊞ {{ $t->checklistItems->where('is_completed', true)->count() }}/{{ $t->checklistItems->count() }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 4px;">
+                                        <span class="nav-badge-pill" style="{{ $t->priority === 'urgent' ? 'background: rgba(217, 107, 95, 0.15); color: #D96B5F;' : ($t->priority === 'high' ? 'background: rgba(214, 162, 58, 0.15); color: #D6A23A;' : '') }} font-size: 9px; font-weight: 800;">
+                                            {{ $t->priority === 'urgent' ? '🔥 ' . __('Urgent') : ($t->priority === 'high' ? '⚡ ' . __('High') : ucfirst($t->priority)) }}
+                                        </span>
+                                        <select onclick="event.stopPropagation()" onchange="updateTaskStatusDirect('{{ $t->id }}', this.value)" {{ $canEditThisTask ? '' : 'disabled' }} style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 10px; font-weight: 700; border-radius: 6px; padding: 2px 4px; outline: none; cursor: {{ $canEditThisTask ? 'pointer' : 'not-allowed' }};">
+                                            <option value="backlog" {{ $t->status === 'backlog' ? 'selected' : '' }}>📌 Backlog</option>
+                                            <option value="ready" {{ $t->status === 'ready' ? 'selected' : '' }}>🎯 Ready</option>
+                                            <option value="in_progress" {{ $t->status === 'in_progress' ? 'selected' : '' }}>⚡ In Progress</option>
+                                            <option value="review" {{ $t->status === 'review' || $t->status === 'qa' ? 'selected' : '' }}>🔍 Review</option>
+                                            <option value="done" {{ $t->status === 'done' ? 'selected' : '' }}>🎉 Done</option>
+                                        </select>
+                                        <button onclick="event.stopPropagation(); openTaskContextMenu(event, '{{ $t->id }}', '{{ $t->project_id }}', '{{ addslashes($t->title) }}')" class="tactile-btn btn-secondary" style="padding: 2px 6px; font-size: 10px; line-height: 1;" title="{{ __('Task Actions') }}">
+                                            •••
+                                        </button>
+                                    </div>
                                 </div>
-                                <div style="font-weight: 800; font-size: 14px; margin-bottom: 4px; color: var(--text-primary);">{{ $t->title }}</div>
-                                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">📁 {{ $t->project->name }}</div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 10px;">
-                                    <span style="font-size: 11px; font-weight: 600; color: var(--text-secondary);">📅 {{ $t->due_date ? $t->due_date->format('M d') : 'No date' }}</span>
-                                    <button onclick="startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name) }}')" class="tactile-btn btn-secondary" style="padding: 5px 12px; font-size: 11px;">
+                                <div style="font-weight: 800; font-size: 13px; margin-bottom: 6px; color: var(--text-primary); line-height: 1.4;">{{ $t->title }}</div>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                                    <span>📁 {{ $t->project->name ?? 'General' }}</span>
+                                    @if($t->due_date)
+                                        <span>•</span>
+                                        <span style="{{ $t->due_date->isPast() && $t->status !== 'done' ? 'color: #D96B5F; font-weight: 800;' : '' }}">
+                                            📅 {{ $t->due_date->format('M d') }}
+                                        </span>
+                                    @endif
+                                </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 8px; font-size: 11px;">
+                                    <span style="font-family: monospace; font-size: 10px; font-weight: 700; color: var(--brand-forest);">
+                                        ⏱️ {{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h{{ $t->estimated_hours ? ' / ' . $t->estimated_hours . 'h' : '' }}
+                                    </span>
+                                    <button onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="tactile-btn btn-secondary" style="padding: 4px 10px; font-size: 11px; font-weight: 800;">
                                         ▶ {{ __('Start Timer') }}
                                     </button>
                                 </div>
@@ -3761,17 +4096,42 @@
                 <div class="card" style="border-radius: var(--radius-lg); padding: 18px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #4F9B5F; padding-bottom: 12px; margin-bottom: 14px;">
                         <h3 style="font-size: 15px; font-weight: 900; color: var(--text-primary);">🎉 {{ __('Completed & Under Review') }}</h3>
-                        <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F;">{{ $myTasks->whereIn('status', ['review', 'qa', 'done'])->count() }}</span>
+                        <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F; font-weight: 800;">{{ $myTasks->whereIn('status', ['review', 'qa', 'done'])->count() }}</span>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 12px;">
                         @forelse($myTasks->whereIn('status', ['review', 'qa', 'done']) as $t)
-                            <div class="kanban-card" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px; box-shadow: var(--shadow-card); opacity: 0.85;">
-                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
-                                    <span class="nav-badge-pill" style="font-size: 10px;">{{ $t->project->code ?? 'PRJ' }}-{{ $t->task_number }}</span>
-                                    <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F; font-size: 10px;">{{ ucfirst($t->status) }}</span>
+                            @php
+                                $canEditThisTask = ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || ($t->project && $t->project->manager_id === $user->id) || $t->assignee_id === $user->id || $t->creator_id === $user->id);
+                            @endphp
+                            <div class="kanban-task-card" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 14px; box-shadow: var(--shadow-card); opacity: 0.9; cursor: pointer;" onclick="openTaskDetails('{{ $t->id }}')">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 6px;">
+                                    <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                                        <span class="nav-badge-pill" style="font-family: monospace; font-size: 10px; font-weight: 800;">#{{ $t->task_number ?? 1 }}</span>
+                                        <span class="nav-badge-pill" style="font-size: 9px; font-weight: 700; color: var(--brand-forest); background: rgba(79, 155, 95, 0.12);">
+                                            📁 {{ $t->project->code ?? 'PRJ' }}
+                                        </span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 4px;">
+                                        <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F; font-size: 9px; font-weight: 800;">
+                                            {{ ucfirst($t->status) }}
+                                        </span>
+                                        <select onclick="event.stopPropagation()" onchange="updateTaskStatusDirect('{{ $t->id }}', this.value)" {{ $canEditThisTask ? '' : 'disabled' }} style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 10px; font-weight: 700; border-radius: 6px; padding: 2px 4px; outline: none; cursor: {{ $canEditThisTask ? 'pointer' : 'not-allowed' }};">
+                                            <option value="backlog" {{ $t->status === 'backlog' ? 'selected' : '' }}>📌 Backlog</option>
+                                            <option value="ready" {{ $t->status === 'ready' ? 'selected' : '' }}>🎯 Ready</option>
+                                            <option value="in_progress" {{ $t->status === 'in_progress' ? 'selected' : '' }}>⚡ In Progress</option>
+                                            <option value="review" {{ $t->status === 'review' || $t->status === 'qa' ? 'selected' : '' }}>🔍 Review</option>
+                                            <option value="done" {{ $t->status === 'done' ? 'selected' : '' }}>🎉 Done</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <div style="font-weight: 800; font-size: 14px; margin-bottom: 4px; color: var(--text-primary);">{{ $t->title }}</div>
-                                <div style="font-size: 11px; color: var(--text-muted);">📁 {{ $t->project->name }}</div>
+                                <div style="font-weight: 800; font-size: 13px; margin-bottom: 6px; color: var(--text-primary); line-height: 1.4; {{ $t->status === 'done' ? 'text-decoration: line-through; opacity: 0.6;' : '' }}">{{ $t->title }}</div>
+                                <div style="font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                                    <span>📁 {{ $t->project->name ?? 'General' }}</span>
+                                    @if($t->due_date)
+                                        <span>•</span>
+                                        <span>📅 {{ $t->due_date->format('M d') }}</span>
+                                    @endif
+                                </div>
                             </div>
                         @empty
                             <div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 12px;">
@@ -4472,7 +4832,7 @@
                     </div>
                     <div style="display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--text-muted); flex-wrap: wrap;">
                         <span>📁 {{ __('Project') }}: <strong id="task-modal-project" style="color: var(--text-primary);">Project Name</strong></span>
-                        <span>👤 {{ __('Assignee') }}: <strong id="task-modal-assignee" style="color: var(--text-primary);">Assignee</strong></span>
+                        <span onclick="if(window.currentModalTaskAssigneeMemberId) { closeTaskDetailsModal(); openMemberProfileModal(window.currentModalTaskAssigneeMemberId); }" style="cursor: pointer;" title="{{ __('Click to view member profile, tasks & hours') }}">👤 {{ __('Assignee') }}: <strong id="task-modal-assignee" style="color: var(--brand-forest); text-decoration: underline;">Assignee</strong></span>
                         <span>📅 {{ __('Due Date') }}: <strong id="task-modal-due" style="color: var(--text-primary);">Date</strong></span>
                     </div>
                 </div>
@@ -4589,6 +4949,212 @@
                     </table>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Comprehensive Team Member Profile Modal -->
+    <div id="member-details-modal" class="modal" style="display: none; align-items: center; justify-content: center; z-index: 9999;">
+        <div class="modal-box" style="max-width: 860px; width: 95%; max-height: 90vh; display: flex; flex-direction: column; padding: 0; overflow: hidden; border-radius: var(--radius-xl); box-shadow: var(--shadow-modal-3d); border: 1px solid var(--border-color); background: var(--bg-surface);">
+            
+            <!-- Modal Hero Header -->
+            <div style="background: linear-gradient(135deg, rgba(79, 155, 95, 0.12) 0%, rgba(36, 92, 58, 0.22) 100%); padding: 24px; border-bottom: 1px solid var(--border-color); position: relative;">
+                <button onclick="closeMemberProfileModal()" style="position: absolute; top: 16px; inset-inline-end: 16px; width: 32px; height: 32px; border-radius: 50%; background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-secondary); font-size: 16px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-soft-3d); transition: all 0.2s;">✕</button>
+
+                <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+                    <!-- Avatar -->
+                    <div id="mp-avatar-container" style="position: relative; width: 76px; height: 76px; border-radius: 20px; background: var(--accent-gradient); border: 3px solid #FFFDF6; box-shadow: 0 10px 25px rgba(36, 92, 58, 0.25); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 900; color: white; flex-shrink: 0; overflow: hidden;">
+                        <img id="mp-avatar-img" src="" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; display: none;">
+                        <span id="mp-avatar-fallback">AB</span>
+                        <div style="position: absolute; bottom: -2px; inset-inline-end: -2px; width: 16px; height: 16px; border-radius: 50%; background: #4F9B5F; border: 3px solid #FFFDF6;" title="Online"></div>
+                    </div>
+
+                    <!-- Details -->
+                    <div style="flex: 1; min-width: 200px;">
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <h2 id="mp-user-name" style="font-size: 22px; font-weight: 900; color: var(--text-primary); margin: 0;">Member Name</h2>
+                            <span id="mp-user-nickname" class="nav-badge-pill" style="font-family: monospace; font-size: 11px;">@nickname</span>
+                            <span id="mp-user-role" class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F; font-size: 11px;">Employee</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary);">
+                            <span id="mp-job-title" style="font-weight: 700; color: var(--text-primary);">Senior Engineer</span>
+                            <span>•</span>
+                            <span id="mp-dept-team">Engineering Team</span>
+                            <span>•</span>
+                            <span id="mp-work-mode" class="nav-badge-pill" style="font-size: 10px;">🏠 Remote</span>
+                        </div>
+                    </div>
+
+                    <!-- Direct Chat Action -->
+                    <div style="flex-shrink: 0;">
+                        <button id="mp-chat-btn" onclick="openChatFromProfileModal()" class="tactile-btn btn-primary" style="padding: 10px 20px; font-size: 13px;">
+                            <span>💬</span> {{ __('Send Message') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Nav Tabs -->
+            <div style="display: flex; border-bottom: 1px solid var(--border-color); background: var(--bg-surface-subtle); padding: 0 16px;">
+                <button onclick="switchMemberProfileTab('about')" id="mp-tab-btn-about" class="member-profile-tab-btn active" style="padding: 14px 18px; font-size: 13px; font-weight: 800; border: none; background: transparent; cursor: pointer; color: var(--brand-forest); border-bottom: 3px solid var(--brand-forest); transition: all 0.2s;">
+                    👤 {{ __('Profile & About') }}
+                </button>
+                <button onclick="switchMemberProfileTab('tasks')" id="mp-tab-btn-tasks" class="member-profile-tab-btn" style="padding: 14px 18px; font-size: 13px; font-weight: 700; border: none; background: transparent; cursor: pointer; color: var(--text-secondary); border-bottom: 3px solid transparent; transition: all 0.2s;">
+                    📋 {{ __('Assigned Tasks') }} <span id="mp-tasks-count-pill" class="nav-badge-pill" style="font-size: 10px; margin-inline-start: 4px;">0</span>
+                </button>
+                <button onclick="switchMemberProfileTab('time')" id="mp-tab-btn-time" class="member-profile-tab-btn" style="padding: 14px 18px; font-size: 13px; font-weight: 700; border: none; background: transparent; cursor: pointer; color: var(--text-secondary); border-bottom: 3px solid transparent; transition: all 0.2s;">
+                    ⏱️ {{ __('Work Time & Logs') }} <span id="mp-hours-count-pill" class="nav-badge-pill" style="font-size: 10px; margin-inline-start: 4px;">0h</span>
+                </button>
+            </div>
+
+            <!-- Profile Content Body -->
+            <div style="flex: 1; overflow-y: auto; padding: 24px; max-height: calc(90vh - 200px);">
+                
+                <!-- TAB 1: ABOUT & INFO -->
+                <div id="mp-tab-content-about" style="display: flex; flex-direction: column; gap: 20px;">
+                    
+                    <!-- Contact Cards Grid -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+                        <div style="background: var(--bg-surface-subtle); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-inset-3d);">
+                            <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">✉️ {{ __('Email Address') }}</div>
+                            <div id="mp-info-email" style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-top: 4px; word-break: break-all;">user@company.com</div>
+                        </div>
+                        <div style="background: var(--bg-surface-subtle); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-inset-3d);">
+                            <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">📱 {{ __('Phone') }}</div>
+                            <div id="mp-info-phone" style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-top: 4px;">—</div>
+                        </div>
+                        <div style="background: var(--bg-surface-subtle); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-inset-3d);">
+                            <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">🎂 {{ __('Birthday') }}</div>
+                            <div id="mp-info-dob" style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-top: 4px;">—</div>
+                        </div>
+                        <div style="background: var(--bg-surface-subtle); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-inset-3d);">
+                            <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">📅 {{ __('Joined Workspace') }}</div>
+                            <div id="mp-info-joined" style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-top: 4px;">Jan 01, 2026</div>
+                        </div>
+                    </div>
+
+                    <!-- Bio Section -->
+                    <div style="background: var(--bg-surface-subtle); padding: 16px; border-radius: 14px; border: 1px solid var(--border-color); box-shadow: var(--shadow-inset-3d);">
+                        <div style="font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">📝 {{ __('About / Biography') }}</div>
+                        <div id="mp-info-bio" style="font-size: 13px; line-height: 1.6; color: var(--text-primary); font-weight: 500;">No bio provided.</div>
+                    </div>
+
+                    <!-- Skills & Hobbies in 2 Columns -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div style="background: var(--bg-surface-subtle); padding: 16px; border-radius: 14px; border: 1px solid var(--border-color); box-shadow: var(--shadow-inset-3d);">
+                            <div style="font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">⚡ {{ __('Skills & Expertise') }}</div>
+                            <div id="mp-info-skills" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                <span style="font-size: 11px; color: var(--text-muted);">—</span>
+                            </div>
+                        </div>
+                        <div style="background: var(--bg-surface-subtle); padding: 16px; border-radius: 14px; border: 1px solid var(--border-color); box-shadow: var(--shadow-inset-3d);">
+                            <div style="font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">🎯 {{ __('Hobbies & Interests') }}</div>
+                            <div id="mp-info-hobbies" style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                <span style="font-size: 11px; color: var(--text-muted);">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Media Links -->
+                    <div style="background: var(--bg-surface-subtle); padding: 16px; border-radius: 14px; border: 1px solid var(--border-color); box-shadow: var(--shadow-inset-3d);">
+                        <div style="font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 10px;">🌐 {{ __('Social Profiles & Portfolio') }}</div>
+                        <div id="mp-info-socials" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <span style="font-size: 11px; color: var(--text-muted);">—</span>
+                        </div>
+                    </div>
+
+                    <!-- Notes -->
+                    <div id="mp-notes-container" style="background: var(--bg-surface-subtle); padding: 16px; border-radius: 14px; border: 1px solid var(--border-color); box-shadow: var(--shadow-inset-3d); display: none;">
+                        <div style="font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">📌 {{ __('Work Preferences & Notes') }}</div>
+                        <div id="mp-info-notes" style="font-size: 12px; color: var(--text-primary); line-height: 1.5;"></div>
+                    </div>
+
+                </div>
+
+                <!-- TAB 2: ASSIGNED TASKS -->
+                <div id="mp-tab-content-tasks" style="display: none; flex-direction: column; gap: 16px;">
+                    
+                    <!-- Tasks KPIs Summary -->
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+                        <div class="kpi-card" style="margin-bottom: 0; padding: 14px;">
+                            <div class="kpi-title" style="font-size: 11px;">{{ __('Total Tasks') }}</div>
+                            <div id="mp-task-stat-total" class="kpi-value" style="font-size: 20px;">0</div>
+                        </div>
+                        <div class="kpi-card" style="margin-bottom: 0; padding: 14px;">
+                            <div class="kpi-title" style="font-size: 11px;">{{ __('In Progress') }}</div>
+                            <div id="mp-task-stat-progress" class="kpi-value" style="font-size: 20px; color: var(--brand-forest);">0</div>
+                        </div>
+                        <div class="kpi-card" style="margin-bottom: 0; padding: 14px;">
+                            <div class="kpi-title" style="font-size: 11px;">{{ __('Pending / Ready') }}</div>
+                            <div id="mp-task-stat-pending" class="kpi-value" style="font-size: 20px; color: var(--status-warning);">0</div>
+                        </div>
+                        <div class="kpi-card" style="margin-bottom: 0; padding: 14px;">
+                            <div class="kpi-title" style="font-size: 11px;">{{ __('Completed') }}</div>
+                            <div id="mp-task-stat-done" class="kpi-value" style="font-size: 20px; color: #4F9B5F;">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Tasks Feed Container -->
+                    <div id="mp-tasks-list-container" style="display: flex; flex-direction: column; gap: 8px;">
+                        <div style="text-align: center; color: var(--text-muted); font-size: 12px; padding: 24px;">
+                            {{ __('No tasks assigned to this member.') }}
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- TAB 3: WORK TIME & LOGS -->
+                <div id="mp-tab-content-time" style="display: none; flex-direction: column; gap: 16px;">
+                    
+                    <!-- Time KPIs -->
+                    <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 14px;">
+                        <div class="kpi-card" style="margin-bottom: 0; padding: 16px; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <div class="kpi-title" style="font-size: 11px;">{{ __('Total Logged Effort') }}</div>
+                                <div id="mp-time-total-hours" class="kpi-value" style="font-size: 24px; color: var(--brand-forest);">0.0h</div>
+                                <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">{{ __('Tracked across all initiatives') }}</div>
+                            </div>
+                            <div style="font-size: 32px;">⏱️</div>
+                        </div>
+
+                        <div id="mp-active-timer-box" class="kpi-card" style="margin-bottom: 0; padding: 16px; background: rgba(79, 155, 95, 0.1); border: 1px solid rgba(79, 155, 95, 0.3);">
+                            <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; color: #4F9B5F;">
+                                <span style="animation: pulse 1.5s infinite;">🟢</span> {{ __('Live Stopwatch Status') }}
+                            </div>
+                            <div id="mp-active-timer-text" style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-top: 6px;">
+                                {{ __('No active timer running') }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Time Entries History Table -->
+                    <div class="card" style="margin-bottom: 0; padding: 0; overflow: hidden; border-radius: var(--radius-lg);">
+                        <div style="padding: 12px 16px; background: var(--bg-surface-subtle); border-bottom: 1px solid var(--border-color); font-size: 12px; font-weight: 800; color: var(--text-primary);">
+                            ⏱️ {{ __('Recent Work Logs') }}
+                        </div>
+                        <div style="overflow-x: auto;">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>{{ __('Date') }}</th>
+                                        <th>{{ __('Project / Initiative') }}</th>
+                                        <th>{{ __('Task') }}</th>
+                                        <th>{{ __('Duration') }}</th>
+                                        <th>{{ __('Description') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="mp-time-entries-tbody">
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 20px;">{{ __('No work logs recorded yet.') }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
         </div>
     </div>
 
@@ -4778,6 +5344,111 @@
         </div>
     </div>
 
+    <!-- Modal: Edit Complete Member Information -->
+    <div id="edit-member-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 520px;">
+            <div class="modal-header">
+                <h3 class="modal-title">✏️ {{ __('Edit Team Member (تعديل بيانات المستخدم)') }}</h3>
+                <button onclick="closeEditMemberModal()" class="modal-close">✕</button>
+            </div>
+            <form id="edit-member-form" method="POST" action="" style="display: flex; flex-direction: column; gap: 14px;">
+                @csrf
+                @method('PUT')
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Full Name (الاسم)') }} *</label>
+                        <input type="text" name="name" id="edit-member-name-input" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Email Address (البريد الإلكتروني)') }} *</label>
+                        <input type="email" name="email" id="edit-member-email-input" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Department (القسم)') }}</label>
+                        <select name="department_id" id="edit-member-dept-select" onchange="filterTeamsForEditMember(this.value)" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                            <option value="">— {{ __('No Department') }} —</option>
+                            @foreach($departments as $d)
+                                <option value="{{ $d->id }}">{{ $d->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Sub-Team (الفريق الفرعي)') }}</label>
+                        <select name="team_id" id="edit-member-team-select" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                            <option value="">— {{ __('No Team') }} —</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Job Title (المسمى الوظيفي)') }}</label>
+                    <input type="text" name="job_title" id="edit-member-job-title" placeholder="e.g. Senior Project Manager, Software Engineer" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Access Role (الدور / الصلاحية)') }} *</label>
+                        <select name="role_id" id="edit-member-role-select" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                            @foreach($roles as $role)
+                                <option value="{{ $role->id }}">{{ $role->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Account Status (حالة الحساب)') }} *</label>
+                        <select name="status" id="edit-member-status-select" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                            <option value="active">🟢 {{ __('Active (نشط)') }}</option>
+                            <option value="suspended">🔴 {{ __('Suspended (معلق)') }}</option>
+                            <option value="invited">✉️ {{ __('Invited (مدعو)') }}</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="header-btn btn-primary" style="margin-top: 8px; padding: 12px; font-size: 14px; justify-content: center;">
+                    💾 {{ __('Save Member Changes (حفظ التعديلات)') }}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Change Member Password -->
+    <div id="change-member-password-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 440px;">
+            <div class="modal-header">
+                <h3 class="modal-title">🔑 {{ __('Reset Member Password (تغيير كلمة المرور)') }}</h3>
+                <button onclick="closeChangeMemberPasswordModal()" class="modal-close">✕</button>
+            </div>
+            <form id="change-member-password-form" method="POST" action="" style="display: flex; flex-direction: column; gap: 14px;">
+                @csrf
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('User Name (المستخدم)') }}</label>
+                    <div id="change-password-user-name" style="font-size: 14px; font-weight: 800; color: var(--brand-forest); background: var(--bg-elevated); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                        User Name
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('New Password (كلمة المرور الجديدة)') }} *</label>
+                    <input type="password" name="password" required minlength="8" placeholder="••••••••" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    <span style="font-size: 11px; color: var(--text-muted); margin-top: 2px; display: block;">{{ __('Minimum 8 characters') }}</span>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Confirm New Password (تأكيد كلمة المرور)') }} *</label>
+                    <input type="password" name="password_confirmation" required minlength="8" placeholder="••••••••" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                </div>
+
+                <button type="submit" class="header-btn btn-primary" style="margin-top: 8px; padding: 12px; font-size: 14px; justify-content: center; background: linear-gradient(135deg, #D6A23A 0%, #B88628 100%);">
+                    🔑 {{ __('Update Password (تعيين كلمة المرور)') }}
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- 🌟 CLICKUP-PARITY 3D TASK CONTEXT MENU 🌟 -->
     <div id="task-context-menu" class="task-context-menu" onclick="event.stopPropagation();">
         <div class="ctx-quick-header">
@@ -4924,6 +5595,14 @@
             }
         }
 
+        // Mobile drawer toggle
+        function toggleDashboardSidebar() {
+            const sidebar = document.getElementById('dashboardSidebar');
+            if (sidebar) {
+                sidebar.classList.toggle('open');
+            }
+        }
+
         // Restore sidebar state on load
         if (localStorage.getItem('vw_sidebar_collapsed') === '1') {
             document.addEventListener('DOMContentLoaded', () => {
@@ -5004,24 +5683,40 @@
                 }
             }
 
+            // Close mobile sidebar if open
+            const sidebar = document.getElementById('dashboardSidebar');
+            if (sidebar && window.innerWidth <= 900) {
+                sidebar.classList.remove('open');
+            }
+
             const breadcrumb = document.getElementById('current-tab-breadcrumb');
             if (breadcrumb) {
                 breadcrumb.textContent = tabName.replace('-', ' ');
             }
 
-            // Highlight corresponding sidebar button & expand its parent accordion if collapsed
-            document.querySelectorAll('.nav-tab-btn').forEach(btn => {
-                const onclickAttr = btn.getAttribute('onclick') || '';
-                if (onclickAttr.includes(`'${tabName}'`) || onclickAttr.includes(`"${tabName}"`)) {
-                    btn.classList.add('active');
-                    const parentAccordion = btn.closest('.sidebar-accordion');
-                    if (parentAccordion && parentAccordion.classList.contains('collapsed')) {
-                        parentAccordion.classList.remove('collapsed');
-                    }
+            // Highlight corresponding sidebar button by ID or onclick match & expand parent accordion
+            const directNavBtn = document.getElementById(`nav-btn-${tabName}`);
+            if (directNavBtn) {
+                directNavBtn.classList.add('active');
+                const parentAccordion = directNavBtn.closest('.sidebar-accordion');
+                if (parentAccordion && parentAccordion.classList.contains('collapsed')) {
+                    parentAccordion.classList.remove('collapsed');
                 }
-            });
+            } else {
+                document.querySelectorAll('.nav-tab-btn').forEach(btn => {
+                    const onclickAttr = btn.getAttribute('onclick') || '';
+                    if (onclickAttr.includes(`'${tabName}'`) || onclickAttr.includes(`"${tabName}"`)) {
+                        btn.classList.add('active');
+                        const parentAccordion = btn.closest('.sidebar-accordion');
+                        if (parentAccordion && parentAccordion.classList.contains('collapsed')) {
+                            parentAccordion.classList.remove('collapsed');
+                        }
+                    }
+                });
+            }
             const titles = {
                 'overview': '{{ __('Dashboard') }}',
+                'chat': '{{ __('Team Chat & Direct Messages') }}',
                 'rooms': '{{ __('Rooms & Doors') }}',
                 'members': '{{ __('People & Roles') }}',
                 'meetings': '{{ __('Scheduled Meetings & Live Sessions') }}',
@@ -5039,6 +5734,7 @@
             };
             const subtitles = {
                 'overview': '{{ __('Welcome to your virtual workspace') }}',
+                'chat': '{{ __('Realtime company communication, direct colleague messaging, and team channels') }}',
                 'rooms': '{{ __('Collaborative 2D & 3D space management') }}',
                 'members': '{{ __('Team roster, departments, and permissions') }}',
                 'meetings': '{{ __('Scheduled video rooms, attendee sync, and sound alerts') }}',
@@ -5059,6 +5755,10 @@
             const headerSub = document.getElementById('page-primary-subtitle');
             if (headerTitle && titles[tabName]) headerTitle.textContent = titles[tabName];
             if (headerSub && subtitles[tabName]) headerSub.textContent = subtitles[tabName];
+
+            if (tabName === 'chat') {
+                loadChatConversations();
+            }
         }
 
         // Global Live Search Filter
@@ -5185,6 +5885,55 @@
 
         function closeAssignModal() {
             document.getElementById('assign-modal').style.display = 'none';
+        }
+
+        // ── Edit Member Modal ──
+        function openEditMemberModal(memberId, name, email, deptId, teamId, roleId, jobTitle, status) {
+            document.getElementById('edit-member-form').action = `/organization/members/${memberId}`;
+            document.getElementById('edit-member-name-input').value = name || '';
+            document.getElementById('edit-member-email-input').value = email || '';
+            document.getElementById('edit-member-dept-select').value = deptId || '';
+            filterTeamsForEditMember(deptId, teamId);
+            document.getElementById('edit-member-job-title').value = jobTitle || '';
+            if (roleId) {
+                document.getElementById('edit-member-role-select').value = roleId;
+            }
+            if (status) {
+                document.getElementById('edit-member-status-select').value = status;
+            }
+            document.getElementById('edit-member-modal').style.display = 'flex';
+        }
+
+        function filterTeamsForEditMember(deptId, selectedTeamId = '') {
+            const teamSelect = document.getElementById('edit-member-team-select');
+            teamSelect.innerHTML = '<option value="">— {{ __('No Team') }} —</option>';
+            if (!deptId) return;
+
+            const filtered = ALL_TEAMS.filter(t => t.department_id == deptId);
+            filtered.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.id;
+                opt.textContent = t.name;
+                if (selectedTeamId && t.id == selectedTeamId) {
+                    opt.selected = true;
+                }
+                teamSelect.appendChild(opt);
+            });
+        }
+
+        function closeEditMemberModal() {
+            document.getElementById('edit-member-modal').style.display = 'none';
+        }
+
+        // ── Change Password Modal ──
+        function openChangeMemberPasswordModal(memberId, userName) {
+            document.getElementById('change-member-password-form').action = `/organization/members/${memberId}/password`;
+            document.getElementById('change-password-user-name').textContent = userName || 'User';
+            document.getElementById('change-member-password-modal').style.display = 'flex';
+        }
+
+        function closeChangeMemberPasswordModal() {
+            document.getElementById('change-member-password-modal').style.display = 'none';
         }
 
         function openInviteModal() {
@@ -6440,6 +7189,17 @@
             document.getElementById('task-modal-priority-badge').textContent = (t.priority || 'medium').toUpperCase();
             document.getElementById('task-modal-project').textContent = t.project ? t.project.name : 'General';
             document.getElementById('task-modal-assignee').textContent = t.assignee ? t.assignee.name : 'Unassigned';
+            
+            window.currentModalTaskAssigneeMemberId = null;
+            if (t.assignee) {
+                if (t.assignee.member_id) {
+                    window.currentModalTaskAssigneeMemberId = t.assignee.member_id;
+                } else if (typeof cachedChatMembers !== 'undefined' && cachedChatMembers.length) {
+                    const matched = cachedChatMembers.find(m => m.user_id == t.assignee.id);
+                    if (matched) window.currentModalTaskAssigneeMemberId = matched.id;
+                }
+            }
+
             document.getElementById('task-modal-due').textContent = t.due_date ? new Date(t.due_date).toLocaleDateString() : '—';
             document.getElementById('task-modal-status-select').value = t.status || 'backlog';
             document.getElementById('task-modal-description').textContent = t.description || 'No description provided.';
@@ -6758,6 +7518,529 @@
 
         setInterval(checkMeetingAlarms, 20000);
         setTimeout(checkMeetingAlarms, 2500);
+
+        // ═════════════════════════════════════════════════════════════════════
+        // 💬 REALTIME TEAM CHAT & DIRECT MESSAGES SYSTEM
+        // ═════════════════════════════════════════════════════════════════════
+        let activeChatChannelId = null;
+        let activeChatTargetUserId = null;
+        let activeChatMemberId = null;
+        let chatPollingInterval = null;
+        let cachedChatMembers = [];
+        let cachedChatChannels = [];
+        let currentUserId = "{{ Auth::id() }}";
+
+        async function loadChatConversations(isManual = false) {
+            try {
+                const res = await fetch("{{ route('chat.conversations') }}", {
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+                cachedChatChannels = data.channels || [];
+                cachedChatMembers = data.members || [];
+                currentUserId = data.current_user_id || currentUserId;
+
+                renderChatRoster(cachedChatChannels, cachedChatMembers);
+
+                if (isManual) {
+                    showToastNotification('💬 {{ __('Messages and channels updated.') }}');
+                }
+
+                // If currently viewing a chat, refresh its messages
+                if (activeChatChannelId) {
+                    fetchChatMessages(activeChatChannelId, false);
+                }
+            } catch (err) {
+                console.error('Failed to load chat conversations:', err);
+            }
+        }
+
+        function renderChatRoster(channels, members) {
+            const channelsContainer = document.getElementById('chat-channels-list');
+            const membersContainer = document.getElementById('chat-members-list');
+            const rosterCount = document.getElementById('chat-roster-count');
+
+            if (rosterCount) rosterCount.textContent = members.length;
+
+            // Render Channels
+            if (channelsContainer) {
+                if (!channels.length) {
+                    channelsContainer.innerHTML = `<div style="padding: 10px 12px; font-size: 11px; color: var(--text-muted); text-align: center;">{{ __('No channels found') }}</div>`;
+                } else {
+                    channelsContainer.innerHTML = channels.map(c => {
+                        const isActive = activeChatChannelId === c.id;
+                        const icon = c.type === 'announcement' ? '📢' : (c.type === 'room' ? '🚪' : '#');
+                        return `
+                            <div onclick="selectChatChannel('${c.id}', '${escapeHtml(c.name)}', '${c.type}', null, null)"
+                                 class="chat-roster-item"
+                                 data-name="${escapeHtml(c.name).toLowerCase()}"
+                                 style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 10px; cursor: pointer; transition: all 0.2s; background: ${isActive ? 'rgba(79, 155, 95, 0.15)' : 'transparent'}; border: 1px solid ${isActive ? 'rgba(79, 155, 95, 0.35)' : 'transparent'};"
+                                 onmouseover="if(!${isActive}) this.style.background='var(--bg-surface)'"
+                                 onmouseout="if(!${isActive}) this.style.background='transparent'">
+                                <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                                    <span style="font-weight: 900; color: var(--brand-forest); font-size: 13px;">${icon}</span>
+                                    <span style="font-size: 12px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${c.name}</span>
+                                </div>
+                                ${c.last_message ? `<span style="font-size: 10px; color: var(--text-muted);">${c.last_message.created_at}</span>` : ''}
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+
+            // Render Direct Messages Roster
+            if (membersContainer) {
+                if (!members.length) {
+                    membersContainer.innerHTML = `<div style="padding: 10px 12px; font-size: 11px; color: var(--text-muted); text-align: center;">{{ __('No colleagues found') }}</div>`;
+                } else {
+                    membersContainer.innerHTML = members.map(m => {
+                        const isSelected = activeChatTargetUserId === m.user_id;
+                        const initials = (m.name || 'User').substring(0, 2).toUpperCase();
+                        const lastMsgPreview = m.last_message ? (m.last_message.is_mine ? `{{ __('You') }}: ` : '') + m.last_message.body : m.job_title;
+
+                        return `
+                            <div onclick="openChatWithUser('${m.user_id}')"
+                                 class="chat-roster-item"
+                                 data-name="${escapeHtml(m.name).toLowerCase()} ${escapeHtml(m.nickname || '').toLowerCase()} ${escapeHtml(m.job_title || '').toLowerCase()}"
+                                 style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; cursor: pointer; transition: all 0.2s; background: ${isSelected ? 'rgba(79, 155, 95, 0.15)' : 'transparent'}; border: 1px solid ${isSelected ? 'rgba(79, 155, 95, 0.35)' : 'transparent'};"
+                                 onmouseover="if(!${isSelected}) this.style.background='var(--bg-surface)'"
+                                 onmouseout="if(!${isSelected}) this.style.background='transparent'">
+                                <div style="position: relative; width: 34px; height: 34px; border-radius: 10px; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; color: white; flex-shrink: 0; box-shadow: var(--shadow-soft-3d); overflow: hidden;">
+                                    ${m.avatar_url ? `<img src="${m.avatar_url}" style="width:100%;height:100%;object-fit:cover;">` : initials}
+                                    <div style="position: absolute; bottom: -1px; inset-inline-end: -1px; width: 10px; height: 10px; border-radius: 50%; background: #4F9B5F; border: 2px solid var(--bg-surface-subtle);" title="Online"></div>
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="font-size: 12px; font-weight: 800; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                            ${escapeHtml(m.name)} ${m.is_self ? '<span style="font-size: 10px; color: var(--text-muted);">({{ __('You') }})</span>' : ''}
+                                        </span>
+                                        ${m.last_message ? `<span style="font-size: 9px; color: var(--text-muted); margin-inline-start: 4px;">${m.last_message.created_at}</span>` : ''}
+                                    </div>
+                                    <div style="font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px;">
+                                        ${escapeHtml(lastMsgPreview)}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+        }
+
+        function filterChatRoster() {
+            const q = (document.getElementById('chat-search-input').value || '').toLowerCase().trim();
+            document.querySelectorAll('.chat-roster-item').forEach(item => {
+                const name = item.getAttribute('data-name') || '';
+                item.style.display = (!q || name.includes(q)) ? 'flex' : 'none';
+            });
+        }
+
+        async function openChatWithUser(targetUserId) {
+            switchAdminTab('chat');
+            try {
+                const res = await fetch(`{{ url('/chat/dm') }}/${targetUserId}`, {
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (!res.ok) throw new Error('Failed to initiate direct message.');
+                const data = await res.json();
+                const channel = data.channel;
+                const targetUser = data.target_user;
+
+                // Find corresponding memberId
+                const memberObj = cachedChatMembers.find(m => m.user_id == targetUserId);
+                activeChatMemberId = memberObj ? memberObj.id : null;
+
+                selectChatChannel(channel.id, targetUser.name, 'dm', targetUserId, activeChatMemberId);
+            } catch (err) {
+                console.error(err);
+                showToastNotification('❌ ' + err.message);
+            }
+        }
+
+        function selectFirstColleagueChat() {
+            if (cachedChatMembers && cachedChatMembers.length) {
+                const firstOther = cachedChatMembers.find(m => !m.is_self) || cachedChatMembers[0];
+                openChatWithUser(firstOther.user_id);
+            } else if (cachedChatChannels && cachedChatChannels.length) {
+                const firstCh = cachedChatChannels[0];
+                selectChatChannel(firstCh.id, firstCh.name, firstCh.type, null, null);
+            }
+        }
+
+        function selectChatChannel(channelId, channelName, channelType, targetUserId = null, memberId = null) {
+            activeChatChannelId = channelId;
+            activeChatTargetUserId = targetUserId;
+            activeChatMemberId = memberId;
+
+            // Hide empty state, show active state
+            const emptyState = document.getElementById('chat-empty-state');
+            const activeState = document.getElementById('chat-active-state');
+            if (emptyState) emptyState.style.display = 'none';
+            if (activeState) activeState.style.display = 'flex';
+
+            // Update Header Info
+            const titleEl = document.getElementById('chat-active-title');
+            const subtitleEl = document.getElementById('chat-active-subtitle');
+            const badgeEl = document.getElementById('chat-active-badge');
+            const avatarBox = document.getElementById('chat-active-avatar-box');
+            const avatarInitials = document.getElementById('chat-active-avatar-initials');
+            const profileBtn = document.getElementById('chat-view-profile-btn');
+
+            if (titleEl) titleEl.textContent = channelType === 'dm' ? channelName : '#' + channelName;
+            if (badgeEl) badgeEl.textContent = channelType === 'dm' ? 'Direct Message' : 'Channel';
+
+            if (channelType === 'dm') {
+                const memberObj = cachedChatMembers.find(m => m.user_id == targetUserId);
+                if (memberObj) {
+                    activeChatMemberId = memberObj.id;
+                    if (subtitleEl) subtitleEl.textContent = `${memberObj.job_title} • ${memberObj.role}`;
+                }
+                if (avatarInitials) avatarInitials.textContent = (channelName || 'U').substring(0, 2).toUpperCase();
+                if (profileBtn) profileBtn.style.display = 'inline-flex';
+            } else {
+                if (subtitleEl) subtitleEl.textContent = `Company Channel • All Members`;
+                if (avatarInitials) avatarInitials.textContent = '#';
+                if (profileBtn) profileBtn.style.display = 'none';
+            }
+
+            renderChatRoster(cachedChatChannels, cachedChatMembers);
+            fetchChatMessages(channelId, true);
+
+            // Focus input
+            setTimeout(() => {
+                const input = document.getElementById('chat-message-input');
+                if (input) input.focus();
+            }, 100);
+
+            // Start auto polling
+            if (chatPollingInterval) clearInterval(chatPollingInterval);
+            chatPollingInterval = setInterval(() => {
+                if (activeChatChannelId && document.getElementById('tab-chat')?.classList.contains('active')) {
+                    fetchChatMessages(activeChatChannelId, false);
+                }
+            }, 3500);
+        }
+
+        async function fetchChatMessages(channelId, scrollToBottom = true) {
+            try {
+                const res = await fetch(`{{ url('/chat/channels') }}/${channelId}/messages`, {
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+                const container = document.getElementById('chat-messages-container');
+                if (!container) return;
+
+                if (!data.messages || !data.messages.length) {
+                    container.innerHTML = `
+                        <div style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 40px;">
+                            <div style="font-size: 28px; margin-bottom: 8px;">👋</div>
+                            <div style="font-weight: 700;">{{ __('No messages in this conversation yet.') }}</div>
+                            <div style="font-size: 11px; margin-top: 4px;">{{ __('Send a message below to start the discussion!') }}</div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = data.messages.map(msg => {
+                    const isMine = msg.is_mine;
+                    const initials = (msg.sender.name || 'U').substring(0, 2).toUpperCase();
+
+                    return `
+                        <div style="display: flex; gap: 10px; align-items: flex-end; justify-content: ${isMine ? 'flex-end' : 'flex-start'};">
+                            ${!isMine ? `
+                                <div style="width: 30px; height: 30px; border-radius: 8px; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: white; flex-shrink: 0; box-shadow: var(--shadow-soft-3d); overflow: hidden;">
+                                    ${msg.sender.avatar_url ? `<img src="${msg.sender.avatar_url}" style="width:100%;height:100%;object-fit:cover;">` : initials}
+                                </div>
+                            ` : ''}
+
+                            <div style="max-width: 70%; display: flex; flex-direction: column; align-items: ${isMine ? 'flex-end' : 'flex-start'};">
+                                ${!isMine ? `<span style="font-size: 10px; font-weight: 800; color: var(--text-secondary); margin-bottom: 2px; margin-inline-start: 4px;">${escapeHtml(msg.sender.name)}</span>` : ''}
+                                
+                                <div style="padding: 10px 14px; border-radius: ${isMine ? '14px 14px 2px 14px' : '14px 14px 14px 2px'}; background: ${isMine ? 'var(--accent-gradient)' : 'var(--bg-surface)'}; color: ${isMine ? '#FFFDF6' : 'var(--text-primary)'}; border: 1px solid ${isMine ? 'transparent' : 'var(--border-color)'}; box-shadow: var(--shadow-soft-3d); font-size: 13px; line-height: 1.5; word-break: break-word;">
+                                    ${escapeHtml(msg.body).replace(/\\n/g, '<br>')}
+                                </div>
+                                
+                                <span style="font-size: 9px; color: var(--text-muted); margin-top: 3px; margin-inline-start: 4px; margin-inline-end: 4px;">
+                                    ${msg.created_at}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                if (scrollToBottom) {
+                    container.scrollTop = container.scrollHeight;
+                }
+            } catch (err) {
+                console.error('Failed to fetch messages:', err);
+            }
+        }
+
+        async function handleSendChatMessage(event) {
+            if (event) event.preventDefault();
+            if (!activeChatChannelId) return;
+
+            const input = document.getElementById('chat-message-input');
+            const body = (input?.value || '').trim();
+            if (!body) return;
+
+            input.value = '';
+
+            try {
+                const res = await fetch(`{{ url('/chat/channels') }}/${activeChatChannelId}/messages`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': CSRF_TOKEN,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ body })
+                });
+
+                if (!res.ok) throw new Error('Failed to send message.');
+
+                fetchChatMessages(activeChatChannelId, true);
+                loadChatConversations(false);
+            } catch (err) {
+                showToastNotification('❌ ' + err.message);
+            }
+        }
+
+        function handleChatInputKeydown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                handleSendChatMessage();
+            }
+        }
+
+        function viewActiveChatUserProfile() {
+            if (activeChatMemberId) {
+                openMemberProfileModal(activeChatMemberId);
+            } else if (activeChatTargetUserId) {
+                const memberObj = cachedChatMembers.find(m => m.user_id == activeChatTargetUserId);
+                if (memberObj) openMemberProfileModal(memberObj.id);
+            }
+        }
+
+        // ═════════════════════════════════════════════════════════════════════
+        // 👤 COMPREHENSIVE TEAM MEMBER PROFILE MODAL SYSTEM
+        // ═════════════════════════════════════════════════════════════════════
+        let currentModalMemberData = null;
+
+        async function openMemberProfileModal(memberId) {
+            const modal = document.getElementById('member-details-modal');
+            if (!modal) return;
+
+            modal.style.display = 'flex';
+            switchMemberProfileTab('about');
+
+            // Reset placeholders
+            document.getElementById('mp-user-name').textContent = '{{ __('Loading...') }}';
+            document.getElementById('mp-info-email').textContent = '—';
+            document.getElementById('mp-info-bio').textContent = '{{ __('Fetching profile details from workspace database...') }}';
+
+            try {
+                const res = await fetch(`{{ url('/organization/members') }}/${memberId}/details`, {
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (!res.ok) throw new Error('Failed to load member profile.');
+                const data = await res.json();
+                currentModalMemberData = data;
+
+                const m = data.member;
+                const p = data.profile;
+                const s = data.stats;
+
+                // Hero Details
+                document.getElementById('mp-user-name').textContent = m.name;
+                document.getElementById('mp-user-nickname').textContent = m.nickname ? `@${m.nickname}` : `@${m.name.toLowerCase().replace(/\\s+/g, '')}`;
+                document.getElementById('mp-user-role').textContent = m.role_name;
+                document.getElementById('mp-job-title').textContent = p.job_title || m.role_name;
+                document.getElementById('mp-dept-team').textContent = `${p.department_name || '{{ __('General') }}'} • ${p.team_name || '{{ __('Core Team') }}'}`;
+                
+                const workModePill = document.getElementById('mp-work-mode');
+                if (workModePill) {
+                    const modeLabels = { 'remote': '🏠 {{ __('Remote') }}', 'hybrid': '🔄 {{ __('Hybrid') }}', 'onsite': '🏢 {{ __('On-site') }}' };
+                    workModePill.textContent = modeLabels[p.work_mode] || '🏠 {{ __('Remote') }}';
+                }
+
+                // Avatar
+                const imgEl = document.getElementById('mp-avatar-img');
+                const fallbackEl = document.getElementById('mp-avatar-fallback');
+                if (m.avatar_url) {
+                    imgEl.src = m.avatar_url;
+                    imgEl.style.display = 'block';
+                    fallbackEl.style.display = 'none';
+                } else {
+                    imgEl.style.display = 'none';
+                    fallbackEl.style.display = 'block';
+                    fallbackEl.textContent = (m.name || 'U').substring(0, 2).toUpperCase();
+                }
+
+                // Tab 1: About & Info
+                document.getElementById('mp-info-email').textContent = m.email;
+                document.getElementById('mp-info-phone').textContent = p.phone || '—';
+                document.getElementById('mp-info-dob').textContent = p.date_of_birth || '—';
+                document.getElementById('mp-info-joined').textContent = m.joined_at;
+                document.getElementById('mp-info-bio').textContent = p.bio || '{{ __('No bio or summary added yet.') }}';
+
+                // Skills
+                const skillsContainer = document.getElementById('mp-info-skills');
+                if (skillsContainer) {
+                    if (p.skills && p.skills.length) {
+                        skillsContainer.innerHTML = p.skills.map(sk => `<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F; font-size: 11px; font-weight: 700;">⚡ ${escapeHtml(sk)}</span>`).join('');
+                    } else {
+                        skillsContainer.innerHTML = `<span style="font-size: 11px; color: var(--text-muted); font-style: italic;">— {{ __('No skills listed') }} —</span>`;
+                    }
+                }
+
+                // Hobbies
+                const hobbiesContainer = document.getElementById('mp-info-hobbies');
+                if (hobbiesContainer) {
+                    if (p.hobbies && p.hobbies.length) {
+                        hobbiesContainer.innerHTML = p.hobbies.map(hb => `<span class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.15); color: #D6A23A; font-size: 11px; font-weight: 700;">🎯 ${escapeHtml(hb)}</span>`).join('');
+                    } else {
+                        hobbiesContainer.innerHTML = `<span style="font-size: 11px; color: var(--text-muted); font-style: italic;">— {{ __('No hobbies listed') }} —</span>`;
+                    }
+                }
+
+                // Social Links
+                const socialsContainer = document.getElementById('mp-info-socials');
+                if (socialsContainer) {
+                    const links = p.social_links || {};
+                    const socialHtml = [];
+                    if (links.linkedin) socialHtml.push(`<a href="${links.linkedin}" target="_blank" class="tactile-btn btn-secondary" style="font-size: 11px; padding: 4px 10px; text-decoration: none;">💼 LinkedIn</a>`);
+                    if (links.github) socialHtml.push(`<a href="${links.github}" target="_blank" class="tactile-btn btn-secondary" style="font-size: 11px; padding: 4px 10px; text-decoration: none;">🐙 GitHub</a>`);
+                    if (links.twitter) socialHtml.push(`<a href="${links.twitter}" target="_blank" class="tactile-btn btn-secondary" style="font-size: 11px; padding: 4px 10px; text-decoration: none;">🐦 X (Twitter)</a>`);
+                    if (links.website) socialHtml.push(`<a href="${links.website}" target="_blank" class="tactile-btn btn-secondary" style="font-size: 11px; padding: 4px 10px; text-decoration: none;">🌐 Website</a>`);
+
+                    socialsContainer.innerHTML = socialHtml.length ? socialHtml.join('') : `<span style="font-size: 11px; color: var(--text-muted); font-style: italic;">— {{ __('No social links attached') }} —</span>`;
+                }
+
+                // Notes
+                const notesBox = document.getElementById('mp-notes-container');
+                const notesText = document.getElementById('mp-info-notes');
+                if (p.notes) {
+                    notesBox.style.display = 'block';
+                    notesText.textContent = p.notes;
+                } else {
+                    notesBox.style.display = 'none';
+                }
+
+                // Tab 2: Assigned Tasks
+                document.getElementById('mp-tasks-count-pill').textContent = s.total_tasks;
+                document.getElementById('mp-task-stat-total').textContent = s.total_tasks;
+                document.getElementById('mp-task-stat-progress').textContent = s.in_progress_tasks;
+                document.getElementById('mp-task-stat-pending').textContent = s.pending_tasks;
+                document.getElementById('mp-task-stat-done').textContent = s.completed_tasks;
+
+                const tasksContainer = document.getElementById('mp-tasks-list-container');
+                if (tasksContainer) {
+                    if (!data.tasks || !data.tasks.length) {
+                        tasksContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 12px; padding: 30px;">{{ __('No tasks assigned to this member.') }}</div>`;
+                    } else {
+                        tasksContainer.innerHTML = data.tasks.map(t => {
+                            const priorityColors = {
+                                'urgent': 'background: rgba(217, 107, 95, 0.15); color: #D96B5F;',
+                                'high': 'background: rgba(214, 162, 58, 0.15); color: #D6A23A;',
+                                'normal': 'background: rgba(79, 155, 95, 0.15); color: #4F9B5F;',
+                                'low': 'background: rgba(148, 163, 184, 0.15); color: #64748B;'
+                            };
+                            return `
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-radius: 12px; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); box-shadow: var(--shadow-soft-3d); gap: 12px; flex-wrap: wrap;">
+                                    <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                                        <span class="nav-badge-pill" style="font-family: monospace; font-size: 10px; font-weight: 800;">#${t.task_number}</span>
+                                        <div>
+                                            <div style="font-weight: 800; font-size: 13px; color: var(--text-primary);">${escapeHtml(t.title)}</div>
+                                            <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px; font-size: 11px; color: var(--text-secondary);">
+                                                <span>📁 ${escapeHtml(t.project ? t.project.name : 'General')}</span>
+                                                ${t.due_date ? `<span>• 📅 ${t.due_date} ${t.is_overdue ? '<span style="color:#D96B5F;font-weight:800;">({{ __('Overdue') }})</span>' : ''}</span>` : ''}
+                                                ${t.checklist_count ? `<span>• ☑️ ${t.checklist_done}/${t.checklist_count}</span>` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span class="nav-badge-pill" style="${priorityColors[t.priority] || ''}; font-size: 10px; text-transform: uppercase;">${t.priority}</span>
+                                        <span class="nav-badge-pill" style="font-size: 10px;">${t.status.replace('_', ' ')}</span>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                }
+
+                // Tab 3: Work Time & Logs
+                document.getElementById('mp-hours-count-pill').textContent = `${s.total_hours_logged}h`;
+                document.getElementById('mp-time-total-hours').textContent = `${s.total_hours_logged}h`;
+
+                const timerText = document.getElementById('mp-active-timer-text');
+                if (s.active_timer) {
+                    timerText.innerHTML = `<strong>⏱️ ${s.active_timer.project_name || 'Project'}</strong>: ${s.active_timer.task_title || 'Work Session'}`;
+                } else {
+                    timerText.textContent = '{{ __('No active timer running') }}';
+                }
+
+                const tbody = document.getElementById('mp-time-entries-tbody');
+                if (tbody) {
+                    if (!data.time_entries || !data.time_entries.length) {
+                        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 20px;">{{ __('No work logs recorded yet.') }}</td></tr>`;
+                    } else {
+                        tbody.innerHTML = data.time_entries.map(te => `
+                            <tr>
+                                <td style="font-size: 12px; font-weight: 700; color: var(--text-primary);">${te.date}</td>
+                                <td style="font-size: 12px; font-weight: 700; color: var(--brand-forest);">📁 ${escapeHtml(te.project_name)}</td>
+                                <td style="font-size: 12px; color: var(--text-secondary);">${escapeHtml(te.task_title)}</td>
+                                <td><span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F; font-weight: 800;">${te.duration_hours}h</span></td>
+                                <td style="font-size: 11px; color: var(--text-muted);">${escapeHtml(te.description)}</td>
+                            </tr>
+                        `).join('');
+                    }
+                }
+
+            } catch (err) {
+                console.error(err);
+                showToastNotification('❌ ' + err.message);
+            }
+        }
+
+        function switchMemberProfileTab(tabName) {
+            document.querySelectorAll('.member-profile-tab-btn').forEach(btn => {
+                btn.style.color = 'var(--text-secondary)';
+                btn.style.borderBottomColor = 'transparent';
+                btn.classList.remove('active');
+            });
+            const activeBtn = document.getElementById(`mp-tab-btn-${tabName}`);
+            if (activeBtn) {
+                activeBtn.style.color = 'var(--brand-forest)';
+                activeBtn.style.borderBottomColor = 'var(--brand-forest)';
+                activeBtn.classList.add('active');
+            }
+
+            document.getElementById('mp-tab-content-about').style.display = tabName === 'about' ? 'flex' : 'none';
+            document.getElementById('mp-tab-content-tasks').style.display = tabName === 'tasks' ? 'flex' : 'none';
+            document.getElementById('mp-tab-content-time').style.display = tabName === 'time' ? 'flex' : 'none';
+        }
+
+        function closeMemberProfileModal() {
+            const modal = document.getElementById('member-details-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function openChatFromProfileModal() {
+            if (currentModalMemberData && currentModalMemberData.member) {
+                const targetUserId = currentModalMemberData.member.user_id;
+                closeMemberProfileModal();
+                openChatWithUser(targetUserId);
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
     </script>
 </body>
 </html>
