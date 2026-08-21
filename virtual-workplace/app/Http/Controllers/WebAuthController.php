@@ -28,6 +28,9 @@ class WebAuthController extends Controller
     public function showLogin()
     {
         if (Auth::check()) {
+            if (Auth::user()->isSuperAdmin()) {
+                return redirect()->route('superadmin.dashboard');
+            }
             return redirect()->route('dashboard');
         }
 
@@ -47,6 +50,10 @@ class WebAuthController extends Controller
         if (Auth::attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
 
+            if (Auth::user()->isSuperAdmin()) {
+                return redirect()->intended(route('superadmin.dashboard'));
+            }
+
             return redirect()->intended(route('dashboard'));
         }
 
@@ -61,6 +68,9 @@ class WebAuthController extends Controller
     public function showRegister()
     {
         if (Auth::check()) {
+            if (Auth::user()->isSuperAdmin()) {
+                return redirect()->route('superadmin.dashboard');
+            }
             return redirect()->route('dashboard');
         }
 
@@ -112,6 +122,16 @@ class WebAuthController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
+
+        // If Super Admin accesses tenant dashboard without a tenant membership, route cleanly to Super Admin Dashboard
+        if ($user->isSuperAdmin()) {
+            $hasMembership = OrganizationMember::where('user_id', $user->id)
+                ->whereIn('status', ['active', 'invited'])
+                ->exists();
+            if (!$hasMembership) {
+                return redirect()->route('superadmin.dashboard');
+            }
+        }
 
         // Get the active/invited membership
         $membership = OrganizationMember::where('user_id', $user->id)

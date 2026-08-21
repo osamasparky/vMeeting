@@ -36,6 +36,7 @@ class User extends Authenticatable
         'email',
         'password',
         'avatar_url',
+        'is_super_admin',
         'two_factor_secret',
         'two_factor_recovery_codes',
     ];
@@ -62,6 +63,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_super_admin' => 'boolean',
             'two_factor_recovery_codes' => 'array',
         ];
     }
@@ -157,10 +159,17 @@ class User extends Authenticatable
 
     public function isSuperAdmin(): bool
     {
-        $superAdminEmails = array_filter(array_map('trim', explode(',', env('SUPER_ADMIN_EMAILS', 'info@meemdtt.com'))));
-        return in_array($this->email, $superAdminEmails) ||
-            $this->memberships()->whereHas('role', function ($q) {
-                $q->where('slug', 'super_admin');
-            })->exists();
+        if ((bool)($this->is_super_admin ?? false)) {
+            return true;
+        }
+
+        $superAdminEmails = array_filter(array_map('trim', explode(',', env('SUPER_ADMIN_EMAILS', 'admin@nextspace.munazzah.com,info@meemdtt.com'))));
+        if (in_array($this->email, $superAdminEmails, true)) {
+            return true;
+        }
+
+        return $this->memberships()->whereHas('role', function ($q) {
+            $q->where('slug', 'super_admin');
+        })->exists();
     }
 }
