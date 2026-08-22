@@ -1729,12 +1729,63 @@
                         console.error('[WS] Error processing message:', err);
                     }
                 };
-                ws.onclose = () => setTimeout(connectWebSocket, 3000);
             } catch(err) {
-                setTimeout(connectWebSocket, 3000);
+                if (!wsReconnectTimer) {
+                    wsReconnectTimer = setTimeout(connectWebSocket, 3000);
+                }
             }
         }
         connectWebSocket();
+
+        function updateOccupantsCounter() {
+            const total = 1 + remoteAvatars.size;
+            const counterEl = document.getElementById('occupants-counter');
+            if (counterEl) {
+                counterEl.textContent = `${total} {{ __("Online") }}`;
+            }
+        }
+
+        function openOccupantsModal() {
+            const modal = document.getElementById('occupants-modal');
+            const list = document.getElementById('occupants-list');
+            if (!modal || !list) return;
+
+            const occupants = [
+                {
+                    id: localAvatar.id,
+                    name: `${localAvatar.name} ({{ __("You") }})`,
+                    gender: userGender,
+                    isGuest: localAvatar.isGuest,
+                    isSelf: true
+                },
+                ...Array.from(remoteAvatars.values())
+            ];
+
+            list.innerHTML = occupants.map(occ => {
+                const initials = (occ.name || 'U').substring(0, 2).toUpperCase();
+                return `
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 12px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 32px; height: 32px; border-radius: 50%; background: ${occ.isSelf ? 'var(--brand-primary)' : 'var(--brand-accent)'}; color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800;">
+                                ${initials}
+                            </div>
+                            <div>
+                                <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);">${escapeHtml(occ.name)}</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">${occ.isGuest ? '🔗 {{ __("Guest Access") }}' : '🏢 {{ __("Team Member") }}'} • ${occ.gender === 'female' ? '👩 Female' : '👨 Male'}</div>
+                            </div>
+                        </div>
+                        <span class="live-dot" style="width: 8px; height: 8px;" title="Online"></span>
+                    </div>
+                `;
+            }).join('');
+
+            modal.style.display = 'flex';
+        }
+
+        function closeOccupantsModal() {
+            const modal = document.getElementById('occupants-modal');
+            if (modal) modal.style.display = 'none';
+        }
 
         function respondToKnock(approved) {
             document.getElementById('knock-alert-modal').style.display = 'none';

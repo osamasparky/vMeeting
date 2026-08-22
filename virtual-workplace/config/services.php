@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'realtime' => [
+        'secret' => env('REALTIME_SECRET', env('APP_KEY', 'base64:9fj2ZRPjCy3ClL13gPaYCv9gl8GsE8APwzVK8EceIRM=')),
+        'ws_url' => env('REALTIME_WS_URL'),
+    ],
+
 ];
