@@ -685,11 +685,43 @@ class WebAuthController extends Controller
         $organization = $membership->organization;
         $this->ensureDefaultWorkspace($organization);
 
-        $floor = $organization->floors()->first();
+        $requestedOfficeId = request('office');
+        if ($requestedOfficeId) {
+            $floor = $organization->floors()->where('id', $requestedOfficeId)->first() ?? $organization->defaultOffice() ?? $organization->floors()->first();
+        } else {
+            $floor = $organization->defaultOffice() ?? $organization->floors()->first();
+        }
+
+        if (!$floor) {
+            $floor = $organization->floors()->create([
+                'name' => $organization->name . ' HQ',
+                'is_default' => true,
+                'order' => 1,
+            ]);
+        }
+
         $map = $organization->maps()->where('floor_id', $floor->id)->where('status', 'published')->latest('published_at')->first()
             ?? $organization->maps()->where('floor_id', $floor->id)->latest()->first();
+
+        if (!$map) {
+            $map = $organization->maps()->create([
+                'floor_id' => $floor->id,
+                'name' => $floor->name . ' Blueprint',
+                'status' => 'published',
+                'version' => 1,
+                'width' => 32,
+                'height' => 26,
+                'tile_size' => 16,
+                'layout_data' => [
+                    'theme' => 'open_spatial_blueprint',
+                    'wall_sign_text' => strtoupper($floor->name),
+                ],
+                'published_at' => now(),
+            ]);
+        }
+
         $map->load(['rooms', 'zones', 'objects', 'versions']);
-        $floors = $organization->floors()->get();
+        $floors = $organization->floors()->orderBy('is_default', 'desc')->orderBy('name', 'asc')->get();
 
         $furnitureCategories = Cache::remember('furniture_categories_with_items', 86400, function () {
             return \App\Domains\Workspace\Models\FurnitureCategory::with('items')
@@ -1325,7 +1357,7 @@ class WebAuthController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255'],
-            'role_id' => ['required', 'uuid', 'exists:roles,id'],
+            'role_id' => ['required', 'exists:roles,id'],
             'password' => ['nullable', 'string', 'min:8'],
             'job_title' => ['nullable', 'string', 'max:255'],
             'department_id' => ['nullable', 'uuid', 'exists:departments,id'],
@@ -1448,7 +1480,7 @@ class WebAuthController extends Controller
             'job_title' => ['nullable', 'string', 'max:255'],
             'department_id' => ['nullable', 'uuid', 'exists:departments,id'],
             'team_id' => ['nullable', 'uuid', 'exists:teams,id'],
-            'role_id' => ['required', 'uuid', 'exists:roles,id'],
+            'role_id' => ['required', 'exists:roles,id'],
             'status' => ['required', 'in:active,invited,suspended'],
             'allowed_offices' => ['nullable', 'array'],
             'allowed_offices.*' => ['uuid', 'exists:floors,id'],

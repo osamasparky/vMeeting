@@ -119,37 +119,120 @@
         }
 
         /* ── Tools Bar ── */
+        .segmented-tool-pill {
+            display: flex;
+            align-items: center;
+            background: rgba(11, 22, 16, 0.9);
+            border: 1px solid var(--border-panel);
+            border-radius: 12px;
+            padding: 3px;
+            gap: 2px;
+        }
+
         .tool-btn {
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 7px 13px;
-            background: var(--bg-input);
-            border: 1px solid var(--border-panel);
+            padding: 6px 12px;
+            background: transparent;
+            border: 1px solid transparent;
             border-radius: 9px;
             color: var(--text-muted);
             font-size: 12px;
             font-weight: 800;
             cursor: pointer;
-            transition: all 0.18s;
+            transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .tool-btn:hover {
-            background: rgba(52, 211, 153, 0.08);
-            border-color: rgba(52, 211, 153, 0.3);
+            background: rgba(52, 211, 153, 0.1);
             color: var(--text-main);
         }
         .tool-btn.active {
-            background: rgba(16, 185, 129, 0.18);
-            border-color: var(--brand-primary);
+            background: rgba(16, 185, 129, 0.22);
+            border-color: rgba(52, 211, 153, 0.45);
             color: #6EE7B7;
-            box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+        }
+
+        .tool-icon-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-panel);
+            border-radius: 10px;
+            color: var(--text-muted);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.18s;
+        }
+        .tool-icon-btn:hover {
+            background: rgba(52, 211, 153, 0.12);
+            border-color: var(--brand-primary);
+            color: var(--text-main);
+            transform: scale(1.05);
+        }
+        .tool-icon-btn.danger:hover {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.5);
+            color: #F87171;
+        }
+
+        /* ── Editor Dropdowns ── */
+        .editor-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            inset-inline-start: 0;
+            background: rgba(14, 28, 20, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(52, 211, 153, 0.25);
+            border-radius: 12px;
+            box-shadow: 0 16px 36px rgba(0,0,0,0.6);
+            padding: 6px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            animation: fadeInDown 0.15s ease;
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .editor-dropdown-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            text-align: start;
+            transition: background 0.15s ease;
+        }
+        .editor-dropdown-item:hover {
+            background: rgba(52, 211, 153, 0.12);
+            color: #6EE7B7;
+        }
+        .editor-dropdown-item.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6EE7B7;
         }
 
         .act-btn {
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 8px 14px;
+            padding: 7px 12px;
             border-radius: 10px;
             font-size: 12px;
             font-weight: 800;
@@ -553,73 +636,118 @@
 
     <!-- ── Header Navigation ── -->
     <header class="editor-header">
+        <!-- Left: Navigation & Branch Selector -->
         <div class="header-left">
-            <a href="{{ route('office') }}" class="brand-btn">
-                <span>🏢</span>
-                <span>{{ __('Virtual Office') }}</span>
+            <a href="{{ route('dashboard') }}" class="brand-btn" title="{{ __('Back to Dashboard') }}">
+                <span>📊</span>
+                <span>{{ __('Dashboard') }}</span>
             </a>
-            <div class="map-meta" style="display: flex; align-items: center; gap: 8px;">
-                @if(!empty($organization->logo_url))
-                    <img src="{{ $organization->logo_url }}" alt="{{ $organization->name }}" style="width: 28px; height: 28px; border-radius: 6px; object-fit: contain; background: rgba(255,255,255,0.08); padding: 2px;">
-                @elseif(!empty($organization->settings?->logo_url))
-                    <img src="{{ $organization->settings->logo_url }}" alt="{{ $organization->name }}" style="width: 28px; height: 28px; border-radius: 6px; object-fit: contain; background: rgba(255,255,255,0.08); padding: 2px;">
-                @endif
-                <div>
-                    <div class="map-name">
-                        {{ __('Map Editor') }}: {{ $map->name }}
-                        <span style="color: var(--text-muted); font-size: 11px;">({{ $organization->name }})</span>
+
+            <!-- Office / Branch Switcher Dropdown -->
+            <div style="position: relative; display: inline-block;">
+                <button type="button" onclick="toggleBranchDropdown(event)" class="brand-btn" style="background: rgba(16, 185, 129, 0.12); border-color: rgba(52, 211, 153, 0.35); color: #6EE7B7; display: flex; align-items: center; gap: 8px;" title="{{ __('Select Office Branch to Edit') }}">
+                    <span>🏢</span>
+                    <span style="max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $floor->name }}</span>
+                    <span style="font-size: 8px; opacity: 0.7;">▼</span>
+                </button>
+
+                <div id="branch-select-dropdown" class="editor-dropdown-menu" style="display: none; min-width: 230px;">
+                    <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); padding: 8px 12px; border-bottom: 1px solid var(--border-card);">
+                        🏢 {{ __('Select Office Branch (اختر الفرع للتعديل)') }}
                     </div>
-                    <span class="map-version-badge" id="header-version-badge">v{{ $map->version }} ({{ ucfirst($map->status) }})</span>
+                    @foreach($floors as $f)
+                    <a href="{{ route('editor', ['office' => $f->id]) }}" class="editor-dropdown-item {{ $f->id === $floor->id ? 'active' : '' }}">
+                        <div style="display: flex; flex-direction: column; gap: 2px;">
+                            <strong style="font-size: 12px; color: {{ $f->id === $floor->id ? '#6EE7B7' : 'var(--text-main)' }};">
+                                {{ $f->name }}
+                            </strong>
+                            <span style="font-size: 10px; color: var(--text-dim);">
+                                📍 {{ $f->city_location ?: __('Primary Location') }}
+                            </span>
+                        </div>
+                        @if($f->id === $floor->id)
+                            <span style="font-size: 10px; color: #6EE7B7; font-weight: 800;">● {{ __('Editing') }}</span>
+                        @endif
+                    </a>
+                    @endforeach
                 </div>
+            </div>
+
+            <span class="map-version-badge" id="header-version-badge" title="Map version and publishing status">
+                v{{ $map->version }} • {{ ucfirst($map->status) }}
+            </span>
+        </div>
+
+        <!-- Center: Tool Selector Segmented Pill -->
+        <div class="header-center">
+            <div class="segmented-tool-pill">
+                <button class="tool-btn active" id="tool-select" onclick="setTool('select')" title="{{ __('Select & Move Objects (V)') }}">
+                    <span>🖱️</span> <span>{{ __('Select') }}</span>
+                </button>
+                <button class="tool-btn" id="tool-room" onclick="setTool('room')" title="{{ __('Draw Meeting / Private Rooms (R)') }}">
+                    <span>🚪</span> <span>{{ __('Room') }}</span>
+                </button>
+                <button class="tool-btn" id="tool-object" onclick="setTool('object')" title="{{ __('Place Furniture & Decor (F)') }}">
+                    <span>🪑</span> <span>{{ __('Furniture') }}</span>
+                </button>
+            </div>
+
+            <div style="display: flex; gap: 4px; align-items: center;">
+                <button class="tool-icon-btn" onclick="rotateSelectedItem(90)" title="{{ __('Rotate 90° (R)') }}">
+                    <span>🔄</span>
+                </button>
+                <button class="tool-icon-btn danger" onclick="deleteSelectedItem()" title="{{ __('Delete Selected (Del)') }}">
+                    <span>🗑️</span>
+                </button>
             </div>
         </div>
 
-        <div class="header-center">
-            <button class="tool-btn active" id="tool-select" onclick="setTool('select')">
-                <span>🖱️</span> {{ __('Select / Edit') }}
-            </button>
-            <button class="tool-btn" id="tool-room" onclick="setTool('room')">
-                <span>🏢</span> {{ __('Add Room') }}
-            </button>
-            <button class="tool-btn" id="tool-object" onclick="setTool('object')">
-                <span>🪑</span> {{ __('Furniture') }}
-            </button>
-            <button class="tool-btn" onclick="rotateSelectedItem(90)" title="{{ __('Rotate 90° (R)') }}">
-                <span>🔄</span> {{ __('Rotate') }}
-            </button>
-            <button class="tool-btn" onclick="deleteSelectedItem()" style="color: var(--brand-crimson);">
-                <span>🗑️</span> {{ __('Delete') }}
-            </button>
-        </div>
-
+        <!-- Right: Actions Group -->
         <div class="header-right">
             <input type="file" id="floorplan-file-input" accept="image/jpeg,image/png,image/webp,image/jpg" style="display:none;" onchange="handleFloorplanUpload(this)">
-            
-            <button class="act-btn act-btn-emerald" onclick="triggerFloorplanUpload()" title="{{ __('Upload Custom Floorplan Background') }}">
-                <span>🖼️</span> {{ __('Upload Floorplan') }}
+
+            <!-- Floorplan Dropdown Menu -->
+            <div style="position: relative; display: inline-block;">
+                <button type="button" onclick="toggleFloorplanDropdown(event)" class="act-btn act-btn-secondary" style="display: flex; align-items: center; gap: 6px;" title="{{ __('Floorplan Background & Clear Options') }}">
+                    <span>🖼️</span>
+                    <span>{{ __('Floorplan') }}</span>
+                    <span style="font-size: 8px; opacity: 0.7;">▼</span>
+                </button>
+
+                <div id="floorplan-actions-dropdown" class="editor-dropdown-menu" style="display: none; min-width: 220px; inset-inline-end: 0; inset-inline-start: auto;">
+                    <button type="button" onclick="triggerFloorplanUpload(); closeDropdowns();" class="editor-dropdown-item">
+                        <span>⬆️</span>
+                        <span>{{ __('Upload Custom Floorplan') }}</span>
+                    </button>
+                    <button type="button" onclick="deleteFloorplan(); closeDropdowns();" class="editor-dropdown-item" style="color: #F87171;">
+                        <span>🔄</span>
+                        <span>{{ __('Reset to Default Floorplan') }}</span>
+                    </button>
+                    <div style="height: 1px; background: var(--border-card); margin: 4px 0;"></div>
+                    <button type="button" onclick="clearWorkspace(); closeDropdowns();" class="editor-dropdown-item" style="color: #FBBF24;">
+                        <span>🧹</span>
+                        <span>{{ __('Clear All Furniture (تفريغ)') }}</span>
+                    </button>
+                </div>
+            </div>
+
+            <button class="act-btn act-btn-secondary" onclick="saveMapDraft()" title="{{ __('Save Map Draft') }}">
+                <span>💾</span> <span>{{ __('Save') }}</span>
             </button>
-            <button class="act-btn act-btn-crimson" onclick="deleteFloorplan()" title="{{ __('Reset to System Default Floorplan') }}">
-                <span>🗑️</span> {{ __('Reset Floorplan') }}
+
+            <button class="act-btn act-btn-emerald" onclick="publishMap()" title="{{ __('Publish Map to Live Office') }}">
+                <span>🚀</span> <span>{{ __('Publish') }}</span>
             </button>
-            <button class="act-btn act-btn-amber" onclick="clearWorkspace()" title="{{ __('Clear All Furniture & Layout for Fresh Upload') }}">
-                <span>🧹</span> {{ __('Clear Canvas (تفريغ المساحة)') }}
-            </button>
+
+            <a href="{{ route('office', ['office' => $floor->id]) }}" class="act-btn act-btn-secondary" style="background: rgba(37, 99, 235, 0.15); border-color: rgba(59, 130, 246, 0.35); color: #93C5FD;" title="{{ __('Enter Live Office Branch') }}">
+                <span>👁️</span> <span>{{ __('Live View') }}</span>
+            </a>
 
             @if(app()->getLocale() === 'ar')
-                <a href="{{ route('lang.switch', 'en') }}" class="brand-btn" title="Switch to English">🌐 English</a>
+                <a href="{{ route('lang.switch', 'en') }}" class="brand-btn" style="padding: 6px 10px; font-size: 11px;" title="Switch to English">EN</a>
             @else
-                <a href="{{ route('lang.switch', 'ar') }}" class="brand-btn" title="التبديل إلى العربية">🌐 العربية</a>
+                <a href="{{ route('lang.switch', 'ar') }}" class="brand-btn" style="padding: 6px 10px; font-size: 11px;" title="التبديل إلى العربية">عربي</a>
             @endif
-
-            <button class="act-btn act-btn-secondary" onclick="saveMapDraft()">
-                <span>💾</span> {{ __('Save Draft') }}
-            </button>
-            <button class="act-btn act-btn-emerald" onclick="publishMap()">
-                <span>🚀</span> {{ __('Publish Map') }}
-            </button>
-            <a href="{{ route('office') }}" class="act-btn act-btn-emerald">
-                <span>👁️</span> {{ __('Live View') }}
-            </a>
         </div>
     </header>
 
@@ -1826,6 +1954,36 @@
                 showToast('❌ {{ __("Failed to clear canvas") }}');
             }
         }
+
+        // ── Dropdown Handlers ──
+        function toggleBranchDropdown(e) {
+            e.stopPropagation();
+            const dd = document.getElementById('branch-select-dropdown');
+            const other = document.getElementById('floorplan-actions-dropdown');
+            if (other) other.style.display = 'none';
+            if (dd) dd.style.display = dd.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        function toggleFloorplanDropdown(e) {
+            e.stopPropagation();
+            const dd = document.getElementById('floorplan-actions-dropdown');
+            const other = document.getElementById('branch-select-dropdown');
+            if (other) other.style.display = 'none';
+            if (dd) dd.style.display = dd.style.display === 'none' ? 'flex' : 'none';
+        }
+
+        function closeDropdowns() {
+            const d1 = document.getElementById('branch-select-dropdown');
+            const d2 = document.getElementById('floorplan-actions-dropdown');
+            if (d1) d1.style.display = 'none';
+            if (d2) d2.style.display = 'none';
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#branch-select-dropdown') && !e.target.closest('#floorplan-actions-dropdown')) {
+                closeDropdowns();
+            }
+        });
 
         function showToast(msg) {
             const t = document.getElementById('toast-bubble');

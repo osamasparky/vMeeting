@@ -1635,6 +1635,40 @@
             </div>
         </div>
 
+        @if(session('success'))
+        <div style="background: rgba(79, 155, 95, 0.15); border: 1px solid rgba(79, 155, 95, 0.35); color: #2E6B40; border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-soft-3d);">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span>✅</span>
+                <span>{{ session('success') }}</span>
+            </div>
+            <button onclick="this.parentElement.remove()" style="background: none; border: none; font-size: 16px; cursor: pointer; color: #2E6B40;">✕</button>
+        </div>
+        @endif
+
+        @if(session('error'))
+        <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); color: #D96B5F; border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-soft-3d);">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span>⚠️</span>
+                <span>{{ session('error') }}</span>
+            </div>
+            <button onclick="this.parentElement.remove()" style="background: none; border: none; font-size: 16px; cursor: pointer; color: #D96B5F;">✕</button>
+        </div>
+        @endif
+
+        @if($errors->any())
+        <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); color: #D96B5F; border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; font-weight: 800; font-size: 13px; box-shadow: var(--shadow-soft-3d);">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <span>⚠️</span>
+                <strong>{{ __('Please correct the following errors:') }}</strong>
+            </div>
+            <ul style="margin: 0; padding-inline-start: 20px; font-size: 12px; font-weight: 600;">
+                @foreach($errors->all() as $err)
+                    <li>{{ $err }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
         <!-- Universal Live Timer Banner Strip -->
         <div id="universal-timer-strip" class="live-timer-strip" style="{{ $activeTimer ? '' : 'display: none;' }}">
             <div style="display: flex; align-items: center; gap: 14px;">
