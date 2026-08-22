@@ -701,28 +701,22 @@
     </style>
 </head>
 <body>
-    @if(session('superadmin_impersonator_id'))
-    <div style="background: linear-gradient(90deg, #1E3A8A, #2563EB); color: #ffffff; padding: 8px 24px; display: flex; align-items: center; justify-content: space-between; position: fixed; top: 0; left: 0; right: 0; z-index: 999999; box-shadow: 0 4px 14px rgba(37,99,235,0.4); font-weight: 800; font-size: 12px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 16px;">⚡</span>
-            <span>{{ __('Logged in as company:') }} <strong>{{ session('superadmin_impersonated_org_name') }}</strong> ({{ Auth::user()->name }})</span>
-        </div>
-        <form method="POST" action="{{ route('impersonate.leave') }}" style="margin: 0;">
-            @csrf
-            <button type="submit" style="background: #ffffff; color: #1E3A8A; border: none; padding: 4px 14px; border-radius: 9999px; font-weight: 900; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
-                <span>🛡️</span>
-                <span>{{ __('Return to Super Admin') }}</span>
-            </button>
-        </form>
-    </div>
-    @endif
 
     <!-- ── Top Floating Overlay Bar ── -->
-    <div class="top-bar-overlay" style="{{ session('superadmin_impersonator_id') ? 'top: 50px;' : '' }}">
+    <div class="top-bar-overlay">
         <div class="glass-pill">
             <a href="{{ route('dashboard') }}" class="action-link-btn" title="{{ __('Back to Dashboard (الخروج إلى لوحة التحكم)') }}">
                 <span>🏠</span> <span>{{ __('Dashboard') }}</span>
             </a>
+
+            @if(session('superadmin_impersonator_id'))
+            <form method="POST" action="{{ route('impersonate.leave') }}" style="margin: 0; display: inline-flex;">
+                @csrf
+                <button type="submit" class="action-link-btn" style="background: rgba(37, 99, 235, 0.25); color: #93C5FD; border: 1px solid rgba(147, 197, 253, 0.45); font-weight: 800;" title="{{ __('Return to Super Admin (الرجوع للوحة التحكم)') }}">
+                    <span>🛡️</span> <span>{{ __('Super Admin') }}</span>
+                </button>
+            </form>
+            @endif
 
             <div class="org-badge">
                 <div class="status-dot"></div>

@@ -104,6 +104,24 @@ class SuperAdminController extends Controller
     }
 
     /**
+     * Toggle company active/suspended status.
+     */
+    public function toggleCompanyStatus(Organization $organization)
+    {
+        $newStatus = $organization->status === 'suspended' ? 'active' : 'suspended';
+        $organization->update(['status' => $newStatus]);
+
+        AuditLog::create([
+            'organization_id' => $organization->id,
+            'actor_id' => Auth::id(),
+            'action' => 'superadmin.company_status_toggled',
+            'metadata' => ['status' => $newStatus],
+        ]);
+
+        return back()->with('success', "Company {$organization->name} " . ($newStatus === 'suspended' ? 'suspended' : 'activated') . ' successfully.');
+    }
+
+    /**
      * Show comprehensive company detail profile page.
      */
     public function showCompany(Organization $organization)
