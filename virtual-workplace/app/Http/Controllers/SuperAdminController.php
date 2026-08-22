@@ -95,36 +95,193 @@ class SuperAdminController extends Controller
 
         AuditLog::create([
             'organization_id' => $organization->id,
-            'user_id' => Auth::id(),
-            'event' => 'superadmin.company_plan_updated',
-            'auditable_type' => Organization::class,
-            'auditable_id' => $organization->id,
-            'new_values' => ['plan_id' => $validated['plan_id']],
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
+            'actor_id' => Auth::id(),
+            'action' => 'superadmin.company_plan_updated',
+            'metadata' => ['plan_id' => $validated['plan_id']],
         ]);
 
         return back()->with('success', "Updated plan for {$organization->name} successfully.");
     }
 
     /**
-     * Toggle company active/suspended status.
+     * Show comprehensive company detail profile page.
      */
-    public function toggleCompanyStatus(Organization $organization)
+    public function showCompany(Organization $organization)
     {
-        $newStatus = $organization->status === 'suspended' ? 'active' : 'suspended';
-        $organization->update(['status' => $newStatus]);
+        $user = Auth::user();
+
+        $organization->load([
+            'plan',
+            'settings',
+            'departments.teams',
+            'teams',
+            'floors.maps',
+            'maps.rooms',
+            'rooms',
+            'members.user.profile.department',
+            'members.user.profile.team',
+            'members.role',
+            'projects.tasks',
+            'auditLogs' => fn($q) => $q->latest()->take(30),
+        ]);
+
+        $allPlans = Plan::where('is_active', true)->orderBy('price', 'asc')->get();
+
+        $stats = [
+            'total_members' => $organization->members->count(),
+            'active_members' => $organization->members->where('status', 'active')->count(),
+            'invited_members' => $organization->members->where('status', 'invited')->count(),
+            'suspended_members' => $organization->members->where('status', 'suspended')->count(),
+            'departments_count' => $organization->departments->count(),
+            'teams_count' => $organization->teams->count(),
+            'rooms_count' => $organization->rooms->count(),
+            'projects_count' => $organization->projects->count(),
+            'tasks_count' => $organization->tasks()->count(),
+            'active_floor' => $organization->floors->first(),
+            'active_map' => $organization->maps->first(),
+        ];
+
+        return view('superadmin.company_show', compact('user', 'organization', 'allPlans', 'stats'));
+    }
+
+    /**
+     * Impersonate / Log into a company directly as an owner/admin.
+     */
+    public function impersonateCompany(Organization $organization)
+    {
+        $superAdminUser = Auth::user();
+
+        // 1. Find the highest privileged member of this company (Admin, Manager, or first member)
+        $adminMember = $organization->members()
+            ->whereHas('role', function ($q) {
+                $q->whereIn('slug', ['company_admin', 'owner', 'manager']);
+            })
+            ->first() ?? $organization->members()->first();
+
+        // If company has no members, create an owner member linked to a user
+        if (!$adminMember || !$adminMember->user) {
+            $companyAdminRole = Role::where('slug', 'company_admin')->first()
+                ?? Role::firstOrCreate(['name' => 'Company Admin', 'slug' => 'company_admin']);
+
+            $user = User::firstOrCreate(
+                ['email' => 'admin@' . ($organization->slug ?: 'company') . '.local'],
+                [
+                    'name' => $organization->name . ' Admin',
+                    'password' => \Illuminate\Support\Facades\Hash::make(Str::random(16)),
+                ]
+            );
+
+            $adminMember = OrganizationMember::create([
+                'organization_id' => $organization->id,
+                'user_id' => $user->id,
+                'role_id' => $companyAdminRole->id,
+                'status' => 'active',
+                'joined_at' => now(),
+            ]);
+        }
+
+        $targetUser = $adminMember->user;
+
+        // Store impersonation metadata in session
+        session([
+            'superadmin_impersonator_id' => $superAdminUser->id,
+            'superadmin_impersonated_org_id' => $organization->id,
+            'superadmin_impersonated_org_name' => $organization->name,
+        ]);
+
+        AuditLog::create([
+            'organization_id' => $organization->id,
+            'actor_id' => $superAdminUser->id,
+            'action' => 'superadmin.company_impersonated',
+            'metadata' => [
+                'target_user_id' => $targetUser->id,
+                'target_user_email' => $targetUser->email,
+                'company_name' => $organization->name,
+            ],
+        ]);
+
+        Auth::login($targetUser);
+
+        return redirect()->route('dashboard')->with('success', "⚡ Logged into {$organization->name} as {$targetUser->name}.");
+    }
+
+    /**
+     * Leave impersonation and return to Super Admin portal.
+     */
+    public function leaveImpersonation()
+    {
+        $superAdminId = session('superadmin_impersonator_id');
+
+        if (!$superAdminId) {
+            return redirect()->route('login');
+        }
+
+        $superAdmin = User::find($superAdminId);
+
+        if (!$superAdmin || !$superAdmin->isSuperAdmin()) {
+            session()->forget(['superadmin_impersonator_id', 'superadmin_impersonated_org_id', 'superadmin_impersonated_org_name']);
+            return redirect()->route('login');
+        }
+
+        $impersonatedOrgName = session('superadmin_impersonated_org_name');
+        session()->forget(['superadmin_impersonator_id', 'superadmin_impersonated_org_id', 'superadmin_impersonated_org_name']);
+
+        Auth::login($superAdmin);
+
+        return redirect()->route('superadmin.companies')->with('success', "🛡️ Exited impersonation of {$impersonatedOrgName} and returned to Super Admin.");
+    }
+
+    /**
+     * Update general company details.
+     */
+    public function updateCompanyDetails(Request $request, Organization $organization)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'slug' => ['required', 'string', 'max:255', 'unique:organizations,slug,' . $organization->id],
+            'timezone' => ['nullable', 'string', 'max:100'],
+            'status' => ['required', 'in:active,suspended,trial'],
+            'plan_id' => ['required', 'exists:plans,id'],
+        ]);
+
+        $organization->update($validated);
 
         AuditLog::create([
             'organization_id' => $organization->id,
             'actor_id' => Auth::id(),
-            'event' => 'superadmin.company_status_toggled',
-            'details' => ['status' => $newStatus],
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
+            'action' => 'superadmin.company_updated',
+            'metadata' => $validated,
         ]);
 
-        return back()->with('success', "Company {$organization->name} " . ($newStatus === 'suspended' ? 'suspended' : 'activated') . ' successfully.');
+        return back()->with('success', "Company {$organization->name} details updated successfully.");
+    }
+
+    /**
+     * Permanently delete a company.
+     */
+    public function deleteCompany(Organization $organization)
+    {
+        $orgName = $organization->name;
+        $orgId = $organization->id;
+
+        // Clean up relations
+        $organization->members()->delete();
+        $organization->departments()->delete();
+        $organization->teams()->delete();
+        $organization->rooms()->delete();
+        $organization->maps()->delete();
+        $organization->floors()->delete();
+        $organization->projects()->delete();
+        $organization->delete();
+
+        AuditLog::create([
+            'organization_id' => null,
+            'actor_id' => Auth::id(),
+            'action' => 'superadmin.company_deleted',
+            'metadata' => ['company_id' => $orgId, 'company_name' => $orgName],
+        ]);
+
+        return redirect()->route('superadmin.companies')->with('success', "Company '{$orgName}' and all its resources have been deleted permanently.");
     }
 
     /**

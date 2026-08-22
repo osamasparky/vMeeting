@@ -87,6 +87,11 @@ class User extends Authenticatable
         return $this->hasMany(\App\Domains\People\Models\UserProfile::class);
     }
 
+    public function profile(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Domains\People\Models\UserProfile::class);
+    }
+
     public function projectMemberships(): HasMany
     {
         return $this->hasMany(\App\Domains\Projects\Models\ProjectMember::class);

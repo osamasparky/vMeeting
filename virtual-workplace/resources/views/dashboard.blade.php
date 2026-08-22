@@ -1266,6 +1266,21 @@
     </style>
 </head>
 <body>
+    @if(session('superadmin_impersonator_id'))
+    <div style="background: linear-gradient(90deg, #1E3A8A, #2563EB); color: #ffffff; padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 999999; box-shadow: 0 4px 14px rgba(37,99,235,0.4); font-weight: 800; font-size: 13px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 18px;">⚡</span>
+            <span>{{ __('Logged in as company:') }} <strong>{{ session('superadmin_impersonated_org_name') }}</strong> ({{ Auth::user()->name }})</span>
+        </div>
+        <form method="POST" action="{{ route('impersonate.leave') }}" style="margin: 0;">
+            @csrf
+            <button type="submit" style="background: #ffffff; color: #1E3A8A; border: none; padding: 6px 16px; border-radius: 9999px; font-weight: 900; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                <span>🛡️</span>
+                <span>{{ __('Return to Super Admin (الرجوع للوحة التحكم)') }}</span>
+            </button>
+        </form>
+    </div>
+    @endif
 
     <!-- Left Admin Sidebar -->
     <aside class="sidebar" id="dashboardSidebar" style="overflow-y: auto;">

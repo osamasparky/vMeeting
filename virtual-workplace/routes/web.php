@@ -88,6 +88,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/organizations/{organization}/rooms/{room}/files', [WebAuthController::class, 'uploadRoomFile'])->name('room_files.store');
     Route::delete('/organizations/{organization}/rooms/{room}/files/{file}', [WebAuthController::class, 'deleteRoomFile'])->name('room_files.destroy');
     Route::post('/organizations/{organization}/chat/upload', [WebAuthController::class, 'uploadChatAttachment'])->name('chat.upload');
+
+    // Impersonation Exit Routes
+    Route::post('/impersonate/leave', [\App\Http\Controllers\SuperAdminController::class, 'leaveImpersonation'])->name('impersonate.leave');
+    Route::get('/impersonate/leave', [\App\Http\Controllers\SuperAdminController::class, 'leaveImpersonation'])->name('impersonate.leave.get');
 });
 
 // Guest Access Routes (Public / Unauthenticated)
@@ -98,6 +102,10 @@ Route::post('/guest/join/{token}', [WebAuthController::class, 'guestEnter'])->mi
 Route::prefix('superadmin')->middleware(['auth', 'superadmin'])->name('superadmin.')->group(function () {
     Route::get('/', [\App\Http\Controllers\SuperAdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/companies', [\App\Http\Controllers\SuperAdminController::class, 'companies'])->name('companies');
+    Route::get('/companies/{organization}', [\App\Http\Controllers\SuperAdminController::class, 'showCompany'])->name('companies.show');
+    Route::post('/companies/{organization}/impersonate', [\App\Http\Controllers\SuperAdminController::class, 'impersonateCompany'])->name('companies.impersonate');
+    Route::put('/companies/{organization}', [\App\Http\Controllers\SuperAdminController::class, 'updateCompanyDetails'])->name('companies.update');
+    Route::delete('/companies/{organization}', [\App\Http\Controllers\SuperAdminController::class, 'deleteCompany'])->name('companies.delete');
     Route::post('/companies/{organization}/plan', [\App\Http\Controllers\SuperAdminController::class, 'updateCompanyPlan'])->name('companies.plan');
     Route::post('/companies/{organization}/toggle-status', [\App\Http\Controllers\SuperAdminController::class, 'toggleCompanyStatus'])->name('companies.toggle');
 

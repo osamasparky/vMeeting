@@ -46,7 +46,12 @@
                 @endphp
                 <tr>
                     <td>
-                        <strong style="color: var(--text-primary); font-size: 14px;">{{ $comp->name }}</strong>
+                        <a href="{{ route('superadmin.companies.show', $comp) }}" style="text-decoration: none; display: block;" title="{{ __('View Full Company Profile') }}">
+                            <strong style="color: var(--brand-primary); font-size: 14px; display: inline-flex; align-items: center; gap: 4px;">
+                                <span>🏢</span>
+                                <span>{{ $comp->name }}</span>
+                            </strong>
+                        </a>
                         <div style="font-size: 11px; color: var(--text-muted); font-family: monospace;">{{ $comp->slug }}</div>
                     </td>
                     <td>
@@ -78,20 +83,33 @@
                         @endif
                     </td>
                     <td>
-                        <div style="display: flex; gap: 6px;">
+                        <div style="display: flex; gap: 6px; align-items: center;">
+                            <!-- Details Page Button -->
+                            <a href="{{ route('superadmin.companies.show', $comp) }}" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 11px; text-decoration: none;" title="{{ __('View Details') }}">
+                                🔍 {{ __('Details') }}
+                            </a>
+
+                            <!-- Impersonate Button -->
+                            <form method="POST" action="{{ route('superadmin.companies.impersonate', $comp) }}" style="display: inline; margin: 0;">
+                                @csrf
+                                <button type="submit" class="tactile-btn" style="background: linear-gradient(135deg, #2563EB, #1D4ED8); color: white; border: none; padding: 6px 12px; font-size: 11px; font-weight: 800;" title="{{ __('Log in as this company owner') }}">
+                                    ⚡ {{ __('Login') }}
+                                </button>
+                            </form>
+
                             <button
                                 onclick="openChangePlanModal('{{ $comp->id }}', '{{ $comp->name }}', '{{ $comp->plan_id }}')"
                                 class="tactile-btn btn-secondary"
                                 style="padding: 6px 12px; font-size: 11px;"
                                 title="{{ __('Change Plan') }}"
                             >
-                                💎 {{ __('Change Plan') }}
+                                💎 {{ __('Plan') }}
                             </button>
 
-                            <form method="POST" action="{{ route('superadmin.companies.toggle', $comp) }}" style="display: inline;">
+                            <form method="POST" action="{{ route('superadmin.companies.toggle', $comp) }}" style="display: inline; margin: 0;">
                                 @csrf
                                 <button type="submit" class="tactile-btn" style="padding: 6px 12px; font-size: 11px; color: {{ $isSuspended ? 'var(--brand-forest)' : '#D96B5F' }};">
-                                    {{ $isSuspended ? '▶️ ' . __('Activate') : '⏸️ ' . __('Suspend') }}
+                                    {{ $isSuspended ? '▶️' : '⏸️' }}
                                 </button>
                             </form>
                         </div>
