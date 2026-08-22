@@ -750,11 +750,17 @@ class WebAuthController extends Controller
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
 
+        $file = $request->file('image') ?? $request->file('background');
+
+        if (!$file) {
+            return response()->json(['message' => 'No image file provided.'], 422);
+        }
+
         $request->validate([
-            'image' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:15360'],
+            'image' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:15360'],
+            'background' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:15360'],
         ]);
 
-        $file = $request->file('image');
         $filename = 'floorplan_' . $map->id . '_' . time() . '.' . $file->getClientOriginalExtension();
         
         $destDir = public_path('images/maps');

@@ -1873,6 +1873,7 @@
             if (!input.files || !input.files[0]) return;
             const file = input.files[0];
             const formData = new FormData();
+            formData.append('image', file);
             formData.append('background', file);
 
             showToast('⏳ {{ __("Uploading floorplan image...") }}');
@@ -1886,7 +1887,12 @@
                 });
                 const data = await res.json();
                 if (res.ok && data.image_url) {
-                    BLUEPRINT_IMAGE.src = data.image_url + (data.image_url.includes('?') ? '&' : '?') + 'v=' + Date.now();
+                    const newUrl = data.image_url + (data.image_url.includes('?') ? '&' : '?') + 'v=' + Date.now();
+                    BLUEPRINT_IMAGE.src = newUrl;
+                    BLUEPRINT_IMAGE.onload = () => {
+                        blueprintLoaded = true;
+                        draw();
+                    };
                     MAP_DATA.layout_data = MAP_DATA.layout_data || {};
                     MAP_DATA.layout_data.background_image_url = data.image_url;
                     showToast('✅ {{ __("Floorplan uploaded and active!") }}');
