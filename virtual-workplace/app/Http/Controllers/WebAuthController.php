@@ -757,8 +757,8 @@ class WebAuthController extends Controller
         }
 
         $request->validate([
-            'image' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:15360'],
-            'background' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:15360'],
+            'image' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:51200'],
+            'background' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:51200'],
         ]);
 
         $filename = 'floorplan_' . $map->id . '_' . time() . '.' . $file->getClientOriginalExtension();
@@ -1366,8 +1366,8 @@ class WebAuthController extends Controller
             'role_id' => ['required', 'exists:roles,id'],
             'password' => ['nullable', 'string', 'min:8'],
             'job_title' => ['nullable', 'string', 'max:255'],
-            'department_id' => ['nullable', 'uuid', 'exists:departments,id'],
-            'team_id' => ['nullable', 'uuid', 'exists:teams,id'],
+            'department_id' => ['nullable', 'exists:departments,id'],
+            'team_id' => ['nullable', 'exists:teams,id'],
             'status' => ['nullable', 'in:active,invited,suspended'],
             'allowed_offices' => ['nullable', 'array'],
             'allowed_offices.*' => ['uuid', 'exists:floors,id'],
@@ -1484,8 +1484,8 @@ class WebAuthController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $member->user_id],
             'job_title' => ['nullable', 'string', 'max:255'],
-            'department_id' => ['nullable', 'uuid', 'exists:departments,id'],
-            'team_id' => ['nullable', 'uuid', 'exists:teams,id'],
+            'department_id' => ['nullable', 'exists:departments,id'],
+            'team_id' => ['nullable', 'exists:teams,id'],
             'role_id' => ['required', 'exists:roles,id'],
             'status' => ['required', 'in:active,invited,suspended'],
             'allowed_offices' => ['nullable', 'array'],

@@ -1874,7 +1874,6 @@
             const file = input.files[0];
             const formData = new FormData();
             formData.append('image', file);
-            formData.append('background', file);
 
             showToast('⏳ {{ __("Uploading floorplan image...") }}');
 
