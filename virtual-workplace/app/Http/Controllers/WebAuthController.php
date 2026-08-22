@@ -173,7 +173,10 @@ class WebAuthController extends Controller
         ];
 
         $rooms = $organization->rooms()->get();
-        $roles = \App\Domains\Administration\Models\Role::where('organization_id', $organization->id)->orWhereNull('organization_id')->get();
+        $roles = \App\Domains\Administration\Models\Role::where('slug', '!=', 'super_admin')
+            ->where(function($q) use ($organization) {
+                $q->where('organization_id', $organization->id)->orWhereNull('organization_id');
+            })->get();
         $members = $organization->members()->with(['user.profiles', 'role'])->get();
         $departments = $organization->departments()->withCount('teams')->get();
         $teams = $organization->teams()->with('department')->get();
@@ -1092,6 +1095,9 @@ class WebAuthController extends Controller
         // Verify role is global or belongs to this organization
         if (!empty($validated['role_id'])) {
             $role = \App\Domains\Administration\Models\Role::findOrFail($validated['role_id']);
+            if ($role->slug === 'super_admin' && !$user->isSuperAdmin()) {
+                abort(403, 'Unauthorized: only the System Owner (Super Admin) can assign or create a Super Admin.');
+            }
             if ($role->organization_id && $role->organization_id !== $membership->organization_id) {
                 abort(403, 'Invalid role selection.');
             }
@@ -1111,6 +1117,110 @@ class WebAuthController extends Controller
         $profile->save();
 
         return back()->with('success', 'Member department assignment updated.');
+    }
+
+    /**
+     * Store or Invite a new Team Member in the Organization.
+     */
+    public function storeMember(Request $request)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
+        if (!$membership) abort(403);
+
+        if (!$membership->hasPermission('members.manage') && $membership->role?->slug !== 'company_admin') {
+            abort(403, 'Unauthorized: insufficient permissions to manage members.');
+        }
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255'],
+            'role_id' => ['required', 'uuid', 'exists:roles,id'],
+            'password' => ['nullable', 'string', 'min:8'],
+            'job_title' => ['nullable', 'string', 'max:255'],
+            'department_id' => ['nullable', 'uuid', 'exists:departments,id'],
+            'team_id' => ['nullable', 'uuid', 'exists:teams,id'],
+            'status' => ['nullable', 'in:active,invited,suspended'],
+        ]);
+
+        $targetRole = \App\Domains\Administration\Models\Role::findOrFail($validated['role_id']);
+        if ($targetRole->slug === 'super_admin' && !$user->isSuperAdmin()) {
+            abort(403, 'Unauthorized: only the System Owner (Super Admin) can assign or create a Super Admin.');
+        }
+
+        if (!empty($validated['department_id'])) {
+            $dept = \App\Domains\People\Models\Department::findOrFail($validated['department_id']);
+            if ($dept->organization_id !== $membership->organization_id) {
+                abort(403, 'Invalid department selection.');
+            }
+        }
+
+        if (!empty($validated['team_id'])) {
+            $team = \App\Domains\People\Models\Team::findOrFail($validated['team_id']);
+            if ($team->organization_id !== $membership->organization_id) {
+                abort(403, 'Invalid team selection.');
+            }
+        }
+
+        // Find or create User
+        $targetUser = \App\Domains\Identity\Models\User::where('email', $validated['email'])->first();
+        $plainPassword = $validated['password'] ?: 'Password@1234';
+        
+        if (!$targetUser) {
+            $targetUser = \App\Domains\Identity\Models\User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => \Illuminate\Support\Facades\Hash::make($plainPassword),
+                'email_verified_at' => now(),
+            ]);
+        } else {
+            $targetUser->name = $validated['name'];
+            if (!empty($validated['password'])) {
+                $targetUser->password = \Illuminate\Support\Facades\Hash::make($validated['password']);
+            }
+            $targetUser->save();
+        }
+
+        // Create or update membership
+        $memberStatus = $validated['status'] ?? 'active';
+        $member = OrganizationMember::updateOrCreate(
+            [
+                'organization_id' => $membership->organization_id,
+                'user_id' => $targetUser->id,
+            ],
+            [
+                'role_id' => $validated['role_id'],
+                'status' => $memberStatus,
+            ]
+        );
+
+        // Create or update Profile
+        $profile = \App\Domains\People\Models\UserProfile::firstOrNew([
+            'user_id' => $targetUser->id,
+            'organization_id' => $membership->organization_id,
+        ]);
+        $profile->department_id = $validated['department_id'] ?? null;
+        $profile->team_id = $validated['team_id'] ?? null;
+        $profile->job_title = $validated['job_title'] ?? null;
+        $profile->save();
+
+        \App\Domains\Administration\Models\AuditLog::create([
+            'organization_id' => $membership->organization_id,
+            'user_id' => $user->id,
+            'action' => 'member.created',
+            'target_type' => 'user',
+            'target_id' => $targetUser->id,
+            'metadata' => [
+                'name' => $targetUser->name,
+                'email' => $targetUser->email,
+                'role' => $targetRole->name,
+                'status' => $memberStatus,
+            ],
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
+        return redirect('/dashboard#members')->with('success', __('Team member created/invited successfully and added to workspace!'));
     }
 
     /**
@@ -1139,6 +1249,11 @@ class WebAuthController extends Controller
             'role_id' => ['required', 'uuid', 'exists:roles,id'],
             'status' => ['required', 'in:active,invited,suspended'],
         ]);
+
+        $targetRole = \App\Domains\Administration\Models\Role::findOrFail($validated['role_id']);
+        if ($targetRole->slug === 'super_admin' && !$user->isSuperAdmin()) {
+            abort(403, 'Unauthorized: only the System Owner (Super Admin) can assign or create a Super Admin.');
+        }
 
         if (!empty($validated['department_id'])) {
             $dept = \App\Domains\People\Models\Department::findOrFail($validated['department_id']);

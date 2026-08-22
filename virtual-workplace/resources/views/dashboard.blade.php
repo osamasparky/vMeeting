@@ -2298,7 +2298,15 @@
                                         <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F;">{{ $m->role->name ?? __('Company Admin') }}</span>
                                     </td>
                                     <td>
-                                        <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F;">{{ __('Active') }}</span>
+                                        @if($m->status === 'active')
+                                            <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F; font-weight: 800;">🟢 {{ __('Active') }}</span>
+                                        @elseif($m->status === 'invited')
+                                            <span class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.2); color: #D6A23A; font-weight: 800;">✉️ {{ __('Invited / Pending') }}</span>
+                                        @elseif($m->status === 'suspended')
+                                            <span class="nav-badge-pill" style="background: rgba(217, 107, 95, 0.2); color: #D96B5F; font-weight: 800;">🔴 {{ __('Suspended') }}</span>
+                                        @else
+                                            <span class="nav-badge-pill">{{ ucfirst($m->status) }}</span>
+                                        @endif
                                     </td>
                                     @if($membership->hasPermission('members.manage') || $membership->role?->slug === 'company_admin')
                                     <td>
@@ -5222,28 +5230,71 @@
                 </div>
             </div>
 
-            <!-- Member Form -->
+            <!-- Member Form (Direct Member Add & Invite) -->
             <div id="member-tab-content" style="display: none;">
-                <div style="display: flex; flex-direction: column; gap: 14px;">
+                <form method="POST" action="{{ route('organization.members.store') }}" style="display: flex; flex-direction: column; gap: 14px;">
+                    @csrf
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Email Address') }}</label>
-                        <input type="email" id="invite-member-email" placeholder="colleague@company.com" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Full Name (الاسم بالكامل)') }} *</label>
+                        <input type="text" name="name" required placeholder="e.g. Ahmed Ali" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                     </div>
 
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Role') }}</label>
-                        <select id="invite-member-role" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
-                            @foreach($roles as $role)
-                                <option value="{{ $role->id }}">{{ $role->name }}</option>
-                            @endforeach
-                        </select>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Email Address (البريد الإلكتروني)') }} *</label>
+                        <input type="email" name="email" required placeholder="colleague@company.com" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                     </div>
 
-                    <button onclick="sendMemberInvite()" id="btn-send-member-invite" style="margin-top: 6px; background: var(--brand-primary); color: white; font-weight: 800; border: none; border-radius: 10px; padding: 12px; cursor: pointer; font-size: 14px;">
-                        📨 {{ __('Send Invitation Email') }}
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div>
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Access Role (الدور والصلاحية)') }} *</label>
+                            <select name="role_id" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                                @foreach($roles as $role)
+                                    <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Initial Password (كلمة المرور)') }}</label>
+                            <input type="password" name="password" minlength="8" placeholder="Default: Password@1234" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div>
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Department (القسم)') }}</label>
+                            <select name="department_id" onchange="filterTeamsForInvite(this.value)" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                                <option value="">— {{ __('No Department') }} —</option>
+                                @foreach($departments as $d)
+                                    <option value="{{ $d->id }}">{{ $d->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Sub-Team (الفريق الفرعي)') }}</label>
+                            <select name="team_id" id="invite-team-select" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                                <option value="">— {{ __('No Team') }} —</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 12px;">
+                        <div>
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Job Title (المسمى الوظيفي)') }}</label>
+                            <input type="text" name="job_title" placeholder="e.g. Senior Software Architect" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Status (الحالة)') }}</label>
+                            <select name="status" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                                <option value="active">🟢 {{ __('Active (نشط)') }}</option>
+                                <option value="invited">✉️ {{ __('Invited (مدعو)') }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="header-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px; justify-content: center;">
+                        <span>👤</span> {{ __('Create / Add Team Member (إضافة المستخدم)') }}
                     </button>
-                    <div id="member-invite-status" style="display: none; font-size: 12px; text-align: center; margin-top: 6px;"></div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
@@ -5917,6 +5968,21 @@
                 if (selectedTeamId && t.id == selectedTeamId) {
                     opt.selected = true;
                 }
+                teamSelect.appendChild(opt);
+            });
+        }
+
+        function filterTeamsForInvite(deptId) {
+            const teamSelect = document.getElementById('invite-team-select');
+            if (!teamSelect) return;
+            teamSelect.innerHTML = '<option value="">— {{ __('No Team') }} —</option>';
+            if (!deptId) return;
+
+            const filtered = ALL_TEAMS.filter(t => t.department_id == deptId);
+            filtered.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.id;
+                opt.textContent = t.name;
                 teamSelect.appendChild(opt);
             });
         }

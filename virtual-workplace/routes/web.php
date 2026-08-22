@@ -56,6 +56,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/teams/{team}', [WebAuthController::class, 'deleteTeam'])->name('teams.delete');
 
     Route::get('/organization/members/{member}/details', [WebAuthController::class, 'getMemberProfileDetails'])->name('organization.members.details');
+    Route::post('/organization/members/create', [WebAuthController::class, 'storeMember'])->name('organization.members.store');
     Route::post('/members/{member}/assign', [WebAuthController::class, 'assignMemberDepartment'])->name('members.assign_department');
     Route::put('/organization/members/{member}', [WebAuthController::class, 'updateOrganizationMember'])->name('organization.members.update');
     Route::post('/organization/members/{member}/password', [WebAuthController::class, 'updateMemberPassword'])->name('organization.members.password');

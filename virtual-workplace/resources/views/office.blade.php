@@ -1036,6 +1036,7 @@
             currentUser: @json($user),
             org: @json($organization),
             token: "{{ $realtimeToken }}",
+            wsUrl: @json($wsUrl ?? null),
             csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
         };
 
@@ -1513,15 +1514,29 @@
 
         // ── WebSocket Realtime Connection & Presence Protocol ──
         let ws = null;
+        let wsReconnectTimer = null;
+
         function connectWebSocket() {
-            const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsHost = window.location.hostname || '127.0.0.1';
-            const wsUrl = `${wsProtocol}//${wsHost}:8080?token=${CONFIG.token}`;
+            let wsUrl;
+            if (CONFIG.wsUrl && !CONFIG.wsUrl.includes('127.0.0.1') && !CONFIG.wsUrl.includes('localhost')) {
+                wsUrl = `${CONFIG.wsUrl}${CONFIG.wsUrl.includes('?') ? '&' : '?'}token=${CONFIG.token}`;
+            } else if (window.location.protocol === 'https:') {
+                wsUrl = `wss://${window.location.host}/ws?token=${CONFIG.token}`;
+            } else {
+                wsUrl = `ws://${window.location.hostname || '127.0.0.1'}:8080?token=${CONFIG.token}`;
+            }
 
             try {
+                if (ws) {
+                    try { ws.close(); } catch(e) {}
+                }
                 ws = new WebSocket(wsUrl);
                 ws.onopen = () => {
-                    console.log('⚡ WebSocket Connected');
+                    console.log('⚡ WebSocket Connected successfully via:', wsUrl);
+                    if (wsReconnectTimer) {
+                        clearTimeout(wsReconnectTimer);
+                        wsReconnectTimer = null;
+                    }
                     // CRITICAL: Send map.join with gender to register presence and receive full occupant roster!
                     ws.send(JSON.stringify({
                         type: 'map.join',
@@ -1539,6 +1554,17 @@
                             ws.send(JSON.stringify({ type: 'status.update', payload: { status: 'online' } }));
                         }
                     }, 10000);
+                };
+
+                ws.onclose = (ev) => {
+                    console.log('⚠️ WebSocket disconnected. Reconnecting in 3s...', ev);
+                    if (!wsReconnectTimer) {
+                        wsReconnectTimer = setTimeout(() => connectWebSocket(), 3000);
+                    }
+                };
+
+                ws.onerror = (err) => {
+                    console.error('WebSocket Error:', err);
                 };
 
                 ws.onmessage = (e) => {

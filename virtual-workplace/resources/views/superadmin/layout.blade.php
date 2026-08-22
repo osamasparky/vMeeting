@@ -735,6 +735,15 @@
                 <span class="nav-item-icon">⚙️</span>
                 <span>{{ __('System Settings') }}</span>
             </a>
+
+            <div class="nav-category-title">{{ __('Session') }}</div>
+            <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0;">
+                @csrf
+                <button type="submit" class="nav-item" style="width: 100%; border: none; background: none; text-align: start; cursor: pointer; color: #D96B5F;" data-tooltip="{{ __('Logout') }}">
+                    <span class="nav-item-icon">🚪</span>
+                    <span>{{ __('Logout') }}</span>
+                </button>
+            </form>
         </nav>
 
         <div class="admin-sidebar-footer">
@@ -781,10 +790,14 @@
                     <span style="font-size: 12px; font-weight: 800; color: var(--text-primary);">{{ explode(' ', auth()->user()?->name ?? 'Admin')[0] }}</span>
                 </div>
 
-                <a href="{{ route('office') }}" class="btn-return-app">
-                    <span>🏢</span>
-                    <span>{{ __('Return to Workplace') }}</span>
-                </a>
+                <!-- Super Admin Logout Header Button -->
+                <form method="POST" action="{{ route('logout') }}" style="display: inline; margin: 0;">
+                    @csrf
+                    <button type="submit" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.35); padding: 7px 14px; font-size: 12px; font-weight: 800; cursor: pointer; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px;" title="{{ __('Logout') }}">
+                        <span>🚪</span>
+                        <span>{{ __('Logout') }}</span>
+                    </button>
+                </form>
             </div>
         </header>
 
