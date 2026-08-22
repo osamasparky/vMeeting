@@ -11,6 +11,7 @@ class Plan extends Model
         'name',
         'slug',
         'seat_limit',
+        'max_offices',
         'room_limit',
         'storage_limit_gb',
         'features',
@@ -22,6 +23,7 @@ class Plan extends Model
         'features' => 'array',
         'price' => 'decimal:2',
         'seat_limit' => 'integer',
+        'max_offices' => 'integer',
         'room_limit' => 'integer',
         'storage_limit_gb' => 'integer',
         'is_active' => 'boolean',
@@ -35,6 +37,16 @@ class Plan extends Model
     public function isUnlimitedSeats(): bool
     {
         return $this->seat_limit === 0;
+    }
+
+    public function isUnlimitedOffices(): bool
+    {
+        return $this->max_offices === 0;
+    }
+
+    public function isUnlimitedRooms(): bool
+    {
+        return $this->room_limit === 0;
     }
 
     public function hasFeature(string $feature): bool

@@ -718,6 +718,33 @@
             </form>
             @endif
 
+            <!-- Office / Branch Switcher -->
+            @if(isset($userAllowedOffices) && $userAllowedOffices->count() > 1)
+            <div style="position: relative; display: inline-block;">
+                <button type="button" onclick="toggleOfficeDropdown(event)" class="action-link-btn" style="background: rgba(36, 92, 58, 0.35); color: #86EFAC; border: 1px solid rgba(134, 239, 172, 0.45); font-weight: 800; display: flex; align-items: center; gap: 6px;" title="{{ __('Switch Office Branch (تغيير الفرع)') }}">
+                    <span>🏢</span>
+                    <span>{{ $floor->name }}</span>
+                    <span style="font-size: 8px;">▼</span>
+                </button>
+                <div id="office-switcher-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); inset-inline-start: 0; min-width: 220px; background: rgba(18, 28, 22, 0.96); backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; box-shadow: 0 16px 36px rgba(0,0,0,0.6); padding: 6px; z-index: 100000;">
+                    <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); padding: 6px 10px;">
+                        {{ __('Switch Office Branch') }}
+                    </div>
+                    @foreach($userAllowedOffices as $off)
+                    <a href="{{ route('office', ['office' => $off->id]) }}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: {{ $off->id === $floor->id ? '#86EFAC' : '#E2E8F0' }}; background: {{ $off->id === $floor->id ? 'rgba(36, 92, 58, 0.45)' : 'transparent' }}; font-weight: 700; font-size: 12px; transition: background 0.15s ease;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span>🏢</span>
+                            <span>{{ $off->name }}</span>
+                        </div>
+                        @if($off->id === $floor->id)
+                            <span style="font-size: 10px; color: #86EFAC;">● {{ __('Active') }}</span>
+                        @endif
+                    </a>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
             <div class="org-badge">
                 <div class="status-dot"></div>
                 @if(!empty($organization->logo_url))
@@ -1044,6 +1071,7 @@
             map: @json($map),
             currentUser: @json($user),
             org: @json($organization),
+            allowedRoomIds: @json($userAllowedRoomIds ?? []),
             token: "{{ $realtimeToken }}",
             wsUrl: @json($wsUrl ?? null),
             csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
@@ -1308,14 +1336,25 @@
                 }
             }
 
-            // Door lock collision detection
+            // Door lock & Room Permission Guard collision detection
             const currentR = getCurrentRoom(localAvatar.x, localAvatar.y);
             const targetR = getCurrentRoom(nextX, nextY);
-            if (targetR && targetR !== currentR && roomDoorStates.get(targetR.id)) {
-                nextX = localAvatar.x;
-                nextY = localAvatar.y;
-                localAvatar.targetX = localAvatar.x;
-                localAvatar.targetY = localAvatar.y;
+            if (targetR && targetR !== currentR) {
+                // 1. Room Permission Check
+                if (CONFIG.allowedRoomIds && CONFIG.allowedRoomIds.length > 0 && !CONFIG.allowedRoomIds.includes(targetR.id)) {
+                    nextX = localAvatar.x;
+                    nextY = localAvatar.y;
+                    localAvatar.targetX = localAvatar.x;
+                    localAvatar.targetY = localAvatar.y;
+                    showToast(`🚫 {{ __("Restricted Room: Access not permitted for ':name'.", ['name' => '']) }} ${targetR.name}`);
+                }
+                // 2. Door Lock Check
+                else if (roomDoorStates.get(targetR.id)) {
+                    nextX = localAvatar.x;
+                    nextY = localAvatar.y;
+                    localAvatar.targetX = localAvatar.x;
+                    localAvatar.targetY = localAvatar.y;
+                }
             }
 
             localAvatar.x = Math.max(10, Math.min(MAP_WIDTH_PX - 10, nextX));
@@ -2912,6 +2951,21 @@
             t.style.display = 'block';
             setTimeout(() => { t.style.display = 'none'; }, 3200);
         }
+
+        function toggleOfficeDropdown(e) {
+            e.stopPropagation();
+            const dd = document.getElementById('office-switcher-dropdown');
+            if (dd) {
+                dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        document.addEventListener('click', (e) => {
+            const dd = document.getElementById('office-switcher-dropdown');
+            if (dd && !e.target.closest('#office-switcher-dropdown')) {
+                dd.style.display = 'none';
+            }
+        });
 
         // Start animation loop
         requestAnimationFrame(draw);

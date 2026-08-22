@@ -44,6 +44,10 @@
                     <strong style="color: var(--text-primary);">{{ $plan->seat_limit === 0 ? __('Unlimited') : $plan->seat_limit }}</strong>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-secondary); font-weight: 700;">🏢 {{ __('Max Offices / Branches') }}:</span>
+                    <strong style="color: var(--text-primary);">{{ $plan->max_offices === 0 ? __('Unlimited') : $plan->max_offices }}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
                     <span style="color: var(--text-secondary); font-weight: 700;">🚪 {{ __('Max Rooms') }}:</span>
                     <strong style="color: var(--text-primary);">{{ $plan->room_limit === 0 ? __('Unlimited') : $plan->room_limit }}</strong>
                 </div>
@@ -101,18 +105,22 @@
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px;">
                 <div>
                     <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase;">{{ __('Seats (Users)') }}</label>
-                    <input type="number" id="inputPlanSeats" name="seat_limit" required placeholder="0 = Unlimited" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 14px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--shadow-inset-3d);">
+                    <input type="number" id="inputPlanSeats" name="seat_limit" required placeholder="0 = Unlimited" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--shadow-inset-3d);">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase;">{{ __('Max Offices') }}</label>
+                    <input type="number" id="inputPlanOffices" name="max_offices" required placeholder="0 = Unlimited" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--shadow-inset-3d);">
                 </div>
                 <div>
                     <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase;">{{ __('Max Rooms') }}</label>
-                    <input type="number" id="inputPlanRooms" name="room_limit" required placeholder="0 = Unlimited" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 14px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--shadow-inset-3d);">
+                    <input type="number" id="inputPlanRooms" name="room_limit" required placeholder="0 = Unlimited" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--shadow-inset-3d);">
                 </div>
                 <div>
                     <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase;">{{ __('Storage (GB)') }}</label>
-                    <input type="number" id="inputPlanStorage" name="storage_limit_gb" required placeholder="0 = Unlimited" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 14px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--shadow-inset-3d);">
+                    <input type="number" id="inputPlanStorage" name="storage_limit_gb" required placeholder="0 = Unlimited" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--shadow-inset-3d);">
                 </div>
             </div>
 
@@ -148,7 +156,8 @@
         document.getElementById('inputPlanName').value = '';
         document.getElementById('inputPlanPrice').value = '19.99';
         document.getElementById('inputPlanSeats').value = '15';
-        document.getElementById('inputPlanRooms').value = '5';
+        document.getElementById('inputPlanOffices').value = '3';
+        document.getElementById('inputPlanRooms').value = '10';
         document.getElementById('inputPlanStorage').value = '5';
         document.getElementById('inputPlanFeatures').value = 'basic_chat, basic_audio, video, screen_share';
         document.getElementById('inputPlanActive').checked = true;
@@ -162,6 +171,7 @@
         document.getElementById('inputPlanName').value = plan.name;
         document.getElementById('inputPlanPrice').value = plan.price;
         document.getElementById('inputPlanSeats').value = plan.seat_limit;
+        document.getElementById('inputPlanOffices').value = plan.max_offices ?? 1;
         document.getElementById('inputPlanRooms').value = plan.room_limit;
         document.getElementById('inputPlanStorage').value = plan.storage_limit_gb;
         document.getElementById('inputPlanFeatures').value = (plan.features || []).join(', ');

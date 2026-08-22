@@ -19,11 +19,15 @@ class Floor extends Model
     protected $fillable = [
         'organization_id',
         'name',
+        'city_location',
+        'description',
+        'is_default',
         'order',
     ];
 
     protected $casts = [
         'order' => 'integer',
+        'is_default' => 'boolean',
     ];
 
     // ── Relationships ──
@@ -36,5 +40,16 @@ class Floor extends Model
     public function activeMap(): HasOne
     {
         return $this->hasOne(Map::class)->where('status', 'published')->latestOfMany();
+    }
+
+    public function rooms(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    {
+        return $this->hasManyThrough(Room::class, Map::class);
+    }
+
+    public function members(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(\App\Domains\Tenancy\Models\OrganizationMember::class, 'member_office_access', 'floor_id', 'organization_member_id')
+            ->withTimestamps();
     }
 }

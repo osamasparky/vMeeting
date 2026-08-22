@@ -173,11 +173,12 @@ class WebAuthController extends Controller
         ];
 
         $rooms = $organization->rooms()->get();
+        $offices = $organization->offices()->with(['rooms', 'activeMap'])->get();
         $roles = \App\Domains\Administration\Models\Role::where('slug', '!=', 'super_admin')
             ->where(function($q) use ($organization) {
                 $q->where('organization_id', $organization->id)->orWhereNull('organization_id');
             })->get();
-        $members = $organization->members()->with(['user.profiles', 'role'])->get();
+        $members = $organization->members()->with(['user.profiles', 'role', 'offices', 'rooms'])->get();
         $departments = $organization->departments()->withCount('teams')->get();
         $teams = $organization->teams()->with('department')->get();
         $auditLogs = \App\Domains\Administration\Models\AuditLog::where('organization_id', $organization->id)->latest()->take(20)->get();
@@ -228,7 +229,7 @@ class WebAuthController extends Controller
         })->values();
 
         return view('dashboard', compact(
-            'user', 'membership', 'organization', 'stats', 'rooms', 'roles', 'members',
+            'user', 'membership', 'organization', 'stats', 'rooms', 'offices', 'roles', 'members',
             'departments', 'teams', 'auditLogs', 'guestInvitations', 'allPlans',
             'projects', 'tasks', 'myTasks', 'activeTimer', 'recentTimeEntries', 'allTimesheets', 'myProfile',
             'upcomingMeetings', 'allMeetings', 'smtpSettings', 'upcomingMeetingsJson'
@@ -431,7 +432,7 @@ class WebAuthController extends Controller
     }
 
     /**
-     * Show the interactive Virtual Office floor.
+     * Show the interactive Virtual Office floor with multi-branch switcher and room access guard.
      */
     public function office(\App\Domains\Identity\Services\RealtimeTokenService $tokenService)
     {
@@ -439,7 +440,7 @@ class WebAuthController extends Controller
 
         $membership = OrganizationMember::where('user_id', $user->id)
             ->whereIn('status', ['active', 'invited'])
-            ->with(['organization'])
+            ->with(['organization.plan', 'role.permissions', 'offices', 'rooms'])
             ->first();
 
         if (!$membership) {
@@ -453,10 +454,70 @@ class WebAuthController extends Controller
         $organization = $membership->organization;
         $this->ensureDefaultWorkspace($organization);
 
-        $floor = $organization->floors()->first();
+        $requestedOfficeId = request('office');
+        $allOffices = $organization->offices()->with(['rooms', 'activeMap'])->get();
+
+        // Determine user allowed offices
+        $isFullAdmin = $membership->role?->slug === 'company_admin' || $membership->role?->slug === 'super_admin' || $user->isSuperAdmin();
+        $userAllowedOffices = $isFullAdmin || $membership->offices()->count() === 0
+            ? $allOffices
+            : $membership->offices()->with(['rooms', 'activeMap'])->get();
+
+        if ($requestedOfficeId) {
+            $floor = $organization->floors()->find($requestedOfficeId);
+            if (!$floor) {
+                return redirect()->route('office')->with('error', __('Requested office branch not found.'));
+            }
+            if (!$membership->hasOfficeAccess($floor->id)) {
+                return redirect()->route('dashboard')->with('error', __('You do not have access permission to enter this office branch (ليس لديك صلاحية لدخول هذا الفرع).'));
+            }
+        } else {
+            // Find default allowed office
+            $floor = $userAllowedOffices->firstWhere('is_default', true)
+                ?: $userAllowedOffices->first()
+                ?: $organization->floors()->first();
+        }
+
+        if (!$floor) {
+            return redirect()->route('dashboard')->with('error', __('No active office available.'));
+        }
+
         $map = $organization->maps()->where('floor_id', $floor->id)->where('status', 'published')->latest('published_at')->first()
             ?? $organization->maps()->where('floor_id', $floor->id)->latest()->first();
+
+        if (!$map) {
+            // Auto generate initial map for this office
+            $map = $organization->maps()->create([
+                'floor_id' => $floor->id,
+                'name' => $floor->name . ' Blueprint',
+                'status' => 'published',
+                'version' => 1,
+                'width' => 32,
+                'height' => 26,
+                'tile_size' => 16,
+                'layout_data' => [
+                    'theme' => 'open_spatial_blueprint',
+                    'wall_sign_text' => strtoupper($floor->name),
+                ],
+                'published_at' => now(),
+            ]);
+        }
+
         $map->load(['rooms', 'zones', 'objects']);
+
+        // Determine allowed room IDs for this user
+        $userAllowedRoomIds = [];
+        if ($isFullAdmin) {
+            $userAllowedRoomIds = $map->rooms->pluck('id')->toArray();
+        } else {
+            $assignedRoomIds = $membership->rooms()->pluck('rooms.id')->toArray();
+            if (count($assignedRoomIds) > 0) {
+                $userAllowedRoomIds = $assignedRoomIds;
+            } else {
+                // If no specific room restrictions assigned, allow all public rooms in this map
+                $userAllowedRoomIds = $map->rooms->where('access_mode', '!=', 'private')->pluck('id')->toArray();
+            }
+        }
 
         $realtimeToken = $tokenService->generateToken($user, $organization);
         $wsUrl = env('REALTIME_WS_URL', 'ws://127.0.0.1:8080');
@@ -465,7 +526,136 @@ class WebAuthController extends Controller
             return \App\Domains\Workspace\Models\FurnitureItem::where('is_active', true)->get();
         });
 
-        return view('office', compact('user', 'organization', 'floor', 'map', 'realtimeToken', 'wsUrl', 'furnitureItems'));
+        return view('office', compact('user', 'organization', 'membership', 'floor', 'map', 'allOffices', 'userAllowedOffices', 'userAllowedRoomIds', 'realtimeToken', 'wsUrl', 'furnitureItems'));
+    }
+
+    /**
+     * Create a new Office branch for the organization.
+     */
+    public function storeOffice(Request $request)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->with(['organization.plan', 'role.permissions'])->first();
+        if (!$membership) abort(403);
+
+        if (!$membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin') {
+            abort(403, 'Unauthorized: only organization admins can create offices.');
+        }
+
+        $organization = $membership->organization;
+
+        if ($organization->hasReachedOfficeLimit()) {
+            return back()->with('error', __('Office limit reached for your current plan (:limit offices max). Please upgrade your subscription.', [
+                'limit' => $organization->plan?->max_offices ?? 1
+            ]));
+        }
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'city_location' => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:1000'],
+            'is_default' => ['nullable', 'boolean'],
+        ]);
+
+        if (!empty($validated['is_default'])) {
+            $organization->floors()->update(['is_default' => false]);
+        }
+
+        $floor = $organization->floors()->create([
+            'name' => $validated['name'],
+            'city_location' => $validated['city_location'] ?? null,
+            'description' => $validated['description'] ?? null,
+            'is_default' => !empty($validated['is_default']),
+            'order' => $organization->floors()->count() + 1,
+        ]);
+
+        // Create default published map
+        $map = $organization->maps()->create([
+            'floor_id' => $floor->id,
+            'name' => $floor->name . ' Blueprint',
+            'status' => 'published',
+            'version' => 1,
+            'width' => 32,
+            'height' => 26,
+            'tile_size' => 16,
+            'layout_data' => [
+                'theme' => 'open_spatial_blueprint',
+                'wall_sign_text' => strtoupper($floor->name),
+            ],
+            'published_at' => now(),
+        ]);
+
+        \App\Domains\Administration\Models\AuditLog::create([
+            'organization_id' => $organization->id,
+            'actor_id' => $user->id,
+            'action' => 'office.created',
+            'metadata' => [
+                'office_id' => $floor->id,
+                'name' => $floor->name,
+                'city' => $floor->city_location,
+            ],
+        ]);
+
+        return back()->with('success', __("Office ':name' created successfully!", ['name' => $floor->name]));
+    }
+
+    /**
+     * Update Office branch details.
+     */
+    public function updateOffice(Request $request, \App\Domains\Workspace\Models\Floor $floor)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->with(['organization', 'role.permissions'])->first();
+        if (!$membership || $floor->organization_id !== $membership->organization_id) abort(403);
+
+        if (!$membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin') {
+            abort(403, 'Unauthorized');
+        }
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'city_location' => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:1000'],
+            'is_default' => ['nullable', 'boolean'],
+        ]);
+
+        if (!empty($validated['is_default'])) {
+            $membership->organization->floors()->where('id', '!=', $floor->id)->update(['is_default' => false]);
+        }
+
+        $floor->update([
+            'name' => $validated['name'],
+            'city_location' => $validated['city_location'] ?? null,
+            'description' => $validated['description'] ?? null,
+            'is_default' => !empty($validated['is_default']),
+        ]);
+
+        return back()->with('success', __("Office ':name' updated successfully.", ['name' => $floor->name]));
+    }
+
+    /**
+     * Delete an Office branch.
+     */
+    public function deleteOffice(\App\Domains\Workspace\Models\Floor $floor)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->with(['organization', 'role.permissions'])->first();
+        if (!$membership || $floor->organization_id !== $membership->organization_id) abort(403);
+
+        if (!$membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin') {
+            abort(403, 'Unauthorized');
+        }
+
+        if ($membership->organization->floors()->count() <= 1) {
+            return back()->with('error', __('You cannot delete the only remaining office branch.'));
+        }
+
+        $officeName = $floor->name;
+        $floor->rooms()->delete();
+        $floor->maps()->delete();
+        $floor->delete();
+
+        return back()->with('success', __("Office ':name' deleted successfully.", ['name' => $officeName]));
     }
 
     /**
@@ -1141,6 +1331,10 @@ class WebAuthController extends Controller
             'department_id' => ['nullable', 'uuid', 'exists:departments,id'],
             'team_id' => ['nullable', 'uuid', 'exists:teams,id'],
             'status' => ['nullable', 'in:active,invited,suspended'],
+            'allowed_offices' => ['nullable', 'array'],
+            'allowed_offices.*' => ['uuid', 'exists:floors,id'],
+            'allowed_rooms' => ['nullable', 'array'],
+            'allowed_rooms.*' => ['uuid', 'exists:rooms,id'],
         ]);
 
         $targetRole = \App\Domains\Administration\Models\Role::findOrFail($validated['role_id']);
@@ -1194,6 +1388,14 @@ class WebAuthController extends Controller
             ]
         );
 
+        // Sync allowed offices & rooms
+        if (isset($validated['allowed_offices'])) {
+            $member->offices()->sync($validated['allowed_offices']);
+        }
+        if (isset($validated['allowed_rooms'])) {
+            $member->rooms()->sync($validated['allowed_rooms']);
+        }
+
         // Create or update Profile
         $profile = \App\Domains\People\Models\UserProfile::firstOrNew([
             'user_id' => $targetUser->id,
@@ -1224,7 +1426,7 @@ class WebAuthController extends Controller
     }
 
     /**
-     * Update complete Organization Member details (Name, Email, Job Title, Department, Team, Role, Status).
+     * Update complete Organization Member details (Name, Email, Job Title, Department, Team, Role, Status, Allowed Offices & Rooms).
      */
     public function updateOrganizationMember(Request $request, OrganizationMember $member)
     {
@@ -1248,6 +1450,10 @@ class WebAuthController extends Controller
             'team_id' => ['nullable', 'uuid', 'exists:teams,id'],
             'role_id' => ['required', 'uuid', 'exists:roles,id'],
             'status' => ['required', 'in:active,invited,suspended'],
+            'allowed_offices' => ['nullable', 'array'],
+            'allowed_offices.*' => ['uuid', 'exists:floors,id'],
+            'allowed_rooms' => ['nullable', 'array'],
+            'allowed_rooms.*' => ['uuid', 'exists:rooms,id'],
         ]);
 
         $targetRole = \App\Domains\Administration\Models\Role::findOrFail($validated['role_id']);
@@ -1279,6 +1485,10 @@ class WebAuthController extends Controller
             'status' => $validated['status'],
         ]);
 
+        // Sync allowed offices & rooms
+        $member->offices()->sync($validated['allowed_offices'] ?? []);
+        $member->rooms()->sync($validated['allowed_rooms'] ?? []);
+
         $profile = \App\Domains\People\Models\UserProfile::firstOrNew([
             'user_id' => $member->user_id,
             'organization_id' => $member->organization_id,
@@ -1289,7 +1499,7 @@ class WebAuthController extends Controller
         $profile->job_title = $validated['job_title'] ?? null;
         $profile->save();
 
-        return back()->with('success', __('Member details updated successfully.'));
+        return back()->with('success', __('Member details and office/room access updated successfully.'));
     }
 
     /**
@@ -1338,20 +1548,18 @@ class WebAuthController extends Controller
         }
 
         if ($member->user_id === $user->id) {
-            return back()->with('error', __('You cannot remove yourself from the organization.'));
+            return back()->with('error', __('You cannot remove your own administrative account.'));
         }
 
-        \App\Domains\People\Models\UserProfile::where('user_id', $member->user_id)
-            ->where('organization_id', $member->organization_id)
-            ->delete();
-
+        $member->offices()->detach();
+        $member->rooms()->detach();
         $member->delete();
 
         return back()->with('success', __('Member has been removed from organization.'));
     }
 
     /**
-     * Fetch full Team Member Profile Details (Bio, Skills, Contact, Assigned Tasks, Work Time Logs).
+     * Fetch full Team Member Profile Details (Bio, Skills, Contact, Assigned Tasks, Work Time Logs, Allowed Offices & Rooms).
      */
     public function getMemberProfileDetails(OrganizationMember $member): \Illuminate\Http\JsonResponse
     {
@@ -1408,15 +1616,14 @@ class WebAuthController extends Controller
             ->where('user_id', $targetUser->id)
             ->with(['project:id,name,code', 'task:id,task_number,title'])
             ->latest('started_at')
-            ->take(50)
+            ->take(20)
             ->get()
             ->map(function ($te) {
                 return [
                     'id' => $te->id,
                     'date' => $te->started_at ? $te->started_at->format('M d, Y') : '—',
-                    'time_range' => ($te->started_at ? $te->started_at->format('h:i A') : '') . ($te->ended_at ? ' - ' . $te->ended_at->format('h:i A') : ''),
-                    'duration_hours' => round(($te->duration_seconds ?? 0) / 3600, 2),
-                    'description' => $te->description ?? __('Work execution'),
+                    'duration_formatted' => $te->formattedDuration(),
+                    'description' => $te->description ?? 'General Work Session',
                     'project_name' => $te->project?->name ?? 'General',
                     'task_title' => $te->task ? ('#' . $te->task->task_number . ' ' . $te->task->title) : '—',
                     'is_billable' => (bool)$te->is_billable,
@@ -1442,11 +1649,16 @@ class WebAuthController extends Controller
                 'avatar_url' => $targetUser->avatar_url,
                 'role_name' => $member->role?->name ?? 'Member',
                 'role_slug' => $member->role?->slug ?? 'employee',
+                'role_id' => $member->role_id,
                 'status' => $member->status,
                 'joined_at' => $member->joined_at ? $member->joined_at->format('M d, Y') : ($member->created_at ? $member->created_at->format('M d, Y') : '—'),
+                'allowed_office_ids' => $member->offices->pluck('id')->toArray(),
+                'allowed_room_ids' => $member->rooms->pluck('id')->toArray(),
             ],
             'profile' => [
                 'job_title' => $profile?->job_title ?? $member->role?->name ?? 'Team Member',
+                'department_id' => $profile?->department_id,
+                'team_id' => $profile?->team_id,
                 'department_name' => $dept?->name,
                 'team_name' => $team?->name,
                 'work_mode' => $profile?->work_mode ?? 'remote',

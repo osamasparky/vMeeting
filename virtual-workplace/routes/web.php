@@ -44,8 +44,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/editor/maps/{map}/publish', [WebAuthController::class, 'publishEditorMap'])->name('editor.maps.publish');
     Route::post('/editor/rooms', [WebAuthController::class, 'saveEditorRoom'])->name('editor.rooms.store');
     Route::patch('/editor/rooms/{room}', [WebAuthController::class, 'updateEditorRoom'])->name('editor.rooms.update');
-    Route::delete('/editor/rooms/{room}', [WebAuthController::class, 'deleteEditorRoom'])->name('editor.rooms.delete');
     Route::get('/projects/{project}', [WebAuthController::class, 'projectHub'])->name('projects.hub');
+
+    // Multi-Office & Branches Management
+    Route::post('/offices', [WebAuthController::class, 'storeOffice'])->name('offices.store');
+    Route::put('/offices/{floor}', [WebAuthController::class, 'updateOffice'])->name('offices.update');
+    Route::delete('/offices/{floor}', [WebAuthController::class, 'deleteOffice'])->name('offices.delete');
 
     // Departments & Teams Management
     Route::post('/departments', [WebAuthController::class, 'storeDepartment'])->name('departments.store');

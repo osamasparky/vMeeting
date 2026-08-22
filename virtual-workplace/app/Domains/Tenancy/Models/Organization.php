@@ -121,4 +121,32 @@ class Organization extends Model
 
         return $this->activeMembersCount() >= $this->plan->seat_limit;
     }
+
+    public function offices(): HasMany
+    {
+        return $this->hasMany(\App\Domains\Workspace\Models\Floor::class)->orderBy('order', 'asc');
+    }
+
+    public function defaultOffice(): ?\App\Domains\Workspace\Models\Floor
+    {
+        return $this->offices()->where('is_default', true)->first() ?: $this->offices()->first();
+    }
+
+    public function hasReachedOfficeLimit(): bool
+    {
+        if (!$this->plan || $this->plan->max_offices === 0) {
+            return false; // Unlimited
+        }
+
+        return $this->offices()->count() >= $this->plan->max_offices;
+    }
+
+    public function hasReachedRoomLimit(): bool
+    {
+        if (!$this->plan || $this->plan->room_limit === 0) {
+            return false; // Unlimited
+        }
+
+        return $this->rooms()->count() >= $this->plan->room_limit;
+    }
 }

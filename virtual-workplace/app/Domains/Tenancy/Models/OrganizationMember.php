@@ -43,6 +43,18 @@ class OrganizationMember extends Model
         return $this->belongsTo(Role::class);
     }
 
+    public function offices(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(\App\Domains\Workspace\Models\Floor::class, 'member_office_access', 'organization_member_id', 'floor_id')
+            ->withTimestamps();
+    }
+
+    public function rooms(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(\App\Domains\Workspace\Models\Room::class, 'member_room_access', 'organization_member_id', 'room_id')
+            ->withTimestamps();
+    }
+
     // ── Helpers ──
 
     public function isActive(): bool
@@ -73,5 +85,53 @@ class OrganizationMember extends Model
         }
 
         return $this->role->permissions()->where('key', $permissionKey)->exists();
+    }
+
+    /**
+     * Check if member is allowed to enter a given office/floor.
+     */
+    public function hasOfficeAccess(?string $floorId): bool
+    {
+        if (!$floorId) {
+            return true;
+        }
+
+        if ($this->role?->slug === 'company_admin' || $this->role?->slug === 'super_admin' || $this->user?->isSuperAdmin()) {
+            return true;
+        }
+
+        // If no explicit office restrictions are configured for this member, default to all company offices
+        if ($this->offices()->count() === 0) {
+            return true;
+        }
+
+        return $this->offices()->where('floors.id', $floorId)->exists();
+    }
+
+    /**
+     * Check if member is allowed to enter a given room.
+     */
+    public function hasRoomAccess(?string $roomId): bool
+    {
+        if (!$roomId) {
+            return true;
+        }
+
+        if ($this->role?->slug === 'company_admin' || $this->role?->slug === 'super_admin' || $this->user?->isSuperAdmin()) {
+            return true;
+        }
+
+        $room = \App\Domains\Workspace\Models\Room::find($roomId);
+        if (!$room) {
+            return true;
+        }
+
+        // Check if member has specific room assignments
+        if ($this->rooms()->count() > 0) {
+            return $this->rooms()->where('rooms.id', $roomId)->exists();
+        }
+
+        // If public and no specific restrictions, allowed
+        return $room->access_mode !== 'private';
     }
 }
