@@ -1,0 +1,7 @@
+task list 
+i need to remove the avatar in user in office and replace it with the user profile image and when i open the camera and mic it appearss on this profile square and i can popitup to see it biger and conrol  to see all the users camera or spasific user 
+1- user canot be in 2 offices in the same time example i canot be on riyad office and egypt office in the same time .
+2- need all the services to be on my server no cdn or 3d part .
+3-need to recourd time when the user enter the room and how many hours he stayed online on the office to calculate his working hours .
+3-need when i click on the user to see his task list and what he working in now .
+5-need to enhance The WebRTC  and do best practes becouse i have delay in the office members appearance 
