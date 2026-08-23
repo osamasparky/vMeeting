@@ -93,6 +93,17 @@ class PresenceManager {
         const occupants = [];
         for (const conn of this.clients.values()) {
             if (conn.user.organizationId === organizationId) {
+                if (!mapId || conn.user.mapId === mapId) {
+                    occupants.push(conn.user);
+                }
+            }
+        }
+        return occupants;
+    }
+    getOrganizationOccupants(organizationId) {
+        const occupants = [];
+        for (const conn of this.clients.values()) {
+            if (conn.user.organizationId === organizationId) {
                 occupants.push(conn.user);
             }
         }
@@ -132,7 +143,23 @@ class PresenceManager {
     broadcastToMap(organizationId, mapId, event, excludeWs) {
         const messageStr = JSON.stringify(event);
         for (const [socket, conn] of this.clients.entries()) {
-            if (socket !== excludeWs && conn.user.organizationId === organizationId && socket.readyState === ws_1.WebSocket.OPEN) {
+            if (socket !== excludeWs &&
+                conn.user.organizationId === organizationId &&
+                (!mapId || conn.user.mapId === mapId) &&
+                socket.readyState === ws_1.WebSocket.OPEN) {
+                socket.send(messageStr);
+            }
+        }
+    }
+    /**
+     * Broadcast an event across the entire organization (e.g. global chat, organization presence).
+     */
+    broadcastToOrganization(organizationId, event, excludeWs) {
+        const messageStr = JSON.stringify(event);
+        for (const [socket, conn] of this.clients.entries()) {
+            if (socket !== excludeWs &&
+                conn.user.organizationId === organizationId &&
+                socket.readyState === ws_1.WebSocket.OPEN) {
                 socket.send(messageStr);
             }
         }

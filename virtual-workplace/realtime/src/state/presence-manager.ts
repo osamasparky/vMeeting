@@ -121,6 +121,18 @@ export class PresenceManager {
     const occupants: OfficeUser[] = [];
     for (const conn of this.clients.values()) {
       if (conn.user.organizationId === organizationId) {
+        if (!mapId || conn.user.mapId === mapId) {
+          occupants.push(conn.user);
+        }
+      }
+    }
+    return occupants;
+  }
+
+  public getOrganizationOccupants(organizationId: string): OfficeUser[] {
+    const occupants: OfficeUser[] = [];
+    for (const conn of this.clients.values()) {
+      if (conn.user.organizationId === organizationId) {
         occupants.push(conn.user);
       }
     }
@@ -170,7 +182,32 @@ export class PresenceManager {
   ): void {
     const messageStr = JSON.stringify(event);
     for (const [socket, conn] of this.clients.entries()) {
-      if (socket !== excludeWs && conn.user.organizationId === organizationId && socket.readyState === WebSocket.OPEN) {
+      if (
+        socket !== excludeWs &&
+        conn.user.organizationId === organizationId &&
+        (!mapId || conn.user.mapId === mapId) &&
+        socket.readyState === WebSocket.OPEN
+      ) {
+        socket.send(messageStr);
+      }
+    }
+  }
+
+  /**
+   * Broadcast an event across the entire organization (e.g. global chat, organization presence).
+   */
+  public broadcastToOrganization(
+    organizationId: string,
+    event: OutboundEvent,
+    excludeWs?: WebSocket
+  ): void {
+    const messageStr = JSON.stringify(event);
+    for (const [socket, conn] of this.clients.entries()) {
+      if (
+        socket !== excludeWs &&
+        conn.user.organizationId === organizationId &&
+        socket.readyState === WebSocket.OPEN
+      ) {
         socket.send(messageStr);
       }
     }

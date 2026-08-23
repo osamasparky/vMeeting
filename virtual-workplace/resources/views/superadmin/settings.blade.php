@@ -61,7 +61,7 @@
                 <input
                     type="text"
                     name="stun_server"
-                    value="stun:stun.l.google.com:19302"
+                    value="stun:173.212.248.192:3478"
                     style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px 14px; color: var(--text-primary); outline: none; font-size: 13px; font-family: monospace; box-shadow: var(--shadow-inset-3d);"
                 >
             </div>

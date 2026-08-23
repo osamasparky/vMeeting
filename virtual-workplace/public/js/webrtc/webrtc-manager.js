@@ -287,13 +287,14 @@ class DiagnosticsManager {
             results.internet = { passed: false, latencyMs: Math.round(performance.now() - start) };
         }
 
-        // 5. STUN Server Check
+        // 5. STUN & TURN Server Check (Self-Hosted Coturn)
         try {
-            const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+            const stunUrl = (config?.ice_servers && config.ice_servers[0]?.urls) || 'stun:173.212.248.192:3478';
+            const pc = new RTCPeerConnection({ iceServers: [{ urls: stunUrl }] });
             const ch = pc.createDataChannel('diag');
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
-            results.stun = { passed: true, message: 'STUN Candidate Discovered ✓' };
+            results.stun = { passed: true, message: 'STUN Candidate Discovered (Self-Hosted Coturn) ✓' };
             pc.close();
         } catch (e) {
             results.stun = { passed: false, message: e.message };

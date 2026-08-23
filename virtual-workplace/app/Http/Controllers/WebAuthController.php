@@ -1136,9 +1136,21 @@ class WebAuthController extends Controller
         $organization = $invitation->organization;
         $room = $invitation->room;
         
-        $floor = $organization->floors()->first();
-        $map = $organization->maps()->where('floor_id', $floor->id)->where('status', 'published')->latest('published_at')->first()
-            ?? $organization->maps()->where('floor_id', $floor->id)->latest()->first();
+        $targetRoom = $room;
+        $floor = null;
+        if ($targetRoom && $targetRoom->map && $targetRoom->map->floor) {
+            $floor = $targetRoom->map->floor;
+        } elseif ($targetRoom && $targetRoom->floor_id) {
+            $floor = $organization->floors()->find($targetRoom->floor_id);
+        }
+        if (!$floor) {
+            $floor = $organization->floors()->where('is_default', true)->first() ?: $organization->floors()->first();
+        }
+
+        $map = ($targetRoom && $targetRoom->map) ? $targetRoom->map : (
+            $organization->maps()->where('floor_id', $floor->id)->where('status', 'published')->latest('published_at')->first()
+            ?? $organization->maps()->where('floor_id', $floor->id)->latest()->first()
+        );
 
         $map->load(['rooms', 'zones', 'objects']);
 

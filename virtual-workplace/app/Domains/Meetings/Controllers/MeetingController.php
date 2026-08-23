@@ -174,10 +174,10 @@ class MeetingController extends Controller
         $turnUser = config('services.turn.username', env('TURN_USERNAME', 'vw_turn_user'));
         $turnPass = config('services.turn.credential', env('TURN_CREDENTIAL', 'vw_turn_password_2026'));
 
+        $stunUrl = str_replace('turn:', 'stun:', $turnUrl);
+
         return [
-            ['urls' => 'stun:stun.l.google.com:19302'],
-            ['urls' => 'stun:stun1.l.google.com:19302'],
-            ['urls' => 'stun:stun2.l.google.com:19302'],
+            ['urls' => $stunUrl],
             [
                 'urls' => [
                     $turnUrl . '?transport=udp',

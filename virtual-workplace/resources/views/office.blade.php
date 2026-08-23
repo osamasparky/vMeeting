@@ -1328,11 +1328,17 @@
 
         const RTC_CONFIG = {
             iceServers: [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' },
-                { urls: 'stun:stun2.l.google.com:19302' },
-                { urls: 'stun:stun3.l.google.com:19302' }
-            ]
+                { urls: 'stun:173.212.248.192:3478' },
+                {
+                    urls: [
+                        'turn:173.212.248.192:3478?transport=udp',
+                        'turn:173.212.248.192:3478?transport=tcp'
+                    ],
+                    username: 'vw_turn_user',
+                    credential: 'vw_turn_password_2026'
+                }
+            ],
+            iceCandidatePoolSize: 10
         };
 
         // ── Resize & Camera ──
@@ -1906,14 +1912,27 @@
                         if (data.type === 'welcome' && data.payload?.occupants) {
                             data.payload.occupants.forEach(occ => {
                                 if (occ.userId && occ.userId !== localAvatar.id) {
+                                    let avImg = null;
+                                    if (occ.avatarUrl) {
+                                        avImg = new Image();
+                                        avImg.crossOrigin = 'anonymous';
+                                        avImg.src = occ.avatarUrl;
+                                    }
+                                    const posX = Number(occ.position?.x) || 400;
+                                    const posY = Number(occ.position?.y) || 400;
                                     remoteAvatars.set(occ.userId, {
                                         id: occ.userId,
                                         name: occ.name || 'Member',
+                                        avatarUrl: occ.avatarUrl || null,
+                                        avatarImg: avImg,
                                         isGuest: !!occ.isGuest || (occ.name && occ.name.includes('(Guest)')),
-                                        x: occ.position?.x || 500,
-                                        y: occ.position?.y || 500,
-                                        targetX: occ.position?.x || 500,
-                                        targetY: occ.position?.y || 500,
+                                        x: posX,
+                                        y: posY,
+                                        targetX: posX,
+                                        targetY: posY,
+                                        camActive: !!occ.camActive,
+                                        micActive: !!occ.micActive,
+                                        isSpeaking: false,
                                         gender: occ.gender || 'male'
                                     });
                                     initiatePeerConnection(occ.userId, true);
@@ -1926,14 +1945,27 @@
                         else if (data.type === 'user.joined' && data.payload) {
                             const u = data.payload;
                             if (u.userId && u.userId !== localAvatar.id) {
+                                let avImg = null;
+                                if (u.avatarUrl) {
+                                    avImg = new Image();
+                                    avImg.crossOrigin = 'anonymous';
+                                    avImg.src = u.avatarUrl;
+                                }
+                                const posX = Number(u.position?.x) || 400;
+                                const posY = Number(u.position?.y) || 400;
                                 remoteAvatars.set(u.userId, {
                                     id: u.userId,
                                     name: u.name || 'Member',
+                                    avatarUrl: u.avatarUrl || null,
+                                    avatarImg: avImg,
                                     isGuest: !!u.isGuest || (u.name && u.name.includes('(Guest)')),
-                                    x: u.position?.x || 500,
-                                    y: u.position?.y || 500,
-                                    targetX: u.position?.x || 500,
-                                    targetY: u.position?.y || 500,
+                                    x: posX,
+                                    y: posY,
+                                    targetX: posX,
+                                    targetY: posY,
+                                    camActive: !!u.camActive,
+                                    micActive: !!u.micActive,
+                                    isSpeaking: false,
                                     gender: u.gender || 'male'
                                 });
                                 initiatePeerConnection(u.userId, false);
@@ -2219,6 +2251,11 @@
                         videoEl.srcObject = stream;
                         videoEl.play().catch(()=>{});
 
+                        if (av) {
+                            av.videoEl = videoEl;
+                            av.camActive = true;
+                        }
+
                         document.getElementById('video-grid').appendChild(videoCard);
                         peerVideoCards.set(targetUserId, videoCard);
 
@@ -2229,6 +2266,10 @@
                         if (videoEl) {
                             videoEl.srcObject = stream;
                             videoEl.play().catch(()=>{});
+                            if (av) {
+                                av.videoEl = videoEl;
+                                av.camActive = true;
+                            }
                         }
                     }
                 }
