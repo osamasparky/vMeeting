@@ -782,6 +782,11 @@
                 <span>👥</span> <span id="occupants-counter">1 {{ __('Online') }}</span>
             </button>
 
+            <button onclick="openDiagnosticsModal()" class="action-link-btn" id="btn-webrtc-quality-pill" title="{{ __('WebRTC Connection Quality') }}">
+                <span id="webrtc-quality-dot" style="width: 7px; height: 7px; border-radius: 50%; background: #10B981; display: inline-block;"></span>
+                <span id="webrtc-quality-text">WebRTC: Good</span>
+            </button>
+
             <button onclick="toggleChatDrawer()" class="action-link-btn" title="{{ __('Chat & Files') }}">
                 <span>💬</span> <span>{{ __('Chat') }}</span>
             </button>
@@ -898,9 +903,128 @@
             <span>📼</span>
             <span>{{ __('Gallery') }}</span>
         </button>
+        <button class="dock-btn" onclick="openDeviceSettingsModal()" title="{{ __('Camera & Microphone Settings') }}">
+            <span>⚙️</span>
+            <span>{{ __('Devices') }}</span>
+        </button>
+        <button class="dock-btn" onclick="openDiagnosticsModal()" title="{{ __('WebRTC & Network Diagnostics') }}">
+            <span>🩺</span>
+            <span>{{ __('Diagnostics') }}</span>
+        </button>
     </div>
 
     <!-- ── Modals & Overlays ── -->
+
+    <!-- 0a. Device Settings & Pre-Join Test Modal -->
+    <div id="device-settings-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 540px;">
+            <div class="modal-header">
+                <div class="modal-title"><span>⚙️</span> {{ __('Audio & Video Device Settings') }}</div>
+                <button onclick="closeDeviceSettingsModal()" style="background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button>
+            </div>
+            
+            <!-- Video Preview Box -->
+            <div style="position: relative; width: 100%; height: 200px; background: #070F0A; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                <video id="device-preview-video" autoplay playsinline muted style="width: 100%; height: 100%; object-fit: cover;"></video>
+                <div id="device-no-preview" style="display: none; color: var(--text-muted); font-size: 12px; font-weight: 700;">📷 {{ __('Camera Preview Inactive') }}</div>
+            </div>
+
+            <!-- Mic Volume Level Meter -->
+            <div style="margin-bottom: 14px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px;">
+                    <span>🎙️ {{ __('Microphone Input Test') }}</span>
+                    <span id="mic-level-val">0%</span>
+                </div>
+                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+                    <div id="mic-level-bar" style="width: 0%; height: 100%; background: #10B981; transition: width 0.08s ease;"></div>
+                </div>
+            </div>
+
+            <!-- Selectors -->
+            <div class="input-group">
+                <label class="input-label">📹 {{ __('Camera Device') }}</label>
+                <select class="styled-input" id="select-video-input" onchange="onCameraDeviceChanged(this.value)">
+                    <option value="default">{{ __('Default Camera') }}</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label class="input-label">🎙️ {{ __('Microphone Device') }}</label>
+                <select class="styled-input" id="select-audio-input" onchange="onMicDeviceChanged(this.value)">
+                    <option value="default">{{ __('Default Microphone') }}</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label class="input-label">🔊 {{ __('Audio Output Speaker') }}</label>
+                <select class="styled-input" id="select-audio-output" onchange="onSpeakerDeviceChanged(this.value)">
+                    <option value="default">{{ __('Default Speaker') }}</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <button onclick="closeDeviceSettingsModal()" class="action-link-btn" style="flex: 1; background: var(--brand-primary); color: white; justify-content: center; padding: 10px;">
+                    ✓ {{ __('Done & Save Settings') }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 0b. WebRTC & Network Diagnostics Modal -->
+    <div id="diagnostics-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 600px;">
+            <div class="modal-header">
+                <div class="modal-title"><span>🩺</span> {{ __('WebRTC & Media Diagnostics (فحص جودة الاتصال)') }}</div>
+                <button onclick="closeDiagnosticsModal()" style="background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button>
+            </div>
+
+            <div id="diag-loading" style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 13px;">
+                ⏳ {{ __('Running automated WebRTC & STUN/TURN checks...') }}
+            </div>
+
+            <div id="diag-content" style="display: none; flex-direction: column; gap: 12px;">
+                <!-- Overall Status Banner -->
+                <div id="diag-overall-box" style="padding: 12px 16px; border-radius: 12px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(52, 211, 153, 0.3); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <div style="font-size: 10px; font-weight: 800; color: var(--brand-primary); text-transform: uppercase;">{{ __('Overall Connection Quality') }}</div>
+                        <div id="diag-overall-text" style="font-size: 16px; font-weight: 900; color: #6EE7B7;">Excellent (ممتاز)</div>
+                    </div>
+                    <span id="diag-overall-badge" style="font-size: 24px;">🟢</span>
+                </div>
+
+                <!-- Diagnostics Grid -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; padding: 10px;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 800;">📷 {{ __('Camera Access') }}</div>
+                        <div id="diag-cam-status" style="font-size: 13px; font-weight: 800; color: #10B981;">✓ Verified</div>
+                    </div>
+                    <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; padding: 10px;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 800;">🎙️ {{ __('Microphone Access') }}</div>
+                        <div id="diag-mic-status" style="font-size: 13px; font-weight: 800; color: #10B981;">✓ Verified</div>
+                    </div>
+                    <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; padding: 10px;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 800;">⚡ {{ __('Internet Ping (RTT)') }}</div>
+                        <div id="diag-ping-status" style="font-size: 13px; font-weight: 800; color: #6EE7B7;">32 ms</div>
+                    </div>
+                    <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; padding: 10px;">
+                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 800;">🌐 {{ __('STUN & TURN Relay') }}</div>
+                        <div id="diag-turn-status" style="font-size: 13px; font-weight: 800; color: #10B981;">✓ Active (Coturn)</div>
+                    </div>
+                </div>
+
+                <!-- Telemetry Stats Table -->
+                <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; font-family: monospace; font-size: 11px; line-height: 1.6; color: var(--text-secondary);">
+                    <div style="display: flex; justify-content: space-between;"><span>SFU Host:</span> <span id="diag-livekit-host" style="color: #93C5FD;">wss://nextspace.munazzah.com/livekit</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span>Packet Loss:</span> <span id="diag-packet-loss" style="color: #6EE7B7;">0.0%</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span>Jitter:</span> <span id="diag-jitter" style="color: #6EE7B7;">4 ms</span></div>
+                    <div style="display: flex; justify-content: space-between;"><span>Framerate (FPS):</span> <span id="diag-fps" style="color: #6EE7B7;">30 FPS</span></div>
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="runDiagnosticsCheck()" class="action-link-btn" style="flex: 1; justify-content: center;">🔄 {{ __('Re-run Check') }}</button>
+                    <button onclick="copyDiagnosticsReport()" class="action-link-btn" style="flex: 1; background: var(--brand-accent); color: white; justify-content: center;">📋 {{ __('Copy Report for Support') }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- 1. User Spotlight & Live Video Modal -->
     <div id="user-spotlight-modal" class="modal-overlay">
@@ -3296,6 +3420,160 @@
             } catch(e) {}
         }
 
+        // ── WebRTC Device Settings & Diagnostics Modals ──
+        let latestDiagResults = null;
+
+        async function openDeviceSettingsModal() {
+            const modal = document.getElementById('device-settings-modal');
+            if (!modal) return;
+            modal.style.display = 'flex';
+
+            const selCam = document.getElementById('select-video-input');
+            const selMic = document.getElementById('select-audio-input');
+            const selSpk = document.getElementById('select-audio-output');
+            const previewVideo = document.getElementById('device-preview-video');
+            const noPreview = document.getElementById('device-no-preview');
+
+            try {
+                if (window.VWorkWebRTC && window.VWorkWebRTC.deviceManager) {
+                    const dev = await window.VWorkWebRTC.deviceManager.enumerateDevices();
+                    if (dev) {
+                        selCam.innerHTML = dev.cams.map(c => `<option value="${c.deviceId}">${c.label || 'Camera ' + c.deviceId.substring(0,5)}</option>`).join('') || '<option value="default">{{ __("Default Camera") }}</option>';
+                        selMic.innerHTML = dev.mics.map(m => `<option value="${m.deviceId}">${m.label || 'Mic ' + m.deviceId.substring(0,5)}</option>`).join('') || '<option value="default">{{ __("Default Microphone") }}</option>';
+                        selSpk.innerHTML = dev.speakers.map(s => `<option value="${s.deviceId}">${s.label || 'Speaker ' + s.deviceId.substring(0,5)}</option>`).join('') || '<option value="default">{{ __("Default Speaker") }}</option>';
+                        
+                        selCam.value = window.VWorkWebRTC.deviceManager.selectedVideoInputId;
+                        selMic.value = window.VWorkWebRTC.deviceManager.selectedAudioInputId;
+                        selSpk.value = window.VWorkWebRTC.deviceManager.selectedAudioOutputId;
+                    }
+
+                    // Start camera preview & mic meter
+                    try {
+                        await window.VWorkWebRTC.deviceManager.startCameraPreview(previewVideo);
+                        previewVideo.style.display = 'block';
+                        noPreview.style.display = 'none';
+                    } catch(e) {
+                        previewVideo.style.display = 'none';
+                        noPreview.style.display = 'block';
+                    }
+
+                    window.VWorkWebRTC.deviceManager.startMicLevelMeter((volume) => {
+                        const bar = document.getElementById('mic-level-bar');
+                        const val = document.getElementById('mic-level-val');
+                        if (bar) bar.style.width = `${volume}%`;
+                        if (val) val.textContent = `${volume}%`;
+                    });
+                }
+            } catch(err) {
+                console.error(err);
+            }
+        }
+
+        function closeDeviceSettingsModal() {
+            if (window.VWorkWebRTC && window.VWorkWebRTC.deviceManager) {
+                window.VWorkWebRTC.deviceManager.stopCameraPreview();
+                window.VWorkWebRTC.deviceManager.stopMicLevelMeter();
+            }
+            const modal = document.getElementById('device-settings-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function onCameraDeviceChanged(devId) {
+            if (window.VWorkWebRTC && window.VWorkWebRTC.deviceManager) {
+                window.VWorkWebRTC.deviceManager.setVideoInput(devId);
+                const previewVideo = document.getElementById('device-preview-video');
+                window.VWorkWebRTC.deviceManager.startCameraPreview(previewVideo, devId).catch(()=>{});
+            }
+        }
+
+        function onMicDeviceChanged(devId) {
+            if (window.VWorkWebRTC && window.VWorkWebRTC.deviceManager) {
+                window.VWorkWebRTC.deviceManager.setAudioInput(devId);
+                window.VWorkWebRTC.deviceManager.startMicLevelMeter((volume) => {
+                    const bar = document.getElementById('mic-level-bar');
+                    const val = document.getElementById('mic-level-val');
+                    if (bar) bar.style.width = `${volume}%`;
+                    if (val) val.textContent = `${volume}%`;
+                }, devId);
+            }
+        }
+
+        function onSpeakerDeviceChanged(devId) {
+            if (window.VWorkWebRTC && window.VWorkWebRTC.deviceManager) {
+                window.VWorkWebRTC.deviceManager.setAudioOutput(devId);
+            }
+        }
+
+        async function openDiagnosticsModal() {
+            const modal = document.getElementById('diagnostics-modal');
+            if (!modal) return;
+            modal.style.display = 'flex';
+            await runDiagnosticsCheck();
+        }
+
+        function closeDiagnosticsModal() {
+            const modal = document.getElementById('diagnostics-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        async function runDiagnosticsCheck() {
+            const loading = document.getElementById('diag-loading');
+            const content = document.getElementById('diag-content');
+            loading.style.display = 'block';
+            content.style.display = 'none';
+
+            try {
+                const configRes = await fetch(`/organizations/${CONFIG.org.id}/webrtc/diagnostics-config`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                const config = configRes.ok ? await configRes.json() : {};
+
+                if (window.VWorkWebRTC && window.VWorkWebRTC.diagnostics) {
+                    const results = await window.VWorkWebRTC.diagnostics.runFullDiagnostics(config);
+                    latestDiagResults = results;
+
+                    // Populate UI
+                    document.getElementById('diag-overall-text').textContent = `${results.overall}`;
+                    document.getElementById('diag-overall-badge').textContent = results.overall === 'Excellent' ? '🟢' : (results.overall.includes('Good') ? '🟡' : '🔴');
+                    document.getElementById('diag-cam-status').textContent = results.camera.passed ? '✓ Active' : '✗ ' + results.camera.message;
+                    document.getElementById('diag-cam-status').style.color = results.camera.passed ? '#10B981' : '#EF4444';
+                    document.getElementById('diag-mic-status').textContent = results.microphone.passed ? '✓ Active' : '✗ ' + results.microphone.message;
+                    document.getElementById('diag-mic-status').style.color = results.microphone.passed ? '#10B981' : '#EF4444';
+                    document.getElementById('diag-ping-status').textContent = `${results.internet.latencyMs} ms`;
+                    document.getElementById('diag-turn-status').textContent = results.turn.passed ? '✓ Active (Coturn)' : '✗ Inactive';
+                    document.getElementById('diag-livekit-host').textContent = results.livekit.host;
+                    document.getElementById('diag-packet-loss').textContent = `${results.networkStats.packetLoss}%`;
+                    document.getElementById('diag-jitter').textContent = `${results.networkStats.jitter} ms`;
+                    document.getElementById('diag-fps').textContent = `${results.networkStats.fps} FPS`;
+                }
+            } catch(e) {
+                console.error(e);
+            }
+
+            loading.style.display = 'none';
+            content.style.display = 'flex';
+        }
+
+        function copyDiagnosticsReport() {
+            if (!latestDiagResults || !window.VWorkWebRTC || !window.VWorkWebRTC.diagnostics) return;
+            const text = window.VWorkWebRTC.diagnostics.formatDiagnosticsReport(latestDiagResults);
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('📋 {{ __("Diagnostics report copied to clipboard!") }}');
+            });
+        }
+
+        // Listen for realtime connection quality changes
+        if (window.VWorkWebRTC && window.VWorkWebRTC.connectionMonitor) {
+            window.VWorkWebRTC.connectionMonitor.onQualityChange((quality, stats) => {
+                const dot = document.getElementById('webrtc-quality-dot');
+                const text = document.getElementById('webrtc-quality-text');
+                if (dot && text) {
+                    dot.style.background = quality === 'excellent' ? '#10B981' : (quality === 'good' || quality === 'fair' ? '#F59E0B' : '#EF4444');
+                    text.textContent = `WebRTC: ${quality.toUpperCase()}`;
+                }
+            });
+        }
+
         function toggleAppTheme() {
             const cur = document.documentElement.getAttribute('data-theme') || 'dark';
             const next = cur === 'dark' ? 'light' : 'dark';
@@ -3328,5 +3606,6 @@
         // Start animation loop
         requestAnimationFrame(draw);
     </script>
+    <script src="/js/webrtc/webrtc-manager.js"></script>
 </body>
 </html>

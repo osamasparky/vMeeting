@@ -266,6 +266,14 @@ Route::prefix('v1')->group(function () {
                     ->middleware('permission:timesheets.approve');
                 Route::post('/timesheets/{timesheet}/reject', [\App\Domains\Projects\Controllers\TimesheetController::class, 'reject'])
                     ->middleware('permission:timesheets.approve');
+
+                // ── WebRTC & LiveKit Meetings Domain ──
+                Route::get('/meetings', [\App\Domains\Meetings\Controllers\MeetingController::class, 'listMeetings']);
+                Route::post('/meetings', [\App\Domains\Meetings\Controllers\MeetingController::class, 'createMeeting']);
+                Route::post('/meetings/{meeting}/end', [\App\Domains\Meetings\Controllers\MeetingController::class, 'endMeeting']);
+                Route::post('/meetings/{meeting}/token', [\App\Domains\Meetings\Controllers\MeetingController::class, 'getMeetingToken']);
+                Route::post('/rooms/{room}/livekit-token', [\App\Domains\Meetings\Controllers\MeetingController::class, 'getLiveKitToken']);
+                Route::get('/webrtc/diagnostics-config', [\App\Domains\Meetings\Controllers\MeetingController::class, 'getDiagnosticsConfig']);
             });
 
         // ── Plans (public listing) ──

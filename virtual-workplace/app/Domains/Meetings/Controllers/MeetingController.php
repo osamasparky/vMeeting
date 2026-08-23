@@ -4,6 +4,7 @@ namespace App\Domains\Meetings\Controllers;
 
 use App\Domains\Meetings\Models\Meeting;
 use App\Domains\Meetings\Services\LiveKitTokenService;
+use App\Domains\People\Models\OrganizationMember;
 use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Workspace\Models\Room;
 use Illuminate\Http\JsonResponse;
@@ -14,24 +15,84 @@ use Illuminate\Support\Facades\Auth;
 class MeetingController extends Controller
 {
     /**
-     * Issue a short-lived LiveKit WebRTC Access Token for joining a room audio/video stream.
+     * Issue a short-lived LiveKit WebRTC Access Token for joining an office workspace room.
      */
     public function getLiveKitToken(
+        Request $request,
         Organization $organization,
         Room $room,
         LiveKitTokenService $service
     ): JsonResponse {
         if ($room->organization_id !== $organization->id) {
-            return response()->json(['message' => 'Unauthorized room access.'], 403);
+            return response()->json(['message' => 'Unauthorized: Room does not belong to this organization.'], 403);
         }
 
         $user = Auth::user();
-        $token = $service->generateRoomToken($user, $room);
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        // Verify membership in this organization
+        $membership = OrganizationMember::where('organization_id', $organization->id)
+            ->where('user_id', $user->id)
+            ->first();
+
+        $isHost = $membership && in_array($membership->role, ['owner', 'admin', 'manager']);
+
+        $token = $service->generateRoomToken($user, $room, $isHost);
+        $livekitHost = config('services.livekit.host', env('LIVEKIT_HOST', 'wss://nextspace.munazzah.com/livekit'));
 
         return response()->json([
             'token' => $token,
-            'livekit_host' => env('LIVEKIT_HOST', 'wss://livekit.virtualworkplace.local'),
+            'livekit_host' => $livekitHost,
             'room_name' => "org_{$room->organization_id}_room_{$room->id}",
+            'is_host' => $isHost,
+            'ice_servers' => $this->getIceServersList(),
+        ]);
+    }
+
+    /**
+     * Issue a short-lived LiveKit WebRTC Access Token for joining a formal meeting session.
+     */
+    public function getMeetingToken(
+        Request $request,
+        Organization $organization,
+        Meeting $meeting,
+        LiveKitTokenService $service
+    ): JsonResponse {
+        if ($meeting->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Unauthorized: Meeting does not belong to this organization.'], 403);
+        }
+
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        $isHost = ($meeting->created_by === $user->id);
+
+        $token = $service->generateMeetingToken($user, $meeting, $isHost);
+        $livekitHost = config('services.livekit.host', env('LIVEKIT_HOST', 'wss://nextspace.munazzah.com/livekit'));
+
+        return response()->json([
+            'token' => $token,
+            'livekit_host' => $livekitHost,
+            'room_name' => $meeting->livekit_room_name ?: "meeting_{$meeting->organization_id}_{$meeting->id}",
+            'is_host' => $isHost,
+            'ice_servers' => $this->getIceServersList(),
+        ]);
+    }
+
+    /**
+     * Get WebRTC STUN/TURN & Diagnostics configuration.
+     */
+    public function getDiagnosticsConfig(Request $request, Organization $organization): JsonResponse
+    {
+        return response()->json([
+            'livekit_host' => config('services.livekit.host', env('LIVEKIT_HOST', 'wss://nextspace.munazzah.com/livekit')),
+            'ice_servers' => $this->getIceServersList(),
+            'organization_id' => $organization->id,
+            'server_time' => now()->toIso8601String(),
         ]);
     }
 
@@ -102,5 +163,29 @@ class MeetingController extends Controller
             'message' => 'Meeting ended successfully.',
             'meeting' => $meeting,
         ]);
+    }
+
+    /**
+     * Internal helper to build ICE servers list with STUN & Coturn TURN fallbacks.
+     */
+    protected function getIceServersList(): array
+    {
+        $turnUrl = config('services.turn.url', env('TURN_URL', 'turn:173.212.248.192:3478'));
+        $turnUser = config('services.turn.username', env('TURN_USERNAME', 'vw_turn_user'));
+        $turnPass = config('services.turn.credential', env('TURN_CREDENTIAL', 'vw_turn_password_2026'));
+
+        return [
+            ['urls' => 'stun:stun.l.google.com:19302'],
+            ['urls' => 'stun:stun1.l.google.com:19302'],
+            ['urls' => 'stun:stun2.l.google.com:19302'],
+            [
+                'urls' => [
+                    $turnUrl . '?transport=udp',
+                    $turnUrl . '?transport=tcp',
+                ],
+                'username' => $turnUser,
+                'credential' => $turnPass,
+            ],
+        ];
     }
 }

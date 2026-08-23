@@ -97,6 +97,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/members/{userId}/activity', [WebAuthController::class, 'memberActivity'])->name('members.activity');
     Route::post('/api/office/attendance/log', [WebAuthController::class, 'logRoomAttendance'])->name('office.attendance.log');
 
+    // WebRTC & LiveKit Media Plane Routes
+    Route::get('/organizations/{organization}/meetings', [\App\Domains\Meetings\Controllers\MeetingController::class, 'listMeetings'])->name('web.meetings.list');
+    Route::post('/organizations/{organization}/meetings', [\App\Domains\Meetings\Controllers\MeetingController::class, 'createMeeting'])->name('web.meetings.create');
+    Route::post('/organizations/{organization}/meetings/{meeting}/end', [\App\Domains\Meetings\Controllers\MeetingController::class, 'endMeeting'])->name('web.meetings.end');
+    Route::post('/organizations/{organization}/meetings/{meeting}/token', [\App\Domains\Meetings\Controllers\MeetingController::class, 'getMeetingToken'])->name('web.meetings.token');
+    Route::post('/organizations/{organization}/rooms/{room}/livekit-token', [\App\Domains\Meetings\Controllers\MeetingController::class, 'getLiveKitToken'])->name('web.rooms.livekit_token');
+    Route::get('/organizations/{organization}/webrtc/diagnostics-config', [\App\Domains\Meetings\Controllers\MeetingController::class, 'getDiagnosticsConfig'])->name('web.webrtc.diagnostics');
+
     // Impersonation Exit Routes
     Route::post('/impersonate/leave', [\App\Http\Controllers\SuperAdminController::class, 'leaveImpersonation'])->name('impersonate.leave');
     Route::get('/impersonate/leave', [\App\Http\Controllers\SuperAdminController::class, 'leaveImpersonation'])->name('impersonate.leave.get');

@@ -40,4 +40,16 @@ return [
         'ws_url' => env('REALTIME_WS_URL'),
     ],
 
+    'livekit' => [
+        'host' => env('LIVEKIT_HOST', env('LIVEKIT_URL', 'wss://nextspace.munazzah.com/livekit')),
+        'api_key' => env('LIVEKIT_API_KEY', 'devkey'),
+        'api_secret' => env('LIVEKIT_API_SECRET', 'secret_livekit_key_virtual_workplace_2026'),
+    ],
+
+    'turn' => [
+        'url' => env('TURN_URL', 'turn:173.212.248.192:3478'),
+        'username' => env('TURN_USERNAME', 'vw_turn_user'),
+        'credential' => env('TURN_CREDENTIAL', 'vw_turn_password_2026'),
+    ],
+
 ];
