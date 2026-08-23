@@ -83,6 +83,13 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
             ws
           );
 
+          // 3. Broadcast updated organization-wide map occupancy counts to all branches
+          const mapCounts = presence.getOrganizationMapOccupancyCounts(user.organizationId);
+          presence.broadcastToOrganization(user.organizationId, {
+            type: 'organization.map_occupancy',
+            payload: { counts: mapCounts },
+          });
+
           console.log(`[WS] ${user.name} joined map ${mapId} (gender: ${user.gender || 'male'}, total occupants: ${occupants.length})`);
           break;
         }
@@ -477,6 +484,11 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
           userId: left.userId,
           mapId: left.mapId,
         },
+      });
+      const mapCounts = presence.getOrganizationMapOccupancyCounts(left.orgId);
+      presence.broadcastToOrganization(left.orgId, {
+        type: 'organization.map_occupancy',
+        payload: { counts: mapCounts },
       });
       console.log(`[WS] User disconnected: ${conn.user.name} from map ${left.mapId}`);
     }

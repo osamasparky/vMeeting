@@ -420,6 +420,13 @@ export interface OutboundSessionReplaced {
   };
 }
 
+export interface OutboundMapOccupancy {
+  type: 'organization.map_occupancy';
+  payload: {
+    counts: Record<string, number>;
+  };
+}
+
 export type OutboundEvent =
   | OutboundWelcome
   | OutboundUserJoined
@@ -445,6 +452,7 @@ export type OutboundEvent =
   | OutboundRoomDoorUpdated
   | OutboundWebRtcSignal
   | OutboundSessionReplaced
+  | OutboundMapOccupancy
   | OutboundError;
 
 

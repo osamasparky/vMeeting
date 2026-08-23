@@ -769,19 +769,29 @@
                     <span>{{ $floor->name }}</span>
                     <span style="font-size: 8px;">▼</span>
                 </button>
-                <div id="office-switcher-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); inset-inline-start: 0; min-width: 220px; background: rgba(18, 28, 22, 0.96); backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; box-shadow: 0 16px 36px rgba(0,0,0,0.6); padding: 6px; z-index: 100000;">
-                    <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); padding: 6px 10px;">
-                        {{ __('Switch Office Branch') }}
+                <div id="office-switcher-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); inset-inline-start: 0; min-width: 250px; background: rgba(18, 28, 22, 0.96); backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; box-shadow: 0 16px 36px rgba(0,0,0,0.6); padding: 6px; z-index: 100000;">
+                    <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 4px;">
+                        🏢 {{ __('Office Branches (فروع الشركة)') }}
                     </div>
                     @foreach($userAllowedOffices as $off)
+                    @php
+                        $offMap = $off->activeMap ?: $off->maps->first();
+                        $offMapId = $offMap ? $offMap->id : '';
+                    @endphp
                     <a href="{{ route('office', ['office' => $off->id]) }}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: {{ $off->id === $floor->id ? '#86EFAC' : '#E2E8F0' }}; background: {{ $off->id === $floor->id ? 'rgba(36, 92, 58, 0.45)' : 'transparent' }}; font-weight: 700; font-size: 12px; transition: background 0.15s ease;">
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span>🏢</span>
                             <span>{{ $off->name }}</span>
                         </div>
-                        @if($off->id === $floor->id)
-                            <span style="font-size: 10px; color: #86EFAC;">● {{ __('Active') }}</span>
-                        @endif
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span class="branch-occupants-badge" data-map-id="{{ $offMapId }}" style="font-size: 10px; padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.05); color: #94A3B8; font-weight: 700;">
+                                <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: {{ $off->id === $floor->id ? '#10B981' : '#64748B' }}; margin-inline-end: 4px;"></span>
+                                {{ $off->id === $floor->id ? __('Current') : __('0 active') }}
+                            </span>
+                            @if($off->id === $floor->id)
+                                <span style="font-size: 10px; color: #86EFAC;">●</span>
+                            @endif
+                        </div>
                     </a>
                     @endforeach
                 </div>
@@ -1410,6 +1420,8 @@
         const remoteAvatars = new Map();
         const speechBubbles = new Map(); // userId -> { text, emoji, timestamp, type }
         let nearbyChair = null;
+        let isSessionReplaced = false;
+        let wsReconnectAttempts = 0;
 
         // ── WebRTC Multi-Peer Mesh Media ──
         const peerConnections = new Map(); // targetUserId -> RTCPeerConnection
@@ -2128,6 +2140,7 @@
                 ws = new WebSocket(wsUrl);
                 ws.onopen = () => {
                     console.log('⚡ WebSocket Connected successfully via:', wsUrl);
+                    wsReconnectAttempts = 0;
                     if (wsReconnectTimer) {
                         clearTimeout(wsReconnectTimer);
                         wsReconnectTimer = null;
@@ -2152,9 +2165,16 @@
                 };
 
                 ws.onclose = (ev) => {
-                    console.log('⚠️ WebSocket disconnected. Reconnecting in 3s...', ev);
-                    if (!wsReconnectTimer) {
-                        wsReconnectTimer = setTimeout(() => connectWebSocket(), 3000);
+                    console.log('⚠️ WebSocket disconnected. Code:', ev.code, 'Reason:', ev.reason);
+                    if (window._wsPingTimer) clearInterval(window._wsPingTimer);
+                    if (!isSessionReplaced && !wsReconnectTimer) {
+                        wsReconnectAttempts++;
+                        const delay = Math.min(1000 * Math.pow(1.5, wsReconnectAttempts), 8000);
+                        console.log(`⏳ Reconnecting WebSocket (attempt #${wsReconnectAttempts}) in ${delay}ms...`);
+                        wsReconnectTimer = setTimeout(() => {
+                            wsReconnectTimer = null;
+                            connectWebSocket();
+                        }, delay);
                     }
                 };
 
@@ -2407,6 +2427,11 @@
                             }
                             showToast(`⏹️ {{ __("Screen presentation stopped") }}`);
                         }
+
+                        // 12. Live Organization-Wide Map Occupancy for Branch Switcher
+                        else if (data.type === 'organization.map_occupancy' && data.payload?.counts) {
+                            updateBranchOccupancyBadges(data.payload.counts);
+                        }
                     } catch(err) {
                         console.error('[WS] Error processing message:', err);
                     }
@@ -2418,6 +2443,23 @@
             }
         }
         connectWebSocket();
+
+        function updateBranchOccupancyBadges(counts) {
+            if (!counts) return;
+            document.querySelectorAll('.branch-occupants-badge').forEach(badge => {
+                const mapId = badge.getAttribute('data-map-id');
+                const count = counts[mapId] || 0;
+                if (count > 0) {
+                    badge.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #10B981; margin-inline-end: 4px;"></span>${count} {{ __("active") }}`;
+                    badge.style.color = '#86EFAC';
+                    badge.style.background = 'rgba(16, 185, 129, 0.18)';
+                } else {
+                    badge.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #64748B; margin-inline-end: 4px;"></span>0 {{ __("active") }}`;
+                    badge.style.color = '#94A3B8';
+                    badge.style.background = 'rgba(255, 255, 255, 0.05)';
+                }
+            });
+        }
 
         function updateOccupantsCounter() {
             const total = 1 + remoteAvatars.size;

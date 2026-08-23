@@ -146,6 +146,15 @@ class PresenceManager {
         }
         return occupants;
     }
+    getOrganizationMapOccupancyCounts(organizationId) {
+        const counts = {};
+        for (const conn of this.clients.values()) {
+            if (conn.user.organizationId === organizationId && conn.user.mapId) {
+                counts[conn.user.mapId] = (counts[conn.user.mapId] || 0) + 1;
+            }
+        }
+        return counts;
+    }
     updatePosition(ws, position) {
         const conn = this.clients.get(ws);
         if (!conn)

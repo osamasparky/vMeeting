@@ -472,10 +472,11 @@ class WebAuthController extends Controller
                 return redirect()->route('dashboard')->with('error', __('You do not have access permission to enter this office branch (ليس لديك صلاحية لدخول هذا الفرع).'));
             }
         } else {
-            // Find default allowed office
-            $floor = $userAllowedOffices->firstWhere('is_default', true)
-                ?: $userAllowedOffices->first()
-                ?: $organization->floors()->first();
+            // UNIFIED: Use the organization's primary default floor for all members to ensure they meet in the same office
+            $orgDefaultFloor = $allOffices->firstWhere('is_default', true) ?: $allOffices->first();
+            $floor = ($orgDefaultFloor && $membership->hasOfficeAccess($orgDefaultFloor->id))
+                ? $orgDefaultFloor
+                : ($userAllowedOffices->firstWhere('is_default', true) ?: $userAllowedOffices->first() ?: $organization->floors()->first());
         }
 
         if (!$floor) {
@@ -1173,7 +1174,26 @@ class WebAuthController extends Controller
             'y' => ($targetRoom->bounds['y'] + $targetRoom->bounds['height'] / 2) * 32,
         ];
 
-        return view('office', compact('user', 'invitation', 'organization', 'floor', 'map', 'room', 'realtimeToken', 'wsUrl', 'initialSpawn'));
+        $allOffices = $organization->offices()->with(['rooms', 'activeMap'])->get();
+        $userAllowedOffices = $allOffices;
+
+        // Check if host has an active attendance session in a specific room/floor
+        if ($invitation->host_id) {
+            $hostSession = \App\Domains\People\Models\AttendanceSession::where('user_id', $invitation->host_id)
+                ->whereNull('ended_at')
+                ->latest('last_heartbeat_at')
+                ->first();
+            if ($hostSession && $hostSession->room_id) {
+                $hostRoom = \App\Domains\Workspace\Models\Room::with('map.floor')->find($hostSession->room_id);
+                if ($hostRoom && $hostRoom->map && $hostRoom->map->floor) {
+                    $targetRoom = $hostRoom;
+                    $floor = $hostRoom->map->floor;
+                    $map = $hostRoom->map;
+                }
+            }
+        }
+
+        return view('office', compact('user', 'invitation', 'organization', 'floor', 'map', 'room', 'allOffices', 'userAllowedOffices', 'realtimeToken', 'wsUrl', 'initialSpawn'));
     }
 
     /**

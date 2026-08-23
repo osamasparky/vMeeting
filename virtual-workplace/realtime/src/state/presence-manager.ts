@@ -178,6 +178,16 @@ export class PresenceManager {
     return occupants;
   }
 
+  public getOrganizationMapOccupancyCounts(organizationId: string): Record<string, number> {
+    const counts: Record<string, number> = {};
+    for (const conn of this.clients.values()) {
+      if (conn.user.organizationId === organizationId && conn.user.mapId) {
+        counts[conn.user.mapId] = (counts[conn.user.mapId] || 0) + 1;
+      }
+    }
+    return counts;
+  }
+
   public updatePosition(ws: WebSocket, position: UserPosition): OfficeUser | null {
     const conn = this.clients.get(ws);
     if (!conn) return null;
