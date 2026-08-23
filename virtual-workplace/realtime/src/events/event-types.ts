@@ -412,6 +412,14 @@ export interface OutboundUserSit {
   };
 }
 
+export interface OutboundSessionReplaced {
+  type: 'session.replaced';
+  payload: {
+    reason: string;
+    timestamp: string;
+  };
+}
+
 export type OutboundEvent =
   | OutboundWelcome
   | OutboundUserJoined
@@ -436,7 +444,9 @@ export type OutboundEvent =
   | OutboundRoomKnockResult
   | OutboundRoomDoorUpdated
   | OutboundWebRtcSignal
+  | OutboundSessionReplaced
   | OutboundError;
+
 
 
 

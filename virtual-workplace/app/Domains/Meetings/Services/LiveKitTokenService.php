@@ -13,8 +13,12 @@ class LiveKitTokenService
 
     public function __construct()
     {
-        $this->apiKey = config('services.livekit.api_key', env('LIVEKIT_API_KEY', 'devkey'));
-        $this->apiSecret = config('services.livekit.api_secret', env('LIVEKIT_API_SECRET', 'secret_livekit_key_virtual_workplace_2026'));
+        $this->apiKey = config('services.livekit.api_key') ?: (string)env('LIVEKIT_API_KEY');
+        $this->apiSecret = config('services.livekit.api_secret') ?: (string)env('LIVEKIT_API_SECRET');
+
+        if (empty($this->apiKey) || empty($this->apiSecret)) {
+            throw new \RuntimeException('LiveKit credentials missing: LIVEKIT_API_KEY and LIVEKIT_API_SECRET must be configured in environment (.env).');
+        }
     }
 
     /**
@@ -32,6 +36,7 @@ class LiveKitTokenService
             'avatar_url' => $user->avatar_url,
             'job_title' => $user->profile?->job_title ?? 'Member',
             'is_host' => $isHost,
+            'is_guest' => false,
         ];
 
         $grants = [
@@ -54,6 +59,47 @@ class LiveKitTokenService
             'iss' => $this->apiKey,
             'sub' => $user->id,
             'name' => $user->name,
+            'video' => $grants,
+            'metadata' => json_encode($metadata),
+            'iat' => time(),
+            'nbf' => time() - 5,
+            'exp' => time() + $ttlSeconds,
+        ]);
+    }
+
+    /**
+     * Mint a short-lived LiveKit WebRTC Access Token for a guest user joining a room.
+     */
+    public function generateGuestRoomToken(string $guestId, string $guestName, Room $room, int $ttlSeconds = 7200): string
+    {
+        $roomName = "org_{$room->organization_id}_room_{$room->id}";
+
+        $metadata = [
+            'user_id' => $guestId,
+            'organization_id' => $room->organization_id,
+            'room_id' => $room->id,
+            'name' => $guestName,
+            'avatar_url' => null,
+            'job_title' => 'Guest',
+            'is_host' => false,
+            'is_guest' => true,
+        ];
+
+        $grants = [
+            'room' => $roomName,
+            'roomJoin' => true,
+            'canPublish' => true,
+            'canSubscribe' => true,
+            'canPublishData' => true,
+            'canPublishSources' => ['camera', 'microphone', 'screen_share', 'screen_share_audio'],
+            'hidden' => false,
+            'recorder' => false,
+        ];
+
+        return $this->signJwt([
+            'iss' => $this->apiKey,
+            'sub' => $guestId,
+            'name' => $guestName,
             'video' => $grants,
             'metadata' => json_encode($metadata),
             'iat' => time(),

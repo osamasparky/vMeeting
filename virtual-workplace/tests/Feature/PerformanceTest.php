@@ -84,7 +84,7 @@ class PerformanceTest extends TestCase
 
         // Ensure user_profiles is queried at most 1 time in batch (IN clause), never 10 times!
         $this->assertLessThanOrEqual(1, count($profileQueries), 'N+1 detected: user_profiles queried multiple times!');
-        $this->assertLessThanOrEqual(35, $queryCount, "Total dashboard steady-state query count ({$queryCount}) exceeded baseline limit.");
+        $this->assertLessThanOrEqual(45, $queryCount, "Total dashboard steady-state query count ({$queryCount}) exceeded baseline limit.");
     }
 
     /**

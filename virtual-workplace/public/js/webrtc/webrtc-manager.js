@@ -343,68 +343,160 @@ class WebRTCManager {
         this.deviceManager = new DeviceManager();
         this.connectionMonitor = new ConnectionMonitor();
         this.diagnostics = new DiagnosticsManager(this.deviceManager, this.connectionMonitor);
-        this.localMediaStream = null;
-        this.screenStream = null;
-        this.peerConnections = new Map(); // userId -> RTCPeerConnection
-        this.peerStreams = new Map(); // userId -> MediaStream
+        this.livekitRoom = null;
         this.activeRoomId = null;
+        this.activeHost = null;
         this.token = null;
+        this.callbacks = {};
     }
 
     async init() {
         await this.deviceManager.enumerateDevices();
-        this.connectionMonitor.startMonitoring(this.peerConnections.values());
     }
 
-    async fetchRoomToken(organizationId, roomId) {
+    async fetchRoomToken(organizationId, roomId, guestInfo = null) {
+        let body = {};
+        if (guestInfo) {
+            body.guest_id = guestInfo.guestId;
+            body.guest_name = guestInfo.guestName;
+        }
+
         const res = await fetch(`/organizations/${organizationId}/rooms/${roomId}/livekit-token`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
                 'Accept': 'application/json'
-            }
+            },
+            body: JSON.stringify(body)
         });
         if (!res.ok) throw new Error('Failed to obtain LiveKit WebRTC Access Token');
         return await res.json();
     }
 
-    async getLocalMedia(video = true, audio = true) {
-        const videoConstraints = video ? {
-            deviceId: this.deviceManager.selectedVideoInputId !== 'default' ? { exact: this.deviceManager.selectedVideoInputId } : undefined,
-            width: { ideal: 640 },
-            height: { ideal: 480 },
-            frameRate: { ideal: 24 }
-        } : false;
+    /**
+     * Connect to a LiveKit SFU Room
+     */
+    async joinLiveKitRoom(livekitHost, token, callbacks = {}) {
+        await this.leaveLiveKitRoom();
 
-        const audioConstraints = audio ? {
-            deviceId: this.deviceManager.selectedAudioInputId !== 'default' ? { exact: this.deviceManager.selectedAudioInputId } : undefined,
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true
-        } : false;
+        if (typeof LivekitClient === 'undefined' && typeof window.LivekitClient === 'undefined') {
+            console.warn('[WebRTCManager] LiveKit Client SDK not loaded yet.');
+            return null;
+        }
 
-        this.localMediaStream = await navigator.mediaDevices.getUserMedia({
-            video: videoConstraints,
-            audio: audioConstraints
+        const Livekit = window.LivekitClient || LivekitClient;
+        this.callbacks = callbacks;
+
+        const roomOptions = {
+            adaptiveStream: true,
+            dynacast: true,
+            publishDefaults: {
+                simulcast: true,
+                videoCodec: 'vp8',
+            }
+        };
+
+        const room = new Livekit.Room(roomOptions);
+        this.livekitRoom = room;
+
+        // Register LiveKit SFU Events
+        room.on(Livekit.RoomEvent.ParticipantConnected, (participant) => {
+            console.log(`[LiveKit SFU] Participant connected: ${participant.identity} (${participant.name})`);
+            if (this.callbacks.onParticipantConnected) {
+                this.callbacks.onParticipantConnected(participant);
+            }
         });
 
-        return this.localMediaStream;
-    }
-
-    async startScreenShare() {
-        if (this.screenStream) return this.screenStream;
-        this.screenStream = await navigator.mediaDevices.getDisplayMedia({
-            video: { cursor: 'always', frameRate: { max: 30 } },
-            audio: true
+        room.on(Livekit.RoomEvent.ParticipantDisconnected, (participant) => {
+            console.log(`[LiveKit SFU] Participant disconnected: ${participant.identity}`);
+            if (this.callbacks.onParticipantDisconnected) {
+                this.callbacks.onParticipantDisconnected(participant);
+            }
         });
-        return this.screenStream;
+
+        room.on(Livekit.RoomEvent.TrackSubscribed, (track, publication, participant) => {
+            console.log(`[LiveKit SFU] Track subscribed: ${track.kind} from ${participant.identity}`);
+            if (this.callbacks.onTrackSubscribed) {
+                this.callbacks.onTrackSubscribed(track, publication, participant);
+            }
+        });
+
+        room.on(Livekit.RoomEvent.TrackUnsubscribed, (track, publication, participant) => {
+            console.log(`[LiveKit SFU] Track unsubscribed: ${track.kind} from ${participant.identity}`);
+            if (this.callbacks.onTrackUnsubscribed) {
+                this.callbacks.onTrackUnsubscribed(track, publication, participant);
+            }
+        });
+
+        room.on(Livekit.RoomEvent.ActiveSpeakersChanged, (speakers) => {
+            if (this.callbacks.onActiveSpeakersChanged) {
+                this.callbacks.onActiveSpeakersChanged(speakers);
+            }
+        });
+
+        room.on(Livekit.RoomEvent.Disconnected, () => {
+            console.log('[LiveKit SFU] Room disconnected.');
+            if (this.callbacks.onDisconnected) {
+                this.callbacks.onDisconnected();
+            }
+        });
+
+        console.log(`[LiveKit SFU] Connecting to ${livekitHost}...`);
+        await room.connect(livekitHost, token);
+        console.log(`[LiveKit SFU] Successfully connected to room: ${room.name}`);
+
+        return room;
     }
 
-    stopScreenShare() {
-        if (this.screenStream) {
-            this.screenStream.getTracks().forEach(t => t.stop());
-            this.screenStream = null;
+    /**
+     * Leave current LiveKit Room
+     */
+    async leaveLiveKitRoom() {
+        if (this.livekitRoom) {
+            try {
+                await this.livekitRoom.disconnect(true);
+            } catch(e) {
+                console.warn('[LiveKit SFU] Error during disconnect:', e);
+            }
+            this.livekitRoom = null;
+        }
+    }
+
+    async setCameraEnabled(enabled) {
+        if (!this.livekitRoom || !this.livekitRoom.localParticipant) return false;
+        try {
+            const devId = this.deviceManager.selectedVideoInputId;
+            const options = devId && devId !== 'default' ? { deviceId: { exact: devId } } : {};
+            await this.livekitRoom.localParticipant.setCameraEnabled(enabled, options);
+            return enabled;
+        } catch (err) {
+            console.error('[LiveKit SFU] Error setting camera enabled:', err);
+            throw err;
+        }
+    }
+
+    async setMicrophoneEnabled(enabled) {
+        if (!this.livekitRoom || !this.livekitRoom.localParticipant) return false;
+        try {
+            const devId = this.deviceManager.selectedAudioInputId;
+            const options = devId && devId !== 'default' ? { deviceId: { exact: devId }, echoCancellation: true, noiseSuppression: true } : { echoCancellation: true, noiseSuppression: true };
+            await this.livekitRoom.localParticipant.setMicrophoneEnabled(enabled, options);
+            return enabled;
+        } catch (err) {
+            console.error('[LiveKit SFU] Error setting microphone enabled:', err);
+            throw err;
+        }
+    }
+
+    async setScreenShareEnabled(enabled) {
+        if (!this.livekitRoom || !this.livekitRoom.localParticipant) return false;
+        try {
+            await this.livekitRoom.localParticipant.setScreenShareEnabled(enabled, { audio: true });
+            return enabled;
+        } catch (err) {
+            console.error('[LiveKit SFU] Error setting screen share enabled:', err);
+            throw err;
         }
     }
 }

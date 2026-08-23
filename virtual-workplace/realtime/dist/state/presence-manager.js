@@ -3,6 +3,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PresenceManager = void 0;
 const ws_1 = require("ws");
 const proximity_calculator_js_1 = require("./proximity-calculator.js");
+/**
+ * PresenceManager
+ *
+ * Manages active connected clients, spatial positions, room occupants, and map rooms.
+ *
+ * ── HORIZONTAL SCALING ROADMAP (Redis Adapter Backlog) ──
+ * For multi-instance horizontal scaling behind an L4/L7 load balancer:
+ * 1. State Storage: Replace in-memory `clients` & `mapRooms` with Redis Hashes:
+ *    - `hset office:user:{userId} mapId orgId position status lastActive`
+ *    - `sadd office:map:{orgId}:{mapId}:occupants userId`
+ * 2. Cross-Instance Broadcasting: Use Redis Pub/Sub:
+ *    - Channel `office:map:{orgId}:{mapId}:events`
+ *    - Every node subscribes to active local rooms and relays messages to local WebSocket clients.
+ * 3. Heartbeat / TTL: Expire user keys with `EXPIRE office:user:{userId} 60`.
+ */
 class PresenceManager {
     // Map of ws -> ClientConnection
     clients = new Map();
@@ -12,7 +27,41 @@ class PresenceManager {
     constructor() {
         this.proximityCalculator = new proximity_calculator_js_1.ProximityCalculator(150);
     }
+    /**
+     * Register a new client connection with strict session locking.
+     * If a previous active connection exists for the same userId (across any map or org),
+     * the previous connection is gracefully terminated and replaced.
+     */
     registerClient(ws, token) {
+        // 1. Enforce single active session per user across all organizations and maps
+        for (const [otherWs, otherConn] of this.clients.entries()) {
+            if (otherWs !== ws && otherConn.user.userId === token.sub) {
+                console.log(`[WS] Duplicate session detected for user ${otherConn.user.name} (${token.sub}). Replacing previous session.`);
+                // Notify old connection
+                this.send(otherWs, {
+                    type: 'session.replaced',
+                    payload: {
+                        reason: 'Your account was opened in another window, tab, or office branch.',
+                        timestamp: new Date().toISOString(),
+                    },
+                });
+                // Broadcast departure from previous map if applicable
+                if (otherConn.user.mapId) {
+                    const oldMapId = otherConn.user.mapId;
+                    const oldOrgId = otherConn.user.organizationId;
+                    this.leaveMap(otherWs);
+                    this.broadcastToMap(oldOrgId, oldMapId, {
+                        type: 'user.left',
+                        payload: { userId: token.sub, mapId: oldMapId },
+                    });
+                }
+                try {
+                    otherWs.close(4003, 'Session replaced by new connection');
+                }
+                catch (e) { }
+                this.clients.delete(otherWs);
+            }
+        }
         const user = {
             userId: token.sub,
             organizationId: token.organization_id,
@@ -37,18 +86,6 @@ class PresenceManager {
         const conn = this.clients.get(ws);
         if (!conn)
             return null;
-        // Enforce single active office presence per user across all connections/tabs
-        for (const [otherWs, otherConn] of this.clients.entries()) {
-            if (otherWs !== ws && otherConn.user.userId === conn.user.userId && otherConn.user.mapId) {
-                const oldMapId = otherConn.user.mapId;
-                const oldOrgId = otherConn.user.organizationId;
-                this.leaveMap(otherWs);
-                this.broadcastToMap(oldOrgId, oldMapId, {
-                    type: 'user.left',
-                    payload: { userId: conn.user.userId, mapId: oldMapId }
-                });
-            }
-        }
         // Leave previous map if any on this socket
         if (conn.user.mapId) {
             this.leaveMap(ws);

@@ -959,12 +959,6 @@
         <button class="more-menu-item" onclick="openRecordingsGallery(); closeMoreMenu();">
             <span>📼</span> <span>{{ __('Recordings Gallery (التسجيلات)') }}</span>
         </button>
-        <button class="more-menu-item" onclick="openDeviceSettingsModal(); closeMoreMenu();">
-            <span>⚙️</span> <span>{{ __('Device Settings (إعدادات الأجهزة)') }}</span>
-        </button>
-        <button class="more-menu-item" onclick="openDiagnosticsModal(); closeMoreMenu();">
-            <span>🩺</span> <span>{{ __('Diagnostics (فحص الاتصال)') }}</span>
-        </button>
     </div>
 
     <!-- ── Floating In-World Contextual Prompts & Menus ── -->
@@ -1310,10 +1304,33 @@
         </div>
     </div>
 
+    <!-- ── Session Replaced Alert Modal ── -->
+    <div id="session-replaced-modal" class="modal-overlay" style="display: none; z-index: 1000000;">
+        <div class="modal-card" style="max-width: 440px; text-align: center; border: 1px solid rgba(239, 68, 68, 0.4); box-shadow: 0 20px 50px rgba(239, 68, 68, 0.3);">
+            <div style="font-size: 48px; margin-bottom: 12px;">🚪</div>
+            <div class="modal-title" style="color: #F87171; justify-content: center;">{{ __('Session Terminated (تم إنهاء الجلسة)') }}</div>
+            <p id="session-replaced-reason" style="font-size: 13px; color: var(--text-secondary); margin: 16px 0 24px; line-height: 1.6;">
+                {{ __('Your session was opened in another window, tab, or office location. This window has been disconnected to prevent concurrent sessions.') }}
+            </p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button onclick="location.reload()" class="tactile-btn btn-primary" style="padding: 10px 24px;">
+                    🔄 {{ __('Reconnect Here (إعادة الاتصال هنا)') }}
+                </button>
+                <a href="{{ route('dashboard') }}" class="tactile-btn btn-secondary" style="padding: 10px 20px; text-decoration: none;">
+                    📊 {{ __('Go to Dashboard') }}
+                </a>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
     <div id="toast-bubble" class="toast-bubble"></div>
 
-    <!-- ── JavaScript Realtime Engine, Multi-Peer WebRTC Mesh & Spatial Audio Pipeline ── -->
+    <!-- ── LiveKit Client SFU SDK (Self-Hosted on Server) & WebRTC Media Layer ── -->
+    <script src="/js/webrtc/livekit-client.umd.min.js"></script>
+    <script src="/js/webrtc/webrtc-manager.js"></script>
+
+    <!-- ── JavaScript Realtime Engine, LiveKit SFU & Spatial Audio Pipeline ── -->
     <script>
         const CONFIG = {
             map: @json($map),
@@ -1624,6 +1641,7 @@
                     if (ws && ws.readyState === WebSocket.OPEN) {
                         ws.send(JSON.stringify({ type: 'room.enter', payload: { roomId: r.id } }));
                     }
+                    syncLiveKitRoom(r.id);
                     logAttendanceInterval('enter', r.id);
                     if (prevId) {
                         logAttendanceInterval('leave', prevId);
@@ -1638,6 +1656,7 @@
                     if (ws && ws.readyState === WebSocket.OPEN) {
                         ws.send(JSON.stringify({ type: 'room.leave', payload: { roomId: prevId } }));
                     }
+                    syncLiveKitRoom(null);
                     logAttendanceInterval('leave', prevId);
                     checkAutoUnlockEmptyRooms();
                 }
@@ -2147,6 +2166,22 @@
                     try {
                         const data = JSON.parse(e.data);
 
+                        // 0. Session Replaced Event (Multi-tab / Multi-office lock)
+                        if (data.type === 'session.replaced') {
+                            isSessionReplaced = true;
+                            if (wsReconnectTimer) { clearTimeout(wsReconnectTimer); wsReconnectTimer = null; }
+                            if (window._wsPingTimer) { clearInterval(window._wsPingTimer); }
+                            if (ws) { try { ws.close(); } catch(err) {} }
+                            const reasonEl = document.getElementById('session-replaced-reason');
+                            if (reasonEl && data.payload?.reason) {
+                                reasonEl.textContent = data.payload.reason;
+                            }
+                            const modal = document.getElementById('session-replaced-modal');
+                            if (modal) modal.style.display = 'flex';
+                            showToast('⚠️ {{ __("Session replaced by another window") }}');
+                            return;
+                        }
+
                         // 1. Welcome packet with current map occupants
                         if (data.type === 'welcome' && data.payload?.occupants) {
                             data.payload.occupants.forEach(occ => {
@@ -2174,7 +2209,6 @@
                                         isSpeaking: false,
                                         gender: occ.gender || 'male'
                                     });
-                                    initiatePeerConnection(occ.userId, true);
                                 }
                             });
                             updateOccupantsCounter();
@@ -2207,7 +2241,6 @@
                                     isSpeaking: false,
                                     gender: u.gender || 'male'
                                 });
-                                initiatePeerConnection(u.userId, false);
                                 showToast(`👋 ${u.name} {{ __("joined the office") }}`);
                                 updateOccupantsCounter();
                             }
@@ -2455,235 +2488,187 @@
             pendingKnock = null;
         }
 
-        // ── WebRTC Multi-Peer Mesh Media Engine ──
-        function initiatePeerConnection(targetUserId, isInitiator) {
-            if (peerConnections.has(targetUserId)) {
-                return peerConnections.get(targetUserId);
-            }
+        // ── LiveKit SFU Media Engine & Room Synchronization ──
+        let currentLiveKitRoomId = null;
 
-            const pc = new RTCPeerConnection(RTC_CONFIG);
-            peerConnections.set(targetUserId, pc);
-            if (!pendingIceCandidates.has(targetUserId)) {
-                pendingIceCandidates.set(targetUserId, []);
-            }
-
-            // Add local mic/camera tracks
-            if (localMediaStream) {
-                localMediaStream.getTracks().forEach(track => {
-                    try { pc.addTrack(track, localMediaStream); } catch(e) {}
-                });
-            }
-            // Add screen share tracks
-            if (screenStream) {
-                screenStream.getTracks().forEach(track => {
-                    try { pc.addTrack(track, screenStream); } catch(e) {}
-                });
-            }
-
-            pc.onicecandidate = (event) => {
-                if (event.candidate && ws && ws.readyState === WebSocket.OPEN) {
-                    ws.send(JSON.stringify({
-                        type: 'webrtc.signal',
-                        payload: {
-                            targetUserId: targetUserId,
-                            signal: { type: 'candidate', candidate: event.candidate }
-                        }
-                    }));
-                }
-            };
-
-            pc.ontrack = (event) => {
-                const stream = event.streams[0] || new MediaStream([event.track]);
-
-                if (event.track.kind === 'audio') {
-                    let audioEl = peerAudioElements.get(targetUserId);
-                    if (!audioEl) {
-                        audioEl = document.createElement('audio');
-                        audioEl.autoplay = true;
-                        document.body.appendChild(audioEl);
-                        peerAudioElements.set(targetUserId, audioEl);
+        async function syncLiveKitRoom(roomId) {
+            if (!roomId) {
+                if (currentLiveKitRoomId) {
+                    currentLiveKitRoomId = null;
+                    if (window.VWorkWebRTC) {
+                        await window.VWorkWebRTC.leaveLiveKitRoom();
                     }
-                    audioEl.srcObject = stream;
-                    audioEl.play().catch(()=>{});
-                } else if (event.track.kind === 'video') {
-                    let videoCard = peerVideoCards.get(targetUserId);
-                    const av = remoteAvatars.get(targetUserId);
-                    const presenterName = av ? av.name : 'Colleague';
-
-                    if (!videoCard) {
-                        videoCard = document.createElement('div');
-                        videoCard.id = `peer-video-${targetUserId}`;
-                        videoCard.className = 'video-card size-medium';
-                        videoCard.innerHTML = `
-                            <div class="video-card-topbar">
-                                <div class="video-card-title">
-                                    <span class="live-dot"></span>
-                                    <span class="user-title">🖥️ ${presenterName}</span>
-                                </div>
-                                <div class="video-card-actions">
-                                    <button class="v-btn" id="vbtn-sm-${targetUserId}" onclick="resizeVideoCard('${targetUserId}', 'small')" title="{{ __('Small View (عرض صغير)') }}">📱</button>
-                                    <button class="v-btn active" id="vbtn-med-${targetUserId}" onclick="resizeVideoCard('${targetUserId}', 'medium')" title="{{ __('Medium View (عرض متوسط)') }}">💻</button>
-                                    <button class="v-btn" id="vbtn-lg-${targetUserId}" onclick="resizeVideoCard('${targetUserId}', 'large')" title="{{ __('Theater / Large (عرض كبير)') }}">📺</button>
-                                    <button class="v-btn" onclick="toggleFullscreenVideo('${targetUserId}')" title="{{ __('Full Screen (شاشة كاملة)') }}">⛶</button>
-                                    <button class="v-btn" onclick="togglePipVideo('${targetUserId}')" title="{{ __('Picture in Picture') }}">🗖</button>
-                                    <button class="v-btn" onclick="toggleCollapseVideo('${targetUserId}')" title="{{ __('Minimize (تصغير)') }}">➖</button>
-                                </div>
-                            </div>
-                            <div class="video-wrapper">
-                                <video autoplay playsinline></video>
-                            </div>
-                        `;
-                        const videoEl = videoCard.querySelector('video');
-                        videoEl.srcObject = stream;
-                        videoEl.play().catch(()=>{});
-
-                        if (av) {
-                            av.videoEl = videoEl;
-                            av.camActive = true;
-                        }
-
-                        document.getElementById('video-grid').appendChild(videoCard);
-                        peerVideoCards.set(targetUserId, videoCard);
-
-                        const chatBtn = document.getElementById('btn-chat-focus-screen');
-                        if (chatBtn) chatBtn.style.display = 'inline-flex';
-                    } else {
-                        const videoEl = videoCard.querySelector('video');
-                        if (videoEl) {
-                            videoEl.srcObject = stream;
-                            videoEl.play().catch(()=>{});
-                            if (av) {
-                                av.videoEl = videoEl;
-                                av.camActive = true;
-                            }
-                        }
-                    }
+                    // Clean up peer video cards and audios
+                    peerVideoCards.forEach(card => card.remove());
+                    peerVideoCards.clear();
+                    peerAudioElements.forEach(a => a.remove());
+                    peerAudioElements.clear();
+                    remoteAvatars.forEach(av => { av.videoEl = null; av.camActive = false; av.isSpeaking = false; });
+                    const chatBtn = document.getElementById('btn-chat-focus-screen');
+                    if (chatBtn) chatBtn.style.display = 'none';
                 }
-            };
-
-            if (isInitiator) {
-                createAndSendOffer(targetUserId);
+                return;
             }
 
-            return pc;
-        }
-
-        async function createAndSendOffer(targetUserId) {
-            const pc = peerConnections.get(targetUserId);
-            if (!pc) return;
-            try {
-                const offer = await pc.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true });
-                await pc.setLocalDescription(offer);
-                if (ws && ws.readyState === WebSocket.OPEN) {
-                    ws.send(JSON.stringify({
-                        type: 'webrtc.signal',
-                        payload: { targetUserId: targetUserId, signal: offer }
-                    }));
-                }
-            } catch(err) {
-                console.error('[WebRTC] Error creating offer for', targetUserId, err);
-            }
-        }
-
-        async function handleIncomingWebRTCSignal(payload) {
-            const senderUserId = payload.senderUserId;
-            const signal = payload.signal;
-            if (!senderUserId || !signal) return;
-
-            let pc = peerConnections.get(senderUserId);
-            if (!pc) {
-                pc = initiatePeerConnection(senderUserId, false);
-            }
+            if (currentLiveKitRoomId === roomId) return;
+            currentLiveKitRoomId = roomId;
 
             try {
-                if (signal.type === 'offer') {
-                    await pc.setRemoteDescription(new RTCSessionDescription(signal));
+                const guestInfo = isGuest ? { guestId: localAvatar.id, guestName: localAvatar.name } : null;
+                const res = await window.VWorkWebRTC.fetchRoomToken(CONFIG.org.id, roomId, guestInfo);
+                if (!res || !res.token) return;
 
-                    // Drain any queued ICE candidates
-                    const queued = pendingIceCandidates.get(senderUserId) || [];
-                    while (queued.length > 0) {
-                        const cand = queued.shift();
-                        try { await pc.addIceCandidate(new RTCIceCandidate(cand)); } catch(e) {}
+                console.log(`[LiveKit SFU] Joining room: ${roomId} with token...`);
+                await window.VWorkWebRTC.joinLiveKitRoom(res.livekit_host, res.token, {
+                    onTrackSubscribed: (track, publication, participant) => {
+                        handleLiveKitTrackSubscribed(track, publication, participant);
+                    },
+                    onTrackUnsubscribed: (track, publication, participant) => {
+                        handleLiveKitTrackUnsubscribed(track, publication, participant);
+                    },
+                    onParticipantDisconnected: (participant) => {
+                        handleLiveKitParticipantDisconnected(participant);
+                    },
+                    onActiveSpeakersChanged: (speakers) => {
+                        handleLiveKitActiveSpeakers(speakers);
                     }
+                });
 
-                    const answer = await pc.createAnswer();
-                    await pc.setLocalDescription(answer);
-                    if (ws && ws.readyState === WebSocket.OPEN) {
-                        ws.send(JSON.stringify({
-                            type: 'webrtc.signal',
-                            payload: { targetUserId: senderUserId, signal: answer }
-                        }));
-                    }
-                } else if (signal.type === 'answer') {
-                    await pc.setRemoteDescription(new RTCSessionDescription(signal));
+                // Auto publish active states to SFU
+                if (micActive) await window.VWorkWebRTC.setMicrophoneEnabled(true).catch(()=>{});
+                if (camActive) await window.VWorkWebRTC.setCameraEnabled(true).catch(()=>{});
+                if (screenActive) await window.VWorkWebRTC.setScreenShareEnabled(true).catch(()=>{});
 
-                    // Drain any queued ICE candidates
-                    const queued = pendingIceCandidates.get(senderUserId) || [];
-                    while (queued.length > 0) {
-                        const cand = queued.shift();
-                        try { await pc.addIceCandidate(new RTCIceCandidate(cand)); } catch(e) {}
-                    }
-                } else if (signal.type === 'candidate' && signal.candidate) {
-                    if (pc.remoteDescription && pc.remoteDescription.type) {
-                        await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
-                    } else {
-                        if (!pendingIceCandidates.has(senderUserId)) {
-                            pendingIceCandidates.set(senderUserId, []);
-                        }
-                        pendingIceCandidates.get(senderUserId).push(signal.candidate);
-                    }
-                }
-            } catch(err) {
-                console.error('[WebRTC] Signal handling error:', err);
+            } catch (err) {
+                console.warn('[LiveKit SFU] Join error:', err);
             }
         }
 
-        function closePeerConnection(targetUserId) {
-            const pc = peerConnections.get(targetUserId);
-            if (pc) {
-                try { pc.close(); } catch(e) {}
-                peerConnections.delete(targetUserId);
-            }
-            pendingIceCandidates.delete(targetUserId);
+        function handleLiveKitTrackSubscribed(track, publication, participant) {
+            const userId = participant.identity;
+            console.log(`[LiveKit SFU] Track subscribed: ${track.kind} from ${userId}`);
 
-            const audio = peerAudioElements.get(targetUserId);
-            if (audio) {
-                audio.remove();
-                peerAudioElements.delete(targetUserId);
+            if (track.kind === 'audio') {
+                let audioEl = peerAudioElements.get(userId);
+                if (!audioEl) {
+                    audioEl = track.attach();
+                    audioEl.autoplay = true;
+                    document.body.appendChild(audioEl);
+                    peerAudioElements.set(userId, audioEl);
+                } else {
+                    track.attach(audioEl);
+                }
+            } else if (track.kind === 'video') {
+                let videoCard = peerVideoCards.get(userId);
+                const av = remoteAvatars.get(userId);
+                const presenterName = (av && av.name) ? av.name : (participant.name || 'Colleague');
+
+                if (!videoCard) {
+                    videoCard = document.createElement('div');
+                    videoCard.id = `peer-video-${userId}`;
+                    videoCard.className = 'video-card size-medium';
+                    videoCard.innerHTML = `
+                        <div class="video-card-topbar">
+                            <div class="video-card-title">
+                                <span class="live-dot"></span>
+                                <span class="user-title">🖥️ ${presenterName}</span>
+                            </div>
+                            <div class="video-card-actions">
+                                <button class="v-btn" id="vbtn-sm-${userId}" onclick="resizeVideoCard('${userId}', 'small')" title="{{ __('Small View (عرض صغير)') }}">📱</button>
+                                <button class="v-btn active" id="vbtn-med-${userId}" onclick="resizeVideoCard('${userId}', 'medium')" title="{{ __('Medium View (عرض متوسط)') }}">💻</button>
+                                <button class="v-btn" id="vbtn-lg-${userId}" onclick="resizeVideoCard('${userId}', 'large')" title="{{ __('Theater / Large (عرض كبير)') }}">📺</button>
+                                <button class="v-btn" onclick="toggleFullscreenVideo('${userId}')" title="{{ __('Full Screen (شاشة كاملة)') }}">⛶</button>
+                                <button class="v-btn" onclick="togglePipVideo('${userId}')" title="{{ __('Picture in Picture') }}">🗖</button>
+                                <button class="v-btn" onclick="toggleCollapseVideo('${userId}')" title="{{ __('Minimize (تصغير)') }}">➖</button>
+                            </div>
+                        </div>
+                        <div class="video-wrapper"></div>
+                    `;
+                    const wrapper = videoCard.querySelector('.video-wrapper');
+                    const videoEl = track.attach();
+                    videoEl.autoplay = true;
+                    videoEl.playsInline = true;
+                    wrapper.appendChild(videoEl);
+
+                    if (av) {
+                        av.videoEl = videoEl;
+                        av.camActive = true;
+                    }
+
+                    document.getElementById('video-grid').appendChild(videoCard);
+                    peerVideoCards.set(userId, videoCard);
+
+                    const chatBtn = document.getElementById('btn-chat-focus-screen');
+                    if (chatBtn) chatBtn.style.display = 'inline-flex';
+                } else {
+                    const wrapper = videoCard.querySelector('.video-wrapper');
+                    wrapper.innerHTML = '';
+                    const videoEl = track.attach();
+                    videoEl.autoplay = true;
+                    videoEl.playsInline = true;
+                    wrapper.appendChild(videoEl);
+                    if (av) {
+                        av.videoEl = videoEl;
+                        av.camActive = true;
+                    }
+                }
             }
-            const card = peerVideoCards.get(targetUserId);
+        }
+
+        function handleLiveKitTrackUnsubscribed(track, publication, participant) {
+            const userId = participant.identity;
+            track.detach().forEach(el => el.remove());
+
+            if (track.kind === 'video') {
+                const card = peerVideoCards.get(userId);
+                if (card) {
+                    card.remove();
+                    peerVideoCards.delete(userId);
+                }
+                const av = remoteAvatars.get(userId);
+                if (av) {
+                    av.videoEl = null;
+                    av.camActive = false;
+                }
+                if (peerVideoCards.size === 0) {
+                    const chatBtn = document.getElementById('btn-chat-focus-screen');
+                    if (chatBtn) chatBtn.style.display = 'none';
+                }
+            } else if (track.kind === 'audio') {
+                const audio = peerAudioElements.get(userId);
+                if (audio) {
+                    audio.remove();
+                    peerAudioElements.delete(userId);
+                }
+            }
+        }
+
+        function handleLiveKitParticipantDisconnected(participant) {
+            const userId = participant.identity;
+            const card = peerVideoCards.get(userId);
             if (card) {
                 card.remove();
-                peerVideoCards.delete(targetUserId);
+                peerVideoCards.delete(userId);
             }
-            if (peerVideoCards.size === 0) {
-                const chatBtn = document.getElementById('btn-chat-focus-screen');
-                if (chatBtn) chatBtn.style.display = 'none';
+            const audio = peerAudioElements.get(userId);
+            if (audio) {
+                audio.remove();
+                peerAudioElements.delete(userId);
+            }
+            const av = remoteAvatars.get(userId);
+            if (av) {
+                av.videoEl = null;
+                av.camActive = false;
+                av.isSpeaking = false;
             }
         }
 
-        function updateTracksInAllPeerConnections() {
-            peerConnections.forEach((pc, targetUserId) => {
-                try {
-                    const senders = pc.getSenders();
-                    senders.forEach(s => {
-                        try { pc.removeTrack(s); } catch(e) {}
-                    });
-                    if (localMediaStream) {
-                        localMediaStream.getTracks().forEach(t => {
-                            try { pc.addTrack(t, localMediaStream); } catch(e) {}
-                        });
-                    }
-                    if (screenStream) {
-                        screenStream.getTracks().forEach(t => {
-                            try { pc.addTrack(t, screenStream); } catch(e) {}
-                        });
-                    }
-                    createAndSendOffer(targetUserId);
-                } catch(e) {
-                    console.error('[WebRTC] Update tracks error for', targetUserId, e);
-                }
+        function handleLiveKitActiveSpeakers(speakers) {
+            const speakerIds = new Set(speakers.map(s => s.identity));
+            remoteAvatars.forEach((av, id) => {
+                av.isSpeaking = speakerIds.has(id);
             });
+            localAvatar.isSpeaking = speakerIds.has(localAvatar.id);
         }
 
         // ── Video & Screen Share Window Sizing Controls ──
@@ -2744,59 +2729,25 @@
             }
         }
 
-        // ── Camera, Microphone Media Toggling & Browser Permission Engine ──
+        // ── Camera, Microphone & Screen Media Controls via LiveKit SFU ──
+        let screenActive = false;
+
         async function toggleMicrophone() {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                showToast('⚠️ {{ __("Microphone requires HTTPS or localhost.") }}');
-                return;
-            }
-
             try {
-                if (!micActive) {
-                    let audioTrack = null;
-                    if (localMediaStream) {
-                        const existingTracks = localMediaStream.getAudioTracks();
-                        if (existingTracks.length > 0) {
-                            audioTrack = existingTracks[0];
-                            audioTrack.enabled = true;
-                        }
-                    }
-
-                    if (!audioTrack) {
-                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                        audioTrack = stream.getAudioTracks()[0];
-                        if (localMediaStream) {
-                            localMediaStream.addTrack(audioTrack);
-                        } else {
-                            localMediaStream = stream;
-                        }
-                    }
-
-                    micActive = true;
-                    showToast('🎙️ {{ __("Microphone active") }}');
-                } else {
-                    if (localMediaStream) {
-                        localMediaStream.getAudioTracks().forEach(t => t.enabled = false);
-                    }
-                    micActive = false;
-                    showToast('🔇 {{ __("Microphone muted") }}');
+                micActive = !micActive;
+                if (window.VWorkWebRTC) {
+                    await window.VWorkWebRTC.setMicrophoneEnabled(micActive);
                 }
 
                 if (ws && ws.readyState === WebSocket.OPEN) {
                     ws.send(JSON.stringify({ type: 'media.state', payload: { camActive: camActive, micActive: micActive } }));
                 }
 
-                updateTracksInAllPeerConnections();
+                showToast(micActive ? '🎙️ {{ __("Microphone active") }}' : '🔇 {{ __("Microphone muted") }}');
             } catch(e) {
-                console.error('[Audio] getUserMedia error:', e);
+                console.error('[Audio] error:', e);
                 micActive = false;
-                if (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError') {
-                    showToast('🚫 {{ __("Microphone permission denied by browser. Please allow microphone access in your browser settings.") }}');
-                } else if (e.name === 'NotFoundError' || e.name === 'DevicesNotFoundError') {
-                    showToast('⚠️ {{ __("No microphone found on this device.") }}');
-                } else {
-                    showToast(`❌ {{ __("Microphone error:") }} ${e.message || e.name}`);
-                }
+                showToast(`❌ {{ __("Microphone error:") }} ${e.message || e.name}`);
             }
 
             const btn = document.getElementById('btn-mic');
@@ -2807,69 +2758,36 @@
         }
 
         async function toggleCamera() {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                showToast('⚠️ {{ __("Camera requires HTTPS or localhost.") }}');
-                return;
-            }
-
             try {
-                if (!camActive) {
-                    let videoTrack = null;
-                    if (localMediaStream) {
-                        const existingTracks = localMediaStream.getVideoTracks();
-                        if (existingTracks.length > 0) {
-                            videoTrack = existingTracks[0];
-                            videoTrack.enabled = true;
+                camActive = !camActive;
+                if (window.VWorkWebRTC) {
+                    await window.VWorkWebRTC.setCameraEnabled(camActive);
+                }
+
+                const videoElem = document.getElementById('local-video-elem');
+                const card = document.getElementById('local-video-card');
+
+                if (camActive) {
+                    if (window.VWorkWebRTC && window.VWorkWebRTC.livekitRoom && window.VWorkWebRTC.livekitRoom.localParticipant) {
+                        const trackPub = window.VWorkWebRTC.livekitRoom.localParticipant.getTrackPublication(LivekitClient.Track.Source.Camera);
+                        if (trackPub && trackPub.track) {
+                            trackPub.track.attach(videoElem);
                         }
                     }
-
-                    if (!videoTrack) {
-                        const stream = await navigator.mediaDevices.getUserMedia({
-                            video: { width: { ideal: 640 }, height: { ideal: 480 } }
-                        });
-                        videoTrack = stream.getVideoTracks()[0];
-                        if (localMediaStream) {
-                            localMediaStream.addTrack(videoTrack);
-                        } else {
-                            localMediaStream = stream;
-                        }
-                    }
-
-                    camActive = true;
-                    const videoElem = document.getElementById('local-video-elem');
-                    videoElem.srcObject = localMediaStream;
-                    document.getElementById('local-video-card').style.display = 'flex';
+                    if (card) card.style.display = 'flex';
                     showToast('📹 {{ __("Camera active") }}');
-                    if (ws && ws.readyState === WebSocket.OPEN) {
-                        ws.send(JSON.stringify({ type: 'media.state', payload: { camActive: true, micActive: micActive } }));
-                    }
                 } else {
-                    if (localMediaStream) {
-                        localMediaStream.getVideoTracks().forEach(t => {
-                            t.enabled = false;
-                            t.stop();
-                            localMediaStream.removeTrack(t);
-                        });
-                    }
-                    camActive = false;
-                    document.getElementById('local-video-card').style.display = 'none';
+                    if (card) card.style.display = 'none';
                     showToast('📷 {{ __("Camera turned off") }}');
-                    if (ws && ws.readyState === WebSocket.OPEN) {
-                        ws.send(JSON.stringify({ type: 'media.state', payload: { camActive: false, micActive: micActive } }));
-                    }
                 }
 
-                updateTracksInAllPeerConnections();
-            } catch(e) {
-                console.error('[Video] getUserMedia error:', e);
-                camActive = false;
-                if (e.name === 'NotAllowedError' || e.name === 'PermissionDeniedError') {
-                    showToast('🚫 {{ __("Camera permission denied by browser.") }}');
-                } else if (e.name === 'NotFoundError' || e.name === 'DevicesNotFoundError') {
-                    showToast('⚠️ {{ __("No camera found on this device.") }}');
-                } else {
-                    showToast(`❌ {{ __("Camera error:") }} ${e.message || e.name}`);
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ type: 'media.state', payload: { camActive: camActive, micActive: micActive } }));
                 }
+            } catch(e) {
+                console.error('[Video] error:', e);
+                camActive = false;
+                showToast(`❌ {{ __("Camera error:") }} ${e.message || e.name}`);
             }
 
             const btn = document.getElementById('btn-cam');
@@ -2879,53 +2797,39 @@
             document.getElementById('cam-text').textContent = camActive ? '{{ __("Cam On") }}' : '{{ __("Cam Off") }}';
         }
 
-        // ── Screen Sharing Across All Peers ──
         async function toggleScreenShare() {
-            if (screenStream) {
-                screenStream.getTracks().forEach(t => t.stop());
-                screenStream = null;
-                updateTracksInAllPeerConnections();
-                if (ws && ws.readyState === WebSocket.OPEN) {
-                    ws.send(JSON.stringify({ type: 'presentation.stop', payload: {} }));
-                }
-                document.getElementById('btn-screen').classList.remove('active');
-                document.getElementById('screen-text').textContent = '{{ __("Share") }}';
-                showToast('⏹️ {{ __("Screen share stopped") }}');
-                return;
-            }
-
             try {
-                screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-                
-                // Handle when user stops sharing from browser toolbar
-                screenStream.getVideoTracks()[0].onended = () => {
-                    if (screenStream) {
-                        screenStream = null;
-                        updateTracksInAllPeerConnections();
-                        if (ws && ws.readyState === WebSocket.OPEN) {
-                            ws.send(JSON.stringify({ type: 'presentation.stop', payload: {} }));
-                        }
-                        document.getElementById('btn-screen').classList.remove('active');
-                        document.getElementById('screen-text').textContent = '{{ __("Share") }}';
-                        showToast('⏹️ {{ __("Screen share stopped") }}');
-                    }
-                };
-
-                updateTracksInAllPeerConnections();
-
-                if (ws && ws.readyState === WebSocket.OPEN) {
-                    ws.send(JSON.stringify({ type: 'presentation.start', payload: {} }));
+                screenActive = !screenActive;
+                if (window.VWorkWebRTC) {
+                    await window.VWorkWebRTC.setScreenShareEnabled(screenActive);
                 }
 
-                document.getElementById('btn-screen').classList.add('active');
-                document.getElementById('screen-text').textContent = '{{ __("Sharing") }}';
-                showToast('🖥️ {{ __("Screen sharing active") }}');
+                const btn = document.getElementById('btn-screen');
+                const text = document.getElementById('screen-text');
+
+                if (screenActive) {
+                    btn.classList.add('active');
+                    text.textContent = '{{ __("Sharing") }}';
+                    showToast('🖥️ {{ __("Screen sharing active") }}');
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'presentation.start', payload: {} }));
+                    }
+                } else {
+                    btn.classList.remove('active');
+                    text.textContent = '{{ __("Share") }}';
+                    showToast('⏹️ {{ __("Screen share stopped") }}');
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'presentation.stop', payload: {} }));
+                    }
+                }
             } catch(e) {
-                console.error('[Screen] getDisplayMedia error:', e);
-                document.getElementById('btn-screen').classList.remove('active');
+                console.error('[Screen] error:', e);
+                screenActive = false;
+                const btn = document.getElementById('btn-screen');
+                btn.classList.remove('active');
                 document.getElementById('screen-text').textContent = '{{ __("Share") }}';
                 if (e.name !== 'NotAllowedError') {
-                    showToast('❌ {{ __("Could not start screen share") }}');
+                    showToast(`❌ {{ __("Screen share error:") }} ${e.message || e.name}`);
                 }
             }
         }
@@ -4085,6 +3989,5 @@
         // Start animation loop
         requestAnimationFrame(draw);
     </script>
-    <script src="/js/webrtc/webrtc-manager.js"></script>
 </body>
 </html>

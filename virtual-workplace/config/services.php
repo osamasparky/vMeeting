@@ -36,20 +36,20 @@ return [
     ],
 
     'realtime' => [
-        'secret' => env('REALTIME_SECRET', env('APP_KEY', 'base64:9fj2ZRPjCy3ClL13gPaYCv9gl8GsE8APwzVK8EceIRM=')),
-        'ws_url' => env('REALTIME_WS_URL'),
+        'secret' => env('REALTIME_SECRET', env('APP_KEY')),
+        'ws_url' => env('REALTIME_WS_URL', 'ws://127.0.0.1:8080'),
     ],
 
     'livekit' => [
         'host' => env('LIVEKIT_HOST', env('LIVEKIT_URL', 'wss://nextspace.munazzah.com/livekit')),
-        'api_key' => env('LIVEKIT_API_KEY', 'devkey'),
-        'api_secret' => env('LIVEKIT_API_SECRET', 'secret_livekit_key_virtual_workplace_2026'),
+        'api_key' => env('LIVEKIT_API_KEY'),
+        'api_secret' => env('LIVEKIT_API_SECRET'),
     ],
 
     'turn' => [
-        'url' => env('TURN_URL', 'turn:173.212.248.192:3478'),
-        'username' => env('TURN_USERNAME', 'vw_turn_user'),
-        'credential' => env('TURN_CREDENTIAL', 'vw_turn_password_2026'),
+        'url' => env('TURN_URL'),
+        'username' => env('TURN_USERNAME'),
+        'credential' => env('TURN_CREDENTIAL'),
     ],
 
 ];

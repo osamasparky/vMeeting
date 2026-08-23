@@ -4,8 +4,8 @@ namespace App\Domains\Meetings\Controllers;
 
 use App\Domains\Meetings\Models\Meeting;
 use App\Domains\Meetings\Services\LiveKitTokenService;
-use App\Domains\People\Models\OrganizationMember;
 use App\Domains\Tenancy\Models\Organization;
+use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Domains\Workspace\Models\Room;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -28,24 +28,28 @@ class MeetingController extends Controller
         }
 
         $user = Auth::user();
-        if (!$user) {
-            return response()->json(['message' => 'Unauthenticated.'], 401);
+        $isHost = false;
+
+        if ($user) {
+            $membership = OrganizationMember::where('organization_id', $organization->id)
+                ->where('user_id', $user->id)
+                ->first();
+
+            $isHost = $membership && in_array($membership->role, ['owner', 'admin', 'manager']);
+            $token = $service->generateRoomToken($user, $room, $isHost);
+        } else {
+            $guestName = (string)($request->input('guest_name') ?: 'Guest User');
+            $guestId = (string)($request->input('guest_id') ?: ('guest_' . uniqid()));
+            $token = $service->generateGuestRoomToken($guestId, $guestName, $room);
         }
 
-        // Verify membership in this organization
-        $membership = OrganizationMember::where('organization_id', $organization->id)
-            ->where('user_id', $user->id)
-            ->first();
-
-        $isHost = $membership && in_array($membership->role, ['owner', 'admin', 'manager']);
-
-        $token = $service->generateRoomToken($user, $room, $isHost);
         $livekitHost = config('services.livekit.host', env('LIVEKIT_HOST', 'wss://nextspace.munazzah.com/livekit'));
 
         return response()->json([
             'token' => $token,
             'livekit_host' => $livekitHost,
             'room_name' => "org_{$room->organization_id}_room_{$room->id}",
+            'participant_identity' => $user ? $user->id : $guestId,
             'is_host' => $isHost,
             'ice_servers' => $this->getIceServersList(),
         ]);

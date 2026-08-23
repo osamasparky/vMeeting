@@ -2292,7 +2292,7 @@ class WebAuthController extends Controller
     /**
      * Log Room and Floor presence intervals for time & attendance tracking.
      */
-    public function logRoomAttendance(Request $request)
+    public function logRoomAttendance(Request $request, \App\Domains\People\Services\AttendanceService $attendanceService)
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->first();
@@ -2304,15 +2304,29 @@ class WebAuthController extends Controller
             'duration_seconds' => 'nullable|integer',
         ]);
 
+        $organization = $membership->organization;
+        $roomId = $validated['room_id'] ?? null;
+        $action = $validated['action'];
+
+        // 1. Manage dedicated attendance_sessions record
+        if ($action === 'enter') {
+            $attendanceService->startSession($user, $organization, $roomId, $request->ip(), $request->userAgent());
+        } elseif ($action === 'leave') {
+            $attendanceService->endSession($user, $organization, $roomId);
+        } elseif ($action === 'heartbeat') {
+            $attendanceService->recordHeartbeat($user, $organization, $roomId, $validated['duration_seconds'] ?? null);
+        }
+
+        // 2. Also log to AuditLog for audit trail history
         \App\Domains\Administration\Models\AuditLog::create([
             'organization_id' => $membership->organization_id,
             'user_id' => $user->id,
-            'action' => 'room.' . $validated['action'],
+            'action' => 'room.' . $action,
             'target_type' => 'room',
-            'target_id' => $validated['room_id'] ?? null,
+            'target_id' => $roomId,
             'metadata' => [
                 'user_name' => $user->name,
-                'room_id' => $validated['room_id'] ?? null,
+                'room_id' => $roomId,
                 'duration_seconds' => $validated['duration_seconds'] ?? 0,
                 'timestamp' => now()->toISOString(),
             ],
@@ -2321,6 +2335,21 @@ class WebAuthController extends Controller
         ]);
 
         return response()->json(['status' => 'logged']);
+    }
+
+    /**
+     * Get user attendance hours and sessions report.
+     */
+    public function getAttendanceSummary(Request $request, \App\Domains\People\Services\AttendanceService $attendanceService)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        if (!$membership) return response()->json(['message' => 'Unauthorized'], 403);
+
+        $period = (string)$request->query('period', 'week');
+        $report = $attendanceService->getUserReport($user->id, $membership->organization_id, $period);
+
+        return response()->json($report);
     }
 
     /**

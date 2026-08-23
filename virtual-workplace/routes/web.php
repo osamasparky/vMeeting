@@ -96,6 +96,7 @@ Route::middleware('auth')->group(function () {
     // Member Activity & Live Inspector Routes
     Route::get('/api/members/{userId}/activity', [WebAuthController::class, 'memberActivity'])->name('members.activity');
     Route::post('/api/office/attendance/log', [WebAuthController::class, 'logRoomAttendance'])->name('office.attendance.log');
+    Route::get('/api/office/attendance/summary', [WebAuthController::class, 'getAttendanceSummary'])->name('office.attendance.summary');
 
     // WebRTC & LiveKit Media Plane Routes
     Route::get('/organizations/{organization}/meetings', [\App\Domains\Meetings\Controllers\MeetingController::class, 'listMeetings'])->name('web.meetings.list');

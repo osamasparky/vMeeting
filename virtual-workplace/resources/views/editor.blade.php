@@ -643,6 +643,11 @@
                 <span>{{ __('Dashboard') }}</span>
             </a>
 
+            <div style="display: flex; align-items: center; gap: 6px; padding: 0 4px;">
+                <strong style="font-size: 13px; font-weight: 900; color: #FFFFFF; letter-spacing: -0.01em;">{{ __('Map Editor') }}</strong>
+                <span style="font-size: 11px; font-weight: 700; color: var(--brand-primary); background: rgba(16, 185, 129, 0.12); padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(52, 211, 153, 0.25);">{{ $organization->name }}</span>
+            </div>
+
             <!-- Office / Branch Switcher Dropdown -->
             <div style="position: relative; display: inline-block;">
                 <button type="button" onclick="toggleBranchDropdown(event)" class="brand-btn" style="background: rgba(16, 185, 129, 0.12); border-color: rgba(52, 211, 153, 0.35); color: #6EE7B7; display: flex; align-items: center; gap: 8px;" title="{{ __('Select Office Branch to Edit') }}">
