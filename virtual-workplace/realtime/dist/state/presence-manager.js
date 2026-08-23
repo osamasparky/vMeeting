@@ -37,7 +37,19 @@ class PresenceManager {
         const conn = this.clients.get(ws);
         if (!conn)
             return null;
-        // Leave previous map if any
+        // Enforce single active office presence per user across all connections/tabs
+        for (const [otherWs, otherConn] of this.clients.entries()) {
+            if (otherWs !== ws && otherConn.user.userId === conn.user.userId && otherConn.user.mapId) {
+                const oldMapId = otherConn.user.mapId;
+                const oldOrgId = otherConn.user.organizationId;
+                this.leaveMap(otherWs);
+                this.broadcastToMap(oldOrgId, oldMapId, {
+                    type: 'user.left',
+                    payload: { userId: conn.user.userId, mapId: oldMapId }
+                });
+            }
+        }
+        // Leave previous map if any on this socket
         if (conn.user.mapId) {
             this.leaveMap(ws);
         }

@@ -2208,6 +2208,110 @@ class WebAuthController extends Controller
     }
 
     /**
+     * Fetch user profile, live working timer and task list for office spotlight / inspector.
+     */
+    public function memberActivity(Request $request, $userId)
+    {
+        $viewer = Auth::user();
+        $viewerMembership = OrganizationMember::where('user_id', $viewer->id)->first();
+        if (!$viewerMembership) return response()->json(['message' => 'Unauthorized'], 403);
+
+        $orgId = $viewerMembership->organization_id;
+        $targetUser = \App\Domains\Identity\Models\User::with(['profile.department', 'profile.team'])->findOrFail($userId);
+        $targetMembership = OrganizationMember::where('user_id', $targetUser->id)
+            ->where('organization_id', $orgId)
+            ->with(['role'])
+            ->first();
+
+        if (!$targetMembership) {
+            return response()->json(['message' => 'Member not found in organization'], 404);
+        }
+
+        // Active timer (what they are working on right now)
+        $activeTimer = \App\Domains\Projects\Models\TimeEntry::where('user_id', $targetUser->id)
+            ->where('organization_id', $orgId)
+            ->whereNull('ended_at')
+            ->with(['task', 'project'])
+            ->latest('started_at')
+            ->first();
+
+        // Tasks assigned to this user
+        $tasks = \App\Domains\Projects\Models\Task::where('organization_id', $orgId)
+            ->where(function($q) use ($targetUser) {
+                $q->where('assignee_id', $targetUser->id);
+            })
+            ->with(['project'])
+            ->latest()
+            ->take(15)
+            ->get();
+
+        return response()->json([
+            'user' => [
+                'id' => $targetUser->id,
+                'name' => $targetUser->name,
+                'email' => $targetUser->email,
+                'avatar_url' => $targetUser->avatar_url,
+                'role_name' => $targetMembership->role?->name ?? 'Member',
+                'job_title' => $targetUser->profile?->job_title ?? __('Team Member'),
+                'department' => $targetUser->profile?->department?->name,
+                'team' => $targetUser->profile?->team?->name,
+                'status' => $targetMembership->status,
+            ],
+            'active_timer' => $activeTimer ? [
+                'id' => $activeTimer->id,
+                'project_name' => $activeTimer->project?->name ?? 'General Work',
+                'task_title' => $activeTimer->task?->title ?? ($activeTimer->description ?? 'Focused Work Session'),
+                'started_at' => $activeTimer->started_at?->toISOString(),
+                'duration_seconds' => $activeTimer->started_at ? now()->diffInSeconds($activeTimer->started_at) : 0,
+            ] : null,
+            'tasks' => $tasks->map(function($t) {
+                return [
+                    'id' => $t->id,
+                    'title' => $t->title,
+                    'status' => $t->status,
+                    'priority' => $t->priority ?? 'medium',
+                    'project_name' => $t->project?->name ?? 'Main',
+                    'due_date' => $t->due_date ? $t->due_date->format('Y-m-d') : null,
+                ];
+            }),
+        ]);
+    }
+
+    /**
+     * Log Room and Floor presence intervals for time & attendance tracking.
+     */
+    public function logRoomAttendance(Request $request)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        if (!$membership) return response()->json(['message' => 'Unauthorized'], 403);
+
+        $validated = $request->validate([
+            'room_id' => 'nullable|uuid|exists:rooms,id',
+            'action' => 'required|in:enter,leave,heartbeat',
+            'duration_seconds' => 'nullable|integer',
+        ]);
+
+        \App\Domains\Administration\Models\AuditLog::create([
+            'organization_id' => $membership->organization_id,
+            'user_id' => $user->id,
+            'action' => 'room.' . $validated['action'],
+            'target_type' => 'room',
+            'target_id' => $validated['room_id'] ?? null,
+            'metadata' => [
+                'user_name' => $user->name,
+                'room_id' => $validated['room_id'] ?? null,
+                'duration_seconds' => $validated['duration_seconds'] ?? 0,
+                'timestamp' => now()->toISOString(),
+            ],
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+        ]);
+
+        return response()->json(['status' => 'logged']);
+    }
+
+    /**
      * Logout.
      */
     public function logout(Request $request)

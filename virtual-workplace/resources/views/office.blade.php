@@ -874,9 +874,13 @@
 
         <div class="dock-divider"></div>
 
-        <button class="dock-btn" onclick="openAvatarModal()">
-            <span>🎭</span>
-            <span>{{ __('Avatar') }}</span>
+        <button class="dock-btn" id="btn-gallery-grid" onclick="toggleCameraGalleryModal()" title="{{ __('Live Camera Gallery Grid') }}">
+            <span>🎥</span>
+            <span>{{ __('Cameras') }}</span>
+        </button>
+        <button class="dock-btn" onclick="openMyTaskDrawer()" title="{{ __('My Tasks & Active Timer') }}">
+            <span>📝</span>
+            <span>{{ __('My Tasks') }}</span>
         </button>
         <button class="dock-btn" onclick="openGuestInviteModal()">
             <span>⚡</span>
@@ -896,24 +900,71 @@
         </button>
     </div>
 
-    <!-- ── Modals ── -->
+    <!-- ── Modals & Overlays ── -->
 
-    <!-- 1. Avatar Picker Modal -->
-    <div id="avatar-modal" class="modal-overlay">
-        <div class="modal-card">
+    <!-- 1. User Spotlight & Live Video Modal -->
+    <div id="user-spotlight-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 650px; padding: 20px;">
             <div class="modal-header">
-                <div class="modal-title"><span>🎭</span> {{ __('Select 2.5D Avatar Character') }}</div>
-                <button onclick="closeAvatarModal()" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
+                <div class="modal-title" style="display: flex; align-items: center; gap: 12px;">
+                    <div id="spotlight-avatar-box" style="width: 42px; height: 42px; border-radius: 12px; overflow: hidden; background: var(--bg-card); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; color: var(--brand-primary); border: 2px solid var(--border-color);">
+                    </div>
+                    <div>
+                        <div id="spotlight-user-name" style="font-size: 16px; font-weight: 800; color: var(--text-primary);"></div>
+                        <div id="spotlight-user-subtitle" style="font-size: 11px; color: var(--text-secondary);"></div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button onclick="closeUserSpotlight()" style="background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button>
+                </div>
             </div>
-            <div class="avatar-grid">
-                <div class="avatar-card-picker" id="pick-male" onclick="setAvatarGender('male')">
-                    <img src="/images/avatars/male.png" class="avatar-preview-img" alt="Male Character">
-                    <strong style="font-size: 13px;">👨 {{ __('Business Male') }}</strong>
+
+            <!-- Spotlight Video Viewport -->
+            <div id="spotlight-video-container" style="position: relative; width: 100%; height: 320px; background: #070F0A; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-color); box-shadow: inset 0 0 40px rgba(0,0,0,0.8);">
+                <video id="spotlight-video-player" autoplay playsinline style="width: 100%; height: 100%; object-fit: contain; display: none;"></video>
+                <div id="spotlight-no-video" style="display: flex; flex-direction: column; align-items: center; gap: 12px; color: var(--text-muted);">
+                    <div id="spotlight-big-avatar" style="width: 86px; height: 86px; border-radius: 24px; background: rgba(16, 185, 129, 0.15); border: 2px solid var(--brand-primary); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; color: #6EE7B7; overflow: hidden;">
+                    </div>
+                    <span style="font-size: 13px; font-weight: 700;">{{ __('Live camera stream is currently offline') }}</span>
                 </div>
-                <div class="avatar-card-picker" id="pick-female" onclick="setAvatarGender('female')">
-                    <img src="/images/avatars/female.png" class="avatar-preview-img" alt="Female Character">
-                    <strong style="font-size: 13px;">👩 {{ __('Executive Female') }}</strong>
+            </div>
+
+            <!-- Live Work Activity & Task List Section -->
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 4px;">
+                <div id="spotlight-active-timer-box" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(52, 211, 153, 0.25); border-radius: 12px; padding: 12px; display: none; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 22px;">⏱️</span>
+                        <div>
+                            <div style="font-size: 10px; font-weight: 800; color: var(--brand-primary); text-transform: uppercase; letter-spacing: 0.5px;">{{ __('Currently Working On:') }}</div>
+                            <div id="spotlight-timer-task" style="font-size: 13px; font-weight: 800; color: var(--text-primary);"></div>
+                        </div>
+                    </div>
+                    <div id="spotlight-timer-clock" style="font-family: monospace; font-size: 16px; font-weight: 900; color: #6EE7B7; letter-spacing: 1px;"></div>
                 </div>
+
+                <!-- Assigned Tasks List -->
+                <div>
+                    <div style="font-size: 11px; font-weight: 900; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <span>📋 {{ __('Assigned Tasks & Progress') }}</span>
+                        <span id="spotlight-tasks-count" class="guest-badge" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(52, 211, 153, 0.3); color: #6EE7B7;">0 Tasks</span>
+                    </div>
+                    <div id="spotlight-tasks-list" style="display: flex; flex-direction: column; gap: 6px; max-height: 180px; overflow-y: auto;">
+                        <!-- Injected dynamically via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1b. All-Users Camera Gallery Grid Modal -->
+    <div id="camera-gallery-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 1100px; height: 85vh;">
+            <div class="modal-header">
+                <div class="modal-title"><span>🎥</span> {{ __('Office Live Cameras Gallery (شبكة الكاميرات المباشرة)') }}</div>
+                <button onclick="closeCameraGalleryModal()" style="background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button>
+            </div>
+            <div id="camera-gallery-grid" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; padding: 6px;">
+                <!-- Populated dynamically via JS -->
             </div>
         </div>
     </div>
@@ -1094,7 +1145,7 @@
         const roomDoorStates = new Map();
         let pendingKnock = null;
 
-        // ── Preloaded Background & 2.5D Avatars ──
+        // ── Preloaded Background & Realtime User Profile Avatars ──
         const MAP_BG_URL = (CONFIG.map.layout_data && CONFIG.map.layout_data.background_image_url)
             ? CONFIG.map.layout_data.background_image_url
             : '/images/office_floorplan.jpg';
@@ -1107,14 +1158,14 @@
             draw();
         };
 
-        const AVATAR_SPRITES = {
-            male: new Image(),
-            female: new Image()
-        };
-        AVATAR_SPRITES.male.src = '/images/avatars/male.png';
-        AVATAR_SPRITES.female.src = '/images/avatars/female.png';
-
-        let userGender = localStorage.getItem('vw_gender') || 'male';
+        // Local User Profile Image
+        const userAvatarUrl = CONFIG.currentUser?.avatar_url || null;
+        let localAvatarImg = null;
+        if (userAvatarUrl) {
+            localAvatarImg = new Image();
+            localAvatarImg.crossOrigin = 'anonymous';
+            localAvatarImg.src = userAvatarUrl;
+        }
 
         // ── Local & Remote Avatars ──
         const isGuest = {{ !empty($user->is_guest) ? 'true' : 'false' }};
@@ -1124,14 +1175,19 @@
         const localAvatar = {
             id: String(CONFIG.currentUser?.id || 'usr_1'),
             name: CONFIG.currentUser?.name || 'User',
+            avatarUrl: userAvatarUrl,
+            avatarImg: localAvatarImg,
+            jobTitle: CONFIG.currentUser?.profile?.job_title || 'Team Member',
             isGuest: isGuest,
             x: (spawnPos && spawnPos.x) ? spawnPos.x : defaultX,
             y: (spawnPos && spawnPos.y) ? spawnPos.y : defaultY,
             targetX: (spawnPos && spawnPos.x) ? spawnPos.x : defaultX,
             targetY: (spawnPos && spawnPos.y) ? spawnPos.y : defaultY,
             speed: 5.0,
-            radius: 18,
-            gender: userGender,
+            radius: 26,
+            micActive: false,
+            camActive: false,
+            isSpeaking: false,
             currentRoomId: null
         };
         const remoteAvatars = new Map();
@@ -1190,6 +1246,24 @@
             const rect = canvas.getBoundingClientRect();
             const clickX = (e.clientX - rect.left - cameraOffset.x) / zoomLevel;
             const clickY = (e.clientY - rect.top - cameraOffset.y) / zoomLevel;
+
+            // 1. Check if clicking an avatar (local or remote) to open Spotlight & Task List
+            if (Math.hypot(clickX - localAvatar.x, clickY - localAvatar.y) < 32) {
+                openUserSpotlight(localAvatar.id);
+                return;
+            }
+
+            let clickedRemote = null;
+            remoteAvatars.forEach(av => {
+                if (Math.hypot(clickX - av.x, clickY - av.y) < 32) {
+                    clickedRemote = av;
+                }
+            });
+
+            if (clickedRemote) {
+                openUserSpotlight(clickedRemote.id);
+                return;
+            }
 
             // Check if clicking a locked room to knock
             const targetRoom = getCurrentRoom(clickX, clickY);
@@ -1268,7 +1342,11 @@
                     if (ws && ws.readyState === WebSocket.OPEN) {
                         ws.send(JSON.stringify({ type: 'room.enter', payload: { roomId: r.id } }));
                     }
-                    if (prevId) checkAutoUnlockEmptyRooms();
+                    logAttendanceInterval('enter', r.id);
+                    if (prevId) {
+                        logAttendanceInterval('leave', prevId);
+                        checkAutoUnlockEmptyRooms();
+                    }
                 }
             } else {
                 statusPill.style.display = 'none';
@@ -1278,6 +1356,7 @@
                     if (ws && ws.readyState === WebSocket.OPEN) {
                         ws.send(JSON.stringify({ type: 'room.leave', payload: { roomId: prevId } }));
                     }
+                    logAttendanceInterval('leave', prevId);
                     checkAutoUnlockEmptyRooms();
                 }
             }
@@ -1502,62 +1581,142 @@
             requestAnimationFrame(draw);
         }
 
-        // ── Clean 3D Figure Avatar Rendering (Without White Circle) ──
+        // ── Modern Profile & Live Video Node Rendering (Replacing Sprite Characters) ──
         function drawAvatar(av, isSelf) {
             const x = Number(av.x) || 400;
             const y = Number(av.y) || 400;
-            const gender = isSelf ? userGender : (av.gender || 'male');
-            const spriteImg = AVATAR_SPRITES[gender] || AVATAR_SPRITES.male;
+            const cardSize = 46;
+            const radius = cardSize / 2;
 
-            // 1. Spatial Audio Hearing Aura
+            // 1. Spatial Audio Hearing Aura (Translucent Ambient Glow)
             const auraRadius = isSelf ? 150 : 130;
             const auraGrad = ctx.createRadialGradient(x, y, 10, x, y, auraRadius);
-            auraGrad.addColorStop(0, isSelf ? 'rgba(79, 155, 95, 0.20)' : 'rgba(59, 130, 246, 0.15)');
+            auraGrad.addColorStop(0, isSelf ? 'rgba(16, 185, 129, 0.18)' : 'rgba(59, 130, 246, 0.14)');
             auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
             ctx.fillStyle = auraGrad;
             ctx.beginPath();
             ctx.arc(x, y, auraRadius, 0, Math.PI * 2);
             ctx.fill();
 
-            // 2. Soft Floor Ground Drop Shadow
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
-            ctx.beginPath();
-            ctx.ellipse(x, y + 18, 16, 6, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            // 3. Clean 2.5D Figure (Standing 3D Character)
-            if (spriteImg && spriteImg.complete && spriteImg.naturalWidth > 0) {
-                ctx.save();
-                const figW = 42;
-                const figH = 66;
-                ctx.drawImage(spriteImg, x - figW / 2, y - figH + 18, figW, figH);
-                ctx.restore();
-            } else {
-                ctx.fillStyle = isSelf ? '#10B981' : '#3B82F6';
+            // 2. Speaking Audio Pulsing Ring (Acoustic Wave)
+            const isSpeaking = isSelf ? (micActive && localAvatar.isSpeaking) : (av.micActive && av.isSpeaking);
+            if (isSpeaking) {
+                const pulse = (Math.sin(Date.now() / 120) + 1) / 2;
+                ctx.strokeStyle = '#10B981';
+                ctx.lineWidth = 3 + pulse * 3;
                 ctx.beginPath();
-                ctx.arc(x, y, 16, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.arc(x, y, radius + 5 + pulse * 5, 0, Math.PI * 2);
+                ctx.stroke();
             }
 
-            // 4. Sleek Name Pill
+            // 3. Drop Shadow under Profile Card
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+            ctx.beginPath();
+            ctx.ellipse(x, y + radius + 4, radius + 2, 7, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 4. Live Camera Video OR User Profile Picture / Gradient Monogram
+            const isCamOn = isSelf ? camActive : (av.camActive && !!av.videoEl);
+            const videoEl = isSelf ? (document.getElementById('local-video-elem') || localAvatar.videoEl) : av.videoEl;
+
+            ctx.save();
+            ctx.beginPath();
+            if (ctx.roundRect) ctx.roundRect(x - radius, y - radius, cardSize, cardSize, 14);
+            else ctx.rect(x - radius, y - radius, cardSize, cardSize);
+            ctx.clip();
+
+            if (isCamOn && videoEl && videoEl.readyState >= 2) {
+                // Draw Live Video Stream directly inside the Canvas Profile Square!
+                ctx.drawImage(videoEl, x - radius, y - radius, cardSize, cardSize);
+            } else if (av.avatarImg && av.avatarImg.complete && av.avatarImg.naturalWidth > 0) {
+                // Draw User Profile Picture
+                ctx.drawImage(av.avatarImg, x - radius, y - radius, cardSize, cardSize);
+            } else {
+                // Draw Modern Gradient Monogram with User's Initials
+                const bgGrad = ctx.createLinearGradient(x - radius, y - radius, x + radius, y + radius);
+                if (isSelf) {
+                    bgGrad.addColorStop(0, '#10B981');
+                    bgGrad.addColorStop(1, '#047857');
+                } else {
+                    bgGrad.addColorStop(0, '#3B82F6');
+                    bgGrad.addColorStop(1, '#1D4ED8');
+                }
+                ctx.fillStyle = bgGrad;
+                ctx.fillRect(x - radius, y - radius, cardSize, cardSize);
+
+                // Initials
+                const nameParts = (av.name || 'User').trim().split(' ');
+                const initials = nameParts.length >= 2 
+                    ? (nameParts[0][0] + nameParts[1][0]).toUpperCase()
+                    : (nameParts[0].substring(0, 2)).toUpperCase();
+                ctx.font = '900 15px Cairo, Inter, sans-serif';
+                ctx.fillStyle = '#FFFFFF';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(initials, x, y);
+            }
+            ctx.restore();
+
+            // 5. Card Border Frame
+            ctx.strokeStyle = isSelf ? '#10B981' : (isCamOn ? '#3B82F6' : 'rgba(255, 255, 255, 0.4)');
+            ctx.lineWidth = isSelf ? 2.5 : 2;
+            ctx.beginPath();
+            if (ctx.roundRect) ctx.roundRect(x - radius, y - radius, cardSize, cardSize, 14);
+            else ctx.rect(x - radius, y - radius, cardSize, cardSize);
+            ctx.stroke();
+
+            // 6. Status Indicators (Top-right Mic & Bottom-right Cam)
+            const isMicOn = isSelf ? micActive : av.micActive;
+            
+            // Mic Badge
+            ctx.fillStyle = isMicOn ? '#10B981' : 'rgba(15, 23, 42, 0.85)';
+            ctx.beginPath();
+            ctx.arc(x + radius - 4, y - radius + 4, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.font = '8px Cairo, Inter, sans-serif';
+            ctx.fillStyle = '#FFFFFF';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(isMicOn ? '🎙️' : '🔇', x + radius - 4, y - radius + 4);
+
+            // Cam Badge if live
+            if (isCamOn) {
+                ctx.fillStyle = '#3B82F6';
+                ctx.beginPath();
+                ctx.arc(x + radius - 4, y + radius - 4, 8, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.font = '8px Cairo, Inter, sans-serif';
+                ctx.fillStyle = '#FFFFFF';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('📷', x + radius - 4, y + radius - 4);
+            }
+
+            // 7. Sleek User Name Pill
             const displayName = isSelf ? `${av.name} ({{ __("You") }})` : av.name;
             ctx.font = 'bold 10px Cairo, Inter, sans-serif';
             const nameW = ctx.measureText(displayName).width + 16;
             ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
-            if (ctx.roundRect) ctx.roundRect(x - nameW / 2, y + 22, nameW, 18, 6);
-            else ctx.rect(x - nameW / 2, y + 22, nameW, 18);
+            if (ctx.roundRect) ctx.roundRect(x - nameW / 2, y + radius + 8, nameW, 18, 6);
+            else ctx.rect(x - nameW / 2, y + radius + 8, nameW, 18);
             ctx.fill();
 
             ctx.strokeStyle = isSelf ? 'rgba(16, 185, 129, 0.6)' : 'rgba(255, 255, 255, 0.2)';
             ctx.lineWidth = 1;
-            if (ctx.roundRect) ctx.roundRect(x - nameW / 2, y + 22, nameW, 18, 6);
-            else ctx.rect(x - nameW / 2, y + 22, nameW, 18);
+            if (ctx.roundRect) ctx.roundRect(x - nameW / 2, y + radius + 8, nameW, 18, 6);
+            else ctx.rect(x - nameW / 2, y + radius + 8, nameW, 18);
             ctx.stroke();
 
             ctx.fillStyle = isSelf ? '#6EE7B7' : '#F8FAFC';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(displayName, x, y + 31);
+            ctx.fillText(displayName, x, y + radius + 17);
         }
 
         // ── WebSocket Realtime Connection & Presence Protocol ──
@@ -2920,22 +3079,221 @@
             showToast(`🎯 {{ __('Moving to') }} ${av.name}...`);
         }
 
-        // ── Avatar Character Modal ──
-        function openAvatarModal() {
-            document.getElementById('avatar-modal').style.display = 'flex';
-            document.getElementById('pick-male').classList.toggle('selected', userGender === 'male');
-            document.getElementById('pick-female').classList.toggle('selected', userGender === 'female');
-        }
-        function closeAvatarModal() { document.getElementById('avatar-modal').style.display = 'none'; }
-        function setAvatarGender(g) {
-            userGender = g;
-            localAvatar.gender = g;
-            localStorage.setItem('vw_gender', g);
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ type: 'avatar.update', payload: { gender: g } }));
+        // ── User Spotlight & Activity Drawer ──
+        let spotlightTimerInterval = null;
+
+        async function openUserSpotlight(userId) {
+            const isSelf = (userId === localAvatar.id);
+            const modal = document.getElementById('user-spotlight-modal');
+            const videoPlayer = document.getElementById('spotlight-video-player');
+            const noVideoBox = document.getElementById('spotlight-no-video');
+            const nameEl = document.getElementById('spotlight-user-name');
+            const subEl = document.getElementById('spotlight-user-subtitle');
+            const avBox = document.getElementById('spotlight-avatar-box');
+            const bigAv = document.getElementById('spotlight-big-avatar');
+            const timerBox = document.getElementById('spotlight-active-timer-box');
+            const timerTask = document.getElementById('spotlight-timer-task');
+            const timerClock = document.getElementById('spotlight-timer-clock');
+            const tasksList = document.getElementById('spotlight-tasks-list');
+            const tasksCount = document.getElementById('spotlight-tasks-count');
+
+            if (spotlightTimerInterval) clearInterval(spotlightTimerInterval);
+
+            // Set Video Stream
+            let targetStream = null;
+            if (isSelf && camActive && localMediaStream) {
+                targetStream = localMediaStream;
+            } else if (!isSelf) {
+                const rVideo = peerVideoCards.get(userId);
+                if (rVideo && rVideo.srcObject) targetStream = rVideo.srcObject;
             }
-            closeAvatarModal();
-            showToast(`🎭 {{ __('Avatar set to') }} ${g === 'female' ? '👩 Female' : '👨 Male'}`);
+
+            if (targetStream) {
+                videoPlayer.srcObject = targetStream;
+                videoPlayer.style.display = 'block';
+                noVideoBox.style.display = 'none';
+            } else {
+                videoPlayer.srcObject = null;
+                videoPlayer.style.display = 'none';
+                noVideoBox.style.display = 'flex';
+            }
+
+            // Quick default placeholders
+            const avObj = isSelf ? localAvatar : remoteAvatars.get(userId);
+            const displayName = avObj ? avObj.name : 'Team Member';
+            nameEl.textContent = displayName;
+            subEl.textContent = isSelf ? '{{ __("You (Current Session)") }}' : (avObj?.jobTitle || '{{ __("Colleague") }}');
+            
+            const initials = displayName.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+            avBox.textContent = initials;
+            bigAv.textContent = initials;
+
+            if (avObj && avObj.avatarUrl) {
+                avBox.innerHTML = `<img src="${avObj.avatarUrl}" style="width:100%;height:100%;object-fit:cover;">`;
+                bigAv.innerHTML = `<img src="${avObj.avatarUrl}" style="width:100%;height:100%;object-fit:cover;">`;
+            }
+
+            tasksList.innerHTML = `<div style="text-align:center; padding: 12px; color: var(--text-muted); font-size:12px;">⏳ {{ __("Loading profile activity...") }}</div>`;
+            modal.style.display = 'flex';
+
+            // Fetch live activity & task list from server API
+            try {
+                const res = await fetch(`/api/members/${userId}/activity`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.user) {
+                        nameEl.textContent = data.user.name;
+                        subEl.textContent = `${data.user.role_name} • ${data.user.job_title || ''} ${data.user.department ? '('+data.user.department+')' : ''}`;
+                        if (data.user.avatar_url) {
+                            avBox.innerHTML = `<img src="${data.user.avatar_url}" style="width:100%;height:100%;object-fit:cover;">`;
+                            bigAv.innerHTML = `<img src="${data.user.avatar_url}" style="width:100%;height:100%;object-fit:cover;">`;
+                        }
+                    }
+
+                    // Active Timer
+                    if (data.active_timer) {
+                        timerBox.style.display = 'flex';
+                        timerTask.textContent = `${data.active_timer.task_title} (${data.active_timer.project_name})`;
+                        let elapsed = data.active_timer.duration_seconds || 0;
+                        function updateTimerClock() {
+                            elapsed++;
+                            const hrs = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+                            const mins = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+                            const secs = String(elapsed % 60).padStart(2, '0');
+                            timerClock.textContent = `${hrs}:${mins}:${secs}`;
+                        }
+                        updateTimerClock();
+                        spotlightTimerInterval = setInterval(updateTimerClock, 1000);
+                    } else {
+                        timerBox.style.display = 'none';
+                    }
+
+                    // Tasks List
+                    tasksCount.textContent = `${data.tasks.length} ${data.tasks.length === 1 ? 'Task' : 'Tasks'}`;
+                    if (data.tasks.length > 0) {
+                        tasksList.innerHTML = data.tasks.map(t => `
+                            <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span style="font-size: 14px;">${t.status === 'done' ? '✅' : (t.status === 'in_progress' ? '⚡' : '📌')}</span>
+                                    <div>
+                                        <div style="font-size: 12px; font-weight: 800; color: var(--text-primary); text-decoration: ${t.status === 'done' ? 'line-through' : 'none'};">${t.title}</div>
+                                        <div style="font-size: 10px; color: var(--text-secondary);">${t.project_name} ${t.due_date ? '• 📅 ' + t.due_date : ''}</div>
+                                    </div>
+                                </div>
+                                <span class="guest-badge" style="text-transform: uppercase; font-size: 9px;">${t.status.replace('_', ' ')}</span>
+                            </div>
+                        `).join('');
+                    } else {
+                        tasksList.innerHTML = `<div style="text-align:center; padding: 12px; color: var(--text-muted); font-size:12px;">☕ {{ __("No pending tasks assigned.") }}</div>`;
+                    }
+                }
+            } catch(err) {
+                console.error(err);
+            }
+        }
+
+        function closeUserSpotlight() {
+            if (spotlightTimerInterval) clearInterval(spotlightTimerInterval);
+            const modal = document.getElementById('user-spotlight-modal');
+            const videoPlayer = document.getElementById('spotlight-video-player');
+            if (videoPlayer) videoPlayer.srcObject = null;
+            if (modal) modal.style.display = 'none';
+        }
+
+        function openMyTaskDrawer() {
+            openUserSpotlight(localAvatar.id);
+        }
+
+        // ── Camera Gallery Grid Overlay ──
+        function toggleCameraGalleryModal() {
+            const modal = document.getElementById('camera-gallery-modal');
+            if (!modal) return;
+            const isShown = modal.style.display === 'flex';
+            if (isShown) {
+                closeCameraGalleryModal();
+            } else {
+                modal.style.display = 'flex';
+                updateGalleryGrid();
+            }
+        }
+
+        function closeCameraGalleryModal() {
+            const modal = document.getElementById('camera-gallery-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function updateGalleryGrid() {
+            const grid = document.getElementById('camera-gallery-grid');
+            if (!grid || document.getElementById('camera-gallery-modal').style.display !== 'flex') return;
+
+            grid.innerHTML = '';
+
+            // Local user card
+            const selfCard = document.createElement('div');
+            selfCard.style.cssText = 'position: relative; height: 200px; background: #08120D; border-radius: 14px; overflow: hidden; border: 2px solid var(--brand-primary); display: flex; align-items: center; justify-content: center; cursor: pointer;';
+            if (camActive && localMediaStream) {
+                const selfVid = document.createElement('video');
+                selfVid.autoplay = true;
+                selfVid.playsInline = true;
+                selfVid.muted = true;
+                selfVid.srcObject = localMediaStream;
+                selfVid.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
+                selfCard.appendChild(selfVid);
+            } else {
+                const init = (localAvatar.name || 'You').substring(0, 2).toUpperCase();
+                selfCard.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; gap:8px;"><div style="width:52px;height:52px;border-radius:50%;background:rgba(16,185,129,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#6EE7B7;">${init}</div><span style="font-size:11px;color:var(--text-muted);">{{ __("Camera Off") }}</span></div>`;
+            }
+            const selfLabel = document.createElement('div');
+            selfLabel.style.cssText = 'position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; color: #6EE7B7;';
+            selfLabel.textContent = `${localAvatar.name} ({{ __("You") }}) ${micActive ? '🎙️' : '🔇'}`;
+            selfCard.appendChild(selfLabel);
+            selfCard.onclick = () => openUserSpotlight(localAvatar.id);
+            grid.appendChild(selfCard);
+
+            // Remote users
+            remoteAvatars.forEach(av => {
+                const rCard = document.createElement('div');
+                rCard.style.cssText = 'position: relative; height: 200px; background: #0F172A; border-radius: 14px; overflow: hidden; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; cursor: pointer;';
+                const rVideo = peerVideoCards.get(av.id);
+                if (rVideo && rVideo.srcObject) {
+                    const cloneVid = document.createElement('video');
+                    cloneVid.autoplay = true;
+                    cloneVid.playsInline = true;
+                    cloneVid.srcObject = rVideo.srcObject;
+                    cloneVid.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
+                    rCard.appendChild(cloneVid);
+                } else {
+                    const init = (av.name || 'User').substring(0, 2).toUpperCase();
+                    rCard.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; gap:8px;"><div style="width:52px;height:52px;border-radius:50%;background:rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#93C5FD;">${init}</div><span style="font-size:11px;color:var(--text-muted);">${av.camActive ? 'Loading video...' : '{{ __("Camera Off") }}'}</span></div>`;
+                }
+                const rLabel = document.createElement('div');
+                rLabel.style.cssText = 'position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; color: #FFFFFF;';
+                rLabel.textContent = `${av.name} ${av.micActive ? '🎙️' : '🔇'}`;
+                rCard.appendChild(rLabel);
+                rCard.onclick = () => openUserSpotlight(av.id);
+                grid.appendChild(rCard);
+            });
+        }
+
+        // ── Room Attendance & Working Hours Logger ──
+        let roomEnterTimestamp = Date.now();
+        async function logAttendanceInterval(action, roomId) {
+            try {
+                let duration = 0;
+                if (action === 'leave') {
+                    duration = Math.round((Date.now() - roomEnterTimestamp) / 1000);
+                } else if (action === 'enter') {
+                    roomEnterTimestamp = Date.now();
+                }
+                fetch('/api/office/attendance/log', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CONFIG.csrf, 'Accept': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ action: action, room_id: roomId, duration_seconds: duration })
+                }).catch(()=>{});
+            } catch(e) {}
         }
 
         function toggleAppTheme() {
