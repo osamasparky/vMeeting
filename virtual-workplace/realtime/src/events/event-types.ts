@@ -34,6 +34,8 @@ export interface OfficeUser {
   position: UserPosition;
   currentRoomId?: string | null;
   currentZoneId?: string | null;
+  camActive?: boolean;
+  micActive?: boolean;
   lastActive: number;
 }
 

@@ -1178,8 +1178,9 @@ class WebAuthController extends Controller
         $userAllowedOffices = $allOffices;
 
         // Check if host has an active attendance session in a specific room/floor
-        if ($invitation->host_id) {
-            $hostSession = \App\Domains\People\Models\AttendanceSession::where('user_id', $invitation->host_id)
+        $hostUserId = $invitation->invited_by ?: $invitation->host?->id;
+        if ($hostUserId) {
+            $hostSession = \App\Domains\People\Models\AttendanceSession::where('user_id', $hostUserId)
                 ->whereNull('ended_at')
                 ->latest('last_heartbeat_at')
                 ->first();

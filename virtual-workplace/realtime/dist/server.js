@@ -287,12 +287,14 @@ wss.on('connection', (ws, req) => {
                     const user = conn.user;
                     if (!user.mapId)
                         break;
+                    user.camActive = !!event.payload.camActive;
+                    user.micActive = !!event.payload.micActive;
                     presence.broadcastToMap(user.organizationId, user.mapId, {
                         type: 'media.state_updated',
                         payload: {
                             userId: user.userId,
-                            camActive: !!event.payload.camActive,
-                            micActive: !!event.payload.micActive,
+                            camActive: user.camActive,
+                            micActive: user.micActive,
                         },
                     }, ws);
                     break;

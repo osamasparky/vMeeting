@@ -442,8 +442,13 @@ class WebRTCManager {
             }
         });
 
-        console.log(`[LiveKit SFU] Connecting to ${livekitHost}...`);
-        await room.connect(livekitHost, token);
+        let cleanHost = (livekitHost || '').trim();
+        if (cleanHost && !cleanHost.startsWith('ws://') && !cleanHost.startsWith('wss://') && !cleanHost.startsWith('http://') && !cleanHost.startsWith('https://')) {
+            cleanHost = `wss://${cleanHost}`;
+        }
+
+        console.log(`[LiveKit SFU] Connecting to ${cleanHost}...`);
+        await room.connect(cleanHost, token);
         console.log(`[LiveKit SFU] Successfully connected to room: ${room.name}`);
 
         return room;
