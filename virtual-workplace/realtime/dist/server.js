@@ -291,6 +291,100 @@ wss.on('connection', (ws, req) => {
                     }, ws);
                     break;
                 }
+                case 'chat.bubble': {
+                    const user = conn.user;
+                    if (!user.mapId)
+                        break;
+                    presence.broadcastToMap(user.organizationId, user.mapId, {
+                        type: 'chat.bubble',
+                        payload: {
+                            userId: user.userId,
+                            userName: user.name,
+                            text: event.payload.text,
+                        },
+                    });
+                    break;
+                }
+                case 'user.reaction': {
+                    const user = conn.user;
+                    if (!user.mapId)
+                        break;
+                    presence.broadcastToMap(user.organizationId, user.mapId, {
+                        type: 'user.reaction',
+                        payload: {
+                            userId: user.userId,
+                            userName: user.name,
+                            emoji: event.payload.emoji,
+                        },
+                    });
+                    break;
+                }
+                case 'user.wave': {
+                    const user = conn.user;
+                    const { targetUserId } = event.payload;
+                    const targetWs = presence.findUserSocket(targetUserId);
+                    if (targetWs) {
+                        presence.send(targetWs, {
+                            type: 'user.wave',
+                            payload: {
+                                senderUserId: user.userId,
+                                senderName: user.name,
+                                targetUserId,
+                            },
+                        });
+                        console.log(`[WS] ${user.name} waved 👋 at ${targetUserId}`);
+                    }
+                    break;
+                }
+                case 'user.sit': {
+                    const user = conn.user;
+                    if (!user.mapId)
+                        break;
+                    const { isSitting, furnitureId, seatPosition } = event.payload;
+                    if (seatPosition) {
+                        user.position = { ...seatPosition };
+                    }
+                    presence.broadcastToMap(user.organizationId, user.mapId, {
+                        type: 'user.sit_updated',
+                        payload: {
+                            userId: user.userId,
+                            isSitting,
+                            furnitureId,
+                            seatPosition,
+                        },
+                    });
+                    console.log(`[WS] ${user.name} is now ${isSitting ? 'SITTING at ' + furnitureId : 'STANDING'}`);
+                    break;
+                }
+                case 'whiteboard.draw': {
+                    const user = conn.user;
+                    if (!user.mapId)
+                        break;
+                    const { roomId, stroke } = event.payload;
+                    presence.broadcastToMap(user.organizationId, user.mapId, {
+                        type: 'whiteboard.draw',
+                        payload: {
+                            roomId,
+                            senderUserId: user.userId,
+                            stroke,
+                        },
+                    }, ws);
+                    break;
+                }
+                case 'whiteboard.clear': {
+                    const user = conn.user;
+                    if (!user.mapId)
+                        break;
+                    const { roomId } = event.payload;
+                    presence.broadcastToMap(user.organizationId, user.mapId, {
+                        type: 'whiteboard.clear',
+                        payload: {
+                            roomId,
+                            clearedBy: user.name,
+                        },
+                    }, ws);
+                    break;
+                }
                 case 'webrtc.signal': {
                     const { targetUserId, signal } = event.payload;
                     const targetWs = presence.findUserSocket(targetUserId);

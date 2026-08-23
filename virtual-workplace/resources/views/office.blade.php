@@ -522,6 +522,49 @@
             gap: 6px;
         }
 
+        .reaction-emoji-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 50%;
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s ease;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .reaction-emoji-btn:hover {
+            transform: scale(1.35) translateY(-2px);
+            background: rgba(255, 255, 255, 0.15);
+        }
+        .reaction-emoji-btn:active {
+            transform: scale(0.95);
+        }
+
+        .more-menu-item {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            padding: 9px 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            text-align: start;
+            transition: all 0.15s ease;
+        }
+        .more-menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #6EE7B7;
+            transform: translateX(3px);
+        }
+
         /* ── Modals & Drawers ── */
         .modal-overlay {
             position: fixed;
@@ -782,9 +825,9 @@
                 <span>👥</span> <span id="occupants-counter">1 {{ __('Online') }}</span>
             </button>
 
-            <button onclick="openDiagnosticsModal()" class="action-link-btn" id="btn-webrtc-quality-pill" title="{{ __('WebRTC Connection Quality') }}">
+            <button onclick="openDiagnosticsModal()" class="action-link-btn" id="btn-webrtc-quality-pill" title="{{ __('Connection Quality (جودة الاتصال)') }}">
                 <span id="webrtc-quality-dot" style="width: 7px; height: 7px; border-radius: 50%; background: #10B981; display: inline-block;"></span>
-                <span id="webrtc-quality-text">WebRTC: Good</span>
+                <span id="webrtc-quality-text">{{ __('Good') }}</span>
             </button>
 
             <button onclick="toggleChatDrawer()" class="action-link-btn" title="{{ __('Chat & Files') }}">
@@ -879,10 +922,6 @@
 
         <div class="dock-divider"></div>
 
-        <button class="dock-btn" id="btn-gallery-grid" onclick="toggleCameraGalleryModal()" title="{{ __('Live Camera Gallery Grid') }}">
-            <span>🎥</span>
-            <span>{{ __('Cameras') }}</span>
-        </button>
         <button class="dock-btn" onclick="openMyTaskDrawer()" title="{{ __('My Tasks & Active Timer') }}">
             <span>📝</span>
             <span>{{ __('My Tasks') }}</span>
@@ -890,6 +929,10 @@
         <button class="dock-btn" onclick="openGuestInviteModal()">
             <span>⚡</span>
             <span>{{ __('Invite') }}</span>
+        </button>
+        <button class="dock-btn" id="btn-react-dock" onclick="toggleReactionMenu(event)" title="{{ __('Quick Reactions & Speech Bubbles') }}">
+            <span>😀</span>
+            <span>{{ __('React') }}</span>
         </button>
         <button class="dock-btn" onclick="openWhiteboardModal()">
             <span>📋</span>
@@ -899,18 +942,45 @@
             <span id="rec-icon">⏺️</span>
             <span id="rec-text">{{ __('Record') }}</span>
         </button>
-        <button class="dock-btn" onclick="openRecordingsGallery()">
-            <span>📼</span>
-            <span>{{ __('Gallery') }}</span>
+
+        <div class="dock-divider"></div>
+
+        <button class="dock-btn" id="btn-more-dock" onclick="toggleMoreMenu(event)" title="{{ __('More Tools & Settings (المزيد)') }}">
+            <span style="font-size: 16px; font-weight: 900; letter-spacing: 2px;">•••</span>
+            <span>{{ __('More') }}</span>
         </button>
-        <button class="dock-btn" onclick="openDeviceSettingsModal()" title="{{ __('Camera & Microphone Settings') }}">
-            <span>⚙️</span>
-            <span>{{ __('Devices') }}</span>
+    </div>
+
+    <!-- ── Floating More Tools & Settings Popover Menu ── -->
+    <div id="floating-more-popover" style="display: none; position: absolute; bottom: 85px; left: 65%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.96); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.18); border-radius: 18px; padding: 8px; flex-direction: column; gap: 4px; box-shadow: 0 16px 36px rgba(0,0,0,0.6); z-index: 100000; min-width: 220px;">
+        <button class="more-menu-item" onclick="toggleCameraGalleryModal(); closeMoreMenu();">
+            <span>🎥</span> <span>{{ __('Cameras Gallery (شبكة الكاميرات)') }}</span>
         </button>
-        <button class="dock-btn" onclick="openDiagnosticsModal()" title="{{ __('WebRTC & Network Diagnostics') }}">
-            <span>🩺</span>
-            <span>{{ __('Diagnostics') }}</span>
+        <button class="more-menu-item" onclick="openRecordingsGallery(); closeMoreMenu();">
+            <span>📼</span> <span>{{ __('Recordings Gallery (التسجيلات)') }}</span>
         </button>
+        <button class="more-menu-item" onclick="openDeviceSettingsModal(); closeMoreMenu();">
+            <span>⚙️</span> <span>{{ __('Device Settings (إعدادات الأجهزة)') }}</span>
+        </button>
+        <button class="more-menu-item" onclick="openDiagnosticsModal(); closeMoreMenu();">
+            <span>🩺</span> <span>{{ __('Diagnostics (فحص الاتصال)') }}</span>
+        </button>
+    </div>
+
+    <!-- ── Floating In-World Contextual Prompts & Menus ── -->
+    <div id="furniture-sit-prompt" style="display: none; position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); background: rgba(16, 185, 129, 0.95); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.4); border-radius: 24px; padding: 6px 18px; color: #FFFFFF; font-size: 12px; font-weight: 900; box-shadow: 0 10px 28px rgba(16,185,129,0.45); z-index: 9999; pointer-events: none; transition: opacity 0.2s ease;">
+        <span>🪑 {{ __('Press') }} <kbd style="background: rgba(0,0,0,0.35); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px;">E</kbd> {{ __('to Sit at Desk / Table (الجلوس)') }}</span>
+    </div>
+
+    <div id="floating-reaction-popover" style="display: none; position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.96); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.18); border-radius: 32px; padding: 6px 14px; align-items: center; gap: 8px; box-shadow: 0 16px 36px rgba(0,0,0,0.6); z-index: 100000;">
+        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('👋')" title="Wave (تحية)">👋</button>
+        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('👍')" title="Thumbs Up (موافق)">👍</button>
+        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('☕')" title="Coffee Break (استراحة)">☕</button>
+        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('💡')" title="Idea (فكرة)">💡</button>
+        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('👏')" title="Applause (تصفيق)">👏</button>
+        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('🎯')" title="Focus Mode (تركيز)">🎯</button>
+        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('❓')" title="Question (سؤال)">❓</button>
+        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('🔥')" title="Great Work (رائع)">🔥</button>
     </div>
 
     <!-- ── Modals & Overlays ── -->
@@ -1039,6 +1109,9 @@
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
+                    <button id="spotlight-wave-btn" onclick="sendWaveToSpotlightUser()" class="action-link-btn" style="background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.4); color: #93C5FD; font-size: 11px; padding: 4px 10px;">
+                        <span>👋</span> {{ __('Wave (استئذان)') }}
+                    </button>
                     <button onclick="closeUserSpotlight()" style="background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button>
                 </div>
             </div>
@@ -1293,6 +1366,7 @@
 
         // ── Local & Remote Avatars ──
         const isGuest = {{ !empty($user->is_guest) ? 'true' : 'false' }};
+        const userGender = @json($user->gender ?? $user->profile?->gender ?? 'male');
         const spawnPos = @json($initialSpawn ?? null);
         const defaultX = isGuest ? 310 : 250;
         const defaultY = isGuest ? 220 : 200;
@@ -1312,9 +1386,13 @@
             micActive: false,
             camActive: false,
             isSpeaking: false,
+            isSitting: false,
+            sittingFurnitureId: null,
             currentRoomId: null
         };
         const remoteAvatars = new Map();
+        const speechBubbles = new Map(); // userId -> { text, emoji, timestamp, type }
+        let nearbyChair = null;
 
         // ── WebRTC Multi-Peer Mesh Media ──
         const peerConnections = new Map(); // targetUserId -> RTCPeerConnection
@@ -1365,12 +1443,86 @@
         window.addEventListener('keydown', (e) => {
             if (['input', 'textarea', 'select'].includes(document.activeElement.tagName.toLowerCase())) return;
             const k = e.key.toLowerCase();
-            if (['w', 'a', 's', 'd', 'arrowup', 'arrowleft', 'arrowdown', 'arrowright'].includes(k)) keys[k] = true;
+            if (['w', 'a', 's', 'd', 'arrowup', 'arrowleft', 'arrowdown', 'arrowright'].includes(k)) {
+                keys[k] = true;
+            }
+
+            // 'E' Key to Sit / Stand at Desk or Chair
+            if (k === 'e') {
+                if (localAvatar.isSitting) {
+                    localAvatar.isSitting = false;
+                    localAvatar.sittingFurnitureId = null;
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'user.sit', payload: { isSitting: false } }));
+                    }
+                    showToast('🧍 {{ __("Stood up (نهوض)") }}');
+                } else if (nearbyChair) {
+                    localAvatar.isSitting = true;
+                    localAvatar.sittingFurnitureId = nearbyChair.id;
+                    localAvatar.x = nearbyChair.x;
+                    localAvatar.y = nearbyChair.y;
+                    localAvatar.targetX = nearbyChair.x;
+                    localAvatar.targetY = nearbyChair.y;
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({
+                            type: 'user.sit',
+                            payload: {
+                                isSitting: true,
+                                furnitureId: nearbyChair.id,
+                                seatPosition: { x: nearbyChair.x, y: nearbyChair.y }
+                            }
+                        }));
+                    }
+                    showToast('🪑 {{ __("Seated at Desk / Table (جلوس في المكتب)") }}');
+                }
+            }
+
+            // 'R' Key to Toggle Screen Share
+            if (k === 'r') {
+                toggleScreenShare();
+            }
         });
         window.addEventListener('keyup', (e) => {
             const k = e.key.toLowerCase();
             if (keys[k] !== undefined) keys[k] = false;
         });
+
+        function checkNearbyFurniture() {
+            const promptEl = document.getElementById('furniture-sit-prompt');
+            if (localAvatar.isSitting) {
+                if (promptEl) promptEl.style.display = 'none';
+                return;
+            }
+
+            const objects = (CONFIG.map && CONFIG.map.objects) || [];
+            let found = null;
+            for (const obj of objects) {
+                const ox = (obj.x + (obj.width || 1) / 2) * 32;
+                const oy = (obj.y + (obj.height || 1) / 2) * 32;
+                const dist = Math.hypot(localAvatar.x - ox, localAvatar.y - oy);
+                if (dist < 48) {
+                    found = { id: obj.id || `chair_${obj.x}_${obj.y}`, x: ox, y: oy, name: obj.name || 'Desk / Chair' };
+                    break;
+                }
+            }
+
+            if (!found && CONFIG.map && CONFIG.map.rooms) {
+                for (const r of CONFIG.map.rooms) {
+                    const rx = (r.bounds.x + r.bounds.width / 2) * 32;
+                    const ry = (r.bounds.y + r.bounds.height / 2) * 32;
+                    const dist = Math.hypot(localAvatar.x - rx, localAvatar.y - ry);
+                    if (dist < 55) {
+                        found = { id: `room_center_${r.id}`, x: rx, y: ry, name: r.name };
+                        break;
+                    }
+                }
+            }
+
+            nearbyChair = found;
+            if (promptEl) {
+                promptEl.style.display = found ? 'block' : 'none';
+            }
+        }
 
         canvas.addEventListener('click', (e) => {
             const rect = canvas.getBoundingClientRect();
@@ -1529,21 +1681,35 @@
             let nextX = localAvatar.x;
             let nextY = localAvatar.y;
 
-            if (dx !== 0 || dy !== 0) {
-                const len = Math.sqrt(dx * dx + dy * dy);
-                nextX += (dx / len) * localAvatar.speed;
-                nextY += (dy / len) * localAvatar.speed;
-                localAvatar.targetX = nextX;
-                localAvatar.targetY = nextY;
+            if (localAvatar.isSitting) {
+                // If user moves while sitting, auto stand up!
+                if (dx !== 0 || dy !== 0) {
+                    localAvatar.isSitting = false;
+                    localAvatar.sittingFurnitureId = null;
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'user.sit', payload: { isSitting: false } }));
+                    }
+                    showToast('🧍 {{ __("Stood up") }}');
+                }
             } else {
-                const diffX = localAvatar.targetX - localAvatar.x;
-                const diffY = localAvatar.targetY - localAvatar.y;
-                const dist = Math.sqrt(diffX * diffX + diffY * diffY);
-                if (dist > 2) {
-                    nextX += (diffX / dist) * localAvatar.speed;
-                    nextY += (diffY / dist) * localAvatar.speed;
+                if (dx !== 0 || dy !== 0) {
+                    const len = Math.sqrt(dx * dx + dy * dy);
+                    nextX += (dx / len) * localAvatar.speed;
+                    nextY += (dy / len) * localAvatar.speed;
+                    localAvatar.targetX = nextX;
+                    localAvatar.targetY = nextY;
+                } else {
+                    const diffX = localAvatar.targetX - localAvatar.x;
+                    const diffY = localAvatar.targetY - localAvatar.y;
+                    const dist = Math.sqrt(diffX * diffX + diffY * diffY);
+                    if (dist > 2) {
+                        nextX += (diffX / dist) * localAvatar.speed;
+                        nextY += (diffY / dist) * localAvatar.speed;
+                    }
                 }
             }
+
+            checkNearbyFurniture();
 
             // Door lock & Room Permission Guard collision detection
             const currentR = getCurrentRoom(localAvatar.x, localAvatar.y);
@@ -1829,10 +1995,14 @@
             }
 
             // 7. Sleek User Name Pill
-            const displayName = isSelf ? `${av.name} ({{ __("You") }})` : av.name;
+            // 7. Sleek User Name Pill (with Seated Desk indicator)
+            const isSitting = isSelf ? localAvatar.isSitting : av.isSitting;
+            const displayName = isSelf 
+                ? (isSitting ? `🪑 ${av.name} ({{ __("At Desk") }})` : `${av.name} ({{ __("You") }})`)
+                : (isSitting ? `🪑 ${av.name}` : av.name);
             ctx.font = 'bold 10px Cairo, Inter, sans-serif';
             const nameW = ctx.measureText(displayName).width + 16;
-            ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+            ctx.fillStyle = isSitting ? 'rgba(16, 185, 129, 0.95)' : 'rgba(15, 23, 42, 0.92)';
             if (ctx.roundRect) ctx.roundRect(x - nameW / 2, y + radius + 8, nameW, 18, 6);
             else ctx.rect(x - nameW / 2, y + radius + 8, nameW, 18);
             ctx.fill();
@@ -1843,10 +2013,79 @@
             else ctx.rect(x - nameW / 2, y + radius + 8, nameW, 18);
             ctx.stroke();
 
-            ctx.fillStyle = isSelf ? '#6EE7B7' : '#F8FAFC';
+            ctx.fillStyle = isSitting ? '#FFFFFF' : (isSelf ? '#6EE7B7' : '#F8FAFC');
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(displayName, x, y + radius + 17);
+
+            // 8. In-World Floating Speech / Reaction Comic Bubble
+            const bubble = speechBubbles.get(av.id);
+            if (bubble) {
+                const elapsed = Date.now() - bubble.timestamp;
+                if (elapsed < 4800) {
+                    const progress = Math.min(1, elapsed / 250);
+                    const scale = progress < 1 ? Math.sin(progress * Math.PI / 2) * 1.08 : (elapsed > 4000 ? (4800 - elapsed) / 800 : 1.0);
+                    const alpha = elapsed > 4000 ? (4800 - elapsed) / 800 : 1.0;
+                    const bubbleY = y - radius - 18 - (scale * 10);
+
+                    ctx.save();
+                    ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+
+                    if (bubble.type === 'emoji') {
+                        // Big Animated Emoji Pop
+                        ctx.font = '28px "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(bubble.emoji, x, bubbleY);
+                    } else {
+                        // Comic Speech Bubble
+                        const text = bubble.text || '';
+                        ctx.font = 'bold 11px Cairo, Inter, sans-serif';
+                        const textMetrics = ctx.measureText(text);
+                        const bubbleW = Math.min(240, Math.max(60, textMetrics.width + 20));
+                        const bubbleH = 26;
+                        const bx = x - bubbleW / 2;
+                        const by = bubbleY - bubbleH;
+
+                        // Bubble background
+                        ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
+                        ctx.beginPath();
+                        if (ctx.roundRect) ctx.roundRect(bx, by, bubbleW, bubbleH, 10);
+                        else ctx.rect(bx, by, bubbleW, bubbleH);
+                        ctx.fill();
+
+                        ctx.strokeStyle = isSelf ? '#10B981' : '#3B82F6';
+                        ctx.lineWidth = 1.5;
+                        if (ctx.roundRect) ctx.roundRect(bx, by, bubbleW, bubbleH, 10);
+                        else ctx.rect(bx, by, bubbleW, bubbleH);
+                        ctx.stroke();
+
+                        // Pointer Tail
+                        ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
+                        ctx.beginPath();
+                        ctx.moveTo(x - 5, by + bubbleH);
+                        ctx.lineTo(x, by + bubbleH + 6);
+                        ctx.lineTo(x + 5, by + bubbleH);
+                        ctx.fill();
+
+                        ctx.strokeStyle = isSelf ? '#10B981' : '#3B82F6';
+                        ctx.beginPath();
+                        ctx.moveTo(x - 5, by + bubbleH);
+                        ctx.lineTo(x, by + bubbleH + 6);
+                        ctx.lineTo(x + 5, by + bubbleH);
+                        ctx.stroke();
+
+                        // Bubble Text
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(text.length > 30 ? text.substring(0, 28) + '...' : text, x, by + bubbleH / 2);
+                    }
+                    ctx.restore();
+                } else {
+                    speechBubbles.delete(av.id);
+                }
+            }
         }
 
         // ── WebSocket Realtime Connection & Presence Protocol ──
@@ -2044,6 +2283,53 @@
                                 time: new Date(data.payload.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                                 file: null
                             });
+                        }
+
+                        // 8b. In-World Floating Speech Bubble
+                        else if (data.type === 'chat.bubble' && data.payload) {
+                            spawnSpeechBubble(data.payload.userId, data.payload.userName, data.payload.text);
+                        }
+
+                        // 8c. In-World Floating Emoji Reaction
+                        else if (data.type === 'user.reaction' && data.payload) {
+                            spawnSpeechBubble(data.payload.userId, data.payload.userName, null, data.payload.emoji);
+                        }
+
+                        // 8d. Shoulder-Tap / Wave
+                        else if (data.type === 'user.wave' && data.payload) {
+                            if (data.payload.targetUserId === localAvatar.id) {
+                                showToast(`👋 ${data.payload.senderName} {{ __("waved at you for a quick chat! (ألقى التحية عليك)") }}`);
+                                spawnSpeechBubble(data.payload.senderUserId, data.payload.senderName, null, '👋');
+                            }
+                        }
+
+                        // 8e. User Seating State Updated
+                        else if (data.type === 'user.sit_updated' && data.payload) {
+                            const { userId, isSitting, furnitureId, seatPosition } = data.payload;
+                            const av = remoteAvatars.get(userId);
+                            if (av) {
+                                av.isSitting = !!isSitting;
+                                av.sittingFurnitureId = furnitureId || null;
+                                if (seatPosition) {
+                                    av.x = seatPosition.x;
+                                    av.y = seatPosition.y;
+                                    av.targetX = seatPosition.x;
+                                    av.targetY = seatPosition.y;
+                                }
+                            }
+                        }
+
+                        // 8f. Collaborative Whiteboard Stroke
+                        else if (data.type === 'whiteboard.draw' && data.payload) {
+                            renderRemoteWbStroke(data.payload.stroke);
+                        }
+
+                        // 8g. Collaborative Whiteboard Cleared
+                        else if (data.type === 'whiteboard.clear' && data.payload) {
+                            if (wbCtx && wbCanvas) {
+                                wbCtx.clearRect(0, 0, wbCanvas.width, wbCanvas.height);
+                                showToast(`🧹 ${data.payload.clearedBy} {{ __("cleared the whiteboard.") }}`);
+                            }
                         }
 
                         // 9. WebRTC Signaling Dispatch
@@ -2817,6 +3103,78 @@
             }
         }
 
+        function spawnSpeechBubble(userId, userName, text, emoji) {
+            speechBubbles.set(userId, {
+                userId,
+                userName,
+                text: text || null,
+                emoji: emoji || null,
+                timestamp: Date.now(),
+                type: emoji ? 'emoji' : 'text'
+            });
+        }
+
+        function toggleReactionMenu(e) {
+            if (e) e.stopPropagation();
+            const p = document.getElementById('floating-reaction-popover');
+            if (p) {
+                p.style.display = (p.style.display === 'flex' || p.style.display === 'block') ? 'none' : 'flex';
+            }
+        }
+
+        function sendEmojiReaction(emoji) {
+            spawnSpeechBubble(localAvatar.id, localAvatar.name, null, emoji);
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'user.reaction',
+                    payload: { emoji }
+                }));
+            }
+            const p = document.getElementById('floating-reaction-popover');
+            if (p) p.style.display = 'none';
+            showToast(`${emoji} {{ __("Reaction sent!") }}`);
+        }
+
+        function sendWaveToSpotlightUser() {
+            const modal = document.getElementById('user-spotlight-modal');
+            const targetId = modal ? modal.getAttribute('data-active-user-id') : null;
+            if (targetId && ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'user.wave',
+                    payload: { targetUserId: targetId }
+                }));
+                spawnSpeechBubble(localAvatar.id, localAvatar.name, null, '👋');
+                showToast('👋 {{ __("Waved at colleague! (تم إلقاء التحية)") }}');
+            }
+        }
+
+        function toggleMoreMenu(e) {
+            if (e) e.stopPropagation();
+            const p = document.getElementById('floating-more-popover');
+            if (p) {
+                p.style.display = (p.style.display === 'flex' || p.style.display === 'block') ? 'none' : 'flex';
+            }
+        }
+
+        function closeMoreMenu() {
+            const p = document.getElementById('floating-more-popover');
+            if (p) p.style.display = 'none';
+        }
+
+        document.addEventListener('click', (e) => {
+            const reactPop = document.getElementById('floating-reaction-popover');
+            const reactBtn = document.getElementById('btn-react-dock');
+            if (reactPop && reactPop.style.display === 'flex' && !reactPop.contains(e.target) && !reactBtn.contains(e.target)) {
+                reactPop.style.display = 'none';
+            }
+
+            const morePop = document.getElementById('floating-more-popover');
+            const moreBtn = document.getElementById('btn-more-dock');
+            if (morePop && morePop.style.display === 'flex' && !morePop.contains(e.target) && (!moreBtn || !moreBtn.contains(e.target))) {
+                morePop.style.display = 'none';
+            }
+        });
+
         // ── Chat & File Sharing ──
         let chatScope = 'room';
         function toggleChatDrawer() {
@@ -2846,8 +3204,18 @@
                 file: null
             };
 
+            // 1. Spawn floating speech bubble on canvas
+            spawnSpeechBubble(localAvatar.id, localAvatar.name, text, null);
+
+            // 2. Append to chat drawer
             appendChatMessage(msgPayload, true);
+
+            // 3. Send over WebSocket
             if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'chat.bubble',
+                    payload: { text }
+                }));
                 ws.send(JSON.stringify({
                     type: 'chat.send',
                     payload: { channelId: 'general', body: text }
@@ -2862,25 +3230,27 @@
             showToast('⏳ {{ __("Uploading attachment...") }}');
 
             try {
-                const res = await fetch(`/organizations/${CONFIG.org.id}/chat/upload`, {
+                const res = await fetch(`/organizations/${CONFIG.org.id}/files`, {
                     method: 'POST',
                     headers: { 'X-CSRF-TOKEN': CONFIG.csrf, 'Accept': 'application/json' },
                     credentials: 'same-origin',
                     body: formData
                 });
-                const fileData = await res.json();
                 if (res.ok) {
+                    const data = await res.json();
+                    const fileData = data.file || { name: input.files[0].name, url: '#' };
                     const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
-                    const msgPayload = {
+
+                    appendChatMessage({
                         senderName: localAvatar.name,
                         senderId: localAvatar.id,
-                        text: `📎 Shared file: ${fileData.name}`,
+                        text: `📎 {{ __("Shared a file:") }} ${fileData.name}`,
                         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                         scope: chatScope,
                         roomId: myRoom ? myRoom.id : null,
                         file: fileData
-                    };
-                    appendChatMessage(msgPayload, true);
+                    }, true);
+
                     if (ws && ws.readyState === WebSocket.OPEN) {
                         ws.send(JSON.stringify({
                             type: 'chat.send',
@@ -2913,7 +3283,7 @@
             container.scrollTop = container.scrollHeight;
         }
 
-        // ── Rich Collaborative Whiteboard Engine ──
+        // ── Rich Realtime Collaborative Whiteboard Engine ──
         let wbCanvas, wbCtx;
         let wbTool = 'pen';
         let wbColor = '#0F172A';
@@ -2957,6 +3327,7 @@
                         wbCtx.font = 'bold 16px Cairo, sans-serif';
                         wbCtx.fillStyle = wbColor;
                         wbCtx.fillText(txt, wbStartX, wbStartY);
+                        broadcastWbStroke({ tool: 'text', color: wbColor, startX: wbStartX, startY: wbStartY, text: txt });
                         saveWbState();
                     }
                     wbDrawing = false;
@@ -2967,6 +3338,7 @@
                     wbCtx.fillStyle = '#0F172A';
                     wbCtx.font = '12px Cairo, sans-serif';
                     wbCtx.fillText('📌 Note', wbStartX + 10, wbStartY + 20);
+                    broadcastWbStroke({ tool: 'note', startX: wbStartX, startY: wbStartY });
                     saveWbState();
                     wbDrawing = false;
                 }
@@ -3009,6 +3381,15 @@
                 wbCtx.fillStyle = wbColor + '33';
                 wbCtx.lineWidth = 3;
 
+                const strokeData = {
+                    tool: wbTool,
+                    color: wbColor,
+                    startX: wbStartX,
+                    startY: wbStartY,
+                    endX: x,
+                    endY: y
+                };
+
                 if (wbTool === 'rect') {
                     wbCtx.strokeRect(wbStartX, wbStartY, x - wbStartX, y - wbStartY);
                 } else if (wbTool === 'circle') {
@@ -3016,6 +3397,7 @@
                     wbCtx.beginPath();
                     wbCtx.arc(wbStartX, wbStartY, rad, 0, Math.PI * 2);
                     wbCtx.stroke();
+                    strokeData.rad = rad;
                 } else if (wbTool === 'line') {
                     wbCtx.beginPath();
                     wbCtx.moveTo(wbStartX, wbStartY);
@@ -3032,8 +3414,57 @@
                     wbCtx.lineTo(x - 15 * Math.cos(angle + Math.PI / 6), y - 15 * Math.sin(angle + Math.PI / 6));
                     wbCtx.stroke();
                 }
+
+                broadcastWbStroke(strokeData);
                 saveWbState();
             };
+        }
+
+        function broadcastWbStroke(stroke) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+                ws.send(JSON.stringify({
+                    type: 'whiteboard.draw',
+                    payload: {
+                        roomId: myRoom ? myRoom.id : 'global',
+                        stroke
+                    }
+                }));
+            }
+        }
+
+        function renderRemoteWbStroke(s) {
+            if (!wbCtx || !wbCanvas) return;
+            wbCtx.save();
+            wbCtx.strokeStyle = s.color || '#0F172A';
+            wbCtx.fillStyle = (s.color || '#0F172A') + '33';
+            wbCtx.lineWidth = 3;
+
+            if (s.tool === 'pen' || s.tool === 'line') {
+                wbCtx.beginPath();
+                wbCtx.moveTo(s.startX, s.startY);
+                wbCtx.lineTo(s.endX, s.endY);
+                wbCtx.stroke();
+            } else if (s.tool === 'rect') {
+                wbCtx.strokeRect(s.startX, s.startY, s.endX - s.startX, s.endY - s.startY);
+            } else if (s.tool === 'circle') {
+                const rad = s.rad || Math.hypot(s.endX - s.startX, s.endY - s.startY);
+                wbCtx.beginPath();
+                wbCtx.arc(s.startX, s.startY, rad, 0, Math.PI * 2);
+                wbCtx.stroke();
+            } else if (s.tool === 'text') {
+                wbCtx.font = 'bold 16px Cairo, sans-serif';
+                wbCtx.fillStyle = s.color || '#0F172A';
+                wbCtx.fillText(s.text || '', s.startX, s.startY);
+            } else if (s.tool === 'note') {
+                wbCtx.fillStyle = '#FEF08A';
+                wbCtx.fillRect(s.startX, s.startY, 140, 100);
+                wbCtx.strokeRect(s.startX, s.startY, 140, 100);
+                wbCtx.fillStyle = '#0F172A';
+                wbCtx.font = '12px Cairo, sans-serif';
+                wbCtx.fillText('📌 Note', s.startX + 10, s.startY + 20);
+            }
+            wbCtx.restore();
         }
 
         function saveWbState() {
@@ -3250,6 +3681,13 @@
         async function openUserSpotlight(userId) {
             const isSelf = (userId === localAvatar.id);
             const modal = document.getElementById('user-spotlight-modal');
+            modal.setAttribute('data-active-user-id', userId);
+
+            const waveBtn = document.getElementById('spotlight-wave-btn');
+            if (waveBtn) {
+                waveBtn.style.display = isSelf ? 'none' : 'inline-flex';
+            }
+
             const videoPlayer = document.getElementById('spotlight-video-player');
             const noVideoBox = document.getElementById('spotlight-no-video');
             const nameEl = document.getElementById('spotlight-user-name');
@@ -3610,7 +4048,7 @@
                 const text = document.getElementById('webrtc-quality-text');
                 if (dot && text) {
                     dot.style.background = quality === 'excellent' ? '#10B981' : (quality === 'good' || quality === 'fair' ? '#F59E0B' : '#EF4444');
-                    text.textContent = `WebRTC: ${quality.toUpperCase()}`;
+                    text.textContent = quality === 'excellent' ? '{{ __("Excellent") }}' : (quality === 'good' ? '{{ __("Good") }}' : quality.toUpperCase());
                 }
             });
         }

@@ -140,6 +140,51 @@ export interface InboundMediaState {
   };
 }
 
+export interface InboundChatBubble {
+  type: 'chat.bubble';
+  payload: {
+    text: string;
+  };
+}
+
+export interface InboundUserReaction {
+  type: 'user.reaction';
+  payload: {
+    emoji: string;
+  };
+}
+
+export interface InboundUserWave {
+  type: 'user.wave';
+  payload: {
+    targetUserId: string;
+  };
+}
+
+export interface InboundWhiteboardDraw {
+  type: 'whiteboard.draw';
+  payload: {
+    roomId: string;
+    stroke: any;
+  };
+}
+
+export interface InboundWhiteboardClear {
+  type: 'whiteboard.clear';
+  payload: {
+    roomId: string;
+  };
+}
+
+export interface InboundUserSit {
+  type: 'user.sit';
+  payload: {
+    isSitting: boolean;
+    furnitureId?: string;
+    seatPosition?: UserPosition;
+  };
+}
+
 export type InboundEvent =
   | InboundJoinMap
   | InboundPositionUpdate
@@ -151,6 +196,12 @@ export type InboundEvent =
   | InboundRoomEnter
   | InboundRoomLeave
   | InboundChatMessage
+  | InboundChatBubble
+  | InboundUserReaction
+  | InboundUserWave
+  | InboundWhiteboardDraw
+  | InboundWhiteboardClear
+  | InboundUserSit
   | InboundRoomKnock
   | InboundRoomKnockResponse
   | InboundRoomDoorToggle
@@ -307,6 +358,60 @@ export interface OutboundMediaStateUpdated {
   };
 }
 
+export interface OutboundChatBubble {
+  type: 'chat.bubble';
+  payload: {
+    userId: string;
+    userName: string;
+    text: string;
+  };
+}
+
+export interface OutboundUserReaction {
+  type: 'user.reaction';
+  payload: {
+    userId: string;
+    userName: string;
+    emoji: string;
+  };
+}
+
+export interface OutboundUserWave {
+  type: 'user.wave';
+  payload: {
+    senderUserId: string;
+    senderName: string;
+    targetUserId: string;
+  };
+}
+
+export interface OutboundWhiteboardDraw {
+  type: 'whiteboard.draw';
+  payload: {
+    roomId: string;
+    senderUserId: string;
+    stroke: any;
+  };
+}
+
+export interface OutboundWhiteboardClear {
+  type: 'whiteboard.clear';
+  payload: {
+    roomId: string;
+    clearedBy: string;
+  };
+}
+
+export interface OutboundUserSit {
+  type: 'user.sit_updated';
+  payload: {
+    userId: string;
+    isSitting: boolean;
+    furnitureId?: string;
+    seatPosition?: UserPosition;
+  };
+}
+
 export type OutboundEvent =
   | OutboundWelcome
   | OutboundUserJoined
@@ -317,6 +422,12 @@ export type OutboundEvent =
   | OutboundPresentationStarted
   | OutboundPresentationStopped
   | OutboundMediaStateUpdated
+  | OutboundChatBubble
+  | OutboundUserReaction
+  | OutboundUserWave
+  | OutboundWhiteboardDraw
+  | OutboundWhiteboardClear
+  | OutboundUserSit
   | OutboundRoomEntered
   | OutboundRoomLeft
   | OutboundProximityChanged
