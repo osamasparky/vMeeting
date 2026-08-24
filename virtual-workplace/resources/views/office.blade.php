@@ -1669,11 +1669,11 @@
             const lockText = document.getElementById('lock-text');
 
             if (r) {
-                statusPill.style.display = 'flex';
-                roomNameEl.textContent = `🏢 ${r.name}`;
+                if (statusPill) statusPill.style.display = 'flex';
+                if (roomNameEl) roomNameEl.textContent = `🏢 ${r.name}`;
                 const isLocked = !!roomDoorStates.get(r.id);
-                lockIcon.textContent = isLocked ? '🔒' : '🔓';
-                lockText.textContent = isLocked ? '{{ __("Unlock Door") }}' : '{{ __("Lock Door") }}';
+                if (lockIcon) lockIcon.textContent = isLocked ? '🔒' : '🔓';
+                if (lockText) lockText.textContent = isLocked ? '{{ __("Unlock Door") }}' : '{{ __("Lock Door") }}';
 
                 if (localAvatar.currentRoomId !== r.id) {
                     const prevId = localAvatar.currentRoomId;
