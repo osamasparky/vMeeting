@@ -1155,7 +1155,7 @@ class WebAuthController extends Controller
 
         $map->load(['rooms', 'zones', 'objects']);
 
-        $guestId = 'guest_' . md5($token . '_' . microtime(true));
+        $guestId = 'guest_' . \Illuminate\Support\Str::random(24);
         $realtimeToken = $tokenService->generateGuestTokenWithId($guestId, $guestName, $organization);
         $wsUrl = env('REALTIME_WS_URL', 'ws://127.0.0.1:8080');
 
@@ -1183,10 +1183,11 @@ class WebAuthController extends Controller
             ];
         }
 
-        $allOffices = $organization->offices()->with(['rooms', 'activeMap'])->get();
+        $allOffices = $floor ? collect([$floor]) : collect();
         $userAllowedOffices = $allOffices;
+        $userAllowedRoomIds = $targetRoom ? [$targetRoom->id] : [];
 
-        return view('office', compact('user', 'invitation', 'organization', 'floor', 'map', 'room', 'allOffices', 'userAllowedOffices', 'realtimeToken', 'wsUrl', 'initialSpawn'));
+        return view('office', compact('user', 'invitation', 'organization', 'floor', 'map', 'room', 'allOffices', 'userAllowedOffices', 'userAllowedRoomIds', 'realtimeToken', 'wsUrl', 'initialSpawn'));
     }
 
     /**

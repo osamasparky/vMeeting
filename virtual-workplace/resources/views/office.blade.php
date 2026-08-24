@@ -1390,32 +1390,11 @@
         const roomDoorStates = new Map();
         let pendingKnock = null;
 
-        function centerCamera() {
-            if (!canvas) return;
-            if (container && container.clientWidth > 0) {
-                width = canvas.width = container.clientWidth;
-                height = canvas.height = container.clientHeight;
-            } else {
-                width = canvas.width = window.innerWidth;
-                height = canvas.height = window.innerHeight;
-            }
-            const targetX = (typeof localAvatar !== 'undefined' && localAvatar && localAvatar.x) ? localAvatar.x : (MAP_WIDTH_PX / 2);
-            const targetY = (typeof localAvatar !== 'undefined' && localAvatar && localAvatar.y) ? localAvatar.y : (MAP_HEIGHT_PX / 2);
-            cameraOffset.x = (width / 2) - (targetX * zoomLevel);
-            cameraOffset.y = (height / 2) - (targetY * zoomLevel);
-        }
-
-        window.addEventListener('resize', () => {
-            centerCamera();
-            if (typeof draw === 'function') draw();
-        });
-
         // Local User Profile Image
         const userAvatarUrl = CONFIG.currentUser?.avatar_url || null;
         let localAvatarImg = null;
         if (userAvatarUrl) {
             localAvatarImg = new Image();
-            localAvatarImg.crossOrigin = 'anonymous';
             localAvatarImg.src = userAvatarUrl;
         }
 
@@ -1468,6 +1447,35 @@
         let isSessionReplaced = false;
         let wsReconnectAttempts = 0;
 
+        // ── Resize & Camera ──
+        function centerCamera() {
+            if (!canvas || !container) return;
+            width = canvas.width = container.clientWidth || window.innerWidth;
+            height = canvas.height = container.clientHeight || window.innerHeight;
+
+            const scaleX = (width - 40) / MAP_WIDTH_PX;
+            const scaleY = (height - 40) / MAP_HEIGHT_PX;
+            zoomLevel = Math.min(1.0, Math.max(0.65, Math.min(scaleX, scaleY)));
+
+            const targetX = (typeof localAvatar !== 'undefined' && localAvatar && localAvatar.x) ? localAvatar.x : (MAP_WIDTH_PX / 2);
+            const targetY = (typeof localAvatar !== 'undefined' && localAvatar && localAvatar.y) ? localAvatar.y : (MAP_HEIGHT_PX / 2);
+
+            if (MAP_WIDTH_PX * zoomLevel <= width && MAP_HEIGHT_PX * zoomLevel <= height) {
+                cameraOffset.x = (width - MAP_WIDTH_PX * zoomLevel) / 2;
+                cameraOffset.y = (height - MAP_HEIGHT_PX * zoomLevel) / 2;
+            } else {
+                cameraOffset.x = (width / 2) - (targetX * zoomLevel);
+                cameraOffset.y = (height / 2) - (targetY * zoomLevel);
+            }
+        }
+
+        function resizeCanvas() {
+            centerCamera();
+            if (typeof draw === 'function') draw();
+        }
+        window.addEventListener('resize', resizeCanvas);
+        centerCamera();
+
         // ── Preloaded Background & Realtime User Profile Avatars ──
         const MAP_BG_URL = (CONFIG.map && CONFIG.map.layout_data && CONFIG.map.layout_data.background_image_url)
             ? CONFIG.map.layout_data.background_image_url
@@ -1477,16 +1485,12 @@
         let blueprintLoaded = false;
         BLUEPRINT_IMAGE.onload = () => {
             blueprintLoaded = true;
-            centerCamera();
+            resizeCanvas();
         };
         BLUEPRINT_IMAGE.onerror = () => {
             blueprintLoaded = false;
-            centerCamera();
+            resizeCanvas();
         };
-
-        // Start render loop immediately
-        centerCamera();
-        requestAnimationFrame(draw);
 
         // ── LiveKit SFU Real-Time Media ──
         const peerAudioElements = new Map(); // targetUserId -> HTMLAudioElement
@@ -1498,25 +1502,6 @@
         let camActive = false;
         let screenActive = false;
         let currentLiveKitRoomId = null;
-
-        // ── Resize & Camera ──
-        function centerCamera() {
-            if (width && height) {
-                const scaleX = (width - 40) / MAP_WIDTH_PX;
-                const scaleY = (height - 40) / MAP_HEIGHT_PX;
-                zoomLevel = Math.min(1.0, Math.max(0.65, Math.min(scaleX, scaleY)));
-                cameraOffset.x = (width - MAP_WIDTH_PX * zoomLevel) / 2;
-                cameraOffset.y = (height - MAP_HEIGHT_PX * zoomLevel) / 2;
-            }
-        }
-        function resizeCanvas() {
-            width = canvas.width = container.clientWidth;
-            height = canvas.height = container.clientHeight;
-            centerCamera();
-            draw();
-        }
-        window.addEventListener('resize', resizeCanvas);
-        centerCamera();
 
         // ── Movement & Controls ──
         const keys = {};
