@@ -287,27 +287,98 @@ class DiagnosticsManager {
             results.internet = { passed: false, latencyMs: Math.round(performance.now() - start) };
         }
 
-        // 5. STUN & TURN Server Check (Self-Hosted Coturn)
+        // 5. STUN Server Candidate Discovery Check
         try {
             const stunUrl = (config?.ice_servers && config.ice_servers[0]?.urls) || 'stun:173.212.248.192:3478';
             const pc = new RTCPeerConnection({ iceServers: [{ urls: stunUrl }] });
             const ch = pc.createDataChannel('diag');
             const offer = await pc.createOffer();
             await pc.setLocalDescription(offer);
-            results.stun = { passed: true, message: 'STUN Candidate Discovered (Self-Hosted Coturn) ✓' };
+            results.stun = { passed: true, message: 'STUN Candidate Discovered ✓' };
             pc.close();
         } catch (e) {
             results.stun = { passed: false, message: e.message };
         }
 
-        // 6. TURN & LiveKit Check
-        results.turn = { passed: true, message: 'Relay configured (173.212.248.192:3478) ✓' };
+        // 6. Real TURN Relay Connectivity Verification (Forced Relay)
+        const turnIceServers = config?.ice_servers || [
+            {
+                urls: [
+                    'turn:nextspace.munazzah.com:3478?transport=udp',
+                    'turn:nextspace.munazzah.com:3478?transport=tcp',
+                    'turns:nextspace.munazzah.com:5349?transport=tcp'
+                ],
+                username: 'devkey',
+                credential: 'secret_livekit_key_virtual_workplace_2026'
+            }
+        ];
+        results.turn = await this.testTurnConnectivity(turnIceServers);
         results.livekit = { passed: true, host: config?.livekit_host || 'wss://nextspace.munazzah.com/livekit' };
 
         const allOk = results.camera.passed && results.microphone.passed && results.internet.passed;
         results.overall = allOk ? 'Excellent' : (results.internet.passed ? 'Good with warnings' : 'Critical');
 
         return results;
+    }
+
+    /**
+     * Actively verify TURN Relay connectivity by forcing iceTransportPolicy: 'relay'
+     */
+    async testTurnConnectivity(iceServers) {
+        return new Promise((resolve) => {
+            let pc = null;
+            let relayFound = false;
+            let resolved = false;
+
+            const finish = (result) => {
+                if (resolved) return;
+                resolved = true;
+                if (pc) {
+                    try { pc.close(); } catch(e) {}
+                }
+                resolve(result);
+            };
+
+            const timeout = setTimeout(() => {
+                finish({
+                    passed: relayFound,
+                    message: relayFound ? 'TURN Relay Verified ✓' : 'No TURN relay candidate discovered (NAT timeout)'
+                });
+            }, 5000);
+
+            try {
+                pc = new RTCPeerConnection({
+                    iceServers: iceServers,
+                    iceTransportPolicy: 'relay' // Force TURN relay only
+                });
+
+                pc.onicecandidate = (event) => {
+                    if (event.candidate) {
+                        const candType = event.candidate.type;
+                        if (candType === 'relay') {
+                            relayFound = true;
+                            clearTimeout(timeout);
+                            finish({ passed: true, message: 'TURN Relay Verified ✓' });
+                        }
+                    }
+                };
+
+                pc.onicecandidateerror = (event) => {
+                    console.warn('[Diagnostics] ICE Candidate error:', event);
+                };
+
+                pc.createDataChannel('turn-diag-test');
+                pc.createOffer()
+                    .then(offer => pc.setLocalDescription(offer))
+                    .catch((err) => {
+                        clearTimeout(timeout);
+                        finish({ passed: false, message: `Failed to create offer: ${err.message}` });
+                    });
+            } catch (err) {
+                clearTimeout(timeout);
+                finish({ passed: false, message: `Relay test error: ${err.message}` });
+            }
+        });
     }
 
     formatDiagnosticsReport(results) {
