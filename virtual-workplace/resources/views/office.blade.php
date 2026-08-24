@@ -813,42 +813,42 @@
             </div>
 
             @if(!empty($user->is_guest))
-                <span class="guest-badge">
-                    GUEST ACCESS ({{ $user->name }})
+                <span class="guest-badge" style="font-weight: 800;">
+                    🛡️ {{ __('دخول ضيف') }} ({{ $user->name }})
                 </span>
             @endif
         </div>
 
         <div class="glass-pill" id="room-status-pill" style="display: none;">
-            <span id="current-room-name" style="font-weight: 800; font-size: 12px; color: #34D399;">🏢 Conference Room</span>
+            <span id="current-room-name" style="font-weight: 800; font-size: 12px; color: #34D399;">🏢 {{ __('غرفة الاجتماعات') }}</span>
             
             <button onclick="openRoomFilesModal()" id="btn-room-files" class="action-link-btn" style="padding: 4px 8px; font-size: 11px;">
-                <span>📁</span> <span>{{ __('Room Files') }}</span>
+                <span>📁</span> <span>{{ __('ملفات الغرفة') }}</span>
             </button>
 
             @if(empty($user->is_guest))
             <button onclick="toggleRoomDoorLock()" id="btn-lock-room" class="action-link-btn" style="padding: 4px 8px; font-size: 11px;">
-                <span id="lock-icon">🔓</span> <span id="lock-text">{{ __('Lock Door') }}</span>
+                <span id="lock-icon">🔓</span> <span id="lock-text">{{ __('قفل الباب') }}</span>
             </button>
             @endif
         </div>
 
         <div class="glass-pill">
-            <button onclick="openOccupantsModal()" class="action-link-btn" id="btn-occupants-pill" title="{{ __('Online Members & Guests (المتواجدون في المكتب)') }}">
+            <button onclick="openOccupantsModal()" class="action-link-btn" id="btn-occupants-pill" title="{{ __('المتواجدون في المكتب') }}">
                 <span class="live-dot" style="width: 7px; height: 7px;"></span>
-                <span>👥</span> <span id="occupants-counter">1 {{ __('Online') }}</span>
+                <span>👥</span> <span id="occupants-counter">1 {{ __('متصل الآن') }}</span>
             </button>
 
-            <button onclick="openDiagnosticsModal()" class="action-link-btn" id="btn-webrtc-quality-pill" title="{{ __('Connection Quality (جودة الاتصال)') }}">
+            <button onclick="openDiagnosticsModal()" class="action-link-btn" id="btn-webrtc-quality-pill" title="{{ __('جودة الاتصال بالسيرفر') }}">
                 <span id="webrtc-quality-dot" style="width: 7px; height: 7px; border-radius: 50%; background: #10B981; display: inline-block;"></span>
-                <span id="webrtc-quality-text">{{ __('Good') }}</span>
+                <span id="webrtc-quality-text">{{ __('ممتاز') }}</span>
             </button>
 
-            <button onclick="toggleChatDrawer()" class="action-link-btn" title="{{ __('Chat & Files') }}">
-                <span>💬</span> <span>{{ __('Chat') }}</span>
+            <button onclick="toggleChatDrawer()" class="action-link-btn" title="{{ __('المحادثة والمستندات') }}">
+                <span>💬</span> <span>{{ __('المحادثة') }}</span>
             </button>
 
-            <button onclick="toggleAppTheme()" class="action-link-btn" title="{{ __('Toggle Theme') }}">
+            <button onclick="toggleAppTheme()" class="action-link-btn" title="{{ __('تغيير مظهر الشاشة') }}">
                 <span id="theme-icon">☀️</span>
             </button>
 
@@ -860,7 +860,7 @@
 
             @if(!empty($user) && in_array($user->role ?? 'member', ['superadmin', 'company_admin', 'manager']))
                 <a href="{{ route('editor') }}" class="action-link-btn" style="color: var(--brand-primary); font-weight: 800;">
-                    <span>🛠️</span> {{ __('Map Editor') }}
+                    <span>🛠️</span> {{ __('محرر الخريطة') }}
                 </a>
             @endif
         </div>
@@ -876,9 +876,9 @@
         <div class="local-cam-header">
             <span style="font-size: 10px; font-weight: 800; color: #F8FAFC; display: flex; align-items: center; gap: 4px;">
                 <span class="live-dot" style="width: 6px; height: 6px;"></span>
-                📹 {{ $user->name ?? 'You' }} ({{ __('You') }})
+                📹 {{ $user->name ?? 'You' }} ({{ __('أنت') }})
             </span>
-            <button onclick="toggleCamera()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; line-height: 1;" title="{{ __('Turn Off Camera') }}">✕</button>
+            <button onclick="toggleCamera()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; line-height: 1;" title="{{ __('إيقاف الكاميرا') }}">✕</button>
         </div>
         <div class="local-cam-viewport">
             <video id="local-video-elem" autoplay playsinline muted></video>
@@ -893,28 +893,28 @@
     <!-- ── Sliding Chat & File Sharing Drawer ── -->
     <div class="chat-drawer" id="chat-drawer">
         <div class="chat-header">
-            <strong style="font-size: 13px; display: flex; align-items: center; gap: 6px;">💬 {{ __('Office & Room Chat') }}</strong>
+            <strong style="font-size: 13px; display: flex; align-items: center; gap: 6px;">💬 {{ __('محادثة المكتب والغرف') }}</strong>
             <div style="display: flex; align-items: center; gap: 6px;">
-                <button onclick="focusActiveScreenShare()" class="action-link-btn" id="btn-chat-focus-screen" style="display: none; padding: 3px 8px; font-size: 10px; color: #34D399; border-color: rgba(52, 211, 153, 0.4);" title="{{ __('View Active Screen Share (عرض الشاشة المشاركة)') }}">
-                    🖥️ {{ __('Screen') }}
+                <button onclick="focusActiveScreenShare()" class="action-link-btn" id="btn-chat-focus-screen" style="display: none; padding: 3px 8px; font-size: 10px; color: #34D399; border-color: rgba(52, 211, 153, 0.4);" title="{{ __('عرض الشاشة المشاركة') }}">
+                    🖥️ {{ __('الشاشة') }}
                 </button>
                 <button onclick="toggleChatDrawer()" style="background:none; border:none; color:var(--text-muted); font-size:16px; cursor:pointer;">✕</button>
             </div>
         </div>
         <div class="chat-tabs">
-            <div class="chat-tab active" id="chat-tab-room" onclick="switchChatScope('room')">🏢 {{ __('Room') }}</div>
-            <div class="chat-tab" id="chat-tab-global" onclick="switchChatScope('global')">🌐 {{ __('General') }}</div>
+            <div class="chat-tab active" id="chat-tab-room" onclick="switchChatScope('room')">🏢 {{ __('شات الغرفة') }}</div>
+            <div class="chat-tab" id="chat-tab-global" onclick="switchChatScope('global')">🌐 {{ __('العام') }}</div>
         </div>
         <div class="chat-messages" id="chat-messages-container">
             <div class="msg-bubble">
-                <div class="msg-meta"><span>🤖 Assistant</span> <span>{{ date('H:i') }}</span></div>
-                <span>{{ __('Welcome to the collaborative office! Use chat to share notes and files with your team.') }}</span>
+                <div class="msg-meta"><span>🤖 {{ __('المساعد الذكي') }}</span> <span>{{ date('H:i') }}</span></div>
+                <span>{{ __('مرحبًا بك في المكتب الافتراضي! يمكنك استخدام الشات للتواصل ومشاركة الملفات والملاحظات مع فريقك.') }}</span>
             </div>
         </div>
         <div class="chat-input-bar">
             <input type="file" id="chat-file-input" style="display:none;" onchange="handleChatFileUpload(this)">
-            <button onclick="document.getElementById('chat-file-input').click()" class="action-link-btn" style="padding: 6px 8px;" title="{{ __('Attach File') }}">📎</button>
-            <input type="text" id="chat-msg-input" placeholder="{{ __('Type message...') }}" class="styled-input" style="padding: 8px 10px; font-size: 12px;" onkeydown="if(event.key==='Enter') sendChatMessage()">
+            <button onclick="document.getElementById('chat-file-input').click()" class="action-link-btn" style="padding: 6px 8px;" title="{{ __('إرفاق ملف') }}">📎</button>
+            <input type="text" id="chat-msg-input" placeholder="{{ __('اكتب رسالتك هنا...') }}" class="styled-input" style="padding: 8px 10px; font-size: 12px;" onkeydown="if(event.key==='Enter') sendChatMessage()">
             <button onclick="sendChatMessage()" class="action-link-btn" style="background: var(--brand-primary); color: white; padding: 6px 12px;">➤</button>
         </div>
     </div>
@@ -923,55 +923,55 @@
     <div class="bottom-dock">
         <button class="dock-btn muted" id="btn-mic" onclick="toggleMicrophone()">
             <span id="mic-icon">🔇</span>
-            <span id="mic-text">{{ __('Mic Off') }}</span>
+            <span id="mic-text">{{ __('كتم المايك') }}</span>
         </button>
         <button class="dock-btn muted" id="btn-cam" onclick="toggleCamera()">
             <span id="cam-icon">📷</span>
-            <span id="cam-text">{{ __('Cam Off') }}</span>
+            <span id="cam-text">{{ __('إيقاف الكاميرا') }}</span>
         </button>
         <button class="dock-btn" id="btn-screen" onclick="toggleScreenShare()">
             <span id="screen-icon">🖥️</span>
-            <span id="screen-text">{{ __('Share') }}</span>
+            <span id="screen-text">{{ __('مشاركة الشاشة') }}</span>
         </button>
 
         <div class="dock-divider"></div>
 
-        <button class="dock-btn" onclick="openMyTaskDrawer()" title="{{ __('My Tasks & Active Timer') }}">
+        <button class="dock-btn" onclick="openMyTaskDrawer()" title="{{ __('قائمة مهامي وتتبع الوقت') }}">
             <span>📝</span>
-            <span>{{ __('My Tasks') }}</span>
+            <span>{{ __('مهامي') }}</span>
         </button>
         <button class="dock-btn" onclick="openGuestInviteModal()">
             <span>⚡</span>
-            <span>{{ __('Invite') }}</span>
+            <span>{{ __('دعوة ضيف') }}</span>
         </button>
-        <button class="dock-btn" id="btn-react-dock" onclick="toggleReactionMenu(event)" title="{{ __('Quick Reactions & Speech Bubbles') }}">
+        <button class="dock-btn" id="btn-react-dock" onclick="toggleReactionMenu(event)" title="{{ __('التفاعلات السريعة والفقاعات') }}">
             <span>😀</span>
-            <span>{{ __('React') }}</span>
+            <span>{{ __('تفاعل') }}</span>
         </button>
         <button class="dock-btn" onclick="openWhiteboardModal()">
             <span>📋</span>
-            <span>{{ __('Board') }}</span>
+            <span>{{ __('السبورة') }}</span>
         </button>
         <button class="dock-btn" id="btn-record" onclick="toggleRecording()">
             <span id="rec-icon">⏺️</span>
-            <span id="rec-text">{{ __('Record') }}</span>
+            <span id="rec-text">{{ __('تسجيل') }}</span>
         </button>
 
         <div class="dock-divider"></div>
 
-        <button class="dock-btn" id="btn-more-dock" onclick="toggleMoreMenu(event)" title="{{ __('More Tools & Settings (المزيد)') }}">
+        <button class="dock-btn" id="btn-more-dock" onclick="toggleMoreMenu(event)" title="{{ __('المزيد من الأدوات والإعدادات') }}">
             <span style="font-size: 16px; font-weight: 900; letter-spacing: 2px;">•••</span>
-            <span>{{ __('More') }}</span>
+            <span>{{ __('المزيد') }}</span>
         </button>
     </div>
 
     <!-- ── Floating More Tools & Settings Popover Menu ── -->
     <div id="floating-more-popover" style="display: none; position: absolute; bottom: 85px; left: 65%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.96); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.18); border-radius: 18px; padding: 8px; flex-direction: column; gap: 4px; box-shadow: 0 16px 36px rgba(0,0,0,0.6); z-index: 100000; min-width: 220px;">
         <button class="more-menu-item" onclick="toggleCameraGalleryModal(); closeMoreMenu();">
-            <span>🎥</span> <span>{{ __('Cameras Gallery (شبكة الكاميرات)') }}</span>
+            <span>🎥</span> <span>{{ __('شبكة الكاميرات المباشرة') }}</span>
         </button>
         <button class="more-menu-item" onclick="openRecordingsGallery(); closeMoreMenu();">
-            <span>📼</span> <span>{{ __('Recordings Gallery (التسجيلات)') }}</span>
+            <span>📼</span> <span>{{ __('مكتبة التسجيلات') }}</span>
         </button>
     </div>
 
@@ -1360,8 +1360,8 @@
         const ctx = canvas.getContext('2d');
         const container = document.getElementById('canvas-container');
 
-        let width = canvas.width = container.clientWidth;
-        let height = canvas.height = container.clientHeight;
+        let width = canvas.width = (container && container.clientWidth) ? container.clientWidth : window.innerWidth;
+        let height = canvas.height = (container && container.clientHeight) ? container.clientHeight : window.innerHeight;
 
         const TILE_SIZE = (CONFIG.map && CONFIG.map.tile_size) ? Number(CONFIG.map.tile_size) : 16;
         const MAP_WIDTH_PX = 1024;
@@ -1369,22 +1369,29 @@
 
         let zoomLevel = 1.0;
         let cameraOffset = { x: 0, y: 0 };
-        const rooms = CONFIG.map.rooms || [];
+        const rooms = (CONFIG.map && CONFIG.map.rooms) ? CONFIG.map.rooms : [];
         const roomDoorStates = new Map();
         let pendingKnock = null;
 
-        // ── Preloaded Background & Realtime User Profile Avatars ──
-        const MAP_BG_URL = (CONFIG.map.layout_data && CONFIG.map.layout_data.background_image_url)
-            ? CONFIG.map.layout_data.background_image_url
-            : '/images/office_floorplan.jpg';
-        const BLUEPRINT_IMAGE = new Image();
-        BLUEPRINT_IMAGE.src = MAP_BG_URL + (MAP_BG_URL.includes('?') ? '&' : '?') + 'v=' + Date.now();
-        let blueprintLoaded = false;
-        BLUEPRINT_IMAGE.onload = () => {
-            blueprintLoaded = true;
+        function centerCamera() {
+            if (!canvas) return;
+            if (container && container.clientWidth > 0) {
+                width = canvas.width = container.clientWidth;
+                height = canvas.height = container.clientHeight;
+            } else {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+            }
+            const targetX = (typeof localAvatar !== 'undefined' && localAvatar && localAvatar.x) ? localAvatar.x : (MAP_WIDTH_PX / 2);
+            const targetY = (typeof localAvatar !== 'undefined' && localAvatar && localAvatar.y) ? localAvatar.y : (MAP_HEIGHT_PX / 2);
+            cameraOffset.x = (width / 2) - (targetX * zoomLevel);
+            cameraOffset.y = (height / 2) - (targetY * zoomLevel);
+        }
+
+        window.addEventListener('resize', () => {
             centerCamera();
-            draw();
-        };
+            if (typeof draw === 'function') draw();
+        });
 
         // Local User Profile Image
         const userAvatarUrl = CONFIG.currentUser?.avatar_url || null;
@@ -1443,6 +1450,25 @@
         let nearbyChair = null;
         let isSessionReplaced = false;
         let wsReconnectAttempts = 0;
+
+        // ── Preloaded Background & Realtime User Profile Avatars ──
+        const MAP_BG_URL = (CONFIG.map && CONFIG.map.layout_data && CONFIG.map.layout_data.background_image_url)
+            ? CONFIG.map.layout_data.background_image_url
+            : '/images/office_floorplan.jpg';
+        const BLUEPRINT_IMAGE = new Image();
+        BLUEPRINT_IMAGE.crossOrigin = 'anonymous';
+        BLUEPRINT_IMAGE.src = MAP_BG_URL + (MAP_BG_URL.includes('?') ? '&' : '?') + 'v=' + Date.now();
+        let blueprintLoaded = false;
+        BLUEPRINT_IMAGE.onload = () => {
+            blueprintLoaded = true;
+            centerCamera();
+            draw();
+        };
+        BLUEPRINT_IMAGE.onerror = () => {
+            blueprintLoaded = true;
+            centerCamera();
+            draw();
+        };
 
         // ── LiveKit SFU Real-Time Media ──
         const peerAudioElements = new Map(); // targetUserId -> HTMLAudioElement
@@ -2816,14 +2842,14 @@
                 console.error('[Audio] error:', e);
                 micActive = false;
                 localAvatar.micActive = false;
-                showToast(`❌ {{ __("Microphone error:") }} ${e.message || e.name}`);
+                showToast(`❌ {{ __("خطأ في الميكروفون:") }} ${e.message || e.name}`);
             }
 
             const btn = document.getElementById('btn-mic');
             btn.classList.toggle('muted', !micActive);
             btn.classList.toggle('active', micActive);
             document.getElementById('mic-icon').textContent = micActive ? '🎙️' : '🔇';
-            document.getElementById('mic-text').textContent = micActive ? '{{ __("Mic On") }}' : '{{ __("Mic Off") }}';
+            document.getElementById('mic-text').textContent = micActive ? '{{ __("المايك يعمل") }}' : '{{ __("كتم المايك") }}';
         }
 
         async function toggleCamera() {
@@ -2870,7 +2896,7 @@
                     if (localMediaStream) {
                         localAvatar.videoEl = videoElem;
                     }
-                    showToast('📹 {{ __("Camera active") }}');
+                    showToast('📹 {{ __("تم تشغيل الكاميرا بنجاح") }}');
                 } else {
                     if (window.VWorkWebRTC) {
                         await window.VWorkWebRTC.setCameraEnabled(false).catch(()=>{});
@@ -2882,7 +2908,7 @@
                     if (videoElem) videoElem.srcObject = null;
                     if (card) card.style.display = 'none';
                     localAvatar.videoEl = null;
-                    showToast('📷 {{ __("Camera turned off") }}');
+                    showToast('📷 {{ __("تم إيقاف الكاميرا") }}');
                 }
 
                 if (ws && ws.readyState === WebSocket.OPEN) {
@@ -2893,14 +2919,14 @@
                 console.error('[Video] error:', e);
                 camActive = false;
                 localAvatar.camActive = false;
-                showToast(`❌ {{ __("Camera error:") }} ${e.message || e.name}`);
+                showToast(`❌ {{ __("خطأ في الكاميرا:") }} ${e.message || e.name}`);
             }
 
             const btn = document.getElementById('btn-cam');
             btn.classList.toggle('muted', !camActive);
             btn.classList.toggle('active', camActive);
             document.getElementById('cam-icon').textContent = camActive ? '📹' : '📷';
-            document.getElementById('cam-text').textContent = camActive ? '{{ __("Cam On") }}' : '{{ __("Cam Off") }}';
+            document.getElementById('cam-text').textContent = camActive ? '{{ __("الكاميرا تعمل") }}' : '{{ __("إيقاف الكاميرا") }}';
         }
 
         async function toggleScreenShare() {
@@ -2919,8 +2945,8 @@
                     const btn = document.getElementById('btn-screen');
                     const text = document.getElementById('screen-text');
                     btn.classList.add('active');
-                    text.textContent = '{{ __("Sharing") }}';
-                    showToast('🖥️ {{ __("Screen sharing active") }}');
+                    text.textContent = '{{ __("إيقاف المشاركة") }}';
+                    showToast('🖥️ {{ __("تم بدء مشاركة الشاشة") }}');
                     if (ws && ws.readyState === WebSocket.OPEN) {
                         ws.send(JSON.stringify({ type: 'presentation.start', payload: {} }));
                     }
@@ -2935,8 +2961,8 @@
                     const btn = document.getElementById('btn-screen');
                     const text = document.getElementById('screen-text');
                     btn.classList.remove('active');
-                    text.textContent = '{{ __("Share") }}';
-                    showToast('⏹️ {{ __("Screen share stopped") }}');
+                    text.textContent = '{{ __("مشاركة الشاشة") }}';
+                    showToast('⏹️ {{ __("تم إيقاف مشاركة الشاشة") }}');
                     if (ws && ws.readyState === WebSocket.OPEN) {
                         ws.send(JSON.stringify({ type: 'presentation.stop', payload: {} }));
                     }
