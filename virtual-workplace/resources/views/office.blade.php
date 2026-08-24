@@ -1423,11 +1423,9 @@
         let isSessionReplaced = false;
         let wsReconnectAttempts = 0;
 
-        // ── WebRTC Multi-Peer Mesh Media ──
-        const peerConnections = new Map(); // targetUserId -> RTCPeerConnection
+        // ── LiveKit SFU Real-Time Media ──
         const peerAudioElements = new Map(); // targetUserId -> HTMLAudioElement
         const peerVideoCards = new Map(); // targetUserId -> HTMLDivElement
-        const pendingIceCandidates = new Map(); // targetUserId -> Array of RTCIceCandidate
         let localMediaStream = null;
         let localAudioStream = null;
         let screenStream = null;
@@ -1435,21 +1433,6 @@
         let camActive = false;
         let screenActive = false;
         let currentLiveKitRoomId = null;
-
-        const RTC_CONFIG = {
-            iceServers: [
-                { urls: 'stun:173.212.248.192:3478' },
-                {
-                    urls: [
-                        'turn:173.212.248.192:3478?transport=udp',
-                        'turn:173.212.248.192:3478?transport=tcp'
-                    ],
-                    username: 'vw_turn_user',
-                    credential: 'vw_turn_password_2026'
-                }
-            ],
-            iceCandidatePoolSize: 10
-        };
 
         // ── Resize & Camera ──
         function centerCamera() {
@@ -2255,8 +2238,6 @@
                                         isSpeaking: false,
                                         gender: occ.gender || 'male'
                                     });
-                                    createPeerConnection(occ.userId);
-                                    initiatePeerOffer(occ.userId);
                                 }
                             });
                             updateOccupantsCounter();
@@ -2292,7 +2273,6 @@
                                 });
                                 showToast(`👋 ${u.name} {{ __("joined the office") }}`);
                                 updateOccupantsCounter();
-                                createPeerConnection(u.userId);
                             }
                         }
 
@@ -2326,9 +2306,19 @@
                         else if ((data.type === 'user.left' || data.type === 'presence.leave') && data.payload?.userId) {
                             const leftId = data.payload.userId;
                             remoteAvatars.delete(leftId);
-                            closePeerConnection(leftId);
+                            const card = peerVideoCards.get(leftId);
+                            if (card) {
+                                card.remove();
+                                peerVideoCards.delete(leftId);
+                            }
+                            const audio = peerAudioElements.get(leftId);
+                            if (audio) {
+                                audio.remove();
+                                peerAudioElements.delete(leftId);
+                            }
                             checkAutoUnlockEmptyRooms();
                             updateOccupantsCounter();
+                            updateGalleryGrid();
                         }
 
                         // 5. Door Lock Sync
@@ -2413,11 +2403,6 @@
                                 wbCtx.clearRect(0, 0, wbCanvas.width, wbCanvas.height);
                                 showToast(`🧹 ${data.payload.clearedBy} {{ __("cleared the whiteboard.") }}`);
                             }
-                        }
-
-                        // 9. WebRTC Signaling Dispatch
-                        else if (data.type === 'webrtc.signal' && data.payload) {
-                            handleIncomingWebRTCSignal(data.payload);
                         }
 
                         // 10. Remote Peer Media State Updated (Cam / Mic toggled)
@@ -2518,291 +2503,8 @@
             pendingKnock = null;
         }
 
-        // ── Hybrid WebRTC & LiveKit SFU Media Engine ──
-        function getIceServersList() {
-            return [
-                { urls: 'stun:stun.l.google.com:19302' },
-                { urls: 'stun:stun1.l.google.com:19302' },
-                { urls: 'stun:stun2.l.google.com:19302' },
-                { urls: 'stun:173.212.248.192:3478' }
-            ];
-        }
-
-        function createPeerConnection(userId) {
-            if (peerConnections.has(userId)) {
-                return peerConnections.get(userId);
-            }
-
-            const pc = new RTCPeerConnection({ iceServers: getIceServersList() });
-            pc._pendingIceCandidates = [];
-            peerConnections.set(userId, pc);
-
-            pc.onicecandidate = (event) => {
-                if (event.candidate && ws && ws.readyState === WebSocket.OPEN) {
-                    ws.send(JSON.stringify({
-                        type: 'webrtc.signal',
-                        payload: {
-                            targetUserId: userId,
-                            signal: { candidate: event.candidate }
-                        }
-                    }));
-                }
-            };
-
-            pc.ontrack = (event) => {
-                const stream = event.streams[0] || new MediaStream([event.track]);
-                handleRemoteStream(userId, stream, event.track);
-            };
-
-            // Attach current active local tracks
-            if (localMediaStream && camActive) {
-                localMediaStream.getTracks().forEach(t => {
-                    try { pc.addTrack(t, localMediaStream); } catch(e) {}
-                });
-            }
-            if (localAudioStream && micActive) {
-                localAudioStream.getTracks().forEach(t => {
-                    try { pc.addTrack(t, localAudioStream); } catch(e) {}
-                });
-            }
-            if (screenStream && screenActive) {
-                screenStream.getTracks().forEach(t => {
-                    try { pc.addTrack(t, screenStream); } catch(e) {}
-                });
-            }
-
-            return pc;
-        }
-
-        async function initiatePeerOffer(userId) {
-            const pc = peerConnections.get(userId) || createPeerConnection(userId);
-            try {
-                const offer = await pc.createOffer();
-                await pc.setLocalDescription(offer);
-                if (ws && ws.readyState === WebSocket.OPEN) {
-                    ws.send(JSON.stringify({
-                        type: 'webrtc.signal',
-                        payload: {
-                            targetUserId: userId,
-                            signal: { type: 'offer', sdp: offer.sdp }
-                        }
-                    }));
-                }
-            } catch(e) {
-                console.warn('[WebRTC P2P] initiatePeerOffer error:', e);
-            }
-        }
-
-        async function handleIncomingWebRTCSignal(payload) {
-            const { senderUserId, signal } = payload;
-            if (!senderUserId || !signal) return;
-
-            let pc = peerConnections.get(senderUserId);
-            if (!pc) {
-                pc = createPeerConnection(senderUserId);
-            }
-
-            try {
-                if (signal.type === 'offer' && signal.sdp) {
-                    await pc.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp: signal.sdp }));
-                    
-                    if (pc._pendingIceCandidates && pc._pendingIceCandidates.length > 0) {
-                        for (const cand of pc._pendingIceCandidates) {
-                            try { await pc.addIceCandidate(new RTCIceCandidate(cand)); } catch(e) {}
-                        }
-                        pc._pendingIceCandidates = [];
-                    }
-
-                    const answer = await pc.createAnswer();
-                    await pc.setLocalDescription(answer);
-                    if (ws && ws.readyState === WebSocket.OPEN) {
-                        ws.send(JSON.stringify({
-                            type: 'webrtc.signal',
-                            payload: {
-                                targetUserId: senderUserId,
-                                signal: { type: 'answer', sdp: answer.sdp }
-                            }
-                        }));
-                    }
-                } else if (signal.type === 'answer' && signal.sdp) {
-                    await pc.setRemoteDescription(new RTCSessionDescription({ type: 'answer', sdp: signal.sdp }));
-                    if (pc._pendingIceCandidates && pc._pendingIceCandidates.length > 0) {
-                        for (const cand of pc._pendingIceCandidates) {
-                            try { await pc.addIceCandidate(new RTCIceCandidate(cand)); } catch(e) {}
-                        }
-                        pc._pendingIceCandidates = [];
-                    }
-                } else if (signal.candidate) {
-                    if (pc.remoteDescription && pc.remoteDescription.type) {
-                        try {
-                            await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
-                        } catch(e) {}
-                    } else {
-                        pc._pendingIceCandidates = pc._pendingIceCandidates || [];
-                        pc._pendingIceCandidates.push(signal.candidate);
-                    }
-                }
-            } catch(err) {
-                console.warn('[WebRTC P2P] Signal handle error:', err);
-            }
-        }
-
-        function closePeerConnection(userId) {
-            const pc = peerConnections.get(userId);
-            if (pc) {
-                try { pc.close(); } catch(e) {}
-                peerConnections.delete(userId);
-            }
-            const card = peerVideoCards.get(userId);
-            if (card) {
-                card.remove();
-                peerVideoCards.delete(userId);
-            }
-            const audio = peerAudioElements.get(userId);
-            if (audio) {
-                audio.remove();
-                peerAudioElements.delete(userId);
-            }
-            const av = remoteAvatars.get(userId);
-            if (av) {
-                av.videoEl = null;
-                av.camActive = false;
-                av.isSpeaking = false;
-            }
-            updateGalleryGrid();
-        }
-
+        // ── LiveKit SFU Real-Time Media Engine ──
         let activeScreenSharers = new Set();
-
-        function handleRemoteStream(userId, stream, track) {
-            console.log(`[Media Stream] Received track ${track.kind} (${track.label}) from ${userId}`);
-            const av = remoteAvatars.get(userId);
-
-            if (track.kind === 'audio') {
-                let audioEl = peerAudioElements.get(userId);
-                if (!audioEl) {
-                    audioEl = document.createElement('audio');
-                    audioEl.id = `peer-audio-${userId}`;
-                    audioEl.autoplay = true;
-                    document.body.appendChild(audioEl);
-                    peerAudioElements.set(userId, audioEl);
-                }
-                audioEl.srcObject = stream;
-                audioEl.play().catch(()=>{});
-            } else if (track.kind === 'video') {
-                const trackLabel = (track.label || '').toLowerCase();
-                const isScreenTrack = trackLabel.includes('screen') || trackLabel.includes('display') || trackLabel.includes('window') || activeScreenSharers.has(userId);
-
-                if (isScreenTrack) {
-                    let videoCard = peerVideoCards.get(userId);
-                    let videoEl = null;
-
-                    if (!videoCard) {
-                        videoCard = document.createElement('div');
-                        videoCard.id = `peer-video-${userId}`;
-                        videoCard.className = 'video-card size-medium';
-                        const presenterName = (av && av.name) ? av.name : 'Colleague';
-                        videoCard.innerHTML = `
-                            <div class="video-card-topbar">
-                                <div class="video-card-title">
-                                    <span class="live-dot"></span>
-                                    <span class="user-title">🖥️ ${presenterName} ({{ __('Screen Share') }})</span>
-                                </div>
-                                <div class="video-card-actions">
-                                    <button class="v-btn" id="vbtn-sm-${userId}" onclick="resizeVideoCard('${userId}', 'small')" title="{{ __('Small View (عرض صغير)') }}">📱</button>
-                                    <button class="v-btn active" id="vbtn-med-${userId}" onclick="resizeVideoCard('${userId}', 'medium')" title="{{ __('Medium View (عرض متوسط)') }}">💻</button>
-                                    <button class="v-btn" id="vbtn-lg-${userId}" onclick="resizeVideoCard('${userId}', 'large')" title="{{ __('Theater / Large (عرض كبير)') }}">📺</button>
-                                    <button class="v-btn" onclick="toggleFullscreenVideo('${userId}')" title="{{ __('Full Screen (شاشة كاملة)') }}">⛶</button>
-                                    <button class="v-btn" onclick="togglePipVideo('${userId}')" title="{{ __('Picture in Picture') }}">🗖</button>
-                                    <button class="v-btn" onclick="toggleCollapseVideo('${userId}')" title="{{ __('Minimize (تصغير)') }}">➖</button>
-                                </div>
-                            </div>
-                            <div class="video-wrapper"></div>
-                        `;
-                        const wrapper = videoCard.querySelector('.video-wrapper');
-                        videoEl = document.createElement('video');
-                        videoEl.autoplay = true;
-                        videoEl.playsInline = true;
-                        videoEl.srcObject = stream;
-                        wrapper.appendChild(videoEl);
-                        document.getElementById('video-grid').appendChild(videoCard);
-                        peerVideoCards.set(userId, videoCard);
-
-                        const chatBtn = document.getElementById('btn-chat-focus-screen');
-                        if (chatBtn) chatBtn.style.display = 'inline-flex';
-                    } else {
-                        const wrapper = videoCard.querySelector('.video-wrapper');
-                        videoEl = wrapper.querySelector('video');
-                        if (!videoEl) {
-                            videoEl = document.createElement('video');
-                            videoEl.autoplay = true;
-                            videoEl.playsInline = true;
-                            wrapper.appendChild(videoEl);
-                        }
-                        videoEl.srcObject = stream;
-                    }
-                    videoEl.play().catch(()=>{});
-                } else {
-                    let camVideoEl = av?.videoEl;
-                    if (!camVideoEl) {
-                        camVideoEl = document.createElement('video');
-                        camVideoEl.autoplay = true;
-                        camVideoEl.playsInline = true;
-                        camVideoEl.muted = true;
-                    }
-                    camVideoEl.srcObject = stream;
-                    camVideoEl.play().catch(()=>{});
-                    if (av) {
-                        av.videoEl = camVideoEl;
-                        av.camActive = true;
-                    }
-                }
-                updateGalleryGrid();
-            }
-        }
-
-        async function syncTracksToPeerConnections() {
-            for (const [userId, pc] of peerConnections.entries()) {
-                const senders = pc.getSenders();
-
-                // Video track
-                const videoTrack = (localMediaStream && camActive) ? localMediaStream.getVideoTracks()[0] : null;
-                const videoSender = senders.find(s => s.track && s.track.kind === 'video');
-                if (videoTrack) {
-                    if (videoSender) {
-                        try { await videoSender.replaceTrack(videoTrack); } catch(e) {}
-                    } else {
-                        try { pc.addTrack(videoTrack, localMediaStream); } catch(e) {}
-                    }
-                } else if (videoSender) {
-                    try { pc.removeTrack(videoSender); } catch(e) {}
-                }
-
-                // Audio track
-                const audioTrack = (localAudioStream && micActive) ? localAudioStream.getAudioTracks()[0] : null;
-                const audioSender = senders.find(s => s.track && s.track.kind === 'audio');
-                if (audioTrack) {
-                    if (audioSender) {
-                        try { await audioSender.replaceTrack(audioTrack); } catch(e) {}
-                    } else {
-                        try { pc.addTrack(audioTrack, localAudioStream); } catch(e) {}
-                    }
-                } else if (audioSender) {
-                    try { pc.removeTrack(audioSender); } catch(e) {}
-                }
-
-                // Screen track
-                if (screenStream && screenActive) {
-                    const screenTrack = screenStream.getVideoTracks()[0];
-                    if (screenTrack && !senders.some(s => s.track === screenTrack)) {
-                        try { pc.addTrack(screenTrack, screenStream); } catch(e) {}
-                    }
-                }
-
-                // Trigger renegotiation offer to remote peer
-                await initiatePeerOffer(userId);
-            }
-        }
 
         async function syncLiveKitRoom(roomId) {
             const targetRoomId = roomId || (CONFIG.map?.rooms && CONFIG.map.rooms[0] ? CONFIG.map.rooms[0].id : null);
@@ -2834,19 +2536,21 @@
                     }
                 });
 
-                // Auto publish active states to SFU
+                // Re-publish active states to SFU if enabled
                 if (micActive && window.VWorkWebRTC) await window.VWorkWebRTC.setMicrophoneEnabled(true).catch(()=>{});
                 if (camActive && window.VWorkWebRTC) await window.VWorkWebRTC.setCameraEnabled(true).catch(()=>{});
                 if (screenActive && window.VWorkWebRTC) await window.VWorkWebRTC.setScreenShareEnabled(true).catch(()=>{});
 
             } catch (err) {
-                console.warn('[LiveKit SFU] Join error (Fallback to P2P):', err);
+                console.warn('[LiveKit SFU] Connection error:', err);
             }
         }
 
         function handleLiveKitTrackSubscribed(track, publication, participant) {
             const userId = participant.identity;
-            console.log(`[LiveKit SFU] Track subscribed: ${track.kind} from ${userId}`);
+            const trackSource = publication?.source || track?.source || 'unknown';
+            console.log(`[LiveKit SFU] Track subscribed: ${track.kind} (${trackSource}) from ${userId}`);
+            const av = remoteAvatars.get(userId);
 
             if (track.kind === 'audio') {
                 let audioEl = peerAudioElements.get(userId);
@@ -2858,59 +2562,70 @@
                 } else {
                     track.attach(audioEl);
                 }
+                audioEl.play().catch(()=>{});
             } else if (track.kind === 'video') {
-                let videoCard = peerVideoCards.get(userId);
-                const av = remoteAvatars.get(userId);
-                const presenterName = (av && av.name) ? av.name : (participant.name || 'Colleague');
+                const isScreen = trackSource === 'screen_share' || (track.mediaStreamTrack?.label || '').toLowerCase().includes('screen') || activeScreenSharers.has(userId);
 
-                if (!videoCard) {
-                    videoCard = document.createElement('div');
-                    videoCard.id = `peer-video-${userId}`;
-                    videoCard.className = 'video-card size-medium';
-                    videoCard.innerHTML = `
-                        <div class="video-card-topbar">
-                            <div class="video-card-title">
-                                <span class="live-dot"></span>
-                                <span class="user-title">🖥️ ${presenterName}</span>
-                            </div>
-                            <div class="video-card-actions">
-                                <button class="v-btn" id="vbtn-sm-${userId}" onclick="resizeVideoCard('${userId}', 'small')" title="{{ __('Small View (عرض صغير)') }}">📱</button>
-                                <button class="v-btn active" id="vbtn-med-${userId}" onclick="resizeVideoCard('${userId}', 'medium')" title="{{ __('Medium View (عرض متوسط)') }}">💻</button>
-                                <button class="v-btn" id="vbtn-lg-${userId}" onclick="resizeVideoCard('${userId}', 'large')" title="{{ __('Theater / Large (عرض كبير)') }}">📺</button>
-                                <button class="v-btn" onclick="toggleFullscreenVideo('${userId}')" title="{{ __('Full Screen (شاشة كاملة)') }}">⛶</button>
-                                <button class="v-btn" onclick="togglePipVideo('${userId}')" title="{{ __('Picture in Picture') }}">🗖</button>
-                                <button class="v-btn" onclick="toggleCollapseVideo('${userId}')" title="{{ __('Minimize (تصغير)') }}">➖</button>
-                            </div>
-                        </div>
-                        <div class="video-wrapper"></div>
-                    `;
-                    const wrapper = videoCard.querySelector('.video-wrapper');
-                    const videoEl = track.attach();
-                    videoEl.autoplay = true;
-                    videoEl.playsInline = true;
-                    wrapper.appendChild(videoEl);
+                if (isScreen) {
+                    let videoCard = peerVideoCards.get(userId);
+                    const presenterName = (av && av.name) ? av.name : (participant.name || 'Colleague');
 
-                    if (av) {
-                        av.videoEl = videoEl;
-                        av.camActive = true;
+                    if (!videoCard) {
+                        videoCard = document.createElement('div');
+                        videoCard.id = `peer-video-${userId}`;
+                        videoCard.className = 'video-card size-medium';
+                        videoCard.innerHTML = `
+                            <div class="video-card-topbar">
+                                <div class="video-card-title">
+                                    <span class="live-dot"></span>
+                                    <span class="user-title">🖥️ ${presenterName} ({{ __('Screen Share') }})</span>
+                                </div>
+                                <div class="video-card-actions">
+                                    <button class="v-btn" id="vbtn-sm-${userId}" onclick="resizeVideoCard('${userId}', 'small')" title="{{ __('Small View (عرض صغير)') }}">📱</button>
+                                    <button class="v-btn active" id="vbtn-med-${userId}" onclick="resizeVideoCard('${userId}', 'medium')" title="{{ __('Medium View (عرض متوسط)') }}">💻</button>
+                                    <button class="v-btn" id="vbtn-lg-${userId}" onclick="resizeVideoCard('${userId}', 'large')" title="{{ __('Theater / Large (عرض كبير)') }}">📺</button>
+                                    <button class="v-btn" onclick="toggleFullscreenVideo('${userId}')" title="{{ __('Full Screen (شاشة كاملة)') }}">⛶</button>
+                                    <button class="v-btn" onclick="togglePipVideo('${userId}')" title="{{ __('Picture in Picture') }}">🗖</button>
+                                    <button class="v-btn" onclick="toggleCollapseVideo('${userId}')" title="{{ __('Minimize (تصغير)') }}">➖</button>
+                                </div>
+                            </div>
+                            <div class="video-wrapper"></div>
+                        `;
+                        const wrapper = videoCard.querySelector('.video-wrapper');
+                        const videoEl = track.attach();
+                        videoEl.autoplay = true;
+                        videoEl.playsInline = true;
+                        wrapper.appendChild(videoEl);
+
+                        document.getElementById('video-grid').appendChild(videoCard);
+                        peerVideoCards.set(userId, videoCard);
+
+                        const chatBtn = document.getElementById('btn-chat-focus-screen');
+                        if (chatBtn) chatBtn.style.display = 'inline-flex';
+                    } else {
+                        const wrapper = videoCard.querySelector('.video-wrapper');
+                        wrapper.innerHTML = '';
+                        const videoEl = track.attach();
+                        videoEl.autoplay = true;
+                        videoEl.playsInline = true;
+                        wrapper.appendChild(videoEl);
                     }
-
-                    document.getElementById('video-grid').appendChild(videoCard);
-                    peerVideoCards.set(userId, videoCard);
-
-                    const chatBtn = document.getElementById('btn-chat-focus-screen');
-                    if (chatBtn) chatBtn.style.display = 'inline-flex';
                 } else {
-                    const wrapper = videoCard.querySelector('.video-wrapper');
-                    wrapper.innerHTML = '';
-                    const videoEl = track.attach();
-                    videoEl.autoplay = true;
-                    videoEl.playsInline = true;
-                    wrapper.appendChild(videoEl);
+                    // Camera Track -> Attach to avatar videoEl for Canvas Avatar, Spotlight, and Cameras Gallery
+                    let camVideoEl = av?.videoEl;
+                    if (!camVideoEl) {
+                        camVideoEl = track.attach();
+                        camVideoEl.autoplay = true;
+                        camVideoEl.playsInline = true;
+                        camVideoEl.muted = true;
+                    } else {
+                        track.attach(camVideoEl);
+                    }
                     if (av) {
-                        av.videoEl = videoEl;
+                        av.videoEl = camVideoEl;
                         av.camActive = true;
                     }
+                    camVideoEl.play().catch(()=>{});
                 }
                 updateGalleryGrid();
             }
@@ -2918,17 +2633,22 @@
 
         function handleLiveKitTrackUnsubscribed(track, publication, participant) {
             const userId = participant.identity;
-            console.log(`[LiveKit SFU] Track unsubscribed: ${track.kind} from ${userId}`);
+            const trackSource = publication?.source || track?.source || 'unknown';
+            console.log(`[LiveKit SFU] Track unsubscribed: ${track.kind} (${trackSource}) from ${userId}`);
+
             if (track.kind === 'video') {
-                const card = peerVideoCards.get(userId);
-                if (card) {
-                    card.remove();
-                    peerVideoCards.delete(userId);
-                }
-                const av = remoteAvatars.get(userId);
-                if (av) {
-                    av.videoEl = null;
-                    av.camActive = false;
+                if (trackSource === 'screen_share') {
+                    const card = peerVideoCards.get(userId);
+                    if (card) {
+                        card.remove();
+                        peerVideoCards.delete(userId);
+                    }
+                } else {
+                    const av = remoteAvatars.get(userId);
+                    if (av) {
+                        av.videoEl = null;
+                        av.camActive = false;
+                    }
                 }
                 updateGalleryGrid();
             } else if (track.kind === 'audio') {
@@ -2942,6 +2662,7 @@
 
         function handleLiveKitParticipantDisconnected(participant) {
             const userId = participant.identity;
+            console.log(`[LiveKit SFU] Participant disconnected: ${userId}`);
             const card = peerVideoCards.get(userId);
             if (card) {
                 card.remove();
@@ -3027,39 +2748,23 @@
             }
         }
 
-        // ── Camera, Microphone & Screen Media Controls ──
+        // ── Camera, Microphone & Screen Media Controls (Pure LiveKit SFU) ──
         async function toggleMicrophone() {
             try {
                 micActive = !micActive;
                 localAvatar.micActive = micActive;
 
-                if (micActive) {
-                    if (!localAudioStream) {
-                        try {
-                            localAudioStream = await navigator.mediaDevices.getUserMedia({
-                                audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
-                                video: false
-                            });
-                        } catch(e) {
-                            console.warn('[Audio] getUserMedia error:', e);
-                        }
-                    }
-                    if (window.VWorkWebRTC && window.VWorkWebRTC.livekitRoom) {
-                        await window.VWorkWebRTC.setMicrophoneEnabled(true).catch(()=>{});
-                    }
-                    showToast('🎙️ {{ __("Microphone active") }}');
-                } else {
-                    if (localAudioStream) {
-                        localAudioStream.getAudioTracks().forEach(t => t.stop());
-                        localAudioStream = null;
-                    }
-                    if (window.VWorkWebRTC && window.VWorkWebRTC.livekitRoom) {
-                        await window.VWorkWebRTC.setMicrophoneEnabled(false).catch(()=>{});
-                    }
-                    showToast('🔇 {{ __("Microphone muted") }}');
+                if (window.VWorkWebRTC) {
+                    await window.VWorkWebRTC.setMicrophoneEnabled(micActive).catch(err => {
+                        console.warn('[LiveKit SFU] setMicrophoneEnabled error:', err);
+                    });
                 }
 
-                await syncTracksToPeerConnections();
+                if (micActive) {
+                    showToast('🎙️ {{ __("Microphone active") }}');
+                } else {
+                    showToast('🔇 {{ __("Microphone muted") }}');
+                }
 
                 if (ws && ws.readyState === WebSocket.OPEN) {
                     ws.send(JSON.stringify({ type: 'media.state', payload: { camActive: camActive, micActive: micActive } }));
@@ -3087,6 +2792,14 @@
                 const card = document.getElementById('local-video-card');
 
                 if (camActive) {
+                    if (window.VWorkWebRTC) {
+                        try {
+                            await window.VWorkWebRTC.setCameraEnabled(true);
+                        } catch(sfuErr) {
+                            console.warn('[LiveKit SFU] setCameraEnabled notice:', sfuErr);
+                        }
+                    }
+
                     if (!localMediaStream) {
                         try {
                             localMediaStream = await navigator.mediaDevices.getUserMedia({
@@ -3094,7 +2807,7 @@
                                 audio: false
                             });
                         } catch(mediaErr) {
-                            console.warn('[Camera] getUserMedia fallback notice:', mediaErr);
+                            console.warn('[Camera] local preview getUserMedia notice:', mediaErr);
                         }
                     }
                     if (localMediaStream && videoElem) {
@@ -3105,16 +2818,11 @@
                     if (localMediaStream) {
                         localAvatar.videoEl = videoElem;
                     }
-
-                    if (window.VWorkWebRTC && window.VWorkWebRTC.livekitRoom) {
-                        try {
-                            await window.VWorkWebRTC.setCameraEnabled(true);
-                        } catch(sfuErr) {
-                            console.warn('[LiveKit SFU] setCameraEnabled notice:', sfuErr);
-                        }
-                    }
                     showToast('📹 {{ __("Camera active") }}');
                 } else {
+                    if (window.VWorkWebRTC) {
+                        await window.VWorkWebRTC.setCameraEnabled(false).catch(()=>{});
+                    }
                     if (localMediaStream) {
                         localMediaStream.getVideoTracks().forEach(t => t.stop());
                         localMediaStream = null;
@@ -3122,16 +2830,8 @@
                     if (videoElem) videoElem.srcObject = null;
                     if (card) card.style.display = 'none';
                     localAvatar.videoEl = null;
-
-                    if (window.VWorkWebRTC && window.VWorkWebRTC.livekitRoom) {
-                        try {
-                            await window.VWorkWebRTC.setCameraEnabled(false);
-                        } catch(e) {}
-                    }
                     showToast('📷 {{ __("Camera turned off") }}');
                 }
-
-                await syncTracksToPeerConnections();
 
                 if (ws && ws.readyState === WebSocket.OPEN) {
                     ws.send(JSON.stringify({ type: 'media.state', payload: { camActive: camActive, micActive: micActive } }));
@@ -3156,27 +2856,13 @@
                 screenActive = !screenActive;
 
                 if (screenActive) {
-                    let shareStarted = false;
-                    if (window.VWorkWebRTC && window.VWorkWebRTC.livekitRoom) {
+                    if (window.VWorkWebRTC) {
                         try {
                             await window.VWorkWebRTC.setScreenShareEnabled(true);
-                            shareStarted = true;
                         } catch(sfuErr) {
                             console.warn('[LiveKit SFU] setScreenShareEnabled notice:', sfuErr);
                         }
                     }
-                    if (!shareStarted || !screenStream) {
-                        try {
-                            screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-                            screenStream.getVideoTracks()[0].onended = () => {
-                                if (screenActive) toggleScreenShare();
-                            };
-                        } catch(err) {
-                            console.warn('[ScreenShare] getDisplayMedia error:', err);
-                        }
-                    }
-
-                    await syncTracksToPeerConnections();
 
                     const btn = document.getElementById('btn-screen');
                     const text = document.getElementById('screen-text');
@@ -3187,14 +2873,13 @@
                         ws.send(JSON.stringify({ type: 'presentation.start', payload: {} }));
                     }
                 } else {
-                    if (window.VWorkWebRTC && window.VWorkWebRTC.livekitRoom) {
+                    if (window.VWorkWebRTC) {
                         await window.VWorkWebRTC.setScreenShareEnabled(false).catch(()=>{});
                     }
                     if (screenStream) {
                         screenStream.getTracks().forEach(t => t.stop());
                         screenStream = null;
                     }
-                    await syncTracksToPeerConnections();
                     const btn = document.getElementById('btn-screen');
                     const text = document.getElementById('screen-text');
                     btn.classList.remove('active');

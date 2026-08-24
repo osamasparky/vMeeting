@@ -416,7 +416,9 @@ class WebRTCManager {
         });
 
         room.on(Livekit.RoomEvent.TrackSubscribed, (track, publication, participant) => {
-            console.log(`[LiveKit SFU] Track subscribed: ${track.kind} from ${participant.identity}`);
+            const trackSource = publication?.source || track?.source || 'unknown';
+            const readyState = track?.mediaStreamTrack?.readyState || 'unknown';
+            console.log(`[LiveKit SFU] Track subscribed: ${track.kind} (${trackSource}, readyState: ${readyState}) from ${participant.identity}`);
             if (this.callbacks.onTrackSubscribed) {
                 this.callbacks.onTrackSubscribed(track, publication, participant);
             }
@@ -442,7 +444,7 @@ class WebRTCManager {
             }
         });
 
-        let cleanHost = (livekitHost || '').trim().replace(/\/livekit\/?$/i, '').replace(/\/+$/, '');
+        let cleanHost = (livekitHost || '').trim().replace(/\/+$/, '');
         if (cleanHost && !cleanHost.startsWith('ws://') && !cleanHost.startsWith('wss://') && !cleanHost.startsWith('http://') && !cleanHost.startsWith('https://')) {
             cleanHost = `wss://${cleanHost}`;
         }
