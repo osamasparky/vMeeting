@@ -841,7 +841,6 @@ class SuperAdminController extends Controller
     /**
      * Default Office Template & Rooms Designer (SuperAdmin).
      */
-    public function defaultTemplate()
     public function defaultTemplate(Request $request)
     {
         $user = Auth::user();
