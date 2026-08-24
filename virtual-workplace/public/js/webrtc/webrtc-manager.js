@@ -400,7 +400,34 @@ class WebRTCManager {
         const room = new Livekit.Room(roomOptions);
         this.livekitRoom = room;
 
-        // Register LiveKit SFU Events
+        // Register LiveKit SFU Events with Rich Diagnostics
+        room.on(Livekit.RoomEvent.ConnectionStateChanged, (state) => {
+            console.log(`[LiveKit SFU] Connection state changed: ${state}`);
+            if (this.callbacks.onConnectionStateChanged) {
+                this.callbacks.onConnectionStateChanged(state);
+            }
+        });
+
+        room.on(Livekit.RoomEvent.SignalConnected, () => {
+            console.log('[LiveKit SFU] Signal WebSocket connection established.');
+        });
+
+        room.on(Livekit.RoomEvent.MediaDevicesError, (error) => {
+            console.error('[LiveKit SFU] Media devices error:', error);
+        });
+
+        room.on(Livekit.RoomEvent.ConnectionQualityChanged, (quality, participant) => {
+            console.log(`[LiveKit SFU] Connection quality for ${participant.identity}: ${quality}`);
+        });
+
+        room.on(Livekit.RoomEvent.Reconnecting, () => {
+            console.warn('[LiveKit SFU] Room reconnecting...');
+        });
+
+        room.on(Livekit.RoomEvent.Reconnected, () => {
+            console.log('[LiveKit SFU] Room reconnected successfully.');
+        });
+
         room.on(Livekit.RoomEvent.ParticipantConnected, (participant) => {
             console.log(`[LiveKit SFU] Participant connected: ${participant.identity} (${participant.name})`);
             if (this.callbacks.onParticipantConnected) {
@@ -418,7 +445,7 @@ class WebRTCManager {
         room.on(Livekit.RoomEvent.TrackSubscribed, (track, publication, participant) => {
             const trackSource = publication?.source || track?.source || 'unknown';
             const readyState = track?.mediaStreamTrack?.readyState || 'unknown';
-            console.log(`[LiveKit SFU] Track subscribed: ${track.kind} (${trackSource}, readyState: ${readyState}) from ${participant.identity}`);
+            console.log(`[LiveKit SFU] Track subscribed: ${track.kind} (${trackSource}, readyState: ${readyState}, muted: ${track.isMuted}) from ${participant.identity}`);
             if (this.callbacks.onTrackSubscribed) {
                 this.callbacks.onTrackSubscribed(track, publication, participant);
             }
@@ -429,6 +456,14 @@ class WebRTCManager {
             if (this.callbacks.onTrackUnsubscribed) {
                 this.callbacks.onTrackUnsubscribed(track, publication, participant);
             }
+        });
+
+        room.on(Livekit.RoomEvent.TrackMuted, (publication, participant) => {
+            console.log(`[LiveKit SFU] Track muted: ${publication.kind} (${publication.source}) by ${participant.identity}`);
+        });
+
+        room.on(Livekit.RoomEvent.TrackUnmuted, (publication, participant) => {
+            console.log(`[LiveKit SFU] Track unmuted: ${publication.kind} (${publication.source}) by ${participant.identity}`);
         });
 
         room.on(Livekit.RoomEvent.ActiveSpeakersChanged, (speakers) => {
