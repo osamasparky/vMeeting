@@ -3691,9 +3691,17 @@
             if (spotlightTimerInterval) clearInterval(spotlightTimerInterval);
 
             // Set Video Stream (enforcing spatial/room privacy)
-            let targetStream = null;
+            let hasVideo = false;
+            videoPlayer.muted = true;
+            videoPlayer.playsInline = true;
+            videoPlayer.autoplay = true;
+
             if (isSelf && camActive && localMediaStream) {
-                targetStream = localMediaStream;
+                videoPlayer.srcObject = localMediaStream;
+                videoPlayer.style.display = 'block';
+                noVideoBox.style.display = 'none';
+                videoPlayer.play().catch(()=>{});
+                hasVideo = true;
             } else if (!isSelf) {
                 const av = remoteAvatars.get(userId);
                 const lRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
@@ -3703,21 +3711,29 @@
                 if (canSee && av) {
                     if (av.livekitVideoTrack) {
                         try {
-                            targetStream = new MediaStream([av.livekitVideoTrack.mediaStreamTrack]);
-                        } catch(e) {}
+                            av.livekitVideoTrack.attach(videoPlayer);
+                            videoPlayer.style.display = 'block';
+                            noVideoBox.style.display = 'none';
+                            videoPlayer.play().catch(()=>{});
+                            hasVideo = true;
+                        } catch(e) {
+                            console.warn('[Spotlight] attach error:', e);
+                        }
                     }
-                    if (!targetStream) {
+                    if (!hasVideo) {
                         const vidEl = av.videoEl || peerVideoCards.get(userId)?.querySelector('video');
-                        if (vidEl && vidEl.srcObject) targetStream = vidEl.srcObject;
+                        if (vidEl && (vidEl.srcObject || vidEl.src)) {
+                            videoPlayer.srcObject = vidEl.srcObject;
+                            videoPlayer.style.display = 'block';
+                            noVideoBox.style.display = 'none';
+                            videoPlayer.play().catch(()=>{});
+                            hasVideo = true;
+                        }
                     }
                 }
             }
 
-            if (targetStream) {
-                videoPlayer.srcObject = targetStream;
-                videoPlayer.style.display = 'block';
-                noVideoBox.style.display = 'none';
-            } else {
+            if (!hasVideo) {
                 videoPlayer.srcObject = null;
                 videoPlayer.style.display = 'none';
                 noVideoBox.style.display = 'flex';
@@ -3802,8 +3818,18 @@
         function closeUserSpotlight() {
             if (spotlightTimerInterval) clearInterval(spotlightTimerInterval);
             const modal = document.getElementById('user-spotlight-modal');
+            const activeUserId = modal?.getAttribute('data-active-user-id');
             const videoPlayer = document.getElementById('spotlight-video-player');
-            if (videoPlayer) videoPlayer.srcObject = null;
+            if (videoPlayer) {
+                if (activeUserId && remoteAvatars.has(activeUserId)) {
+                    const av = remoteAvatars.get(activeUserId);
+                    if (av?.livekitVideoTrack) {
+                        try { av.livekitVideoTrack.detach(videoPlayer); } catch(e) {}
+                    }
+                }
+                videoPlayer.srcObject = null;
+                videoPlayer.style.display = 'none';
+            }
             if (modal) modal.style.display = 'none';
         }
 
