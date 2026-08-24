@@ -2623,6 +2623,7 @@
                     }
                     if (av) {
                         av.videoEl = camVideoEl;
+                        av.livekitVideoTrack = track;
                         av.camActive = true;
                     }
                     camVideoEl.play().catch(()=>{});
@@ -2637,6 +2638,12 @@
             console.log(`[LiveKit SFU] Track unsubscribed: ${track.kind} (${trackSource}) from ${userId}`);
 
             if (track.kind === 'video') {
+                const av = remoteAvatars.get(userId);
+                if (av) {
+                    av.livekitVideoTrack = null;
+                    av.camActive = false;
+                    av.videoEl = null;
+                }
                 if (trackSource === 'screen_share') {
                     const card = peerVideoCards.get(userId);
                     if (card) {
@@ -2800,7 +2807,16 @@
                         }
                     }
 
-                    if (!localMediaStream) {
+                    // Retrieve local camera stream directly from LiveKit publication
+                    let localTrack = null;
+                    if (window.VWorkWebRTC?.livekitRoom?.localParticipant?.videoTrackPublications) {
+                        const pubs = Array.from(window.VWorkWebRTC.livekitRoom.localParticipant.videoTrackPublications.values());
+                        localTrack = pubs.find(p => p.source === 'camera' || !p.source)?.track;
+                    }
+
+                    if (localTrack?.mediaStreamTrack) {
+                        localMediaStream = new MediaStream([localTrack.mediaStreamTrack]);
+                    } else if (!localMediaStream) {
                         try {
                             localMediaStream = await navigator.mediaDevices.getUserMedia({
                                 video: { width: { ideal: 640 }, height: { ideal: 360 } },
@@ -2810,6 +2826,7 @@
                             console.warn('[Camera] local preview getUserMedia notice:', mediaErr);
                         }
                     }
+
                     if (localMediaStream && videoElem) {
                         videoElem.srcObject = localMediaStream;
                         videoElem.play().catch(()=>{});
@@ -3683,9 +3700,16 @@
                 const rRoom = av ? getCurrentRoom(av.x, av.y) : null;
                 const canSee = lRoom ? (rRoom && rRoom.id === lRoom.id) : (!rRoom && av && Math.hypot(localAvatar.x - av.x, localAvatar.y - av.y) <= 300);
 
-                if (canSee) {
-                    const vidEl = av?.videoEl || peerVideoCards.get(userId)?.querySelector('video');
-                    if (vidEl && vidEl.srcObject) targetStream = vidEl.srcObject;
+                if (canSee && av) {
+                    if (av.livekitVideoTrack) {
+                        try {
+                            targetStream = new MediaStream([av.livekitVideoTrack.mediaStreamTrack]);
+                        } catch(e) {}
+                    }
+                    if (!targetStream) {
+                        const vidEl = av.videoEl || peerVideoCards.get(userId)?.querySelector('video');
+                        if (vidEl && vidEl.srcObject) targetStream = vidEl.srcObject;
+                    }
                 }
             }
 
@@ -3856,15 +3880,32 @@
                 }
 
                 const vidEl = av.videoEl || peerVideoCards.get(av.id)?.querySelector('video');
-                if (canViewRemoteVideo && vidEl && vidEl.srcObject) {
-                    const cloneVid = document.createElement('video');
-                    cloneVid.autoplay = true;
-                    cloneVid.playsInline = true;
-                    cloneVid.srcObject = vidEl.srcObject;
-                    cloneVid.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
-                    rCard.appendChild(cloneVid);
-                    cloneVid.play().catch(()=>{});
-                } else {
+                let videoAttached = false;
+
+                if (canViewRemoteVideo) {
+                    if (av.livekitVideoTrack) {
+                        const liveVid = document.createElement('video');
+                        liveVid.autoplay = true;
+                        liveVid.playsInline = true;
+                        liveVid.muted = true;
+                        av.livekitVideoTrack.attach(liveVid);
+                        liveVid.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
+                        rCard.appendChild(liveVid);
+                        liveVid.play().catch(()=>{});
+                        videoAttached = true;
+                    } else if (vidEl && vidEl.srcObject) {
+                        const cloneVid = document.createElement('video');
+                        cloneVid.autoplay = true;
+                        cloneVid.playsInline = true;
+                        cloneVid.srcObject = vidEl.srcObject;
+                        cloneVid.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
+                        rCard.appendChild(cloneVid);
+                        cloneVid.play().catch(()=>{});
+                        videoAttached = true;
+                    }
+                }
+
+                if (!videoAttached) {
                     const init = (av.name || 'User').substring(0, 2).toUpperCase();
                     let statusHtml = '';
                     if (remoteRoom && (!localRoom || localRoom.id !== remoteRoom.id)) {
