@@ -837,4 +837,224 @@ class SuperAdminController extends Controller
         Cache::forget('furniture_catalog_active');
         Cache::forget('furniture_categories_with_items');
     }
+
+    /**
+     * Default Office Template & Rooms Designer (SuperAdmin).
+     */
+    public function defaultTemplate()
+    {
+        $user = Auth::user();
+        $template = \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+        $totalCompanies = Organization::count();
+
+        return view('superadmin.default_template', compact('user', 'template', 'totalCompanies'));
+    }
+
+    /**
+     * Update default office template meta & dimensions.
+     */
+    public function updateDefaultTemplate(Request $request)
+    {
+        $template = \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:150'],
+            'description' => ['nullable', 'string', 'max:500'],
+            'background_image_url' => ['nullable', 'string', 'max:500'],
+            'width' => ['required', 'integer', 'min:10', 'max:100'],
+            'height' => ['required', 'integer', 'min:10', 'max:100'],
+            'tile_size' => ['required', 'integer', 'in:16,32,48,64'],
+        ]);
+
+        $layoutData = $template->layout_data ?? [];
+        if (!empty($validated['background_image_url'])) {
+            $layoutData['background_image_url'] = $validated['background_image_url'];
+        }
+
+        $template->update([
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'background_image_url' => $validated['background_image_url'] ?? $template->background_image_url,
+            'width' => $validated['width'],
+            'height' => $validated['height'],
+            'tile_size' => $validated['tile_size'],
+            'layout_data' => $layoutData,
+            'created_by' => Auth::id(),
+        ]);
+
+        return back()->with('success', __('Default Office Template blueprint settings updated successfully.'));
+    }
+
+    /**
+     * Add or update a default room in the system template.
+     */
+    public function saveTemplateRoom(Request $request)
+    {
+        $template = \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+
+        $validated = $request->validate([
+            'room_index' => ['nullable', 'integer'],
+            'name' => ['required', 'string', 'max:120'],
+            'type' => ['required', 'string', 'in:meeting,private,breakout,lounge,reception'],
+            'access_mode' => ['required', 'string', 'in:public,knock,locked'],
+            'capacity' => ['required', 'integer', 'min:1', 'max:100'],
+            'color' => ['nullable', 'string', 'max:30'],
+            'x' => ['required', 'integer', 'min:0'],
+            'y' => ['required', 'integer', 'min:0'],
+            'width' => ['required', 'integer', 'min:1'],
+            'height' => ['required', 'integer', 'min:1'],
+            'audio_isolation' => ['nullable', 'boolean'],
+        ]);
+
+        $rooms = $template->rooms_data ?: [];
+
+        $newRoom = [
+            'name' => $validated['name'],
+            'type' => $validated['type'],
+            'access_mode' => $validated['access_mode'],
+            'capacity' => (int) $validated['capacity'],
+            'color' => $validated['color'] ?: '#3F7D4F',
+            'bounds' => [
+                'x' => (int) $validated['x'],
+                'y' => (int) $validated['y'],
+                'width' => (int) $validated['width'],
+                'height' => (int) $validated['height'],
+            ],
+            'metadata' => [
+                'audio_isolation' => $request->has('audio_isolation') ? (bool) $request->input('audio_isolation') : true,
+            ],
+        ];
+
+        if ($request->filled('room_index') && isset($rooms[(int) $request->input('room_index')])) {
+            $rooms[(int) $request->input('room_index')] = $newRoom;
+        } else {
+            $rooms[] = $newRoom;
+        }
+
+        $template->update(['rooms_data' => array_values($rooms)]);
+
+        return back()->with('success', __('Default room saved in the system template.'));
+    }
+
+    /**
+     * Delete a default room from the template.
+     */
+    public function deleteTemplateRoom(int $roomIndex)
+    {
+        $template = \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+        $rooms = $template->rooms_data ?: [];
+
+        if (isset($rooms[$roomIndex])) {
+            unset($rooms[$roomIndex]);
+            $template->update(['rooms_data' => array_values($rooms)]);
+            return back()->with('success', __('Room removed from default template.'));
+        }
+
+        return back()->with('error', __('Room not found in template.'));
+    }
+
+    /**
+     * Upload custom blueprint background image for the system default office.
+     */
+    public function uploadTemplateBackground(Request $request)
+    {
+        $request->validate([
+            'background' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:51200'],
+        ]);
+
+        $template = \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+        $file = $request->file('background');
+        $filename = 'template_floorplan_' . time() . '.' . $file->getClientOriginalExtension();
+
+        $destDir = public_path('images/maps');
+        if (!file_exists($destDir)) {
+            mkdir($destDir, 0755, true);
+        }
+        $file->move($destDir, $filename);
+        $url = '/images/maps/' . $filename;
+
+        $layoutData = $template->layout_data ?? [];
+        $layoutData['background_image_url'] = $url;
+
+        $template->update([
+            'background_image_url' => $url,
+            'layout_data' => $layoutData,
+        ]);
+
+        return back()->with('success', __('Default Blueprint background image updated successfully.'));
+    }
+
+    /**
+     * Sync and propagate the Default Template rooms & layout to all existing companies.
+     */
+    public function syncTemplateToOrganizations(Request $request)
+    {
+        $template = \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+        $organizations = Organization::all();
+        $count = 0;
+
+        foreach ($organizations as $org) {
+            $floor = $org->floors()->first();
+            if (!$floor) {
+                $floor = $org->floors()->create([
+                    'name' => 'الدور الرئيسي - Main Office Floor',
+                    'order' => 1,
+                ]);
+            }
+
+            $map = $org->maps()->where('floor_id', $floor->id)->first();
+            $layoutData = $template->layout_data ?? [
+                'theme' => 'open_spatial_blueprint',
+                'background_image_url' => $template->background_image_url ?: '/images/office_floorplan.jpg',
+            ];
+
+            if (!$map) {
+                $map = $org->maps()->create([
+                    'floor_id' => $floor->id,
+                    'name' => $template->name,
+                    'status' => 'published',
+                    'version' => 1,
+                    'width' => $template->width,
+                    'height' => $template->height,
+                    'tile_size' => $template->tile_size,
+                    'layout_data' => $layoutData,
+                    'published_at' => now(),
+                ]);
+            } else {
+                $map->update([
+                    'width' => $template->width,
+                    'height' => $template->height,
+                    'tile_size' => $template->tile_size,
+                    'layout_data' => $layoutData,
+                ]);
+            }
+
+            // Remove untextured blue dummy objects
+            \App\Domains\Workspace\Models\MapObject::where('map_id', $map->id)
+                ->whereNull('image_url')
+                ->delete();
+
+            // If requested to overwrite rooms or if organization has 0 rooms
+            if ($request->has('overwrite_rooms') || $org->rooms()->count() === 0) {
+                $org->rooms()->delete();
+                foreach ($template->rooms_data ?: [] as $rData) {
+                    \App\Domains\Workspace\Models\Room::create([
+                        'organization_id' => $org->id,
+                        'map_id' => $map->id,
+                        'name' => $rData['name'] ?? 'Meeting Room',
+                        'type' => $rData['type'] ?? 'meeting',
+                        'access_mode' => $rData['access_mode'] ?? 'public',
+                        'capacity' => $rData['capacity'] ?? 8,
+                        'color' => $rData['color'] ?? '#3F7D4F',
+                        'bounds' => $rData['bounds'] ?? ['x' => 1, 'y' => 1, 'width' => 10, 'height' => 10],
+                        'metadata' => $rData['metadata'] ?? ['audio_isolation' => true],
+                    ]);
+                }
+            }
+
+            $count++;
+        }
+
+        return back()->with('success', __("Default Office Template synchronized across :count organizations successfully.", ['count' => $count]));
+    }
 }

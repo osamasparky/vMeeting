@@ -139,6 +139,14 @@ Route::prefix('superadmin')->middleware(['auth', 'superadmin'])->name('superadmi
     Route::post('/settings', [\App\Http\Controllers\SuperAdminController::class, 'updateSettings'])->name('settings.update');
     Route::post('/settings/default-blueprint', [\App\Http\Controllers\SuperAdminController::class, 'uploadDefaultBlueprint'])->name('settings.blueprint');
 
+    // Default Office Template & Rooms Designer
+    Route::get('/template', [\App\Http\Controllers\SuperAdminController::class, 'defaultTemplate'])->name('template');
+    Route::post('/template', [\App\Http\Controllers\SuperAdminController::class, 'updateDefaultTemplate'])->name('template.update');
+    Route::post('/template/room', [\App\Http\Controllers\SuperAdminController::class, 'saveTemplateRoom'])->name('template.room.save');
+    Route::delete('/template/room/{roomIndex}', [\App\Http\Controllers\SuperAdminController::class, 'deleteTemplateRoom'])->name('template.room.delete');
+    Route::post('/template/background', [\App\Http\Controllers\SuperAdminController::class, 'uploadTemplateBackground'])->name('template.background');
+    Route::post('/template/sync', [\App\Http\Controllers\SuperAdminController::class, 'syncTemplateToOrganizations'])->name('template.sync');
+
     // Furniture & Assets Catalog Management
     Route::get('/furniture', [\App\Http\Controllers\SuperAdminController::class, 'furniture'])->name('furniture');
     Route::post('/furniture/category', [\App\Http\Controllers\SuperAdminController::class, 'storeFurnitureCategory'])->name('furniture.category.store');

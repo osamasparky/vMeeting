@@ -1529,10 +1529,24 @@
                 ctx.fillText(badgeText, rx + rw / 2, ry - 18);
             }
 
-            // 4. Draw Furniture Objects (Only custom placed items when blueprint is active)
+            // 4. Draw Furniture Objects
             objects.forEach(obj => {
-                if (hasBlueprint && !obj.image_url && !obj.is_custom && !obj.interaction_config) {
-                    return; // Avoid covering blueprint with old fallback boxes
+                // If map has blueprint artwork, seeded untextured placeholder collision items should not be painted as blue blocks
+                if (hasBlueprint && !obj.image_url && !obj.is_custom) {
+                    // Only show subtle dashed selection box when user specifically selects it
+                    if (selectedItem && selectedItem.type === 'object' && selectedItem.item === obj) {
+                        const ox = (obj.position ? obj.position.x : 0) * TILE_SIZE;
+                        const oy = (obj.position ? obj.position.y : 0) * TILE_SIZE;
+                        const objW = (obj.width || (obj.size ? obj.size.width : 1)) * TILE_SIZE;
+                        const objH = (obj.height || (obj.size ? obj.size.height : 1)) * TILE_SIZE;
+                        ctx.save();
+                        ctx.strokeStyle = '#10B981';
+                        ctx.lineWidth = 1.5;
+                        ctx.setLineDash([4, 4]);
+                        ctx.strokeRect(ox, oy, objW, objH);
+                        ctx.restore();
+                    }
+                    return;
                 }
 
                 const ox = (obj.position ? obj.position.x : 0) * TILE_SIZE;
@@ -1546,16 +1560,39 @@
                 const rot = (obj.position && typeof obj.position.rotation === 'number') ? obj.position.rotation : (obj.rotation || 0);
                 if (rot) ctx.rotate((rot * Math.PI) / 180);
 
-                ctx.fillStyle = obj.color || '#3B82F6';
-                if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
-                else ctx.rect(-objW / 2, -objH / 2, objW, objH);
-                ctx.fill();
+                if (obj.image_url) {
+                    if (!window._objImgCache) window._objImgCache = new Map();
+                    let sprImg = window._objImgCache.get(obj.image_url);
+                    if (!sprImg) {
+                        sprImg = new Image();
+                        sprImg.src = obj.image_url;
+                        sprImg.onload = () => { if (typeof draw === 'function') draw(); };
+                        window._objImgCache.set(obj.image_url, sprImg);
+                    }
+                    if (sprImg && sprImg.complete && sprImg.naturalWidth > 0) {
+                        ctx.drawImage(sprImg, -objW / 2, -objH / 2, objW, objH);
+                    } else {
+                        ctx.fillStyle = 'rgba(59, 130, 246, 0.15)';
+                        if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
+                        else ctx.rect(-objW / 2, -objH / 2, objW, objH);
+                        ctx.fill();
+                    }
+                } else if (obj.is_custom) {
+                    ctx.fillStyle = obj.color ? (obj.color + '44') : 'rgba(59, 130, 246, 0.25)';
+                    if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
+                    else ctx.rect(-objW / 2, -objH / 2, objW, objH);
+                    ctx.fill();
+                }
 
-                ctx.strokeStyle = isSelected ? '#10B981' : 'rgba(255, 255, 255, 0.2)';
-                ctx.lineWidth = isSelected ? 2 : 1;
-                if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
-                else ctx.rect(-objW / 2, -objH / 2, objW, objH);
-                ctx.stroke();
+                if (isSelected) {
+                    ctx.strokeStyle = '#10B981';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([4, 4]);
+                    if (ctx.roundRect) ctx.roundRect(-objW / 2 - 2, -objH / 2 - 2, objW + 4, objH + 4, 4);
+                    else ctx.rect(-objW / 2 - 2, -objH / 2 - 2, objW + 4, objH + 4);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
 
                 ctx.restore();
             });

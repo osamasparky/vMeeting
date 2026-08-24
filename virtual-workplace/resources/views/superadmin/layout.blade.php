@@ -721,6 +721,10 @@
                 <span class="nav-item-icon">💎</span>
                 <span>{{ __('Subscription Plans') }}</span>
             </a>
+            <a href="{{ route('superadmin.template') }}" class="nav-item {{ request()->routeIs('superadmin.template*') ? 'active' : '' }}" data-tooltip="{{ __('Default Office Template') }}">
+                <span class="nav-item-icon">📐</span>
+                <span>{{ __('Default Office Blueprint') }}</span>
+            </a>
             @php
                 $sidebarPendingSubs = \App\Domains\Tenancy\Models\SubscriptionRequest::where('status', 'pending')->count();
             @endphp
