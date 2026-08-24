@@ -1456,19 +1456,20 @@
             ? CONFIG.map.layout_data.background_image_url
             : '/images/office_floorplan.jpg';
         const BLUEPRINT_IMAGE = new Image();
-        BLUEPRINT_IMAGE.crossOrigin = 'anonymous';
         BLUEPRINT_IMAGE.src = MAP_BG_URL + (MAP_BG_URL.includes('?') ? '&' : '?') + 'v=' + Date.now();
         let blueprintLoaded = false;
         BLUEPRINT_IMAGE.onload = () => {
             blueprintLoaded = true;
             centerCamera();
-            draw();
         };
         BLUEPRINT_IMAGE.onerror = () => {
-            blueprintLoaded = true;
+            blueprintLoaded = false;
             centerCamera();
-            draw();
         };
+
+        // Start render loop immediately
+        centerCamera();
+        requestAnimationFrame(draw);
 
         // ── LiveKit SFU Real-Time Media ──
         const peerAudioElements = new Map(); // targetUserId -> HTMLAudioElement
