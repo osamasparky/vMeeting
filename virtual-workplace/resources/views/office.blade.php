@@ -78,22 +78,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        .canvas-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            background: #0B1911;
-            z-index: 1;
-        }
-
-        #office-canvas {
-            display: block;
-            width: 100vw;
-            height: 100vh;
-        }
 
         /* ── Top Bar Overlay ── */
         .top-bar-overlay {
@@ -187,17 +171,18 @@
 
         /* ── Canvas Viewport ── */
         .canvas-container {
-            flex: 1;
+            position: absolute;
+            inset: 0;
             width: 100vw;
             height: 100vh;
-            position: relative;
             background: radial-gradient(circle at center, #0B1C13 0%, #050B08 100%);
             overflow: hidden;
+            z-index: 1;
         }
         #office-canvas {
             display: block;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             cursor: crosshair;
         }
 
@@ -1401,7 +1386,7 @@
         // ── Local & Remote Avatars ──
         const isGuest = {{ !empty($user->is_guest) ? 'true' : 'false' }};
         const guestAllowedRoomId = @json(isset($invitation) ? ($invitation->room_id ?: ($room->id ?? null)) : null);
-        const userGender = @json($user->gender ?? $user->profile?->gender ?? 'male');
+        const userGender = @json(!empty($user->gender) ? $user->gender : (!empty($user->profile?->gender) ? $user->profile->gender : 'male'));
         const spawnPos = @json($initialSpawn ?? null);
 
         let defaultX = 250;
@@ -1612,14 +1597,15 @@
                 return;
             }
 
-            // Check if clicking a locked room to knock
+            // Check room boundary & locking guards
             const targetRoom = getCurrentRoom(clickX, clickY);
             const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
-            if (targetRoom && targetRoom !== myRoom) {
-                if (isGuest) {
+            if (isGuest && guestAllowedRoomId) {
+                if (!targetRoom || targetRoom.id !== guestAllowedRoomId) {
                     showToast(`🚫 {{ __("Guests are only permitted in their designated invited room.") }}`);
                     return;
                 }
+            } else if (targetRoom && targetRoom !== myRoom) {
                 if (roomDoorStates.get(targetRoom.id)) {
                     if (confirm(`🚪 ${targetRoom.name} {{ __("is locked. Would you like to knock?") }}`)) {
                         if (ws && ws.readyState === WebSocket.OPEN) {

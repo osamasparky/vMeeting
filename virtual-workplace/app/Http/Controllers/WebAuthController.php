@@ -1165,6 +1165,9 @@ class WebAuthController extends Controller
             'email' => "{$guestId}@guest.local",
             'avatar_url' => null,
             'is_guest' => true,
+            'gender' => 'male',
+            'role' => 'guest',
+            'profile' => null,
         ];
 
         $tileSize = $map->tile_size ?: 16;
