@@ -1070,6 +1070,17 @@ class WebAuthController extends Controller
         $map->save();
 
         if (isset($validated['rooms'])) {
+            $org = $map->organization;
+            $maxRooms = ($org && $org->plan && $org->plan->room_limit > 0) ? $org->plan->room_limit : 0;
+            if ($maxRooms > 0 && count($validated['rooms']) > $maxRooms) {
+                return response()->json([
+                    'message' => __("Your subscription plan allows a maximum of :limit rooms. Please upgrade your subscription plan to save :count rooms.", [
+                        'limit' => $maxRooms,
+                        'count' => count($validated['rooms']),
+                    ])
+                ], 403);
+            }
+
             \App\Domains\Workspace\Models\Room::where('map_id', $map->id)->delete();
             foreach ($validated['rooms'] as $r) {
                 \App\Domains\Workspace\Models\Room::create([
@@ -1146,6 +1157,14 @@ class WebAuthController extends Controller
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
 
+        $org = $membership->organization;
+        if ($org->hasReachedRoomLimit()) {
+            $limit = $org->plan ? $org->plan->room_limit : 3;
+            return response()->json([
+                'message' => __("You have reached the maximum room limit (:limit) for your subscription plan. Please upgrade your plan to create more rooms.", ['limit' => $limit])
+            ], 403);
+        }
+
         $validated = $request->validate([
             'organization_id' => 'required|uuid',
             'map_id' => 'required|uuid',
@@ -1182,6 +1201,14 @@ class WebAuthController extends Controller
 
             if (!$membership) {
                 return response()->json(['message' => 'Unauthorized access.'], 403);
+            }
+
+            $org = $membership->organization;
+            if ($org->hasReachedRoomLimit()) {
+                $limit = $org->plan ? $org->plan->room_limit : 3;
+                return response()->json([
+                    'message' => __("You have reached the maximum room limit (:limit) for your subscription plan. Please upgrade your plan to create more rooms.", ['limit' => $limit])
+                ], 403);
             }
 
             $validated = $request->validate([
@@ -1573,6 +1600,12 @@ class WebAuthController extends Controller
 
         if (!$membership->hasPermission('members.manage') && $membership->role?->slug !== 'company_admin') {
             abort(403, 'Unauthorized: insufficient permissions to manage members.');
+        }
+
+        // Strict Plan Seat Limit Enforcement
+        if ($membership->organization->hasReachedSeatLimit()) {
+            $limit = $membership->organization->plan->seat_limit ?? 5;
+            return back()->with('error', __("You have reached the maximum team member capacity (:limit seats) for your subscription plan. Please upgrade your plan to add more team members.", ['limit' => $limit]));
         }
 
         $validated = $request->validate([

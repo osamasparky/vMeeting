@@ -927,8 +927,20 @@
     ":requester is knocking on your room \":room\" and requesting entry.": "يقوم :requester بالاستئذان على باب غرفتك \":room\" لطلب الدخول.",
     "👋 Wave from :sender": "👋 تحية من :sender",
     ":sender waved at you from :room.": "ألقى :sender التحية عليك من :room.",
-    ":sender waved at you in the workplace.": "ألقى :sender التحية عليك في مساحة العمل.",
     "Wave sent successfully!": "تم إرسال التحية بنجاح!",
-    "Knock sent to room occupants!": "تم إرسال الاستئذان لمتواجدين الغرفة!"
+    "Knock sent to room occupants!": "تم إرسال الاستئذان لمتواجدين الغرفة!",
+    "Plan Limit Exceeded": "تم تجاوز الحد المسموح للباقة",
+    "Limit Exceeded": "تجاوزت الحد",
+    "Office Branches": "الفروع والمكاتب",
+    "Guest Links": "روابط الضيوف",
+    "Guest Meeting Links": "روابط اجتماعات الضيوف",
+    "Upgrade Plan Now (ترقية الباقة)": "ترقية الباقة الآن",
+    "Room Limit Exceeded!": "تم تجاوز الحد الأقصى للغرف!",
+    "Your workspace currently has :used rooms, which exceeds your :plan plan quota (:limit rooms). Please upgrade your subscription plan below.": "تحتوي مساحة عملك حالياً على :used غرف، وهو ما يتجاوز الحد المسموح في باقتك :plan (:limit غرف). يُرجى ترقية باقة الاشتراك أدناه.",
+    "Your workspace currently has :used members, which exceeds your :plan seat quota (:limit seats). Please upgrade your plan below.": "تحتوي مساحة عملك حالياً على :used أعضاء، وهو ما يتجاوز الحد المسموح في باقتك :plan (:limit مقاعد). يُرجى ترقية باقة الاشتراك أدناه.",
+    "Some workplace resources exceed your current plan limits. Please upgrade below.": "بعض موارد مساحة العمل تتجاوز الحدود المسموحة لباقتك الحالية. يُرجى الترقية أدناه.",
+    "You have reached the maximum team member capacity (:limit seats) for your subscription plan. Please upgrade your plan to add more team members.": "لقد وصلت إلى الحد الأقصى لسعة أعضاء الفريق (:limit مقاعد) لباقتك الحالية. يُرجى ترقية الباقة لإضافة المزيد من الأعضاء.",
+    "You have reached your plan limit of active guest links (:limit). Please upgrade your subscription plan to create more guest links.": "لقد وصلت إلى الحد الأقصى لروابط الضيوف النشطة (:limit روابط) لباقتك. يُرجى ترقية الباقة لإنشاء المزيد من الروابط.",
+    "Your subscription plan allows a maximum of :limit rooms. Please upgrade your subscription plan to save :count rooms.": "باقتك الحالية تسمح بحد أقصى :limit غرف. يُرجى ترقية الباقة لحفظ :count غرف."
 }
 

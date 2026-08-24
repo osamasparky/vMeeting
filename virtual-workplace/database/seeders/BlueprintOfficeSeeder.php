@@ -82,9 +82,11 @@ class BlueprintOfficeSeeder extends Seeder
             ->whereNull('image_url')
             ->delete();
 
-        // 5. Seed Rooms from the Template if no rooms exist
+        // 5. Seed Rooms from the Template up to organization plan limit
         if ($organization->rooms()->count() === 0) {
             $roomsList = $template->rooms_data ?: [];
+            $maxAllowed = ($organization->plan && $organization->plan->room_limit > 0) ? $organization->plan->room_limit : count($roomsList);
+            $roomsList = array_slice($roomsList, 0, $maxAllowed);
 
             foreach ($roomsList as $rData) {
                 Room::create([

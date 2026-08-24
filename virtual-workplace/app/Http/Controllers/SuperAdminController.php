@@ -1091,7 +1091,11 @@ class SuperAdminController extends Controller
             // If requested to overwrite rooms or if organization has 0 rooms
             if ($request->has('overwrite_rooms') || $org->rooms()->count() === 0) {
                 $org->rooms()->delete();
-                foreach ($template->rooms_data ?: [] as $rData) {
+                $roomsList = $template->rooms_data ?: [];
+                $maxAllowed = ($org->plan && $org->plan->room_limit > 0) ? $org->plan->room_limit : count($roomsList);
+                $roomsList = array_slice($roomsList, 0, $maxAllowed);
+
+                foreach ($roomsList as $rData) {
                     \App\Domains\Workspace\Models\Room::create([
                         'organization_id' => $org->id,
                         'map_id' => $map->id,

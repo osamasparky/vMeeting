@@ -21,6 +21,14 @@ class GuestController extends Controller
             return response()->json(['message' => 'Unauthorized room access.'], 403);
         }
 
+        // Strict Plan Guest Links Enforcement
+        if ($organization->hasReachedGuestInvitationLimit()) {
+            $limit = $organization->plan->max_guest_invitations ?? 5;
+            return response()->json([
+                'message' => __("You have reached your plan limit of active guest links (:limit). Please upgrade your subscription plan to create more guest links.", ['limit' => $limit]),
+            ], 403);
+        }
+
         $validated = $request->validate([
             'guest_name' => ['required', 'string', 'max:255'],
             'guest_email' => ['nullable', 'email', 'max:255'],

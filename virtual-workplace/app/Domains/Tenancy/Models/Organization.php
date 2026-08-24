@@ -159,4 +159,82 @@ class Organization extends Model
 
         return $this->rooms()->count() >= $this->plan->room_limit;
     }
+
+    public function activeGuestInvitationsCount(): int
+    {
+        return \App\Domains\Guests\Models\GuestInvitation::where('organization_id', $this->id)
+            ->where(function ($q) {
+                $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
+            })
+            ->count();
+    }
+
+    public function hasReachedGuestInvitationLimit(): bool
+    {
+        if (!$this->plan) return false;
+        $maxGuests = $this->plan->max_guest_invitations ?? 5;
+        if ($maxGuests === 0) return false; // Unlimited
+
+        return $this->activeGuestInvitationsCount() >= $maxGuests;
+    }
+
+    /**
+     * Complete Plan Usage Metrics Summary for Dashboard & Billing.
+     */
+    public function getPlanUsageSummary(): array
+    {
+        $plan = $this->plan;
+        $activeMembers = $this->activeMembersCount();
+        $totalRooms = $this->rooms()->count();
+        $totalOffices = $this->offices()->count();
+        $activeGuests = $this->activeGuestInvitationsCount();
+
+        $seatLimit = $plan ? $plan->seat_limit : 5;
+        $roomLimit = $plan ? $plan->room_limit : 3;
+        $officeLimit = $plan ? ($plan->max_offices ?? 1) : 1;
+        $guestLimit = $plan ? ($plan->max_guest_invitations ?? 5) : 5;
+        $storageLimit = $plan ? $plan->storage_limit_gb : 1;
+
+        $isSeatsExceeded = ($seatLimit > 0 && $activeMembers > $seatLimit);
+        $isRoomsExceeded = ($roomLimit > 0 && $totalRooms > $roomLimit);
+        $isOfficesExceeded = ($officeLimit > 0 && $totalOffices > $officeLimit);
+        $isGuestsExceeded = ($guestLimit > 0 && $activeGuests > $guestLimit);
+
+        return [
+            'plan_name' => $plan ? $plan->name : 'Free',
+            'plan_slug' => $plan ? $plan->slug : 'free',
+            'is_active' => $this->isActive(),
+            'members' => [
+                'used' => $activeMembers,
+                'limit' => $seatLimit,
+                'is_unlimited' => $seatLimit === 0,
+                'is_exceeded' => $isSeatsExceeded,
+                'percentage' => $seatLimit > 0 ? min(100, round(($activeMembers / $seatLimit) * 100)) : 0,
+            ],
+            'rooms' => [
+                'used' => $totalRooms,
+                'limit' => $roomLimit,
+                'is_unlimited' => $roomLimit === 0,
+                'is_exceeded' => $isRoomsExceeded,
+                'percentage' => $roomLimit > 0 ? min(100, round(($totalRooms / $roomLimit) * 100)) : 0,
+            ],
+            'offices' => [
+                'used' => $totalOffices,
+                'limit' => $officeLimit,
+                'is_unlimited' => $officeLimit === 0,
+                'is_exceeded' => $isOfficesExceeded,
+            ],
+            'guests' => [
+                'used' => $activeGuests,
+                'limit' => $guestLimit,
+                'is_unlimited' => $guestLimit === 0,
+                'is_exceeded' => $isGuestsExceeded,
+            ],
+            'storage' => [
+                'limit_gb' => $storageLimit,
+                'is_unlimited' => $storageLimit === 0,
+            ],
+            'has_exceeded_any_limit' => ($isSeatsExceeded || $isRoomsExceeded || $isOfficesExceeded || $isGuestsExceeded),
+        ];
+    }
 }

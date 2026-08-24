@@ -995,6 +995,7 @@
         const MAP_DATA = @json($map);
         const MAP_ID = "{{ $map->id }}";
         const ORG_ID = "{{ $organization->id }}";
+        const PLAN_MAX_ROOMS = {{ ($organization->plan && $organization->plan->room_limit > 0) ? $organization->plan->room_limit : 0 }};
         const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         const canvas = document.getElementById('editor-canvas');
@@ -1316,6 +1317,15 @@
 
             if (isDrawing && currentRect) {
                 if (currentTool === 'room') {
+                    if (PLAN_MAX_ROOMS > 0 && rooms.length >= PLAN_MAX_ROOMS) {
+                        isDrawing = false;
+                        currentRect = null;
+                        draw();
+                        alert(`{{ __('Room Limit Exceeded!') }}\n{{ __('Your subscription plan allows a maximum of :limit rooms.', ['limit' => '']) }}${PLAN_MAX_ROOMS}\n{{ __('Please upgrade your plan to add more rooms.') }}`);
+                        setTool('select');
+                        return;
+                    }
+
                     const newRoom = {
                         name: `${currentRoomType.charAt(0).toUpperCase() + currentRoomType.slice(1)} Room`,
                         type: currentRoomType,
