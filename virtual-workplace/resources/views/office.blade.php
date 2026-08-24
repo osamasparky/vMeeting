@@ -78,6 +78,23 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        .canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: #0B1911;
+            z-index: 1;
+        }
+
+        #office-canvas {
+            display: block;
+            width: 100vw;
+            height: 100vh;
+        }
+
         /* ── Top Bar Overlay ── */
         .top-bar-overlay {
             position: absolute;
@@ -1443,7 +1460,7 @@
             isSpeaking: false,
             isSitting: false,
             sittingFurnitureId: null,
-            currentRoomId: null
+            currentRoomId: (isGuest && guestAllowedRoomId) ? guestAllowedRoomId : null
         };
         const remoteAvatars = new Map();
         const speechBubbles = new Map(); // userId -> { text, emoji, timestamp, type }
@@ -2225,6 +2242,13 @@
                             gender: userGender
                         }
                     }));
+
+                    const activeRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+                    if (activeRoom) {
+                        localAvatar.currentRoomId = activeRoom.id;
+                        ws.send(JSON.stringify({ type: 'room.enter', payload: { roomId: activeRoom.id } }));
+                        syncLiveKitRoom(activeRoom.id);
+                    }
 
                     // Heartbeat ping interval to keep connection alive even when tab is backgrounded
                     if (window._wsPingTimer) clearInterval(window._wsPingTimer);
