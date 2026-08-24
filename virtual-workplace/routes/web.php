@@ -87,29 +87,21 @@ Route::middleware('auth')->group(function () {
     Route::get('/organizations/{organization}/recordings/{recording}/download', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'download'])->name('recordings.download');
     Route::delete('/organizations/{organization}/recordings/{recording}', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'destroy'])->name('recordings.destroy');
 
-    // Room Files Vault & Chat File Uploads (Web Session)
-    Route::get('/organizations/{organization}/rooms/{room}/files', [WebAuthController::class, 'listRoomFiles'])->name('room_files.index');
-    Route::post('/organizations/{organization}/rooms/{room}/files', [WebAuthController::class, 'uploadRoomFile'])->name('room_files.store');
-    Route::delete('/organizations/{organization}/rooms/{room}/files/{file}', [WebAuthController::class, 'deleteRoomFile'])->name('room_files.destroy');
-    Route::post('/organizations/{organization}/chat/upload', [WebAuthController::class, 'uploadChatAttachment'])->name('chat.upload');
-
-    // Member Activity & Live Inspector Routes
-    Route::get('/api/members/{userId}/activity', [WebAuthController::class, 'memberActivity'])->name('members.activity');
-    Route::post('/api/office/attendance/log', [WebAuthController::class, 'logRoomAttendance'])->name('office.attendance.log');
-    Route::get('/api/office/attendance/summary', [WebAuthController::class, 'getAttendanceSummary'])->name('office.attendance.summary');
-
-    // WebRTC & LiveKit Media Plane Routes
-    Route::get('/organizations/{organization}/meetings', [\App\Domains\Meetings\Controllers\MeetingController::class, 'listMeetings'])->name('web.meetings.list');
-    Route::post('/organizations/{organization}/meetings', [\App\Domains\Meetings\Controllers\MeetingController::class, 'createMeeting'])->name('web.meetings.create');
-    Route::post('/organizations/{organization}/meetings/{meeting}/end', [\App\Domains\Meetings\Controllers\MeetingController::class, 'endMeeting'])->name('web.meetings.end');
-    Route::post('/organizations/{organization}/meetings/{meeting}/token', [\App\Domains\Meetings\Controllers\MeetingController::class, 'getMeetingToken'])->name('web.meetings.token');
-    Route::post('/organizations/{organization}/rooms/{room}/livekit-token', [\App\Domains\Meetings\Controllers\MeetingController::class, 'getLiveKitToken'])->name('web.rooms.livekit_token');
-    Route::get('/organizations/{organization}/webrtc/diagnostics-config', [\App\Domains\Meetings\Controllers\MeetingController::class, 'getDiagnosticsConfig'])->name('web.webrtc.diagnostics');
-
     // Impersonation Exit Routes
     Route::post('/impersonate/leave', [\App\Http\Controllers\SuperAdminController::class, 'leaveImpersonation'])->name('impersonate.leave');
     Route::get('/impersonate/leave', [\App\Http\Controllers\SuperAdminController::class, 'leaveImpersonation'])->name('impersonate.leave.get');
 });
+
+// Hybrid Workplace & Media Plane Routes (Accessible by Authenticated Members and Invited Guests)
+Route::post('/organizations/{organization}/rooms/{room}/livekit-token', [\App\Domains\Meetings\Controllers\MeetingController::class, 'getLiveKitToken'])->name('web.rooms.livekit_token');
+Route::get('/organizations/{organization}/webrtc/diagnostics-config', [\App\Domains\Meetings\Controllers\MeetingController::class, 'getDiagnosticsConfig'])->name('web.webrtc.diagnostics');
+Route::get('/organizations/{organization}/rooms/{room}/files', [WebAuthController::class, 'listRoomFiles'])->name('room_files.index');
+Route::post('/organizations/{organization}/rooms/{room}/files', [WebAuthController::class, 'uploadRoomFile'])->name('room_files.store');
+Route::delete('/organizations/{organization}/rooms/{room}/files/{file}', [WebAuthController::class, 'deleteRoomFile'])->name('room_files.destroy');
+Route::post('/organizations/{organization}/chat/upload', [WebAuthController::class, 'uploadChatAttachment'])->name('chat.upload');
+Route::get('/api/members/{userId}/activity', [WebAuthController::class, 'memberActivity'])->name('members.activity');
+Route::post('/api/office/attendance/log', [WebAuthController::class, 'logRoomAttendance'])->name('office.attendance.log');
+Route::get('/api/office/attendance/summary', [WebAuthController::class, 'getAttendanceSummary'])->name('office.attendance.summary');
 
 // Guest Access Routes (Public / Unauthenticated)
 Route::get('/guest/join/{token}', [WebAuthController::class, 'guestJoin'])->name('guest.join');

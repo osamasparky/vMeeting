@@ -2246,50 +2246,73 @@ class WebAuthController extends Controller
     public function memberActivity(Request $request, $userId)
     {
         $viewer = Auth::user();
-        $viewerMembership = OrganizationMember::where('user_id', $viewer->id)->first();
-        if (!$viewerMembership) return response()->json(['message' => 'Unauthorized'], 403);
+        $isGuest = empty($viewer);
+        $orgId = null;
 
-        $orgId = $viewerMembership->organization_id;
-        $targetUser = \App\Domains\Identity\Models\User::with(['profile.department', 'profile.team'])->findOrFail($userId);
+        if ($viewer) {
+            $viewerMembership = OrganizationMember::where('user_id', $viewer->id)->first();
+            if (!$viewerMembership) return response()->json(['message' => 'Unauthorized'], 403);
+            $orgId = $viewerMembership->organization_id;
+        } else {
+            // Guest viewer
+            $orgId = $request->input('organization_id');
+        }
+
+        $targetUser = \App\Domains\Identity\Models\User::with(['profile.department', 'profile.team'])->find($userId);
+        if (!$targetUser) {
+            return response()->json(['message' => 'Member not found'], 404);
+        }
+
         $targetMembership = OrganizationMember::where('user_id', $targetUser->id)
-            ->where('organization_id', $orgId)
+            ->when($orgId, function($q) use ($orgId) {
+                $q->where('organization_id', $orgId);
+            })
             ->with(['role'])
             ->first();
 
-        if (!$targetMembership) {
+        if (!$targetMembership && $orgId) {
             return response()->json(['message' => 'Member not found in organization'], 404);
         }
 
-        // Active timer (what they are working on right now)
-        $activeTimer = \App\Domains\Projects\Models\TimeEntry::where('user_id', $targetUser->id)
-            ->where('organization_id', $orgId)
-            ->whereNull('ended_at')
-            ->with(['task', 'project'])
-            ->latest('started_at')
-            ->first();
+        $effectiveOrgId = $targetMembership ? $targetMembership->organization_id : $orgId;
 
-        // Tasks assigned to this user
-        $tasks = \App\Domains\Projects\Models\Task::where('organization_id', $orgId)
-            ->where(function($q) use ($targetUser) {
-                $q->where('assignee_id', $targetUser->id);
-            })
-            ->with(['project'])
-            ->latest()
-            ->take(15)
-            ->get();
+        // Privacy rule: Guests are NEVER permitted to inspect team tasks or internal active timers
+        $activeTimer = null;
+        $tasks = collect([]);
+
+        if (!$isGuest && $effectiveOrgId) {
+            // Active timer (what they are working on right now)
+            $activeTimer = \App\Domains\Projects\Models\TimeEntry::where('user_id', $targetUser->id)
+                ->where('organization_id', $effectiveOrgId)
+                ->whereNull('ended_at')
+                ->with(['task', 'project'])
+                ->latest('started_at')
+                ->first();
+
+            // Tasks assigned to this user
+            $tasks = \App\Domains\Projects\Models\Task::where('organization_id', $effectiveOrgId)
+                ->where(function($q) use ($targetUser) {
+                    $q->where('assignee_id', $targetUser->id);
+                })
+                ->with(['project'])
+                ->latest()
+                ->take(15)
+                ->get();
+        }
 
         return response()->json([
             'user' => [
                 'id' => $targetUser->id,
                 'name' => $targetUser->name,
-                'email' => $targetUser->email,
+                'email' => $isGuest ? null : $targetUser->email,
                 'avatar_url' => $targetUser->avatar_url,
-                'role_name' => $targetMembership->role?->name ?? 'Member',
+                'role_name' => $targetMembership?->role?->name ?? 'Member',
                 'job_title' => $targetUser->profile?->job_title ?? __('Team Member'),
                 'department' => $targetUser->profile?->department?->name,
                 'team' => $targetUser->profile?->team?->name,
-                'status' => $targetMembership->status,
+                'status' => $targetMembership?->status ?? 'active',
             ],
+            'is_guest_viewer' => $isGuest,
             'active_timer' => $activeTimer ? [
                 'id' => $activeTimer->id,
                 'project_name' => $activeTimer->project?->name ?? 'General Work',

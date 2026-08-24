@@ -748,9 +748,11 @@
     <!-- ── Top Floating Overlay Bar ── -->
     <div class="top-bar-overlay">
         <div class="glass-pill">
+            @if(empty($user->is_guest))
             <a href="{{ route('dashboard') }}" class="action-link-btn" title="{{ __('Back to Dashboard (الخروج إلى لوحة التحكم)') }}">
                 <span>🏠</span> <span>{{ __('Dashboard') }}</span>
             </a>
+            @endif
 
             @if(session('superadmin_impersonator_id'))
             <form method="POST" action="{{ route('impersonate.leave') }}" style="margin: 0; display: inline-flex;">
@@ -761,8 +763,8 @@
             </form>
             @endif
 
-            <!-- Office / Branch Switcher -->
-            @if(isset($userAllowedOffices) && $userAllowedOffices->count() > 1)
+            <!-- Office / Branch Switcher (Internal Team Members Only) -->
+            @if(isset($userAllowedOffices) && $userAllowedOffices->count() > 1 && empty($user->is_guest))
             <div style="position: relative; display: inline-block;">
                 <button type="button" onclick="toggleOfficeDropdown(event)" class="action-link-btn" style="background: rgba(36, 92, 58, 0.35); color: #86EFAC; border: 1px solid rgba(134, 239, 172, 0.45); font-weight: 800; display: flex; align-items: center; gap: 6px;" title="{{ __('Switch Office Branch (تغيير الفرع)') }}">
                     <span>🏢</span>
@@ -820,13 +822,15 @@
         <div class="glass-pill" id="room-status-pill" style="display: none;">
             <span id="current-room-name" style="font-weight: 800; font-size: 12px; color: #34D399;">🏢 Conference Room</span>
             
-            <button onclick="openRoomFilesModal()" class="action-link-btn" style="padding: 4px 8px; font-size: 11px;">
+            <button onclick="openRoomFilesModal()" id="btn-room-files" class="action-link-btn" style="padding: 4px 8px; font-size: 11px;">
                 <span>📁</span> <span>{{ __('Room Files') }}</span>
             </button>
 
+            @if(empty($user->is_guest))
             <button onclick="toggleRoomDoorLock()" id="btn-lock-room" class="action-link-btn" style="padding: 4px 8px; font-size: 11px;">
                 <span id="lock-icon">🔓</span> <span id="lock-text">{{ __('Lock Door') }}</span>
             </button>
+            @endif
         </div>
 
         <div class="glass-pill">
@@ -1393,6 +1397,7 @@
 
         // ── Local & Remote Avatars ──
         const isGuest = {{ !empty($user->is_guest) ? 'true' : 'false' }};
+        const guestAllowedRoomId = @json(isset($invitation) ? ($invitation->room_id ?: ($room->id ?? null)) : null);
         const userGender = @json($user->gender ?? $user->profile?->gender ?? 'male');
         const spawnPos = @json($initialSpawn ?? null);
         const defaultX = isGuest ? 310 : 250;
@@ -1565,14 +1570,20 @@
             // Check if clicking a locked room to knock
             const targetRoom = getCurrentRoom(clickX, clickY);
             const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
-            if (targetRoom && targetRoom !== myRoom && roomDoorStates.get(targetRoom.id)) {
-                if (confirm(`🚪 ${targetRoom.name} {{ __("is locked. Would you like to knock?") }}`)) {
-                    if (ws && ws.readyState === WebSocket.OPEN) {
-                        ws.send(JSON.stringify({ type: 'room.knock', payload: { roomId: targetRoom.id, roomName: targetRoom.name } }));
-                        showToast('⏳ {{ __("Knocked on door... waiting for occupant response.") }}');
-                    }
+            if (targetRoom && targetRoom !== myRoom) {
+                if (isGuest) {
+                    showToast(`🚫 {{ __("Guests are only permitted in their designated invited room.") }}`);
+                    return;
                 }
-                return;
+                if (roomDoorStates.get(targetRoom.id)) {
+                    if (confirm(`🚪 ${targetRoom.name} {{ __("is locked. Would you like to knock?") }}`)) {
+                        if (ws && ws.readyState === WebSocket.OPEN) {
+                            ws.send(JSON.stringify({ type: 'room.knock', payload: { roomId: targetRoom.id, roomName: targetRoom.name } }));
+                            showToast('⏳ {{ __("Knocked on door... waiting for occupant response.") }}');
+                        }
+                    }
+                    return;
+                }
             }
 
             localAvatar.targetX = Math.max(10, Math.min(MAP_WIDTH_PX - 10, clickX));
@@ -1732,15 +1743,23 @@
             const currentR = getCurrentRoom(localAvatar.x, localAvatar.y);
             const targetR = getCurrentRoom(nextX, nextY);
             if (targetR && targetR !== currentR) {
-                // 1. Room Permission Check
-                if (CONFIG.allowedRoomIds && CONFIG.allowedRoomIds.length > 0 && !CONFIG.allowedRoomIds.includes(targetR.id)) {
+                // 1. Guest Restriction Check: Guests can ONLY enter their designated invited room
+                if (isGuest && guestAllowedRoomId && targetR.id !== guestAllowedRoomId) {
+                    nextX = localAvatar.x;
+                    nextY = localAvatar.y;
+                    localAvatar.targetX = localAvatar.x;
+                    localAvatar.targetY = localAvatar.y;
+                    showToast(`🚫 {{ __("Restricted Room: Guests are only permitted inside their invited meeting room.") }}`);
+                }
+                // 2. Member Room Permission Check
+                else if (CONFIG.allowedRoomIds && CONFIG.allowedRoomIds.length > 0 && !CONFIG.allowedRoomIds.includes(targetR.id)) {
                     nextX = localAvatar.x;
                     nextY = localAvatar.y;
                     localAvatar.targetX = localAvatar.x;
                     localAvatar.targetY = localAvatar.y;
                     showToast(`🚫 {{ __("Restricted Room: Access not permitted for ':name'.", ['name' => '']) }} ${targetR.name}`);
                 }
-                // 2. Door Lock Check
+                // 3. Door Lock Check
                 else if (roomDoorStates.get(targetR.id)) {
                     nextX = localAvatar.x;
                     nextY = localAvatar.y;
@@ -3004,6 +3023,10 @@
         async function openRoomFilesModal() {
             const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
             if (!myRoom) return;
+            if (isGuest && guestAllowedRoomId && myRoom.id !== guestAllowedRoomId) {
+                showToast('🚫 {{ __("Guests are only permitted to view files in their designated invited room.") }}');
+                return;
+            }
             document.getElementById('room-files-title').textContent = `📁 ${myRoom.name} — {{ __('Documents & Assets') }}`;
             document.getElementById('room-files-modal').style.display = 'flex';
             await loadRoomFiles(myRoom.id);
@@ -3759,7 +3782,7 @@
 
             // Fetch live activity & task list from server API
             try {
-                const res = await fetch(`/api/members/${userId}/activity`, {
+                const res = await fetch(`/api/members/${userId}/activity?organization_id=${CONFIG.org.id}`, {
                     headers: { 'Accept': 'application/json' }
                 });
                 if (res.ok) {
@@ -3773,41 +3796,48 @@
                         }
                     }
 
-                    // Active Timer
-                    if (data.active_timer) {
-                        timerBox.style.display = 'flex';
-                        timerTask.textContent = `${data.active_timer.task_title} (${data.active_timer.project_name})`;
-                        let elapsed = data.active_timer.duration_seconds || 0;
-                        function updateTimerClock() {
-                            elapsed++;
-                            const hrs = String(Math.floor(elapsed / 3600)).padStart(2, '0');
-                            const mins = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
-                            const secs = String(elapsed % 60).padStart(2, '0');
-                            timerClock.textContent = `${hrs}:${mins}:${secs}`;
+                    if (isGuest) {
+                        // Privacy protection: completely hide timer and tasks for guest viewers
+                        if (timerBox) timerBox.style.display = 'none';
+                        if (tasksCount) tasksCount.textContent = '🔒 {{ __("Restricted") }}';
+                        tasksList.innerHTML = `<div style="text-align:center; padding: 14px; color: var(--text-muted); font-size:12px;">🔒 {{ __("Internal team tasks and project tracking are private to team members.") }}</div>`;
+                    } else {
+                        // Active Timer for members
+                        if (data.active_timer) {
+                            timerBox.style.display = 'flex';
+                            timerTask.textContent = `${data.active_timer.task_title} (${data.active_timer.project_name})`;
+                            let elapsed = data.active_timer.duration_seconds || 0;
+                            function updateTimerClock() {
+                                elapsed++;
+                                const hrs = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+                                const mins = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+                                const secs = String(elapsed % 60).padStart(2, '0');
+                                timerClock.textContent = `${hrs}:${mins}:${secs}`;
+                            }
+                            updateTimerClock();
+                            spotlightTimerInterval = setInterval(updateTimerClock, 1000);
+                        } else {
+                            timerBox.style.display = 'none';
                         }
-                        updateTimerClock();
-                        spotlightTimerInterval = setInterval(updateTimerClock, 1000);
-                    } else {
-                        timerBox.style.display = 'none';
-                    }
 
-                    // Tasks List
-                    tasksCount.textContent = `${data.tasks.length} ${data.tasks.length === 1 ? 'Task' : 'Tasks'}`;
-                    if (data.tasks.length > 0) {
-                        tasksList.innerHTML = data.tasks.map(t => `
-                            <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <span style="font-size: 14px;">${t.status === 'done' ? '✅' : (t.status === 'in_progress' ? '⚡' : '📌')}</span>
-                                    <div>
-                                        <div style="font-size: 12px; font-weight: 800; color: var(--text-primary); text-decoration: ${t.status === 'done' ? 'line-through' : 'none'};">${t.title}</div>
-                                        <div style="font-size: 10px; color: var(--text-secondary);">${t.project_name} ${t.due_date ? '• 📅 ' + t.due_date : ''}</div>
+                        // Tasks List for members
+                        tasksCount.textContent = `${data.tasks.length} ${data.tasks.length === 1 ? 'Task' : 'Tasks'}`;
+                        if (data.tasks.length > 0) {
+                            tasksList.innerHTML = data.tasks.map(t => `
+                                <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <span style="font-size: 14px;">${t.status === 'done' ? '✅' : (t.status === 'in_progress' ? '⚡' : '📌')}</span>
+                                        <div>
+                                            <div style="font-size: 12px; font-weight: 800; color: var(--text-primary); text-decoration: ${t.status === 'done' ? 'line-through' : 'none'};">${t.title}</div>
+                                            <div style="font-size: 10px; color: var(--text-secondary);">${t.project_name} ${t.due_date ? '• 📅 ' + t.due_date : ''}</div>
+                                        </div>
                                     </div>
+                                    <span class="guest-badge" style="text-transform: uppercase; font-size: 9px;">${t.status.replace('_', ' ')}</span>
                                 </div>
-                                <span class="guest-badge" style="text-transform: uppercase; font-size: 9px;">${t.status.replace('_', ' ')}</span>
-                            </div>
-                        `).join('');
-                    } else {
-                        tasksList.innerHTML = `<div style="text-align:center; padding: 12px; color: var(--text-muted); font-size:12px;">☕ {{ __("No pending tasks assigned.") }}</div>`;
+                            `).join('');
+                        } else {
+                            tasksList.innerHTML = `<div style="text-align:center; padding: 12px; color: var(--text-muted); font-size:12px;">☕ {{ __("No pending tasks assigned.") }}</div>`;
+                        }
                     }
                 }
             } catch(err) {
