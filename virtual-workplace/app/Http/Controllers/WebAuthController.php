@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domains\Administration\Models\AuditLog;
 use App\Domains\Administration\Models\Role;
 use App\Domains\Identity\Models\User;
 use App\Domains\Identity\Services\RealtimeTokenService;
@@ -10,6 +11,8 @@ use App\Domains\Projects\Models\Project;
 use App\Domains\Tenancy\Actions\CreateOrganizationAction;
 use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Domains\Tenancy\Models\OrganizationSetting;
+use App\Domains\Tenancy\Models\Plan;
+use App\Domains\Tenancy\Models\SubscriptionRequest;
 use App\Mail\MeetingInvitationMail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -19,6 +22,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class WebAuthController extends Controller
 {
@@ -100,18 +105,33 @@ class WebAuthController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        // Create organization with user as admin and assigned plan
-        $createOrgAction->execute(
+        // Find requested plan
+        $selectedPlan = null;
+        if (!empty($validated['plan_id'])) {
+            $selectedPlan = Plan::find($validated['plan_id']);
+        } elseif (!empty($validated['plan_slug'])) {
+            $selectedPlan = Plan::where('slug', $validated['plan_slug'])->first();
+        }
+
+        // Create organization with user as admin (initially with selected plan if free, or base plan)
+        $freePlan = Plan::where('slug', 'free')->first() ?? Plan::where('price', 0)->first() ?? Plan::first();
+        $isPaidPlan = $selectedPlan && (float)$selectedPlan->price > 0;
+
+        $organization = $createOrgAction->execute(
             [
                 'name' => $validated['organization_name'],
-                'plan_id' => $validated['plan_id'] ?? null,
-                'plan_slug' => $validated['plan_slug'] ?? null,
+                'plan_id' => $isPaidPlan ? $freePlan?->id : ($selectedPlan?->id ?? $freePlan?->id),
             ],
             $user
         );
 
         // Log in
         Auth::login($user);
+
+        if ($isPaidPlan && $selectedPlan) {
+            return redirect()->route('subscription.payment', ['plan' => $selectedPlan->id])
+                ->with('info', "مرحباً بك في Virtual Workplace! يرجى إتمام التحويل البنكي لتفعيل اشتراك باقة ({$selectedPlan->name}).");
+        }
 
         return redirect()->route('dashboard');
     }
@@ -228,11 +248,14 @@ class WebAuthController extends Controller
             ];
         })->values();
 
+        $pendingSubscriptionRequest = $organization->pendingSubscriptionRequest()->with('plan')->first();
+
         return view('dashboard', compact(
             'user', 'membership', 'organization', 'stats', 'rooms', 'offices', 'roles', 'members',
             'departments', 'teams', 'auditLogs', 'guestInvitations', 'allPlans',
             'projects', 'tasks', 'myTasks', 'activeTimer', 'recentTimeEntries', 'allTimesheets', 'myProfile',
-            'upcomingMeetings', 'allMeetings', 'smtpSettings', 'upcomingMeetingsJson'
+            'upcomingMeetings', 'allMeetings', 'smtpSettings', 'upcomingMeetingsJson',
+            'pendingSubscriptionRequest'
         ));
     }
 
@@ -424,11 +447,174 @@ class WebAuthController extends Controller
         ]);
 
         $organization = $membership->organization;
-        $newPlan = \App\Domains\Tenancy\Models\Plan::findOrFail($validated['plan_id']);
+        $newPlan = Plan::findOrFail($validated['plan_id']);
+
+        if ((float)$newPlan->price > 0) {
+            return redirect()->route('subscription.payment', ['plan' => $newPlan->id]);
+        }
 
         $organization->update(['plan_id' => $newPlan->id]);
 
-        return back()->with('success', "Subscription successfully upgraded to {$newPlan->name} Plan!");
+        return back()->with('success', "تم تغيير الباقة إلى {$newPlan->name} بنجاح!");
+    }
+
+    /**
+     * Show the Bank Transfer Payment & Plan Details Page.
+     */
+    public function showPaymentPage(Plan $plan)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)
+            ->whereIn('status', ['active', 'invited'])
+            ->with(['organization.plan', 'role.permissions'])
+            ->first();
+
+        if (!$membership) {
+            return redirect()->route('login');
+        }
+
+        if (!$membership->hasPermission('organizations.manage') && $membership->role?->slug !== 'company_admin') {
+            abort(403, 'Unauthorized: only organization admins can manage subscription payments.');
+        }
+
+        $organization = $membership->organization;
+        $pendingRequest = $organization->pendingSubscriptionRequest()->where('plan_id', $plan->id)->first()
+            ?: $organization->pendingSubscriptionRequest()->with('plan')->first();
+
+        $priceUSD = (float)$plan->price;
+        $priceSAR = round($priceUSD * 3.75, 2);
+
+        $cleanSlug = preg_replace('/[^a-zA-Z0-9]/', '', $organization->slug ?: 'ORG');
+        $referenceCode = 'PAY-' . strtoupper(substr($cleanSlug, 0, 4))
+            . '-' . strtoupper(substr($plan->slug, 0, 4))
+            . '-' . strtoupper(Str::random(4));
+
+        $bankAccounts = [
+            [
+                'bank_name' => 'مصرف الراجحي (Al Rajhi Bank)',
+                'account_name' => 'شركة مساحات العمل الافتراضية للاتصالات وتقنية المعلومات',
+                'account_name_en' => 'Virtual Workplace Information Technology Co.',
+                'iban' => 'SA4480000201608010099999',
+                'account_number' => '201608010099999',
+                'swift' => 'RJHISARI',
+                'currency' => 'SAR / USD',
+                'badge' => '⚡ التحويل الفوري المعتمد (Instant Transfer)',
+            ],
+            [
+                'bank_name' => 'البنك الأهلي السعودي (Saudi National Bank - SNB)',
+                'account_name' => 'شركة مساحات العمل الافتراضية للاتصالات وتقنية المعلومات',
+                'account_name_en' => 'Virtual Workplace Information Technology Co.',
+                'iban' => 'SA0310000001234567890123',
+                'account_number' => '1234567890123',
+                'swift' => 'NCBISARI',
+                'currency' => 'SAR',
+                'badge' => '🏢 الحساب التجاري المعتمد (Corporate)',
+            ],
+        ];
+
+        return view('billing.payment', compact(
+            'user', 'membership', 'organization', 'plan', 'pendingRequest',
+            'priceUSD', 'priceSAR', 'referenceCode', 'bankAccounts'
+        ));
+    }
+
+    /**
+     * Submit Bank Transfer Payment Confirmation & Receipt.
+     */
+    public function submitBankTransferPayment(Request $request, Plan $plan)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)
+            ->whereIn('status', ['active', 'invited'])
+            ->with(['organization', 'role.permissions'])
+            ->first();
+
+        if (!$membership) {
+            return redirect()->route('login');
+        }
+
+        if (!$membership->hasPermission('organizations.manage') && $membership->role?->slug !== 'company_admin') {
+            abort(403, 'Unauthorized: only organization admins can manage subscription payments.');
+        }
+
+        $organization = $membership->organization;
+
+        $validated = $request->validate([
+            'sender_name' => ['required', 'string', 'max:255'],
+            'bank_name' => ['required', 'string', 'max:255'],
+            'sender_account' => ['nullable', 'string', 'max:100'],
+            'transfer_reference' => ['required', 'string', 'max:100'],
+            'amount' => ['required', 'numeric', 'min:0'],
+            'currency' => ['required', 'string', 'in:SAR,USD'],
+            'billing_cycle' => ['required', 'string', 'in:monthly,yearly'],
+            'transfer_date' => ['required', 'date'],
+            'receipt' => ['required', 'file', 'mimes:jpeg,png,jpg,webp,pdf', 'max:15360'],
+            'notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        // Store receipt
+        $receiptPath = $request->file('receipt')->store('receipts', 'public');
+
+        // Create subscription request
+        $subRequest = SubscriptionRequest::create([
+            'organization_id' => $organization->id,
+            'user_id' => $user->id,
+            'plan_id' => $plan->id,
+            'amount' => $validated['amount'],
+            'currency' => $validated['currency'],
+            'billing_cycle' => $validated['billing_cycle'],
+            'payment_method' => 'bank_transfer',
+            'bank_name' => $validated['bank_name'],
+            'sender_name' => $validated['sender_name'],
+            'sender_account' => $validated['sender_account'] ?? null,
+            'transfer_reference' => $validated['transfer_reference'],
+            'transfer_date' => $validated['transfer_date'],
+            'receipt_path' => $receiptPath,
+            'notes' => $validated['notes'] ?? null,
+            'status' => 'pending',
+        ]);
+
+        AuditLog::create([
+            'organization_id' => $organization->id,
+            'actor_id' => $user->id,
+            'action' => 'subscription.bank_transfer_submitted',
+            'metadata' => [
+                'plan_id' => $plan->id,
+                'plan_name' => $plan->name,
+                'amount' => $validated['amount'],
+                'currency' => $validated['currency'],
+                'transfer_reference' => $validated['transfer_reference'],
+                'request_id' => $subRequest->id,
+            ],
+        ]);
+
+        return redirect()->route('dashboard')
+            ->with('success', "تم إرسال إشعار التحويل البنكي للاشتراك في باقة ({$plan->name}) بنجاح! طلبكم قيد المراجعة والاعتماد من الإدارة.");
+    }
+
+    /**
+     * Cancel a pending subscription request.
+     */
+    public function cancelSubscriptionRequest(SubscriptionRequest $subscriptionRequest)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)
+            ->whereIn('status', ['active', 'invited'])
+            ->with(['organization', 'role.permissions'])
+            ->first();
+
+        if (!$membership || $membership->organization_id !== $subscriptionRequest->organization_id) {
+            abort(403, 'Unauthorized.');
+        }
+
+        if ($subscriptionRequest->isPending()) {
+            $subscriptionRequest->update([
+                'status' => 'cancelled',
+                'admin_notes' => 'Cancelled by user',
+            ]);
+        }
+
+        return back()->with('success', 'تم إلغاء طلب الاشتراك بنجاح.');
     }
 
     /**

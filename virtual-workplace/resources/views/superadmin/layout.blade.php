@@ -721,6 +721,18 @@
                 <span class="nav-item-icon">💎</span>
                 <span>{{ __('Subscription Plans') }}</span>
             </a>
+            @php
+                $sidebarPendingSubs = \App\Domains\Tenancy\Models\SubscriptionRequest::where('status', 'pending')->count();
+            @endphp
+            <a href="{{ route('superadmin.subscriptions') }}" class="nav-item {{ request()->routeIs('superadmin.subscriptions*') ? 'active' : '' }}" data-tooltip="{{ __('Subscription Requests') }}" style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+                    <span class="nav-item-icon">💳</span>
+                    <span>{{ __('Subscription Requests') }}</span>
+                </div>
+                @if($sidebarPendingSubs > 0)
+                    <span style="background: #D6A23A; color: white; font-size: 10px; font-weight: 900; padding: 2px 7px; border-radius: 9999px;">{{ $sidebarPendingSubs }}</span>
+                @endif
+            </a>
             <a href="{{ route('superadmin.furniture') }}" class="nav-item {{ request()->routeIs('superadmin.furniture*') ? 'active' : '' }}" data-tooltip="{{ __('Furniture & Assets') }}">
                 <span class="nav-item-icon">🛋️</span>
                 <span>{{ __('Furniture & Assets') }}</span>

@@ -100,6 +100,16 @@ class Organization extends Model
         return $this->hasMany(\App\Domains\Projects\Models\Timesheet::class);
     }
 
+    public function subscriptionRequests(): HasMany
+    {
+        return $this->hasMany(SubscriptionRequest::class)->latest();
+    }
+
+    public function pendingSubscriptionRequest(): HasOne
+    {
+        return $this->hasOne(SubscriptionRequest::class)->where('status', 'pending')->latestOfMany();
+    }
+
 
     // ── Helpers ──
 

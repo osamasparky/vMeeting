@@ -32,6 +32,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [WebAuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [WebAuthController::class, 'dashboard'])->name('dashboard');
     Route::post('/organization/upgrade-plan', [WebAuthController::class, 'upgradePlan'])->name('organization.upgrade_plan');
+    Route::get('/billing/payment/{plan}', [WebAuthController::class, 'showPaymentPage'])->name('subscription.payment');
+    Route::post('/billing/payment/{plan}/submit', [WebAuthController::class, 'submitBankTransferPayment'])->name('subscription.payment.submit');
+    Route::post('/billing/payment-requests/{subscriptionRequest}/cancel', [WebAuthController::class, 'cancelSubscriptionRequest'])->name('subscription.payment.cancel');
     Route::post('/organization/settings', [WebAuthController::class, 'updateOrganizationSettings'])->name('organization.settings.update');
     Route::post('/profile', [WebAuthController::class, 'updateProfile'])->name('profile.update');
     Route::post('/profile/password', [WebAuthController::class, 'updatePassword'])->name('profile.password.update');
@@ -122,6 +125,12 @@ Route::prefix('superadmin')->middleware(['auth', 'superadmin'])->name('superadmi
     Route::post('/plans', [\App\Http\Controllers\SuperAdminController::class, 'storePlan'])->name('plans.store');
     Route::put('/plans/{plan}', [\App\Http\Controllers\SuperAdminController::class, 'updatePlan'])->name('plans.update');
     Route::delete('/plans/{plan}', [\App\Http\Controllers\SuperAdminController::class, 'deletePlan'])->name('plans.delete');
+
+    // Subscription & Bank Transfer Payment Requests
+    Route::get('/subscriptions', [\App\Http\Controllers\SuperAdminController::class, 'subscriptionRequests'])->name('subscriptions');
+    Route::post('/subscriptions/{subscriptionRequest}/approve', [\App\Http\Controllers\SuperAdminController::class, 'approveSubscriptionRequest'])->name('subscriptions.approve');
+    Route::post('/subscriptions/{subscriptionRequest}/reject', [\App\Http\Controllers\SuperAdminController::class, 'rejectSubscriptionRequest'])->name('subscriptions.reject');
+    Route::get('/subscriptions/{subscriptionRequest}/receipt', [\App\Http\Controllers\SuperAdminController::class, 'viewSubscriptionReceipt'])->name('subscriptions.receipt');
 
     Route::get('/matrix', [\App\Http\Controllers\SuperAdminController::class, 'matrix'])->name('matrix');
     Route::post('/matrix/sync', [\App\Http\Controllers\SuperAdminController::class, 'syncMatrix'])->name('matrix.sync');

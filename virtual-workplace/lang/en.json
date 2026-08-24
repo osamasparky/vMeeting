@@ -72,5 +72,18 @@
     "Unlock Door": "Unlock Door",
     "Knock on Door": "Knock on Door",
     "Allow Entry": "Allow Entry",
-    "Deny": "Deny"
+    "Deny": "Deny",
+    "Bank Transfer Payment": "Bank Transfer Payment",
+    "Subscription Requests": "Subscription Requests",
+    "Bank Transfer Payments & Subscription Requests": "Bank Transfer Payments & Subscription Requests",
+    "Pending Approvals": "Pending Approvals",
+    "Approved Subscriptions": "Approved Subscriptions",
+    "Rejected Requests": "Rejected Requests",
+    "Total Payment Requests": "Total Payment Requests",
+    "Submit Bank Transfer for SuperAdmin Approval": "Submit Bank Transfer for SuperAdmin Approval",
+    "Pending Wire Transfer Approval": "Pending Wire Transfer Approval",
+    "Under SuperAdmin Review": "Under SuperAdmin Review",
+    "View Transfer Details": "View Transfer Details",
+    "Subscribe & Bank Transfer": "Subscribe & Bank Transfer",
+    "Payments & Wire Transfers": "Payments & Wire Transfers"
 }

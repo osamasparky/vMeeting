@@ -157,6 +157,9 @@
     <button onclick="switchTab('plan')" id="tab-btn-plan" class="tactile-btn tab-nav-btn" style="padding: 9px 18px; font-size: 13px;">
         💎 {{ __('Plan & Quotas') }}
     </button>
+    <button onclick="switchTab('payments')" id="tab-btn-payments" class="tactile-btn tab-nav-btn" style="padding: 9px 18px; font-size: 13px;">
+        💳 {{ __('Payments & Wire Transfers') }} ({{ $organization->subscriptionRequests->count() }})
+    </button>
     <button onclick="switchTab('audit')" id="tab-btn-audit" class="tactile-btn tab-nav-btn" style="padding: 9px 18px; font-size: 13px;">
         📜 {{ __('Activity Logs') }}
     </button>
@@ -381,7 +384,113 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════════
-     TAB 5: AUDIT LOGS
+     TAB 5: BANK PAYMENTS & SUBSCRIPTION REQUESTS
+     ═══════════════════════════════════════════════════════ -->
+<div id="tab-content-payments" class="tab-pane" style="display: none;">
+    <div class="panel-card">
+        <div class="panel-header">
+            <div class="panel-title">
+                <span>💳</span>
+                <span>{{ __('Bank Transfer Payments & Upgrade Requests') }}</span>
+            </div>
+            <a href="{{ route('superadmin.subscriptions') }}" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 11px;">
+                {{ __('All System Subscriptions') }} →
+            </a>
+        </div>
+
+        <div class="data-table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>{{ __('Requested Plan') }}</th>
+                        <th>{{ __('Amount') }}</th>
+                        <th>{{ __('Bank & Sender') }}</th>
+                        <th>{{ __('Transfer Ref #') }}</th>
+                        <th>{{ __('Receipt Slip') }}</th>
+                        <th>{{ __('Status') }}</th>
+                        <th>{{ __('Date') }}</th>
+                        <th>{{ __('Actions') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($organization->subscriptionRequests as $req)
+                    <tr>
+                        <td>
+                            <span class="badge-status badge-plan">💎 {{ $req->plan?->name ?? 'Plan' }}</span>
+                        </td>
+                        <td>
+                            <strong>{{ number_format($req->amount, 2) }} {{ $req->currency }}</strong>
+                            <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">{{ $req->billing_cycle }}</div>
+                        </td>
+                        <td>
+                            <div style="font-weight: 800;">🏦 {{ $req->bank_name }}</div>
+                            <div style="font-size: 11px; color: var(--text-muted);">👤 {{ $req->sender_name }}</div>
+                        </td>
+                        <td>
+                            <code style="font-family: monospace; font-weight: 800; color: var(--brand-forest);">#{{ $req->transfer_reference }}</code>
+                        </td>
+                        <td>
+                            @if($req->receipt_path)
+                                <a href="{{ route('superadmin.subscriptions.receipt', $req->id) }}" target="_blank" class="tactile-btn" style="padding: 4px 8px; font-size: 11px; text-decoration: none;">
+                                    📄 {{ __('View') }}
+                                </a>
+                            @else
+                                <span style="color: var(--text-muted); font-size: 11px;">—</span>
+                            @endif
+                        </td>
+                        <td>
+                            @if($req->status === 'pending')
+                                <span class="badge-status" style="background: rgba(214, 162, 58, 0.2); color: #996D12; border-color: rgba(214, 162, 58, 0.4);">
+                                    ⏳ {{ __('Pending') }}
+                                </span>
+                            @elseif($req->status === 'approved')
+                                <span class="badge-status badge-active">✓ {{ __('Approved') }}</span>
+                            @elseif($req->status === 'rejected')
+                                <span class="badge-status badge-suspended">✕ {{ __('Rejected') }}</span>
+                            @else
+                                <span class="badge-status">{{ ucfirst($req->status) }}</span>
+                            @endif
+                        </td>
+                        <td style="font-size: 11px; color: var(--text-muted);">
+                            {{ $req->created_at->format('Y-m-d H:i') }}
+                        </td>
+                        <td>
+                            @if($req->status === 'pending')
+                                <div style="display: flex; gap: 6px;">
+                                    <form method="POST" action="{{ route('superadmin.subscriptions.approve', $req->id) }}" onsubmit="return confirm('{{ __('Approve this transfer and activate the plan for this company?') }}');" style="margin: 0;">
+                                        @csrf
+                                        <button type="submit" class="tactile-btn btn-primary" style="padding: 4px 8px; font-size: 11px;">
+                                            ✓ {{ __('Approve') }}
+                                        </button>
+                                    </form>
+                                    <form method="POST" action="{{ route('superadmin.subscriptions.reject', $req->id) }}" onsubmit="return confirm('{{ __('Reject this transfer request?') }}');" style="margin: 0;">
+                                        @csrf
+                                        <input type="hidden" name="admin_notes" value="Rejected from company profile">
+                                        <button type="submit" class="tactile-btn" style="padding: 4px 8px; font-size: 11px; color: #D96B5F; border-color: rgba(217,107,95,0.3);">
+                                            ✕
+                                        </button>
+                                    </form>
+                                </div>
+                            @else
+                                <span style="font-size: 11px; color: var(--text-muted);">—</span>
+                            @endif
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                            {{ __('No wire transfer payment requests recorded for this company.') }}
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     TAB 6: AUDIT LOGS
      ═══════════════════════════════════════════════════════ -->
 <div id="tab-content-audit" class="tab-pane" style="display: none;">
     <div class="panel-card">

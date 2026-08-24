@@ -219,6 +219,75 @@
     </div>
 </div>
 
+<!-- Pending Subscription Approvals Alert Panel -->
+@if(isset($pendingSubscriptionRequests) && $pendingSubscriptionRequests->count() > 0)
+<div class="panel-card" style="border: 2px solid #D6A23A; background: var(--bg-surface); margin-bottom: 28px;">
+    <div class="panel-header" style="border-bottom: 1px solid rgba(214, 162, 58, 0.3); padding-bottom: 14px; margin-bottom: 16px;">
+        <div class="panel-title" style="color: #996D12;">
+            <span>⏳</span>
+            <span>{{ __('Pending Subscription Approvals') }} ({{ $stats['pending_subscriptions_count'] ?? $pendingSubscriptionRequests->count() }})</span>
+        </div>
+        <a href="{{ route('superadmin.subscriptions', ['status' => 'pending']) }}" class="tactile-btn" style="font-size: 12px; padding: 6px 14px; background: #D6A23A; color: white; border: 1px solid #B4831B; text-decoration: none;">
+            <span>{{ __('Review All Requests') }}</span>
+            <span>→</span>
+        </a>
+    </div>
+
+    <div class="data-table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>{{ __('Company') }}</th>
+                    <th>{{ __('Target Plan') }}</th>
+                    <th>{{ __('Amount') }}</th>
+                    <th>{{ __('Bank & Reference') }}</th>
+                    <th>{{ __('Receipt Slip') }}</th>
+                    <th>{{ __('Submitted') }}</th>
+                    <th>{{ __('Quick Action') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($pendingSubscriptionRequests as $pReq)
+                <tr>
+                    <td>
+                        <strong style="color: var(--text-primary);">🏢 {{ $pReq->organization?->name ?? 'Company' }}</strong>
+                        <div style="font-size: 11px; color: var(--text-muted);">👤 {{ $pReq->sender_name }}</div>
+                    </td>
+                    <td>
+                        <span class="badge-status badge-plan">💎 {{ $pReq->plan?->name ?? 'Plan' }}</span>
+                    </td>
+                    <td>
+                        <strong>{{ number_format($pReq->amount, 2) }} {{ $pReq->currency }}</strong>
+                    </td>
+                    <td>
+                        <div>🏦 {{ $pReq->bank_name }}</div>
+                        <div style="font-family: monospace; font-size: 11px; color: var(--brand-forest); font-weight: 800;">#{{ $pReq->transfer_reference }}</div>
+                    </td>
+                    <td>
+                        @if($pReq->receipt_path)
+                            <a href="{{ route('superadmin.subscriptions.receipt', $pReq->id) }}" target="_blank" class="tactile-btn" style="padding: 4px 10px; font-size: 11px; text-decoration: none;">
+                                📄 {{ __('View Receipt') }}
+                            </a>
+                        @else
+                            <span style="color: var(--text-muted); font-size: 11px;">—</span>
+                        @endif
+                    </td>
+                    <td style="font-size: 11px; color: var(--text-muted);">
+                        {{ $pReq->created_at->diffForHumans() }}
+                    </td>
+                    <td>
+                        <a href="{{ route('superadmin.subscriptions') }}" class="tactile-btn btn-primary" style="padding: 6px 12px; font-size: 11px; text-decoration: none;">
+                            ⚡ {{ __('Review & Approve') }}
+                        </a>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+@endif
+
 <!-- Recent Companies & Tenant Directory -->
 <div class="panel-card">
     <div class="panel-header">

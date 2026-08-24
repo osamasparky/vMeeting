@@ -2405,6 +2405,45 @@
                 <p class="page-subtitle" style="font-size: 13px; color: var(--text-secondary);">{{ __('Manage your plan tier, seat capacity, renewal period, and workspace upgrade.') }}</p>
             </div>
 
+            <!-- Pending Subscription Request Banner -->
+            @if(isset($pendingSubscriptionRequest) && $pendingSubscriptionRequest)
+            <div class="card" style="margin-bottom: 24px; border-radius: var(--radius-xl); padding: 22px; border: 2px solid #D6A23A; background: linear-gradient(135deg, rgba(214, 162, 58, 0.08) 0%, rgba(214, 162, 58, 0.02) 100%); box-shadow: var(--shadow-card);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(214, 162, 58, 0.2); color: #D6A23A; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                            ⏳
+                        </div>
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                <span style="font-size: 11px; font-weight: 900; color: #996D12; text-transform: uppercase;">{{ __('Pending Wire Transfer Approval') }}</span>
+                                <span class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.25); color: #996D12; font-size: 10px; font-weight: 900;">{{ __('Under SuperAdmin Review') }}</span>
+                            </div>
+                            <h3 style="font-size: 18px; font-weight: 900; color: var(--text-primary); margin: 0;">
+                                💎 {{ __('Upgrade to') }} {{ $pendingSubscriptionRequest->plan?->name ?? __('Plan') }} — {{ number_format($pendingSubscriptionRequest->amount, 2) }} {{ $pendingSubscriptionRequest->currency }}
+                            </h3>
+                            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px; display: flex; gap: 14px; flex-wrap: wrap;">
+                                <span>🏦 <strong>{{ $pendingSubscriptionRequest->bank_name }}</strong></span>
+                                <span>📋 {{ __('Ref') }}: <strong style="font-family: monospace;">{{ $pendingSubscriptionRequest->transfer_reference }}</strong></span>
+                                <span>📅 {{ $pendingSubscriptionRequest->created_at->diffForHumans() }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <a href="{{ route('subscription.payment', $pendingSubscriptionRequest->plan_id) }}" class="tactile-btn" style="padding: 9px 16px; font-size: 12px; text-decoration: none;">
+                            📄 {{ __('View Transfer Details') }}
+                        </a>
+                        <form method="POST" action="{{ route('subscription.payment.cancel', $pendingSubscriptionRequest->id) }}" onsubmit="return confirm('{{ __('Are you sure you want to cancel this pending subscription request?') }}');" style="margin: 0;">
+                            @csrf
+                            <button type="submit" class="tactile-btn" style="padding: 9px 14px; font-size: 12px; color: #D96B5F; border-color: rgba(217, 107, 95, 0.3);">
+                                ✕ {{ __('Cancel') }}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             @php
                 $currentPlan = $organization->plan ?? \App\Domains\Tenancy\Models\Plan::where('slug', 'free')->first();
                 $seatLimit = $currentPlan?->seat_limit ?? 5;
@@ -2510,6 +2549,7 @@
                     $isCurrent = ($organization->plan_id == $p->id);
                     $pPriceUSD = (float)$p->price;
                     $pPriceSAR = round($pPriceUSD * 3.75, 2);
+                    $isPaid = $pPriceUSD > 0;
                 @endphp
                 <div class="card plan-selection-card" style="padding: 24px; border-radius: var(--radius-xl); border: 2px solid {{ $isCurrent ? 'var(--brand-forest)' : 'var(--border-color)' }}; position: relative; display: flex; flex-direction: column; justify-content: space-between; box-shadow: {{ $isCurrent ? 'var(--shadow-hover)' : 'var(--shadow-card)' }}; background: var(--bg-surface);">
                     @if($isCurrent)
@@ -2545,6 +2585,10 @@
                         <button disabled class="tactile-btn btn-secondary" style="width: 100%; padding: 12px; opacity: 0.6; cursor: not-allowed;">
                             ✓ {{ __('Current Plan') }}
                         </button>
+                    @elseif($isPaid)
+                        <a href="{{ route('subscription.payment', $p->id) }}" class="tactile-btn btn-primary" style="width: 100%; padding: 12px; font-weight: 800; text-align: center; text-decoration: none; justify-content: center;">
+                            💳 {{ __('Subscribe & Bank Transfer') }}
+                        </a>
                     @else
                         <form method="POST" action="{{ route('organization.upgrade_plan') }}">
                             @csrf

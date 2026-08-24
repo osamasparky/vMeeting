@@ -9,9 +9,12 @@ use App\Domains\Identity\Models\User;
 use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Domains\Tenancy\Models\Plan;
+use App\Domains\Tenancy\Models\Subscription;
+use App\Domains\Tenancy\Models\SubscriptionRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class SuperAdminController extends Controller
@@ -48,6 +51,7 @@ class SuperAdminController extends Controller
             'total_tasks' => \App\Domains\Projects\Models\Task::count(),
             'total_logged_hours' => round((\App\Domains\Projects\Models\TimeEntry::sum('duration_seconds') ?? 0) / 3600, 1),
             'total_audit_events' => AuditLog::count(),
+            'pending_subscriptions_count' => SubscriptionRequest::where('status', 'pending')->count(),
         ];
 
         $recentCompanies = Organization::with(['plan', 'members.user', 'rooms'])
@@ -57,8 +61,15 @@ class SuperAdminController extends Controller
 
         $plans = Plan::withCount('organizations')->where('is_active', true)->orderBy('price', 'desc')->get();
         $recentAuditLogs = AuditLog::with(['actor', 'organization'])->latest()->take(6)->get();
+        $pendingSubscriptionRequests = SubscriptionRequest::with(['organization', 'user', 'plan'])
+            ->where('status', 'pending')
+            ->latest()
+            ->take(6)
+            ->get();
 
-        return view('superadmin.dashboard', compact('user', 'stats', 'recentCompanies', 'plans', 'recentAuditLogs'));
+        return view('superadmin.dashboard', compact(
+            'user', 'stats', 'recentCompanies', 'plans', 'recentAuditLogs', 'pendingSubscriptionRequests'
+        ));
     }
 
     /**
@@ -142,6 +153,9 @@ class SuperAdminController extends Controller
             'members.offices',
             'members.rooms',
             'projects.tasks',
+            'subscriptionRequests.plan',
+            'subscriptionRequests.user',
+            'subscriptionRequests.reviewer',
             'auditLogs' => fn($q) => $q->latest()->take(30),
         ]);
 
@@ -396,6 +410,147 @@ class SuperAdminController extends Controller
         $plan->delete();
 
         return back()->with('success', 'Plan deleted successfully.');
+    }
+
+    /**
+     * List all Subscription & Bank Transfer Payment Requests.
+     */
+    public function subscriptionRequests(Request $request)
+    {
+        $user = Auth::user();
+        $statusFilter = $request->input('status', 'all');
+        $search = $request->input('search');
+
+        $query = SubscriptionRequest::with(['organization', 'user', 'plan', 'reviewer']);
+
+        if ($statusFilter && $statusFilter !== 'all') {
+            $query->where('status', $statusFilter);
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('transfer_reference', 'like', "%{$search}%")
+                  ->orWhere('sender_name', 'like', "%{$search}%")
+                  ->orWhere('bank_name', 'like', "%{$search}%")
+                  ->orWhereHas('organization', function ($orgQ) use ($search) {
+                      $orgQ->where('name', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('plan', function ($planQ) use ($search) {
+                      $planQ->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $subscriptionRequests = $query->latest()->paginate(15)->withQueryString();
+
+        $stats = [
+            'total' => SubscriptionRequest::count(),
+            'pending' => SubscriptionRequest::where('status', 'pending')->count(),
+            'approved' => SubscriptionRequest::where('status', 'approved')->count(),
+            'rejected' => SubscriptionRequest::where('status', 'rejected')->count(),
+        ];
+
+        return view('superadmin.subscriptions', compact('user', 'subscriptionRequests', 'stats', 'statusFilter', 'search'));
+    }
+
+    /**
+     * Approve a Bank Transfer Subscription Request and activate plan.
+     */
+    public function approveSubscriptionRequest(Request $request, SubscriptionRequest $subscriptionRequest)
+    {
+        $subscriptionRequest->load(['organization', 'plan']);
+        $organization = $subscriptionRequest->organization;
+        $plan = $subscriptionRequest->plan;
+
+        if (!$organization || !$plan) {
+            return back()->with('error', 'المنظمة أو الخطة المطلوبة غير موجودة.');
+        }
+
+        $months = $subscriptionRequest->billing_cycle === 'yearly' ? 12 : 1;
+
+        // 1. Update Organization Plan
+        $organization->update([
+            'plan_id' => $plan->id,
+        ]);
+
+        // 2. Create / Renew Subscription Record
+        Subscription::create([
+            'organization_id' => $organization->id,
+            'plan_id' => $plan->id,
+            'status' => 'active',
+            'current_period_end' => now()->addMonths($months),
+        ]);
+
+        // 3. Mark Request as Approved
+        $adminNotes = $request->input('admin_notes', 'Approved by SuperAdmin');
+        $subscriptionRequest->update([
+            'status' => 'approved',
+            'reviewed_by' => Auth::id(),
+            'reviewed_at' => now(),
+            'admin_notes' => $adminNotes,
+        ]);
+
+        // 4. Log Audit Event
+        AuditLog::create([
+            'organization_id' => $organization->id,
+            'actor_id' => Auth::id(),
+            'action' => 'superadmin.subscription_approved',
+            'metadata' => [
+                'request_id' => $subscriptionRequest->id,
+                'plan_id' => $plan->id,
+                'plan_name' => $plan->name,
+                'amount' => $subscriptionRequest->amount,
+                'reference' => $subscriptionRequest->transfer_reference,
+            ],
+        ]);
+
+        return back()->with('success', "تم قبول طلب التحويل البنكي وتفعيل باقة ({$plan->name}) لشركة {$organization->name} بنجاح!");
+    }
+
+    /**
+     * Reject a Bank Transfer Subscription Request with notes.
+     */
+    public function rejectSubscriptionRequest(Request $request, SubscriptionRequest $subscriptionRequest)
+    {
+        $validated = $request->validate([
+            'admin_notes' => ['required', 'string', 'max:1000'],
+        ]);
+
+        $subscriptionRequest->load(['organization', 'plan']);
+
+        $subscriptionRequest->update([
+            'status' => 'rejected',
+            'reviewed_by' => Auth::id(),
+            'reviewed_at' => now(),
+            'admin_notes' => $validated['admin_notes'],
+        ]);
+
+        if ($subscriptionRequest->organization_id) {
+            AuditLog::create([
+                'organization_id' => $subscriptionRequest->organization_id,
+                'actor_id' => Auth::id(),
+                'action' => 'superadmin.subscription_rejected',
+                'metadata' => [
+                    'request_id' => $subscriptionRequest->id,
+                    'reason' => $validated['admin_notes'],
+                ],
+            ]);
+        }
+
+        return back()->with('success', 'تم رفض طلب الاشتراك بنجاح.');
+    }
+
+    /**
+     * View or download uploaded bank transfer receipt.
+     */
+    public function viewSubscriptionReceipt(SubscriptionRequest $subscriptionRequest)
+    {
+        if (!$subscriptionRequest->receipt_path || !Storage::disk('public')->exists($subscriptionRequest->receipt_path)) {
+            abort(404, 'Receipt file not found.');
+        }
+
+        $filePath = Storage::disk('public')->path($subscriptionRequest->receipt_path);
+        return response()->file($filePath);
     }
 
     /**
