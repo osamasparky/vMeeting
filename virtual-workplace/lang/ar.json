@@ -908,6 +908,27 @@
     "Selected": "محددة",
     "Edit & Rename": "تعديل وتسمية",
     "All default rooms updated and saved successfully!": "تم حفظ وتحديث كافة الغرف النموذجية بنجاح!",
-    "Are you sure you want to delete this room from the default template?": "هل أنت متأكد من حذف هذه الغرفة من القالب الافتراضي؟"
+    "Are you sure you want to delete this room from the default template?": "هل أنت متأكد من حذف هذه الغرفة من القالب الافتراضي؟",
+    "Workplace Notifications": "إشعارات بيئة العمل",
+    "Mark read": "تحديد كمقروء",
+    "Mark all as read": "تحديد الكل كمقروء",
+    "Clear all": "مسح الكل",
+    "Clear all notifications?": "هل أنت متأكد من مسح كافة الإشعارات؟",
+    "All caught up!": "أنت على اطلاع بكل جديد!",
+    "No new notifications right now.": "لا توجد إشعارات جديدة في الوقت الحالي.",
+    "No notifications in this category.": "لا توجد إشعارات في هذا التصنيف.",
+    "New Task Assigned: :task": "تم تعيين مهمة جديدة لك: :task",
+    ":actor assigned you to task \":task\" in project \":project\".": "قام :actor بتعيينك للمهمة \":task\" في مشروع \":project\".",
+    "Task Updated: :task": "تحديث على المهمة: :task",
+    ":actor changed status of task \":task\" from :old to :new.": "قام :actor بتحديث حالة المهمة \":task\" من :old إلى :new.",
+    "📅 Meeting Invitation: :meeting": "📅 دعوة لاجتماع: :meeting",
+    ":host scheduled a meeting \":meeting\" at :time.": "قام :host بجدولة اجتماع \":meeting\" في موعد :time.",
+    "🚪 Knock on Door: :room": "🚪 استئذان بالدخول: :room",
+    ":requester is knocking on your room \":room\" and requesting entry.": "يقوم :requester بالاستئذان على باب غرفتك \":room\" لطلب الدخول.",
+    "👋 Wave from :sender": "👋 تحية من :sender",
+    ":sender waved at you from :room.": "ألقى :sender التحية عليك من :room.",
+    ":sender waved at you in the workplace.": "ألقى :sender التحية عليك في مساحة العمل.",
+    "Wave sent successfully!": "تم إرسال التحية بنجاح!",
+    "Knock sent to room occupants!": "تم إرسال الاستئذان لمتواجدين الغرفة!"
 }
 

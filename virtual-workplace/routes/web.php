@@ -93,6 +93,14 @@ Route::middleware('auth')->group(function () {
     // Impersonation Exit Routes
     Route::post('/impersonate/leave', [\App\Http\Controllers\SuperAdminController::class, 'leaveImpersonation'])->name('impersonate.leave');
     Route::get('/impersonate/leave', [\App\Http\Controllers\SuperAdminController::class, 'leaveImpersonation'])->name('impersonate.leave.get');
+
+    // In-App Notification System Routes
+    Route::get('/api/notifications', [WebAuthController::class, 'getUserNotifications'])->name('notifications.index');
+    Route::post('/api/notifications/{id}/read', [WebAuthController::class, 'markNotificationRead'])->name('notifications.read');
+    Route::post('/api/notifications/read-all', [WebAuthController::class, 'markAllNotificationsRead'])->name('notifications.read_all');
+    Route::delete('/api/notifications/clear', [WebAuthController::class, 'clearAllNotifications'])->name('notifications.clear');
+    Route::post('/api/notifications/wave', [WebAuthController::class, 'sendDirectWave'])->name('notifications.wave');
+    Route::post('/api/notifications/knock', [WebAuthController::class, 'sendDoorKnock'])->name('notifications.knock');
 });
 
 // Hybrid Workplace & Media Plane Routes (Accessible by Authenticated Members and Invited Guests)

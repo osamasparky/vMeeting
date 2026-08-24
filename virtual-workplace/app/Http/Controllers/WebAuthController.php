@@ -2148,6 +2148,9 @@ class WebAuthController extends Controller
                     'role' => 'participant',
                     'joined_at' => now(),
                 ]);
+
+                // Send live in-app & database notification
+                \App\Domains\Notifications\Services\NotificationService::notifyMeetingScheduled($meeting, $recipient, $user);
             }
         }
 
@@ -2577,6 +2580,157 @@ class WebAuthController extends Controller
 
         return response()->json($report);
     }
+
+    /**
+     * Get user workplace notifications list and unread count.
+     */
+     public function getUserNotifications(Request $request)
+     {
+         $user = Auth::user();
+         if (!$user) {
+             return response()->json(['unread_count' => 0, 'notifications' => []]);
+         }
+
+         $unreadCount = \App\Domains\Notifications\Models\WorkplaceNotification::forUser($user->id)->unread()->count();
+         $notifications = \App\Domains\Notifications\Models\WorkplaceNotification::forUser($user->id)
+             ->orderByDesc('created_at')
+             ->limit(35)
+             ->get()
+             ->map(function ($n) {
+                 return [
+                     'id' => $n->id,
+                     'type' => $n->type,
+                     'title' => $n->title,
+                     'body' => $n->body,
+                     'icon' => $n->icon ?: '🔔',
+                     'action_url' => $n->action_url,
+                     'is_read' => (bool) $n->is_read,
+                     'data' => $n->data,
+                     'created_at_human' => $n->created_at ? $n->created_at->diffForHumans() : '',
+                     'created_at' => $n->created_at ? $n->created_at->toISOString() : '',
+                 ];
+             });
+
+         return response()->json([
+             'unread_count' => $unreadCount,
+             'notifications' => $notifications,
+         ]);
+     }
+
+     /**
+      * Mark a specific notification as read.
+      */
+     public function markNotificationRead(Request $request, string $id)
+     {
+         $user = Auth::user();
+         $notification = \App\Domains\Notifications\Models\WorkplaceNotification::forUser($user->id)->where('id', $id)->first();
+
+         if ($notification) {
+             $notification->markAsRead();
+         }
+
+         $unreadCount = \App\Domains\Notifications\Models\WorkplaceNotification::forUser($user->id)->unread()->count();
+
+         return response()->json([
+             'success' => true,
+             'unread_count' => $unreadCount,
+         ]);
+     }
+
+     /**
+      * Mark all notifications as read for current user.
+      */
+     public function markAllNotificationsRead(Request $request)
+     {
+         $user = Auth::user();
+         \App\Domains\Notifications\Models\WorkplaceNotification::forUser($user->id)
+             ->unread()
+             ->update([
+                 'is_read' => true,
+                 'read_at' => now(),
+             ]);
+
+         return response()->json([
+             'success' => true,
+             'unread_count' => 0,
+         ]);
+     }
+
+     /**
+      * Clear / delete all notifications for current user.
+      */
+     public function clearAllNotifications(Request $request)
+     {
+         $user = Auth::user();
+         \App\Domains\Notifications\Models\WorkplaceNotification::forUser($user->id)->delete();
+
+         return response()->json([
+             'success' => true,
+             'unread_count' => 0,
+             'notifications' => [],
+         ]);
+     }
+
+     /**
+      * Send a direct wave notification to another team member.
+      */
+     public function sendDirectWave(Request $request)
+     {
+         $user = Auth::user();
+         $validated = $request->validate([
+             'target_user_id' => 'required|exists:users,id',
+             'room_name' => 'nullable|string|max:100',
+         ]);
+
+         if ($validated['target_user_id'] === $user->id) {
+             return response()->json(['message' => 'Cannot wave to yourself'], 422);
+         }
+
+         $notification = \App\Domains\Notifications\Services\NotificationService::notifyWave(
+             $validated['target_user_id'],
+             $user,
+             $validated['room_name'] ?? null
+         );
+
+         return response()->json([
+             'success' => true,
+             'message' => __('Wave sent successfully!'),
+         ]);
+     }
+
+     /**
+      * Send a door knock notification for a private room.
+      */
+     public function sendDoorKnock(Request $request)
+     {
+         $user = Auth::user();
+         $validated = $request->validate([
+             'room_id' => 'required|exists:rooms,id',
+         ]);
+
+         $room = \App\Domains\Workspace\Models\Room::find($validated['room_id']);
+         if (!$room) {
+             return response()->json(['message' => 'Room not found'], 404);
+         }
+
+         // Find occupants or organization admins
+         $occupants = \App\Domains\Identity\Models\User::where('current_room_id', $room->id)->get();
+         if ($occupants->isEmpty()) {
+             // Notify room or organization members
+             $occupants = $room->organization ? $room->organization->users()->limit(3)->get() : collect([$user]);
+         }
+
+         foreach ($occupants as $occupant) {
+             if ($occupant->id !== $user->id) {
+                 \App\Domains\Notifications\Services\NotificationService::notifyDoorKnock($room, $occupant, $user);
+             }
+         }
+
+         return response()->json([
+             'success' => true,
+             'message' => __('Knock sent to room occupants!'),
+         ]);
+     }
 
     /**
      * Logout.

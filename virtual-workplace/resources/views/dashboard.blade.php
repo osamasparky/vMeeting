@@ -1204,6 +1204,116 @@
             100% { transform: scale(1); }
         }
 
+        /* ── Notification Center Dropdown ── */
+        .notification-dropdown-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        .notification-bell-btn {
+            position: relative;
+            cursor: pointer;
+        }
+        .notification-badge-pulse {
+            position: absolute;
+            top: -3px;
+            inset-inline-end: -3px;
+            background: #EF4444;
+            color: #FFFFFF;
+            font-size: 10px;
+            font-weight: 900;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            border: 2px solid var(--bg-surface);
+            box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+            animation: bellBadgePulse 2s infinite;
+        }
+        @keyframes bellBadgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.12); }
+        }
+        .notification-dropdown-panel {
+            position: absolute;
+            top: calc(100% + 12px);
+            inset-inline-end: 0;
+            width: 380px;
+            max-width: 90vw;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-card), 0 20px 40px rgba(0,0,0,0.25);
+            z-index: 100000;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: notifSlideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes notifSlideDown {
+            from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .notif-tab-btn {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .notif-tab-btn.active {
+            background: var(--bg-surface-subtle);
+            color: var(--brand-forest);
+            border-color: var(--border-color);
+        }
+        .notif-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+        .notif-item:hover {
+            background: var(--bg-surface-subtle);
+        }
+        .notif-item.unread {
+            background: rgba(79, 155, 95, 0.06);
+        }
+        .notif-item.unread:hover {
+            background: rgba(79, 155, 95, 0.12);
+        }
+        .notif-icon-box {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--bg-surface-subtle);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .notif-unread-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--brand-forest);
+            box-shadow: 0 0 6px var(--brand-forest);
+            flex-shrink: 0;
+            margin-top: 5px;
+        }
+
         /* ── Live Timer Strip ── */
         .live-timer-strip {
             background: linear-gradient(135deg, #E8EFE2, #FFFDF6);
@@ -1600,10 +1710,50 @@
                 <a href="javascript:void(0)" onclick="openInviteModal()" class="header-icon-btn" title="{{ __('Invite People') }}">
                     <span>👥</span>
                 </a>
-                <a href="javascript:void(0)" class="header-icon-btn" title="{{ __('Notifications') }}">
-                    <span>🔔</span>
-                    <span class="header-icon-badge">3</span>
-                </a>
+                <!-- Notification Center Bell & Live Dropdown -->
+                <div class="notification-dropdown-wrapper" id="notifWrapper">
+                    <a href="javascript:void(0)" onclick="toggleNotificationDropdown()" class="header-icon-btn notification-bell-btn" id="notifBellBtn" title="{{ __('Notifications') }}">
+                        <span>🔔</span>
+                        <span class="notification-badge-pulse" id="notifBadge" style="display: none;">0</span>
+                    </a>
+
+                    <!-- Dropdown Panel -->
+                    <div class="notification-dropdown-panel" id="notifDropdown">
+                        <!-- Dropdown Header -->
+                        <div style="padding: 14px 18px; background: var(--bg-surface-subtle); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 16px;">🔔</span>
+                                <strong style="font-size: 13px; color: var(--text-primary);">{{ __('Notifications') }}</strong>
+                                <span id="notifHeaderCount" class="badge-status badge-active" style="font-size: 10px; padding: 2px 8px; display: none;">0 new</span>
+                            </div>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <button type="button" onclick="markAllNotificationsAsRead()" style="background: none; border: none; font-size: 11px; font-weight: 800; color: var(--brand-forest); cursor: pointer;" title="{{ __('Mark all as read') }}">
+                                    ✓ {{ __('Mark read') }}
+                                </button>
+                                <button type="button" onclick="clearAllNotificationsFromServer()" style="background: none; border: none; font-size: 11px; font-weight: 800; color: var(--text-muted); cursor: pointer;" title="{{ __('Clear all') }}">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Filter Tabs -->
+                        <div style="padding: 8px 12px; border-bottom: 1px solid var(--border-color); display: flex; gap: 6px; background: var(--bg-surface);">
+                            <button type="button" class="notif-tab-btn active" onclick="filterNotifTab('all', this)">{{ __('All') }}</button>
+                            <button type="button" class="notif-tab-btn" onclick="filterNotifTab('task', this)">📋 {{ __('Tasks') }}</button>
+                            <button type="button" class="notif-tab-btn" onclick="filterNotifTab('meeting', this)">📅 {{ __('Meetings') }}</button>
+                            <button type="button" class="notif-tab-btn" onclick="filterNotifTab('spatial', this)">🚪 {{ __('Office') }}</button>
+                        </div>
+
+                        <!-- Notifications Scrollable Feed -->
+                        <div id="notifListContainer" style="max-height: 380px; overflow-y: auto; display: flex; flex-direction: column;">
+                            <div id="notifEmptyState" style="padding: 36px 18px; text-align: center; color: var(--text-muted);">
+                                <div style="font-size: 32px; margin-bottom: 8px;">🎉</div>
+                                <strong style="display: block; font-size: 13px; color: var(--text-primary); margin-bottom: 4px;">{{ __('All caught up!') }}</strong>
+                                <span style="font-size: 12px;">{{ __('No new notifications right now.') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <button onclick="toggleThemeMode()" class="header-icon-btn" title="{{ __('Toggle Dark / Light Mode') }}">
                     <span class="theme-toggle-icon-label">🌙</span>
                 </button>
@@ -6431,8 +6581,234 @@
                 setTimeout(() => {
                     if (toast.parentNode) toast.parentNode.removeChild(toast);
                 }, 300);
-            }, 3000);
+            }, 3500);
         }
+
+        /* ── Live Workplace Notification Center Client ── */
+        let currentNotifications = [];
+        let activeNotifFilter = 'all';
+        let previousUnreadCount = 0;
+        let isInitialNotifLoad = true;
+
+        function playNotificationChime() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const now = audioCtx.currentTime;
+                
+                const osc1 = audioCtx.createOscillator();
+                const gain1 = audioCtx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(587.33, now); // D5
+                osc1.frequency.exponentialRampToValueAtTime(880, now + 0.12); // A5
+                gain1.gain.setValueAtTime(0.08, now);
+                gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+                osc1.connect(gain1);
+                gain1.connect(audioCtx.destination);
+                osc1.start(now);
+                osc1.stop(now + 0.35);
+            } catch (e) {
+                // AudioContext not allowed before user gesture
+            }
+        }
+
+        function triggerDesktopNotification(notif) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                try {
+                    const n = new Notification(notif.title || 'Workplace Notification', {
+                        body: notif.body || '',
+                        icon: '/favicon.ico',
+                        badge: '/favicon.ico'
+                    });
+                    n.onclick = () => {
+                        window.focus();
+                        if (notif.action_url) window.location.href = notif.action_url;
+                    };
+                } catch (e) {
+                    console.log('Desktop notification error:', e);
+                }
+            }
+        }
+
+        async function fetchUserNotifications() {
+            try {
+                const res = await fetch('/api/notifications', {
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+                const unreadCount = data.unread_count || 0;
+                currentNotifications = data.notifications || [];
+
+                // Update UI badge
+                const badge = document.getElementById('notifBadge');
+                const headerCount = document.getElementById('notifHeaderCount');
+
+                if (badge) {
+                    if (unreadCount > 0) {
+                        badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+                        badge.style.display = 'flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+
+                if (headerCount) {
+                    if (unreadCount > 0) {
+                        headerCount.textContent = `${unreadCount} {{ __('new') }}`;
+                        headerCount.style.display = 'inline-flex';
+                    } else {
+                        headerCount.style.display = 'none';
+                    }
+                }
+
+                // If new notifications arrived after initial load
+                if (!isInitialNotifLoad && unreadCount > previousUnreadCount) {
+                    playNotificationChime();
+                    const newest = currentNotifications.find(n => !n.is_read) || currentNotifications[0];
+                    if (newest) {
+                        showToastNotification(`${newest.icon || '🔔'} <strong>${newest.title}</strong><br><small style="color: var(--text-muted);">${newest.body || ''}</small>`);
+                        triggerDesktopNotification(newest);
+                    }
+                }
+
+                previousUnreadCount = unreadCount;
+                isInitialNotifLoad = false;
+                renderNotificationsList();
+            } catch (err) {
+                // Silently handle polling errors
+            }
+        }
+
+        function toggleNotificationDropdown() {
+            const dropdown = document.getElementById('notifDropdown');
+            if (!dropdown) return;
+            const isOpen = dropdown.style.display === 'flex';
+            dropdown.style.display = isOpen ? 'none' : 'flex';
+
+            if (!isOpen) {
+                // Request desktop notification permission on user interaction
+                if ('Notification' in window && Notification.permission === 'default') {
+                    Notification.requestPermission();
+                }
+                renderNotificationsList();
+            }
+        }
+
+        function filterNotifTab(tab, btn) {
+            activeNotifFilter = tab;
+            document.querySelectorAll('.notif-tab-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderNotificationsList();
+        }
+
+        function renderNotificationsList() {
+            const container = document.getElementById('notifListContainer');
+            if (!container) return;
+
+            let filtered = currentNotifications;
+            if (activeNotifFilter === 'task') {
+                filtered = currentNotifications.filter(n => n.type.startsWith('task'));
+            } else if (activeNotifFilter === 'meeting') {
+                filtered = currentNotifications.filter(n => n.type.startsWith('meeting'));
+            } else if (activeNotifFilter === 'spatial') {
+                filtered = currentNotifications.filter(n => n.type === 'door_knock' || n.type === 'wave' || n.type.startsWith('room'));
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div style="padding: 36px 18px; text-align: center; color: var(--text-muted);">
+                        <div style="font-size: 32px; margin-bottom: 8px;">🎉</div>
+                        <strong style="display: block; font-size: 13px; color: var(--text-primary); margin-bottom: 4px;">{{ __('All caught up!') }}</strong>
+                        <span style="font-size: 12px;">{{ __('No notifications in this category.') }}</span>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            filtered.forEach(n => {
+                const item = document.createElement('div');
+                item.className = `notif-item ${n.is_read ? '' : 'unread'}`;
+                item.onclick = () => handleNotificationClick(n);
+
+                item.innerHTML = `
+                    <div class="notif-icon-box">${n.icon || '🔔'}</div>
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 2px;">
+                            <strong style="font-size: 12px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${n.title}</strong>
+                            <span style="font-size: 10px; color: var(--text-muted); flex-shrink: 0;">${n.created_at_human || ''}</span>
+                        </div>
+                        <p style="font-size: 11px; color: var(--text-secondary); margin: 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${n.body || ''}</p>
+                    </div>
+                    ${!n.is_read ? '<div class="notif-unread-dot"></div>' : ''}
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        async function handleNotificationClick(notif) {
+            if (!notif.is_read) {
+                try {
+                    await fetch(`/api/notifications/${notif.id}/read`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    });
+                    notif.is_read = true;
+                    fetchUserNotifications();
+                } catch (e) {}
+            }
+
+            if (notif.action_url) {
+                window.location.href = notif.action_url;
+            }
+        }
+
+        async function markAllNotificationsAsRead() {
+            try {
+                await fetch('/api/notifications/read-all', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                });
+                currentNotifications.forEach(n => n.is_read = true);
+                fetchUserNotifications();
+            } catch (e) {}
+        }
+
+        async function clearAllNotificationsFromServer() {
+            if (!confirm('{{ __("Clear all notifications?") }}')) return;
+            try {
+                await fetch('/api/notifications/clear', {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                });
+                currentNotifications = [];
+                fetchUserNotifications();
+            } catch (e) {}
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const wrapper = document.getElementById('notifWrapper');
+            const dropdown = document.getElementById('notifDropdown');
+            if (wrapper && dropdown && !wrapper.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        // Initialize notification polling
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchUserNotifications();
+            setInterval(fetchUserNotifications, 15000);
+        });
 
         function triggerCopySuccess(btn) {
             if (btn) {

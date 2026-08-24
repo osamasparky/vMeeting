@@ -41,6 +41,10 @@ class CreateTaskAction
                 'order' => $nextOrder,
             ]);
 
+            if (!empty($data['assignee_id'])) {
+                \App\Domains\Notifications\Services\NotificationService::notifyTaskAssigned($task, $data['assignee_id'], $creator);
+            }
+
             return $task->load(['project', 'assignee', 'reporter', 'phase', 'milestone', 'team', 'parentTask']);
         });
     }
