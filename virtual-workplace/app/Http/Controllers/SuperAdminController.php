@@ -954,6 +954,60 @@ class SuperAdminController extends Controller
     }
 
     /**
+     * Bulk save all visually drawn & renamed rooms to the default office template.
+     */
+    public function saveAllTemplateRooms(Request $request)
+    {
+        $template = \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+
+        $validated = $request->validate([
+            'rooms' => ['present', 'array'],
+            'rooms.*.name' => ['required', 'string', 'max:120'],
+            'rooms.*.type' => ['nullable', 'string', 'in:meeting,private,breakout,lounge,reception'],
+            'rooms.*.access_mode' => ['nullable', 'string', 'in:public,knock,locked'],
+            'rooms.*.capacity' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'rooms.*.color' => ['nullable', 'string', 'max:30'],
+            'rooms.*.bounds' => ['required', 'array'],
+            'rooms.*.bounds.x' => ['required', 'integer', 'min:0'],
+            'rooms.*.bounds.y' => ['required', 'integer', 'min:0'],
+            'rooms.*.bounds.width' => ['required', 'integer', 'min:1'],
+            'rooms.*.bounds.height' => ['required', 'integer', 'min:1'],
+            'rooms.*.metadata' => ['nullable', 'array'],
+        ]);
+
+        $roomsFormatted = [];
+        foreach ($validated['rooms'] as $r) {
+            $roomsFormatted[] = [
+                'name' => $r['name'],
+                'type' => $r['type'] ?? 'meeting',
+                'access_mode' => $r['access_mode'] ?? 'public',
+                'capacity' => (int) ($r['capacity'] ?? 8),
+                'color' => $r['color'] ?? '#3F7D4F',
+                'bounds' => [
+                    'x' => (int) ($r['bounds']['x'] ?? 0),
+                    'y' => (int) ($r['bounds']['y'] ?? 0),
+                    'width' => (int) ($r['bounds']['width'] ?? 10),
+                    'height' => (int) ($r['bounds']['height'] ?? 8),
+                ],
+                'metadata' => [
+                    'audio_isolation' => isset($r['metadata']['audio_isolation']) ? (bool) $r['metadata']['audio_isolation'] : true,
+                ],
+            ];
+        }
+
+        $template->update([
+            'rooms_data' => $roomsFormatted,
+            'created_by' => Auth::id(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('All default rooms updated and saved successfully!'),
+            'rooms' => $roomsFormatted,
+        ]);
+    }
+
+    /**
      * Upload custom blueprint background image for the system default office.
      */
     public function uploadTemplateBackground(Request $request)

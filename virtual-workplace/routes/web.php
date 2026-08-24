@@ -143,6 +143,7 @@ Route::prefix('superadmin')->middleware(['auth', 'superadmin'])->name('superadmi
     Route::get('/template', [\App\Http\Controllers\SuperAdminController::class, 'defaultTemplate'])->name('template');
     Route::post('/template', [\App\Http\Controllers\SuperAdminController::class, 'updateDefaultTemplate'])->name('template.update');
     Route::post('/template/room', [\App\Http\Controllers\SuperAdminController::class, 'saveTemplateRoom'])->name('template.room.save');
+    Route::post('/template/rooms/bulk', [\App\Http\Controllers\SuperAdminController::class, 'saveAllTemplateRooms'])->name('template.rooms.bulk');
     Route::delete('/template/room/{roomIndex}', [\App\Http\Controllers\SuperAdminController::class, 'deleteTemplateRoom'])->name('template.room.delete');
     Route::post('/template/background', [\App\Http\Controllers\SuperAdminController::class, 'uploadTemplateBackground'])->name('template.background');
     Route::post('/template/sync', [\App\Http\Controllers\SuperAdminController::class, 'syncTemplateToOrganizations'])->name('template.sync');
