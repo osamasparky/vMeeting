@@ -466,8 +466,21 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
         }
 
         case 'webrtc.signal': {
-          // Deprecated: WebRTC media plane migrated to LiveKit SFU.
-          console.log(`[WS] webrtc.signal received from ${conn.user.name} - media is managed via LiveKit SFU.`);
+          const user = conn.user;
+          const { targetUserId, signal } = event.payload || {};
+          if (targetUserId) {
+            const targetWs = presence.findUserSocket(targetUserId);
+            if (targetWs) {
+              presence.send(targetWs, {
+                type: 'webrtc.signal',
+                payload: {
+                  senderUserId: user.userId,
+                  senderName: user.name,
+                  signal,
+                },
+              });
+            }
+          }
           break;
         }
       }

@@ -442,7 +442,7 @@ class WebRTCManager {
             }
         });
 
-        let cleanHost = (livekitHost || '').trim();
+        let cleanHost = (livekitHost || '').trim().replace(/\/livekit\/?$/i, '').replace(/\/+$/, '');
         if (cleanHost && !cleanHost.startsWith('ws://') && !cleanHost.startsWith('wss://') && !cleanHost.startsWith('http://') && !cleanHost.startsWith('https://')) {
             cleanHost = `wss://${cleanHost}`;
         }

@@ -1429,9 +1429,12 @@
         const peerVideoCards = new Map(); // targetUserId -> HTMLDivElement
         const pendingIceCandidates = new Map(); // targetUserId -> Array of RTCIceCandidate
         let localMediaStream = null;
+        let localAudioStream = null;
         let screenStream = null;
         let micActive = false;
         let camActive = false;
+        let screenActive = false;
+        let currentLiveKitRoomId = null;
 
         const RTC_CONFIG = {
             iceServers: [
@@ -1768,32 +1771,29 @@
 
             updateRoomPresence();
 
-            // Smooth remote avatar interpolation & Dynamic Spatial Audio Isolation
+            // Smooth remote avatar interpolation & Dynamic Spatial Audio + Screen Share Isolation
             const localRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
 
             remoteAvatars.forEach(av => {
                 av.x += (av.targetX - av.x) * 0.25;
                 av.y += (av.targetY - av.y) * 0.25;
 
-                // Spatial Audio Isolation Engine
+                const remoteRoom = getCurrentRoom(av.x, av.y);
+                const isInSameRoom = localRoom ? (remoteRoom && remoteRoom.id === localRoom.id) : (!remoteRoom && Math.hypot(localAvatar.x - av.x, localAvatar.y - av.y) <= 250);
+
+                // 1. Spatial Audio Isolation Engine
                 const audioEl = peerAudioElements.get(av.id);
                 if (audioEl) {
-                    const remoteRoom = getCurrentRoom(av.x, av.y);
-
                     if (localRoom) {
                         // Inside Room: Only hear occupants in the SAME room
-                        if (!remoteRoom || remoteRoom.id !== localRoom.id) {
-                            audioEl.volume = 0;
-                        } else {
-                            audioEl.volume = 1.0;
-                        }
+                        audioEl.volume = (remoteRoom && remoteRoom.id === localRoom.id) ? 1.0 : 0;
                     } else {
-                        // In Open Area: Never hear occupants inside rooms; hear open area colleagues by distance
+                        // In Open Area: Never hear occupants inside closed rooms
                         if (remoteRoom) {
                             audioEl.volume = 0;
                         } else {
                             const dist = Math.hypot(localAvatar.x - av.x, localAvatar.y - av.y);
-                            const maxDist = 220;
+                            const maxDist = 250;
                             if (dist > maxDist) {
                                 audioEl.volume = 0;
                             } else {
@@ -1802,6 +1802,12 @@
                             }
                         }
                     }
+                }
+
+                // 2. Spatial Screen Share Card Visibility
+                const screenCard = peerVideoCards.get(av.id);
+                if (screenCard) {
+                    screenCard.style.display = isInSameRoom ? 'flex' : 'none';
                 }
             });
 
@@ -1943,7 +1949,21 @@
             ctx.fill();
 
             // 4. Live Camera Video OR User Profile Picture / Gradient Monogram
-            const isCamOn = isSelf ? camActive : (av.camActive && !!av.videoEl);
+            const lRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+            const rRoom = isSelf ? lRoom : getCurrentRoom(av.x, av.y);
+            let canSeeLiveCam = false;
+            if (isSelf) {
+                canSeeLiveCam = true;
+            } else if (lRoom) {
+                canSeeLiveCam = (rRoom && rRoom.id === lRoom.id);
+            } else {
+                if (!rRoom) {
+                    const dist = Math.hypot(localAvatar.x - av.x, localAvatar.y - av.y);
+                    canSeeLiveCam = (dist <= 280);
+                }
+            }
+
+            const isCamOn = isSelf ? (camActive && !!localMediaStream) : (av.camActive && !!av.videoEl && canSeeLiveCam);
             const videoEl = isSelf ? (document.getElementById('local-video-elem') || localAvatar.videoEl) : av.videoEl;
 
             ctx.save();
@@ -1952,9 +1972,15 @@
             else ctx.rect(x - radius, y - radius, cardSize, cardSize);
             ctx.clip();
 
-            if (isCamOn && videoEl && videoEl.readyState >= 2) {
+            if (isCamOn && videoEl && (videoEl.readyState >= 2 || videoEl.videoWidth > 0)) {
                 // Draw Live Video Stream directly inside the Canvas Profile Square!
-                ctx.drawImage(videoEl, x - radius, y - radius, cardSize, cardSize);
+                try {
+                    ctx.drawImage(videoEl, x - radius, y - radius, cardSize, cardSize);
+                } catch(e) {
+                    if (av.avatarImg && av.avatarImg.complete && av.avatarImg.naturalWidth > 0) {
+                        ctx.drawImage(av.avatarImg, x - radius, y - radius, cardSize, cardSize);
+                    }
+                }
             } else if (av.avatarImg && av.avatarImg.complete && av.avatarImg.naturalWidth > 0) {
                 // Draw User Profile Picture
                 ctx.drawImage(av.avatarImg, x - radius, y - radius, cardSize, cardSize);
@@ -2229,9 +2255,12 @@
                                         isSpeaking: false,
                                         gender: occ.gender || 'male'
                                     });
+                                    createPeerConnection(occ.userId);
+                                    initiatePeerOffer(occ.userId);
                                 }
                             });
                             updateOccupantsCounter();
+                            syncLiveKitRoom(localAvatar.currentRoomId);
                         }
 
                         // 2. User joined the map
@@ -2263,6 +2292,7 @@
                                 });
                                 showToast(`👋 ${u.name} {{ __("joined the office") }}`);
                                 updateOccupantsCounter();
+                                createPeerConnection(u.userId);
                             }
                         }
 
@@ -2414,6 +2444,7 @@
 
                         // 11. Presentation started/stopped
                         else if (data.type === 'presentation.started' && data.payload) {
+                            if (data.payload.presenterId) activeScreenSharers.add(data.payload.presenterId);
                             showToast(`🖥️ ${data.payload.presenterName || 'Colleague'} {{ __("started screen presentation") }}`);
                             const btn = document.getElementById('btn-chat-focus-screen');
                             if (btn) btn.style.display = 'inline-flex';
@@ -2421,6 +2452,7 @@
                         else if (data.type === 'presentation.stopped' || data.type === 'presentation.stop') {
                             const pId = data.payload?.presenterId;
                             if (pId) {
+                                activeScreenSharers.delete(pId);
                                 const card = peerVideoCards.get(pId);
                                 if (card) {
                                     card.remove();
@@ -2467,56 +2499,6 @@
             });
         }
 
-        function updateOccupantsCounter() {
-            const total = 1 + remoteAvatars.size;
-            const counterEl = document.getElementById('occupants-counter');
-            if (counterEl) {
-                counterEl.textContent = `${total} {{ __("Online") }}`;
-            }
-        }
-
-        function openOccupantsModal() {
-            const modal = document.getElementById('occupants-modal');
-            const list = document.getElementById('occupants-list');
-            if (!modal || !list) return;
-
-            const occupants = [
-                {
-                    id: localAvatar.id,
-                    name: `${localAvatar.name} ({{ __("You") }})`,
-                    gender: userGender,
-                    isGuest: localAvatar.isGuest,
-                    isSelf: true
-                },
-                ...Array.from(remoteAvatars.values())
-            ];
-
-            list.innerHTML = occupants.map(occ => {
-                const initials = (occ.name || 'U').substring(0, 2).toUpperCase();
-                return `
-                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 12px;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="width: 32px; height: 32px; border-radius: 50%; background: ${occ.isSelf ? 'var(--brand-primary)' : 'var(--brand-accent)'}; color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800;">
-                                ${initials}
-                            </div>
-                            <div>
-                                <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);">${escapeHtml(occ.name)}</div>
-                                <div style="font-size: 11px; color: var(--text-muted);">${occ.isGuest ? '🔗 {{ __("Guest Access") }}' : '🏢 {{ __("Team Member") }}'} • ${occ.gender === 'female' ? '👩 Female' : '👨 Male'}</div>
-                            </div>
-                        </div>
-                        <span class="live-dot" style="width: 8px; height: 8px;" title="Online"></span>
-                    </div>
-                `;
-            }).join('');
-
-            modal.style.display = 'flex';
-        }
-
-        function closeOccupantsModal() {
-            const modal = document.getElementById('occupants-modal');
-            if (modal) modal.style.display = 'none';
-        }
-
         function respondToKnock(approved) {
             document.getElementById('knock-alert-modal').style.display = 'none';
             if (pendingKnock && ws && ws.readyState === WebSocket.OPEN) {
@@ -2536,8 +2518,291 @@
             pendingKnock = null;
         }
 
-        // ── LiveKit SFU Media Engine & Room Synchronization ──
-        let currentLiveKitRoomId = null;
+        // ── Hybrid WebRTC & LiveKit SFU Media Engine ──
+        function getIceServersList() {
+            return [
+                { urls: 'stun:stun.l.google.com:19302' },
+                { urls: 'stun:stun1.l.google.com:19302' },
+                { urls: 'stun:stun2.l.google.com:19302' },
+                { urls: 'stun:173.212.248.192:3478' }
+            ];
+        }
+
+        function createPeerConnection(userId) {
+            if (peerConnections.has(userId)) {
+                return peerConnections.get(userId);
+            }
+
+            const pc = new RTCPeerConnection({ iceServers: getIceServersList() });
+            pc._pendingIceCandidates = [];
+            peerConnections.set(userId, pc);
+
+            pc.onicecandidate = (event) => {
+                if (event.candidate && ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({
+                        type: 'webrtc.signal',
+                        payload: {
+                            targetUserId: userId,
+                            signal: { candidate: event.candidate }
+                        }
+                    }));
+                }
+            };
+
+            pc.ontrack = (event) => {
+                const stream = event.streams[0] || new MediaStream([event.track]);
+                handleRemoteStream(userId, stream, event.track);
+            };
+
+            // Attach current active local tracks
+            if (localMediaStream && camActive) {
+                localMediaStream.getTracks().forEach(t => {
+                    try { pc.addTrack(t, localMediaStream); } catch(e) {}
+                });
+            }
+            if (localAudioStream && micActive) {
+                localAudioStream.getTracks().forEach(t => {
+                    try { pc.addTrack(t, localAudioStream); } catch(e) {}
+                });
+            }
+            if (screenStream && screenActive) {
+                screenStream.getTracks().forEach(t => {
+                    try { pc.addTrack(t, screenStream); } catch(e) {}
+                });
+            }
+
+            return pc;
+        }
+
+        async function initiatePeerOffer(userId) {
+            const pc = peerConnections.get(userId) || createPeerConnection(userId);
+            try {
+                const offer = await pc.createOffer();
+                await pc.setLocalDescription(offer);
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({
+                        type: 'webrtc.signal',
+                        payload: {
+                            targetUserId: userId,
+                            signal: { type: 'offer', sdp: offer.sdp }
+                        }
+                    }));
+                }
+            } catch(e) {
+                console.warn('[WebRTC P2P] initiatePeerOffer error:', e);
+            }
+        }
+
+        async function handleIncomingWebRTCSignal(payload) {
+            const { senderUserId, signal } = payload;
+            if (!senderUserId || !signal) return;
+
+            let pc = peerConnections.get(senderUserId);
+            if (!pc) {
+                pc = createPeerConnection(senderUserId);
+            }
+
+            try {
+                if (signal.type === 'offer' && signal.sdp) {
+                    await pc.setRemoteDescription(new RTCSessionDescription({ type: 'offer', sdp: signal.sdp }));
+                    
+                    if (pc._pendingIceCandidates && pc._pendingIceCandidates.length > 0) {
+                        for (const cand of pc._pendingIceCandidates) {
+                            try { await pc.addIceCandidate(new RTCIceCandidate(cand)); } catch(e) {}
+                        }
+                        pc._pendingIceCandidates = [];
+                    }
+
+                    const answer = await pc.createAnswer();
+                    await pc.setLocalDescription(answer);
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({
+                            type: 'webrtc.signal',
+                            payload: {
+                                targetUserId: senderUserId,
+                                signal: { type: 'answer', sdp: answer.sdp }
+                            }
+                        }));
+                    }
+                } else if (signal.type === 'answer' && signal.sdp) {
+                    await pc.setRemoteDescription(new RTCSessionDescription({ type: 'answer', sdp: signal.sdp }));
+                    if (pc._pendingIceCandidates && pc._pendingIceCandidates.length > 0) {
+                        for (const cand of pc._pendingIceCandidates) {
+                            try { await pc.addIceCandidate(new RTCIceCandidate(cand)); } catch(e) {}
+                        }
+                        pc._pendingIceCandidates = [];
+                    }
+                } else if (signal.candidate) {
+                    if (pc.remoteDescription && pc.remoteDescription.type) {
+                        try {
+                            await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
+                        } catch(e) {}
+                    } else {
+                        pc._pendingIceCandidates = pc._pendingIceCandidates || [];
+                        pc._pendingIceCandidates.push(signal.candidate);
+                    }
+                }
+            } catch(err) {
+                console.warn('[WebRTC P2P] Signal handle error:', err);
+            }
+        }
+
+        function closePeerConnection(userId) {
+            const pc = peerConnections.get(userId);
+            if (pc) {
+                try { pc.close(); } catch(e) {}
+                peerConnections.delete(userId);
+            }
+            const card = peerVideoCards.get(userId);
+            if (card) {
+                card.remove();
+                peerVideoCards.delete(userId);
+            }
+            const audio = peerAudioElements.get(userId);
+            if (audio) {
+                audio.remove();
+                peerAudioElements.delete(userId);
+            }
+            const av = remoteAvatars.get(userId);
+            if (av) {
+                av.videoEl = null;
+                av.camActive = false;
+                av.isSpeaking = false;
+            }
+            updateGalleryGrid();
+        }
+
+        let activeScreenSharers = new Set();
+
+        function handleRemoteStream(userId, stream, track) {
+            console.log(`[Media Stream] Received track ${track.kind} (${track.label}) from ${userId}`);
+            const av = remoteAvatars.get(userId);
+
+            if (track.kind === 'audio') {
+                let audioEl = peerAudioElements.get(userId);
+                if (!audioEl) {
+                    audioEl = document.createElement('audio');
+                    audioEl.id = `peer-audio-${userId}`;
+                    audioEl.autoplay = true;
+                    document.body.appendChild(audioEl);
+                    peerAudioElements.set(userId, audioEl);
+                }
+                audioEl.srcObject = stream;
+                audioEl.play().catch(()=>{});
+            } else if (track.kind === 'video') {
+                const trackLabel = (track.label || '').toLowerCase();
+                const isScreenTrack = trackLabel.includes('screen') || trackLabel.includes('display') || trackLabel.includes('window') || activeScreenSharers.has(userId);
+
+                if (isScreenTrack) {
+                    let videoCard = peerVideoCards.get(userId);
+                    let videoEl = null;
+
+                    if (!videoCard) {
+                        videoCard = document.createElement('div');
+                        videoCard.id = `peer-video-${userId}`;
+                        videoCard.className = 'video-card size-medium';
+                        const presenterName = (av && av.name) ? av.name : 'Colleague';
+                        videoCard.innerHTML = `
+                            <div class="video-card-topbar">
+                                <div class="video-card-title">
+                                    <span class="live-dot"></span>
+                                    <span class="user-title">🖥️ ${presenterName} ({{ __('Screen Share') }})</span>
+                                </div>
+                                <div class="video-card-actions">
+                                    <button class="v-btn" id="vbtn-sm-${userId}" onclick="resizeVideoCard('${userId}', 'small')" title="{{ __('Small View (عرض صغير)') }}">📱</button>
+                                    <button class="v-btn active" id="vbtn-med-${userId}" onclick="resizeVideoCard('${userId}', 'medium')" title="{{ __('Medium View (عرض متوسط)') }}">💻</button>
+                                    <button class="v-btn" id="vbtn-lg-${userId}" onclick="resizeVideoCard('${userId}', 'large')" title="{{ __('Theater / Large (عرض كبير)') }}">📺</button>
+                                    <button class="v-btn" onclick="toggleFullscreenVideo('${userId}')" title="{{ __('Full Screen (شاشة كاملة)') }}">⛶</button>
+                                    <button class="v-btn" onclick="togglePipVideo('${userId}')" title="{{ __('Picture in Picture') }}">🗖</button>
+                                    <button class="v-btn" onclick="toggleCollapseVideo('${userId}')" title="{{ __('Minimize (تصغير)') }}">➖</button>
+                                </div>
+                            </div>
+                            <div class="video-wrapper"></div>
+                        `;
+                        const wrapper = videoCard.querySelector('.video-wrapper');
+                        videoEl = document.createElement('video');
+                        videoEl.autoplay = true;
+                        videoEl.playsInline = true;
+                        videoEl.srcObject = stream;
+                        wrapper.appendChild(videoEl);
+                        document.getElementById('video-grid').appendChild(videoCard);
+                        peerVideoCards.set(userId, videoCard);
+
+                        const chatBtn = document.getElementById('btn-chat-focus-screen');
+                        if (chatBtn) chatBtn.style.display = 'inline-flex';
+                    } else {
+                        const wrapper = videoCard.querySelector('.video-wrapper');
+                        videoEl = wrapper.querySelector('video');
+                        if (!videoEl) {
+                            videoEl = document.createElement('video');
+                            videoEl.autoplay = true;
+                            videoEl.playsInline = true;
+                            wrapper.appendChild(videoEl);
+                        }
+                        videoEl.srcObject = stream;
+                    }
+                    videoEl.play().catch(()=>{});
+                } else {
+                    let camVideoEl = av?.videoEl;
+                    if (!camVideoEl) {
+                        camVideoEl = document.createElement('video');
+                        camVideoEl.autoplay = true;
+                        camVideoEl.playsInline = true;
+                        camVideoEl.muted = true;
+                    }
+                    camVideoEl.srcObject = stream;
+                    camVideoEl.play().catch(()=>{});
+                    if (av) {
+                        av.videoEl = camVideoEl;
+                        av.camActive = true;
+                    }
+                }
+                updateGalleryGrid();
+            }
+        }
+
+        async function syncTracksToPeerConnections() {
+            for (const [userId, pc] of peerConnections.entries()) {
+                const senders = pc.getSenders();
+
+                // Video track
+                const videoTrack = (localMediaStream && camActive) ? localMediaStream.getVideoTracks()[0] : null;
+                const videoSender = senders.find(s => s.track && s.track.kind === 'video');
+                if (videoTrack) {
+                    if (videoSender) {
+                        try { await videoSender.replaceTrack(videoTrack); } catch(e) {}
+                    } else {
+                        try { pc.addTrack(videoTrack, localMediaStream); } catch(e) {}
+                    }
+                } else if (videoSender) {
+                    try { pc.removeTrack(videoSender); } catch(e) {}
+                }
+
+                // Audio track
+                const audioTrack = (localAudioStream && micActive) ? localAudioStream.getAudioTracks()[0] : null;
+                const audioSender = senders.find(s => s.track && s.track.kind === 'audio');
+                if (audioTrack) {
+                    if (audioSender) {
+                        try { await audioSender.replaceTrack(audioTrack); } catch(e) {}
+                    } else {
+                        try { pc.addTrack(audioTrack, localAudioStream); } catch(e) {}
+                    }
+                } else if (audioSender) {
+                    try { pc.removeTrack(audioSender); } catch(e) {}
+                }
+
+                // Screen track
+                if (screenStream && screenActive) {
+                    const screenTrack = screenStream.getVideoTracks()[0];
+                    if (screenTrack && !senders.some(s => s.track === screenTrack)) {
+                        try { pc.addTrack(screenTrack, screenStream); } catch(e) {}
+                    }
+                }
+
+                // Trigger renegotiation offer to remote peer
+                await initiatePeerOffer(userId);
+            }
+        }
 
         async function syncLiveKitRoom(roomId) {
             const targetRoomId = roomId || (CONFIG.map?.rooms && CONFIG.map.rooms[0] ? CONFIG.map.rooms[0].id : null);
@@ -2575,7 +2840,7 @@
                 if (screenActive && window.VWorkWebRTC) await window.VWorkWebRTC.setScreenShareEnabled(true).catch(()=>{});
 
             } catch (err) {
-                console.warn('[LiveKit SFU] Join error:', err);
+                console.warn('[LiveKit SFU] Join error (Fallback to P2P):', err);
             }
         }
 
@@ -2762,27 +3027,44 @@
             }
         }
 
-        // ── Camera, Microphone & Screen Media Controls via LiveKit SFU ──
-        let screenActive = false;
-
+        // ── Camera, Microphone & Screen Media Controls ──
         async function toggleMicrophone() {
             try {
                 micActive = !micActive;
                 localAvatar.micActive = micActive;
 
-                if (window.VWorkWebRTC && window.VWorkWebRTC.livekitRoom) {
-                    try {
-                        await window.VWorkWebRTC.setMicrophoneEnabled(micActive);
-                    } catch(sfuErr) {
-                        console.warn('[LiveKit SFU] setMicrophoneEnabled warning:', sfuErr);
+                if (micActive) {
+                    if (!localAudioStream) {
+                        try {
+                            localAudioStream = await navigator.mediaDevices.getUserMedia({
+                                audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+                                video: false
+                            });
+                        } catch(e) {
+                            console.warn('[Audio] getUserMedia error:', e);
+                        }
                     }
+                    if (window.VWorkWebRTC && window.VWorkWebRTC.livekitRoom) {
+                        await window.VWorkWebRTC.setMicrophoneEnabled(true).catch(()=>{});
+                    }
+                    showToast('🎙️ {{ __("Microphone active") }}');
+                } else {
+                    if (localAudioStream) {
+                        localAudioStream.getAudioTracks().forEach(t => t.stop());
+                        localAudioStream = null;
+                    }
+                    if (window.VWorkWebRTC && window.VWorkWebRTC.livekitRoom) {
+                        await window.VWorkWebRTC.setMicrophoneEnabled(false).catch(()=>{});
+                    }
+                    showToast('🔇 {{ __("Microphone muted") }}');
                 }
+
+                await syncTracksToPeerConnections();
 
                 if (ws && ws.readyState === WebSocket.OPEN) {
                     ws.send(JSON.stringify({ type: 'media.state', payload: { camActive: camActive, micActive: micActive } }));
                 }
-
-                showToast(micActive ? '🎙️ {{ __("Microphone active") }}' : '🔇 {{ __("Microphone muted") }}');
+                updateGalleryGrid();
             } catch(e) {
                 console.error('[Audio] error:', e);
                 micActive = false;
@@ -2800,6 +3082,7 @@
         async function toggleCamera() {
             try {
                 camActive = !camActive;
+                localAvatar.camActive = camActive;
                 const videoElem = document.getElementById('local-video-elem');
                 const card = document.getElementById('local-video-card');
 
@@ -2819,7 +3102,6 @@
                         videoElem.play().catch(()=>{});
                     }
                     if (card) card.style.display = 'flex';
-                    localAvatar.camActive = true;
                     if (localMediaStream) {
                         localAvatar.videoEl = videoElem;
                     }
@@ -2839,7 +3121,6 @@
                     }
                     if (videoElem) videoElem.srcObject = null;
                     if (card) card.style.display = 'none';
-                    localAvatar.camActive = false;
                     localAvatar.videoEl = null;
 
                     if (window.VWorkWebRTC && window.VWorkWebRTC.livekitRoom) {
@@ -2850,9 +3131,12 @@
                     showToast('📷 {{ __("Camera turned off") }}');
                 }
 
+                await syncTracksToPeerConnections();
+
                 if (ws && ws.readyState === WebSocket.OPEN) {
                     ws.send(JSON.stringify({ type: 'media.state', payload: { camActive: camActive, micActive: micActive } }));
                 }
+                updateGalleryGrid();
             } catch(e) {
                 console.error('[Video] error:', e);
                 camActive = false;
@@ -2881,12 +3165,18 @@
                             console.warn('[LiveKit SFU] setScreenShareEnabled notice:', sfuErr);
                         }
                     }
-                    if (!shareStarted) {
-                        screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
-                        screenStream.getVideoTracks()[0].onended = () => {
-                            if (screenActive) toggleScreenShare();
-                        };
+                    if (!shareStarted || !screenStream) {
+                        try {
+                            screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+                            screenStream.getVideoTracks()[0].onended = () => {
+                                if (screenActive) toggleScreenShare();
+                            };
+                        } catch(err) {
+                            console.warn('[ScreenShare] getDisplayMedia error:', err);
+                        }
                     }
+
+                    await syncTracksToPeerConnections();
 
                     const btn = document.getElementById('btn-screen');
                     const text = document.getElementById('screen-text');
@@ -2904,6 +3194,7 @@
                         screenStream.getTracks().forEach(t => t.stop());
                         screenStream = null;
                     }
+                    await syncTracksToPeerConnections();
                     const btn = document.getElementById('btn-screen');
                     const text = document.getElementById('screen-text');
                     btn.classList.remove('active');
@@ -3697,13 +3988,20 @@
 
             if (spotlightTimerInterval) clearInterval(spotlightTimerInterval);
 
-            // Set Video Stream
+            // Set Video Stream (enforcing spatial/room privacy)
             let targetStream = null;
             if (isSelf && camActive && localMediaStream) {
                 targetStream = localMediaStream;
             } else if (!isSelf) {
-                const rVideo = peerVideoCards.get(userId);
-                if (rVideo && rVideo.srcObject) targetStream = rVideo.srcObject;
+                const av = remoteAvatars.get(userId);
+                const lRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+                const rRoom = av ? getCurrentRoom(av.x, av.y) : null;
+                const canSee = lRoom ? (rRoom && rRoom.id === lRoom.id) : (!rRoom && av && Math.hypot(localAvatar.x - av.x, localAvatar.y - av.y) <= 300);
+
+                if (canSee) {
+                    const vidEl = av?.videoEl || peerVideoCards.get(userId)?.querySelector('video');
+                    if (vidEl && vidEl.srcObject) targetStream = vidEl.srcObject;
+                }
             }
 
             if (targetStream) {
@@ -3829,6 +4127,8 @@
 
             grid.innerHTML = '';
 
+            const localRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+
             // Local user card
             const selfCard = document.createElement('div');
             selfCard.style.cssText = 'position: relative; height: 200px; background: #08120D; border-radius: 14px; overflow: hidden; border: 2px solid var(--brand-primary); display: flex; align-items: center; justify-content: center; cursor: pointer;';
@@ -3857,17 +4157,39 @@
                 const rCard = document.createElement('div');
                 rCard.style.cssText = 'position: relative; height: 200px; background: #0F172A; border-radius: 14px; overflow: hidden; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; cursor: pointer;';
                 
+                const remoteRoom = getCurrentRoom(av.x, av.y);
+                let canViewRemoteVideo = false;
+                if (localRoom) {
+                    // Inside a room: only see colleagues in the same room
+                    canViewRemoteVideo = (remoteRoom && remoteRoom.id === localRoom.id);
+                } else {
+                    // On open floor: only see colleagues on open floor within proximity
+                    if (!remoteRoom) {
+                        const dist = Math.hypot(localAvatar.x - av.x, localAvatar.y - av.y);
+                        canViewRemoteVideo = (dist <= 300);
+                    }
+                }
+
                 const vidEl = av.videoEl || peerVideoCards.get(av.id)?.querySelector('video');
-                if (vidEl && vidEl.srcObject) {
+                if (canViewRemoteVideo && vidEl && vidEl.srcObject) {
                     const cloneVid = document.createElement('video');
                     cloneVid.autoplay = true;
                     cloneVid.playsInline = true;
                     cloneVid.srcObject = vidEl.srcObject;
                     cloneVid.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
                     rCard.appendChild(cloneVid);
+                    cloneVid.play().catch(()=>{});
                 } else {
                     const init = (av.name || 'User').substring(0, 2).toUpperCase();
-                    rCard.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; gap:8px;"><div style="width:52px;height:52px;border-radius:50%;background:rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#93C5FD;">${init}</div><span style="font-size:11px;color:var(--text-muted);">${av.camActive ? '🟢 {{ __("Camera Active") }}' : '{{ __("Camera Off") }}'}</span></div>`;
+                    let statusHtml = '';
+                    if (remoteRoom && (!localRoom || localRoom.id !== remoteRoom.id)) {
+                        statusHtml = `<span style="font-size:11px; color:#FCA5A5; font-weight:700;">🔒 {{ __("In Private Room:") }} ${remoteRoom.name.split(' - ')[0]}</span>`;
+                    } else if (av.camActive && !canViewRemoteVideo) {
+                        statusHtml = `<span style="font-size:11px; color:var(--text-muted);">🏢 {{ __("Out of visual range") }}</span>`;
+                    } else {
+                        statusHtml = `<span style="font-size:11px; color:var(--text-muted);">${av.camActive ? '🟢 {{ __("Camera Active") }}' : '{{ __("Camera Off") }}'}</span>`;
+                    }
+                    rCard.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; padding:10px;"><div style="width:52px;height:52px;border-radius:50%;background:rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#93C5FD;">${init}</div>${statusHtml}</div>`;
                 }
                 const rLabel = document.createElement('div');
                 rLabel.style.cssText = 'position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; color: #FFFFFF;';
