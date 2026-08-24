@@ -1167,32 +1167,24 @@ class WebAuthController extends Controller
             'is_guest' => true,
         ];
 
-        $targetRoom = $map->rooms->where('id', $room->id)->first() ?? $map->rooms->first() ?? $room;
+        $tileSize = $map->tile_size ?: 16;
+        $targetRoom = $map->rooms->where('id', $room->id)->first() ?? $room ?? $map->rooms->first();
 
-        $initialSpawn = [
-            'x' => ($targetRoom->bounds['x'] + $targetRoom->bounds['width'] / 2) * 32,
-            'y' => ($targetRoom->bounds['y'] + $targetRoom->bounds['height'] / 2) * 32,
-        ];
+        $initialSpawn = null;
+        if ($targetRoom && !empty($targetRoom->bounds)) {
+            $initialSpawn = [
+                'x' => round(($targetRoom->bounds['x'] + ($targetRoom->bounds['width'] / 2)) * $tileSize),
+                'y' => round(($targetRoom->bounds['y'] + ($targetRoom->bounds['height'] / 2)) * $tileSize),
+            ];
+        } else {
+            $initialSpawn = [
+                'x' => 320,
+                'y' => 240,
+            ];
+        }
 
         $allOffices = $organization->offices()->with(['rooms', 'activeMap'])->get();
         $userAllowedOffices = $allOffices;
-
-        // Check if host has an active attendance session in a specific room/floor
-        $hostUserId = $invitation->invited_by ?: $invitation->host?->id;
-        if ($hostUserId) {
-            $hostSession = \App\Domains\People\Models\AttendanceSession::where('user_id', $hostUserId)
-                ->whereNull('ended_at')
-                ->latest('last_heartbeat_at')
-                ->first();
-            if ($hostSession && $hostSession->room_id) {
-                $hostRoom = \App\Domains\Workspace\Models\Room::with('map.floor')->find($hostSession->room_id);
-                if ($hostRoom && $hostRoom->map && $hostRoom->map->floor) {
-                    $targetRoom = $hostRoom;
-                    $floor = $hostRoom->map->floor;
-                    $map = $hostRoom->map;
-                }
-            }
-        }
 
         return view('office', compact('user', 'invitation', 'organization', 'floor', 'map', 'room', 'allOffices', 'userAllowedOffices', 'realtimeToken', 'wsUrl', 'initialSpawn'));
     }

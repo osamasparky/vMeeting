@@ -1400,8 +1400,24 @@
         const guestAllowedRoomId = @json(isset($invitation) ? ($invitation->room_id ?: ($room->id ?? null)) : null);
         const userGender = @json($user->gender ?? $user->profile?->gender ?? 'male');
         const spawnPos = @json($initialSpawn ?? null);
-        const defaultX = isGuest ? 310 : 250;
-        const defaultY = isGuest ? 220 : 200;
+
+        let defaultX = 250;
+        let defaultY = 200;
+
+        if (isGuest && guestAllowedRoomId) {
+            const guestRoomObj = rooms.find(r => r.id === guestAllowedRoomId);
+            if (guestRoomObj && guestRoomObj.bounds) {
+                defaultX = Math.round((guestRoomObj.bounds.x + (guestRoomObj.bounds.width / 2)) * TILE_SIZE);
+                defaultY = Math.round((guestRoomObj.bounds.y + (guestRoomObj.bounds.height / 2)) * TILE_SIZE);
+            } else if (spawnPos && spawnPos.x && spawnPos.y) {
+                defaultX = spawnPos.x;
+                defaultY = spawnPos.y;
+            }
+        } else if (spawnPos && spawnPos.x && spawnPos.y) {
+            defaultX = spawnPos.x;
+            defaultY = spawnPos.y;
+        }
+
         const localAvatar = {
             id: String(CONFIG.currentUser?.id || 'usr_1'),
             name: CONFIG.currentUser?.name || 'User',
@@ -1409,10 +1425,10 @@
             avatarImg: localAvatarImg,
             jobTitle: CONFIG.currentUser?.profile?.job_title || 'Team Member',
             isGuest: isGuest,
-            x: (spawnPos && spawnPos.x) ? spawnPos.x : defaultX,
-            y: (spawnPos && spawnPos.y) ? spawnPos.y : defaultY,
-            targetX: (spawnPos && spawnPos.x) ? spawnPos.x : defaultX,
-            targetY: (spawnPos && spawnPos.y) ? spawnPos.y : defaultY,
+            x: defaultX,
+            y: defaultY,
+            targetX: defaultX,
+            targetY: defaultY,
             speed: 5.0,
             radius: 26,
             micActive: false,
