@@ -941,6 +941,17 @@
     "Some workplace resources exceed your current plan limits. Please upgrade below.": "بعض موارد مساحة العمل تتجاوز الحدود المسموحة لباقتك الحالية. يُرجى الترقية أدناه.",
     "You have reached the maximum team member capacity (:limit seats) for your subscription plan. Please upgrade your plan to add more team members.": "لقد وصلت إلى الحد الأقصى لسعة أعضاء الفريق (:limit مقاعد) لباقتك الحالية. يُرجى ترقية الباقة لإضافة المزيد من الأعضاء.",
     "You have reached your plan limit of active guest links (:limit). Please upgrade your subscription plan to create more guest links.": "لقد وصلت إلى الحد الأقصى لروابط الضيوف النشطة (:limit روابط) لباقتك. يُرجى ترقية الباقة لإنشاء المزيد من الروابط.",
-    "Your subscription plan allows a maximum of :limit rooms. Please upgrade your subscription plan to save :count rooms.": "باقتك الحالية تسمح بحد أقصى :limit غرف. يُرجى ترقية الباقة لحفظ :count غرف."
+    "Your subscription plan allows a maximum of :limit rooms. Please upgrade your subscription plan to save :count rooms.": "باقتك الحالية تسمح بحد أقصى :limit غرف. يُرجى ترقية الباقة لحفظ :count غرف.",
+    "Subscription Plan Office Blueprints (تصميم قوالب المكاتب لكل باقة)": "تصميم قوالب المكاتب لكل باقة",
+    "Configure and design dedicated default office floorplans and rooms for each subscription plan tier.": "تصميم وتهيئة مخططات المكاتب والغرف الافتراضية المخصصة لكل باقة اشتراك.",
+    "Sync Office to Companies": "مزامنة المكتب للشركات",
+    "Save Rooms for :plan": "حفظ غرف باقة :plan",
+    "Sync Office Template to Companies": "مزامنة قالب المكتب مع الشركات",
+    "Synchronize the office blueprint floorplan and the configured default rooms for :plan tier.": "مزامنة مخطط المكتب والغرف النموذجية المجهزة لباقة :plan.",
+    "Target Organizations (الشركات المستهدفة بالمزامنة)": "الشركات المستهدفة بالمزامنة",
+    "Only companies subscribed to :plan (:count companies)": "الشركات المشتركة في باقة :plan فقط (:count شركة)",
+    "All registered companies (:count companies)": "كافة الشركات المسجلة بالكامل (:count شركة)",
+    "Tier": "باقة",
+    "Office Template synchronized across :count organizations successfully.": "تمت مزامنة قالب المكتب بنجاح عبر :count شركة."
 }
 

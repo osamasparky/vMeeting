@@ -29,8 +29,8 @@ class BlueprintOfficeSeeder extends Seeder
      */
     public function seedOrganizationOffice(Organization $organization): void
     {
-        // 1. Get or initialize the SuperAdmin default template
-        $template = OfficeTemplate::getDefault();
+        // 1. Get or initialize the SuperAdmin template tailored to organization's plan
+        $template = OfficeTemplate::getForPlan($organization->plan);
 
         // 2. Ensure Floor
         $floor = Floor::where('organization_id', $organization->id)->first();

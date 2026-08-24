@@ -842,12 +842,19 @@ class SuperAdminController extends Controller
      * Default Office Template & Rooms Designer (SuperAdmin).
      */
     public function defaultTemplate()
+    public function defaultTemplate(Request $request)
     {
         $user = Auth::user();
-        $template = \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
-        $totalCompanies = Organization::count();
+        $allPlans = \App\Domains\Tenancy\Models\Plan::where('is_active', true)->orderBy('price', 'asc')->get();
+        
+        $selectedPlanSlug = $request->query('plan', 'free');
+        $selectedPlan = $allPlans->firstWhere('slug', $selectedPlanSlug) ?: $allPlans->first();
 
-        return view('superadmin.default_template', compact('user', 'template', 'totalCompanies'));
+        $template = \App\Domains\Workspace\Models\OfficeTemplate::getForPlan($selectedPlan);
+        $totalCompanies = Organization::count();
+        $planCompaniesCount = $selectedPlan ? Organization::where('plan_id', $selectedPlan->id)->count() : 0;
+
+        return view('superadmin.default_template', compact('user', 'template', 'allPlans', 'selectedPlan', 'totalCompanies', 'planCompaniesCount'));
     }
 
     /**
@@ -855,9 +862,12 @@ class SuperAdminController extends Controller
      */
     public function updateDefaultTemplate(Request $request)
     {
-        $template = \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+        $template = $request->filled('template_id')
+            ? \App\Domains\Workspace\Models\OfficeTemplate::findOrFail($request->input('template_id'))
+            : \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
 
         $validated = $request->validate([
+            'template_id' => ['nullable', 'uuid'],
             'name' => ['required', 'string', 'max:150'],
             'description' => ['nullable', 'string', 'max:500'],
             'background_image_url' => ['nullable', 'string', 'max:500'],
@@ -882,7 +892,7 @@ class SuperAdminController extends Controller
             'created_by' => Auth::id(),
         ]);
 
-        return back()->with('success', __('Default Office Template blueprint settings updated successfully.'));
+        return back()->with('success', __('Office Template blueprint settings updated successfully.'));
     }
 
     /**
@@ -890,9 +900,12 @@ class SuperAdminController extends Controller
      */
     public function saveTemplateRoom(Request $request)
     {
-        $template = \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+        $template = $request->filled('template_id')
+            ? \App\Domains\Workspace\Models\OfficeTemplate::findOrFail($request->input('template_id'))
+            : \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
 
         $validated = $request->validate([
+            'template_id' => ['nullable', 'uuid'],
             'room_index' => ['nullable', 'integer'],
             'name' => ['required', 'string', 'max:120'],
             'type' => ['required', 'string', 'in:meeting,private,breakout,lounge,reception'],
@@ -933,21 +946,24 @@ class SuperAdminController extends Controller
 
         $template->update(['rooms_data' => array_values($rooms)]);
 
-        return back()->with('success', __('Default room saved in the system template.'));
+        return back()->with('success', __('Room saved in the office template.'));
     }
 
     /**
      * Delete a default room from the template.
      */
-    public function deleteTemplateRoom(int $roomIndex)
+    public function deleteTemplateRoom(Request $request, int $roomIndex)
     {
-        $template = \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+        $template = $request->filled('template_id')
+            ? \App\Domains\Workspace\Models\OfficeTemplate::findOrFail($request->input('template_id'))
+            : \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+
         $rooms = $template->rooms_data ?: [];
 
         if (isset($rooms[$roomIndex])) {
             unset($rooms[$roomIndex]);
             $template->update(['rooms_data' => array_values($rooms)]);
-            return back()->with('success', __('Room removed from default template.'));
+            return back()->with('success', __('Room removed from office template.'));
         }
 
         return back()->with('error', __('Room not found in template.'));
@@ -958,9 +974,12 @@ class SuperAdminController extends Controller
      */
     public function saveAllTemplateRooms(Request $request)
     {
-        $template = \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+        $template = $request->filled('template_id')
+            ? \App\Domains\Workspace\Models\OfficeTemplate::findOrFail($request->input('template_id'))
+            : \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
 
         $validated = $request->validate([
+            'template_id' => ['nullable', 'uuid'],
             'rooms' => ['present', 'array'],
             'rooms.*.name' => ['required', 'string', 'max:120'],
             'rooms.*.type' => ['nullable', 'string', 'in:meeting,private,breakout,lounge,reception'],
@@ -1002,23 +1021,27 @@ class SuperAdminController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => __('All default rooms updated and saved successfully!'),
+            'message' => __('All office rooms updated and saved successfully!'),
             'rooms' => $roomsFormatted,
         ]);
     }
 
     /**
-     * Upload custom blueprint background image for the system default office.
+     * Upload custom blueprint background image for the template.
      */
     public function uploadTemplateBackground(Request $request)
     {
         $request->validate([
+            'template_id' => ['nullable', 'uuid'],
             'background' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:51200'],
         ]);
 
-        $template = \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+        $template = $request->filled('template_id')
+            ? \App\Domains\Workspace\Models\OfficeTemplate::findOrFail($request->input('template_id'))
+            : \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+
         $file = $request->file('background');
-        $filename = 'template_floorplan_' . time() . '.' . $file->getClientOriginalExtension();
+        $filename = 'template_floorplan_' . ($template->plan_slug ?: 'default') . '_' . time() . '.' . $file->getClientOriginalExtension();
 
         $destDir = public_path('images/maps');
         if (!file_exists($destDir)) {
@@ -1035,16 +1058,26 @@ class SuperAdminController extends Controller
             'layout_data' => $layoutData,
         ]);
 
-        return back()->with('success', __('Default Blueprint background image updated successfully.'));
+        return back()->with('success', __('Office Blueprint background image updated successfully.'));
     }
 
     /**
-     * Sync and propagate the Default Template rooms & layout to all existing companies.
+     * Sync and propagate the Template rooms & layout to companies.
      */
     public function syncTemplateToOrganizations(Request $request)
     {
-        $template = \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
-        $organizations = Organization::all();
+        $template = $request->filled('template_id')
+            ? \App\Domains\Workspace\Models\OfficeTemplate::findOrFail($request->input('template_id'))
+            : \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+
+        $scope = $request->input('sync_scope', 'all');
+        $query = Organization::query();
+
+        if ($scope === 'plan_only' && $template->plan_id) {
+            $query->where('plan_id', $template->plan_id);
+        }
+
+        $organizations = $query->get();
         $count = 0;
 
         foreach ($organizations as $org) {
@@ -1113,6 +1146,6 @@ class SuperAdminController extends Controller
             $count++;
         }
 
-        return back()->with('success', __("Default Office Template synchronized across :count organizations successfully.", ['count' => $count]));
+        return back()->with('success', __("Office Template synchronized across :count organizations successfully.", ['count' => $count]));
     }
 }

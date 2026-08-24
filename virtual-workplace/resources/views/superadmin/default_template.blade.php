@@ -7,24 +7,44 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 
 <!-- ── Header Banner ── -->
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 16px;">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 16px;">
     <div>
         <h2 style="font-size: 20px; font-weight: 900; color: var(--text-primary); margin: 0 0 4px 0;">
-            🏢 {{ __('Visual Default Office & Room Designer (المصمم المرئي لغرف المكتب الافتراضي)') }}
+            🏢 {{ __('Subscription Plan Office Blueprints (تصميم قوالب المكاتب لكل باقة)') }}
         </h2>
         <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
-            {{ __('Draw rooms directly on the blueprint, rename them, set acoustic boundaries, and configure capacities for all organizations.') }}
+            {{ __('Configure and design dedicated default office floorplans and rooms for each subscription plan tier.') }}
         </p>
     </div>
 
     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
         <button type="button" onclick="openSyncModal()" class="tactile-btn" style="background: rgba(37, 99, 235, 0.15); border-color: rgba(59, 130, 246, 0.35); color: #93C5FD; font-size: 13px;">
-            🔄 {{ __('Sync to All Companies (:count)', ['count' => $totalCompanies]) }}
+            🔄 {{ __('Sync Office to Companies') }}
         </button>
         <button type="button" onclick="saveAllRoomsToServer()" class="tactile-btn btn-primary" style="font-size: 13px; box-shadow: 0 4px 14px rgba(36, 92, 58, 0.4);">
-            💾 {{ __('Save All Rooms (حفظ كافة الغرف)') }}
+            💾 {{ __('Save Rooms for :plan', ['plan' => $selectedPlan ? $selectedPlan->name : 'Plan']) }}
         </button>
     </div>
+</div>
+
+<!-- ── Plan Selector Bar ── -->
+<div style="display: flex; gap: 8px; margin-bottom: 20px; background: var(--bg-surface-subtle); padding: 6px; border-radius: 16px; border: 1px solid var(--border-color); flex-wrap: wrap;">
+    @foreach($allPlans as $p)
+        @php
+            $isActivePlan = ($selectedPlan && $selectedPlan->id === $p->id);
+            $planTemplate = \App\Domains\Workspace\Models\OfficeTemplate::getForPlan($p);
+            $tierRoomsCount = count($planTemplate->rooms_data ?: []);
+        @endphp
+        <a href="{{ route('superadmin.template', ['plan' => $p->slug]) }}" 
+           class="tactile-btn" 
+           style="flex: 1; min-width: 170px; padding: 10px 16px; font-size: 13px; font-weight: 800; text-decoration: none; justify-content: center; border: {{ $isActivePlan ? '2px solid var(--brand-forest)' : '1px solid transparent' }}; background: {{ $isActivePlan ? 'var(--accent-gradient)' : 'transparent' }}; color: {{ $isActivePlan ? 'white' : 'var(--text-secondary)' }}; box-shadow: {{ $isActivePlan ? '0 4px 14px rgba(36, 92, 58, 0.3)' : 'none' }};">
+            @if($p->slug === 'free') 🟢 @elseif($p->slug === 'starter') ⚡ @elseif($p->slug === 'business') 💎 @else 👑 @endif
+            <span>{{ $p->name }}</span>
+            <span style="font-size: 11px; background: {{ $isActivePlan ? 'rgba(255,255,255,0.25)' : 'var(--bg-elevated)' }}; padding: 2px 8px; border-radius: 999px; margin-inline-start: 6px;">
+                {{ $tierRoomsCount }} {{ __('Rooms') }}
+            </span>
+        </a>
+    @endforeach
 </div>
 
 <!-- ════════════════════════════════════════════════════════════
@@ -80,6 +100,7 @@
             </div>
             <form method="POST" action="{{ route('superadmin.template.background') }}" enctype="multipart/form-data" style="margin: 0; display: flex; gap: 8px;">
                 @csrf
+                <input type="hidden" name="template_id" value="{{ $template->id }}">
                 <input type="file" name="background" id="template_bg_input" accept="image/jpeg,image/png,image/webp,image/jpg" style="display:none;" onchange="this.form.submit()">
                 <button type="button" onclick="document.getElementById('template_bg_input').click()" class="tactile-btn btn-secondary" style="font-size: 11px; padding: 6px 12px;">
                     📁 {{ __('Change Background Floorplan') }}
@@ -260,24 +281,47 @@
     </div>
 </div>
 
-<!-- ── Modal: Sync to All Companies ── -->
+<!-- ── Modal: Sync to Companies ── -->
 <div id="syncModal" class="modal-overlay">
-    <div class="modal-card" style="border-radius: 24px; padding: 26px; max-width: 480px;">
+    <div class="modal-card" style="border-radius: 24px; padding: 26px; max-width: 520px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h3 style="font-size: 17px; font-weight: 900; color: var(--text-primary);">🔄 {{ __('Sync Template to Organizations') }}</h3>
+            <h3 style="font-size: 17px; font-weight: 900; color: var(--text-primary);">🔄 {{ __('Sync Office Template to Companies') }}</h3>
             <button onclick="closeSyncModal()" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-primary); font-weight: 800;">✕</button>
         </div>
 
-        <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;">
-            {{ __('This will synchronize the master blueprint floorplan and your newly drawn and renamed default rooms across all :count registered organizations.', ['count' => $totalCompanies]) }}
+        <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+            {{ __('Synchronize the office blueprint floorplan and the configured default rooms for :plan tier.', ['plan' => $selectedPlan ? $selectedPlan->name : '']) }}
         </p>
 
         <form method="POST" action="{{ route('superadmin.template.sync') }}">
             @csrf
+            <input type="hidden" name="template_id" value="{{ $template->id }}">
+
+            <!-- Sync Scope Selection -->
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
+                    🎯 {{ __('Target Organizations (الشركات المستهدفة بالمزامنة)') }}
+                </label>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <label style="display: flex; align-items: center; gap: 10px; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); padding: 10px 14px; border-radius: 12px; cursor: pointer;">
+                        <input type="radio" name="sync_scope" value="plan_only" checked>
+                        <span style="font-size: 12px; font-weight: 700; color: var(--text-primary);">
+                            {{ __('Only companies subscribed to :plan (:count companies)', ['plan' => $selectedPlan ? $selectedPlan->name : 'this plan', 'count' => $planCompaniesCount]) }}
+                        </span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); padding: 10px 14px; border-radius: 12px; cursor: pointer;">
+                        <input type="radio" name="sync_scope" value="all">
+                        <span style="font-size: 12px; font-weight: 700; color: var(--text-primary);">
+                            {{ __('All registered companies (:count companies)', ['count' => $totalCompanies]) }}
+                        </span>
+                    </label>
+                </div>
+            </div>
+
             <div style="background: rgba(214, 162, 58, 0.1); border: 1px solid rgba(214, 162, 58, 0.3); border-radius: 12px; padding: 14px; margin-bottom: 20px;">
                 <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 12px; font-weight: 700; color: var(--text-primary);">
                     <input type="checkbox" name="overwrite_rooms" value="1" checked style="margin-top: 2px;">
-                    <span>⚠️ {{ __('Overwrite and apply these exact rooms & boundaries to all companies (إعادة تعيين الغرف بالكامل)') }}</span>
+                    <span>⚠️ {{ __('Overwrite and apply these exact rooms & boundaries (إعادة تعيين الغرف بالكامل)') }}</span>
                 </label>
             </div>
 
@@ -779,7 +823,10 @@
                     'X-CSRF-TOKEN': CSRF_TOKEN,
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify({ rooms: defaultRooms })
+                body: JSON.stringify({ 
+                    template_id: "{{ $template->id }}",
+                    rooms: defaultRooms 
+                })
             });
 
             const data = await res.json();
