@@ -3,10 +3,10 @@
 namespace App\Domains\Notifications\Services;
 
 use App\Domains\Identity\Models\User;
+use App\Domains\Meetings\Models\Meeting;
 use App\Domains\Notifications\Models\WorkplaceNotification;
 use App\Domains\Projects\Models\Task;
 use App\Domains\Tenancy\Models\Organization;
-use App\Domains\Workspace\Models\Meeting;
 use App\Domains\Workspace\Models\Room;
 use Illuminate\Support\Facades\Log;
 
@@ -146,7 +146,8 @@ class NotificationService
 
         $hostName = $host ? $host->name : __('Organizer');
         $meetingTitle = $meeting->title ?: __('Workspace Meeting');
-        $timeFormatted = $meeting->start_time ? (is_string($meeting->start_time) ? $meeting->start_time : $meeting->start_time->format('Y-m-d H:i')) : __('Upcoming');
+        $sched = $meeting->scheduled_at ?? $meeting->start_time;
+        $timeFormatted = $sched ? (is_string($sched) ? $sched : $sched->format('Y-m-d H:i')) : __('Upcoming');
 
         $title = __('📅 Meeting Invitation: :meeting', ['meeting' => $meetingTitle]);
         $body = __(':host scheduled a meeting ":meeting" at :time.', [
@@ -155,7 +156,7 @@ class NotificationService
             'time' => $timeFormatted,
         ]);
 
-        $actionUrl = '/dashboard?tab=calendar&meeting=' . $meeting->id;
+        $actionUrl = '/dashboard#meetings';
 
         return self::send(
             $targetUserId,
