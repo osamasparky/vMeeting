@@ -80,9 +80,29 @@ Route::middleware('auth')->group(function () {
     Route::post('/organization/audit-logs/clear', [WebAuthController::class, 'clearAuditLogs'])->name('audit_logs.clear');
 
     // Scheduled Meetings & SMTP Test Routes
+    Route::get('/meetings/schedule', fn() => redirect('/dashboard#meetings'))->name('meetings.schedule.get');
     Route::post('/meetings/schedule', [WebAuthController::class, 'storeScheduledMeeting'])->name('meetings.schedule');
     Route::post('/meetings/{meeting}/cancel', [WebAuthController::class, 'cancelMeeting'])->name('meetings.cancel');
     Route::post('/organization/smtp/test', [WebAuthController::class, 'testSmtpConnection'])->name('organization.smtp.test');
+
+    // Organization Member Impersonation
+    Route::post('/organization/members/{member}/impersonate', [WebAuthController::class, 'impersonateMember'])->name('organization.members.impersonate');
+    Route::post('/organization/impersonate/leave', [WebAuthController::class, 'leaveMemberImpersonation'])->name('organization.members.impersonate.leave');
+    Route::get('/organization/impersonate/leave', [WebAuthController::class, 'leaveMemberImpersonation'])->name('organization.members.impersonate.leave.get');
+
+    // Project Files & Task Attachments
+    Route::post('/projects/{project}/files', [WebAuthController::class, 'uploadProjectFile'])->name('projects.files.store');
+    Route::delete('/projects/{project}/files/{file}', [WebAuthController::class, 'deleteProjectFile'])->name('projects.files.destroy');
+    Route::post('/tasks/{task}/attachments', [WebAuthController::class, 'uploadTaskAttachment'])->name('tasks.attachments.store');
+    Route::delete('/tasks/{task}/attachments/{attachment}', [WebAuthController::class, 'deleteTaskAttachment'])->name('tasks.attachments.destroy');
+
+    // Task Comments & Mentions
+    Route::get('/tasks/{task}/comments', [WebAuthController::class, 'getTaskComments'])->name('tasks.comments.index');
+    Route::post('/tasks/{task}/comments', [WebAuthController::class, 'storeTaskComment'])->name('tasks.comments.store');
+
+    // Task PM Review & Approvals
+    Route::post('/tasks/{task}/approve', [WebAuthController::class, 'approveTask'])->name('tasks.approve');
+    Route::post('/tasks/{task}/reject', [WebAuthController::class, 'rejectTask'])->name('tasks.reject');
 
     // Recordings Gallery Routes (Web Session)
     Route::get('/organizations/{organization}/recordings', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'index'])->name('recordings.index');
@@ -90,7 +110,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/organizations/{organization}/recordings/{recording}/download', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'download'])->name('recordings.download');
     Route::delete('/organizations/{organization}/recordings/{recording}', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'destroy'])->name('recordings.destroy');
 
-    // Impersonation Exit Routes
+    // Impersonation Exit Routes (SuperAdmin)
     Route::post('/impersonate/leave', [\App\Http\Controllers\SuperAdminController::class, 'leaveImpersonation'])->name('impersonate.leave');
     Route::get('/impersonate/leave', [\App\Http\Controllers\SuperAdminController::class, 'leaveImpersonation'])->name('impersonate.leave.get');
 

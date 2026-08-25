@@ -1689,6 +1689,22 @@
         </div>
         @endif
 
+        @if(session('org_impersonator_id'))
+        <div style="background: linear-gradient(135deg, #065F46 0%, #059669 100%); color: #ffffff; padding: 12px 22px; border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; box-shadow: 0 8px 24px rgba(5,150,105,0.28); border: 1px solid rgba(255,255,255,0.25); font-weight: 800; font-size: 13px; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">👤</span>
+                <span>{{ __('You are currently logged in as team member:') }} <strong style="text-decoration: underline;">{{ Auth::user()->name }}</strong> ({{ Auth::user()->email }})</span>
+            </div>
+            <form method="POST" action="{{ route('organization.members.impersonate.leave') }}" style="margin: 0; display: inline-flex;">
+                @csrf
+                <button type="submit" class="tactile-btn" style="background: #ffffff; color: #065F46; border: none; padding: 8px 20px; border-radius: 9999px; font-weight: 900; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.18);">
+                    <span>↩️</span>
+                    <span>{{ __('Leave Impersonation (العودة لحساب المسؤول)') }}</span>
+                </button>
+            </form>
+        </div>
+        @endif
+
         <!-- Top App Bar Navigation Header -->
         <div class="top-app-header">
             <div style="display: flex; align-items: center; gap: 14px;">
@@ -2520,6 +2536,14 @@
                                     @if($membership->hasPermission('members.manage') || $membership->role?->slug === 'company_admin')
                                     <td>
                                         <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                                            @if($m->user_id !== $user->id)
+                                                <form method="POST" action="{{ route('organization.members.impersonate', $m->id) }}" style="display: inline;" onsubmit="return confirm('{{ __('Are you sure you want to log in as :name?', ['name' => addslashes($m->user->name)]) }}');">
+                                                    @csrf
+                                                    <button type="submit" class="tactile-btn" style="background: rgba(59, 130, 246, 0.15); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3); padding: 5px 10px; font-size: 11px; font-weight: 800;" title="{{ __('Log in as this member (تسجيل الدخول كعضو)') }}">
+                                                        <span>👤</span> {{ __('Login As') }}
+                                                    </button>
+                                                </form>
+                                            @endif
                                             <button onclick="openEditMemberModal('{{ $m->id }}', '{{ addslashes($m->user->name) }}', '{{ addslashes($m->user->email) }}', '{{ $profile?->department_id }}', '{{ $profile?->team_id }}', '{{ $m->role_id }}', '{{ addslashes($profile?->job_title ?? '') }}', '{{ $m->status }}')" class="tactile-btn btn-secondary" style="padding: 5px 10px; font-size: 11px; font-weight: 800;" title="{{ __('Edit Member Data (تعديل البيانات)') }}">
                                                 <span>✏️</span> {{ __('Edit') }}
                                             </button>
@@ -4410,190 +4434,107 @@
                 </div>
             </div>
 
-            <!-- Task Status Columns Grid (3D Spatial Cards) -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
-                <!-- Due Today / In Progress -->
-                <div class="card" style="border-radius: var(--radius-lg); padding: 18px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--brand-forest); padding-bottom: 12px; margin-bottom: 14px;">
-                        <h3 style="font-size: 15px; font-weight: 900; color: var(--text-primary);">⚡ {{ __('In Progress & Active') }}</h3>
-                        <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F; font-weight: 800;">{{ $myTasks->where('status', 'in_progress')->count() }}</span>
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
-                        @forelse($myTasks->where('status', 'in_progress') as $t)
-                            @php
-                                $canEditThisTask = ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || ($t->project && $t->project->manager_id === $user->id) || $t->assignee_id === $user->id || $t->creator_id === $user->id);
-                            @endphp
-                            <div class="kanban-task-card" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 14px; box-shadow: var(--shadow-card); cursor: pointer;" onclick="openTaskDetails('{{ $t->id }}')">
-                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 6px;">
-                                    <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
-                                        <span class="nav-badge-pill" style="font-family: monospace; font-size: 10px; font-weight: 800;">#{{ $t->task_number ?? 1 }}</span>
-                                        <span class="nav-badge-pill" style="font-size: 9px; font-weight: 700; color: var(--brand-forest); background: rgba(79, 155, 95, 0.12);">
-                                            📁 {{ $t->project->code ?? 'PRJ' }}
-                                        </span>
-                                        @if($t->checklistItems && $t->checklistItems->count() > 0)
-                                            <span class="nav-badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.15); color: #4F9B5F;">
-                                                ⊞ {{ $t->checklistItems->where('is_completed', true)->count() }}/{{ $t->checklistItems->count() }}
+            <!-- Task Status Columns Grid (5-Column Kanban matching All Tasks) -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+                @php
+                    $myKanbanCols = [
+                        'backlog' => ['title' => '📌 ' . __('Backlog'), 'color' => 'var(--text-secondary)', 'border' => 'var(--border-color)'],
+                        'ready' => ['title' => '🎯 ' . __('Ready'), 'color' => 'var(--brand-sage)', 'border' => 'var(--brand-sage)'],
+                        'in_progress' => ['title' => '⚡ ' . __('In Progress'), 'color' => 'var(--brand-forest)', 'border' => 'var(--brand-forest)'],
+                        'review' => ['title' => '🔍 ' . __('Review / QA'), 'color' => 'var(--status-warning)', 'border' => '#D6A23A'],
+                        'done' => ['title' => '🎉 ' . __('Done'), 'color' => 'var(--brand-forest)', 'border' => '#4F9B5F'],
+                    ];
+                @endphp
+
+                @foreach($myKanbanCols as $colKey => $colMeta)
+                    @php
+                        $colTasks = ($colKey === 'review') ? $myTasks->whereIn('status', ['review', 'qa']) : $myTasks->where('status', $colKey);
+                    @endphp
+                    <div class="card" style="border-radius: var(--radius-lg); padding: 14px; background: var(--bg-surface-subtle); display: flex; flex-direction: column;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid {{ $colMeta['border'] }}; padding-bottom: 10px; margin-bottom: 12px;">
+                            <h3 style="font-size: 14px; font-weight: 900; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+                                <span>{{ $colMeta['title'] }}</span>
+                            </h3>
+                            <span class="nav-badge-pill" style="font-weight: 800;">{{ $colTasks->count() }}</span>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 10px; flex: 1;">
+                            @forelse($colTasks as $t)
+                                @php
+                                    $canEditThisTask = ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || ($t->project && $t->project->manager_id === $user->id) || $t->assignee_id === $user->id || $t->creator_id === $user->id);
+                                    $isManager = ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || ($t->project && $t->project->manager_id === $user->id));
+                                @endphp
+                                <div class="kanban-task-card" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 12px; box-shadow: var(--shadow-card); cursor: pointer;" onclick="openTaskDetails('{{ $t->id }}')">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 6px;">
+                                        <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                                            <span class="nav-badge-pill" style="font-family: monospace; font-size: 9px; font-weight: 800;">#{{ $t->task_number ?? 1 }}</span>
+                                            <span class="nav-badge-pill" style="font-size: 9px; font-weight: 700; color: var(--brand-forest); background: rgba(79, 155, 95, 0.12);">
+                                                {{ $t->project->code ?? 'PRJ' }}
+                                            </span>
+                                            @if($t->checklistItems && $t->checklistItems->count() > 0)
+                                                <span class="nav-badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.15); color: #4F9B5F;">
+                                                    ⊞ {{ $t->checklistItems->where('is_completed', true)->count() }}/{{ $t->checklistItems->count() }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 4px;">
+                                            @if($t->priority === 'urgent')
+                                                <span class="nav-badge-pill" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F; font-size: 9px; font-weight: 800;">🔥</span>
+                                            @elseif($t->priority === 'high')
+                                                <span class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.15); color: #D6A23A; font-size: 9px; font-weight: 800;">⚡</span>
+                                            @endif
+                                            <select onclick="event.stopPropagation()" onchange="updateTaskStatusDirect('{{ $t->id }}', this.value)" {{ $canEditThisTask ? '' : 'disabled' }} style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 9px; font-weight: 700; border-radius: 6px; padding: 2px 4px; outline: none; cursor: {{ $canEditThisTask ? 'pointer' : 'not-allowed' }};">
+                                                <option value="backlog" {{ $t->status === 'backlog' ? 'selected' : '' }}>📌 Backlog</option>
+                                                <option value="ready" {{ $t->status === 'ready' ? 'selected' : '' }}>🎯 Ready</option>
+                                                <option value="in_progress" {{ $t->status === 'in_progress' ? 'selected' : '' }}>⚡ In Progress</option>
+                                                <option value="review" {{ $t->status === 'review' || $t->status === 'qa' ? 'selected' : '' }}>🔍 Review</option>
+                                                <option value="done" {{ $t->status === 'done' ? 'selected' : '' }}>🎉 Done</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div style="font-weight: 800; font-size: 12px; margin-bottom: 4px; color: var(--text-primary); line-height: 1.3;">{{ $t->title }}</div>
+
+                                    @if($t->approval_status === 'pending_approval')
+                                        <div style="background: rgba(214, 162, 58, 0.15); border: 1px solid rgba(214, 162, 58, 0.3); color: #D6A23A; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
+                                            <span>⏳ {{ __('Pending PM Approval') }}</span>
+                                            @if($isManager)
+                                                <button onclick="event.stopPropagation(); quickApproveTask('{{ $t->id }}')" class="tactile-btn" style="background: #4F9B5F; color: white; padding: 2px 6px; font-size: 9px; border: none;">✓ {{ __('Approve') }}</button>
+                                            @endif
+                                        </div>
+                                    @elseif($t->approval_status === 'rejected')
+                                        <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.3); color: #D96B5F; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; margin-bottom: 6px;">
+                                            <span>⚠️ {{ __('Changes Requested') }}</span>
+                                        </div>
+                                    @endif
+
+                                    <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 8px; display: flex; align-items: center; gap: 4px;">
+                                        <span>📁 {{ $t->project->name ?? 'General' }}</span>
+                                        @if($t->due_date)
+                                            <span>•</span>
+                                            <span style="{{ $t->due_date->isPast() && $t->status !== 'done' ? 'color: #D96B5F; font-weight: 800;' : '' }}">
+                                                📅 {{ $t->due_date->format('M d') }}
                                             </span>
                                         @endif
                                     </div>
-                                    <div style="display: flex; align-items: center; gap: 4px;">
-                                        <span class="nav-badge-pill" style="{{ $t->priority === 'urgent' ? 'background: rgba(217, 107, 95, 0.15); color: #D96B5F;' : ($t->priority === 'high' ? 'background: rgba(214, 162, 58, 0.15); color: #D6A23A;' : '') }} font-size: 9px; font-weight: 800;">
-                                            {{ $t->priority === 'urgent' ? '🔥 ' . __('Urgent') : ($t->priority === 'high' ? '⚡ ' . __('High') : ucfirst($t->priority)) }}
+
+                                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 6px; font-size: 10px;">
+                                        <span style="font-family: monospace; font-size: 9px; font-weight: 700; color: var(--brand-forest);">
+                                            ⏱️ {{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h{{ $t->estimated_hours ? ' / ' . $t->estimated_hours . 'h' : '' }}
                                         </span>
-                                        <select onclick="event.stopPropagation()" onchange="updateTaskStatusDirect('{{ $t->id }}', this.value)" {{ $canEditThisTask ? '' : 'disabled' }} style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 10px; font-weight: 700; border-radius: 6px; padding: 2px 4px; outline: none; cursor: {{ $canEditThisTask ? 'pointer' : 'not-allowed' }};">
-                                            <option value="backlog" {{ $t->status === 'backlog' ? 'selected' : '' }}>📌 Backlog</option>
-                                            <option value="ready" {{ $t->status === 'ready' ? 'selected' : '' }}>🎯 Ready</option>
-                                            <option value="in_progress" {{ $t->status === 'in_progress' ? 'selected' : '' }}>⚡ In Progress</option>
-                                            <option value="review" {{ $t->status === 'review' || $t->status === 'qa' ? 'selected' : '' }}>🔍 Review</option>
-                                            <option value="done" {{ $t->status === 'done' ? 'selected' : '' }}>🎉 Done</option>
-                                        </select>
-                                        <button onclick="event.stopPropagation(); openTaskContextMenu(event, '{{ $t->id }}', '{{ $t->project_id }}', '{{ addslashes($t->title) }}')" class="tactile-btn btn-secondary" style="padding: 2px 6px; font-size: 10px; line-height: 1;" title="{{ __('Task Actions') }}">
-                                            •••
+                                        <button onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--brand-forest); border: 1px solid rgba(79, 155, 95, 0.3); padding: 3px 8px; font-size: 10px; font-weight: 800;">
+                                            ▶ {{ __('Timer') }}
                                         </button>
                                     </div>
                                 </div>
-                                <div style="font-weight: 800; font-size: 13px; margin-bottom: 6px; color: var(--text-primary); line-height: 1.4;">{{ $t->title }}</div>
-                                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
-                                    <span>📁 {{ $t->project->name ?? 'General' }}</span>
-                                    @if($t->due_date)
-                                        <span>•</span>
-                                        <span style="{{ $t->due_date->isPast() && $t->status !== 'done' ? 'color: #D96B5F; font-weight: 800;' : '' }}">
-                                            📅 {{ $t->due_date->format('M d') }}
-                                        </span>
-                                    @endif
+                            @empty
+                                <div style="text-align: center; padding: 18px 8px; color: var(--text-muted); font-size: 11px; border: 1px dashed var(--border-color); border-radius: var(--radius-md);">
+                                    {{ __('No tasks in this stage.') }}
                                 </div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 8px; font-size: 11px;">
-                                    <span style="font-family: monospace; font-size: 10px; font-weight: 700; color: var(--brand-forest);">
-                                        ⏱️ {{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h{{ $t->estimated_hours ? ' / ' . $t->estimated_hours . 'h' : '' }}
-                                    </span>
-                                    <button onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--brand-forest); border: 1px solid rgba(79, 155, 95, 0.3); padding: 4px 10px; font-size: 11px; font-weight: 800;">
-                                        ▶ {{ __('Start Timer') }}
-                                    </button>
-                                </div>
-                            </div>
-                        @empty
-                            <div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 12px;">
-                                {{ __('No tasks currently in progress.') }}
-                            </div>
-                        @endforelse
+                            @endforelse
+                        </div>
                     </div>
-                </div>
-
-                <!-- Backlog / Ready -->
-                <div class="card" style="border-radius: var(--radius-lg); padding: 18px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--brand-sage); padding-bottom: 12px; margin-bottom: 14px;">
-                        <h3 style="font-size: 15px; font-weight: 900; color: var(--text-primary);">📌 {{ __('Ready & Backlog') }}</h3>
-                        <span class="nav-badge-pill" style="font-weight: 800;">{{ $myTasks->whereIn('status', ['backlog', 'ready'])->count() }}</span>
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
-                        @forelse($myTasks->whereIn('status', ['backlog', 'ready']) as $t)
-                            @php
-                                $canEditThisTask = ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || ($t->project && $t->project->manager_id === $user->id) || $t->assignee_id === $user->id || $t->creator_id === $user->id);
-                            @endphp
-                            <div class="kanban-task-card" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 14px; box-shadow: var(--shadow-card); cursor: pointer;" onclick="openTaskDetails('{{ $t->id }}')">
-                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 6px;">
-                                    <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
-                                        <span class="nav-badge-pill" style="font-family: monospace; font-size: 10px; font-weight: 800;">#{{ $t->task_number ?? 1 }}</span>
-                                        <span class="nav-badge-pill" style="font-size: 9px; font-weight: 700; color: var(--brand-forest); background: rgba(79, 155, 95, 0.12);">
-                                            📁 {{ $t->project->code ?? 'PRJ' }}
-                                        </span>
-                                        @if($t->checklistItems && $t->checklistItems->count() > 0)
-                                            <span class="nav-badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.15); color: #4F9B5F;">
-                                                ⊞ {{ $t->checklistItems->where('is_completed', true)->count() }}/{{ $t->checklistItems->count() }}
-                                            </span>
-                                        @endif
-                                    </div>
-                                    <div style="display: flex; align-items: center; gap: 4px;">
-                                        <span class="nav-badge-pill" style="{{ $t->priority === 'urgent' ? 'background: rgba(217, 107, 95, 0.15); color: #D96B5F;' : ($t->priority === 'high' ? 'background: rgba(214, 162, 58, 0.15); color: #D6A23A;' : '') }} font-size: 9px; font-weight: 800;">
-                                            {{ $t->priority === 'urgent' ? '🔥 ' . __('Urgent') : ($t->priority === 'high' ? '⚡ ' . __('High') : ucfirst($t->priority)) }}
-                                        </span>
-                                        <select onclick="event.stopPropagation()" onchange="updateTaskStatusDirect('{{ $t->id }}', this.value)" {{ $canEditThisTask ? '' : 'disabled' }} style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 10px; font-weight: 700; border-radius: 6px; padding: 2px 4px; outline: none; cursor: {{ $canEditThisTask ? 'pointer' : 'not-allowed' }};">
-                                            <option value="backlog" {{ $t->status === 'backlog' ? 'selected' : '' }}>📌 Backlog</option>
-                                            <option value="ready" {{ $t->status === 'ready' ? 'selected' : '' }}>🎯 Ready</option>
-                                            <option value="in_progress" {{ $t->status === 'in_progress' ? 'selected' : '' }}>⚡ In Progress</option>
-                                            <option value="review" {{ $t->status === 'review' || $t->status === 'qa' ? 'selected' : '' }}>🔍 Review</option>
-                                            <option value="done" {{ $t->status === 'done' ? 'selected' : '' }}>🎉 Done</option>
-                                        </select>
-                                        <button onclick="event.stopPropagation(); openTaskContextMenu(event, '{{ $t->id }}', '{{ $t->project_id }}', '{{ addslashes($t->title) }}')" class="tactile-btn btn-secondary" style="padding: 2px 6px; font-size: 10px; line-height: 1;" title="{{ __('Task Actions') }}">
-                                            •••
-                                        </button>
-                                    </div>
-                                </div>
-                                <div style="font-weight: 800; font-size: 13px; margin-bottom: 6px; color: var(--text-primary); line-height: 1.4;">{{ $t->title }}</div>
-                                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
-                                    <span>📁 {{ $t->project->name ?? 'General' }}</span>
-                                    @if($t->due_date)
-                                        <span>•</span>
-                                        <span style="{{ $t->due_date->isPast() && $t->status !== 'done' ? 'color: #D96B5F; font-weight: 800;' : '' }}">
-                                            📅 {{ $t->due_date->format('M d') }}
-                                        </span>
-                                    @endif
-                                </div>
-                                <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 8px; font-size: 11px;">
-                                    <span style="font-family: monospace; font-size: 10px; font-weight: 700; color: var(--brand-forest);">
-                                        ⏱️ {{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h{{ $t->estimated_hours ? ' / ' . $t->estimated_hours . 'h' : '' }}
-                                    </span>
-                                    <button onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="tactile-btn btn-secondary" style="padding: 4px 10px; font-size: 11px; font-weight: 800;">
-                                        ▶ {{ __('Start Timer') }}
-                                    </button>
-                                </div>
-                            </div>
-                        @empty
-                            <div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 12px;">
-                                {{ __('No pending tasks.') }}
-                            </div>
-                        @endforelse
-                    </div>
-                </div>
-
-                <!-- Review / QA / Done -->
-                <div class="card" style="border-radius: var(--radius-lg); padding: 18px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #4F9B5F; padding-bottom: 12px; margin-bottom: 14px;">
-                        <h3 style="font-size: 15px; font-weight: 900; color: var(--text-primary);">🎉 {{ __('Completed & Under Review') }}</h3>
-                        <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F; font-weight: 800;">{{ $myTasks->whereIn('status', ['review', 'qa', 'done'])->count() }}</span>
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
-                        @forelse($myTasks->whereIn('status', ['review', 'qa', 'done']) as $t)
-                            @php
-                                $canEditThisTask = ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || ($t->project && $t->project->manager_id === $user->id) || $t->assignee_id === $user->id || $t->creator_id === $user->id);
-                            @endphp
-                            <div class="kanban-task-card" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 14px; box-shadow: var(--shadow-card); opacity: 0.9; cursor: pointer;" onclick="openTaskDetails('{{ $t->id }}')">
-                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 6px;">
-                                    <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
-                                        <span class="nav-badge-pill" style="font-family: monospace; font-size: 10px; font-weight: 800;">#{{ $t->task_number ?? 1 }}</span>
-                                        <span class="nav-badge-pill" style="font-size: 9px; font-weight: 700; color: var(--brand-forest); background: rgba(79, 155, 95, 0.12);">
-                                            📁 {{ $t->project->code ?? 'PRJ' }}
-                                        </span>
-                                    </div>
-                                    <div style="display: flex; align-items: center; gap: 4px;">
-                                        <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F; font-size: 9px; font-weight: 800;">
-                                            {{ ucfirst($t->status) }}
-                                        </span>
-                                        <select onclick="event.stopPropagation()" onchange="updateTaskStatusDirect('{{ $t->id }}', this.value)" {{ $canEditThisTask ? '' : 'disabled' }} style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 10px; font-weight: 700; border-radius: 6px; padding: 2px 4px; outline: none; cursor: {{ $canEditThisTask ? 'pointer' : 'not-allowed' }};">
-                                            <option value="backlog" {{ $t->status === 'backlog' ? 'selected' : '' }}>📌 Backlog</option>
-                                            <option value="ready" {{ $t->status === 'ready' ? 'selected' : '' }}>🎯 Ready</option>
-                                            <option value="in_progress" {{ $t->status === 'in_progress' ? 'selected' : '' }}>⚡ In Progress</option>
-                                            <option value="review" {{ $t->status === 'review' || $t->status === 'qa' ? 'selected' : '' }}>🔍 Review</option>
-                                            <option value="done" {{ $t->status === 'done' ? 'selected' : '' }}>🎉 Done</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div style="font-weight: 800; font-size: 13px; margin-bottom: 6px; color: var(--text-primary); line-height: 1.4; {{ $t->status === 'done' ? 'text-decoration: line-through; opacity: 0.6;' : '' }}">{{ $t->title }}</div>
-                                <div style="font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
-                                    <span>📁 {{ $t->project->name ?? 'General' }}</span>
-                                    @if($t->due_date)
-                                        <span>•</span>
-                                        <span>📅 {{ $t->due_date->format('M d') }}</span>
-                                    @endif
-                                </div>
-                            </div>
-                        @empty
-                            <div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 12px;">
-                                {{ __('No completed tasks yet.') }}
-                            </div>
-                        @endforelse
-                    </div>
-                </div>
+                @endforeach
             </div>
         </div>
 
@@ -4956,14 +4897,24 @@
                 <!-- Project Selector (Shown when scope is project) -->
                 <div id="meeting-project-field" style="display: none;">
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Target Project') }} *</label>
-                    <select name="project_id" id="meeting-project-select" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 14px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    <select name="project_id" id="meeting-project-select" onchange="renderProjectAttendeesList(this.value)" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 14px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         <option value="">— {{ __('Select Project') }} —</option>
                         @foreach($projects as $p)
                             <option value="{{ $p->id }}">📁 {{ $p->name }} ({{ $p->code }})</option>
                         @endforeach
                     </select>
-                    <div style="background: rgba(79, 155, 95, 0.12); border: 1px solid rgba(79, 155, 95, 0.25); color: var(--brand-forest); padding: 8px 12px; border-radius: 8px; font-size: 11px; margin-top: 6px; font-weight: 700;">
-                        📢 {{ __('All project managers, owners, and task assignees will automatically receive email invitations and chime alerts before the meeting.') }}
+                    
+                    <!-- Project Team Members Checklist (Only Project-related Members) -->
+                    <div id="project-attendees-selection-box" style="margin-top: 10px; display: none;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">
+                                👥 {{ __('Select Project Members to Attend') }}
+                            </label>
+                            <button type="button" onclick="toggleAllProjectAttendees()" style="background: none; border: none; font-size: 11px; font-weight: 800; color: var(--brand-forest); cursor: pointer;">
+                                ✓ {{ __('Select / Unselect All') }}
+                            </button>
+                        </div>
+                        <div id="project-attendees-list" style="max-height: 140px; overflow-y: auto; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px;"></div>
                     </div>
                 </div>
 
@@ -5298,30 +5249,41 @@
                 </div>
             </div>
 
-            <!-- Task Quick Status Changer Bar -->
-            <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface-subtle); padding: 10px 16px; border-radius: var(--radius-md); margin-bottom: 14px; border: 1px solid var(--border-color); box-shadow: var(--shadow-inset-3d);">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 12px; font-weight: 800; color: var(--text-secondary);">⚡ {{ __('Quick Status Update') }}:</span>
-                    <select id="task-modal-status-select" onchange="updateCurrentTaskStatus(this.value)" style="background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 12px; font-weight: 700; border-radius: 8px; padding: 5px 12px; outline: none;">
-                        <option value="backlog">📌 Backlog</option>
-                        <option value="ready">🎯 Ready</option>
-                        <option value="in_progress">⚡ In Progress</option>
-                        <option value="review">🔍 In Review / QA</option>
-                        <option value="done">🎉 Done / Completed</option>
-                    </select>
+            <!-- Task Quick Status Changer Bar & PM Approval Actions -->
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface-subtle); padding: 10px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-inset-3d); flex-wrap: wrap; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 12px; font-weight: 800; color: var(--text-secondary);">⚡ {{ __('Status') }}:</span>
+                        <select id="task-modal-status-select" onchange="updateCurrentTaskStatus(this.value)" style="background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 12px; font-weight: 700; border-radius: 8px; padding: 5px 12px; outline: none;">
+                            <option value="backlog">📌 Backlog</option>
+                            <option value="ready">🎯 Ready</option>
+                            <option value="in_progress">⚡ In Progress</option>
+                            <option value="review">🔍 In Review / QA</option>
+                            <option value="done">🎉 Done / Completed</option>
+                        </select>
+                    </div>
+                    <div style="font-size: 12px; font-family: monospace; font-weight: 800; color: var(--brand-forest);">
+                        ⏱️ <span id="task-modal-hours">0h / 0h</span>
+                    </div>
                 </div>
-                <div style="font-size: 12px; font-family: monospace; font-weight: 800; color: var(--brand-forest);">
-                    ⏱️ <span id="task-modal-hours">0h / 0h</span>
+
+                <!-- Approval Status Alert & Action Box -->
+                <div id="task-modal-approval-banner" style="display: none; padding: 12px 16px; border-radius: var(--radius-md); font-size: 12px; font-weight: 700; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <div id="task-modal-approval-text" style="display: flex; align-items: center; gap: 8px;"></div>
+                    <div id="task-modal-approval-actions" style="display: flex; gap: 8px;"></div>
                 </div>
             </div>
 
             <!-- Sub-Tabs -->
-            <div style="display: flex; gap: 6px; margin-bottom: 14px; background: var(--bg-surface-subtle); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-inset-3d);">
+            <div style="display: flex; gap: 6px; margin-bottom: 14px; background: var(--bg-surface-subtle); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-inset-3d); flex-wrap: wrap;">
                 <button onclick="switchTaskInspectorTab('details')" id="task-tab-btn-details" class="tactile-btn btn-primary" style="flex: 1; padding: 7px; font-size: 12px; justify-content: center;">
                     📝 {{ __('Details') }}
                 </button>
                 <button onclick="switchTaskInspectorTab('checklist')" id="task-tab-btn-checklist" class="tactile-btn btn-secondary" style="flex: 1; padding: 7px; font-size: 12px; justify-content: center; background: transparent; border: none; box-shadow: none; color: var(--text-secondary);">
                     ☑️ {{ __('Checklist') }} (<span id="task-checklist-count">0</span>)
+                </button>
+                <button onclick="switchTaskInspectorTab('attachments')" id="task-tab-btn-attachments" class="tactile-btn btn-secondary" style="flex: 1; padding: 7px; font-size: 12px; justify-content: center; background: transparent; border: none; box-shadow: none; color: var(--text-secondary);">
+                    📎 {{ __('Files') }} (<span id="task-attachments-count">0</span>)
                 </button>
                 <button onclick="switchTaskInspectorTab('comments')" id="task-tab-btn-comments" class="tactile-btn btn-secondary" style="flex: 1; padding: 7px; font-size: 12px; justify-content: center; background: transparent; border: none; box-shadow: none; color: var(--text-secondary);">
                     💬 {{ __('Discussions') }} (<span id="task-comments-count">0</span>)
@@ -5357,18 +5319,46 @@
                     <div id="task-checklist-items-container" style="display: flex; flex-direction: column; gap: 6px;"></div>
                 </div>
 
-                <!-- 3. Comments -->
+                <!-- 3. Attachments & Files -->
+                <div id="task-inspector-attachments" style="display: none;">
+                    <form onsubmit="uploadTaskAttachmentSubmit(event)" style="background: var(--bg-surface-subtle); border: 1px dashed var(--border-color); border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 14px;">
+                        <div style="font-size: 24px; margin-bottom: 6px;">📎</div>
+                        <div style="font-size: 12px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">{{ __('Upload Document or Attachment to Task') }}</div>
+                        <div style="display: flex; justify-content: center; gap: 8px; align-items: center; max-width: 420px; margin: 0 auto;">
+                            <input type="file" id="task-file-input" required style="font-size: 12px; color: var(--text-primary);">
+                            <button type="submit" class="tactile-btn btn-primary" style="padding: 6px 14px; font-size: 12px;">
+                                📤 {{ __('Upload') }}
+                            </button>
+                        </div>
+                    </form>
+                    <div id="task-attachments-list-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px;"></div>
+                </div>
+
+                <!-- 4. Comments & Mentions -->
                 <div id="task-inspector-comments" style="display: none;">
                     <div id="task-comments-feed" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; max-height: 280px; overflow-y: auto;"></div>
+                    
+                    <!-- Quick Mention Suggestion Chips -->
+                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap;">
+                        <span style="font-size: 11px; font-weight: 800; color: var(--text-secondary);">@ {{ __('Mention') }}:</span>
+                        @foreach($members->take(6) as $chipMember)
+                            @if($chipMember->user_id !== $user->id)
+                                <button type="button" onclick="insertMentionHandle('{{ $chipMember->user->name }}')" class="nav-badge-pill" style="cursor: pointer; font-size: 10px; border: 1px solid var(--border-color); background: var(--bg-surface-subtle); color: var(--brand-forest); font-weight: 700;" title="{{ __('Click to mention :name', ['name' => $chipMember->user->name]) }}">
+                                    @<span>{{ $chipMember->user->name }}</span>
+                                </button>
+                            @endif
+                        @endforeach
+                    </div>
+
                     <form onsubmit="addTaskCommentSubmit(event)" style="display: flex; gap: 8px;">
-                        <input type="text" id="new-comment-body-input" required placeholder="{{ __('Write a comment or status update...') }}" style="flex: 1; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 9px 12px; color: var(--text-primary); outline: none; font-size: 12px; font-weight: 600; box-shadow: var(--shadow-inset-3d);">
+                        <input type="text" id="new-comment-body-input" required placeholder="{{ __('Write a comment or status update... Type @name to mention') }}" style="flex: 1; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 9px 12px; color: var(--text-primary); outline: none; font-size: 12px; font-weight: 600; box-shadow: var(--shadow-inset-3d);">
                         <button type="submit" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px;">
                             💬 {{ __('Post') }}
                         </button>
                     </form>
                 </div>
 
-                <!-- 4. Dependencies -->
+                <!-- 5. Dependencies -->
                 <div id="task-inspector-dependencies" style="display: none;">
                     <div style="background: var(--bg-surface-subtle); padding: 14px; border-radius: 12px; margin-bottom: 14px; border: 1px solid var(--border-color); box-shadow: var(--shadow-inset-3d);">
                         <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">🔗 {{ __('Add Predecessor / Blocker Task') }}</label>
@@ -5387,7 +5377,7 @@
                     <div id="task-dependencies-container" style="display: flex; flex-direction: column; gap: 6px;"></div>
                 </div>
 
-                <!-- 5. Time Log -->
+                <!-- 6. Time Log -->
                 <div id="task-inspector-timelog" style="display: none;">
                     <table class="data-table">
                         <thead>
@@ -7967,12 +7957,16 @@
         }
 
         function switchTaskInspectorTab(tab) {
-            ['details', 'checklist', 'comments', 'dependencies', 'timelog'].forEach(t => {
+            ['details', 'checklist', 'attachments', 'comments', 'dependencies', 'timelog'].forEach(t => {
                 const view = document.getElementById(`task-inspector-${t}`);
                 const btn = document.getElementById(`task-tab-btn-${t}`);
                 if (view) view.style.display = (t === tab) ? 'block' : 'none';
                 if (btn) {
-                    btn.className = (t === tab) ? 'header-btn btn-primary' : 'header-btn btn-outline';
+                    btn.className = (t === tab) ? 'tactile-btn btn-primary' : 'tactile-btn btn-secondary';
+                    btn.style.background = (t === tab) ? '' : 'transparent';
+                    btn.style.border = (t === tab) ? '' : 'none';
+                    btn.style.boxShadow = (t === tab) ? '' : 'none';
+                    btn.style.color = (t === tab) ? '' : 'var(--text-secondary)';
                 }
             });
         }
@@ -8045,7 +8039,7 @@
             if (!body || !activeInspectorTaskId) return;
 
             try {
-                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${activeInspectorTaskId}/comments`, {
+                const res = await fetch(`/tasks/${activeInspectorTaskId}/comments`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
                     credentials: 'same-origin',
@@ -8059,6 +8053,110 @@
                 openTaskDetails(activeInspectorTaskId);
             } catch (err) {
                 alert('Network error posting comment.');
+            }
+        }
+
+        function insertMentionHandle(name) {
+            const input = document.getElementById('new-comment-body-input');
+            if (!input) return;
+            input.value += (input.value ? ' ' : '') + '@' + name + ' ';
+            input.focus();
+        }
+
+        async function uploadTaskAttachmentSubmit(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('task-file-input');
+            if (!fileInput || !fileInput.files.length || !activeInspectorTaskId) return;
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const res = await fetch(`/tasks/${activeInspectorTaskId}/attachments`, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+                    credentials: 'same-origin',
+                    body: formData
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.message || 'Error uploading file.');
+                    return;
+                }
+                fileInput.value = '';
+                showToastNotification('📎 ' + "{{ __('Attachment uploaded successfully!') }}");
+                openTaskDetails(activeInspectorTaskId);
+            } catch (err) {
+                alert('Network error uploading attachment.');
+            }
+        }
+
+        async function deleteTaskAttachmentAction(attachmentId) {
+            if (!confirm('{{ __("Are you sure you want to delete this attachment?") }}')) return;
+            try {
+                const res = await fetch(`/tasks/${activeInspectorTaskId}/attachments/${attachmentId}`, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+                    credentials: 'same-origin'
+                });
+                if (!res.ok) {
+                    alert('Error deleting attachment.');
+                    return;
+                }
+                showToastNotification('🗑️ ' + "{{ __('Attachment removed.') }}");
+                openTaskDetails(activeInspectorTaskId);
+            } catch (err) {
+                alert('Network error deleting attachment.');
+            }
+        }
+
+        async function quickApproveTask(taskId) {
+            try {
+                const res = await fetch(`/tasks/${taskId}/approve`, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+                    credentials: 'same-origin'
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.message || 'Error approving task.');
+                    return;
+                }
+                showToastNotification('🎉 ' + "{{ __('Task approved and marked as Completed!') }}");
+                if (activeInspectorTaskId === taskId) {
+                    openTaskDetails(taskId);
+                } else {
+                    window.location.reload();
+                }
+            } catch (err) {
+                alert('Network error approving task.');
+            }
+        }
+
+        async function quickRejectTask(taskId) {
+            const reason = prompt('{{ __("Please enter a note / feedback on required changes:") }}');
+            if (!reason) return;
+
+            try {
+                const res = await fetch(`/tasks/${taskId}/reject`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ rejection_reason: reason })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.message || 'Error rejecting task.');
+                    return;
+                }
+                showToastNotification('⚠️ ' + "{{ __('Task returned to in-progress with feedback.') }}");
+                if (activeInspectorTaskId === taskId) {
+                    openTaskDetails(taskId);
+                } else {
+                    window.location.reload();
+                }
+            } catch (err) {
+                alert('Network error requesting changes.');
             }
         }
 
@@ -8112,6 +8210,40 @@
             document.getElementById('task-modal-description').textContent = t.description || 'No description provided.';
             document.getElementById('task-modal-hours').textContent = `${t.estimated_hours || 0}h est / ${t.actual_hours || 0}h act`;
 
+            // Approval Banner logic
+            const appBanner = document.getElementById('task-modal-approval-banner');
+            const appText = document.getElementById('task-modal-approval-text');
+            const appActions = document.getElementById('task-modal-approval-actions');
+            if (appBanner && appText && appActions) {
+                if (t.approval_status === 'pending_approval') {
+                    appBanner.style.display = 'flex';
+                    appBanner.style.background = 'rgba(214, 162, 58, 0.15)';
+                    appBanner.style.border = '1px solid rgba(214, 162, 58, 0.35)';
+                    appBanner.style.color = '#D6A23A';
+                    appText.innerHTML = '<span>⏳</span> <span>{{ __("This task was submitted for completion and is awaiting Project Manager approval.") }}</span>';
+                    appActions.innerHTML = `
+                        <button type="button" onclick="quickApproveTask('${t.id}')" class="tactile-btn btn-primary" style="padding: 6px 14px; font-size: 11px;">✓ {{ __("Approve & Mark Done") }}</button>
+                        <button type="button" onclick="quickRejectTask('${t.id}')" class="tactile-btn" style="background: rgba(217, 107, 95, 0.2); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.3); padding: 6px 12px; font-size: 11px;">✕ {{ __("Request Changes") }}</button>
+                    `;
+                } else if (t.approval_status === 'rejected') {
+                    appBanner.style.display = 'flex';
+                    appBanner.style.background = 'rgba(217, 107, 95, 0.15)';
+                    appBanner.style.border = '1px solid rgba(217, 107, 95, 0.35)';
+                    appBanner.style.color = '#D96B5F';
+                    appText.innerHTML = `<span>⚠️</span> <span><strong>{{ __("Changes Requested:") }}</strong> ${t.rejection_reason || 'Please review feedback.'}</span>`;
+                    appActions.innerHTML = '';
+                } else if (t.approval_status === 'approved') {
+                    appBanner.style.display = 'flex';
+                    appBanner.style.background = 'rgba(79, 155, 95, 0.15)';
+                    appBanner.style.border = '1px solid rgba(79, 155, 95, 0.35)';
+                    appBanner.style.color = '#4F9B5F';
+                    appText.innerHTML = '<span>✅</span> <span>{{ __("Task approved and completed by Project Manager.") }}</span>';
+                    appActions.innerHTML = '';
+                } else {
+                    appBanner.style.display = 'none';
+                }
+            }
+
             // Timer Button
             const timerBtn = document.getElementById('task-modal-timer-btn');
             if (timerBtn) {
@@ -8140,6 +8272,33 @@
                             <span class="badge ${item.is_completed ? 'badge-green' : 'badge-gray'}" style="font-size: 10px;">${item.is_completed ? 'Done' : 'Pending'}</span>
                         `;
                         checkContainer.appendChild(div);
+                    });
+                }
+            }
+
+            // Attachments
+            const attachments = t.attachments || [];
+            const attCountEl = document.getElementById('task-attachments-count');
+            if (attCountEl) attCountEl.textContent = attachments.length;
+            const attContainer = document.getElementById('task-attachments-list-container');
+            if (attContainer) {
+                attContainer.innerHTML = '';
+                if (attachments.length === 0) {
+                    attContainer.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 8px; grid-column: 1 / -1;">{{ __("No attachments uploaded yet.") }}</div>';
+                } else {
+                    attachments.forEach(att => {
+                        const card = document.createElement('div');
+                        card.style = 'background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; gap: 6px;';
+                        const uploader = att.user ? att.user.name : 'Team Member';
+                        card.innerHTML = `
+                            <div style="font-weight: 800; font-size: 12px; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">📄 ${att.file_name}</div>
+                            <div style="font-size: 10px; color: var(--text-muted);">👤 ${uploader} • ${(att.file_size / 1024).toFixed(1)} KB</div>
+                            <div style="display: flex; gap: 6px; margin-top: 4px;">
+                                <a href="${att.file_url || ('/uploads/tasks/' + t.id + '/' + att.file_name)}" target="_blank" download class="tactile-btn btn-secondary" style="flex: 1; padding: 4px 8px; font-size: 10px; text-align: center; text-decoration: none;">⬇ {{ __("Download") }}</a>
+                                <button type="button" onclick="deleteTaskAttachmentAction('${att.id}')" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.3); padding: 4px 8px; font-size: 10px;">🗑️</button>
+                            </div>
+                        `;
+                        attContainer.appendChild(card);
                     });
                 }
             }
@@ -8220,6 +8379,24 @@
         // ==========================================
         const upcomingMeetingsList = {!! json_encode($upcomingMeetingsJson ?? []) !!};
 
+        const projectMembersMap = {
+            @foreach($projects as $p)
+                '{{ $p->id }}': [
+                    @php
+                        $pMembers = collect();
+                        if ($p->owner) $pMembers->push($p->owner);
+                        if ($p->manager) $pMembers->push($p->manager);
+                        $pTaskUserIds = $p->tasks()->whereNotNull('assignee_id')->pluck('assignee_id')->unique();
+                        $pTaskUsers = \App\Domains\Identity\Models\User::whereIn('id', $pTaskUserIds)->get();
+                        $pMembers = $pMembers->concat($pTaskUsers)->unique('id');
+                    @endphp
+                    @foreach($pMembers as $pm)
+                        { id: '{{ $pm->id }}', name: '{{ addslashes($pm->name) }}', email: '{{ addslashes($pm->email) }}' },
+                    @endforeach
+                ],
+            @endforeach
+        };
+
         function openScheduleMeetingModal(scope = 'general', projectId = null) {
             const modal = document.getElementById('schedule-meeting-modal');
             if (!modal) return;
@@ -8235,7 +8412,10 @@
 
             if (projectId) {
                 const projSelect = document.getElementById('meeting-project-select');
-                if (projSelect) projSelect.value = projectId;
+                if (projSelect) {
+                    projSelect.value = projectId;
+                    renderProjectAttendeesList(projectId);
+                }
             }
 
             modal.style.display = 'flex';
@@ -8261,6 +8441,13 @@
             if (projField) projField.style.display = isProject ? 'block' : 'none';
             if (genField) genField.style.display = isProject ? 'none' : 'block';
 
+            if (isProject) {
+                const projSelect = document.getElementById('meeting-project-select');
+                if (projSelect && projSelect.value) {
+                    renderProjectAttendeesList(projSelect.value);
+                }
+            }
+
             if (lblGeneral && lblProject) {
                 if (isProject) {
                     lblProject.style.background = 'var(--bg-surface)';
@@ -8278,6 +8465,43 @@
                     lblProject.style.boxShadow = 'none';
                 }
             }
+        }
+
+        function renderProjectAttendeesList(projectId) {
+            const container = document.getElementById('project-attendees-list');
+            const box = document.getElementById('project-attendees-selection-box');
+            if (!container || !box) return;
+
+            if (!projectId || !projectMembersMap[projectId] || projectMembersMap[projectId].length === 0) {
+                box.style.display = 'block';
+                container.innerHTML = '<div style="font-size: 11px; color: var(--text-muted); padding: 8px;">{{ __("No assigned members in this project yet. All project roles will be notified automatically.") }}</div>';
+                return;
+            }
+
+            box.style.display = 'block';
+            container.innerHTML = '';
+
+            projectMembersMap[projectId].forEach(m => {
+                if (m.id === '{{ $user->id }}') return;
+                const label = document.createElement('label');
+                label.style = "display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--text-primary); cursor: pointer; padding: 4px 6px; border-radius: 6px; transition: background 0.2s;";
+                label.innerHTML = `
+                    <span style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" name="attendee_ids[]" value="${m.id}" checked class="proj-attendee-chk" style="accent-color: var(--brand-forest);">
+                        <strong>${m.name}</strong>
+                        <span style="font-size: 11px; color: var(--text-muted);">(${m.email})</span>
+                    </span>
+                    <span class="nav-badge-pill" style="font-size: 10px;">{{ __("Project Team") }}</span>
+                `;
+                container.appendChild(label);
+            });
+        }
+
+        function toggleAllProjectAttendees() {
+            const chks = document.querySelectorAll('.proj-attendee-chk');
+            if (!chks.length) return;
+            const anyUnchecked = Array.from(chks).some(c => !c.checked);
+            chks.forEach(c => c.checked = anyUnchecked);
         }
 
         function scheduleMeetingForCurrentProject() {

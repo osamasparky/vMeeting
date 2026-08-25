@@ -253,6 +253,12 @@ Route::prefix('v1')->group(function () {
                 Route::delete('/time/entries/{timeEntry}', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'destroy'])
                     ->middleware('permission:time.delete');
 
+                // ── Time Entries Route Aliases ──
+                Route::post('/time-entries/timer/start', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'startTimer']);
+                Route::post('/time-entries/timer/stop', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'stopTimer']);
+                Route::post('/time-entries/manual', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'logManual']);
+                Route::get('/time-entries', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'index']);
+
                 // ── Timesheets Domain ──
                 Route::get('/timesheets', [\App\Domains\Projects\Controllers\TimesheetController::class, 'index'])
                     ->middleware('permission:timesheets.view');

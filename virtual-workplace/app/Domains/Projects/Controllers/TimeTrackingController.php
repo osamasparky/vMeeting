@@ -42,7 +42,20 @@ class TimeTrackingController extends Controller
         Organization $organization,
         StartTimerAction $action
     ): JsonResponse {
-        $timer = $action->execute($request->validated(), $organization, Auth::user());
+        $targetUser = Auth::user();
+        if ($request->filled('user_id') && $request->input('user_id') !== $targetUser->id) {
+            $membership = \App\Domains\Tenancy\Models\OrganizationMember::where('organization_id', $organization->id)
+                ->where('user_id', $targetUser->id)
+                ->first();
+            $isPrivileged = $targetUser->isSuperAdmin() 
+                || ($membership && ($membership->role?->slug === 'company_admin' || $membership->hasPermission('time.create') || $membership->hasPermission('tasks.assign')));
+            
+            if ($isPrivileged) {
+                $targetUser = \App\Domains\Identity\Models\User::findOrFail($request->input('user_id'));
+            }
+        }
+
+        $timer = $action->execute($request->validated(), $organization, $targetUser);
 
         return response()->json([
             'message' => 'Timer started successfully.',
@@ -58,7 +71,20 @@ class TimeTrackingController extends Controller
         Organization $organization,
         StopTimerAction $action
     ): JsonResponse {
-        $entry = $action->execute($organization, Auth::user(), $request->input('description'));
+        $targetUser = Auth::user();
+        if ($request->filled('user_id') && $request->input('user_id') !== $targetUser->id) {
+            $membership = \App\Domains\Tenancy\Models\OrganizationMember::where('organization_id', $organization->id)
+                ->where('user_id', $targetUser->id)
+                ->first();
+            $isPrivileged = $targetUser->isSuperAdmin() 
+                || ($membership && ($membership->role?->slug === 'company_admin' || $membership->hasPermission('time.create')));
+            
+            if ($isPrivileged) {
+                $targetUser = \App\Domains\Identity\Models\User::findOrFail($request->input('user_id'));
+            }
+        }
+
+        $entry = $action->execute($organization, $targetUser, $request->input('description'));
 
         return response()->json([
             'message' => 'Timer stopped and time entry logged.',

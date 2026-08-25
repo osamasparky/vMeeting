@@ -16,6 +16,7 @@ class StartTimerRequest extends FormRequest
         return [
             'project_id' => ['required', 'exists:projects,id'],
             'task_id' => ['nullable', 'exists:tasks,id'],
+            'user_id' => ['nullable', 'exists:users,id'],
             'description' => ['nullable', 'string', 'max:500'],
             'is_billable' => ['nullable', 'boolean'],
         ];

@@ -72,6 +72,10 @@ class Task extends Model
         'is_billable',
         'order',
         'metadata',
+        'approval_status',
+        'approved_by',
+        'approved_at',
+        'rejection_reason',
     ];
 
     protected $casts = [
@@ -79,6 +83,7 @@ class Task extends Model
         'start_date' => 'date',
         'due_date' => 'date',
         'completed_at' => 'datetime',
+        'approved_at' => 'datetime',
         'estimated_hours' => 'decimal:2',
         'is_billable' => 'boolean',
         'order' => 'integer',
@@ -86,6 +91,11 @@ class Task extends Model
     ];
 
     // ── Relationships ──
+
+    public function approver(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
 
     public function project(): BelongsTo
     {

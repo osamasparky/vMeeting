@@ -1209,6 +1209,9 @@
                 <button onclick="switchHubSection('team')" id="hub-nav-btn-team" class="hub-tab-btn">
                     👥 {{ __('Team Roster') }} ({{ $project->members->count() }})
                 </button>
+                <button onclick="switchHubSection('files')" id="hub-nav-btn-files" class="hub-tab-btn">
+                    📁 {{ __('Files & Docs') }} (<span id="count-total-files">{{ $project->files->count() }}</span>)
+                </button>
                 <button onclick="switchHubSection('milestones')" id="hub-nav-btn-milestones" class="hub-tab-btn">
                     🚩 {{ __('Roadmap') }} ({{ $project->milestones->count() }})
                 </button>
@@ -1227,6 +1230,7 @@
                             'review' => ['title' => '🔍 ' . __('Review / QA'), 'color' => 'var(--status-warning)'],
                             'done' => ['title' => '🎉 ' . __('Done'), 'color' => 'var(--brand-forest)'],
                         ];
+                        $isProjectManager = ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || ($project && $project->manager_id === $user->id));
                     @endphp
 
                     @foreach($columns as $colKey => $colMeta)
@@ -1276,6 +1280,19 @@
                                         <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; line-height: 1.4; {{ $t->status === 'done' ? 'text-decoration: line-through; opacity: 0.6;' : '' }}">
                                             {{ $t->title }}
                                         </div>
+
+                                        @if($t->approval_status === 'pending_approval')
+                                            <div style="background: rgba(214, 162, 58, 0.15); border: 1px solid rgba(214, 162, 58, 0.35); color: #D6A23A; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+                                                <span>⏳ {{ __('Pending PM Approval') }}</span>
+                                                @if($isProjectManager)
+                                                    <button onclick="event.stopPropagation(); quickApproveHubTask('{{ $t->id }}')" class="tactile-btn" style="background: #4F9B5F; color: white; border: none; padding: 2px 6px; font-size: 9px;">✓ {{ __('Approve') }}</button>
+                                                @endif
+                                            </div>
+                                        @elseif($t->approval_status === 'rejected')
+                                            <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); color: #D96B5F; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; margin-bottom: 8px;">
+                                                <span>⚠️ {{ __('Changes Requested') }}</span>
+                                            </div>
+                                        @endif
 
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 11px; color: var(--text-muted);">
                                             <div style="display: flex; align-items: center; gap: 6px;">
@@ -1916,6 +1933,88 @@
                             </div>
                         </div>
                         @endforelse
+            <!-- TAB: FILES & ATTACHMENTS -->
+            <div id="hub-section-files" class="hub-section-content" style="display: none;">
+                <div class="hub-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h3 style="font-size: 16px; font-weight: 900; color: var(--text-primary);">📁 {{ __('Project Assets & File Repository') }}</h3>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">{{ __('Centralized repository for design files, contracts, deliverables, and specifications.') }}</p>
+                        </div>
+                    </div>
+
+                    <!-- File Upload Dropzone Form -->
+                    <form action="{{ route('projects.files.store', $project) }}" method="POST" enctype="multipart/form-data" style="background: var(--bg-surface-subtle); border: 2px dashed var(--border-color); border-radius: var(--radius-lg); padding: 24px; text-align: center; margin-bottom: 24px; transition: border-color 0.2s;">
+                        @csrf
+                        <div style="font-size: 32px; margin-bottom: 8px;">📤</div>
+                        <h4 style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">{{ __('Upload Files to Project') }}</h4>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">{{ __('Choose documents, images, archives or zip files (Max 50MB)') }}</p>
+                        <div style="display: flex; justify-content: center; align-items: center; gap: 10px; max-width: 480px; margin: 0 auto; flex-wrap: wrap;">
+                            <input type="file" name="file" required class="form-input" style="font-size: 12px; flex: 1;">
+                            <button type="submit" class="tactile-btn btn-primary" style="padding: 9px 18px; font-size: 12px;">
+                                🚀 {{ __('Upload File') }}
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Files Grid -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+                        @forelse($project->files as $file)
+                            @php
+                                $ext = strtolower(pathinfo($file->file_name, PATHINFO_EXTENSION));
+                                $icon = match($ext) {
+                                    'pdf' => '📕',
+                                    'png', 'jpg', 'jpeg', 'svg', 'gif', 'webp' => '🖼️',
+                                    'zip', 'rar', 'tar', 'gz', '7z' => '📦',
+                                    'doc', 'docx' => '📘',
+                                    'xls', 'xlsx', 'csv' => '📊',
+                                    'mp4', 'mov', 'avi' => '🎥',
+                                    'mp3', 'wav', 'ogg' => '🎵',
+                                    'php', 'js', 'json', 'html', 'css', 'py', 'ts' => '💻',
+                                    default => '📄'
+                                };
+                                $canDelete = ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || ($project && $project->manager_id === $user->id) || $file->user_id === $user->id);
+                            @endphp
+                            <div style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; box-shadow: var(--shadow-soft-3d);">
+                                <div style="display: flex; gap: 12px; align-items: flex-start;">
+                                    <div style="font-size: 28px; width: 44px; height: 44px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        {{ $icon }}
+                                    </div>
+                                    <div style="flex: 1; min-width: 0;">
+                                        <div style="font-weight: 800; font-size: 13px; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ $file->file_name }}">
+                                            {{ $file->file_name }}
+                                        </div>
+                                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">
+                                            {{ $file->formatted_size }} • {{ $file->created_at->format('M d, Y') }}
+                                        </div>
+                                        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
+                                            <span>👤</span>
+                                            <strong>{{ $file->user ? $file->user->name : __('Team Member') }}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+                                    <a href="{{ $file->file_url }}" target="_blank" download class="tactile-btn btn-secondary" style="flex: 1; padding: 6px 12px; font-size: 11px; text-align: center; text-decoration: none; justify-content: center;">
+                                        ⬇ {{ __('Download') }}
+                                    </a>
+                                    @if($canDelete)
+                                        <form action="{{ route('projects.files.destroy', [$project, $file]) }}" method="POST" onsubmit="return confirm('{{ __('Are you sure you want to delete this file?') }}')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.3); padding: 6px 10px; font-size: 11px;" title="{{ __('Delete File') }}">
+                                                🗑️
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </div>
+                        @empty
+                            <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 40px;">
+                                <div style="font-size: 32px; margin-bottom: 8px;">📂</div>
+                                {{ __('No files or assets uploaded to this project yet.') }}
+                            </div>
+                        @endforelse
                     </div>
                 </div>
             </div>
@@ -2088,20 +2187,28 @@
             </div>
 
             <!-- Quick Status Change & Timer Action -->
-            <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface-subtle); padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 16px;">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 12px; font-weight: 800; color: var(--text-secondary);">⚡ {{ __('Status') }}:</span>
-                    <select id="task-modal-status-select" onchange="updateCurrentTaskStatus(this.value)" class="form-input" style="padding: 4px 8px; font-size: 12px; width: auto;">
-                        <option value="backlog">📌 {{ __('Backlog') }}</option>
-                        <option value="ready">🎯 {{ __('Ready') }}</option>
-                        <option value="in_progress">⚡ {{ __('In Progress') }}</option>
-                        <option value="review">🔍 {{ __('Review / QA') }}</option>
-                        <option value="done">🎉 {{ __('Done') }}</option>
-                    </select>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface-subtle); padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color); flex-wrap: wrap; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 12px; font-weight: 800; color: var(--text-secondary);">⚡ {{ __('Status') }}:</span>
+                        <select id="task-modal-status-select" onchange="updateCurrentTaskStatus(this.value)" class="form-input" style="padding: 4px 8px; font-size: 12px; width: auto;">
+                            <option value="backlog">📌 {{ __('Backlog') }}</option>
+                            <option value="ready">🎯 {{ __('Ready') }}</option>
+                            <option value="in_progress">⚡ {{ __('In Progress') }}</option>
+                            <option value="review">🔍 {{ __('Review / QA') }}</option>
+                            <option value="done">🎉 {{ __('Done') }}</option>
+                        </select>
+                    </div>
+                    <button id="task-modal-timer-btn" onclick="toggleTaskTimerAction()" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 11px;">
+                        ⏱️ {{ __('Start Timer') }}
+                    </button>
                 </div>
-                <button id="task-modal-timer-btn" onclick="toggleTaskTimerAction()" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 11px;">
-                    ⏱️ {{ __('Start Timer') }}
-                </button>
+
+                <!-- Approval Banner -->
+                <div id="task-modal-hub-approval-banner" style="display: none; padding: 12px 16px; border-radius: var(--radius-md); font-size: 12px; font-weight: 700; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <div id="task-modal-hub-approval-text" style="display: flex; align-items: center; gap: 8px;"></div>
+                    <div id="task-modal-hub-approval-actions" style="display: flex; gap: 8px;"></div>
+                </div>
             </div>
 
             <!-- Description -->
@@ -2110,6 +2217,16 @@
                 <div id="task-modal-description" style="background: var(--bg-surface-subtle); padding: 12px; border-radius: var(--radius-md); font-size: 13px; color: var(--text-primary); border: 1px solid var(--border-color);">
                     —
                 </div>
+            </div>
+
+            <!-- Attachments & Files -->
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">📎 {{ __('Task Attachments') }} (<span id="task-hub-attachments-count">0</span>)</label>
+                <form onsubmit="uploadHubTaskAttachmentSubmit(event)" style="background: var(--bg-surface-subtle); border: 1px dashed var(--border-color); border-radius: var(--radius-md); padding: 12px; text-align: center; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                    <input type="file" id="hub-task-file-input" required class="form-input" style="font-size: 11px; max-width: 260px;">
+                    <button type="submit" class="tactile-btn btn-primary" style="padding: 6px 12px; font-size: 11px;">📤 {{ __('Upload') }}</button>
+                </form>
+                <div id="task-hub-attachments-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px;"></div>
             </div>
 
             <!-- Checklist -->
@@ -2124,12 +2241,25 @@
                 </form>
             </div>
 
-            <!-- Comments & Discussion -->
+            <!-- Comments & Discussion & Mentions -->
             <div>
                 <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">💬 {{ __('Discussions & Updates') }}</label>
                 <div id="task-comments-feed" style="max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;"></div>
+                
+                <!-- Mention chips -->
+                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap;">
+                    <span style="font-size: 10px; font-weight: 800; color: var(--text-muted);">@ {{ __('Mention') }}:</span>
+                    @foreach($allMembers->take(6) as $chipMember)
+                        @if($chipMember->user_id !== $user->id)
+                            <button type="button" onclick="insertHubMentionHandle('{{ $chipMember->user->name }}')" class="badge-pill" style="cursor: pointer; font-size: 10px; border: 1px solid var(--border-color); background: var(--bg-surface-subtle); color: var(--brand-forest);" title="{{ __('Mention :name', ['name' => $chipMember->user->name]) }}">
+                                @<span>{{ $chipMember->user->name }}</span>
+                            </button>
+                        @endif
+                    @endforeach
+                </div>
+
                 <form onsubmit="addTaskComment(event)" style="display: flex; gap: 8px;">
-                    <input type="text" id="new-comment-input" required placeholder="{{ __('Write a comment...') }}" class="form-input" style="font-size: 12px; padding: 7px 10px;">
+                    <input type="text" id="new-comment-input" required placeholder="{{ __('Write a comment... Type @name to mention') }}" class="form-input" style="font-size: 12px; padding: 7px 10px;">
                     <button type="submit" class="tactile-btn btn-primary" style="padding: 7px 14px; font-size: 11px;">{{ __('Post') }}</button>
                 </form>
             </div>
@@ -2773,6 +2903,72 @@
                     statusSelect.title = canEdit ? '' : '{{ __('Only assigned member or manager can edit') }}';
                 }
 
+                // Approval Banner handling
+                const appBanner = document.getElementById('task-modal-hub-approval-banner');
+                const appText = document.getElementById('task-modal-hub-approval-text');
+                const appActions = document.getElementById('task-modal-hub-approval-actions');
+                const isProjectManager = {{ ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || ($project && $project->manager_id === $user->id)) ? 'true' : 'false' }};
+
+                if (appBanner && appText && appActions) {
+                    if (t.approval_status === 'pending_approval') {
+                        appBanner.style.display = 'flex';
+                        appBanner.style.background = 'rgba(214, 162, 58, 0.15)';
+                        appBanner.style.border = '1px solid rgba(214, 162, 58, 0.35)';
+                        appBanner.style.color = '#D6A23A';
+                        appText.innerHTML = '<span>⏳</span> <span>{{ __("This task is submitted for completion and awaiting PM approval.") }}</span>';
+                        if (isProjectManager) {
+                            appActions.innerHTML = `
+                                <button type="button" onclick="quickApproveHubTask('${t.id}')" class="tactile-btn btn-primary" style="padding: 4px 10px; font-size: 11px;">✓ {{ __("Approve") }}</button>
+                                <button type="button" onclick="quickRejectHubTask('${t.id}')" class="tactile-btn" style="background: rgba(217, 107, 95, 0.2); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.3); padding: 4px 10px; font-size: 11px;">✕ {{ __("Request Changes") }}</button>
+                            `;
+                        } else {
+                            appActions.innerHTML = '';
+                        }
+                    } else if (t.approval_status === 'rejected') {
+                        appBanner.style.display = 'flex';
+                        appBanner.style.background = 'rgba(217, 107, 95, 0.15)';
+                        appBanner.style.border = '1px solid rgba(217, 107, 95, 0.35)';
+                        appBanner.style.color = '#D96B5F';
+                        appText.innerHTML = `<span>⚠️</span> <span><strong>{{ __("Changes Requested:") }}</strong> ${t.rejection_reason || 'Please review feedback.'}</span>`;
+                        appActions.innerHTML = '';
+                    } else if (t.approval_status === 'approved') {
+                        appBanner.style.display = 'flex';
+                        appBanner.style.background = 'rgba(79, 155, 95, 0.15)';
+                        appBanner.style.border = '1px solid rgba(79, 155, 95, 0.35)';
+                        appBanner.style.color = '#4F9B5F';
+                        appText.innerHTML = '<span>✅</span> <span>{{ __("Task approved and marked Done by Project Manager.") }}</span>';
+                        appActions.innerHTML = '';
+                    } else {
+                        appBanner.style.display = 'none';
+                    }
+                }
+
+                // Render Attachments
+                const attCount = document.getElementById('task-hub-attachments-count');
+                const attCont = document.getElementById('task-hub-attachments-container');
+                const attachments = t.attachments || [];
+                if (attCount) attCount.textContent = attachments.length;
+                if (attCont) {
+                    attCont.innerHTML = '';
+                    if (attachments.length === 0) {
+                        attCont.innerHTML = '<div style="font-size: 11px; color: var(--text-muted); padding: 6px; grid-column: 1/-1;">{{ __("No files attached to this task.") }}</div>';
+                    } else {
+                        attachments.forEach(att => {
+                            const card = document.createElement('div');
+                            card.style = 'background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; justify-content: space-between; gap: 4px;';
+                            card.innerHTML = `
+                                <div style="font-weight: 700; font-size: 11px; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">📄 ${att.file_name}</div>
+                                <div style="font-size: 10px; color: var(--text-muted);">${(att.file_size / 1024).toFixed(1)} KB</div>
+                                <div style="display: flex; gap: 4px; margin-top: 4px;">
+                                    <a href="${att.file_url || ('/uploads/tasks/' + t.id + '/' + att.file_name)}" target="_blank" download class="tactile-btn btn-secondary" style="flex: 1; padding: 3px 6px; font-size: 10px; text-align: center; text-decoration: none;">⬇</a>
+                                    <button type="button" onclick="deleteHubTaskAttachmentAction('${att.id}')" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.3); padding: 3px 6px; font-size: 10px;">🗑️</button>
+                                </div>
+                            `;
+                            attCont.appendChild(card);
+                        });
+                    }
+                }
+
                 // Render checklist
                 const checkCont = document.getElementById('task-checklist-container');
                 checkCont.innerHTML = '';
@@ -2803,6 +2999,102 @@
                 });
             } catch (e) {
                 console.error(e);
+            }
+        }
+
+        function insertHubMentionHandle(name) {
+            const input = document.getElementById('new-comment-input');
+            if (!input) return;
+            input.value += (input.value ? ' ' : '') + '@' + name + ' ';
+            input.focus();
+        }
+
+        async function uploadHubTaskAttachmentSubmit(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('hub-task-file-input');
+            if (!fileInput || !fileInput.files.length || !activeInspectedTaskId) return;
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const res = await fetch(`/tasks/${activeInspectedTaskId}/attachments`, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+                    credentials: 'same-origin',
+                    body: formData
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.message || 'Error uploading file.');
+                    return;
+                }
+                fileInput.value = '';
+                showHubToast('📎 ' + "{{ __('Attachment uploaded successfully!') }}");
+                openTaskInspector(activeInspectedTaskId);
+            } catch (err) {
+                alert('Network error uploading attachment.');
+            }
+        }
+
+        async function deleteHubTaskAttachmentAction(attachmentId) {
+            if (!confirm('{{ __("Are you sure you want to delete this attachment?") }}')) return;
+            try {
+                const res = await fetch(`/tasks/${activeInspectedTaskId}/attachments/${attachmentId}`, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+                    credentials: 'same-origin'
+                });
+                if (!res.ok) {
+                    alert('Error deleting attachment.');
+                    return;
+                }
+                showHubToast('🗑️ ' + "{{ __('Attachment removed.') }}");
+                openTaskInspector(activeInspectedTaskId);
+            } catch (err) {
+                alert('Network error deleting attachment.');
+            }
+        }
+
+        async function quickApproveHubTask(taskId) {
+            try {
+                const res = await fetch(`/tasks/${taskId}/approve`, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+                    credentials: 'same-origin'
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.message || 'Error approving task.');
+                    return;
+                }
+                showHubToast('🎉 ' + "{{ __('Task approved and marked Done!') }}");
+                setTimeout(() => window.location.reload(), 400);
+            } catch (err) {
+                alert('Network error approving task.');
+            }
+        }
+
+        async function quickRejectHubTask(taskId) {
+            const reason = prompt('{{ __("Please enter reason or required changes:") }}');
+            if (!reason) return;
+
+            try {
+                const res = await fetch(`/tasks/${taskId}/reject`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ rejection_reason: reason })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert(data.message || 'Error requesting changes.');
+                    return;
+                }
+                showHubToast('⚠️ ' + "{{ __('Task sent back for changes.') }}");
+                setTimeout(() => window.location.reload(), 400);
+            } catch (err) {
+                alert('Network error requesting changes.');
             }
         }
 

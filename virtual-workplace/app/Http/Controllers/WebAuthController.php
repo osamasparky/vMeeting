@@ -288,6 +288,7 @@ class WebAuthController extends Controller
             'documents.author',
             'goals.targets',
             'sprints.tasks',
+            'files.user',
             'tasks' => function ($q) {
                 $q->with([
                     'assignee.profiles',
@@ -297,6 +298,9 @@ class WebAuthController extends Controller
                     'customFieldValues.definition',
                     'sprint',
                     'timeEntries',
+                    'comments.user',
+                    'attachments.user',
+                    'approver',
                 ])->orderBy('order')->orderBy('created_at');
             },
             'timeEntries' => function ($q) {
@@ -2764,6 +2768,339 @@ class WebAuthController extends Controller
              'message' => __('Knock sent to room occupants!'),
          ]);
      }
+
+    /**
+     * Impersonate a team member within the organization (for Org Owner / Company Admin).
+     */
+    public function impersonateMember(OrganizationMember $member)
+    {
+        $currentUser = Auth::user();
+        $currentMembership = OrganizationMember::where('organization_id', $member->organization_id)
+            ->where('user_id', $currentUser->id)
+            ->first();
+
+        $canImpersonate = $currentUser->isSuperAdmin() 
+            || ($currentMembership && ($currentMembership->role?->slug === 'company_admin' || $currentMembership->hasPermission('users.manage')));
+
+        if (!$canImpersonate) {
+            abort(403, __('You do not have authorization to impersonate members.'));
+        }
+
+        if ($member->user_id === $currentUser->id) {
+            return back()->with('error', __('You cannot impersonate your own account.'));
+        }
+
+        // Store original user ID in session
+        session([
+            'org_impersonator_id' => $currentUser->id,
+            'org_impersonator_name' => $currentUser->name,
+            'org_impersonated_member_name' => $member->user->name,
+        ]);
+
+        Auth::loginUsingId($member->user_id);
+
+        return redirect()->route('dashboard')->with('success', __("Switched session: Logged in as :name", ['name' => $member->user->name]));
+    }
+
+    /**
+     * Leave member impersonation and return to admin account.
+     */
+    public function leaveMemberImpersonation()
+    {
+        $origId = session('org_impersonator_id');
+        $memberName = session('org_impersonated_member_name');
+
+        if ($origId) {
+            session()->forget(['org_impersonator_id', 'org_impersonator_name', 'org_impersonated_member_name']);
+            Auth::loginUsingId($origId);
+            return redirect()->route('dashboard')->with('success', __("Returned to admin account from :name", ['name' => $memberName]));
+        }
+
+        return redirect()->route('dashboard');
+    }
+
+    /**
+     * Upload a file/document to a Project.
+     */
+    public function uploadProjectFile(Request $request, Project $project)
+    {
+        $request->validate([
+            'file' => 'required|file|max:102400', // 100MB max
+        ]);
+
+        $user = Auth::user();
+        $uploadedFile = $request->file('file');
+        $originalName = $uploadedFile->getClientOriginalName();
+        $fileName = 'prj_' . $project->id . '_' . time() . '_' . Str::random(6) . '.' . $uploadedFile->getClientOriginalExtension();
+
+        $destDir = public_path('uploads/projects/' . $project->id);
+        if (!file_exists($destDir)) {
+            mkdir($destDir, 0755, true);
+        }
+        $uploadedFile->move($destDir, $fileName);
+        $fileUrl = '/uploads/projects/' . $project->id . '/' . $fileName;
+
+        $projectFile = \App\Domains\Projects\Models\ProjectFile::create([
+            'organization_id' => $project->organization_id,
+            'project_id' => $project->id,
+            'user_id' => $user->id,
+            'file_name' => $originalName,
+            'file_path' => $destDir . '/' . $fileName,
+            'file_url' => $fileUrl,
+            'file_size' => file_exists($destDir . '/' . $fileName) ? filesize($destDir . '/' . $fileName) : 0,
+            'mime_type' => $uploadedFile->getClientMimeType() ?: 'application/octet-stream',
+        ]);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('File uploaded successfully.'),
+                'file' => $projectFile->load('user:id,name,email'),
+            ]);
+        }
+
+        return back()->with('success', __('File uploaded to project successfully.'));
+    }
+
+    /**
+     * Delete a project file.
+     */
+    public function deleteProjectFile(Project $project, \App\Domains\Projects\Models\ProjectFile $file)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('organization_id', $project->organization_id)->where('user_id', $user->id)->first();
+        $canDelete = $user->isSuperAdmin() || ($membership && $membership->role?->slug === 'company_admin') || $file->user_id === $user->id || $project->manager_id === $user->id;
+
+        if (!$canDelete) {
+            abort(403, __('Unauthorized to delete this file.'));
+        }
+
+        if ($file->file_path && file_exists($file->file_path)) {
+            @unlink($file->file_path);
+        }
+        $file->delete();
+
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json(['success' => true, 'message' => __('File deleted.')]);
+        }
+
+        return back()->with('success', __('File removed from project.'));
+    }
+
+    /**
+     * Upload an attachment to a Task.
+     */
+    public function uploadTaskAttachment(Request $request, \App\Domains\Projects\Models\Task $task)
+    {
+        $request->validate([
+            'file' => 'required|file|max:51200', // 50MB
+        ]);
+
+        $user = Auth::user();
+        $uploadedFile = $request->file('file');
+        $originalName = $uploadedFile->getClientOriginalName();
+        $fileName = 'task_' . $task->id . '_' . time() . '_' . Str::random(6) . '.' . $uploadedFile->getClientOriginalExtension();
+
+        $destDir = public_path('uploads/tasks/' . $task->id);
+        if (!file_exists($destDir)) {
+            mkdir($destDir, 0755, true);
+        }
+        $uploadedFile->move($destDir, $fileName);
+        $fileUrl = '/uploads/tasks/' . $task->id . '/' . $fileName;
+
+        $attachment = \App\Domains\Projects\Models\TaskAttachment::create([
+            'organization_id' => $task->organization_id,
+            'task_id' => $task->id,
+            'user_id' => $user->id,
+            'file_name' => $originalName,
+            'file_path' => $destDir . '/' . $fileName,
+            'file_url' => $fileUrl,
+            'file_size' => file_exists($destDir . '/' . $fileName) ? filesize($destDir . '/' . $fileName) : 0,
+            'mime_type' => $uploadedFile->getClientMimeType() ?: 'application/octet-stream',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Attachment uploaded successfully.'),
+            'attachment' => $attachment->load('user:id,name,email'),
+        ]);
+    }
+
+    /**
+     * Delete a task attachment.
+     */
+    public function deleteTaskAttachment(\App\Domains\Projects\Models\Task $task, \App\Domains\Projects\Models\TaskAttachment $attachment)
+    {
+        $user = Auth::user();
+        if ($attachment->file_path && file_exists($attachment->file_path)) {
+            @unlink($attachment->file_path);
+        }
+        $attachment->delete();
+
+        return response()->json(['success' => true, 'message' => __('Attachment deleted.')]);
+    }
+
+    /**
+     * Get task comments thread.
+     */
+    public function getTaskComments(\App\Domains\Projects\Models\Task $task)
+    {
+        $comments = $task->comments()->with('user:id,name,email')->orderBy('created_at', 'asc')->get();
+        return response()->json([
+            'success' => true,
+            'comments' => $comments,
+        ]);
+    }
+
+    /**
+     * Store a comment on a Task with @mentions parsing and notifications.
+     */
+    public function storeTaskComment(Request $request, \App\Domains\Projects\Models\Task $task)
+    {
+        $request->validate([
+            'body' => 'required|string|max:3000',
+        ]);
+
+        $user = Auth::user();
+        $body = $request->input('body');
+
+        $comment = \App\Domains\Projects\Models\TaskComment::create([
+            'organization_id' => $task->organization_id,
+            'task_id' => $task->id,
+            'user_id' => $user->id,
+            'body' => $body,
+        ]);
+
+        // Parse @mentions (e.g. @username or @name)
+        preg_match_all('/@([a-zA-Z0-9_\.\-]+)/', $body, $matches);
+        if (!empty($matches[1])) {
+            $mentionedHandles = array_unique($matches[1]);
+            $orgUsers = User::whereIn('id', function($q) use ($task) {
+                $q->select('user_id')->from('organization_members')->where('organization_id', $task->organization_id);
+            })->get();
+
+            foreach ($mentionedHandles as $handle) {
+                $target = $orgUsers->first(function($u) use ($handle) {
+                    return str_contains(strtolower($u->name), strtolower($handle)) || str_contains(strtolower($u->email), strtolower($handle));
+                });
+
+                if ($target && $target->id !== $user->id) {
+                    \App\Domains\Notifications\Services\NotificationService::notifyCustom(
+                        $target->id,
+                        'mention',
+                        __("💬 @Mention: :name mentioned you in task \":task\"", ['name' => $user->name, 'task' => $task->title]),
+                        $body,
+                        ['task_id' => $task->id, 'project_id' => $task->project_id],
+                        $user->id
+                    );
+                }
+            }
+        }
+
+        // If assignee is not the commenter, notify assignee
+        if ($task->assignee_id && $task->assignee_id !== $user->id) {
+            \App\Domains\Notifications\Services\NotificationService::notifyCustom(
+                $task->assignee_id,
+                'task_comment',
+                __("💬 New comment on your task \":task\" by :name", ['task' => $task->title, 'name' => $user->name]),
+                Str::limit($body, 120),
+                ['task_id' => $task->id, 'project_id' => $task->project_id],
+                $user->id
+            );
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Comment posted.'),
+            'comment' => $comment->load('user:id,name,email'),
+        ]);
+    }
+
+    /**
+     * Approve a task as completed (by Project Manager / Admin).
+     */
+    public function approveTask(Request $request, \App\Domains\Projects\Models\Task $task)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('organization_id', $task->organization_id)->where('user_id', $user->id)->first();
+        $isManager = $user->isSuperAdmin() 
+            || ($membership && ($membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign')))
+            || ($task->project && $task->project->manager_id === $user->id);
+
+        if (!$isManager) {
+            return response()->json(['message' => __('Only Project Managers or Admins can approve tasks.')], 403);
+        }
+
+        $task->update([
+            'status' => 'done',
+            'approval_status' => 'approved',
+            'approved_by' => $user->id,
+            'approved_at' => now(),
+            'completed_at' => now(),
+            'rejection_reason' => null,
+        ]);
+
+        if ($task->assignee_id && $task->assignee_id !== $user->id) {
+            \App\Domains\Notifications\Services\NotificationService::notifyCustom(
+                $task->assignee_id,
+                'task_approved',
+                __("🎉 Task Approved: \":task\" has been approved as Completed by :name", ['task' => $task->title, 'name' => $user->name]),
+                __("Great work! Your task was reviewed and approved."),
+                ['task_id' => $task->id, 'project_id' => $task->project_id],
+                $user->id
+            );
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Task approved and marked as Completed!'),
+            'task' => $task->fresh(['project', 'assignee', 'approver']),
+        ]);
+    }
+
+    /**
+     * Reject / Request changes on a task (by Project Manager / Admin).
+     */
+    public function rejectTask(Request $request, \App\Domains\Projects\Models\Task $task)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('organization_id', $task->organization_id)->where('user_id', $user->id)->first();
+        $isManager = $user->isSuperAdmin() 
+            || ($membership && ($membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign')))
+            || ($task->project && $task->project->manager_id === $user->id);
+
+        if (!$isManager) {
+            return response()->json(['message' => __('Only Project Managers or Admins can review tasks.')], 403);
+        }
+
+        $validated = $request->validate([
+            'rejection_reason' => 'required|string|max:1000',
+        ]);
+
+        $task->update([
+            'status' => 'in_progress',
+            'approval_status' => 'rejected',
+            'approved_by' => $user->id,
+            'rejection_reason' => $validated['rejection_reason'],
+        ]);
+
+        if ($task->assignee_id && $task->assignee_id !== $user->id) {
+            \App\Domains\Notifications\Services\NotificationService::notifyCustom(
+                $task->assignee_id,
+                'task_rejected',
+                __("⚠️ Changes Requested on Task \":task\" by :name", ['task' => $task->title, 'name' => $user->name]),
+                $validated['rejection_reason'],
+                ['task_id' => $task->id, 'project_id' => $task->project_id],
+                $user->id
+            );
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Changes requested on task.'),
+            'task' => $task->fresh(['project', 'assignee', 'approver']),
+        ]);
+    }
 
     /**
      * Logout.

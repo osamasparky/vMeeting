@@ -102,6 +102,11 @@ class Project extends Model
         return $this->hasMany(TimeEntry::class);
     }
 
+    public function files(): HasMany
+    {
+        return $this->hasMany(ProjectFile::class)->latest();
+    }
+
     public function activeTimers(): HasMany
     {
         return $this->hasMany(ActiveTimer::class);
