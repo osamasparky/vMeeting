@@ -1944,14 +1944,14 @@
                     </div>
 
                     <!-- File Upload Dropzone Form -->
-                    <form action="{{ route('projects.files.store', $project) }}" method="POST" enctype="multipart/form-data" style="background: var(--bg-surface-subtle); border: 2px dashed var(--border-color); border-radius: var(--radius-lg); padding: 24px; text-align: center; margin-bottom: 24px; transition: border-color 0.2s;">
+                    <form id="hub-project-file-form" onsubmit="uploadProjectFileSubmit(event)" action="{{ route('projects.files.store', $project) }}" method="POST" enctype="multipart/form-data" style="background: var(--bg-surface-subtle); border: 2px dashed var(--border-color); border-radius: var(--radius-lg); padding: 24px; text-align: center; margin-bottom: 24px; transition: border-color 0.2s;">
                         @csrf
                         <div style="font-size: 32px; margin-bottom: 8px;">📤</div>
                         <h4 style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">{{ __('Upload Files to Project') }}</h4>
                         <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">{{ __('Choose documents, images, archives or zip files (Max 50MB)') }}</p>
                         <div style="display: flex; justify-content: center; align-items: center; gap: 10px; max-width: 480px; margin: 0 auto; flex-wrap: wrap;">
-                            <input type="file" name="file" required class="form-input" style="font-size: 12px; flex: 1;">
-                            <button type="submit" class="tactile-btn btn-primary" style="padding: 9px 18px; font-size: 12px;">
+                            <input type="file" name="file" id="hub-project-file-input" required class="form-input" style="font-size: 12px; flex: 1;">
+                            <button type="submit" id="hub-project-file-btn" class="tactile-btn btn-primary" style="padding: 9px 18px; font-size: 12px;">
                                 🚀 {{ __('Upload File') }}
                             </button>
                         </div>
@@ -2124,14 +2124,10 @@
                 <h3 style="font-size: 18px; font-weight: 900; color: var(--text-primary);">📅 {{ __('Schedule Project Meeting') }}</h3>
                 <button onclick="closeScheduleProjectMeetingModal()" class="modal-close">✕</button>
             </div>
-            <form method="POST" action="{{ route('meetings.schedule') }}" style="display: flex; flex-direction: column; gap: 14px;">
+            <form id="hub-schedule-meeting-form" onsubmit="scheduleProjectMeetingSubmit(event)" method="POST" action="{{ route('meetings.schedule') }}" style="display: flex; flex-direction: column; gap: 14px;">
                 @csrf
                 <input type="hidden" name="scope" value="project">
                 <input type="hidden" name="project_id" value="{{ $project->id }}">
-
-                <div style="background: rgba(79, 155, 95, 0.12); border: 1px solid rgba(79, 155, 95, 0.25); color: var(--brand-forest); padding: 10px 14px; border-radius: var(--radius-md); font-size: 12px; font-weight: 700;">
-                    📢 {{ __('All project managers, owners, and task assignees will automatically receive email invitations and chime audio alerts before the meeting.') }}
-                </div>
 
                 <div>
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Meeting Title') }} *</label>
@@ -2168,7 +2164,33 @@
                     <input type="datetime-local" name="scheduled_at" id="hub-meeting-time-input" required class="form-input">
                 </div>
 
-                <button type="submit" class="tactile-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px;">
+                <!-- Attendee selection -->
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">
+                            👥 {{ __('Select Project Members to Attend') }}
+                        </label>
+                        <button type="button" onclick="toggleAllHubProjectAttendees()" style="background: none; border: none; font-size: 11px; font-weight: 800; color: var(--brand-forest); cursor: pointer;">
+                            ✓ {{ __('Select / Unselect All') }}
+                        </button>
+                    </div>
+                    <div style="max-height: 120px; overflow-y: auto; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 6px 10px; display: flex; flex-direction: column; gap: 4px;">
+                        @foreach($allMembers as $pm)
+                            @if($pm->user_id !== $user->id)
+                                <label style="display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--text-primary); cursor: pointer; padding: 3px 4px; border-radius: 4px;">
+                                    <span style="display: flex; align-items: center; gap: 6px;">
+                                        <input type="checkbox" name="attendee_ids[]" value="{{ $pm->user_id }}" checked class="hub-proj-attendee-chk" style="accent-color: var(--brand-forest);">
+                                        <strong>{{ $pm->user->name }}</strong>
+                                        <span style="color: var(--text-muted);">({{ $pm->user->email }})</span>
+                                    </span>
+                                    <span class="badge-pill badge-neutral" style="font-size: 9px;">{{ $pm->role->name ?? 'Team' }}</span>
+                                </label>
+                            @endif
+                        @endforeach
+                    </div>
+                </div>
+
+                <button type="submit" id="hub-schedule-meeting-btn" class="tactile-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px;">
                     🚀 {{ __('Schedule Meeting & Email Team') }}
                 </button>
             </form>
@@ -2600,6 +2622,105 @@
         }
         function closeScheduleProjectMeetingModal() {
             document.getElementById('schedule-meeting-modal').style.display = 'none';
+        }
+
+        function toggleAllHubProjectAttendees() {
+            const chks = document.querySelectorAll('.hub-proj-attendee-chk');
+            if (!chks.length) return;
+            const anyUnchecked = Array.from(chks).some(c => !c.checked);
+            chks.forEach(c => c.checked = anyUnchecked);
+        }
+
+        async function scheduleProjectMeetingSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = document.getElementById('hub-schedule-meeting-btn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '⏳ {{ __("Scheduling Meeting...") }}';
+            }
+
+            const formData = new FormData(form);
+
+            try {
+                const res = await fetch('{{ route("meetings.schedule") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': CSRF_TOKEN,
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'same-origin',
+                    body: formData
+                });
+
+                if (res.status === 419) {
+                    alert('{{ __("Session expired. The page will reload now.") }}');
+                    window.location.reload();
+                    return;
+                }
+
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    showHubToast('📅 ' + data.message);
+                    closeScheduleProjectMeetingModal();
+                    setTimeout(() => window.location.reload(), 600);
+                } else {
+                    alert(data.message || 'Error scheduling meeting.');
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '🚀 {{ __("Schedule Meeting & Email Team") }}';
+                    }
+                }
+            } catch (err) {
+                form.submit();
+            }
+        }
+
+        async function uploadProjectFileSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const fileInput = document.getElementById('hub-project-file-input');
+            const btn = document.getElementById('hub-project-file-btn');
+            if (!fileInput || !fileInput.files.length) return;
+
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '⏳ {{ __("Uploading...") }}';
+            }
+
+            const formData = new FormData(form);
+
+            try {
+                const res = await fetch('{{ route("projects.files.store", $project) }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': CSRF_TOKEN,
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'same-origin',
+                    body: formData
+                });
+
+                if (res.status === 419) {
+                    alert('{{ __("Session expired. The page will reload now.") }}');
+                    window.location.reload();
+                    return;
+                }
+
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    showHubToast('📁 ' + data.message);
+                    setTimeout(() => window.location.reload(), 400);
+                } else {
+                    alert(data.message || 'Error uploading file.');
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '🚀 {{ __("Upload File") }}';
+                    }
+                }
+            } catch (err) {
+                form.submit();
+            }
         }
 
         // AJAX: Create Task

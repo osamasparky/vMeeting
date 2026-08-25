@@ -4876,7 +4876,7 @@
                 <button onclick="closeScheduleMeetingModal()" class="modal-close" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-primary); font-weight: 800;">✕</button>
             </div>
 
-            <form method="POST" action="{{ route('meetings.schedule') }}" style="display: flex; flex-direction: column; gap: 14px;">
+            <form id="schedule-meeting-form" onsubmit="scheduleMeetingSubmit(event)" method="POST" action="{{ route('meetings.schedule') }}" style="display: flex; flex-direction: column; gap: 14px;">
                 @csrf
 
                 <!-- Meeting Scope Switcher -->
@@ -8502,6 +8502,58 @@
             if (!chks.length) return;
             const anyUnchecked = Array.from(chks).some(c => !c.checked);
             chks.forEach(c => c.checked = anyUnchecked);
+        }
+
+        async function scheduleMeetingSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '⏳ {{ __("Scheduling Meeting...") }}';
+            }
+
+            const formData = new FormData(form);
+
+            try {
+                const res = await fetch('{{ route("meetings.schedule") }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': CSRF_TOKEN,
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'same-origin',
+                    body: formData
+                });
+
+                if (res.status === 419) {
+                    alert('{{ __("Session expired. The page will reload now.") }}');
+                    window.location.reload();
+                    return;
+                }
+
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    showToastNotification('📅 ' + data.message);
+                    closeScheduleMeetingModal();
+                    setTimeout(() => {
+                        if (data.redirect_url) {
+                            window.location.href = data.redirect_url;
+                            window.location.reload();
+                        } else {
+                            window.location.reload();
+                        }
+                    }, 500);
+                } else {
+                    alert(data.message || 'Error scheduling meeting.');
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '🚀 {{ __("Schedule Meeting & Dispatch Invitations") }}';
+                    }
+                }
+            } catch (err) {
+                form.submit();
+            }
         }
 
         function scheduleMeetingForCurrentProject() {

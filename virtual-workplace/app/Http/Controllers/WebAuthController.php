@@ -2211,7 +2211,18 @@ class WebAuthController extends Controller
 
         $tabRedirect = $validated['scope'] === 'project' ? 'projects' : 'meetings';
         $emailMsg = $sentCount > 0 ? " (" . __(':count invitations emailed', ['count' => $sentCount]) . ")" : "";
-        return redirect("/dashboard#{$tabRedirect}")->with('success', __('Meeting ":title" scheduled successfully!', ['title' => $meeting->title]) . $emailMsg);
+        $successMsg = __('Meeting ":title" scheduled successfully!', ['title' => $meeting->title]) . $emailMsg;
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $successMsg,
+                'meeting' => $meeting,
+                'redirect_url' => "/dashboard#{$tabRedirect}",
+            ]);
+        }
+
+        return redirect("/dashboard#{$tabRedirect}")->with('success', $successMsg);
     }
 
     /**
@@ -2831,14 +2842,21 @@ class WebAuthController extends Controller
         $user = Auth::user();
         $uploadedFile = $request->file('file');
         $originalName = $uploadedFile->getClientOriginalName();
-        $fileName = 'prj_' . $project->id . '_' . time() . '_' . Str::random(6) . '.' . $uploadedFile->getClientOriginalExtension();
+        $fileSize = $uploadedFile->getSize();
+        $mimeType = $uploadedFile->getClientMimeType() ?: 'application/octet-stream';
+        $ext = $uploadedFile->getClientOriginalExtension() ?: pathinfo($originalName, PATHINFO_EXTENSION) ?: 'bin';
+        $fileName = 'prj_' . $project->id . '_' . time() . '_' . Str::random(6) . '.' . $ext;
 
         $destDir = public_path('uploads/projects/' . $project->id);
         if (!file_exists($destDir)) {
-            mkdir($destDir, 0755, true);
+            @mkdir($destDir, 0777, true);
+            @chmod($destDir, 0777);
         }
         $uploadedFile->move($destDir, $fileName);
+        @chmod($destDir . '/' . $fileName, 0666);
         $fileUrl = '/uploads/projects/' . $project->id . '/' . $fileName;
+
+        $actualSize = file_exists($destDir . '/' . $fileName) ? filesize($destDir . '/' . $fileName) : $fileSize;
 
         $projectFile = \App\Domains\Projects\Models\ProjectFile::create([
             'organization_id' => $project->organization_id,
@@ -2847,8 +2865,8 @@ class WebAuthController extends Controller
             'file_name' => $originalName,
             'file_path' => $destDir . '/' . $fileName,
             'file_url' => $fileUrl,
-            'file_size' => file_exists($destDir . '/' . $fileName) ? filesize($destDir . '/' . $fileName) : 0,
-            'mime_type' => $uploadedFile->getClientMimeType() ?: 'application/octet-stream',
+            'file_size' => $actualSize,
+            'mime_type' => $mimeType,
         ]);
 
         if ($request->wantsJson() || $request->ajax()) {
@@ -2893,20 +2911,27 @@ class WebAuthController extends Controller
     public function uploadTaskAttachment(Request $request, \App\Domains\Projects\Models\Task $task)
     {
         $request->validate([
-            'file' => 'required|file|max:51200', // 50MB
+            'file' => 'required|file|max:102400', // 100MB
         ]);
 
         $user = Auth::user();
         $uploadedFile = $request->file('file');
         $originalName = $uploadedFile->getClientOriginalName();
-        $fileName = 'task_' . $task->id . '_' . time() . '_' . Str::random(6) . '.' . $uploadedFile->getClientOriginalExtension();
+        $fileSize = $uploadedFile->getSize();
+        $mimeType = $uploadedFile->getClientMimeType() ?: 'application/octet-stream';
+        $ext = $uploadedFile->getClientOriginalExtension() ?: pathinfo($originalName, PATHINFO_EXTENSION) ?: 'bin';
+        $fileName = 'task_' . $task->id . '_' . time() . '_' . Str::random(6) . '.' . $ext;
 
         $destDir = public_path('uploads/tasks/' . $task->id);
         if (!file_exists($destDir)) {
-            mkdir($destDir, 0755, true);
+            @mkdir($destDir, 0777, true);
+            @chmod($destDir, 0777);
         }
         $uploadedFile->move($destDir, $fileName);
+        @chmod($destDir . '/' . $fileName, 0666);
         $fileUrl = '/uploads/tasks/' . $task->id . '/' . $fileName;
+
+        $actualSize = file_exists($destDir . '/' . $fileName) ? filesize($destDir . '/' . $fileName) : $fileSize;
 
         $attachment = \App\Domains\Projects\Models\TaskAttachment::create([
             'organization_id' => $task->organization_id,
@@ -2915,15 +2940,19 @@ class WebAuthController extends Controller
             'file_name' => $originalName,
             'file_path' => $destDir . '/' . $fileName,
             'file_url' => $fileUrl,
-            'file_size' => file_exists($destDir . '/' . $fileName) ? filesize($destDir . '/' . $fileName) : 0,
-            'mime_type' => $uploadedFile->getClientMimeType() ?: 'application/octet-stream',
+            'file_size' => $actualSize,
+            'mime_type' => $mimeType,
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => __('Attachment uploaded successfully.'),
-            'attachment' => $attachment->load('user:id,name,email'),
-        ]);
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('Attachment uploaded successfully.'),
+                'attachment' => $attachment->load('user:id,name,email'),
+            ]);
+        }
+
+        return back()->with('success', __('Attachment uploaded.'));
     }
 
     /**
