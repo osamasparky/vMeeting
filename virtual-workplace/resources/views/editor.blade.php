@@ -2093,13 +2093,20 @@
             calculateAiQuotas();
         }
 
+        function getAiFieldValue(id, fallback = 0) {
+            const el = document.getElementById(id);
+            if (!el) return fallback;
+            const parsed = parseInt(el.value, 10);
+            return isNaN(parsed) ? fallback : parsed;
+        }
+
         function calculateAiQuotas() {
-            const meeting = parseInt(document.getElementById('ai-inp-meeting').value) || 0;
-            const office = parseInt(document.getElementById('ai-inp-office').value) || 0;
-            const desks = parseInt(document.getElementById('ai-inp-desks').value) || 4;
-            const thinking = parseInt(document.getElementById('ai-inp-thinking').value) || 0;
-            const rest = parseInt(document.getElementById('ai-inp-rest').value) || 0;
-            const theater = parseInt(document.getElementById('ai-inp-theater').value) || 0;
+            const meeting = getAiFieldValue('ai-inp-meeting', 0);
+            const office = getAiFieldValue('ai-inp-office', 1);
+            const desks = getAiFieldValue('ai-inp-desks', 1);
+            const thinking = getAiFieldValue('ai-inp-thinking', 0);
+            const rest = getAiFieldValue('ai-inp-rest', 0);
+            const theater = getAiFieldValue('ai-inp-theater', 0);
 
             // Only count actual custom rooms selected by the user
             const totalRooms = meeting + office + thinking + rest + theater;
@@ -2155,12 +2162,12 @@
         async function generateAiOfficeOnCanvas() {
             const styleRadio = document.querySelector('input[name="ai_style"]:checked');
             const styleKey = styleRadio ? styleRadio.value : 'modern_glass_luxury';
-            const meeting = parseInt(document.getElementById('ai-inp-meeting').value) || 1;
-            const office = parseInt(document.getElementById('ai-inp-office').value) || 2;
-            const desks = parseInt(document.getElementById('ai-inp-desks').value) || 4;
-            const thinking = parseInt(document.getElementById('ai-inp-thinking').value) || 1;
-            const rest = parseInt(document.getElementById('ai-inp-rest').value) || 1;
-            const theater = parseInt(document.getElementById('ai-inp-theater').value) || 0;
+            const meeting = getAiFieldValue('ai-inp-meeting', 0);
+            const office = getAiFieldValue('ai-inp-office', 1);
+            const desks = getAiFieldValue('ai-inp-desks', 1);
+            const thinking = getAiFieldValue('ai-inp-thinking', 0);
+            const rest = getAiFieldValue('ai-inp-rest', 0);
+            const theater = getAiFieldValue('ai-inp-theater', 0);
 
             const modalContent = document.getElementById('ai-modal-form-content');
             const loadingBox = document.getElementById('ai-modal-loading-box');
@@ -2367,7 +2374,7 @@
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 6px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-office', -1, 1, 8)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">-</button>
-                                    <input type="text" id="ai-inp-office" value="2" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--text-main); font-size: 13px;">
+                                    <input type="text" id="ai-inp-office" value="1" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--text-main); font-size: 13px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-office', 1, 1, 8)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">+</button>
                                 </div>
                             </div>
@@ -2375,7 +2382,7 @@
                                 <span style="font-size: 10px; color: var(--text-dim);">🖥️ {{ __('Desks per office') }}:</span>
                                 <div style="display: flex; align-items: center; gap: 4px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-desks', -1, 1, 12)" class="tactile-btn" style="width: 22px; height: 22px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 10px;">-</button>
-                                    <input type="text" id="ai-inp-desks" value="4" readonly style="width: 24px; text-align: center; background: none; border: none; font-weight: 800; color: var(--text-main); font-size: 11px;">
+                                    <input type="text" id="ai-inp-desks" value="2" readonly style="width: 24px; text-align: center; background: none; border: none; font-weight: 800; color: var(--text-main); font-size: 11px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-desks', 1, 1, 12)" class="tactile-btn" style="width: 22px; height: 22px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 10px;">+</button>
                                 </div>
                             </div>
@@ -2390,7 +2397,7 @@
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 6px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-thinking', -1, 0, 4)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">-</button>
-                                    <input type="text" id="ai-inp-thinking" value="1" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--text-main); font-size: 13px;">
+                                    <input type="text" id="ai-inp-thinking" value="0" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--text-main); font-size: 13px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-thinking', 1, 0, 4)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">+</button>
                                 </div>
                             </div>
@@ -2405,7 +2412,7 @@
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 6px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-rest', -1, 0, 3)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">-</button>
-                                    <input type="text" id="ai-inp-rest" value="1" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--text-main); font-size: 13px;">
+                                    <input type="text" id="ai-inp-rest" value="0" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--text-main); font-size: 13px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-rest', 1, 0, 3)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">+</button>
                                 </div>
                             </div>

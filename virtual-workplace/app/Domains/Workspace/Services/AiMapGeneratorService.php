@@ -71,13 +71,13 @@ class AiMapGeneratorService
     {
         $plan = $organization->plan;
 
-        // 1. Parse room quantities
-        $meetingRoomsCount = max(0, min(6, (int)($options['meeting_rooms'] ?? 1)));
-        $officeRoomsCount = max(1, min(8, (int)($options['office_rooms'] ?? 2)));
-        $desksPerOffice = max(1, min(12, (int)($options['desks_per_office'] ?? 4)));
-        $thinkingRoomsCount = max(0, min(4, (int)($options['thinking_rooms'] ?? 1)));
-        $restAreasCount = max(0, min(3, (int)($options['rest_areas'] ?? 1)));
-        $theatersCount = max(0, min(2, (int)($options['theaters'] ?? 0)));
+        // 1. Parse room quantities safely
+        $meetingRoomsCount = isset($options['meeting_rooms']) ? max(0, min(6, (int)$options['meeting_rooms'])) : 0;
+        $officeRoomsCount = isset($options['office_rooms']) ? max(1, min(8, (int)$options['office_rooms'])) : 1;
+        $desksPerOffice = isset($options['desks_per_office']) ? max(1, min(12, (int)$options['desks_per_office'])) : 1;
+        $thinkingRoomsCount = isset($options['thinking_rooms']) ? max(0, min(4, (int)$options['thinking_rooms'])) : 0;
+        $restAreasCount = isset($options['rest_areas']) ? max(0, min(3, (int)$options['rest_areas'])) : 0;
+        $theatersCount = isset($options['theaters']) ? max(0, min(2, (int)$options['theaters'])) : 0;
         $styleKey = $options['style'] ?? 'modern_glass_luxury';
         $styleConfig = $this->styles[$styleKey] ?? $this->styles['modern_glass_luxury'];
 
