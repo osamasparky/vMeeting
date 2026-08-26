@@ -1501,13 +1501,7 @@
             allowedRoomIds: @json($userAllowedRoomIds ?? []),
             token: "{{ $realtimeToken }}",
             wsUrl: @json($wsUrl ?? null),
-            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            attendancePolicy: @json($organization->settings?->getAttendancePolicy() ?? [
-                'auto_attendance_enabled' => true,
-                'idle_prompt_minutes' => 15,
-                'idle_response_grace_seconds' => 180,
-                'allow_in_office_task_tracking' => true,
-            ]),
+            attendancePolicy: @json($organization->settings?->getAttendancePolicy() ?? \App\Domains\Tenancy\Models\OrganizationSetting::getAttendancePolicy()),
         };
 
         const canvas = document.getElementById('office-canvas');
