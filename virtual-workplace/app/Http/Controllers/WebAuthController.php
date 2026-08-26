@@ -2217,6 +2217,13 @@ class WebAuthController extends Controller
         $membership = OrganizationMember::where('user_id', $user->id)->first();
         if (!$membership) abort(403);
 
+        if (!$membership->hasPermission('organizations.manage') && $membership->role?->slug !== 'company_admin' && !$user->isSuperAdmin()) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => __('Unauthorized: insufficient permissions.')], 403);
+            }
+            abort(403, 'Unauthorized: insufficient permissions.');
+        }
+
         $apiKey = trim($request->input('api_key', ''));
         if (empty($apiKey)) {
             $orgSettings = $membership->organization->settings?->openai_settings ?? [];
@@ -3010,11 +3017,9 @@ class WebAuthController extends Controller
 
         $destDir = public_path('uploads/projects/' . $project->id);
         if (!file_exists($destDir)) {
-            @mkdir($destDir, 0777, true);
-            @chmod($destDir, 0777);
+            mkdir($destDir, 0755, true);
         }
         $uploadedFile->move($destDir, $fileName);
-        @chmod($destDir . '/' . $fileName, 0666);
         $fileUrl = '/uploads/projects/' . $project->id . '/' . $fileName;
 
         $actualSize = file_exists($destDir . '/' . $fileName) ? filesize($destDir . '/' . $fileName) : $fileSize;
@@ -3085,11 +3090,9 @@ class WebAuthController extends Controller
 
         $destDir = public_path('uploads/tasks/' . $task->id);
         if (!file_exists($destDir)) {
-            @mkdir($destDir, 0777, true);
-            @chmod($destDir, 0777);
+            mkdir($destDir, 0755, true);
         }
         $uploadedFile->move($destDir, $fileName);
-        @chmod($destDir . '/' . $fileName, 0666);
         $fileUrl = '/uploads/tasks/' . $task->id . '/' . $fileName;
 
         $actualSize = file_exists($destDir . '/' . $fileName) ? filesize($destDir . '/' . $fileName) : $fileSize;

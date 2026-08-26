@@ -1576,7 +1576,7 @@ class SuperAdminController extends Controller
         
         $destDir = public_path('uploads/cms');
         if (!file_exists($destDir)) {
-            mkdir($destDir, 0777, true);
+            mkdir($destDir, 0755, true);
         }
 
         $file->move($destDir, $filename);

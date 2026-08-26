@@ -164,21 +164,19 @@ class AiMapGeneratorService
                     $filename = 'ai_map_' . $organization->id . '_' . time() . '.png';
                     $destinationDir = public_path('uploads/maps');
                     if (!File::isDirectory($destinationDir)) {
-                        File::makeDirectory($destinationDir, 0777, true, true);
+                        File::makeDirectory($destinationDir, 0755, true, true);
                     }
 
                     if (!empty($b64Data)) {
                         $imageBinary = base64_decode($b64Data);
                         $filePath = $destinationDir . '/' . $filename;
                         File::put($filePath, $imageBinary);
-                        @chmod($filePath, 0777);
                         $imageUrl = '/uploads/maps/' . $filename;
                         break;
                     } elseif (!empty($remoteImageUrl)) {
                         $imageBinary = Http::timeout(60)->get($remoteImageUrl)->body();
                         $filePath = $destinationDir . '/' . $filename;
                         File::put($filePath, $imageBinary);
-                        @chmod($filePath, 0777);
                         $imageUrl = '/uploads/maps/' . $filename;
                         break;
                     }
