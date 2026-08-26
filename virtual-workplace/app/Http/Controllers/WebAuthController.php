@@ -2861,11 +2861,8 @@ class WebAuthController extends Controller
 
         // 2. Assigned tasks for this user in this organization
         $tasks = \App\Domains\Projects\Models\Task::where('organization_id', $organizationId)
-            ->where(function ($q) use ($user) {
-                $q->where('assignee_id', $user->id)
-                  ->orWhereJsonContains('collaborator_ids', $user->id);
-            })
-            ->where('status', '!=', 'completed')
+            ->where('assignee_id', $user->id)
+            ->whereNotIn('status', ['done', 'completed', 'cancelled'])
             ->with(['project:id,name,color,code'])
             ->orderBy('priority', 'desc')
             ->orderBy('due_date', 'asc')
