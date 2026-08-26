@@ -331,6 +331,7 @@ class AttendanceService
             'is_in_office' => (bool) $activeOfficeSession,
             'has_running_task' => (bool) $activeTaskTimer,
             'active_task_timer' => $activeTaskTimer,
+            'active_timer' => $activeTaskTimer,
             'task_entries' => $taskEntries,
             'attendance_sessions' => $attendanceSessions,
         ];
