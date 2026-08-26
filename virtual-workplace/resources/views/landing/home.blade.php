@@ -103,7 +103,7 @@
         font-weight: 700;
     }
 
-    /* ── 3D Living Office Canvas Container ── */
+    /* ── 3D Living Office Stage Container ── */
     .ns-canvas-wrapper {
         position: relative;
         width: 100%;
@@ -113,17 +113,147 @@
         border: 1px solid rgba(111, 231, 194, 0.25);
         box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 40px rgba(19, 168, 121, 0.18);
         overflow: hidden;
+        perspective: 1200px;
     }
 
-    #spatial-3d-canvas {
+    .ns-office-stage {
+        position: relative;
         width: 100%;
         height: 100%;
-        display: block;
-        cursor: grab;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transform-style: preserve-3d;
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    #spatial-3d-canvas:active {
-        cursor: grabbing;
+    .ns-floorplan-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        filter: brightness(0.92) contrast(1.08) saturate(1.15);
+    }
+
+    /* ── Interactive Hotspots & Pins ── */
+    .ns-hotspot-zone {
+        position: absolute;
+        border: 2px dashed rgba(111, 231, 194, 0.35);
+        border-radius: 16px;
+        background: rgba(19, 168, 121, 0.08);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 5;
+    }
+
+    .ns-hotspot-zone:hover, .ns-hotspot-zone.focused {
+        border-color: var(--ns-mint, #6FE7C2);
+        background: rgba(19, 168, 121, 0.22);
+        box-shadow: 0 0 30px rgba(111, 231, 194, 0.35), inset 0 0 20px rgba(19, 168, 121, 0.2);
+    }
+
+    .ns-hotspot-pin {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ns-pin-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        background: rgba(7, 26, 22, 0.9);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--ns-mint, #6FE7C2);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), 0 0 15px rgba(19, 168, 121, 0.4);
+        transition: all 0.2s ease;
+    }
+
+    .ns-hotspot-zone:hover .ns-pin-icon {
+        transform: scale(1.15);
+        background: var(--ns-gradient-emerald);
+    }
+
+    .ns-pin-tooltip {
+        position: absolute;
+        bottom: 120%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(7, 26, 22, 0.95);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(111, 231, 194, 0.35);
+        border-radius: 10px;
+        padding: 6px 12px;
+        white-space: nowrap;
+        pointer-events: none;
+        opacity: 0;
+        transition: all 0.2s ease;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+        text-align: center;
+        z-index: 10;
+    }
+
+    .ns-pin-tooltip strong {
+        display: block;
+        font-size: 11px;
+        color: var(--ns-mint);
+    }
+
+    .ns-pin-tooltip span {
+        display: block;
+        font-size: 10px;
+        color: var(--ns-text-muted);
+    }
+
+    .ns-hotspot-zone:hover .ns-pin-tooltip {
+        opacity: 1;
+        bottom: 130%;
+    }
+
+    /* ── Animated Avatars on Stage ── */
+    .ns-avatar-agent {
+        position: absolute;
+        width: 36px;
+        height: 36px;
+        z-index: 6;
+        pointer-events: none;
+        transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .ns-avatar-bubble {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--ns-gradient-emerald);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        border: 2px solid #FFFFFF;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), 0 0 16px rgba(19, 168, 121, 0.6);
+    }
+
+    .ns-avatar-radar {
+        position: absolute;
+        inset: -8px;
+        border-radius: 50%;
+        border: 2px solid var(--ns-mint);
+        animation: radarPulse 2s cubic-bezier(0.2, 1, 0.3, 1) infinite;
+    }
+
+    @keyframes radarPulse {
+        0% { transform: scale(0.6); opacity: 1; }
+        100% { transform: scale(2); opacity: 0; }
     }
 
     /* ── Floating Interactive Overlay in 3D ── */
@@ -328,16 +458,77 @@
             </div>
         </div>
 
-        <!-- Interactive 3D Spatial Canvas Wrapper -->
+        <!-- Interactive Living Office Spatial Showcase Stage -->
         <div class="ns-canvas-wrapper" id="office-preview">
-            <!-- Three.js Canvas Container -->
-            <canvas id="spatial-3d-canvas"></canvas>
+            @php
+                $heroImageUrl = ($heroSection && $heroSection->mediaAsset) ? $heroSection->mediaAsset->url : asset('images/office_floorplan.jpg');
+            @endphp
+
+            <!-- Blueprint Image Display Stage with 3D Tilt -->
+            <div class="ns-office-stage" id="heroOfficeStage">
+                <img src="{{ $heroImageUrl }}" alt="NextSpace Spatial Living Virtual Office" id="heroFloorplanImg" class="ns-floorplan-img">
+
+                <!-- Room Hotspot Overlays & Glowing Pins -->
+                <!-- 1. Meeting Room Zone -->
+                <div class="ns-hotspot-zone" id="zone-meeting" style="top: 12%; left: 14%; width: 34%; height: 38%;" onclick="focus3dRoom('meeting')">
+                    <div class="ns-hotspot-pin">
+                        <span class="ns-pin-icon">📹</span>
+                        <div class="ns-pin-tooltip">
+                            <strong>{{ __('Executive Meeting Room') }}</strong>
+                            <span>{{ __('Soundproof • 4K Screen Sharing Active') }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Open Workspace Desks Zone -->
+                <div class="ns-hotspot-zone" id="zone-workspace" style="top: 48%; left: 18%; width: 42%; height: 42%;" onclick="focus3dRoom('workspace')">
+                    <div class="ns-hotspot-pin">
+                        <span class="ns-pin-icon">💼</span>
+                        <div class="ns-pin-tooltip">
+                            <strong>{{ __('Open Team Desks') }}</strong>
+                            <span>{{ __('8 Members Online • Proximity Voice') }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Lounge & Coffee Zone -->
+                <div class="ns-hotspot-zone" id="zone-lounge" style="top: 15%; right: 14%; width: 32%; height: 35%;" onclick="focus3dRoom('lounge')">
+                    <div class="ns-hotspot-pin">
+                        <span class="ns-pin-icon">☕</span>
+                        <div class="ns-pin-tooltip">
+                            <strong>{{ __('Team Lounge & Coffee') }}</strong>
+                            <span>{{ __('Casual Chats & Water-cooler Area') }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Focus Booth Zone -->
+                <div class="ns-hotspot-zone" id="zone-focus" style="bottom: 12%; right: 14%; width: 28%; height: 30%;" onclick="focus3dRoom('focus')">
+                    <div class="ns-hotspot-pin">
+                        <span class="ns-pin-icon">🎧</span>
+                        <div class="ns-pin-tooltip">
+                            <strong>{{ __('Private Focus Pod') }}</strong>
+                            <span>{{ __('Acoustic DND Pod • Zero Noise') }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Animated Walking Avatars on Floorplan -->
+                <div class="ns-avatar-agent" id="agent-omar" style="top: 52%; left: 34%;">
+                    <div class="ns-avatar-bubble">👨‍💻</div>
+                    <span class="ns-avatar-radar"></span>
+                </div>
+                <div class="ns-avatar-agent" id="agent-sarah" style="top: 54%; left: 45%;">
+                    <div class="ns-avatar-bubble">👩‍💼</div>
+                    <span class="ns-avatar-radar"></span>
+                </div>
+            </div>
 
             <!-- Dynamic Proximity Video Bubble Simulation -->
             <div class="ns-proximity-bubble" id="hero-proximity-indicator">
                 <div class="ns-wave-ring">🎧</div>
                 <div>
-                    <strong style="font-size: 12px; color: var(--ns-mint); display: block;">⚡ {{ __('Proximity Active') }}</strong>
+                    <strong style="font-size: 12px; color: var(--ns-mint); display: block;">⚡ {{ __('Proximity Active (Connected)') }}</strong>
                     <span style="font-size: 11px; color: var(--ns-text-light);">{{ __('Sarah & Omar talking in Open Office') }}</span>
                 </div>
             </div>
@@ -356,6 +547,9 @@
                     </button>
                     <button type="button" class="ns-room-chip" onclick="focus3dRoom('lounge')">
                         <span>☕</span> {{ __('Lounge') }}
+                    </button>
+                    <button type="button" class="ns-room-chip" onclick="focus3dRoom('focus')">
+                        <span>🎧</span> {{ __('Focus Pod') }}
                     </button>
                 </div>
             </div>
@@ -844,179 +1038,111 @@
         }
     }
 
-    // ── 3D Living Virtual Office WebGL Scene (Three.js) ──
-    let scene, camera, renderer, officeGroup, avatars = [];
-
-    function init3dOffice() {
-        const canvas = document.getElementById('spatial-3d-canvas');
-        if (!canvas) return;
-
-        const width = canvas.parentElement.clientWidth;
-        const height = canvas.parentElement.clientHeight;
-
-        scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x071A16);
-
-        camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-        camera.position.set(0, 35, 45);
-        camera.lookAt(0, 0, 0);
-
-        renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-        renderer.setSize(width, height);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-        // Ambient & Spot Lighting
-        const ambientLight = new THREE.AmbientLight(0xdff8ef, 0.7);
-        scene.add(ambientLight);
-
-        const dirLight = new THREE.DirectionalLight(0x6fe7c2, 1.2);
-        dirLight.position.set(20, 40, 20);
-        scene.add(dirLight);
-
-        const accentPoint = new THREE.PointLight(0x13a879, 2, 50);
-        accentPoint.position.set(-10, 10, 0);
-        scene.add(accentPoint);
-
-        officeGroup = new THREE.Group();
-        scene.add(officeGroup);
-
-        // Office Floor Grid
-        const floorGeo = new THREE.PlaneGeometry(60, 40);
-        const floorMat = new THREE.MeshStandardMaterial({
-            color: 0x0b2922,
-            roughness: 0.4,
-            metalness: 0.2
-        });
-        const floor = new THREE.Mesh(floorGeo, floorMat);
-        floor.rotation.x = -Math.PI / 2;
-        officeGroup.add(floor);
-
-        const grid = new THREE.GridHelper(60, 30, 0x13a879, 0x113a30);
-        grid.position.y = 0.05;
-        officeGroup.add(grid);
-
-        // Build Low-Poly Furniture & Room Partitions
-        create3dMeetingRoom(officeGroup, -16, 0);
-        create3dOpenDesks(officeGroup, 8, -5);
-        create3dLounge(officeGroup, 10, 10);
-
-        // Animated Avatars
-        createAvatar(officeGroup, -2, 0, 0x13a879);
-        createAvatar(officeGroup, 4, 0, 0x3b82f6);
-
-        // Window Resize Handling
-        window.addEventListener('resize', () => {
-            if (!canvas.parentElement) return;
-            const newW = canvas.parentElement.clientWidth;
-            const newH = canvas.parentElement.clientHeight;
-            camera.aspect = newW / newH;
-            camera.updateProjectionMatrix();
-            renderer.setSize(newW, newH);
-        });
-
-        // Animation Loop
-        let clock = new THREE.Clock();
-        function animate() {
-            requestAnimationFrame(animate);
-            const time = clock.getElapsedTime();
-
-            // Subtle rotation / life breathing
-            officeGroup.rotation.y = Math.sin(time * 0.2) * 0.05;
-
-            // Avatar walking simulation
-            if (avatars.length >= 2) {
-                avatars[0].position.x = -4 + Math.sin(time * 1.2) * 2;
-                avatars[1].position.x = 4 - Math.sin(time * 1.2) * 2;
-            }
-
-            renderer.render(scene, camera);
-        }
-        animate();
-    }
-
-    function create3dMeetingRoom(parent, x, z) {
-        const roomGroup = new THREE.Group();
-        roomGroup.position.set(x, 0, z);
-
-        // Glass Walls
-        const wallMat = new THREE.MeshStandardMaterial({
-            color: 0x6fe7c2,
-            transparent: true,
-            opacity: 0.25,
-            roughness: 0.1
-        });
-        const wallGeo = new THREE.BoxGeometry(16, 6, 0.4);
-        const wall1 = new THREE.Mesh(wallGeo, wallMat);
-        wall1.position.set(0, 3, -10);
-        roomGroup.add(wall1);
-
-        // Conference Table
-        const tableGeo = new THREE.BoxGeometry(10, 1.2, 5);
-        const tableMat = new THREE.MeshStandardMaterial({ color: 0x10231f, roughness: 0.3 });
-        const table = new THREE.Mesh(tableGeo, tableMat);
-        table.position.set(0, 1.8, -4);
-        roomGroup.add(table);
-
-        parent.add(roomGroup);
-    }
-
-    function create3dOpenDesks(parent, x, z) {
-        const deskMat = new THREE.MeshStandardMaterial({ color: 0x192d21, roughness: 0.5 });
-        for (let i = 0; i < 4; i++) {
-            const deskGeo = new THREE.BoxGeometry(5, 1.4, 3);
-            const desk = new THREE.Mesh(deskGeo, deskMat);
-            desk.position.set(x + (i % 2) * 7, 0.7, z + Math.floor(i / 2) * 5);
-            parent.add(desk);
-        }
-    }
-
-    function create3dLounge(parent, x, z) {
-        const sofaMat = new THREE.MeshStandardMaterial({ color: 0x13a879, roughness: 0.8 });
-        const sofaGeo = new THREE.BoxGeometry(6, 1.5, 3);
-        const sofa = new THREE.Mesh(sofaGeo, sofaMat);
-        sofa.position.set(x, 0.8, z);
-        parent.add(sofa);
-    }
-
-    function createAvatar(parent, x, z, colorHex) {
-        const avGroup = new THREE.Group();
-        avGroup.position.set(x, 0, z);
-
-        const bodyGeo = new THREE.CapsuleGeometry(0.8, 1.8, 4, 8);
-        const bodyMat = new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.3 });
-        const body = new THREE.Mesh(bodyGeo, bodyMat);
-        body.position.y = 1.8;
-        avGroup.add(body);
-
-        parent.add(avGroup);
-        avatars.push(avGroup);
-    }
-
+    // ── Interactive Living Office Showcase Script ──
     function focus3dRoom(roomType) {
-        if (!camera) return;
+        const stage = document.getElementById('heroOfficeStage');
+        if (!stage) return;
+
+        // Update active chip
         document.querySelectorAll('.ns-room-chip').forEach(c => c.classList.remove('active'));
-        if (event && event.currentTarget) event.currentTarget.classList.add('active');
+        document.querySelectorAll('.ns-hotspot-zone').forEach(z => z.classList.remove('focused'));
+
+        // Highlight matching button
+        const activeChip = Array.from(document.querySelectorAll('.ns-room-chip')).find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes(roomType));
+        if (activeChip) activeChip.classList.add('active');
+
+        const indicator = document.getElementById('hero-proximity-indicator');
 
         if (roomType === 'meeting') {
-            camera.position.set(-16, 20, 25);
-            camera.lookAt(-16, 0, -4);
+            stage.style.transform = 'scale(1.45) translate(18%, 15%)';
+            const zone = document.getElementById('zone-meeting');
+            if (zone) zone.classList.add('focused');
+            if (indicator) {
+                indicator.style.opacity = '1';
+                indicator.querySelector('strong').innerText = '📹 {{ __("Meeting in Session (8 Seats)") }}';
+                indicator.querySelector('span').innerText = '{{ __("Executive Boardroom • 4K Screen Active") }}';
+            }
         } else if (roomType === 'workspace') {
-            camera.position.set(10, 20, 20);
-            camera.lookAt(10, 0, -3);
+            stage.style.transform = 'scale(1.4) translate(-10%, -10%)';
+            const zone = document.getElementById('zone-workspace');
+            if (zone) zone.classList.add('focused');
+            if (indicator) {
+                indicator.style.opacity = '1';
+                indicator.querySelector('strong').innerText = '⚡ {{ __("Open Office Active") }}';
+                indicator.querySelector('span').innerText = '{{ __("Sarah & Omar talking in Open Desks") }}';
+            }
         } else if (roomType === 'lounge') {
-            camera.position.set(10, 18, 25);
-            camera.lookAt(10, 0, 10);
+            stage.style.transform = 'scale(1.5) translate(-22%, 18%)';
+            const zone = document.getElementById('zone-lounge');
+            if (zone) zone.classList.add('focused');
+            if (indicator) {
+                indicator.style.opacity = '1';
+                indicator.querySelector('strong').innerText = '☕ {{ __("Team Lounge Active") }}';
+                indicator.querySelector('span').innerText = '{{ __("Casual water-cooler banter & coffee") }}';
+            }
+        } else if (roomType === 'focus') {
+            stage.style.transform = 'scale(1.6) translate(-24%, -20%)';
+            const zone = document.getElementById('zone-focus');
+            if (zone) zone.classList.add('focused');
+            if (indicator) {
+                indicator.style.opacity = '1';
+                indicator.querySelector('strong').innerText = '🎧 {{ __("Focus Pod (DND Mode)") }}';
+                indicator.querySelector('span').innerText = '{{ __("Soundproof Pod • Zero Distractions") }}';
+            }
         } else {
-            camera.position.set(0, 35, 45);
-            camera.lookAt(0, 0, 0);
+            stage.style.transform = 'scale(1) translate(0, 0)';
+            if (indicator) {
+                indicator.style.opacity = '1';
+                indicator.querySelector('strong').innerText = '⚡ {{ __("Proximity Active (Connected)") }}';
+                indicator.querySelector('span').innerText = '{{ __("Sarah & Omar talking in Open Office") }}';
+            }
         }
     }
 
+    // ── Mouse Parallax 3D Tilt on Hero Stage ──
     document.addEventListener('DOMContentLoaded', () => {
-        try {
-            init3dOffice();
-        } catch(e) {
-            console.warn('Three.js 3D WebGL fallback active:', e);
+        const wrapper = document.getElementById('office-preview');
+        const stage = document.getElementById('heroOfficeStage');
+        if (!wrapper || !stage) return;
+
+        wrapper.addEventListener('mousemove', (e) => {
+            const rect = wrapper.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width - 0.5;
+            const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+            // Only tilt if not zoomed into a specific room
+            if (!stage.style.transform || stage.style.transform.includes('scale(1)')) {
+                stage.style.transform = `perspective(1000px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg)`;
+            }
+        });
+
+        wrapper.addEventListener('mouseleave', () => {
+            if (!stage.style.transform || stage.style.transform.includes('rotate')) {
+                stage.style.transform = 'scale(1) translate(0, 0)';
+            }
+        });
+
+        // Walking Avatars Loop Simulation
+        const omar = document.getElementById('agent-omar');
+        const sarah = document.getElementById('agent-sarah');
+        if (omar && sarah) {
+            let step = 0;
+            setInterval(() => {
+                step = (step + 1) % 4;
+                if (step === 0) {
+                    omar.style.top = '52%'; omar.style.left = '34%';
+                    sarah.style.top = '54%'; sarah.style.left = '45%';
+                } else if (step === 1) {
+                    omar.style.top = '50%'; omar.style.left = '38%';
+                    sarah.style.top = '52%'; sarah.style.left = '42%';
+                } else if (step === 2) {
+                    omar.style.top = '53%'; omar.style.left = '40%';
+                    sarah.style.top = '53%'; sarah.style.left = '41%';
+                } else {
+                    omar.style.top = '52%'; omar.style.left = '36%';
+                    sarah.style.top = '55%'; sarah.style.left = '44%';
+                }
+            }, 3000);
         }
     });
 </script>

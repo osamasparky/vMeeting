@@ -390,12 +390,23 @@
             </a>
 
             <!-- Desktop Navigation Links -->
+            @php
+                $navItems = \App\Domains\CMS\Models\CmsThemeSetting::getByKey('main_navigation', [
+                    ['label_en' => 'Platform', 'label_ar' => 'المنصة', 'url' => '#hero-spatial'],
+                    ['label_en' => 'Spatial Presence', 'label_ar' => 'التواجد المكاني', 'url' => '#spatial-presence'],
+                    ['label_en' => 'AI Office', 'label_ar' => 'مكتب الذكاء الاصطناعي', 'url' => '#ai-generator'],
+                    ['label_en' => 'Collaboration', 'label_ar' => 'التعاون والإنتاجية', 'url' => '#collaboration'],
+                    ['label_en' => 'Pricing', 'label_ar' => 'الباقات والأسعار', 'url' => '#pricing'],
+                ]);
+            @endphp
             <ul class="ns-nav-menu">
-                <li><a href="#hero-spatial" class="ns-nav-link">{{ __('Platform (المنصة)') }}</a></li>
-                <li><a href="#spatial-presence" class="ns-nav-link">{{ __('Spatial Presence (التواجد المكاني)') }}</a></li>
-                <li><a href="#ai-generator" class="ns-nav-link">{{ __('AI Office (الذكاء الاصطناعي)') }}</a></li>
-                <li><a href="#collaboration" class="ns-nav-link">{{ __('Collaboration (التعاون)') }}</a></li>
-                <li><a href="#pricing" class="ns-nav-link">{{ __('Pricing (الباقات)') }}</a></li>
+                @foreach($navItems as $item)
+                    <li>
+                        <a href="{{ $item['url'] }}" class="ns-nav-link">
+                            {{ app()->getLocale() === 'ar' ? ($item['label_ar'] ?? $item['label_en']) : ($item['label_en'] ?? $item['label_ar']) }}
+                        </a>
+                    </li>
+                @endforeach
             </ul>
 
             <!-- Header Actions & Auth -->

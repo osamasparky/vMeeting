@@ -1610,16 +1610,24 @@ class SuperAdminController extends Controller
     }
 
     /**
-     * Theme & Branding Studio.
+     * Theme & Branding Studio & Menu Navigation.
      */
     public function cmsTheme()
     {
         $tokens = \App\Domains\CMS\Services\ThemeEngineService::getThemeTokens();
-        return view('superadmin.cms.theme', compact('tokens'));
+        $navItems = \App\Domains\CMS\Models\CmsThemeSetting::getByKey('main_navigation', [
+            ['label_en' => 'Platform', 'label_ar' => 'المنصة', 'url' => '#hero-spatial'],
+            ['label_en' => 'Spatial Presence', 'label_ar' => 'التواجد المكاني', 'url' => '#spatial-presence'],
+            ['label_en' => 'AI Office', 'label_ar' => 'مكتب الذكاء الاصطناعي', 'url' => '#ai-generator'],
+            ['label_en' => 'Collaboration', 'label_ar' => 'التعاون والإنتاجية', 'url' => '#collaboration'],
+            ['label_en' => 'Pricing', 'label_ar' => 'الباقات والأسعار', 'url' => '#pricing'],
+        ]);
+
+        return view('superadmin.cms.theme', compact('tokens', 'navItems'));
     }
 
     /**
-     * Update Theme Tokens.
+     * Update Theme Tokens and Menu Navigation.
      */
     public function updateCmsTheme(Request $request)
     {
@@ -1636,7 +1644,28 @@ class SuperAdminController extends Controller
             }
         }
 
-        return back()->with('success', __('Theme tokens and branding styles updated successfully!'));
+        // Process Main Navigation Menu
+        if ($request->has('nav_labels_en')) {
+            $labelsEn = $request->input('nav_labels_en', []);
+            $labelsAr = $request->input('nav_labels_ar', []);
+            $navUrls = $request->input('nav_urls', []);
+
+            $menu = [];
+            foreach ($labelsEn as $i => $en) {
+                if (!empty(trim($en))) {
+                    $menu[] = [
+                        'label_en' => trim($en),
+                        'label_ar' => trim($labelsAr[$i] ?? $en),
+                        'url' => trim($navUrls[$i] ?? '#'),
+                    ];
+                }
+            }
+            if (!empty($menu)) {
+                \App\Domains\CMS\Models\CmsThemeSetting::setKey('main_navigation', $menu);
+            }
+        }
+
+        return back()->with('success', __('Theme tokens and main navigation menu updated successfully!'));
     }
 
     /**

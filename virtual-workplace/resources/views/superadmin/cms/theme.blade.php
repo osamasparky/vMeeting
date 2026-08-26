@@ -147,9 +147,48 @@
                     </div>
                 </div>
 
+                <!-- 3. Main Navigation Menu Editor -->
+                <div class="panel-card" style="border-radius: var(--radius-xl); padding: 24px;">
+                    <div class="panel-header" style="margin-bottom: 20px;">
+                        <div class="panel-title">
+                            <span>🧭</span>
+                            <span>{{ __('Main Navigation Menu Links (روابط ونصوص القائمة الرئيسية)') }}</span>
+                        </div>
+                        <p class="panel-subtitle">{{ __('Customize top navigation links in Arabic and English.') }}</p>
+                    </div>
+
+                    <div id="nav-items-container" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;">
+                        @foreach($navItems as $idx => $nav)
+                            <div class="nav-item-row" style="display: grid; grid-template-columns: 1.2fr 1.2fr 1.5fr auto; gap: 12px; align-items: center; background: var(--bg-surface-subtle); padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-color);">
+                                <div>
+                                    <label style="display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); margin-bottom: 2px;">🇺🇸 Label (EN)</label>
+                                    <input type="text" name="nav_labels_en[]" value="{{ $nav['label_en'] ?? '' }}" class="form-input" style="width: 100%; font-size: 12px; padding: 6px 10px;">
+                                </div>
+                                <div>
+                                    <label style="display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); margin-bottom: 2px;">🇸🇦 Label (AR)</label>
+                                    <input type="text" name="nav_labels_ar[]" value="{{ $nav['label_ar'] ?? '' }}" dir="rtl" class="form-input" style="width: 100%; font-size: 12px; padding: 6px 10px; font-family: 'Cairo', sans-serif;">
+                                </div>
+                                <div>
+                                    <label style="display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); margin-bottom: 2px;">🔗 Target URL</label>
+                                    <input type="text" name="nav_urls[]" value="{{ $nav['url'] ?? '' }}" class="form-input" style="width: 100%; font-size: 12px; padding: 6px 10px; font-family: monospace;">
+                                </div>
+                                <div style="padding-top: 14px;">
+                                    <button type="button" onclick="this.closest('.nav-item-row').remove()" class="tactile-btn" style="padding: 6px 10px; font-size: 11px; background: rgba(217, 107, 95, 0.15); color: #D96B5F; border-color: rgba(217, 107, 95, 0.3);">
+                                        ✕
+                                    </button>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <button type="button" onclick="addNavRow()" class="tactile-btn btn-secondary" style="font-size: 12px; padding: 6px 14px;">
+                        ➕ {{ __('Add Menu Link') }}
+                    </button>
+                </div>
+
                 <div style="display: flex; justify-content: flex-end;">
                     <button type="submit" class="tactile-btn btn-primary" style="padding: 12px 36px; font-size: 14px;">
-                        💾 {{ __('Save & Propagate Theme Tokens') }}
+                        💾 {{ __('Save & Propagate Theme & Navigation') }}
                     </button>
                 </div>
             </div>
@@ -175,7 +214,36 @@
                     </button>
                 </div>
             </div>
-        </div>
-    </form>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    function addNavRow() {
+        const container = document.getElementById('nav-items-container');
+        const div = document.createElement('div');
+        div.className = 'nav-item-row';
+        div.style = 'display: grid; grid-template-columns: 1.2fr 1.2fr 1.5fr auto; gap: 12px; align-items: center; background: var(--bg-surface-subtle); padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-color);';
+        div.innerHTML = `
+            <div>
+                <label style="display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); margin-bottom: 2px;">🇺🇸 Label (EN)</label>
+                <input type="text" name="nav_labels_en[]" placeholder="e.g. Features" class="form-input" style="width: 100%; font-size: 12px; padding: 6px 10px;">
+            </div>
+            <div>
+                <label style="display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); margin-bottom: 2px;">🇸🇦 Label (AR)</label>
+                <input type="text" name="nav_labels_ar[]" placeholder="مثال: الميزات" dir="rtl" class="form-input" style="width: 100%; font-size: 12px; padding: 6px 10px; font-family: 'Cairo', sans-serif;">
+            </div>
+            <div>
+                <label style="display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); margin-bottom: 2px;">🔗 Target URL</label>
+                <input type="text" name="nav_urls[]" placeholder="#features or /url" class="form-input" style="width: 100%; font-size: 12px; padding: 6px 10px; font-family: monospace;">
+            </div>
+            <div style="padding-top: 14px;">
+                <button type="button" onclick="this.closest('.nav-item-row').remove()" class="tactile-btn" style="padding: 6px 10px; font-size: 11px; background: rgba(217, 107, 95, 0.15); color: #D96B5F; border-color: rgba(217, 107, 95, 0.3);">
+                    ✕
+                </button>
+            </div>
+        `;
+        container.appendChild(div);
+    }
+</script>
 @endsection
