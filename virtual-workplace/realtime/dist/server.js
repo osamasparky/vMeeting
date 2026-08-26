@@ -159,17 +159,19 @@ wss.on('connection', (ws, req) => {
                     break;
                 }
                 case 'chat.send': {
-                    const { channelId, body } = event.payload;
+                    const { channelId, body, scope, roomId } = event.payload;
                     const user = conn.user;
                     if (!user.mapId)
                         break;
                     presence.broadcastToMap(user.organizationId, user.mapId, {
                         type: 'chat.message',
                         payload: {
-                            channelId,
+                            channelId: channelId || (scope === 'global' ? 'global' : (roomId || 'room')),
                             senderId: user.userId,
                             senderName: user.name,
                             body,
+                            scope: scope || 'room',
+                            roomId: roomId || null,
                             timestamp: new Date().toISOString(),
                         },
                     });
@@ -300,6 +302,7 @@ wss.on('connection', (ws, req) => {
                     break;
                 }
                 case 'chat.bubble': {
+                    const { text, scope, roomId } = event.payload;
                     const user = conn.user;
                     if (!user.mapId)
                         break;
@@ -308,7 +311,9 @@ wss.on('connection', (ws, req) => {
                         payload: {
                             userId: user.userId,
                             userName: user.name,
-                            text: event.payload.text,
+                            text,
+                            scope: scope || 'room',
+                            roomId: roomId || null,
                         },
                     });
                     break;

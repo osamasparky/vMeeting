@@ -302,6 +302,8 @@ export interface OutboundChatMessage {
     senderId: string;
     senderName: string;
     body: string;
+    scope?: 'room' | 'global' | string;
+    roomId?: string | null;
     timestamp: string;
   };
 }
@@ -366,6 +368,8 @@ export interface OutboundChatBubble {
     userId: string;
     userName: string;
     text: string;
+    scope?: 'room' | 'global' | string;
+    roomId?: string | null;
   };
 }
 

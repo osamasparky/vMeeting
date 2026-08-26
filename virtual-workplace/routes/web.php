@@ -135,6 +135,7 @@ Route::post('/api/office/attendance/log', [WebAuthController::class, 'logRoomAtt
 Route::get('/api/office/attendance/summary', [WebAuthController::class, 'getAttendanceSummary'])->name('office.attendance.summary');
 Route::get('/api/timesheets/daily-summary', [WebAuthController::class, 'getDailyTimesheetsReport'])->name('timesheets.daily_summary');
 Route::get('/api/office/my-tasks', [WebAuthController::class, 'getOfficeTasksAndTimer'])->name('office.my_tasks');
+Route::get('/api/members/{userId}/activity', [WebAuthController::class, 'getMemberActivity'])->name('members.activity');
 Route::post('/api/office/task-timer/start', [WebAuthController::class, 'startOfficeTaskTimer'])->name('office.task_timer.start');
 Route::post('/api/office/task-timer/stop', [WebAuthController::class, 'stopOfficeTaskTimer'])->name('office.task_timer.stop');
 

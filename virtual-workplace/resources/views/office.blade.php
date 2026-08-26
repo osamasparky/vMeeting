@@ -2089,6 +2089,42 @@
             // 5. Draw Local Avatar (Clean 2.5D Figure without white circle)
             drawAvatar(localAvatar, true);
 
+            // 6. Draw In-World Floating Speech Bubbles & Emoji Reactions
+            const nowTime = Date.now();
+            speechBubbles.forEach((bubble, uid) => {
+                if (bubble.expiresAt < nowTime) {
+                    speechBubbles.delete(uid);
+                    return;
+                }
+                const av = (uid === localAvatar.id) ? localAvatar : remoteAvatars.get(uid);
+                if (!av) return;
+
+                const bx = Number(av.x) || 400;
+                const by = (Number(av.y) || 400) - 38;
+                const text = bubble.emoji ? bubble.emoji : (bubble.text || '');
+                if (!text) return;
+
+                ctx.font = bubble.emoji ? '22px sans-serif' : 'bold 10px Cairo, Inter, sans-serif';
+                const textWidth = ctx.measureText(text).width;
+                const padX = bubble.emoji ? 8 : 10;
+                const padY = bubble.emoji ? 4 : 6;
+                const bw = Math.min(240, textWidth + (padX * 2));
+                const bh = bubble.emoji ? 32 : 22;
+
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
+                ctx.strokeStyle = '#10B981';
+                ctx.lineWidth = 1.5;
+                if (ctx.roundRect) ctx.roundRect(bx - (bw / 2), by - bh, bw, bh, 8);
+                else ctx.rect(bx - (bw / 2), by - bh, bw, bh);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = '#FFFFFF';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(text, bx, by - (bh / 2));
+            });
+
             ctx.restore();
             requestAnimationFrame(draw);
         }
@@ -2553,17 +2589,47 @@
 
                         // 8. Chat Message
                         else if (data.type === 'chat.message' && data.payload) {
+                            const p = data.payload;
+                            // Skip echo for local sender (already added locally)
+                            if (p.senderId === localAvatar.id) {
+                                return;
+                            }
+
+                            // Room isolation: if message is room-scoped, only show if user is in that exact room
+                            if (p.scope === 'room' && p.roomId) {
+                                const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+                                if (!myRoom || myRoom.id !== p.roomId) {
+                                    return; // Ignore room chat when outside the room
+                                }
+                            }
+
                             appendChatMessage({
-                                senderName: data.payload.senderName,
-                                text: data.payload.body,
-                                time: new Date(data.payload.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                                senderId: p.senderId,
+                                senderName: p.senderName,
+                                body: p.body,
+                                scope: p.scope || 'room',
+                                roomId: p.roomId || null,
+                                time: new Date(p.timestamp || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                                 file: null
-                            });
+                            }, false);
                         }
 
                         // 8b. In-World Floating Speech Bubble
                         else if (data.type === 'chat.bubble' && data.payload) {
-                            spawnSpeechBubble(data.payload.userId, data.payload.userName, data.payload.text);
+                            const p = data.payload;
+                            if (p.userId === localAvatar.id) {
+                                return;
+                            }
+
+                            // Room isolation for floating speech bubble
+                            if (p.scope === 'room' && p.roomId) {
+                                const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+                                if (!myRoom || myRoom.id !== p.roomId) {
+                                    return;
+                                }
+                            }
+
+                            spawnSpeechBubble(p.userId, p.userName, p.text);
                         }
 
                         // 8c. In-World Floating Emoji Reaction
@@ -4047,8 +4113,371 @@
             if (modal) modal.style.display = 'none';
         }
 
+        // ── IN-OFFICE MY TASKS DRAWER & QUICK TIME TRACKER ──
+        let myOfficeTasksList = [];
+        let activeOfficeTimer = null;
+        let activeOfficeTimerInterval = null;
+
         function openMyTaskDrawer() {
-            openUserSpotlight(localAvatar.id);
+            if (isGuest) {
+                showToast('🔒 {{ __("Tasks are only available for workspace team members.") }}');
+                return;
+            }
+            const drawer = document.getElementById('my-task-drawer');
+            if (drawer) {
+                drawer.style.display = 'flex';
+                loadMyOfficeTasks();
+            }
+        }
+
+        function closeMyTaskDrawer() {
+            const drawer = document.getElementById('my-task-drawer');
+            if (drawer) drawer.style.display = 'none';
+        }
+
+        async function loadMyOfficeTasks() {
+            if (isGuest) return;
+            const listEl = document.getElementById('office-tasks-list');
+            const heroEl = document.getElementById('office-active-timer-hero');
+            const dockPill = document.getElementById('floating-task-timer-pill');
+
+            try {
+                const res = await fetch('/api/office/my-tasks', {
+                    headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CONFIG.csrf }
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+                myOfficeTasksList = data.tasks || [];
+                activeOfficeTimer = data.active_timer || null;
+
+                // 1. Update Active Timer Hero Card and Dock Timer Pill
+                if (activeOfficeTimer) {
+                    if (heroEl) {
+                        heroEl.style.display = 'block';
+                        const tTitle = document.getElementById('office-timer-title');
+                        const tProj = document.getElementById('office-timer-project');
+                        if (tTitle) tTitle.textContent = activeOfficeTimer.task_title || 'Work Session';
+                        if (tProj) tProj.textContent = `📁 ${activeOfficeTimer.project_name || 'General'}`;
+                    }
+                    if (dockPill) {
+                        dockPill.style.display = 'flex';
+                        const nameEl = document.getElementById('dock-timer-task-name');
+                        if (nameEl) nameEl.textContent = activeOfficeTimer.task_title || 'Task';
+                    }
+
+                    let elapsed = activeOfficeTimer.elapsed_seconds || 0;
+                    if (activeOfficeTimerInterval) clearInterval(activeOfficeTimerInterval);
+
+                    function updateClock() {
+                        elapsed++;
+                        const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+                        const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+                        const s = String(elapsed % 60).padStart(2, '0');
+                        const timeStr = `${h}:${m}:${s}`;
+                        const c1 = document.getElementById('office-timer-clock');
+                        const c2 = document.getElementById('dock-timer-clock');
+                        if (c1) c1.textContent = timeStr;
+                        if (c2) c2.textContent = timeStr;
+                    }
+                    updateClock();
+                    activeOfficeTimerInterval = setInterval(updateClock, 1000);
+                } else {
+                    if (heroEl) heroEl.style.display = 'none';
+                    if (dockPill) dockPill.style.display = 'none';
+                    if (activeOfficeTimerInterval) {
+                        clearInterval(activeOfficeTimerInterval);
+                        activeOfficeTimerInterval = null;
+                    }
+                }
+
+                // 2. Render Tasks List
+                renderOfficeTasksList(myOfficeTasksList);
+
+            } catch (e) {
+                console.error('Error loading office tasks:', e);
+                if (listEl) {
+                    listEl.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 12px; padding: 20px;">❌ {{ __('Failed to load tasks.') }}</div>`;
+                }
+            }
+        }
+
+        function renderOfficeTasksList(tasks) {
+            const listEl = document.getElementById('office-tasks-list');
+            if (!listEl) return;
+
+            if (!tasks || !tasks.length) {
+                listEl.innerHTML = `
+                    <div style="text-align: center; padding: 30px 14px; color: var(--text-muted); font-size: 12px;">
+                        <div style="font-size: 28px; margin-bottom: 6px;">☕</div>
+                        {{ __('No pending tasks assigned to you.') }}
+                    </div>
+                `;
+                return;
+            }
+
+            const priorityColors = {
+                'urgent': 'background: rgba(217, 107, 95, 0.15); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.3);',
+                'high': 'background: rgba(214, 162, 58, 0.15); color: #D6A23A; border: 1px solid rgba(214, 162, 58, 0.3);',
+                'normal': 'background: rgba(79, 155, 95, 0.15); color: #4F9B5F; border: 1px solid rgba(79, 155, 95, 0.3);',
+                'low': 'background: rgba(148, 163, 184, 0.15); color: #64748B; border: 1px solid rgba(148, 163, 184, 0.3);'
+            };
+
+            listEl.innerHTML = tasks.map(t => {
+                const isRunning = activeOfficeTimer && activeOfficeTimer.task_id === t.id;
+                const pStyle = priorityColors[t.priority] || priorityColors['normal'];
+
+                return `
+                    <div class="task-card-item ${isRunning ? 'running' : ''}" id="office-task-${t.id}">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                            <div style="min-width: 0;">
+                                <div style="font-size: 10px; font-weight: 800; color: var(--brand-primary); margin-bottom: 2px;">
+                                    📁 ${escapeHtml(t.project_name || 'General')}
+                                </div>
+                                <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); line-height: 1.3;">
+                                    ${escapeHtml(t.title)}
+                                </div>
+                            </div>
+                            <span class="guest-badge" style="${pStyle} font-size: 9px; text-transform: uppercase;">
+                                ${t.priority || 'normal'}
+                            </span>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                            <div style="font-size: 10px; color: var(--text-muted);">
+                                ${t.due_date ? `📅 ${t.due_date}` : '—'}
+                            </div>
+
+                            ${isRunning ? `
+                                <button type="button" onclick="stopActiveOfficeTask()" class="tactile-btn" style="background: rgba(239, 68, 68, 0.2); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 4px 10px; font-size: 11px; font-weight: 800;">
+                                    ⏹️ {{ __('Stop') }}
+                                </button>
+                            ` : `
+                                <button type="button" onclick="startTaskTimerInOffice('${t.id}', '${t.project_id}', '${escapeAttr(t.title)}', '${escapeAttr(t.project_name || 'Project')}')" class="tactile-btn" style="background: rgba(16, 185, 129, 0.18); color: #34D399; border: 1px solid rgba(52, 211, 153, 0.4); padding: 4px 10px; font-size: 11px; font-weight: 800;">
+                                    ▶ {{ __('Start') }}
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterOfficeTasks(query) {
+            const q = (query || '').toLowerCase().trim();
+            if (!q) {
+                renderOfficeTasksList(myOfficeTasksList);
+                return;
+            }
+            const filtered = myOfficeTasksList.filter(t => 
+                (t.title || '').toLowerCase().includes(q) || 
+                (t.project_name || '').toLowerCase().includes(q)
+            );
+            renderOfficeTasksList(filtered);
+        }
+
+        async function startTaskTimerInOffice(taskId, projectId, title, projectName) {
+            try {
+                const res = await fetch('/api/office/task-timer/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': CONFIG.csrf
+                    },
+                    body: JSON.stringify({
+                        task_id: taskId,
+                        project_id: projectId
+                    })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    showToast(`⚡ {{ __("Task timer started for:") }} ${title}`);
+                    loadMyOfficeTasks();
+                } else {
+                    showToast(`❌ ${data.message || '{{ __("Failed to start timer") }}'}`);
+                }
+            } catch (e) {
+                console.error('Error starting task timer:', e);
+                showToast('❌ {{ __("Network error starting timer.") }}');
+            }
+        }
+
+        async function stopActiveOfficeTask() {
+            try {
+                const res = await fetch('/api/office/task-timer/stop', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': CONFIG.csrf
+                    },
+                    body: JSON.stringify({})
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    showToast('⏹️ {{ __("Task timer stopped and logged to timesheet!") }}');
+                    loadMyOfficeTasks();
+                } else {
+                    showToast(`❌ ${data.message || '{{ __("Failed to stop timer") }}'}`);
+                }
+            } catch (e) {
+                console.error('Error stopping task timer:', e);
+                showToast('❌ {{ __("Network error stopping timer.") }}');
+            }
+        }
+
+        // ── CHAT & FILE SHARING ENGINE (ROOM-SCOPED & GLOBAL) ──
+        let chatScope = 'room'; // 'room' or 'global'
+        const roomMessages = [];
+        const globalMessages = [];
+        const speechBubbles = new Map(); // userId -> { text, emoji, expiresAt, name }
+
+        function toggleChatDrawer() {
+            const drawer = document.getElementById('chat-drawer');
+            if (!drawer) return;
+            const isShown = drawer.style.display === 'flex';
+            drawer.style.display = isShown ? 'none' : 'flex';
+            if (!isShown) {
+                renderChatMessages();
+                const inp = document.getElementById('chat-msg-input');
+                if (inp) inp.focus();
+            }
+        }
+
+        function switchChatScope(scope) {
+            chatScope = scope;
+            const roomTab = document.getElementById('chat-tab-room');
+            const globalTab = document.getElementById('chat-tab-global');
+            if (roomTab) roomTab.classList.toggle('active', scope === 'room');
+            if (globalTab) globalTab.classList.toggle('active', scope === 'global');
+            renderChatMessages();
+        }
+
+        function renderChatMessages() {
+            const container = document.getElementById('chat-messages-container');
+            if (!container) return;
+
+            const msgs = chatScope === 'global' ? globalMessages : roomMessages;
+            const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+
+            let headerHint = '';
+            if (chatScope === 'room') {
+                if (myRoom) {
+                    headerHint = `<div style="text-align: center; padding: 4px 8px; margin-bottom: 8px; font-size: 10px; font-weight: 800; color: #34D399; background: rgba(16, 185, 129, 0.12); border-radius: 6px;">🏢 {{ __("Acoustic Room Channel:") }} ${escapeHtml(myRoom.name)}</div>`;
+                } else {
+                    headerHint = `<div style="text-align: center; padding: 4px 8px; margin-bottom: 8px; font-size: 10px; font-weight: 800; color: #F59E0B; background: rgba(245, 158, 11, 0.12); border-radius: 6px;">🚪 {{ __("Hallway / Open Space (Enter a room to chat with room occupants)") }}</div>`;
+                }
+            } else {
+                headerHint = `<div style="text-align: center; padding: 4px 8px; margin-bottom: 8px; font-size: 10px; font-weight: 800; color: #60A5FA; background: rgba(59, 130, 246, 0.12); border-radius: 6px;">🌐 {{ __("Company-Wide General Office Channel") }}</div>`;
+            }
+
+            if (!msgs.length) {
+                container.innerHTML = headerHint + `
+                    <div style="text-align: center; padding: 24px 10px; color: var(--text-muted); font-size: 11px;">
+                        💬 ${chatScope === 'global' ? '{{ __("No general messages yet. Send a message to everyone!") }}' : '{{ __("No messages in this room yet.") }}'}
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = headerHint + msgs.map(m => {
+                const isSelf = m.senderId === localAvatar.id;
+                return `
+                    <div class="msg-bubble ${isSelf ? 'self' : ''}">
+                        <div class="msg-meta">
+                            <span>${isSelf ? '{{ __("You (أنت)") }}' : escapeHtml(m.senderName)}</span>
+                            <span>${m.time || ''}</span>
+                        </div>
+                        <span style="word-break: break-word;">${escapeHtml(m.body || m.text || '')}</span>
+                    </div>
+                `;
+            }).join('');
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function appendChatMessage(msgPayload, isLocalSender = false) {
+            const targetList = msgPayload.scope === 'global' ? globalMessages : roomMessages;
+            targetList.push(msgPayload);
+
+            if (targetList.length > 100) targetList.shift();
+
+            // Re-render if current tab matches
+            if (chatScope === msgPayload.scope) {
+                renderChatMessages();
+            } else {
+                showToast(`💬 ${escapeHtml(msgPayload.senderName)}: ${escapeHtml((msgPayload.body || msgPayload.text || '').substring(0, 30))}`);
+            }
+        }
+
+        function sendChatMessage() {
+            const inp = document.getElementById('chat-msg-input');
+            if (!inp) return;
+            const text = inp.value.trim();
+            if (!text) return;
+            inp.value = '';
+
+            const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+            const activeScope = chatScope;
+            const roomId = myRoom ? myRoom.id : null;
+
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const msgPayload = {
+                id: 'local_' + Date.now(),
+                senderId: localAvatar.id,
+                senderName: localAvatar.name,
+                body: text,
+                time: timeStr,
+                scope: activeScope,
+                roomId: roomId,
+            };
+
+            // 1. Append locally immediately
+            appendChatMessage(msgPayload, true);
+
+            // 2. Spawn floating bubble on canvas
+            spawnSpeechBubble(localAvatar.id, localAvatar.name, text);
+
+            // 3. Send over WebSocket
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'chat.send',
+                    payload: {
+                        body: text,
+                        scope: activeScope,
+                        roomId: roomId,
+                    }
+                }));
+
+                ws.send(JSON.stringify({
+                    type: 'chat.bubble',
+                    payload: {
+                        text: text,
+                        scope: activeScope,
+                        roomId: roomId,
+                    }
+                }));
+            }
+        }
+
+        function spawnSpeechBubble(userId, userName, text, emoji = null) {
+            if (!userId) return;
+            speechBubbles.set(userId, {
+                text: text || '',
+                emoji: emoji || null,
+                userName: userName || 'Member',
+                expiresAt: Date.now() + 6000 // 6 seconds display
+            });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        function escapeAttr(str) {
+            if (!str) return '';
+            return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
         }
 
         // ── Camera Gallery Grid Overlay ──

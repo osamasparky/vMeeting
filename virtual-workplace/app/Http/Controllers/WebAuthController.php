@@ -2962,6 +2962,73 @@ class WebAuthController extends Controller
     }
 
     /**
+     * Get member live activity, active timer, and assigned tasks for in-office user spotlight card.
+     */
+    public function getMemberActivity(Request $request, string $userId)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        if (!$membership) return response()->json(['message' => 'Unauthorized'], 403);
+        $organizationId = $membership->organization_id;
+
+        $targetUser = \App\Domains\Identity\Models\User::with('profile')->find($userId);
+        if (!$targetUser) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $targetMember = OrganizationMember::where('organization_id', $organizationId)
+            ->where('user_id', $userId)
+            ->with(['role', 'department'])
+            ->first();
+
+        // Active running timer
+        $activeTimer = \App\Domains\Projects\Models\ActiveTimer::where('organization_id', $organizationId)
+            ->where('user_id', $userId)
+            ->with(['project', 'task'])
+            ->first();
+
+        // Pending assigned tasks
+        $tasks = \App\Domains\Projects\Models\Task::where('organization_id', $organizationId)
+            ->where('assignee_id', $userId)
+            ->whereNotIn('status', ['done', 'completed', 'cancelled'])
+            ->with('project')
+            ->orderBy('priority', 'desc')
+            ->orderBy('due_date', 'asc')
+            ->take(20)
+            ->get();
+
+        return response()->json([
+            'user' => [
+                'id' => $targetUser->id,
+                'name' => $targetUser->name,
+                'email' => $targetUser->email,
+                'role_name' => $targetMember?->role?->name ?? 'Member',
+                'job_title' => $targetMember?->job_title ?? $targetUser->profile?->job_title ?? '',
+                'department' => $targetMember?->department?->name ?? '',
+                'avatar_url' => $targetUser->avatar_url ?? null,
+            ],
+            'active_timer' => $activeTimer ? [
+                'task_title' => $activeTimer->task?->title ?? 'Task',
+                'task_number' => $activeTimer->task?->task_number ?? '',
+                'project_name' => $activeTimer->project?->name ?? 'Project',
+                'duration_seconds' => $activeTimer->elapsedSeconds(),
+                'started_at' => $activeTimer->started_at->toIso8601String(),
+            ] : null,
+            'tasks' => $tasks->map(function ($t) {
+                return [
+                    'id' => $t->id,
+                    'title' => $t->title,
+                    'task_number' => $t->task_number,
+                    'status' => $t->status,
+                    'priority' => $t->priority,
+                    'project_name' => $t->project?->name ?? 'General',
+                    'due_date' => $t->due_date ? $t->due_date->format('Y-m-d') : null,
+                ];
+            }),
+        ]);
+    }
+
+    /**
      * Get user workplace notifications list and unread count.
      */
      public function getUserNotifications(Request $request)

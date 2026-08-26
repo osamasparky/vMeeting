@@ -187,17 +187,19 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
         }
 
         case 'chat.send': {
-          const { channelId, body } = event.payload;
+          const { channelId, body, scope, roomId } = event.payload as any;
           const user = conn.user;
           if (!user.mapId) break;
 
           presence.broadcastToMap(user.organizationId, user.mapId, {
             type: 'chat.message',
             payload: {
-              channelId,
+              channelId: channelId || (scope === 'global' ? 'global' : (roomId || 'room')),
               senderId: user.userId,
               senderName: user.name,
               body,
+              scope: scope || 'room',
+              roomId: roomId || null,
               timestamp: new Date().toISOString(),
             },
           });
@@ -349,6 +351,7 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
         }
 
         case 'chat.bubble': {
+          const { text, scope, roomId } = event.payload as any;
           const user = conn.user;
           if (!user.mapId) break;
           presence.broadcastToMap(
@@ -359,7 +362,9 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
               payload: {
                 userId: user.userId,
                 userName: user.name,
-                text: event.payload.text,
+                text,
+                scope: scope || 'room',
+                roomId: roomId || null,
               },
             }
           );
