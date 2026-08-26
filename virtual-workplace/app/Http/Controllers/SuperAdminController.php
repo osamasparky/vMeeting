@@ -851,38 +851,56 @@ class SuperAdminController extends Controller
      */
     public function updateTranslations(Request $request)
     {
-        $keys = $request->input('keys', []);
-        $arVals = $request->input('ar', []);
-        $enVals = $request->input('en', []);
+        try {
+            $keys = $request->input('keys', []);
+            $arVals = $request->input('ar', []);
+            $enVals = $request->input('en', []);
 
-        $arPath = base_path('lang/ar.json');
-        $enPath = base_path('lang/en.json');
+            $arPath = base_path('lang/ar.json');
+            $enPath = base_path('lang/en.json');
 
-        $arJson = file_exists($arPath) ? json_decode(file_get_contents($arPath), true) ?: [] : [];
-        $enJson = file_exists($enPath) ? json_decode(file_get_contents($enPath), true) ?: [] : [];
+            $arJson = file_exists($arPath) ? json_decode(file_get_contents($arPath), true) ?: [] : [];
+            $enJson = file_exists($enPath) ? json_decode(file_get_contents($enPath), true) ?: [] : [];
 
-        for ($i = 0; $i < count($keys); $i++) {
-            $key = $keys[$i];
-            if ($key !== '') {
-                if (isset($arVals[$i])) {
-                    $arJson[$key] = $arVals[$i];
-                }
-                if (isset($enVals[$i])) {
-                    $enJson[$key] = $enVals[$i];
+            for ($i = 0; $i < count($keys); $i++) {
+                $key = $keys[$i];
+                if ($key !== '') {
+                    if (isset($arVals[$i])) {
+                        $arJson[$key] = $arVals[$i];
+                    }
+                    if (isset($enVals[$i])) {
+                        $enJson[$key] = $enVals[$i];
+                    }
                 }
             }
+
+            if (!file_exists(dirname($arPath))) {
+                @mkdir(dirname($arPath), 0775, true);
+            }
+            if (file_exists($arPath) && !is_writable($arPath)) {
+                @chmod($arPath, 0666);
+            }
+            if (file_exists($enPath) && !is_writable($enPath)) {
+                @chmod($enPath, 0666);
+            }
+
+            file_put_contents($arPath, json_encode($arJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            file_put_contents($enPath, json_encode($enJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+            \Illuminate\Support\Facades\Artisan::call('view:clear');
+
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['success' => true, 'message' => __('Translations saved and cache cleared.')]);
+            }
+
+            return back()->with('success', __('Translations saved successfully across the system.'));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Error saving translations: ' . $e->getMessage());
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => 'Failed to save translations: ' . $e->getMessage()], 500);
+            }
+            return back()->with('error', 'Failed to save translations: ' . $e->getMessage());
         }
-
-        file_put_contents($arPath, json_encode($arJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-        file_put_contents($enPath, json_encode($enJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-
-        \Illuminate\Support\Facades\Artisan::call('view:clear');
-
-        if ($request->wantsJson() || $request->ajax()) {
-            return response()->json(['success' => true, 'message' => __('Translations saved and cache cleared.')]);
-        }
-
-        return back()->with('success', __('Translations saved successfully across the system.'));
     }
 
     /**
@@ -896,25 +914,37 @@ class SuperAdminController extends Controller
             'en' => 'nullable|string|max:2000',
         ]);
 
-        $key = trim($request->input('key'));
-        $arVal = trim($request->input('ar'));
-        $enVal = trim($request->input('en', $key)) ?: $key;
+        try {
+            $key = trim($request->input('key'));
+            $arVal = trim($request->input('ar'));
+            $enVal = trim($request->input('en', $key)) ?: $key;
 
-        $arPath = base_path('lang/ar.json');
-        $enPath = base_path('lang/en.json');
+            $arPath = base_path('lang/ar.json');
+            $enPath = base_path('lang/en.json');
 
-        $arJson = file_exists($arPath) ? json_decode(file_get_contents($arPath), true) ?: [] : [];
-        $enJson = file_exists($enPath) ? json_decode(file_get_contents($enPath), true) ?: [] : [];
+            $arJson = file_exists($arPath) ? json_decode(file_get_contents($arPath), true) ?: [] : [];
+            $enJson = file_exists($enPath) ? json_decode(file_get_contents($enPath), true) ?: [] : [];
 
-        $arJson[$key] = $arVal;
-        $enJson[$key] = $enVal;
+            $arJson[$key] = $arVal;
+            $enJson[$key] = $enVal;
 
-        file_put_contents($arPath, json_encode($arJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-        file_put_contents($enPath, json_encode($enJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            if (file_exists($arPath) && !is_writable($arPath)) {
+                @chmod($arPath, 0666);
+            }
+            if (file_exists($enPath) && !is_writable($enPath)) {
+                @chmod($enPath, 0666);
+            }
 
-        \Illuminate\Support\Facades\Artisan::call('view:clear');
+            file_put_contents($arPath, json_encode($arJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            file_put_contents($enPath, json_encode($enJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
-        return back()->with('success', __('New phrase ":key" added successfully.', ['key' => $key]));
+            \Illuminate\Support\Facades\Artisan::call('view:clear');
+
+            return back()->with('success', __('New phrase ":key" added successfully.', ['key' => $key]));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Error adding translation: ' . $e->getMessage());
+            return back()->with('error', 'Failed to add phrase: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -925,21 +955,33 @@ class SuperAdminController extends Controller
         $request->validate(['key' => 'required|string']);
         $key = $request->input('key');
 
-        $arPath = base_path('lang/ar.json');
-        $enPath = base_path('lang/en.json');
+        try {
+            $arPath = base_path('lang/ar.json');
+            $enPath = base_path('lang/en.json');
 
-        $arJson = file_exists($arPath) ? json_decode(file_get_contents($arPath), true) ?: [] : [];
-        $enJson = file_exists($enPath) ? json_decode(file_get_contents($enPath), true) ?: [] : [];
+            $arJson = file_exists($arPath) ? json_decode(file_get_contents($arPath), true) ?: [] : [];
+            $enJson = file_exists($enPath) ? json_decode(file_get_contents($enPath), true) ?: [] : [];
 
-        unset($arJson[$key]);
-        unset($enJson[$key]);
+            unset($arJson[$key]);
+            unset($enJson[$key]);
 
-        file_put_contents($arPath, json_encode($arJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-        file_put_contents($enPath, json_encode($enJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            if (file_exists($arPath) && !is_writable($arPath)) {
+                @chmod($arPath, 0666);
+            }
+            if (file_exists($enPath) && !is_writable($enPath)) {
+                @chmod($enPath, 0666);
+            }
 
-        \Illuminate\Support\Facades\Artisan::call('view:clear');
+            file_put_contents($arPath, json_encode($arJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            file_put_contents($enPath, json_encode($enJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
-        return back()->with('success', __('Phrase removed from system.'));
+            \Illuminate\Support\Facades\Artisan::call('view:clear');
+
+            return back()->with('success', __('Phrase removed from system.'));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Error deleting translation: ' . $e->getMessage());
+            return back()->with('error', 'Failed to delete phrase: ' . $e->getMessage());
+        }
     }
 
     /**

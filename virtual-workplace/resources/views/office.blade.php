@@ -812,20 +812,6 @@
                     <span>🏢</span>
                 @endif
                 <span>{{ $organization->name }}</span>
-
-                @if(empty($user->is_guest) && isset($userAllowedOffices) && $userAllowedOffices->count() > 1)
-                    <select onchange="window.location.href='/office?office=' + this.value" style="background: var(--bg-card); border: 1px solid var(--border-card); color: var(--text-primary); font-size: 11px; font-weight: 800; border-radius: 6px; padding: 2px 6px; outline: none; cursor: pointer; margin-inline-start: 6px;">
-                        @foreach($userAllowedOffices as $o)
-                            <option value="{{ $o->id }}" {{ $floor && $floor->id === $o->id ? 'selected' : '' }}>
-                                🏢 {{ $o->name }} {{ $o->is_default ? '⭐' : '' }}
-                            </option>
-                        @endforeach
-                    </select>
-                @elseif($floor)
-                    <span style="font-size: 11px; font-weight: 700; color: var(--brand-primary); opacity: 0.9; margin-inline-start: 4px;">
-                        ({{ $floor->name }})
-                    </span>
-                @endif
             </div>
 
             @if(!empty($user->is_guest))
