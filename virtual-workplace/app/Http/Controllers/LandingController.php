@@ -6,7 +6,7 @@ use App\Domains\CMS\Models\CmsPage;
 use App\Domains\CMS\Models\FeatureFlag;
 use App\Domains\CMS\Services\ThemeEngineService;
 use App\Domains\Tenancy\Models\Plan;
-use App\Domains\Tenancy\Models\SystemSetting;
+use App\Domains\Administration\Models\SystemSetting;
 use Illuminate\Http\Request;
 
 class LandingController extends Controller
