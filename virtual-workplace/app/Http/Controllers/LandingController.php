@@ -27,7 +27,7 @@ class LandingController extends Controller
         }
 
         $sections = $page ? $page->activeSections->keyBy('section_key') : collect();
-        $plans = Plan::where('is_active', true)->orderBy('price_monthly', 'asc')->get();
+        $plans = Plan::where('is_active', true)->orderBy('price', 'asc')->get();
 
         // Payment & Currency Rates
         $paymentSetting = SystemSetting::where('key', 'payment_gateways')->first();

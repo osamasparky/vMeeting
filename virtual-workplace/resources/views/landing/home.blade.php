@@ -612,8 +612,8 @@
 
                         <!-- Price Tag -->
                         <div style="margin-bottom: 24px;">
-                            <span class="plan-price-val" data-base-usd="{{ $plan->price_monthly }}" style="font-size: 36px; font-weight: 900; color: var(--ns-white);">
-                                {{ round($plan->price_monthly * ($rates['SAR'] ?? 3.75), 0) }}
+                            <span class="plan-price-val" data-base-usd="{{ $plan->price }}" style="font-size: 36px; font-weight: 900; color: var(--ns-white);">
+                                {{ round($plan->price * ($rates['SAR'] ?? 3.75), 0) }}
                             </span>
                             <span class="plan-currency-symbol" style="font-size: 14px; font-weight: 800; color: var(--ns-mint);">
                                 SAR
@@ -647,7 +647,7 @@
                     </div>
 
                     <a href="{{ route('register') }}" class="ns-btn {{ $plan->name === 'Business' || $plan->name === 'Pro' ? 'ns-btn-primary' : 'ns-btn-secondary' }}" style="width: 100%; text-align: center;">
-                        {{ $plan->price_monthly == 0 ? __('Get Started Free') : __('Choose Plan') }}
+                        {{ $plan->price == 0 ? __('Get Started Free') : __('Choose Plan') }}
                     </a>
                 </div>
             @endforeach
