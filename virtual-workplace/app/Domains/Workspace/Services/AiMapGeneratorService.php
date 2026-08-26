@@ -305,7 +305,7 @@ class AiMapGeneratorService
         // 1. Reception & Welcome Lobby (Bottom-Center: entrance)
         $rooms[] = [
             'name' => __('Reception & Welcome Lobby (الاستقبال والمدخل)'),
-            'type' => 'common',
+            'type' => 'reception',
             'capacity' => 6,
             'color' => '#10B981',
             'bounds' => [
@@ -321,7 +321,7 @@ class AiMapGeneratorService
         // 2. Coffee Bar & Cafeteria (Central Social Hub)
         $rooms[] = [
             'name' => __('Coffee Corner & Cafeteria (ركن القهوة والاستراحة)'),
-            'type' => 'breakout',
+            'type' => 'support',
             'capacity' => 10,
             'color' => '#F59E0B',
             'bounds' => [
@@ -348,7 +348,7 @@ class AiMapGeneratorService
             $num = $i + 1;
             $rooms[] = [
                 'name' => __("Team Workspace (مكتب فريق) :num", ['num' => $num]),
-                'type' => 'office',
+                'type' => 'private',
                 'capacity' => $desksPerOffice,
                 'color' => '#3B82F6',
                 'bounds' => [
@@ -396,7 +396,7 @@ class AiMapGeneratorService
         if ($thinkingCount > 0) {
             $rooms[] = [
                 'name' => __('Thinking & Focus Pod (غرفة التركيز والعصف الذهني)'),
-                'type' => 'focus',
+                'type' => 'private',
                 'capacity' => 4,
                 'color' => '#06B6D4',
                 'bounds' => [
@@ -415,7 +415,7 @@ class AiMapGeneratorService
         if ($restCount > 0) {
             $rooms[] = [
                 'name' => __('Rest & Gaming Lounge (صالة الراحة والترفيه)'),
-                'type' => 'breakout',
+                'type' => 'support',
                 'capacity' => 8,
                 'color' => '#EC4899',
                 'bounds' => [
@@ -434,7 +434,7 @@ class AiMapGeneratorService
         if ($theaterCount > 0) {
             $rooms[] = [
                 'name' => __('Presentation Theater & Stage (مسرح وقاعة المؤتمرات)'),
-                'type' => 'stage',
+                'type' => 'meeting',
                 'capacity' => 20,
                 'color' => '#E11D48',
                 'bounds' => [
@@ -444,7 +444,7 @@ class AiMapGeneratorService
                     'height' => 10,
                 ],
                 'desks_count' => 16,
-                'description' => 'Auditorium amphitheater with keynote presentation screen and rows of seats.',
+                'description' => 'Auditorium amphitheater stage with curved visual display wall and spectator seating.',
             ];
         }
 
