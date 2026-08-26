@@ -2225,23 +2225,6 @@
                     BLUEPRINT_IMAGE.src = data.background_image_url + (data.background_image_url.includes('?') ? '&' : '?') + 'v=' + Date.now();
                 }
 
-                // Update rooms array
-                if (data.rooms && Array.isArray(data.rooms)) {
-                    rooms.length = 0;
-                    data.rooms.forEach(r => {
-                        rooms.push({
-                            id: r.id,
-                            name: r.name,
-                            type: r.type,
-                            access_mode: r.access_mode || 'public',
-                            capacity: r.capacity || 10,
-                            color: r.color || '#10B981',
-                            bounds: r.bounds,
-                            metadata: r.metadata || {}
-                        });
-                    });
-                }
-
                 selectedItem = null;
                 updateInspector();
                 hideFloatingActions();
@@ -2251,7 +2234,7 @@
                 modalContent.style.display = 'block';
                 loadingBox.style.display = 'none';
 
-                showToast('✨ ' + (data.message || 'AI Virtual Office & Isolated Rooms generated successfully!'));
+                showToast('✨ ' + (data.message || '{{ __("AI Virtual Office floorplan generated successfully!") }}'));
             } catch (err) {
                 clearInterval(interval);
                 modalContent.style.display = 'block';
