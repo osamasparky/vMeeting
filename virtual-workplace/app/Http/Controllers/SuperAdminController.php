@@ -654,7 +654,7 @@ class SuperAdminController extends Controller
             'model' => 'dall-e-3',
             'image_size' => '1792x1024',
             'quality' => 'standard',
-            'prompt_prefix' => 'A clean, high-angle photorealistic 3D isometric architectural floorplan of a modern virtual workplace office.',
+            'prompt_prefix' => "A clean, photorealistic direct top-down 2D architectural floor plan blueprint of a modern virtual workplace office (straight 90-degree overhead bird's-eye plan view with cutaway interior walls).",
             'is_enabled' => true,
         ]);
 
@@ -671,7 +671,7 @@ class SuperAdminController extends Controller
             'model' => $request->input('model', 'dall-e-3'),
             'image_size' => $request->input('image_size', '1792x1024'),
             'quality' => $request->input('quality', 'standard'),
-            'prompt_prefix' => trim($request->input('prompt_prefix', 'A clean, high-angle photorealistic 3D isometric architectural floorplan of a modern virtual workplace office.')),
+            'prompt_prefix' => trim($request->input('prompt_prefix', "A clean, photorealistic direct top-down 2D architectural floor plan blueprint of a modern virtual workplace office (straight 90-degree overhead bird's-eye plan view with cutaway interior walls).")),
             'is_enabled' => $request->has('is_enabled'),
         ];
 

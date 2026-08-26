@@ -355,7 +355,7 @@
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
                         📝 {{ __('System Prompt Prefix & Directives (تعليمات التوليد المعماري)') }}
                     </label>
-                    <textarea name="prompt_prefix" rows="3" class="form-input" style="width: 100%; font-size: 12px;">{{ $aiSettings['prompt_prefix'] ?? 'A clean, high-angle photorealistic 3D isometric architectural floorplan of a modern virtual workplace office.' }}</textarea>
+                    <textarea name="prompt_prefix" rows="3" class="form-input" style="width: 100%; font-size: 12px;">{{ $aiSettings['prompt_prefix'] ?? "A clean, photorealistic direct top-down 2D architectural floor plan blueprint of a modern virtual workplace office (straight 90-degree overhead bird's-eye plan view with cutaway interior walls)." }}</textarea>
                 </div>
             </div>
 

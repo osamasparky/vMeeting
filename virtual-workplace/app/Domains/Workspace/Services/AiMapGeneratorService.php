@@ -21,39 +21,39 @@ class AiMapGeneratorService
      */
     protected array $styles = [
         'modern_glass_luxury' => [
-            'name' => 'Modern Glass Luxury',
-            'name_ar' => 'زجاجي حديث فاخر',
-            'description' => 'Ultra-modern luxury corporate office with floor-to-ceiling soundproof glass walls, polished marble and dark oak wood flooring, minimalist black steel framing, warm ambient recessed LED perimeter lighting, panoramic executive skyline feel.',
+            'name' => 'Modern Glass Luxury (2D Floorplan)',
+            'name_ar' => 'زجاجي حديث فاخر (مخطط أفقي 2D)',
+            'description' => 'Ultra-modern luxury corporate aesthetic with soundproof glass partition walls, polished concrete hallways, dark oak wood office flooring, emerald acoustic boardroom carpet, minimalist black steel framing, soft warm circular ceiling downlights.',
             'primary_color' => '#10B981',
         ],
         'scandinavian_minimalist' => [
-            'name' => 'Scandinavian Minimalist',
-            'name_ar' => 'اسكندنافي بسيط وهادئ',
-            'description' => 'Nordic Scandinavian open-plan studio with light natural ash wood, acoustic felt wall panels, soft beige and white terrazzo flooring, abundant biophilic indoor plants, clean airy natural daylight.',
+            'name' => 'Scandinavian Minimalist (2D Floorplan)',
+            'name_ar' => 'اسكندنافي هادئ (مخطط أفقي 2D)',
+            'description' => 'Nordic Scandinavian aesthetic with light ash hardwood parquet floors, beige terrazzo walkways, acoustic felt divider walls, soft pastel rugs, clean airy lighting and abundant potted indoor plants.',
             'primary_color' => '#3B82F6',
         ],
         'silicon_valley_tech' => [
-            'name' => 'Silicon Valley Tech HQ',
-            'name_ar' => 'مقر تقني على طراز وادي السيليكون',
-            'description' => 'High-tech Silicon Valley startup headquarters with exposed industrial brick and matte black steel beams, polished concrete floors, vibrant accent neon stripes, agile glass collaboration pods.',
+            'name' => 'Silicon Valley Tech Studio (2D Floorplan)',
+            'name_ar' => 'استوديو تقني وادي السيليكون (مخطط أفقي 2D)',
+            'description' => 'High-tech Silicon Valley startup aesthetic with industrial grey screed concrete, matte black steel wall dividers, agile collaboration zones with modern dual-monitor workstations and neon perimeter trim.',
             'primary_color' => '#8B5CF6',
         ],
         'executive_corporate' => [
-            'name' => 'Executive Corporate Board',
-            'name_ar' => 'رئاسي تنفيذي كلاسيكي',
-            'description' => 'Prestigious executive corporate headquarters with rich mahogany paneling, deep navy and gold accents, plush acoustic carpet tiles, frosted glass boardroom partitions, stately executive furniture.',
+            'name' => 'Executive Corporate Board (2D Floorplan)',
+            'name_ar' => 'رئاسي تنفيذي كلاسيكي (مخطط أفقي 2D)',
+            'description' => 'Prestigious executive corporate aesthetic with rich mahogany wood partitions, navy and gold patterned acoustic carpet tiles, frosted glass meeting suites, and stately executive desks.',
             'primary_color' => '#D97706',
         ],
         'warm_wood_botanical' => [
-            'name' => 'Biophilic Warm Wood & Botanical',
-            'name_ar' => 'طبيعي دافئ مع نباتات خضراء',
-            'description' => 'Eco-luxury biophilic workspace featuring natural live-edge timber tables, lush vertical living green walls, sunlit skylights, organic terracotta and travertine textures, serene tranquil atmosphere.',
+            'name' => 'Biophilic Warm Wood & Botanical (2D Floorplan)',
+            'name_ar' => 'طبيعي دافئ مع نباتات (مخطط أفقي 2D)',
+            'description' => 'Eco-luxury biophilic workspace with live-edge natural timber flooring, lush green planter dividing walls, travertine reception tiles, and sunlit organic atmosphere.',
             'primary_color' => '#059669',
         ],
         'cyberpunk_neon' => [
-            'name' => 'Cyberpunk Dark Neon Studio',
-            'name_ar' => 'استوديو مستقبلي مظلم بإضاءات نيون',
-            'description' => 'Futuristic cyberpunk creative agency office with dark obsidian surfaces, glowing emerald and cyan neon architectural trim, holographic glass displays, dark metallic textures.',
+            'name' => 'Cyberpunk Dark Studio (2D Floorplan)',
+            'name_ar' => 'استوديو مظلم بإضاءات نيون (مخطط أفقي 2D)',
+            'description' => 'Futuristic cyberpunk studio with dark charcoal obsidian flooring, glowing emerald and cyan recessed LED floor strips, dark acoustic theater carpet, and holographic monitors.',
             'primary_color' => '#EC4899',
         ],
     ];
@@ -115,7 +115,7 @@ class AiMapGeneratorService
             'model' => 'dall-e-3',
             'image_size' => '1792x1024',
             'quality' => 'standard',
-            'prompt_prefix' => 'A clean, high-angle photorealistic 3D isometric architectural floorplan of a modern virtual workplace office.',
+            'prompt_prefix' => "A clean, photorealistic direct top-down 2D architectural floor plan blueprint of a modern virtual workplace office (straight 90-degree overhead bird's-eye plan view with cutaway interior walls).",
             'is_enabled' => true,
         ]);
 
@@ -123,21 +123,21 @@ class AiMapGeneratorService
         $model = $aiSettings['model'] ?? 'dall-e-3';
         $imageSize = $aiSettings['image_size'] ?? '1792x1024';
         $quality = $aiSettings['quality'] ?? 'standard';
-        $promptPrefix = $aiSettings['prompt_prefix'] ?? 'A clean, high-angle photorealistic 3D isometric architectural floorplan of a modern virtual workplace office.';
+        $promptPrefix = $aiSettings['prompt_prefix'] ?? "A clean, photorealistic direct top-down 2D architectural floor plan blueprint of a modern virtual workplace office (straight 90-degree overhead bird's-eye plan view with cutaway interior walls).";
 
-        // 4. Construct Architectural Prompt
+        // 4. Construct 2D Architectural Floor Plan Prompt
         $roomSummaryParts = [];
-        $roomSummaryParts[] = "1 Grand Reception & Welcome Lobby at entrance";
-        $roomSummaryParts[] = "1 Central Coffee Bar Lounge & Cafeteria";
-        if ($meetingRoomsCount > 0) $roomSummaryParts[] = "{$meetingRoomsCount} Glass-walled Meeting Boardrooms with conference table";
-        if ($officeRoomsCount > 0) $roomSummaryParts[] = "{$officeRoomsCount} Executive & Team Workspaces with {$desksPerOffice} computer desks each";
-        if ($thinkingRoomsCount > 0) $roomSummaryParts[] = "{$thinkingRoomsCount} Creative Thinking & Brainstorming Pods";
-        if ($restAreasCount > 0) $roomSummaryParts[] = "{$restAreasCount} Relaxation & Gaming Breakout Lounge";
-        if ($theatersCount > 0) $roomSummaryParts[] = "{$theatersCount} Presentation Amphitheater / Auditorium Stage";
+        $roomSummaryParts[] = "1 Central Reception Entrance with welcome desk and computer";
+        $roomSummaryParts[] = "1 Coffee Bar Espresso Counter with barstools and water cooler";
+        if ($meetingRoomsCount > 0) $roomSummaryParts[] = "{$meetingRoomsCount} Executive Meeting Boardrooms with large conference table, 8 to 10 executive chairs, green/blue acoustic carpet and wall display screen";
+        if ($officeRoomsCount > 0) $roomSummaryParts[] = "{$officeRoomsCount} Modular Team Office Pods on warm hardwood parquet flooring, each equipped with {$desksPerOffice} workstations with laptops and ergonomic chairs";
+        if ($thinkingRoomsCount > 0) $roomSummaryParts[] = "{$thinkingRoomsCount} Creative Collaborative Lounge / Thinking Pods with plush sofas, armchairs, coffee table, area rug, bookshelves and whiteboard";
+        if ($restAreasCount > 0) $roomSummaryParts[] = "{$restAreasCount} Relaxation Breakout Lounge with couches, gaming console, and bean bags";
+        if ($theatersCount > 0) $roomSummaryParts[] = "{$theatersCount} Presentation Auditorium Theater with wooden stage, large glowing curved presentation video screen, and neat rows of theater seating";
 
         $roomsText = implode(', ', $roomSummaryParts);
 
-        $prompt = "{$promptPrefix} 3D isometric architectural floorplan view (orthographic perspective, high angle 45-degree isometric projection) of an entire virtual office layout in {$styleConfig['description']}. Clear modular room partitions with distinct functional zones: {$roomsText}. Clean architectural layout, clear floor plan zoning, top-down isometric view, hyper-detailed interior 3D rendering, no people.";
+        $prompt = "{$promptPrefix} Straight top-down 2D overhead orthographic floorplan blueprint of an entire office layout in {$styleConfig['description']}. Crisp interior cutaway partition walls showing open doorways and clear functional zones: {$roomsText}. Polished concrete walkways, hardwood floor pods, ambient warm overhead circular ceiling spot lights, lush indoor potted plants in corners. Highly detailed 2D architectural floor plan drawing, crisp top-down view of all furniture, no people, completely empty office.";
 
         // 5. Generate or Obtain Blueprint Artwork
         $imageUrl = null;
