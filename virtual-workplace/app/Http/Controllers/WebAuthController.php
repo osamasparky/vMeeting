@@ -2978,7 +2978,7 @@ class WebAuthController extends Controller
 
         $targetMember = OrganizationMember::where('organization_id', $organizationId)
             ->where('user_id', $userId)
-            ->with(['role', 'department'])
+            ->with(['role'])
             ->first();
 
         // Active running timer
@@ -3004,7 +3004,7 @@ class WebAuthController extends Controller
                 'email' => $targetUser->email,
                 'role_name' => $targetMember?->role?->name ?? 'Member',
                 'job_title' => $targetMember?->job_title ?? $targetUser->profile?->job_title ?? '',
-                'department' => $targetMember?->department?->name ?? '',
+                'department' => $targetUser->profile?->department ?? '',
                 'avatar_url' => $targetUser->avatar_url ?? null,
             ],
             'active_timer' => $activeTimer ? [
