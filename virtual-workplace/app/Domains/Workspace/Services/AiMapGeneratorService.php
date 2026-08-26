@@ -148,38 +148,56 @@ class AiMapGeneratorService
 
         $imageUrl = null;
         try {
-            $response = Http::withToken($apiKey)
-                ->timeout(120)
-                ->post('https://api.openai.com/v1/images/generations', [
-                    'model' => $model,
+            // Attempt with configured model or auto-fallback to gpt-image-1 / chatgpt-image-latest
+            $attemptModels = array_unique([$model, 'gpt-image-1', 'chatgpt-image-latest', 'dall-e-3', 'dall-e-2']);
+            $lastErrMsg = null;
+
+            foreach ($attemptModels as $currentModel) {
+                $payload = [
+                    'model' => $currentModel,
                     'prompt' => $prompt,
                     'n' => 1,
-                    'size' => $imageSize,
-                    'quality' => $quality,
-                ]);
-
-            if ($response->successful()) {
-                $openAiData = $response->json();
-                $remoteImageUrl = $openAiData['data'][0]['url'] ?? null;
-
-                if (!$remoteImageUrl) {
-                    throw new \Exception(__('OpenAI did not return an image URL.'));
+                ];
+                if (!empty($imageSize)) {
+                    $payload['size'] = $imageSize;
                 }
 
-                $imageBinary = Http::timeout(60)->get($remoteImageUrl)->body();
-                $filename = 'ai_map_' . $organization->id . '_' . time() . '.png';
-                $destinationDir = public_path('uploads/maps');
-                if (!File::isDirectory($destinationDir)) {
-                    File::makeDirectory($destinationDir, 0777, true, true);
+                $response = Http::withToken($apiKey)
+                    ->timeout(120)
+                    ->post('https://api.openai.com/v1/images/generations', $payload);
+
+                if ($response->successful()) {
+                    $openAiData = $response->json();
+                    $remoteImageUrl = $openAiData['data'][0]['url'] ?? null;
+                    $b64Data = $openAiData['data'][0]['b64_json'] ?? null;
+
+                    $filename = 'ai_map_' . $organization->id . '_' . time() . '.png';
+                    $destinationDir = public_path('uploads/maps');
+                    if (!File::isDirectory($destinationDir)) {
+                        File::makeDirectory($destinationDir, 0777, true, true);
+                    }
+
+                    if (!empty($b64Data)) {
+                        $imageBinary = base64_decode($b64Data);
+                        File::put($destinationDir . '/' . $filename, $imageBinary);
+                        $imageUrl = '/uploads/maps/' . $filename;
+                        break;
+                    } elseif (!empty($remoteImageUrl)) {
+                        $imageBinary = Http::timeout(60)->get($remoteImageUrl)->body();
+                        File::put($destinationDir . '/' . $filename, $imageBinary);
+                        $imageUrl = '/uploads/maps/' . $filename;
+                        break;
+                    }
+                } else {
+                    $errBody = $response->json();
+                    $lastErrMsg = $errBody['error']['message'] ?? $response->body();
+                    Log::warning("OpenAI Model {$currentModel} failed: {$lastErrMsg}. Trying fallback...");
                 }
-                File::put($destinationDir . '/' . $filename, $imageBinary);
-                $imageUrl = '/uploads/maps/' . $filename;
-            } else {
-                $errBody = $response->json();
-                $errMsg = $errBody['error']['message'] ?? $response->body();
-                Log::error('OpenAI DALL-E Error: ' . $errMsg);
+            }
+
+            if (!$imageUrl) {
                 throw ValidationException::withMessages([
-                    'openai' => __('OpenAI Image Generation Error: :error', ['error' => $errMsg]),
+                    'openai' => __('OpenAI Image Generation Error: :error', ['error' => $lastErrMsg ?? 'Could not generate image.']),
                 ]);
             }
         } catch (ValidationException $ve) {

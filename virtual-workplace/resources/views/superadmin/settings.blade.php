@@ -314,11 +314,17 @@
                         🖼️ {{ __('Image Generation Model (نموذج توليد الصور)') }}
                     </label>
                     <select name="model" class="form-input" style="width: 100%;">
-                        <option value="dall-e-3" {{ ($aiSettings['model'] ?? 'dall-e-3') === 'dall-e-3' ? 'selected' : '' }}>
-                            DALL-E 3 (Recommended: Ultra-detailed 3D Isometric Art)
+                        <option value="gpt-image-1" {{ ($aiSettings['model'] ?? 'gpt-image-1') === 'gpt-image-1' ? 'selected' : '' }}>
+                            GPT Image 1 (Latest OpenAI Flagship Image Model)
+                        </option>
+                        <option value="chatgpt-image-latest" {{ ($aiSettings['model'] ?? '') === 'chatgpt-image-latest' ? 'selected' : '' }}>
+                            ChatGPT Image Latest
+                        </option>
+                        <option value="dall-e-3" {{ ($aiSettings['model'] ?? '') === 'dall-e-3' ? 'selected' : '' }}>
+                            DALL-E 3 (High Definition Art)
                         </option>
                         <option value="dall-e-2" {{ ($aiSettings['model'] ?? '') === 'dall-e-2' ? 'selected' : '' }}>
-                            DALL-E 2 (Legacy Fast)
+                            DALL-E 2 (Legacy)
                         </option>
                     </select>
                 </div>
