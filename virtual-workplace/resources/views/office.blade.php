@@ -812,6 +812,20 @@
                     <span>🏢</span>
                 @endif
                 <span>{{ $organization->name }}</span>
+
+                @if(empty($user->is_guest) && isset($userAllowedOffices) && $userAllowedOffices->count() > 1)
+                    <select onchange="window.location.href='/office?office=' + this.value" style="background: var(--bg-card); border: 1px solid var(--border-card); color: var(--text-primary); font-size: 11px; font-weight: 800; border-radius: 6px; padding: 2px 6px; outline: none; cursor: pointer; margin-inline-start: 6px;">
+                        @foreach($userAllowedOffices as $o)
+                            <option value="{{ $o->id }}" {{ $floor && $floor->id === $o->id ? 'selected' : '' }}>
+                                🏢 {{ $o->name }} {{ $o->is_default ? '⭐' : '' }}
+                            </option>
+                        @endforeach
+                    </select>
+                @elseif($floor)
+                    <span style="font-size: 11px; font-weight: 700; color: var(--brand-primary); opacity: 0.9; margin-inline-start: 4px;">
+                        ({{ $floor->name }})
+                    </span>
+                @endif
             </div>
 
             @if(!empty($user->is_guest))
@@ -820,6 +834,14 @@
                 </span>
             @endif
         </div>
+
+        @if(!empty($branchWarning))
+            <div id="guest-branch-warning-banner" style="position: absolute; top: 65px; left: 50%; transform: translateX(-50%); background: rgba(214, 162, 58, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; padding: 8px 18px; color: #1E1B18; font-size: 12px; font-weight: 800; box-shadow: 0 10px 25px rgba(0,0,0,0.4); z-index: 99999; display: flex; align-items: center; gap: 8px; max-width: 90vw; pointer-events: auto;">
+                <span>⚠️</span>
+                <span>{{ $branchWarning }}</span>
+                <button onclick="document.getElementById('guest-branch-warning-banner').remove()" style="background: none; border: none; font-size: 14px; font-weight: 900; cursor: pointer; color: #1E1B18; margin-inline-start: 6px;">✕</button>
+            </div>
+        @endif
 
         <div class="glass-pill" id="room-status-pill" style="display: none;">
             <span id="current-room-name" style="font-weight: 800; font-size: 12px; color: #34D399;">🏢 {{ __('غرفة الاجتماعات') }}</span>

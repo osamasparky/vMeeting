@@ -301,18 +301,12 @@ class DiagnosticsManager {
         }
 
         // 6. Real TURN Relay Connectivity Verification (Forced Relay)
-        const turnIceServers = config?.ice_servers || [
-            {
-                urls: [
-                    'turn:nextspace.munazzah.com:3478?transport=udp',
-                    'turn:nextspace.munazzah.com:3478?transport=tcp',
-                    'turns:nextspace.munazzah.com:5349?transport=tcp'
-                ],
-                username: 'devkey',
-                credential: 'secret_livekit_key_virtual_workplace_2026'
-            }
-        ];
-        results.turn = await this.testTurnConnectivity(turnIceServers);
+        const turnIceServers = config?.ice_servers;
+        if (!turnIceServers || turnIceServers.length === 0) {
+            results.turn = { passed: false, message: 'ICE/TURN configuration unavailable — cannot test.' };
+        } else {
+            results.turn = await this.testTurnConnectivity(turnIceServers);
+        }
         results.livekit = { passed: true, host: config?.livekit_host || 'wss://nextspace.munazzah.com/livekit' };
 
         const allOk = results.camera.passed && results.microphone.passed && results.internet.passed;

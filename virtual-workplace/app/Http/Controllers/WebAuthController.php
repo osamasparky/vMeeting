@@ -192,7 +192,7 @@ class WebAuthController extends Controller
             'audio_quality' => '99.98%',
         ];
 
-        $rooms = $organization->rooms()->get();
+        $rooms = $organization->rooms()->with(['floor', 'map.floor'])->get();
         $offices = $organization->offices()->with(['rooms', 'activeMap'])->get();
         $roles = \App\Domains\Administration\Models\Role::where('slug', '!=', 'super_admin')
             ->where(function($q) use ($organization) {
@@ -1430,7 +1430,17 @@ class WebAuthController extends Controller
         $userAllowedOffices = $allOffices;
         $userAllowedRoomIds = $targetRoom ? [$targetRoom->id] : [];
 
-        return view('office', compact('user', 'invitation', 'organization', 'floor', 'map', 'room', 'allOffices', 'userAllowedOffices', 'userAllowedRoomIds', 'realtimeToken', 'wsUrl', 'initialSpawn'));
+        $orgDefaultFloor = $organization->floors()->where('is_default', true)->first() ?: $organization->floors()->first();
+        $isDifferentBranch = ($orgDefaultFloor && $floor && $orgDefaultFloor->id !== $floor->id);
+        $branchWarning = null;
+        if ($isDifferentBranch) {
+            $branchWarning = __('Notice for Guest: You are currently entering branch ":branch", while your host / team\'s default active branch is ":default_branch". If you do not see your host, please notify them to switch to this branch.', [
+                'branch' => $floor->name,
+                'default_branch' => $orgDefaultFloor->name,
+            ]);
+        }
+
+        return view('office', compact('user', 'invitation', 'organization', 'floor', 'map', 'room', 'allOffices', 'userAllowedOffices', 'userAllowedRoomIds', 'realtimeToken', 'wsUrl', 'initialSpawn', 'branchWarning', 'isDifferentBranch', 'orgDefaultFloor'));
     }
 
     /**

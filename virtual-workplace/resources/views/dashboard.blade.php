@@ -5634,11 +5634,31 @@
                 <div style="display: flex; flex-direction: column; gap: 14px;">
                     <div>
                         <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Destination Room') }}</label>
-                        <select id="invite-room-select" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
-                            @foreach($rooms as $r)
-                                <option value="{{ $r->id }}">🏢 {{ $r->name }} ({{ ucfirst($r->type) }})</option>
+                        @php
+                            $defaultOffice = $offices->firstWhere('is_default', true) ?: $offices->first();
+                            $defaultOfficeId = $defaultOffice?->id;
+                            $sortedRooms = $rooms->sortBy(function($r) use ($defaultOfficeId) {
+                                $rFloorId = $r->floor_id ?? $r->map?->floor_id;
+                                return ($rFloorId == $defaultOfficeId) ? 0 : 1;
+                            });
+                        @endphp
+                        <select id="invite-room-select" onchange="onInviteRoomSelected(this)" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                            @foreach($sortedRooms as $r)
+                                @php
+                                    $rFloor = $r->floor ?? $r->map?->floor;
+                                    $rFloorId = $r->floor_id ?? $rFloor?->id;
+                                    $isDefaultBranch = ($rFloorId == $defaultOfficeId || (!$rFloorId && $loop->first));
+                                    $floorName = $rFloor?->name ?? ($isDefaultBranch ? ($defaultOffice?->name ?? __('Main Office')) : __('Branch'));
+                                @endphp
+                                <option value="{{ $r->id }}" data-floor-id="{{ $rFloorId }}" data-floor-name="{{ $floorName }}" data-is-default="{{ $isDefaultBranch ? '1' : '0' }}">
+                                    🏢 {{ $r->name }} ({{ ucfirst($r->type) }}) — [{{ $floorName }}{{ $isDefaultBranch ? ' ⭐ ' . __('Current Branch') : '' }}]
+                                </option>
                             @endforeach
                         </select>
+                        <div id="invite-room-branch-warning" style="display: none; background: rgba(214, 162, 58, 0.15); border: 1px solid rgba(214, 162, 58, 0.4); border-radius: 8px; padding: 10px 12px; margin-top: 8px; font-size: 12px; color: #D6A23A; line-height: 1.4;">
+                            <span>⚠️ <strong>{{ __('Notice') }}:</strong></span>
+                            <span id="invite-room-warning-text">{{ __('This room belongs to a different office branch. Make sure you switch to this branch to meet your guest.') }}</span>
+                        </div>
                     </div>
 
                     <div>
@@ -6986,6 +7006,24 @@
             if (!text) return;
             executeClipboardCopy(text);
             triggerCopySuccess(btn);
+        }
+
+        function onInviteRoomSelected(sel) {
+            if (!sel) return;
+            const opt = sel.options[sel.selectedIndex];
+            if (!opt) return;
+            const isDefault = opt.getAttribute('data-is-default') === '1';
+            const floorName = opt.getAttribute('data-floor-name') || '';
+            const warningBox = document.getElementById('invite-room-branch-warning');
+            const warningText = document.getElementById('invite-room-warning-text');
+            if (warningBox && warningText) {
+                if (!isDefault) {
+                    warningBox.style.display = 'block';
+                    warningText.textContent = `{{ __('This room belongs to branch') }} "${floorName}" {{ __('which is different from your current default team branch. To meet your guest, please switch to this branch.') }}`;
+                } else {
+                    warningBox.style.display = 'none';
+                }
+            }
         }
 
         async function generateGuestLink() {

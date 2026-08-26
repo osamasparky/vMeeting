@@ -998,5 +998,12 @@
     "Bank Transfer Reference Number": "رقم المرجع / رقم الحوالة البنكية",
     "Attach Transfer Receipt Slip": "إرفاق صورة إشعار أو إيصال التحويل",
     "Transfer Notes (Optional)": "ملاحظات إضافية على الحوالة (اختياري)",
-    "Submit Payment for Review & Activation": "إرسال الإيصال للمراجعة والتفعيل الفوري"
+    "Submit Payment for Review & Activation": "إرسال الإيصال للمراجعة والتفعيل الفوري",
+    "This room belongs to a different office branch. Make sure you switch to this branch to meet your guest.": "هذه الغرفة تقع في فرع مختلف عن فرع فريقك الافتراضي. تأكد من الانتقال إلى هذا الفرع لتلتقي بضيفك.",
+    "This room belongs to branch": "هذه الغرفة تقع في فرع",
+    "which is different from your current default team branch. To meet your guest, please switch to this branch.": "وهو مختلف عن الفرع الافتراضي النشط حالياً لفريقك. لتتمكن من رؤية الضيف والتحدث معه، يرجى الدخول إلى نفس هذا الفرع.",
+    "Notice for Guest: You are currently entering branch \":branch\", while your host / team's default active branch is \":default_branch\". If you do not see your host, please notify them to switch to this branch.": "تنبيه للضيف: أنت تدخل حالياً فرع \":branch\"، بينما الفرع الافتراضي لمضيفك/فريقك هو \":default_branch\". إذا لم تشاهد مضيفك، يرجى إبلاغه بالانتقال إلى هذا الفرع.",
+    "Current Branch": "الفرع الحالي للفريق",
+    "Current Team Branch": "الفرع الافتراضي الحالي للفريق",
+    "Main Office": "المكتب الرئيسي"
 }

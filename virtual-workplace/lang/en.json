@@ -240,5 +240,12 @@
     "Attach Transfer Receipt Slip": "Attach Transfer Receipt Slip",
     "Transfer Date": "Transfer Date",
     "Transfer Notes (Optional)": "Transfer Notes (Optional)",
-    "Submit Payment for Review & Activation": "Submit Payment for Review & Activation"
+    "Submit Payment for Review & Activation": "Submit Payment for Review & Activation",
+    "This room belongs to a different office branch. Make sure you switch to this branch to meet your guest.": "This room belongs to a different office branch. Make sure you switch to this branch to meet your guest.",
+    "This room belongs to branch": "This room belongs to branch",
+    "which is different from your current default team branch. To meet your guest, please switch to this branch.": "which is different from your current default team branch. To meet your guest, please switch to this branch.",
+    "Notice for Guest: You are currently entering branch \":branch\", while your host / team's default active branch is \":default_branch\". If you do not see your host, please notify them to switch to this branch.": "Notice for Guest: You are currently entering branch \":branch\", while your host / team's default active branch is \":default_branch\". If you do not see your host, please notify them to switch to this branch.",
+    "Current Branch": "Current Branch",
+    "Current Team Branch": "Current Team Branch",
+    "Main Office": "Main Office"
 }
