@@ -567,6 +567,71 @@
             transform: translateX(3px);
         }
 
+        /* ── In-Office Task Drawer & Quick Timer ── */
+        .task-drawer {
+            position: absolute;
+            top: 70px;
+            inset-inline-start: 16px;
+            width: 360px;
+            height: calc(100vh - 165px);
+            background: var(--bg-dock);
+            backdrop-filter: blur(28px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            box-shadow: var(--shadow-dock);
+            z-index: 60;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: drawerSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .task-card-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        .task-card-item:hover {
+            border-color: rgba(52, 211, 153, 0.4);
+            transform: translateY(-1px);
+        }
+        .task-card-item.running {
+            background: rgba(16, 185, 129, 0.14);
+            border-color: #10B981;
+            box-shadow: 0 0 16px rgba(16, 185, 129, 0.25);
+        }
+
+        .dock-timer-pill {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 9999px;
+            background: rgba(16, 185, 129, 0.92);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            color: #FFFFFF;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+            transition: all 0.2s ease;
+            animation: pulseGlow 2s infinite alternate;
+        }
+        .dock-timer-pill:hover {
+            transform: scale(1.04);
+        }
+
+        @keyframes pulseGlow {
+            from { box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35); }
+            to { box-shadow: 0 6px 24px rgba(16, 185, 129, 0.65); }
+        }
+
         /* ── Modals & Drawers ── */
         .modal-overlay {
             position: fixed;
@@ -973,6 +1038,13 @@
             <span style="font-size: 16px; font-weight: 900; letter-spacing: 2px;">•••</span>
             <span>{{ __('المزيد') }}</span>
         </button>
+
+        <!-- Floating Live Task Timer Pill In Dock -->
+        <div id="floating-task-timer-pill" class="dock-timer-pill" onclick="openMyTaskDrawer()" title="{{ __('انقر لفتح وإدارة المهمة') }}">
+            <span>⏱️</span>
+            <span id="dock-timer-task-name" style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ __('Task') }}</span>
+            <span id="dock-timer-clock" style="font-family: monospace; letter-spacing: 0.5px; background: rgba(0,0,0,0.25); padding: 2px 6px; border-radius: 6px;">00:00:00</span>
+        </div>
     </div>
 
     <!-- ── Floating More Tools & Settings Popover Menu ── -->
@@ -1328,22 +1400,88 @@
         </div>
     </div>
 
-    <!-- ── Session Replaced Alert Modal ── -->
-    <div id="session-replaced-modal" class="modal-overlay" style="display: none; z-index: 1000000;">
-        <div class="modal-card" style="max-width: 440px; text-align: center; border: 1px solid rgba(239, 68, 68, 0.4); box-shadow: 0 20px 50px rgba(239, 68, 68, 0.3);">
-            <div style="font-size: 48px; margin-bottom: 12px;">🚪</div>
-            <div class="modal-title" style="color: #F87171; justify-content: center;">{{ __('Session Terminated (تم إنهاء الجلسة)') }}</div>
-            <p id="session-replaced-reason" style="font-size: 13px; color: var(--text-secondary); margin: 16px 0 24px; line-height: 1.6;">
-                {{ __('Your session was opened in another window, tab, or office location. This window has been disconnected to prevent concurrent sessions.') }}
-            </p>
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button onclick="location.reload()" class="tactile-btn btn-primary" style="padding: 10px 24px;">
-                    🔄 {{ __('Reconnect Here (إعادة الاتصال هنا)') }}
-                </button>
-                <a href="{{ route('dashboard') }}" class="tactile-btn btn-secondary" style="padding: 10px 20px; text-decoration: none;">
-                    📊 {{ __('Go to Dashboard') }}
-                </a>
+    <!-- ── 7. In-Office My Tasks Drawer & Quick Time Tracker ── -->
+    <div class="task-drawer" id="my-task-drawer">
+        <div style="padding: 16px; background: var(--bg-surface); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 14px; font-weight: 900; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                <span>📝</span> <span>{{ __('My Tasks & Time Tracker (مهامي وتتبع الوقت)') }}</span>
             </div>
+            <button onclick="closeMyTaskDrawer()" style="background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">✕</button>
+        </div>
+
+        <!-- Active Running Task Hero Card -->
+        <div id="office-active-timer-hero" style="display: none; padding: 14px 16px; background: rgba(16, 185, 129, 0.12); border-bottom: 1px solid rgba(52, 211, 153, 0.3);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 10px; font-weight: 800; color: var(--brand-primary); text-transform: uppercase; display: flex; align-items: center; gap: 4px;">
+                    <span class="live-dot" style="width: 6px; height: 6px;"></span>
+                    {{ __('Active Task Timer (المهمة الجارية)') }}
+                </span>
+                <span id="office-timer-clock" style="font-family: monospace; font-size: 15px; font-weight: 900; color: #34D399; letter-spacing: 1px;">00:00:00</span>
+            </div>
+            <div id="office-timer-title" style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span id="office-timer-project" style="font-size: 11px; font-weight: 700; color: var(--text-secondary);"></span>
+                <button onclick="stopActiveOfficeTask()" class="tactile-btn" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #F87171; padding: 4px 12px; font-size: 11px;">
+                    ⏹️ {{ __('Stop Task (إيقاف)') }}
+                </button>
+            </div>
+        </div>
+
+        <!-- Task Search & Filters -->
+        <div style="padding: 10px 14px; border-bottom: 1px solid var(--border-card); background: var(--bg-dock);">
+            <input type="text" id="office-task-search" placeholder="{{ __('Search assigned tasks...') }}" oninput="filterOfficeTasks(this.value)" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px 12px; font-size: 12px; color: var(--text-primary); outline: none;">
+        </div>
+
+        <!-- Task List Scroll Container -->
+        <div id="office-tasks-list" style="flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 12px;">
+                ⏳ {{ __('Loading your assigned tasks...') }}
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 8. Smart Inactivity / Idle Check Modal ("Are you still online?") ── -->
+    <div id="office-idle-check-modal" class="modal-overlay" style="display: none; z-index: 1000005;">
+        <div class="modal-card" style="max-width: 440px; text-align: center; padding: 28px 24px; border: 2px solid rgba(214, 162, 58, 0.5); box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 30px rgba(214, 162, 58, 0.25);">
+            <div style="font-size: 44px; margin-bottom: 10px;">⏰</div>
+            <h3 style="font-size: 17px; font-weight: 900; color: #F59E0B; margin-bottom: 8px;">
+                {{ __('Are you still online? (تأكيد التواجد والنشاط)') }}
+            </h3>
+            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+                {{ __('We noticed you have been inactive for a while. Please confirm you are still working so your office attendance time continues calculating.') }}
+            </p>
+
+            <!-- Countdown Timer Progress Bar -->
+            <div style="margin-bottom: 20px;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; color: var(--text-muted); margin-bottom: 6px;">
+                    <span>⏳ {{ __('Auto-pause in:') }}</span>
+                    <span id="idle-countdown-clock" style="font-family: monospace; font-weight: 900; color: #F59E0B; font-size: 14px;">03:00</span>
+                </div>
+                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+                    <div id="idle-countdown-bar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #F59E0B, #EF4444); transition: width 1s linear;"></div>
+                </div>
+            </div>
+
+            <button type="button" onclick="confirmUserPresence()" class="tactile-btn btn-primary" style="width: 100%; padding: 12px 24px; font-size: 14px; justify-content: center; background: #10B981; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);">
+                🟢 {{ __("Yes, I'm Online (نعم، أنا متواجد)") }}
+            </button>
+        </div>
+    </div>
+
+    <!-- ── 9. Inactivity Paused Fullscreen Overlay ── -->
+    <div id="office-idle-paused-overlay" class="modal-overlay" style="display: none; z-index: 1000006; background: rgba(5, 12, 8, 0.95); backdrop-filter: blur(20px);">
+        <div class="modal-card" style="max-width: 480px; text-align: center; padding: 32px 24px; border: 1px solid rgba(52, 211, 153, 0.3);">
+            <div style="font-size: 52px; margin-bottom: 12px;">⏸️</div>
+            <h3 style="font-size: 18px; font-weight: 900; color: var(--text-primary); margin-bottom: 10px;">
+                {{ __('Office Time Tracking Paused (تم إيقاف احتساب وقت الحضور)') }}
+            </h3>
+            <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px;">
+                {{ __('Your office session calculation was paused due to inactivity. Click below whenever you are ready to resume attendance.') }}
+            </p>
+
+            <button type="button" onclick="resumeUserPresenceFromPaused()" class="tactile-btn btn-primary" style="width: 100%; padding: 13px 24px; font-size: 14px; justify-content: center; background: #10B981;">
+                ▶️ {{ __('Resume Presence (استئناف التواجد والحضور)') }}
+            </button>
         </div>
     </div>
 
@@ -1363,7 +1501,13 @@
             allowedRoomIds: @json($userAllowedRoomIds ?? []),
             token: "{{ $realtimeToken }}",
             wsUrl: @json($wsUrl ?? null),
-            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            attendancePolicy: @json($organization->settings?->getAttendancePolicy() ?? [
+                'auto_attendance_enabled' => true,
+                'idle_prompt_minutes' => 15,
+                'idle_response_grace_seconds' => 180,
+                'allow_in_office_task_tracking' => true,
+            ]),
         };
 
         const canvas = document.getElementById('office-canvas');
@@ -4223,12 +4367,366 @@
             }
         }
 
-        document.addEventListener('click', (e) => {
-            const dd = document.getElementById('office-switcher-dropdown');
-            if (dd && !e.target.closest('#office-switcher-dropdown')) {
-                dd.style.display = 'none';
+        // ══════════════════════════════════════════════════════════════════════
+        // ⏱️ TIME & ATTENDANCE, IN-OFFICE TASK TRACKING & SMART IDLE DETECTOR
+        // ══════════════════════════════════════════════════════════════════════
+
+        let officeAttendanceSessionActive = true;
+        let isOfficePresencePaused = false;
+        let hasActiveTaskRunning = false;
+        let activeTaskTimerData = null;
+        let activeTaskTimerInterval = null;
+        let cachedAssignedTasks = [];
+
+        // Idle Detector Configuration
+        const idlePolicy = CONFIG.attendancePolicy || {};
+        const idlePromptMinutes = Number(idlePolicy.idle_prompt_minutes || 15);
+        const idleGraceSeconds = Number(idlePolicy.idle_response_grace_seconds || 180);
+        let lastUserActivityTimestamp = Date.now();
+        let idleCountdownSeconds = idleGraceSeconds;
+        let idleCountdownInterval = null;
+        let isIdleCheckModalOpen = false;
+
+        // 1. Attendance Heartbeat & Presence Logger
+        async function logAttendance(action, duration = null, roomId = null) {
+            if (isGuest) return; // Only log for registered members
+            try {
+                const targetRoom = roomId || (currentRoom ? currentRoom.id : null);
+                await fetch('/api/office/attendance/log', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': CONFIG.csrf,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: action,
+                        room_id: targetRoom,
+                        duration_seconds: duration
+                    })
+                });
+            } catch (err) {
+                console.error('[Attendance] Log failed:', err);
             }
+        }
+
+        // Initialize Attendance on Office Join
+        if (!isGuest && (idlePolicy.auto_attendance_enabled !== false)) {
+            logAttendance('enter');
+
+            // Periodic heartbeat every 45 seconds
+            setInterval(() => {
+                if (!isOfficePresencePaused) {
+                    logAttendance('heartbeat', 45);
+                }
+            }, 45000);
+
+            // Log exit on page unload
+            window.addEventListener('beforeunload', () => {
+                if (!isOfficePresencePaused) {
+                    navigator.sendBeacon('/api/office/attendance/log', new Blob([JSON.stringify({
+                        action: 'leave',
+                        _token: CONFIG.csrf
+                    })], { type: 'application/json' }));
+                }
+            });
+        }
+
+        // 2. In-Office Task Drawer & Quick Timer
+        function openMyTaskDrawer() {
+            const drawer = document.getElementById('my-task-drawer');
+            if (drawer) {
+                drawer.style.display = 'flex';
+                loadMyOfficeTasks();
+            }
+        }
+
+        function closeMyTaskDrawer() {
+            const drawer = document.getElementById('my-task-drawer');
+            if (drawer) drawer.style.display = 'none';
+        }
+
+        async function loadMyOfficeTasks() {
+            const listEl = document.getElementById('office-tasks-list');
+            try {
+                const res = await fetch('/api/office/my-tasks', {
+                    headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CONFIG.csrf }
+                });
+                const data = await res.json();
+                cachedAssignedTasks = data.tasks || [];
+                
+                // Update active timer state
+                if (data.has_active_timer && data.active_timer) {
+                    hasActiveTaskRunning = true;
+                    activeTaskTimerData = data.active_timer;
+                    startActiveTimerClock(data.active_timer.started_at);
+                    showActiveTimerHero(data.active_timer);
+                } else {
+                    hasActiveTaskRunning = false;
+                    activeTaskTimerData = null;
+                    stopActiveTimerClock();
+                    hideActiveTimerHero();
+                }
+
+                renderOfficeTasksList(cachedAssignedTasks);
+            } catch (e) {
+                console.error('[Tasks] Failed to load assigned tasks:', e);
+                if (listEl) listEl.innerHTML = `<div style="text-align: center; color: #EF4444; font-size: 12px;">✕ {{ __('Failed to load tasks') }}</div>`;
+            }
+        }
+
+        function renderOfficeTasksList(tasks) {
+            const listEl = document.getElementById('office-tasks-list');
+            if (!listEl) return;
+
+            if (!tasks || tasks.length === 0) {
+                listEl.innerHTML = `
+                    <div style="text-align: center; padding: 24px 12px; color: var(--text-muted); font-size: 12px;">
+                        <span style="font-size: 28px; display: block; margin-bottom: 8px;">✨</span>
+                        {{ __('No active tasks assigned to you right now.') }}
+                    </div>
+                `;
+                return;
+            }
+
+            listEl.innerHTML = tasks.map(t => `
+                <div class="task-card-item ${t.is_running ? 'running' : ''}" id="task-card-${t.id}">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                        <div style="flex: 1;">
+                            <div style="font-size: 10px; font-weight: 800; color: ${t.project_color || '#10B981'}; text-transform: uppercase; margin-bottom: 2px;">
+                                📁 ${t.project_name} ${t.task_number ? '• #' + t.task_number : ''}
+                            </div>
+                            <div style="font-size: 12px; font-weight: 800; color: var(--text-primary); line-height: 1.4;">
+                                ${t.title}
+                            </div>
+                        </div>
+                        <span class="guest-badge" style="font-size: 9px; padding: 2px 6px;">${t.priority || 'Normal'}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                        <span style="font-size: 10px; color: var(--text-muted);">
+                            ${t.due_date ? '📅 ' + t.due_date : '⚡ In Progress'}
+                        </span>
+                        ${t.is_running ? `
+                            <button onclick="stopActiveOfficeTask()" class="tactile-btn" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #F87171; padding: 3px 10px; font-size: 10px;">
+                                ⏹️ {{ __('Stop') }}
+                            </button>
+                        ` : `
+                            <button onclick="startOfficeTask('${t.id}', '${t.project_id}')" class="tactile-btn" style="background: rgba(16, 185, 129, 0.18); border-color: rgba(52, 211, 153, 0.35); color: #34D399; padding: 3px 10px; font-size: 10px;">
+                                ▶️ {{ __('Start') }}
+                            </button>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterOfficeTasks(query) {
+            if (!query) {
+                renderOfficeTasksList(cachedAssignedTasks);
+                return;
+            }
+            const q = query.toLowerCase();
+            const filtered = cachedAssignedTasks.filter(t => 
+                (t.title && t.title.toLowerCase().includes(q)) || 
+                (t.project_name && t.project_name.toLowerCase().includes(q)) ||
+                (t.task_number && String(t.task_number).includes(q))
+            );
+            renderOfficeTasksList(filtered);
+        }
+
+        async function startOfficeTask(taskId, projectId) {
+            try {
+                const res = await fetch('/api/office/task-timer/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CONFIG.csrf },
+                    body: JSON.stringify({ task_id: taskId, project_id: projectId })
+                });
+                const data = await res.json();
+                if (data.success && data.timer) {
+                    showToast('⏱️ ' + (data.message || 'Task timer started!'));
+                    hasActiveTaskRunning = true;
+                    activeTaskTimerData = data.timer;
+                    startActiveTimerClock(data.timer.started_at);
+                    showActiveTimerHero(data.timer);
+                    loadMyOfficeTasks(); // refresh task cards
+                }
+            } catch (err) {
+                console.error('[Tasks] Start timer failed:', err);
+                showToast('✕ {{ __("Failed to start timer") }}');
+            }
+        }
+
+        async function stopActiveOfficeTask() {
+            try {
+                const res = await fetch('/api/office/task-timer/stop', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CONFIG.csrf }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('✅ ' + (data.message || 'Task timer stopped!'));
+                    hasActiveTaskRunning = false;
+                    activeTaskTimerData = null;
+                    stopActiveTimerClock();
+                    hideActiveTimerHero();
+                    loadMyOfficeTasks(); // refresh task cards
+                }
+            } catch (err) {
+                console.error('[Tasks] Stop timer failed:', err);
+                showToast('✕ {{ __("Failed to stop timer") }}');
+            }
+        }
+
+        function showActiveTimerHero(timer) {
+            const hero = document.getElementById('office-active-timer-hero');
+            const titleEl = document.getElementById('office-timer-title');
+            const projEl = document.getElementById('office-timer-project');
+            const dockPill = document.getElementById('floating-task-timer-pill');
+            const dockTaskName = document.getElementById('dock-timer-task-name');
+
+            if (hero) hero.style.display = 'block';
+            if (titleEl) titleEl.textContent = timer.task_title || 'Task';
+            if (projEl) projEl.textContent = '📁 ' + (timer.project_name || 'Project');
+            if (dockPill) dockPill.style.display = 'flex';
+            if (dockTaskName) dockTaskName.textContent = timer.task_title || 'Task';
+        }
+
+        function hideActiveTimerHero() {
+            const hero = document.getElementById('office-active-timer-hero');
+            const dockPill = document.getElementById('floating-task-timer-pill');
+            if (hero) hero.style.display = 'none';
+            if (dockPill) dockPill.style.display = 'none';
+        }
+
+        function startActiveTimerClock(startedAtStr) {
+            stopActiveTimerClock();
+            const started = startedAtStr ? new Date(startedAtStr).getTime() : Date.now();
+
+            function tick() {
+                const now = Date.now();
+                const totalSeconds = Math.max(0, Math.floor((now - started) / 1000));
+                const hrs = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+                const mins = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+                const secs = String(totalSeconds % 60).padStart(2, '0');
+                const formatted = `${hrs}:${mins}:${secs}`;
+
+                const clockEl = document.getElementById('office-timer-clock');
+                const dockClockEl = document.getElementById('dock-timer-clock');
+                if (clockEl) clockEl.textContent = formatted;
+                if (dockClockEl) dockClockEl.textContent = formatted;
+            }
+
+            tick();
+            activeTaskTimerInterval = setInterval(tick, 1000);
+        }
+
+        function stopActiveTimerClock() {
+            if (activeTaskTimerInterval) {
+                clearInterval(activeTaskTimerInterval);
+                activeTaskTimerInterval = null;
+            }
+        }
+
+        // 3. Smart Idle & Inactivity Detector ("Are you still online?")
+        function registerUserActivity() {
+            lastUserActivityTimestamp = Date.now();
+        }
+
+        ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'].forEach(evt => {
+            window.addEventListener(evt, registerUserActivity, { passive: true });
         });
+
+        // Inactivity Check Loop (Runs every 10 seconds)
+        setInterval(() => {
+            if (isGuest || isOfficePresencePaused || isIdleCheckModalOpen) return;
+
+            // ⚠️ CRITICAL RULE: If user has an active running task, DO NOT log him out or pause!
+            if (hasActiveTaskRunning) {
+                return;
+            }
+
+            const elapsedIdleMs = Date.now() - lastUserActivityTimestamp;
+            const thresholdMs = idlePromptMinutes * 60 * 1000;
+
+            if (elapsedIdleMs >= thresholdMs) {
+                showIdleCheckModal();
+            }
+        }, 10000);
+
+        function showIdleCheckModal() {
+            isIdleCheckModalOpen = true;
+            idleCountdownSeconds = idleGraceSeconds;
+            const modal = document.getElementById('office-idle-check-modal');
+            const clock = document.getElementById('idle-countdown-clock');
+            const bar = document.getElementById('idle-countdown-bar');
+
+            if (modal) modal.style.display = 'flex';
+            updateIdleCountdownUI();
+
+            if (idleCountdownInterval) clearInterval(idleCountdownInterval);
+
+            idleCountdownInterval = setInterval(() => {
+                idleCountdownSeconds--;
+                updateIdleCountdownUI();
+
+                if (idleCountdownSeconds <= 0) {
+                    clearInterval(idleCountdownInterval);
+                    idleCountdownInterval = null;
+                    handleIdleTimeoutExpiration();
+                }
+            }, 1000);
+        }
+
+        function updateIdleCountdownUI() {
+            const clock = document.getElementById('idle-countdown-clock');
+            const bar = document.getElementById('idle-countdown-bar');
+            const mins = String(Math.floor(idleCountdownSeconds / 60)).padStart(2, '0');
+            const secs = String(idleCountdownSeconds % 60).padStart(2, '0');
+            if (clock) clock.textContent = `${mins}:${secs}`;
+            if (bar) {
+                const pct = Math.max(0, Math.min(100, (idleCountdownSeconds / idleGraceSeconds) * 100));
+                bar.style.width = `${pct}%`;
+            }
+        }
+
+        function confirmUserPresence() {
+            isIdleCheckModalOpen = false;
+            if (idleCountdownInterval) {
+                clearInterval(idleCountdownInterval);
+                idleCountdownInterval = null;
+            }
+            const modal = document.getElementById('office-idle-check-modal');
+            if (modal) modal.style.display = 'none';
+            lastUserActivityTimestamp = Date.now();
+            logAttendance('heartbeat');
+            showToast('🟢 {{ __("Presence confirmed! Your time calculation is active.") }}');
+        }
+
+        function handleIdleTimeoutExpiration() {
+            isIdleCheckModalOpen = false;
+            const checkModal = document.getElementById('office-idle-check-modal');
+            if (checkModal) checkModal.style.display = 'none';
+
+            // Show Paused Overlay and Pause Server Attendance Session
+            const pausedOverlay = document.getElementById('office-idle-paused-overlay');
+            if (pausedOverlay) pausedOverlay.style.display = 'flex';
+            isOfficePresencePaused = true;
+            logAttendance('idle_pause');
+        }
+
+        function resumeUserPresenceFromPaused() {
+            const pausedOverlay = document.getElementById('office-idle-paused-overlay');
+            if (pausedOverlay) pausedOverlay.style.display = 'none';
+            isOfficePresencePaused = false;
+            lastUserActivityTimestamp = Date.now();
+            logAttendance('idle_resume');
+            showToast('▶️ {{ __("Welcome back! Presence tracking resumed.") }}');
+        }
+
+        // On Page Load, fetch active timer state if member
+        if (!isGuest) {
+            loadMyOfficeTasks();
+        }
 
         // Start animation loop
         requestAnimationFrame(draw);

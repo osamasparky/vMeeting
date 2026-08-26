@@ -91,4 +91,19 @@ class OrganizationSetting extends Model
     {
         return $this->belongsTo(Organization::class);
     }
+
+    /**
+     * Get attendance and idle tracking policies.
+     */
+    public function getAttendancePolicy(): array
+    {
+        $default = [
+            'auto_attendance_enabled' => true,
+            'idle_prompt_minutes' => 15,
+            'idle_response_grace_seconds' => 180,
+            'allow_in_office_task_tracking' => true,
+        ];
+
+        return array_merge($default, $this->policies['attendance'] ?? []);
+    }
 }

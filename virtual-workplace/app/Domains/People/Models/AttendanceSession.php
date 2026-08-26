@@ -57,6 +57,22 @@ class AttendanceSession extends Model
         return $this->status === 'active' && is_null($this->ended_at);
     }
 
+    public function isIdlePaused(): bool
+    {
+        return $this->status === 'idle_paused';
+    }
+
+    public function pauseForIdle(): self
+    {
+        $now = now();
+        $this->ended_at = $now;
+        $this->status = 'idle_paused';
+        $this->duration_seconds = max(0, $now->diffInSeconds($this->started_at));
+        $this->save();
+
+        return $this;
+    }
+
     public function close(string $status = 'completed'): self
     {
         $now = now();

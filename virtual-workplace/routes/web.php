@@ -131,9 +131,12 @@ Route::get('/organizations/{organization}/rooms/{room}/files', [WebAuthControlle
 Route::post('/organizations/{organization}/rooms/{room}/files', [WebAuthController::class, 'uploadRoomFile'])->name('room_files.store');
 Route::delete('/organizations/{organization}/rooms/{room}/files/{file}', [WebAuthController::class, 'deleteRoomFile'])->name('room_files.destroy');
 Route::post('/organizations/{organization}/chat/upload', [WebAuthController::class, 'uploadChatAttachment'])->name('chat.upload');
-Route::get('/api/members/{userId}/activity', [WebAuthController::class, 'memberActivity'])->name('members.activity');
 Route::post('/api/office/attendance/log', [WebAuthController::class, 'logRoomAttendance'])->name('office.attendance.log');
 Route::get('/api/office/attendance/summary', [WebAuthController::class, 'getAttendanceSummary'])->name('office.attendance.summary');
+Route::get('/api/timesheets/daily-summary', [WebAuthController::class, 'getDailyTimesheetsReport'])->name('timesheets.daily_summary');
+Route::get('/api/office/my-tasks', [WebAuthController::class, 'getOfficeTasksAndTimer'])->name('office.my_tasks');
+Route::post('/api/office/task-timer/start', [WebAuthController::class, 'startOfficeTaskTimer'])->name('office.task_timer.start');
+Route::post('/api/office/task-timer/stop', [WebAuthController::class, 'stopOfficeTaskTimer'])->name('office.task_timer.stop');
 
 // Guest Access Routes (Public / Unauthenticated)
 Route::get('/guest/join/{token}', [WebAuthController::class, 'guestJoin'])->name('guest.join');

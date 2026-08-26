@@ -236,6 +236,7 @@ class WebAuthController extends Controller
 
         $smtpSettings = $organization->settings?->smtp_settings ?? [];
         $openAiSettings = $organization->settings?->openai_settings ?? [];
+        $attendancePolicy = $organization->settings?->getAttendancePolicy() ?? \App\Domains\Tenancy\Models\OrganizationSetting::getAttendancePolicy();
 
         $upcomingMeetingsJson = $upcomingMeetings->map(function ($m) {
             return [
@@ -256,7 +257,7 @@ class WebAuthController extends Controller
             'departments', 'teams', 'auditLogs', 'guestInvitations', 'allPlans',
             'projects', 'tasks', 'myTasks', 'activeTimer', 'recentTimeEntries', 'allTimesheets', 'myProfile',
             'upcomingMeetings', 'allMeetings', 'smtpSettings', 'openAiSettings', 'upcomingMeetingsJson',
-            'pendingSubscriptionRequest'
+            'pendingSubscriptionRequest', 'attendancePolicy'
         ));
     }
 
@@ -2203,9 +2204,19 @@ class WebAuthController extends Controller
         ];
         $orgSettings->openai_settings = $newOpenAi;
 
+        // Update Organization Attendance & Inactivity Policies
+        $currentPolicies = $orgSettings->policies ?? [];
+        $currentPolicies['attendance'] = [
+            'auto_attendance_enabled' => $request->has('attendance_auto_enabled') || $request->input('attendance_auto_enabled', '1') === '1',
+            'idle_prompt_minutes' => max(1, (int)$request->input('attendance_idle_prompt_minutes', 15)),
+            'idle_response_grace_seconds' => max(30, (int)$request->input('attendance_idle_grace_seconds', 180)),
+            'allow_in_office_task_tracking' => true,
+        ];
+        $orgSettings->policies = $currentPolicies;
+
         $orgSettings->save();
 
-        return redirect('/dashboard#settings')->with('success', __('Workspace settings, company logo, SMTP email, and OpenAI configuration updated successfully!'));
+        return redirect('/dashboard#settings')->with('success', __('Workspace settings, company logo, SMTP email, OpenAI configuration, and Time Tracking policies updated successfully!'));
     }
 
     /**
@@ -2745,7 +2756,7 @@ class WebAuthController extends Controller
 
         $validated = $request->validate([
             'room_id' => 'nullable|uuid|exists:rooms,id',
-            'action' => 'required|in:enter,leave,heartbeat',
+            'action' => 'required|in:enter,leave,heartbeat,idle_pause,idle_resume',
             'duration_seconds' => 'nullable|integer',
         ]);
 
@@ -2760,6 +2771,10 @@ class WebAuthController extends Controller
             $attendanceService->endSession($user, $organization, $roomId);
         } elseif ($action === 'heartbeat') {
             $attendanceService->recordHeartbeat($user, $organization, $roomId, $validated['duration_seconds'] ?? null);
+        } elseif ($action === 'idle_pause') {
+            $attendanceService->pauseSessionForIdle($user, $organization);
+        } elseif ($action === 'idle_resume') {
+            $attendanceService->resumeSessionFromIdle($user, $organization, $roomId);
         }
 
         // 2. Also log to AuditLog for audit trail history
@@ -2779,7 +2794,159 @@ class WebAuthController extends Controller
             'user_agent' => $request->userAgent(),
         ]);
 
-        return response()->json(['status' => 'logged']);
+        return response()->json(['status' => 'logged', 'action' => $action]);
+    }
+
+    /**
+     * Get dual-section Daily Timesheet report (Tasks + Office Attendance).
+     */
+    public function getDailyTimesheetsReport(Request $request, \App\Domains\People\Services\AttendanceService $attendanceService)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        if (!$membership) return response()->json(['message' => 'Unauthorized'], 403);
+
+        $targetUserId = $user->id;
+        $requestedUserId = $request->query('user_id');
+
+        // If manager/admin wants to view another member's timesheet
+        if ($requestedUserId && $requestedUserId !== $user->id) {
+            $isPrivileged = $user->isSuperAdmin() 
+                || ($membership->role?->slug === 'company_admin') 
+                || $membership->hasPermission('timesheets.approve')
+                || $membership->hasPermission('organizations.manage');
+
+            if ($isPrivileged) {
+                $targetUserId = $requestedUserId;
+            }
+        }
+
+        $date = $request->query('date', now()->format('Y-m-d'));
+        $data = $attendanceService->getDailyTimesheetData($targetUserId, $membership->organization_id, $date);
+
+        return response()->json($data);
+    }
+
+    /**
+     * Get active task timer and assigned tasks for in-office task drawer.
+     */
+    public function getOfficeTasksAndTimer(Request $request)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        if (!$membership) return response()->json(['message' => 'Unauthorized'], 403);
+
+        $organizationId = $membership->organization_id;
+
+        // 1. Active running timer
+        $activeTimer = \App\Domains\Projects\Models\ActiveTimer::where('organization_id', $organizationId)
+            ->where('user_id', $user->id)
+            ->with(['project:id,name,color,code', 'task:id,title,task_number,priority,status'])
+            ->first();
+
+        $activeTimerData = null;
+        if ($activeTimer) {
+            $activeTimerData = [
+                'id' => $activeTimer->id,
+                'task_id' => $activeTimer->task_id,
+                'project_id' => $activeTimer->project_id,
+                'task_title' => $activeTimer->task?->title ?? 'Task',
+                'task_number' => $activeTimer->task?->task_number ?? '',
+                'project_name' => $activeTimer->project?->name ?? 'Project',
+                'project_color' => $activeTimer->project?->color ?? '#34D399',
+                'started_at' => $activeTimer->started_at->toIso8601String(),
+                'elapsed_seconds' => $activeTimer->elapsedSeconds(),
+            ];
+        }
+
+        // 2. Assigned tasks for this user in this organization
+        $tasks = \App\Domains\Projects\Models\Task::where('organization_id', $organizationId)
+            ->where(function ($q) use ($user) {
+                $q->where('assignee_id', $user->id)
+                  ->orWhereJsonContains('collaborator_ids', $user->id);
+            })
+            ->where('status', '!=', 'completed')
+            ->with(['project:id,name,color,code'])
+            ->orderBy('priority', 'desc')
+            ->orderBy('due_date', 'asc')
+            ->take(30)
+            ->get();
+
+        return response()->json([
+            'has_active_timer' => (bool) $activeTimer,
+            'active_timer' => $activeTimerData,
+            'tasks' => $tasks->map(function ($t) use ($activeTimer) {
+                return [
+                    'id' => $t->id,
+                    'project_id' => $t->project_id,
+                    'title' => $t->title,
+                    'task_number' => $t->task_number,
+                    'priority' => $t->priority,
+                    'status' => $t->status,
+                    'project_name' => $t->project?->name ?? 'Project',
+                    'project_color' => $t->project?->color ?? '#34D399',
+                    'due_date' => $t->due_date ? $t->due_date->format('Y-m-d') : null,
+                    'is_running' => $activeTimer && $activeTimer->task_id === $t->id,
+                ];
+            }),
+        ]);
+    }
+
+    /**
+     * Start task timer directly from Virtual Office.
+     */
+    public function startOfficeTaskTimer(Request $request, \App\Domains\Projects\Actions\StartTimerAction $action)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        if (!$membership) return response()->json(['message' => 'Unauthorized'], 403);
+
+        $validated = $request->validate([
+            'task_id' => 'required|uuid|exists:tasks,id',
+            'project_id' => 'nullable|uuid|exists:projects,id',
+            'description' => 'nullable|string|max:500',
+        ]);
+
+        $task = \App\Domains\Projects\Models\Task::findOrFail($validated['task_id']);
+        $projectId = $validated['project_id'] ?? $task->project_id;
+
+        $timer = $action->execute([
+            'task_id' => $task->id,
+            'project_id' => $projectId,
+            'description' => $validated['description'] ?? $task->title,
+        ], $membership->organization, $user);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Task timer started.'),
+            'timer' => [
+                'id' => $timer->id,
+                'task_id' => $timer->task_id,
+                'task_title' => $task->title,
+                'task_number' => $task->task_number,
+                'project_name' => $timer->project?->name ?? 'Project',
+                'started_at' => $timer->started_at->toIso8601String(),
+                'elapsed_seconds' => 0,
+            ],
+        ]);
+    }
+
+    /**
+     * Stop task timer directly from Virtual Office.
+     */
+    public function stopOfficeTaskTimer(Request $request, \App\Domains\Projects\Actions\StopTimerAction $action)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        if (!$membership) return response()->json(['message' => 'Unauthorized'], 403);
+
+        $entry = $action->execute($membership->organization, $user, $request->input('description'));
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Task timer stopped and logged.'),
+            'time_entry' => $entry,
+        ]);
     }
 
     /**

@@ -3525,6 +3525,10 @@
                     <span>🤖</span>
                     <span>{{ __('AI Blueprint Engine (الذكاء الاصطناعي)') }}</span>
                 </button>
+                <button type="button" class="org-subtab-btn" onclick="switchOrgSettingsTab('attendance', this)" id="org-subtab-btn-attendance">
+                    <span>⏱️</span>
+                    <span>{{ __('Attendance & Inactivity Policy (سياسة الحضور والتواجد)') }}</span>
+                </button>
             </div>
 
             <form method="POST" action="{{ route('organization.settings.update') }}" enctype="multipart/form-data">
@@ -3783,6 +3787,79 @@
                         <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
                             <button type="submit" class="tactile-btn btn-primary" style="padding: 11px 26px; font-size: 13px;">
                                 💾 {{ __('Save AI Settings (حفظ إعدادات الذكاء الاصطناعي)') }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. SUB-TAB: Attendance & Time Tracking Policy -->
+                <div id="org-subtab-content-attendance" class="org-subtab-pane" style="display: none;">
+                    <div class="card" style="max-width: 720px; border-radius: var(--radius-xl); padding: 26px;">
+                        <div style="margin-bottom: 20px;">
+                            <h3 style="font-size: 16px; font-weight: 900; color: var(--text-primary); margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
+                                <span>⏱️</span>
+                                <span>{{ __('Attendance & Smart Inactivity Policy (سياسة الحضور الذكي والتوقف)') }}</span>
+                            </h3>
+                            <p style="font-size: 12px; color: var(--text-muted); margin: 0;">
+                                {{ __('Configure automated virtual office presence recording, task execution rules, and smart idle prompts.') }}
+                            </p>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 18px;">
+                            <!-- Auto Attendance Toggle -->
+                            <div style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface-subtle); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-inset-3d);">
+                                <div>
+                                    <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 2px;">
+                                        🏢 {{ __('Automatic Office Attendance Recording') }}
+                                    </div>
+                                    <div style="font-size: 11px; color: var(--text-muted);">
+                                        {{ __('Automatically start tracking user attendance time when they enter the 3D virtual office.') }}
+                                    </div>
+                                </div>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" name="attendance_auto_enabled" value="1" {{ ($attendancePolicy['auto_attendance_enabled'] ?? true) ? 'checked' : '' }} style="width: 18px; height: 18px; accent-color: var(--brand-forest);">
+                                    <span style="font-size: 12px; font-weight: 800; color: var(--brand-forest);">{{ __('Enabled') }}</span>
+                                </label>
+                            </div>
+
+                            <!-- Inactivity Check Interval & Grace Period -->
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                                <div>
+                                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase;">
+                                        ⏳ {{ __('Idle Check Interval (Minutes)') }}
+                                    </label>
+                                    <input type="number" name="attendance_idle_prompt_minutes" min="1" max="120" value="{{ $attendancePolicy['idle_prompt_minutes'] ?? 15 }}" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 14px; color: var(--text-primary); font-size: 13px; font-weight: 700; box-shadow: var(--shadow-inset-3d);">
+                                    <span style="font-size: 10px; color: var(--text-muted); margin-top: 4px; display: block;">
+                                        {{ __('If user is idle without a running task, system asks "Are you still online?" after this time.') }}
+                                    </span>
+                                </div>
+
+                                <div>
+                                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase;">
+                                        ⚡ {{ __('Confirmation Grace Period (Seconds)') }}
+                                    </label>
+                                    <input type="number" name="attendance_idle_grace_seconds" min="30" max="600" value="{{ $attendancePolicy['idle_response_grace_seconds'] ?? 180 }}" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 14px; color: var(--text-primary); font-size: 13px; font-weight: 700; box-shadow: var(--shadow-inset-3d);">
+                                    <span style="font-size: 10px; color: var(--text-muted); margin-top: 4px; display: block;">
+                                        {{ __('Countdown window to answer before attendance time is automatically paused.') }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Active Task Protection Note -->
+                            <div style="background: rgba(79, 155, 95, 0.08); border: 1px solid rgba(79, 155, 95, 0.25); border-radius: 12px; padding: 14px 16px; font-size: 12px; line-height: 1.5; color: var(--text-primary);">
+                                <div style="font-weight: 800; color: #4F9B5F; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                                    <span>🛡️</span>
+                                    <span>{{ __('Smart Active Task Protection (حماية المهام النشطة)') }}</span>
+                                </div>
+                                <span style="color: var(--text-secondary); font-size: 11px;">
+                                    {{ __('When a member has an active running task in the office, idle prompts are automatically bypassed so deep work is never interrupted.') }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
+                            <button type="submit" class="tactile-btn btn-primary" style="padding: 11px 26px; font-size: 13px;">
+                                💾 {{ __('Save Attendance Policy (حفظ سياسة الحضور)') }}
                             </button>
                         </div>
                     </div>
@@ -4699,79 +4776,218 @@
 
         <!-- 10. TIMESHEETS & TIME TRACKING TAB -->
         <div id="tab-timesheets" class="tab-view">
-            <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
+            <!-- Top Controls & Filters Bar -->
+            <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 14px;">
                 <div>
                     <h1 class="page-title" style="font-size: 22px; font-weight: 900; color: var(--text-primary); margin-bottom: 4px;">⏱️ {{ __('Timesheets & Time Tracking') }}</h1>
-                    <p class="page-subtitle" style="font-size: 13px; color: var(--text-secondary);">{{ __('Log working hours, view weekly timesheets, and review employee submissions.') }}</p>
+                    <p class="page-subtitle" style="font-size: 13px; color: var(--text-secondary);">{{ __('Automated virtual office attendance, project task duration, and daily productivity analytics.') }}</p>
                 </div>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <button onclick="openManualTimeModal()" class="tactile-btn btn-secondary" style="padding: 10px 16px; font-size: 13px;">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                    <button onclick="openManualTimeModal()" class="tactile-btn btn-secondary" style="padding: 9px 16px; font-size: 12px; font-weight: 800;">
                         <span>✍️</span> {{ __('Manual Time Entry') }}
                     </button>
-                    <button onclick="submitMyCurrentTimesheet()" class="tactile-btn btn-primary" style="padding: 10px 18px; font-size: 13px;">
+                    <button onclick="submitMyCurrentTimesheet()" class="tactile-btn btn-primary" style="padding: 9px 18px; font-size: 12px; font-weight: 800;">
                         <span>📤</span> {{ __('Submit Weekly Timesheet') }}
                     </button>
                 </div>
             </div>
 
-            <!-- Recent Time Entries -->
-            <div class="card" style="border-radius: var(--radius-lg); overflow: hidden; padding: 0; margin-bottom: 24px;">
-                <div style="padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface);">
-                    <h3 style="font-size: 16px; font-weight: 900; color: var(--text-primary);">🕒 {{ __('My Recent Time Log') }}</h3>
-                    <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F; font-size: 12px; font-weight: 800;">
-                        {{ round($recentTimeEntries->sum('duration_seconds') / 3600, 1) }} {{ __('Hours logged recently') }}
-                    </span>
+            <!-- Interactive Date & Member Filter Ribbon -->
+            <div class="card" style="padding: 14px 20px; margin-bottom: 20px; border-radius: var(--radius-lg); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; background: var(--bg-surface);">
+                <!-- Date Navigation Bar -->
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <span style="font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase;">📅 {{ __('Date') }}:</span>
+                    <button type="button" onclick="shiftTimesheetDate(-1)" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" title="{{ __('Previous Day') }}">◀</button>
+                    <input type="date" id="ts-filter-date" value="{{ date('Y-m-d') }}" onchange="handleTimesheetDateChange(this.value)" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-size: 12px; font-weight: 800; outline: none; box-shadow: var(--shadow-inset-3d);">
+                    <button type="button" onclick="setTimesheetToday()" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 12px; font-weight: 800;">{{ __('Today') }}</button>
+                    <button type="button" onclick="shiftTimesheetDate(1)" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" title="{{ __('Next Day') }}">▶</button>
+                </div>
+
+                <!-- Member Selector (for Managers & Admins) -->
+                @php
+                    $canSelectMember = $membership->hasPermission('reports.view') || $membership->hasPermission('members.manage') || $membership->role?->slug === 'company_admin' || $user->isSuperAdmin();
+                @endphp
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    @if($canSelectMember)
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span style="font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase;">👤 {{ __('Member') }}:</span>
+                        <select id="ts-filter-user" onchange="handleTimesheetUserChange(this.value)" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-size: 12px; font-weight: 700; outline: none;">
+                            <option value="{{ $user->id }}">{{ __('My Timesheet') }} ({{ $user->name }})</option>
+                            @foreach($members as $m)
+                                @if($m->user_id !== $user->id)
+                                    <option value="{{ $m->user_id }}">{{ $m->user->name }} ({{ $m->role->name ?? 'Member' }})</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
+                    @else
+                        <input type="hidden" id="ts-filter-user" value="{{ $user->id }}">
+                    @endif
+
+                    <button type="button" onclick="refreshDailyTimesheet()" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" title="{{ __('Refresh Data') }}">
+                        🔄 {{ __('Refresh') }}
+                    </button>
+                </div>
+            </div>
+
+            <!-- Daily Summary Metric KPI Cards (4-Grid) -->
+            <div class="kpi-grid" style="margin-bottom: 24px;">
+                <!-- 1. Total Office Time -->
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <span class="kpi-title">{{ __('Time in Virtual Office') }}</span>
+                        <div class="kpi-icon-box" style="background: rgba(36, 92, 58, 0.15); color: var(--brand-forest);">🏢</div>
+                    </div>
+                    <div class="kpi-value" id="ts-kpi-office-time" style="font-family: monospace;">00:00:00</div>
+                    <div class="kpi-trend" style="color: var(--brand-forest);">
+                        <span>🟢</span> {{ __('Automated presence tracking') }}
+                    </div>
+                </div>
+
+                <!-- 2. Productive Task Time -->
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <span class="kpi-title">{{ __('Productive Task Work') }}</span>
+                        <div class="kpi-icon-box" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F;">⏱️</div>
+                    </div>
+                    <div class="kpi-value" id="ts-kpi-task-time" style="font-family: monospace; color: var(--brand-forest);">00:00:00</div>
+                    <div class="kpi-trend" style="color: var(--brand-forest);">
+                        <span>📈</span> {{ __('Logged against active tasks') }}
+                    </div>
+                </div>
+
+                <!-- 3. Idle / Paused Time -->
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <span class="kpi-title">{{ __('Idle / Paused Time') }}</span>
+                        <div class="kpi-icon-box" style="background: rgba(214, 162, 58, 0.15); color: #D6A23A;">⏸️</div>
+                    </div>
+                    <div class="kpi-value" id="ts-kpi-idle-time" style="font-family: monospace; color: #D6A23A;">00:00:00</div>
+                    <div class="kpi-trend" style="color: var(--text-muted);">
+                        <span>⏳</span> {{ __('Inactivity stops excluded') }}
+                    </div>
+                </div>
+
+                <!-- 4. Productivity Ratio -->
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <span class="kpi-title">{{ __('Productivity Ratio') }}</span>
+                        <div class="kpi-icon-box" style="background: rgba(59, 130, 246, 0.15); color: #3B82F6;">📊</div>
+                    </div>
+                    <div class="kpi-value" id="ts-kpi-ratio" style="font-family: monospace;">0%</div>
+                    <div class="kpi-trend" style="color: var(--brand-forest);">
+                        <span>⚡</span> {{ __('Task Time ÷ Office Time') }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Active Timer Banner (Dynamic) -->
+            <div id="ts-live-timer-banner" style="display: none; background: linear-gradient(135deg, rgba(79, 155, 95, 0.15) 0%, rgba(36, 92, 58, 0.08) 100%); border: 1px solid rgba(79, 155, 95, 0.4); border-radius: var(--radius-lg); padding: 14px 20px; margin-bottom: 24px; box-shadow: var(--shadow-soft-3d);">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span class="live-indicator-dot pulse"></span>
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 11px; font-weight: 900; color: #4F9B5F; text-transform: uppercase;">{{ __('Active Task Running in Office') }}</span>
+                                <span class="nav-badge-pill" id="ts-banner-project-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F; font-size: 10px;">Project</span>
+                            </div>
+                            <h4 id="ts-banner-task-title" style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 2px 0 0 0;">Task Title</h4>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div id="ts-banner-clock" style="font-size: 20px; font-weight: 900; font-family: monospace; color: var(--brand-forest);">00:00:00</div>
+                        <button type="button" onclick="stopGlobalTimer()" class="tactile-btn" style="background: #D96B5F; color: white; border: none; padding: 7px 14px; font-size: 11px; font-weight: 800;">
+                            ⏹ {{ __('Stop Timer') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- SECTION 1: PROJECT & TASK WORK DETAILS -->
+            <!-- ========================================== -->
+            <div class="card" style="border-radius: var(--radius-lg); overflow: hidden; padding: 0; margin-bottom: 24px; border: 1px solid var(--border-color); box-shadow: var(--shadow-card);">
+                <div style="padding: 18px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface);">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(79, 155, 95, 0.15); color: #4F9B5F; display: flex; align-items: center; justify-content: center; font-size: 16px;">📋</div>
+                        <div>
+                            <h3 style="font-size: 16px; font-weight: 900; color: var(--text-primary); margin: 0;">{{ __('Section 1: Project & Task Work Details') }} ({{ __('ساعات إنجاز المهام والمشاريع') }})</h3>
+                            <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">{{ __('Detailed breakdown of all work orders, milestones, and task sessions completed on this date.') }}</p>
+                        </div>
+                    </div>
+                    <span class="nav-badge-pill" id="ts-tasks-count-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F; font-size: 11px; font-weight: 800;">0 {{ __('Tasks') }}</span>
                 </div>
                 <div style="overflow-x: auto;">
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>{{ __('Date') }}</th>
+                                <th>{{ __('Task & Code') }}</th>
                                 <th>{{ __('Project') }}</th>
-                                <th>{{ __('Task') }}</th>
-                                <th>{{ __('Description') }}</th>
+                                <th>{{ __('Time Window') }}</th>
                                 <th>{{ __('Duration') }}</th>
-                                <th>{{ __('Type') }}</th>
+                                <th>{{ __('Type / Billing') }}</th>
                                 <th>{{ __('Status') }}</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            @forelse($recentTimeEntries as $te)
-                                <tr>
-                                    <td style="font-weight: 600;">{{ $te->started_at->format('M d, Y') }}</td>
-                                    <td><span class="nav-badge-pill" style="font-weight: 700;">{{ $te->project->name ?? 'General' }}</span></td>
-                                    <td style="font-weight: 800; color: var(--text-primary);">{{ $te->task->title ?? '—' }}</td>
-                                    <td style="color: var(--text-secondary); font-size: 12px;">{{ $te->description ?? 'Work session' }}</td>
-                                    <td style="font-weight: 900; color: var(--brand-forest); font-family: monospace; font-size: 14px;">{{ $te->hours() }}h</td>
-                                    <td><span class="nav-badge-pill">{{ ucfirst($te->entry_type) }}</span></td>
-                                    <td>
-                                        @if($te->status === 'approved')
-                                            <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F;">🔒 {{ __('Approved') }}</span>
-                                        @elseif($te->status === 'submitted')
-                                            <span class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.15); color: #D6A23A;">⏳ {{ __('Submitted') }}</span>
-                                        @elseif($te->status === 'rejected')
-                                            <span class="nav-badge-pill" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F;">❌ {{ __('Rejected') }}</span>
-                                        @else
-                                            <span class="nav-badge-pill">{{ __('Draft') }}</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="7" style="text-align: center; padding: 32px; color: var(--text-muted);">
-                                        ⏱️ {{ __('No time entries logged yet.') }}
-                                    </td>
-                                </tr>
-                            @endforelse
+                        <tbody id="ts-tasks-tbody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 32px; color: var(--text-muted);">
+                                    ⏳ {{ __('Loading task time entries...') }}
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Manager Timesheet Review Queue -->
-            <div class="card" style="border-radius: var(--radius-lg); overflow: hidden; padding: 0;">
-                <div style="padding: 20px 24px; border-bottom: 1px solid var(--border-color); background: var(--bg-surface);">
-                    <h3 style="font-size: 16px; font-weight: 900; color: var(--text-primary);">📋 {{ __('Timesheet Submissions Review Queue') }}</h3>
+            <!-- ========================================== -->
+            <!-- SECTION 2: VIRTUAL OFFICE ATTENDANCE LOG -->
+            <!-- ========================================== -->
+            <div class="card" style="border-radius: var(--radius-lg); overflow: hidden; padding: 0; margin-bottom: 24px; border: 1px solid var(--border-color); box-shadow: var(--shadow-card);">
+                <div style="padding: 18px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface);">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(36, 92, 58, 0.15); color: var(--brand-forest); display: flex; align-items: center; justify-content: center; font-size: 16px;">🏢</div>
+                        <div>
+                            <h3 style="font-size: 16px; font-weight: 900; color: var(--text-primary); margin: 0;">{{ __('Section 2: Virtual Office Attendance & Presence Log') }} ({{ __('سجلات التواجد وساعات العمل في المكتب') }})</h3>
+                            <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">{{ __('Recorded 3D office presence sessions, check-ins, idle pauses, and branch room presence.') }}</p>
+                        </div>
+                    </div>
+                    <span class="nav-badge-pill" id="ts-attendance-count-pill" style="background: rgba(36, 92, 58, 0.15); color: var(--brand-forest); font-size: 11px; font-weight: 800;">0 {{ __('Sessions') }}</span>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>{{ __('Branch Office / Zone') }}</th>
+                                <th>{{ __('Check-In Time') }}</th>
+                                <th>{{ __('Check-Out Time') }}</th>
+                                <th>{{ __('Duration') }}</th>
+                                <th>{{ __('Session Status') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ts-attendance-tbody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 32px; color: var(--text-muted);">
+                                    ⏳ {{ __('Loading office attendance sessions...') }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- SECTION 3: MANAGER TIMESHEET SUBMISSIONS REVIEW -->
+            <!-- ========================================== -->
+            <div class="card" style="border-radius: var(--radius-lg); overflow: hidden; padding: 0; border: 1px solid var(--border-color); box-shadow: var(--shadow-card);">
+                <div style="padding: 18px 24px; border-bottom: 1px solid var(--border-color); background: var(--bg-surface); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(214, 162, 58, 0.15); color: #D6A23A; display: flex; align-items: center; justify-content: center; font-size: 16px;">📑</div>
+                        <div>
+                            <h3 style="font-size: 16px; font-weight: 900; color: var(--text-primary); margin: 0;">{{ __('Timesheet Submissions Review Queue') }}</h3>
+                            <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">{{ __('Weekly employee submissions pending manager approval and payroll audit lock.') }}</p>
+                        </div>
+                    </div>
                 </div>
                 <div style="overflow-x: auto;">
                     <table class="data-table">
@@ -6557,6 +6773,9 @@
 
             if (tabName === 'chat') {
                 loadChatConversations();
+            }
+            if (tabName === 'timesheets') {
+                refreshDailyTimesheet();
             }
         }
 
@@ -9508,6 +9727,235 @@
                 if (defaultBtn) defaultBtn.classList.add('active');
             }
         }
+
+        // ── DUAL-SECTION DAILY TIMESHEETS & ATTENDANCE ENGINE ──
+        let currentTimesheetDate = document.getElementById('ts-filter-date')?.value || new Date().toISOString().split('T')[0];
+        let currentTimesheetUserId = document.getElementById('ts-filter-user')?.value || '{{ $user->id }}';
+
+        function handleTimesheetDateChange(val) {
+            currentTimesheetDate = val;
+            loadDailyTimesheetsData(currentTimesheetDate, currentTimesheetUserId);
+        }
+
+        function shiftTimesheetDate(offset) {
+            const cur = currentTimesheetDate ? new Date(currentTimesheetDate + 'T12:00:00') : new Date();
+            cur.setDate(cur.getDate() + offset);
+            const yyyy = cur.getFullYear();
+            const mm = String(cur.getMonth() + 1).padStart(2, '0');
+            const dd = String(cur.getDate()).padStart(2, '0');
+            const dateStr = `${yyyy}-${mm}-${dd}`;
+            const input = document.getElementById('ts-filter-date');
+            if (input) input.value = dateStr;
+            currentTimesheetDate = dateStr;
+            loadDailyTimesheetsData(currentTimesheetDate, currentTimesheetUserId);
+        }
+
+        function setTimesheetToday() {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const todayStr = `${yyyy}-${mm}-${dd}`;
+            const input = document.getElementById('ts-filter-date');
+            if (input) input.value = todayStr;
+            currentTimesheetDate = todayStr;
+            loadDailyTimesheetsData(currentTimesheetDate, currentTimesheetUserId);
+        }
+
+        function handleTimesheetUserChange(val) {
+            currentTimesheetUserId = val;
+            loadDailyTimesheetsData(currentTimesheetDate, currentTimesheetUserId);
+        }
+
+        function refreshDailyTimesheet() {
+            const inputDate = document.getElementById('ts-filter-date')?.value || currentTimesheetDate;
+            const inputUser = document.getElementById('ts-filter-user')?.value || currentTimesheetUserId;
+            loadDailyTimesheetsData(inputDate, inputUser);
+        }
+
+        async function loadDailyTimesheetsData(date, userId) {
+            if (!date) date = new Date().toISOString().split('T')[0];
+            if (!userId) userId = '{{ $user->id }}';
+
+            try {
+                const res = await fetch(`/api/timesheets/daily-summary?date=${encodeURIComponent(date)}&user_id=${encodeURIComponent(userId)}`, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': CSRF_TOKEN
+                    },
+                    credentials: 'same-origin'
+                });
+
+                if (!res.ok) {
+                    console.error('Error fetching timesheet daily summary');
+                    return;
+                }
+
+                const data = await res.json();
+
+                // 1. Update KPI Summary Cards
+                const officeEl = document.getElementById('ts-kpi-office-time');
+                const taskEl = document.getElementById('ts-kpi-task-time');
+                const idleEl = document.getElementById('ts-kpi-idle-time');
+                const ratioEl = document.getElementById('ts-kpi-ratio');
+
+                const officeSec = data.total_office_seconds || 0;
+                const taskSec = data.total_task_seconds || 0;
+                const idleSec = Math.max(0, officeSec - taskSec);
+
+                if (officeEl) officeEl.textContent = data.total_office_formatted || '00:00:00';
+                if (taskEl) taskEl.textContent = data.total_task_formatted || '00:00:00';
+
+                const idleH = Math.floor(idleSec / 3600);
+                const idleM = Math.floor((idleSec % 3600) / 60);
+                const idleS = idleSec % 60;
+                const idleFormatted = String(idleH).padStart(2, '0') + ':' + String(idleM).padStart(2, '0') + ':' + String(idleS).padStart(2, '0');
+                if (idleEl) idleEl.textContent = idleFormatted;
+
+                const ratio = officeSec > 0 ? Math.min(100, Math.round((taskSec / officeSec) * 100)) : (taskSec > 0 ? 100 : 0);
+                if (ratioEl) ratioEl.textContent = `${ratio}%`;
+
+                // 2. Active timer banner
+                const timerBanner = document.getElementById('ts-live-timer-banner');
+                if (timerBanner) {
+                    if (data.active_timer && userId === '{{ $user->id }}') {
+                        timerBanner.style.display = 'block';
+                        const projectPill = document.getElementById('ts-banner-project-pill');
+                        const taskTitle = document.getElementById('ts-banner-task-title');
+                        const clockEl = document.getElementById('ts-banner-clock');
+                        if (projectPill) projectPill.textContent = data.active_timer.project_name || 'Project';
+                        if (taskTitle) taskTitle.textContent = data.active_timer.task_title || 'Work session';
+                        if (clockEl) clockEl.textContent = formatTimerClock(data.active_timer.elapsed_seconds || 0);
+                    } else {
+                        timerBanner.style.display = 'none';
+                    }
+                }
+
+                // 3. Section 1: Tasks Table
+                const tasksTbody = document.getElementById('ts-tasks-tbody');
+                const tasksCountPill = document.getElementById('ts-tasks-count-pill');
+                const taskEntries = data.task_entries || [];
+
+                if (tasksCountPill) {
+                    tasksCountPill.textContent = `${taskEntries.length} {{ __('Tasks') }}`;
+                }
+
+                if (tasksTbody) {
+                    if (!taskEntries.length) {
+                        tasksTbody.innerHTML = `
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                                    <div style="font-size: 28px; margin-bottom: 6px;">📋</div>
+                                    {{ __('No task work sessions recorded on this date.') }}
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        tasksTbody.innerHTML = taskEntries.map(te => {
+                            let statusBadge = '';
+                            if (te.status === 'approved') {
+                                statusBadge = '<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F;">🔒 {{ __('Approved') }}</span>';
+                            } else if (te.status === 'in_progress') {
+                                statusBadge = '<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F; font-weight: 800;">⚡ {{ __('In Progress') }}</span>';
+                            } else {
+                                statusBadge = '<span class="nav-badge-pill" style="background: var(--bg-surface-subtle); color: var(--text-secondary);">✓ {{ __('Completed') }}</span>';
+                            }
+
+                            const billableBadge = te.is_billable
+                                ? '<span class="nav-badge-pill" style="background: rgba(36, 92, 58, 0.15); color: var(--brand-forest); font-weight: 800;">💎 {{ __('Billable') }}</span>'
+                                : '<span class="nav-badge-pill" style="color: var(--text-muted);">{{ __('Standard') }}</span>';
+
+                            return `
+                                <tr>
+                                    <td>
+                                        <div style="font-weight: 800; color: var(--text-primary);">${escapeHtml(te.task_title || 'Work Session')}</div>
+                                        ${te.description ? `<div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">${escapeHtml(te.description)}</div>` : ''}
+                                    </td>
+                                    <td>
+                                        <span class="nav-badge-pill" style="font-weight: 700; color: var(--brand-forest);">📁 ${escapeHtml(te.project_name || 'General')}</span>
+                                    </td>
+                                    <td style="font-family: monospace; font-size: 12px; font-weight: 700; color: var(--text-secondary);">
+                                        ${te.started_at || '—'} ➔ ${te.ended_at || '—'}
+                                    </td>
+                                    <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--brand-forest);">
+                                        ${te.duration_formatted || '00m'}
+                                    </td>
+                                    <td>${billableBadge}</td>
+                                    <td>${statusBadge}</td>
+                                </tr>
+                            `;
+                        }).join('');
+                    }
+                }
+
+                // 4. Section 2: Virtual Office Attendance Sessions
+                const attTbody = document.getElementById('ts-attendance-tbody');
+                const attCountPill = document.getElementById('ts-attendance-count-pill');
+                const attSessions = data.attendance_sessions || [];
+
+                if (attCountPill) {
+                    attCountPill.textContent = `${attSessions.length} {{ __('Sessions') }}`;
+                }
+
+                if (attTbody) {
+                    if (!attSessions.length) {
+                        attTbody.innerHTML = `
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                                    <div style="font-size: 28px; margin-bottom: 6px;">🏢</div>
+                                    {{ __('No virtual office presence recorded on this date.') }}
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        attTbody.innerHTML = attSessions.map(s => {
+                            let statusPill = '';
+                            if (s.status === 'active') {
+                                statusPill = '<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F; font-weight: 800;">🟢 {{ __('In Office (Live)') }}</span>';
+                            } else if (s.status === 'idle_paused') {
+                                statusPill = '<span class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.2); color: #D6A23A; font-weight: 800;">⏸️ {{ __('Idle Paused') }}</span>';
+                            } else {
+                                statusPill = '<span class="nav-badge-pill" style="background: var(--bg-surface-subtle); color: var(--text-muted);">⚪ {{ __('Completed') }}</span>';
+                            }
+
+                            return `
+                                <tr>
+                                    <td>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span style="font-size: 16px;">📍</span>
+                                            <div>
+                                                <div style="font-weight: 800; color: var(--text-primary);">${escapeHtml(s.branch_name || 'Main Office')}</div>
+                                                <div style="font-size: 11px; color: var(--text-muted);">🚪 ${escapeHtml(s.room_name || 'General Space')}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="font-family: monospace; font-size: 12px; font-weight: 700; color: var(--text-secondary);">
+                                        🟢 ${s.check_in || '—'}
+                                    </td>
+                                    <td style="font-family: monospace; font-size: 12px; font-weight: 700; color: var(--text-secondary);">
+                                        🔴 ${s.check_out || '{{ __('Still in Office') }}'}
+                                    </td>
+                                    <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--brand-forest);">
+                                        ${s.duration_formatted || '00m'}
+                                    </td>
+                                    <td>${statusPill}</td>
+                                </tr>
+                            `;
+                        }).join('');
+                    }
+                }
+
+            } catch (e) {
+                console.error('Error loading timesheets data:', e);
+            }
+        }
+
+        // Auto-load timesheet on DOM load if timesheets tab is active
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.location.hash === '#timesheets' || document.getElementById('tab-timesheets')?.classList.contains('active')) {
+                refreshDailyTimesheet();
+            }
+        });
 
         function escapeHtml(str) {
             if (!str) return '';

@@ -215,4 +215,124 @@ class AttendanceService
             }),
         ];
     }
+
+    /**
+     * Pause user attendance session due to unacknowledged inactivity/idle timeout.
+     */
+    public function pauseSessionForIdle(User $user, Organization $organization): ?AttendanceSession
+    {
+        $session = AttendanceSession::where('organization_id', $organization->id)
+            ->where('user_id', $user->id)
+            ->where('status', 'active')
+            ->whereNull('ended_at')
+            ->latest('started_at')
+            ->first();
+
+        if ($session) {
+            $session->pauseForIdle();
+        }
+
+        return $session;
+    }
+
+    /**
+     * Resume user attendance session from idle pause state.
+     */
+    public function resumeSessionFromIdle(User $user, Organization $organization, ?string $roomId = null): AttendanceSession
+    {
+        // Re-start active session
+        return $this->startSession($user, $organization, $roomId);
+    }
+
+    /**
+     * Get dual-section Daily Timesheet & Attendance Data for dashboard.
+     */
+    public function getDailyTimesheetData(string $userId, string $organizationId, ?string $date = null): array
+    {
+        $targetDate = $date ? Carbon::parse($date)->startOfDay() : now()->startOfDay();
+        $startOfDay = $targetDate->copy()->startOfDay();
+        $endOfDay = $targetDate->copy()->endOfDay();
+
+        // ── Section 1: Project & Task Time Entries ──
+        $taskEntries = \App\Domains\Projects\Models\TimeEntry::where('organization_id', $organizationId)
+            ->where('user_id', $userId)
+            ->where(function ($q) use ($startOfDay, $endOfDay) {
+                $q->whereBetween('started_at', [$startOfDay, $endOfDay])
+                  ->orWhereBetween('created_at', [$startOfDay, $endOfDay]);
+            })
+            ->with(['project:id,name,color,code', 'task:id,title,task_number,priority,status'])
+            ->orderBy('started_at', 'asc')
+            ->get();
+
+        $totalTaskSeconds = $taskEntries->sum(function ($entry) {
+            if (!$entry->ended_at && $entry->started_at) {
+                return max(0, now()->diffInSeconds($entry->started_at));
+            }
+            return $entry->duration_seconds ?? 0;
+        });
+
+        // ── Section 2: Virtual Office Attendance Sessions ──
+        $attendanceSessions = AttendanceSession::where('organization_id', $organizationId)
+            ->where('user_id', $userId)
+            ->whereBetween('started_at', [$startOfDay, $endOfDay])
+            ->with(['room:id,name,type', 'room.floor:id,name'])
+            ->orderBy('started_at', 'asc')
+            ->get();
+
+        $totalOfficeSeconds = $attendanceSessions->sum(function ($session) {
+            if ($session->isActive()) {
+                return max($session->duration_seconds, now()->diffInSeconds($session->started_at));
+            }
+            return $session->duration_seconds ?? 0;
+        });
+
+        $idlePausedSeconds = $attendanceSessions->where('status', 'idle_paused')->sum('duration_seconds');
+
+        // Check if there is an active running timer right now via ActiveTimer or open TimeEntry
+        $activeTimerModel = \App\Domains\Projects\Models\ActiveTimer::where('organization_id', $organizationId)
+            ->where('user_id', $userId)
+            ->with(['project:id,name,color', 'task:id,title,task_number'])
+            ->first();
+
+        $activeTaskTimer = null;
+        if ($activeTimerModel) {
+            $activeTaskTimer = [
+                'id' => $activeTimerModel->id,
+                'task_id' => $activeTimerModel->task_id,
+                'project_id' => $activeTimerModel->project_id,
+                'task_title' => $activeTimerModel->task?->title ?? 'Task',
+                'task_number' => $activeTimerModel->task?->task_number ?? '',
+                'project_name' => $activeTimerModel->project?->name ?? 'Project',
+                'project_color' => $activeTimerModel->project?->color ?? '#34D399',
+                'started_at' => $activeTimerModel->started_at->toIso8601String(),
+                'elapsed_seconds' => $activeTimerModel->elapsedSeconds(),
+            ];
+            $totalTaskSeconds += $activeTimerModel->elapsedSeconds();
+        }
+
+        // Check if currently active in office
+        $activeOfficeSession = AttendanceSession::where('organization_id', $organizationId)
+            ->where('user_id', $userId)
+            ->where('status', 'active')
+            ->whereNull('ended_at')
+            ->latest('started_at')
+            ->first();
+
+        return [
+            'date' => $targetDate->format('Y-m-d'),
+            'date_formatted' => $targetDate->isoFormat('dddd, D MMMM YYYY'),
+            'total_office_seconds' => $totalOfficeSeconds,
+            'total_office_hours' => round($totalOfficeSeconds / 3600, 2),
+            'total_office_formatted' => sprintf('%02d:%02d:%02d', floor($totalOfficeSeconds / 3600), floor(($totalOfficeSeconds % 3600) / 60), $totalOfficeSeconds % 60),
+            'total_task_seconds' => $totalTaskSeconds,
+            'total_task_hours' => round($totalTaskSeconds / 3600, 2),
+            'total_task_formatted' => sprintf('%02d:%02d:%02d', floor($totalTaskSeconds / 3600), floor(($totalTaskSeconds % 3600) / 60), $totalTaskSeconds % 60),
+            'idle_seconds' => $idlePausedSeconds,
+            'is_in_office' => (bool) $activeOfficeSession,
+            'has_running_task' => (bool) $activeTaskTimer,
+            'active_task_timer' => $activeTaskTimer,
+            'task_entries' => $taskEntries,
+            'attendance_sessions' => $attendanceSessions,
+        ];
+    }
 }
