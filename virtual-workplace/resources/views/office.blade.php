@@ -3436,54 +3436,7 @@
             }
         });
 
-        // ── Chat & File Sharing ──
-        let chatScope = 'room';
-        function toggleChatDrawer() {
-            const drawer = document.getElementById('chat-drawer');
-            drawer.style.display = drawer.style.display === 'flex' ? 'none' : 'flex';
-        }
-        function switchChatScope(scope) {
-            chatScope = scope;
-            document.getElementById('chat-tab-room').classList.toggle('active', scope === 'room');
-            document.getElementById('chat-tab-global').classList.toggle('active', scope === 'global');
-        }
-
-        function sendChatMessage() {
-            const inp = document.getElementById('chat-msg-input');
-            const text = inp.value.trim();
-            if (!text) return;
-            inp.value = '';
-
-            const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
-            const msgPayload = {
-                senderName: localAvatar.name,
-                senderId: localAvatar.id,
-                text: text,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                scope: chatScope,
-                roomId: myRoom ? myRoom.id : null,
-                file: null
-            };
-
-            // 1. Spawn floating speech bubble on canvas
-            spawnSpeechBubble(localAvatar.id, localAvatar.name, text, null);
-
-            // 2. Append to chat drawer
-            appendChatMessage(msgPayload, true);
-
-            // 3. Send over WebSocket
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({
-                    type: 'chat.bubble',
-                    payload: { text }
-                }));
-                ws.send(JSON.stringify({
-                    type: 'chat.send',
-                    payload: { channelId: 'general', body: text }
-                }));
-            }
-        }
-
+        // ── Chat File Upload Handler ──
         async function handleChatFileUpload(input) {
             if (!input.files || !input.files[0]) return;
             const formData = new FormData();
@@ -3501,11 +3454,13 @@
                     const data = await res.json();
                     const fileData = data.file || { name: input.files[0].name, url: '#' };
                     const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+                    const fileMsgText = `📎 {{ __("Shared a file:") }} ${fileData.name}`;
 
                     appendChatMessage({
+                        id: 'local_' + Date.now(),
                         senderName: localAvatar.name,
                         senderId: localAvatar.id,
-                        text: `📎 {{ __("Shared a file:") }} ${fileData.name}`,
+                        body: fileMsgText,
                         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                         scope: chatScope,
                         roomId: myRoom ? myRoom.id : null,
@@ -3515,7 +3470,11 @@
                     if (ws && ws.readyState === WebSocket.OPEN) {
                         ws.send(JSON.stringify({
                             type: 'chat.send',
-                            payload: { channelId: 'general', body: `📎 ${fileData.name} - ${fileData.url}` }
+                            payload: {
+                                body: `${fileMsgText} - ${fileData.url}`,
+                                scope: chatScope,
+                                roomId: myRoom ? myRoom.id : null
+                            }
                         }));
                     }
                     showToast('✅ {{ __("File shared in chat!") }}');
@@ -3523,25 +3482,6 @@
             } catch(e) {
                 showToast('❌ {{ __("Failed to upload file") }}');
             }
-        }
-
-        function appendChatMessage(msg, isSelf = false) {
-            const container = document.getElementById('chat-messages-container');
-            const el = document.createElement('div');
-            el.className = `msg-bubble ${isSelf ? 'self' : ''}`;
-
-            let fileHtml = '';
-            if (msg.file && msg.file.url) {
-                fileHtml = `<div style="margin-top:4px;"><a href="${msg.file.url}" target="_blank" download style="color:var(--brand-primary); font-weight:800; text-decoration:none;">💾 ${msg.file.name}</a></div>`;
-            }
-
-            el.innerHTML = `
-                <div class="msg-meta"><span>${msg.senderName || 'Member'}</span> <span>${msg.time || ''}</span></div>
-                <span>${msg.text || ''}</span>
-                ${fileHtml}
-            `;
-            container.appendChild(el);
-            container.scrollTop = container.scrollHeight;
         }
 
         // ── Rich Realtime Collaborative Whiteboard Engine ──
@@ -4330,7 +4270,6 @@
         let chatScope = 'room'; // 'room' or 'global'
         const roomMessages = [];
         const globalMessages = [];
-        const speechBubbles = new Map(); // userId -> { text, emoji, expiresAt, name }
 
         function toggleChatDrawer() {
             const drawer = document.getElementById('chat-drawer');
