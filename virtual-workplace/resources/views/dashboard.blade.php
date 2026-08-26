@@ -4484,11 +4484,11 @@
                                                 <span class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.15); color: #D6A23A; font-size: 9px; font-weight: 800;">⚡</span>
                                             @endif
                                             <select onclick="event.stopPropagation()" onchange="updateTaskStatusDirect('{{ $t->id }}', this.value)" {{ $canEditThisTask ? '' : 'disabled' }} style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 9px; font-weight: 700; border-radius: 6px; padding: 2px 4px; outline: none; cursor: {{ $canEditThisTask ? 'pointer' : 'not-allowed' }};">
-                                                <option value="backlog" {{ $t->status === 'backlog' ? 'selected' : '' }}>📌 Backlog</option>
-                                                <option value="ready" {{ $t->status === 'ready' ? 'selected' : '' }}>🎯 Ready</option>
-                                                <option value="in_progress" {{ $t->status === 'in_progress' ? 'selected' : '' }}>⚡ In Progress</option>
-                                                <option value="review" {{ $t->status === 'review' || $t->status === 'qa' ? 'selected' : '' }}>🔍 Review</option>
-                                                <option value="done" {{ $t->status === 'done' ? 'selected' : '' }}>🎉 Done</option>
+                                                <option value="backlog" {{ $t->status === 'backlog' ? 'selected' : '' }}>📌 {{ __('Backlog') }}</option>
+                                                <option value="ready" {{ $t->status === 'ready' ? 'selected' : '' }}>🎯 {{ __('Ready') }}</option>
+                                                <option value="in_progress" {{ $t->status === 'in_progress' ? 'selected' : '' }}>⚡ {{ __('In Progress') }}</option>
+                                                <option value="review" {{ $t->status === 'review' || $t->status === 'qa' ? 'selected' : '' }}>🔍 {{ __('Review') }}</option>
+                                                <option value="done" {{ $t->status === 'done' ? 'selected' : '' }}>🎉 {{ __('Done') }}</option>
                                             </select>
                                         </div>
                                     </div>
@@ -5227,7 +5227,7 @@
     <div id="task-details-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 850px; width: 95vw; max-height: 90vh; display: flex; flex-direction: column; padding: 24px; overflow: hidden; border-radius: 24px;">
             <!-- Header -->
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; flex-wrap: wrap; gap: 10px;">
                 <div>
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap;">
                         <span id="task-modal-code" class="nav-badge-pill" style="font-family: monospace;">#1</span>
@@ -5255,11 +5255,11 @@
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <span style="font-size: 12px; font-weight: 800; color: var(--text-secondary);">⚡ {{ __('Status') }}:</span>
                         <select id="task-modal-status-select" onchange="updateCurrentTaskStatus(this.value)" style="background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 12px; font-weight: 700; border-radius: 8px; padding: 5px 12px; outline: none;">
-                            <option value="backlog">📌 Backlog</option>
-                            <option value="ready">🎯 Ready</option>
-                            <option value="in_progress">⚡ In Progress</option>
-                            <option value="review">🔍 In Review / QA</option>
-                            <option value="done">🎉 Done / Completed</option>
+                            <option value="backlog">📌 {{ __('Backlog') }}</option>
+                            <option value="ready">🎯 {{ __('Ready') }}</option>
+                            <option value="in_progress">⚡ {{ __('In Progress') }}</option>
+                            <option value="review">🔍 {{ __('In Review / QA') }}</option>
+                            <option value="done">🎉 {{ __('Done / Completed') }}</option>
                         </select>
                     </div>
                     <div style="font-size: 12px; font-family: monospace; font-weight: 800; color: var(--brand-forest);">
@@ -5274,25 +5274,34 @@
                 </div>
             </div>
 
-            <!-- Sub-Tabs -->
-            <div style="display: flex; gap: 6px; margin-bottom: 14px; background: var(--bg-surface-subtle); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border-color); box-shadow: var(--shadow-inset-3d); flex-wrap: wrap;">
-                <button onclick="switchTaskInspectorTab('details')" id="task-tab-btn-details" class="tactile-btn btn-primary" style="flex: 1; padding: 7px; font-size: 12px; justify-content: center;">
-                    📝 {{ __('Details') }}
+            <!-- Sub-Tabs Segmented Control -->
+            <div class="task-modal-segmented-bar" style="display: flex; gap: 4px; margin-bottom: 16px; background: var(--bg-surface-subtle); padding: 4px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow-inset-3d); overflow-x: auto;">
+                <button type="button" onclick="switchTaskInspectorTab('details')" id="task-tab-btn-details" class="tactile-btn btn-primary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px;">
+                    <span>📝</span>
+                    <span>{{ __('Details') }}</span>
                 </button>
-                <button onclick="switchTaskInspectorTab('checklist')" id="task-tab-btn-checklist" class="tactile-btn btn-secondary" style="flex: 1; padding: 7px; font-size: 12px; justify-content: center; background: transparent; border: none; box-shadow: none; color: var(--text-secondary);">
-                    ☑️ {{ __('Checklist') }} (<span id="task-checklist-count">0</span>)
+                <button type="button" onclick="switchTaskInspectorTab('checklist')" id="task-tab-btn-checklist" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--text-secondary);">
+                    <span>☑️</span>
+                    <span>{{ __('Checklist') }}</span>
+                    <span id="task-checklist-count" style="font-size: 10px; background: rgba(36, 92, 58, 0.15); color: var(--brand-forest); padding: 1px 7px; border-radius: 9999px; font-weight: 800; font-family: monospace;">0</span>
                 </button>
-                <button onclick="switchTaskInspectorTab('attachments')" id="task-tab-btn-attachments" class="tactile-btn btn-secondary" style="flex: 1; padding: 7px; font-size: 12px; justify-content: center; background: transparent; border: none; box-shadow: none; color: var(--text-secondary);">
-                    📎 {{ __('Files') }} (<span id="task-attachments-count">0</span>)
+                <button type="button" onclick="switchTaskInspectorTab('attachments')" id="task-tab-btn-attachments" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--text-secondary);">
+                    <span>📎</span>
+                    <span>{{ __('Files') }}</span>
+                    <span id="task-attachments-count" style="font-size: 10px; background: rgba(36, 92, 58, 0.15); color: var(--brand-forest); padding: 1px 7px; border-radius: 9999px; font-weight: 800; font-family: monospace;">0</span>
                 </button>
-                <button onclick="switchTaskInspectorTab('comments')" id="task-tab-btn-comments" class="tactile-btn btn-secondary" style="flex: 1; padding: 7px; font-size: 12px; justify-content: center; background: transparent; border: none; box-shadow: none; color: var(--text-secondary);">
-                    💬 {{ __('Discussions') }} (<span id="task-comments-count">0</span>)
+                <button type="button" onclick="switchTaskInspectorTab('comments')" id="task-tab-btn-comments" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--text-secondary);">
+                    <span>💬</span>
+                    <span>{{ __('Discussions') }}</span>
+                    <span id="task-comments-count" style="font-size: 10px; background: rgba(36, 92, 58, 0.15); color: var(--brand-forest); padding: 1px 7px; border-radius: 9999px; font-weight: 800; font-family: monospace;">0</span>
                 </button>
-                <button onclick="switchTaskInspectorTab('dependencies')" id="task-tab-btn-dependencies" class="tactile-btn btn-secondary" style="flex: 1; padding: 7px; font-size: 12px; justify-content: center; background: transparent; border: none; box-shadow: none; color: var(--text-secondary);">
-                    🔗 {{ __('Dependencies') }}
+                <button type="button" onclick="switchTaskInspectorTab('dependencies')" id="task-tab-btn-dependencies" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--text-secondary);">
+                    <span>🔗</span>
+                    <span>{{ __('Dependencies') }}</span>
                 </button>
-                <button onclick="switchTaskInspectorTab('timelog')" id="task-tab-btn-timelog" class="tactile-btn btn-secondary" style="flex: 1; padding: 7px; font-size: 12px; justify-content: center; background: transparent; border: none; box-shadow: none; color: var(--text-secondary);">
-                    ⏱️ {{ __('Time Log') }}
+                <button type="button" onclick="switchTaskInspectorTab('timelog')" id="task-tab-btn-timelog" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--text-secondary);">
+                    <span>⏱️</span>
+                    <span>{{ __('Time Log') }}</span>
                 </button>
             </div>
 
@@ -8187,13 +8196,27 @@
         }
 
         function renderTaskDetails(t) {
+            const statusLabels = {
+                'backlog': '{{ __("Backlog") }}',
+                'ready': '{{ __("Ready") }}',
+                'in_progress': '{{ __("In Progress") }}',
+                'review': '{{ __("In Review / QA") }}',
+                'done': '{{ __("Done") }}'
+            };
+            const priorityLabels = {
+                'low': '{{ __("Low") }}',
+                'medium': '{{ __("Medium") }}',
+                'high': '{{ __("High") }}',
+                'urgent': '{{ __("Urgent") }}'
+            };
+
             // Header
             document.getElementById('task-modal-code').textContent = `#${t.task_number || 1}`;
             document.getElementById('task-modal-title').textContent = t.title;
-            document.getElementById('task-modal-status-badge').textContent = (t.status || 'backlog').toUpperCase();
-            document.getElementById('task-modal-priority-badge').textContent = (t.priority || 'medium').toUpperCase();
-            document.getElementById('task-modal-project').textContent = t.project ? t.project.name : 'General';
-            document.getElementById('task-modal-assignee').textContent = t.assignee ? t.assignee.name : 'Unassigned';
+            document.getElementById('task-modal-status-badge').textContent = statusLabels[t.status] || (t.status || 'backlog');
+            document.getElementById('task-modal-priority-badge').textContent = priorityLabels[t.priority] || (t.priority || 'medium');
+            document.getElementById('task-modal-project').textContent = t.project ? t.project.name : '{{ __("General") }}';
+            document.getElementById('task-modal-assignee').textContent = t.assignee ? t.assignee.name : '{{ __("Unassigned") }}';
             
             window.currentModalTaskAssigneeMemberId = null;
             if (t.assignee) {
@@ -8207,8 +8230,8 @@
 
             document.getElementById('task-modal-due').textContent = t.due_date ? new Date(t.due_date).toLocaleDateString() : '—';
             document.getElementById('task-modal-status-select').value = t.status || 'backlog';
-            document.getElementById('task-modal-description').textContent = t.description || 'No description provided.';
-            document.getElementById('task-modal-hours').textContent = `${t.estimated_hours || 0}h est / ${t.actual_hours || 0}h act`;
+            document.getElementById('task-modal-description').textContent = t.description || '{{ __("No description provided.") }}';
+            document.getElementById('task-modal-hours').textContent = `${t.estimated_hours || 0} {{ __("Estimated Hours") }} / ${t.actual_hours || 0} {{ __("Logged Hours") }}`;
 
             // Approval Banner logic
             const appBanner = document.getElementById('task-modal-approval-banner');
@@ -8220,9 +8243,9 @@
                     appBanner.style.background = 'rgba(214, 162, 58, 0.15)';
                     appBanner.style.border = '1px solid rgba(214, 162, 58, 0.35)';
                     appBanner.style.color = '#D6A23A';
-                    appText.innerHTML = '<span>⏳</span> <span>{{ __("This task was submitted for completion and is awaiting Project Manager approval.") }}</span>';
+                    appText.innerHTML = '<span>⏳</span> <span>{{ __("This task is submitted for completion and awaiting PM approval.") }}</span>';
                     appActions.innerHTML = `
-                        <button type="button" onclick="quickApproveTask('${t.id}')" class="tactile-btn btn-primary" style="padding: 6px 14px; font-size: 11px;">✓ {{ __("Approve & Mark Done") }}</button>
+                        <button type="button" onclick="quickApproveTask('${t.id}')" class="tactile-btn btn-primary" style="padding: 6px 14px; font-size: 11px;">✓ {{ __("Approve") }}</button>
                         <button type="button" onclick="quickRejectTask('${t.id}')" class="tactile-btn" style="background: rgba(217, 107, 95, 0.2); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.3); padding: 6px 12px; font-size: 11px;">✕ {{ __("Request Changes") }}</button>
                     `;
                 } else if (t.approval_status === 'rejected') {
@@ -8230,14 +8253,14 @@
                     appBanner.style.background = 'rgba(217, 107, 95, 0.15)';
                     appBanner.style.border = '1px solid rgba(217, 107, 95, 0.35)';
                     appBanner.style.color = '#D96B5F';
-                    appText.innerHTML = `<span>⚠️</span> <span><strong>{{ __("Changes Requested:") }}</strong> ${t.rejection_reason || 'Please review feedback.'}</span>`;
+                    appText.innerHTML = `<span>⚠️</span> <span><strong>{{ __("Changes Requested:") }}</strong> ${t.rejection_reason || '{{ __("Please review feedback.") }}'}</span>`;
                     appActions.innerHTML = '';
                 } else if (t.approval_status === 'approved') {
                     appBanner.style.display = 'flex';
                     appBanner.style.background = 'rgba(79, 155, 95, 0.15)';
                     appBanner.style.border = '1px solid rgba(79, 155, 95, 0.35)';
                     appBanner.style.color = '#4F9B5F';
-                    appText.innerHTML = '<span>✅</span> <span>{{ __("Task approved and completed by Project Manager.") }}</span>';
+                    appText.innerHTML = '<span>✅</span> <span>{{ __("Task approved and marked Done by Project Manager.") }}</span>';
                     appActions.innerHTML = '';
                 } else {
                     appBanner.style.display = 'none';
@@ -8248,7 +8271,7 @@
             const timerBtn = document.getElementById('task-modal-timer-btn');
             if (timerBtn) {
                 const pId = t.project_id || '';
-                const pName = t.project ? t.project.name : 'Project';
+                const pName = t.project ? t.project.name : '{{ __("Project") }}';
                 timerBtn.onclick = () => startTaskTimer(pId, t.id, t.title, pName);
             }
 
@@ -8259,17 +8282,17 @@
             if (checkContainer) {
                 checkContainer.innerHTML = '';
                 if (items.length === 0) {
-                    checkContainer.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 8px;">No checklist items yet. Add sub-items above.</div>';
+                    checkContainer.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 8px;">{{ __("No checklist items yet. Add sub-items above.") }}</div>';
                 } else {
                     items.forEach(item => {
                         const div = document.createElement('div');
-                        div.style = 'display: flex; align-items: center; justify-content: space-between; background: var(--bg-elevated); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color);';
+                        div.style = 'display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface-subtle); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color);';
                         div.innerHTML = `
                             <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: var(--text-primary); text-decoration: ${item.is_completed ? 'line-through' : 'none'}; opacity: ${item.is_completed ? 0.6 : 1};">
                                 <input type="checkbox" onchange="toggleTaskChecklistItem('${item.id}')" ${item.is_completed ? 'checked' : ''}>
                                 <span>${item.title}</span>
                             </label>
-                            <span class="badge ${item.is_completed ? 'badge-green' : 'badge-gray'}" style="font-size: 10px;">${item.is_completed ? 'Done' : 'Pending'}</span>
+                            <span class="badge ${item.is_completed ? 'badge-green' : 'badge-gray'}" style="font-size: 10px;">${item.is_completed ? '{{ __("Done") }}' : '{{ __("Pending") }}'}</span>
                         `;
                         checkContainer.appendChild(div);
                     });
@@ -8284,12 +8307,12 @@
             if (attContainer) {
                 attContainer.innerHTML = '';
                 if (attachments.length === 0) {
-                    attContainer.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 8px; grid-column: 1 / -1;">{{ __("No attachments uploaded yet.") }}</div>';
+                    attContainer.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 8px; grid-column: 1 / -1;">{{ __("No files attached to this task.") }}</div>';
                 } else {
                     attachments.forEach(att => {
                         const card = document.createElement('div');
                         card.style = 'background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; gap: 6px;';
-                        const uploader = att.user ? att.user.name : 'Team Member';
+                        const uploader = att.user ? att.user.name : '{{ __("Member") }}';
                         card.innerHTML = `
                             <div style="font-weight: 800; font-size: 12px; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">📄 ${att.file_name}</div>
                             <div style="font-size: 10px; color: var(--text-muted);">👤 ${uploader} • ${(att.file_size / 1024).toFixed(1)} KB</div>
@@ -8310,16 +8333,16 @@
             if (commContainer) {
                 commContainer.innerHTML = '';
                 if (comments.length === 0) {
-                    commContainer.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 8px;">No discussions or comments yet.</div>';
+                    commContainer.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 8px;">{{ __("No discussions or comments yet.") }}</div>';
                 } else {
                     comments.forEach(c => {
                         const box = document.createElement('div');
-                        box.style = 'background: var(--bg-elevated); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;';
-                        const author = c.user ? c.user.name : 'Team Member';
+                        box.style = 'background: var(--bg-surface-subtle); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;';
+                        const author = c.user ? c.user.name : '{{ __("Member") }}';
                         const time = new Date(c.created_at).toLocaleString();
                         box.innerHTML = `
                             <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11px;">
-                                <strong style="color: var(--brand-teal);">👤 ${author}</strong>
+                                <strong style="color: var(--brand-forest);">👤 ${author}</strong>
                                 <span style="color: var(--text-muted);">${time}</span>
                             </div>
                             <div style="color: var(--text-primary); line-height: 1.4;">${c.body || ''}</div>
@@ -8335,15 +8358,15 @@
             if (depContainer) {
                 depContainer.innerHTML = '';
                 if (deps.length === 0) {
-                    depContainer.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 8px;">No blocker dependencies. This task can be started immediately.</div>';
+                    depContainer.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 8px;">{{ __("No blocker dependencies. This task can be started immediately.") }}</div>';
                 } else {
                     deps.forEach(d => {
                         const item = document.createElement('div');
-                        item.style = 'background: var(--bg-elevated); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 12px; display: flex; justify-content: space-between; align-items: center;';
+                        item.style = 'background: var(--bg-surface-subtle); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px; display: flex; justify-content: space-between; align-items: center;';
                         const depTask = d.depends_on_task || {};
                         item.innerHTML = `
-                            <span>🔒 <strong>Depends On:</strong> #${depTask.task_number || ''} ${depTask.title || 'Predecessor Task'}</span>
-                            <span class="badge ${depTask.status === 'done' ? 'badge-green' : 'badge-crimson'}">${depTask.status || 'pending'}</span>
+                            <span>🔒 <strong>{{ __("Depends On:") }}</strong> #${depTask.task_number || ''} ${depTask.title || '{{ __("Predecessor Task") }}'}</span>
+                            <span class="badge ${depTask.status === 'done' ? 'badge-green' : 'badge-crimson'}">${statusLabels[depTask.status] || (depTask.status || 'pending')}</span>
                         `;
                         depContainer.appendChild(item);
                     });
@@ -8356,17 +8379,17 @@
                 timeBody.innerHTML = '';
                 const entries = t.time_entries || [];
                 if (entries.length === 0) {
-                    timeBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 14px; color: var(--text-muted);">No time tracked on this task yet.</td></tr>';
+                    timeBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 14px; color: var(--text-muted);">{{ __("No time tracked on this task yet.") }}</td></tr>';
                 } else {
                     entries.forEach(e => {
                         const tr = document.createElement('tr');
                         const hrs = (e.duration_seconds / 3600).toFixed(2);
                         tr.innerHTML = `
                             <td>${new Date(e.started_at).toLocaleDateString()}</td>
-                            <td style="font-weight: 700;">${e.user ? e.user.name : 'Member'}</td>
-                            <td style="font-weight: 800; color: #34d399; font-family: monospace;">${hrs}h</td>
-                            <td style="font-size: 11px;">${e.description || 'Work session'}</td>
-                            <td><span class="badge ${e.status === 'approved' ? 'badge-green' : 'badge-gray'}">${e.status}</span></td>
+                            <td style="font-weight: 700;">${e.user ? e.user.name : '{{ __("Member") }}'}</td>
+                            <td style="font-weight: 800; color: var(--brand-forest); font-family: monospace;">${hrs} {{ __("h") }}</td>
+                            <td style="font-size: 11px;">${e.description || '{{ __("Work session") }}'}</td>
+                            <td><span class="badge ${e.status === 'approved' ? 'badge-green' : 'badge-gray'}">${e.status === 'approved' ? '{{ __("Approved") }}' : '{{ __("Pending") }}'}</span></td>
                         `;
                         timeBody.appendChild(tr);
                     });

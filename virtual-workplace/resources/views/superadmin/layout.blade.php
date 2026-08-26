@@ -751,6 +751,10 @@
                 <span class="nav-item-icon">⚙️</span>
                 <span>{{ __('System Settings') }}</span>
             </a>
+            <a href="{{ route('superadmin.translations') }}" class="nav-item {{ request()->routeIs('superadmin.translations*') ? 'active' : '' }}" data-tooltip="{{ __('Translations') }}">
+                <span class="nav-item-icon">🌐</span>
+                <span>{{ __('Translations (الترجمات)') }}</span>
+            </a>
 
             <div class="nav-category-title">{{ __('Session') }}</div>
             <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0;">

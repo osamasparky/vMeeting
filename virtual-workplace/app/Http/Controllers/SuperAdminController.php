@@ -583,14 +583,73 @@ class SuperAdminController extends Controller
     }
 
     /**
-     * System Settings.
+     * System Settings & Payment Configuration.
      */
     public function settings()
     {
         $user = Auth::user();
         $plans = Plan::where('is_active', true)->get();
 
-        return view('superadmin.settings', compact('user', 'plans'));
+        $defaultBankAccounts = [
+            [
+                'bank_name' => 'Al Rajhi Bank (مصرف الراجحي)',
+                'account_name' => 'مؤسسة مساحة الغد لتقنية المعلومات',
+                'account_name_en' => 'Next Space Information Technology Est.',
+                'iban' => 'SA4580000412608010123456',
+                'account_number' => '412608010123456',
+                'swift_code' => 'RJHISARI',
+                'currency' => 'SAR',
+                'badge' => 'Direct Instant Local Transfer',
+            ],
+            [
+                'bank_name' => 'Saudi National Bank - SNB (البنك الأهلي السعودي)',
+                'account_name' => 'مؤسسة مساحة الغد لتقنية المعلومات',
+                'account_name_en' => 'Next Space Information Technology Est.',
+                'iban' => 'SA1210000001234567890123',
+                'account_number' => '01234567890123',
+                'swift_code' => 'NCBKSAJI',
+                'currency' => 'SAR',
+                'badge' => 'Corporate Settlement',
+            ],
+            [
+                'bank_name' => 'Riyad Bank (بنك الرياض)',
+                'account_name' => 'مؤسسة مساحة الغد لتقنية المعلومات',
+                'account_name_en' => 'Next Space Information Technology Est.',
+                'iban' => 'SA7820000009876543210987',
+                'account_number' => '09876543210987',
+                'swift_code' => 'RIBLSARI',
+                'currency' => 'SAR / USD',
+                'badge' => 'International Wire / SWIFT',
+            ],
+        ];
+
+        $paymentSettings = \App\Domains\Administration\Models\SystemSetting::get('payment_settings', [
+            'usd_to_sar_rate' => 3.75,
+            'usd_to_egp_rate' => 48.5,
+            'usd_to_aed_rate' => 3.67,
+            'default_currency' => 'SAR',
+            'tax_percentage' => 15,
+            'tax_number' => '300012345600003',
+            'bank_accounts' => $defaultBankAccounts,
+            'instapay_handle' => 'nextspace@instapay',
+            'instapay_phone' => '+201000000000',
+            'stc_pay_phone' => '+966500000000',
+            'vodafone_cash_phone' => '+201000000000',
+            'checkout_terms_ar' => 'يتم تفعيل الاشتراك فور مراجعة إيصال التحويل البنكي أو الدفع الإلكتروني من قبل المشرفين.',
+            'checkout_terms_en' => 'Your subscription will be activated immediately upon review of the payment receipt by our administration team.',
+            'enable_bank_transfer' => true,
+            'enable_instapay' => true,
+            'enable_wallets' => true,
+        ]);
+
+        $globalSettings = \App\Domains\Administration\Models\SystemSetting::get('global_settings', [
+            'platform_name' => 'Virtual Workplace SaaS',
+            'default_plan_id' => $plans->where('slug', 'free')->first()?->id ?? $plans->first()?->id,
+            'ws_url' => 'ws://127.0.0.1:8080',
+            'stun_server' => 'stun:173.212.248.192:3478',
+        ]);
+
+        return view('superadmin.settings', compact('user', 'plans', 'paymentSettings', 'globalSettings'));
     }
 
     /**
@@ -598,7 +657,229 @@ class SuperAdminController extends Controller
      */
     public function updateSettings(Request $request)
     {
-        return back()->with('success', 'System settings saved successfully.');
+        $globalSettings = [
+            'platform_name' => $request->input('platform_name', 'Virtual Workplace SaaS'),
+            'default_plan_id' => $request->input('default_plan_id'),
+            'ws_url' => $request->input('ws_url', 'ws://127.0.0.1:8080'),
+            'stun_server' => $request->input('stun_server', 'stun:173.212.248.192:3478'),
+        ];
+
+        \App\Domains\Administration\Models\SystemSetting::set('global_settings', $globalSettings);
+
+        return back()->with('success', __('System settings saved successfully.'));
+    }
+
+    /**
+     * Update Payment & Checkout settings.
+     */
+    public function updatePaymentSettings(Request $request)
+    {
+        $bankAccounts = [];
+        $bankNames = $request->input('bank_name', []);
+        $accountNames = $request->input('account_name', []);
+        $accountNamesEn = $request->input('account_name_en', []);
+        $ibans = $request->input('iban', []);
+        $accountNumbers = $request->input('account_number', []);
+        $swiftCodes = $request->input('swift_code', []);
+        $currencies = $request->input('currency', []);
+        $badges = $request->input('badge', []);
+
+        for ($i = 0; $i < count($bankNames); $i++) {
+            if (!empty(trim($bankNames[$i]))) {
+                $bankAccounts[] = [
+                    'bank_name' => trim($bankNames[$i]),
+                    'account_name' => trim($accountNames[$i] ?? ''),
+                    'account_name_en' => trim($accountNamesEn[$i] ?? ''),
+                    'iban' => trim($ibans[$i] ?? ''),
+                    'account_number' => trim($accountNumbers[$i] ?? ''),
+                    'swift_code' => trim($swiftCodes[$i] ?? ''),
+                    'currency' => trim($currencies[$i] ?? 'SAR'),
+                    'badge' => trim($badges[$i] ?? 'Official Bank Account'),
+                ];
+            }
+        }
+
+        $paymentSettings = [
+            'usd_to_sar_rate' => (float) $request->input('usd_to_sar_rate', 3.75),
+            'usd_to_egp_rate' => (float) $request->input('usd_to_egp_rate', 48.5),
+            'usd_to_aed_rate' => (float) $request->input('usd_to_aed_rate', 3.67),
+            'default_currency' => $request->input('default_currency', 'SAR'),
+            'tax_percentage' => (float) $request->input('tax_percentage', 15),
+            'tax_number' => $request->input('tax_number', ''),
+            'bank_accounts' => $bankAccounts,
+            'instapay_handle' => $request->input('instapay_handle', ''),
+            'instapay_phone' => $request->input('instapay_phone', ''),
+            'stc_pay_phone' => $request->input('stc_pay_phone', ''),
+            'vodafone_cash_phone' => $request->input('vodafone_cash_phone', ''),
+            'checkout_terms_ar' => $request->input('checkout_terms_ar', ''),
+            'checkout_terms_en' => $request->input('checkout_terms_en', ''),
+            'enable_bank_transfer' => $request->has('enable_bank_transfer'),
+            'enable_instapay' => $request->has('enable_instapay'),
+            'enable_wallets' => $request->has('enable_wallets'),
+        ];
+
+        \App\Domains\Administration\Models\SystemSetting::set('payment_settings', $paymentSettings);
+
+        return back()->with('success', __('Payment & Checkout settings saved successfully.'));
+    }
+
+    /**
+     * Translations & Localization Management Console.
+     */
+    public function translations(Request $request)
+    {
+        $user = Auth::user();
+        $search = trim((string) $request->input('search', ''));
+        $selectedLang = $request->input('lang', 'ar');
+
+        $arPath = base_path('lang/ar.json');
+        $enPath = base_path('lang/en.json');
+
+        $arJson = file_exists($arPath) ? json_decode(file_get_contents($arPath), true) ?: [] : [];
+        $enJson = file_exists($enPath) ? json_decode(file_get_contents($enPath), true) ?: [] : [];
+
+        // Collect all unique keys
+        $allKeys = array_unique(array_merge(array_keys($arJson), array_keys($enJson)));
+        sort($allKeys);
+
+        $translations = [];
+        foreach ($allKeys as $key) {
+            $arVal = $arJson[$key] ?? '';
+            $enVal = $enJson[$key] ?? $key;
+
+            if ($search !== '') {
+                $matchesKey = (stripos($key, $search) !== false);
+                $matchesAr = (stripos($arVal, $search) !== false);
+                $matchesEn = (stripos($enVal, $search) !== false);
+                if (!$matchesKey && !$matchesAr && !$matchesEn) {
+                    continue;
+                }
+            }
+
+            $translations[] = [
+                'key' => $key,
+                'ar' => $arVal,
+                'en' => $enVal,
+            ];
+        }
+
+        $totalCount = count($allKeys);
+        $filteredCount = count($translations);
+
+        // Pagination
+        $page = max(1, (int) $request->input('page', 1));
+        $perPage = 50;
+        $offset = ($page - 1) * $perPage;
+        $paginatedItems = array_slice($translations, $offset, $perPage);
+        $totalPages = max(1, (int) ceil($filteredCount / $perPage));
+
+        return view('superadmin.translations', compact(
+            'user',
+            'paginatedItems',
+            'totalCount',
+            'filteredCount',
+            'search',
+            'selectedLang',
+            'page',
+            'perPage',
+            'totalPages'
+        ));
+    }
+
+    /**
+     * Save updated translations.
+     */
+    public function updateTranslations(Request $request)
+    {
+        $keys = $request->input('keys', []);
+        $arVals = $request->input('ar', []);
+        $enVals = $request->input('en', []);
+
+        $arPath = base_path('lang/ar.json');
+        $enPath = base_path('lang/en.json');
+
+        $arJson = file_exists($arPath) ? json_decode(file_get_contents($arPath), true) ?: [] : [];
+        $enJson = file_exists($enPath) ? json_decode(file_get_contents($enPath), true) ?: [] : [];
+
+        for ($i = 0; $i < count($keys); $i++) {
+            $key = $keys[$i];
+            if ($key !== '') {
+                if (isset($arVals[$i])) {
+                    $arJson[$key] = $arVals[$i];
+                }
+                if (isset($enVals[$i])) {
+                    $enJson[$key] = $enVals[$i];
+                }
+            }
+        }
+
+        file_put_contents($arPath, json_encode($arJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        file_put_contents($enPath, json_encode($enJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        \Illuminate\Support\Facades\Artisan::call('view:clear');
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => __('Translations saved and cache cleared.')]);
+        }
+
+        return back()->with('success', __('Translations saved successfully across the system.'));
+    }
+
+    /**
+     * Add new translation key.
+     */
+    public function addTranslationKey(Request $request)
+    {
+        $request->validate([
+            'key' => 'required|string|max:1000',
+            'ar' => 'required|string|max:2000',
+            'en' => 'nullable|string|max:2000',
+        ]);
+
+        $key = trim($request->input('key'));
+        $arVal = trim($request->input('ar'));
+        $enVal = trim($request->input('en', $key)) ?: $key;
+
+        $arPath = base_path('lang/ar.json');
+        $enPath = base_path('lang/en.json');
+
+        $arJson = file_exists($arPath) ? json_decode(file_get_contents($arPath), true) ?: [] : [];
+        $enJson = file_exists($enPath) ? json_decode(file_get_contents($enPath), true) ?: [] : [];
+
+        $arJson[$key] = $arVal;
+        $enJson[$key] = $enVal;
+
+        file_put_contents($arPath, json_encode($arJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        file_put_contents($enPath, json_encode($enJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        \Illuminate\Support\Facades\Artisan::call('view:clear');
+
+        return back()->with('success', __('New phrase ":key" added successfully.', ['key' => $key]));
+    }
+
+    /**
+     * Delete translation key.
+     */
+    public function deleteTranslationKey(Request $request)
+    {
+        $request->validate(['key' => 'required|string']);
+        $key = $request->input('key');
+
+        $arPath = base_path('lang/ar.json');
+        $enPath = base_path('lang/en.json');
+
+        $arJson = file_exists($arPath) ? json_decode(file_get_contents($arPath), true) ?: [] : [];
+        $enJson = file_exists($enPath) ? json_decode(file_get_contents($enPath), true) ?: [] : [];
+
+        unset($arJson[$key]);
+        unset($enJson[$key]);
+
+        file_put_contents($arPath, json_encode($arJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        file_put_contents($enPath, json_encode($enJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        \Illuminate\Support\Facades\Artisan::call('view:clear');
+
+        return back()->with('success', __('Phrase removed from system.'));
     }
 
     /**

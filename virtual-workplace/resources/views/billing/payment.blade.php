@@ -164,13 +164,48 @@
                             </div>
                         </div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px; color: var(--text-secondary);">
-                            <div><strong>{{ __('Account #') }}:</strong> <span style="font-family: monospace;">{{ $bank['account_number'] }}</span></div>
-                            <div><strong>SWIFT:</strong> <span style="font-family: monospace;">{{ $bank['swift'] }}</span></div>
+                            <div><strong>{{ __('Account #') }}:</strong> <span style="font-family: monospace;">{{ $bank['account_number'] ?? '—' }}</span></div>
+                            <div><strong>SWIFT / BIC:</strong> <span style="font-family: monospace;">{{ $bank['swift_code'] ?? $bank['swift'] ?? '—' }}</span></div>
                         </div>
                     </div>
                     @endforeach
                 </div>
+
+                @if(!empty($paymentSettings['instapay_handle']) || !empty($paymentSettings['stc_pay_phone']) || !empty($paymentSettings['vodafone_cash_phone']))
+                    <div style="margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--border-color);">
+                        <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+                            <span>📱</span> {{ __('Instant Payment & Digital Wallets (الدفع الفوري والمحافظ)') }}
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
+                            @if(!empty($paymentSettings['instapay_handle']))
+                                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface-subtle); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                                    <span>⚡ <strong>Instapay IPA:</strong> <code style="color: var(--brand-forest); font-weight: 800;">{{ $paymentSettings['instapay_handle'] }}</code></span>
+                                    <button type="button" onclick="copyToClipboard('{{ $paymentSettings['instapay_handle'] }}', this)" style="background: none; border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;">📋 {{ __('Copy') }}</button>
+                                </div>
+                            @endif
+                            @if(!empty($paymentSettings['stc_pay_phone']))
+                                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface-subtle); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                                    <span>💚 <strong>STC Pay:</strong> <code style="color: var(--brand-forest); font-weight: 800;">{{ $paymentSettings['stc_pay_phone'] }}</code></span>
+                                    <button type="button" onclick="copyToClipboard('{{ $paymentSettings['stc_pay_phone'] }}', this)" style="background: none; border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;">📋 {{ __('Copy') }}</button>
+                                </div>
+                            @endif
+                            @if(!empty($paymentSettings['vodafone_cash_phone']))
+                                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface-subtle); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color);">
+                                    <span>🔴 <strong>Vodafone Cash:</strong> <code style="color: var(--brand-forest); font-weight: 800;">{{ $paymentSettings['vodafone_cash_phone'] }}</code></span>
+                                    <button type="button" onclick="copyToClipboard('{{ $paymentSettings['vodafone_cash_phone'] }}', this)" style="background: none; border: 1px solid var(--border-color); padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;">📋 {{ __('Copy') }}</button>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @endif
             </div>
+
+            @if(!empty($paymentSettings['checkout_terms_ar']) || !empty($paymentSettings['checkout_terms_en']))
+                <div style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 14px 18px; font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
+                    📌 <strong>{{ __('Terms & Activation Policy') }}:</strong>
+                    {{ app()->getLocale() === 'ar' ? ($paymentSettings['checkout_terms_ar'] ?? $paymentSettings['checkout_terms_en']) : ($paymentSettings['checkout_terms_en'] ?? $paymentSettings['checkout_terms_ar']) }}
+                </div>
+            @endif
         </div>
 
         <!-- Right: Submit Bank Transfer Form -->

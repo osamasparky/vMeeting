@@ -486,21 +486,15 @@ class WebAuthController extends Controller
             ?: $organization->pendingSubscriptionRequest()->with('plan')->first();
 
         $priceUSD = (float)$plan->price;
-        $priceSAR = round($priceUSD * 3.75, 2);
 
-        $cleanSlug = preg_replace('/[^a-zA-Z0-9]/', '', $organization->slug ?: 'ORG');
-        $referenceCode = 'PAY-' . strtoupper(substr($cleanSlug, 0, 4))
-            . '-' . strtoupper(substr($plan->slug, 0, 4))
-            . '-' . strtoupper(Str::random(4));
-
-        $bankAccounts = [
+        $defaultBankAccounts = [
             [
                 'bank_name' => 'مصرف الراجحي (Al Rajhi Bank)',
                 'account_name' => 'شركة مساحات العمل الافتراضية للاتصالات وتقنية المعلومات',
                 'account_name_en' => 'Virtual Workplace Information Technology Co.',
                 'iban' => 'SA4480000201608010099999',
                 'account_number' => '201608010099999',
-                'swift' => 'RJHISARI',
+                'swift_code' => 'RJHISARI',
                 'currency' => 'SAR / USD',
                 'badge' => '⚡ التحويل الفوري المعتمد (Instant Transfer)',
             ],
@@ -510,15 +504,44 @@ class WebAuthController extends Controller
                 'account_name_en' => 'Virtual Workplace Information Technology Co.',
                 'iban' => 'SA0310000001234567890123',
                 'account_number' => '1234567890123',
-                'swift' => 'NCBISARI',
+                'swift_code' => 'NCBISARI',
                 'currency' => 'SAR',
                 'badge' => '🏢 الحساب التجاري المعتمد (Corporate)',
             ],
         ];
 
+        $paymentSettings = \App\Domains\Administration\Models\SystemSetting::get('payment_settings', [
+            'usd_to_sar_rate' => 3.75,
+            'usd_to_egp_rate' => 48.5,
+            'usd_to_aed_rate' => 3.67,
+            'default_currency' => 'SAR',
+            'tax_percentage' => 15,
+            'tax_number' => '300012345600003',
+            'bank_accounts' => $defaultBankAccounts,
+            'instapay_handle' => 'nextspace@instapay',
+            'instapay_phone' => '+201000000000',
+            'stc_pay_phone' => '+966500000000',
+            'vodafone_cash_phone' => '+201000000000',
+            'checkout_terms_ar' => 'يتم تفعيل الاشتراك فور مراجعة إيصال التحويل البنكي أو الدفع الإلكتروني من قبل المشرفين.',
+            'checkout_terms_en' => 'Your subscription will be activated immediately upon review of the payment receipt by our administration team.',
+            'enable_bank_transfer' => true,
+            'enable_instapay' => true,
+            'enable_wallets' => true,
+        ]);
+
+        $sarRate = (float)($paymentSettings['usd_to_sar_rate'] ?? 3.75);
+        $priceSAR = round($priceUSD * $sarRate, 2);
+
+        $bankAccounts = !empty($paymentSettings['bank_accounts']) ? $paymentSettings['bank_accounts'] : $defaultBankAccounts;
+
+        $cleanSlug = preg_replace('/[^a-zA-Z0-9]/', '', $organization->slug ?: 'ORG');
+        $referenceCode = 'PAY-' . strtoupper(substr($cleanSlug, 0, 4))
+            . '-' . strtoupper(substr($plan->slug, 0, 4))
+            . '-' . strtoupper(Str::random(4));
+
         return view('billing.payment', compact(
             'user', 'membership', 'organization', 'plan', 'pendingRequest',
-            'priceUSD', 'priceSAR', 'referenceCode', 'bankAccounts'
+            'priceUSD', 'priceSAR', 'referenceCode', 'bankAccounts', 'paymentSettings'
         ));
     }
 

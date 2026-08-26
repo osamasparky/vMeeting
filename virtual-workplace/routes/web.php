@@ -165,7 +165,14 @@ Route::prefix('superadmin')->middleware(['auth', 'superadmin'])->name('superadmi
 
     Route::get('/settings', [\App\Http\Controllers\SuperAdminController::class, 'settings'])->name('settings');
     Route::post('/settings', [\App\Http\Controllers\SuperAdminController::class, 'updateSettings'])->name('settings.update');
+    Route::post('/settings/payment', [\App\Http\Controllers\SuperAdminController::class, 'updatePaymentSettings'])->name('settings.payment');
     Route::post('/settings/default-blueprint', [\App\Http\Controllers\SuperAdminController::class, 'uploadDefaultBlueprint'])->name('settings.blueprint');
+
+    // System Translations & Localization Manager
+    Route::get('/translations', [\App\Http\Controllers\SuperAdminController::class, 'translations'])->name('translations');
+    Route::post('/translations', [\App\Http\Controllers\SuperAdminController::class, 'updateTranslations'])->name('translations.update');
+    Route::post('/translations/add', [\App\Http\Controllers\SuperAdminController::class, 'addTranslationKey'])->name('translations.add');
+    Route::post('/translations/delete', [\App\Http\Controllers\SuperAdminController::class, 'deleteTranslationKey'])->name('translations.delete');
 
     // Default Office Template & Rooms Designer
     Route::get('/template', [\App\Http\Controllers\SuperAdminController::class, 'defaultTemplate'])->name('template');
