@@ -156,7 +156,6 @@ class AiMapGeneratorService
                     'n' => 1,
                     'size' => $imageSize,
                     'quality' => $quality,
-                    'response_format' => 'url',
                 ]);
 
             if ($response->successful()) {
