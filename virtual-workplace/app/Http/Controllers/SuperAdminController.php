@@ -668,11 +668,11 @@ class SuperAdminController extends Controller
     {
         $aiSettings = [
             'api_key' => trim($request->input('api_key', '')),
-            'model' => $request->input('model', 'dall-e-3'),
-            'image_size' => $request->input('image_size', '1792x1024'),
+            'model' => $request->input('model', 'gpt-image-1'),
+            'image_size' => $request->input('image_size', '1024x1024'),
             'quality' => $request->input('quality', 'standard'),
             'prompt_prefix' => trim($request->input('prompt_prefix', "A clean, photorealistic direct top-down 2D architectural floor plan blueprint of a modern virtual workplace office (straight 90-degree overhead bird's-eye plan view with cutaway interior walls).")),
-            'is_enabled' => $request->has('is_enabled'),
+            'is_enabled' => $request->has('is_enabled') || !empty(trim($request->input('api_key', ''))),
         ];
 
         \App\Domains\Administration\Models\SystemSetting::set('openai_settings', $aiSettings);

@@ -139,10 +139,10 @@ class AiMapGeneratorService
 
         $prompt = "{$promptPrefix} A complete, full-facility 2D architectural floor plan blueprint layout designed in {$styleConfig['description']}. The floorplan strictly contains the following distinct interior zones separated by clean cutaway walls and open doorways: {$roomsText}. Features polished concrete walkways, warm wood floor pods, soft circular overhead downlights, and potted green botanical plants in room corners. Crisp top-down 90-degree direct overhead bird's-eye architectural drawing, hyper-detailed furniture arrangement, completely empty with no people or human characters.";
 
-        // 5. Generate Blueprint Artwork via OpenAI DALL-E 3
-        if (empty($apiKey) || empty($aiSettings['is_enabled'])) {
+        // 5. Generate Blueprint Artwork via OpenAI DALL-E / GPT Image Model
+        if (empty($apiKey)) {
             throw ValidationException::withMessages([
-                'api_key' => __('OpenAI API key is missing or AI Generator is disabled in SuperAdmin settings. Please configure an active OpenAI API key in SuperAdmin Settings.'),
+                'api_key' => __('OpenAI API key is missing. Please configure an active OpenAI API key in SuperAdmin Settings.'),
             ]);
         }
 
