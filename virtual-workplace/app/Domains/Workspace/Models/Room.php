@@ -40,6 +40,18 @@ class Room extends Model
         return $this->belongsTo(Map::class);
     }
 
+    public function floor()
+    {
+        return $this->hasOneThrough(
+            Floor::class,
+            Map::class,
+            'id',
+            'id',
+            'map_id',
+            'floor_id'
+        );
+    }
+
     // ── Helpers ──
 
     public function isPrivate(): bool
