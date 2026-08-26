@@ -157,8 +157,18 @@
                         <p class="panel-subtitle">{{ __('Customize top navigation links in Arabic and English.') }}</p>
                     </div>
 
+                    @php
+                        $currentNavItems = $navItems ?? \App\Domains\CMS\Models\CmsThemeSetting::getByKey('main_navigation', [
+                            ['label_en' => 'Platform', 'label_ar' => 'المنصة', 'url' => '#hero-spatial'],
+                            ['label_en' => 'Spatial Presence', 'label_ar' => 'التواجد المكاني', 'url' => '#spatial-presence'],
+                            ['label_en' => 'AI Office', 'label_ar' => 'مكتب الذكاء الاصطناعي', 'url' => '#ai-generator'],
+                            ['label_en' => 'Collaboration', 'label_ar' => 'التعاون والإنتاجية', 'url' => '#collaboration'],
+                            ['label_en' => 'Pricing', 'label_ar' => 'الباقات والأسعار', 'url' => '#pricing'],
+                        ]);
+                    @endphp
+
                     <div id="nav-items-container" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;">
-                        @foreach($navItems as $idx => $nav)
+                        @foreach($currentNavItems as $idx => $nav)
                             <div class="nav-item-row" style="display: grid; grid-template-columns: 1.2fr 1.2fr 1.5fr auto; gap: 12px; align-items: center; background: var(--bg-surface-subtle); padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-color);">
                                 <div>
                                     <label style="display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); margin-bottom: 2px;">🇺🇸 Label (EN)</label>
