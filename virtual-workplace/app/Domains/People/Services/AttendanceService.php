@@ -275,7 +275,7 @@ class AttendanceService
         $attendanceSessions = AttendanceSession::where('organization_id', $organizationId)
             ->where('user_id', $userId)
             ->whereBetween('started_at', [$startOfDay, $endOfDay])
-            ->with(['room:id,name,type', 'room.floor:id,name'])
+            ->with(['room', 'room.floor', 'room.map'])
             ->orderBy('started_at', 'asc')
             ->get();
 
