@@ -270,9 +270,159 @@
             </div>
         </div>
     </form>
+
+    <!-- 4. OpenAI & AI Office Generator Settings -->
+    <form method="POST" action="{{ route('superadmin.settings.ai') }}">
+        @csrf
+        <div class="panel-card" style="border-radius: var(--radius-xl); padding: 28px;">
+            <div class="panel-header" style="margin-bottom: 20px;">
+                <div class="panel-title">
+                    <span>🤖</span>
+                    <span>{{ __('OpenAI & AI Office Generator Settings (إعدادات الذكاء الاصطناعي)') }}</span>
+                </div>
+                <p class="panel-subtitle">
+                    {{ __('Configure ChatGPT & OpenAI (DALL-E 3) API credentials to empower company admins to generate bespoke, 3D isometric architectural floorplans and isolated room maps directly from the Edit Office page.') }}
+                </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+                <div style="grid-column: 1 / -1;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; font-weight: 800; color: var(--text-primary);">
+                        <input type="checkbox" name="is_enabled" value="1" {{ !empty($aiSettings['is_enabled']) ? 'checked' : '' }} style="width: 18px; height: 18px; accent-color: var(--brand-forest);">
+                        <span>✨ {{ __('Enable AI Office & Floorplan Generator Platform-wide (تفعيل ميزة توليد المكاتب بالذكاء الاصطناعي)') }}</span>
+                    </label>
+                </div>
+
+                <div style="grid-column: 1 / -1;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
+                        🔑 {{ __('OpenAI API Secret Key (مفتاح API الخاص بـ OpenAI)') }} *
+                    </label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="password" id="openai-api-key-input" name="api_key" value="{{ $aiSettings['api_key'] ?? '' }}" placeholder="sk-proj-..." class="form-input" style="flex: 1; font-family: monospace; font-size: 13px;">
+                        <button type="button" onclick="toggleApiKeyVisibility()" class="tactile-btn" style="padding: 0 14px; font-size: 13px;" title="{{ __('Toggle Visibility') }}">
+                            <span id="api-eye-icon">👁️</span>
+                        </button>
+                        <button type="button" onclick="testOpenAiConnection()" id="btn-test-ai" class="tactile-btn" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 0 16px; font-size: 12px; white-space: nowrap;">
+                            ⚡ {{ __('Test Connection (اختبار الاتصال)') }}
+                        </button>
+                    </div>
+                    <div id="ai-test-feedback" style="display: none; margin-top: 8px; font-size: 12px; font-weight: 700; border-radius: 8px; padding: 8px 12px;"></div>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
+                        🖼️ {{ __('Image Generation Model (نموذج توليد الصور)') }}
+                    </label>
+                    <select name="model" class="form-input" style="width: 100%;">
+                        <option value="dall-e-3" {{ ($aiSettings['model'] ?? 'dall-e-3') === 'dall-e-3' ? 'selected' : '' }}>
+                            DALL-E 3 (Recommended: Ultra-detailed 3D Isometric Art)
+                        </option>
+                        <option value="dall-e-2" {{ ($aiSettings['model'] ?? '') === 'dall-e-2' ? 'selected' : '' }}>
+                            DALL-E 2 (Legacy Fast)
+                        </option>
+                    </select>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
+                        📐 {{ __('Floorplan Image Aspect Ratio & Size (أبعاد المخطط)') }}
+                    </label>
+                    <select name="image_size" class="form-input" style="width: 100%;">
+                        <option value="1792x1024" {{ ($aiSettings['image_size'] ?? '1792x1024') === '1792x1024' ? 'selected' : '' }}>
+                            1792 × 1024 (Widescreen 16:9 - Perfect for Virtual Offices)
+                        </option>
+                        <option value="1024x1024" {{ ($aiSettings['image_size'] ?? '') === '1024x1024' ? 'selected' : '' }}>
+                            1024 × 1024 (Square 1:1)
+                        </option>
+                    </select>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
+                        💎 {{ __('Image Render Quality (جودة المعالجة)') }}
+                    </label>
+                    <select name="quality" class="form-input" style="width: 100%;">
+                        <option value="standard" {{ ($aiSettings['quality'] ?? 'standard') === 'standard' ? 'selected' : '' }}>
+                            Standard (Fast & Cost Effective)
+                        </option>
+                        <option value="hd" {{ ($aiSettings['quality'] ?? '') === 'hd' ? 'selected' : '' }}>
+                            HD (High Definition Hyper-Realistic Textures)
+                        </option>
+                    </select>
+                </div>
+
+                <div style="grid-column: 1 / -1;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
+                        📝 {{ __('System Prompt Prefix & Directives (تعليمات التوليد المعماري)') }}
+                    </label>
+                    <textarea name="prompt_prefix" rows="3" class="form-input" style="width: 100%; font-size: 12px;">{{ $aiSettings['prompt_prefix'] ?? 'A clean, high-angle photorealistic 3D isometric architectural floorplan of a modern virtual workplace office.' }}</textarea>
+                </div>
+            </div>
+
+            <div style="margin-top: 24px; display: flex; justify-content: flex-end;">
+                <button type="submit" class="tactile-btn btn-primary" style="padding: 12px 32px; font-size: 13px;">
+                    💾 {{ __('Save AI Generator Settings (حفظ إعدادات الذكاء الاصطناعي)') }}
+                </button>
+            </div>
+        </div>
+    </form>
 </div>
 
 <script>
+    function toggleApiKeyVisibility() {
+        const inp = document.getElementById('openai-api-key-input');
+        const icon = document.getElementById('api-eye-icon');
+        if (inp.type === 'password') {
+            inp.type = 'text';
+            icon.textContent = '🙈';
+        } else {
+            inp.type = 'password';
+            icon.textContent = '👁️';
+        }
+    }
+
+    async function testOpenAiConnection() {
+        const apiKey = document.getElementById('openai-api-key-input').value.trim();
+        const feedback = document.getElementById('ai-test-feedback');
+        const btn = document.getElementById('btn-test-ai');
+        
+        btn.innerHTML = '<span>⏳</span> Testing...';
+        feedback.style.display = 'none';
+
+        try {
+            const res = await fetch("{{ route('superadmin.settings.ai.test') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ api_key: apiKey })
+            });
+            const data = await res.json();
+            
+            feedback.style.display = 'block';
+            if (data.success) {
+                feedback.style.background = 'rgba(16, 185, 129, 0.15)';
+                feedback.style.color = '#10B981';
+                feedback.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+                feedback.innerHTML = data.message;
+            } else {
+                feedback.style.background = 'rgba(217, 107, 95, 0.15)';
+                feedback.style.color = '#D96B5F';
+                feedback.style.border = '1px solid rgba(217, 107, 95, 0.3)';
+                feedback.innerHTML = '⚠️ ' + data.message;
+            }
+        } catch (e) {
+            feedback.style.display = 'block';
+            feedback.style.background = 'rgba(217, 107, 95, 0.15)';
+            feedback.style.color = '#D96B5F';
+            feedback.style.border = '1px solid rgba(217, 107, 95, 0.3)';
+            feedback.innerHTML = '⚠️ Network error testing connection: ' + e.message;
+        } finally {
+            btn.innerHTML = '⚡ {{ __("Test Connection (اختبار الاتصال)") }}';
+        }
+    }
     function addBankAccountRow() {
         const container = document.getElementById('bank-accounts-container');
         const count = container.children.length + 1;

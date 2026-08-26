@@ -2979,7 +2979,10 @@
                     <h1 class="page-title" style="font-size: 22px; font-weight: 900; color: var(--text-primary); margin-bottom: 4px;">🚪 {{ __('Meeting Rooms & Doors') }}</h1>
                     <p class="page-subtitle" style="font-size: 13px; color: var(--text-secondary);">{{ __('Configure private offices, conference rooms, and door lock states.') }}</p>
                 </div>
-                <div style="display: flex; gap: 10px;">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <a href="{{ route('editor') }}" class="tactile-btn" style="background: linear-gradient(135deg, #10B981, #059669); color: white; padding: 10px 18px; font-size: 13px; text-decoration: none; font-weight: 800; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);">
+                        <span>✨</span> {{ __('AI Office Generator (توليد ذكي)') }}
+                    </a>
                     <a href="{{ route('editor') }}" class="tactile-btn btn-primary" style="padding: 10px 18px; font-size: 13px; text-decoration: none;">
                         <span>🎨</span> {{ __('Launch Floor Editor') }}
                     </a>

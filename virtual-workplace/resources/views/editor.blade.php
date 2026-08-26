@@ -709,6 +709,12 @@
 
         <!-- Right: Actions Group -->
         <div class="header-right">
+            <!-- ✨ AI Office & Blueprint Generator Button -->
+            <button type="button" onclick="openAiGeneratorModal()" class="act-btn" style="background: linear-gradient(135deg, #10B981, #059669); color: white; border: 1px solid rgba(52, 211, 153, 0.4); display: flex; align-items: center; gap: 6px; font-weight: 800; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);" title="{{ __('Generate 3D Isometric Office Floorplan & Rooms with AI') }}">
+                <span>✨</span>
+                <span>{{ __('AI Office Generator (توليد بالذكاء الاصطناعي)') }}</span>
+            </button>
+
             <input type="file" id="floorplan-file-input" accept="image/jpeg,image/png,image/webp,image/jpg" style="display:none;" onchange="handleFloorplanUpload(this)">
 
             <!-- Floorplan Dropdown Menu -->
@@ -2049,8 +2055,397 @@
             setTimeout(() => { t.style.display = 'none'; }, 3200);
         }
 
+        // ── AI Workplace Generator Logic ──
+        const PLAN_ROOM_LIMIT = {{ $plan && $plan->room_limit > 0 ? $plan->room_limit : 9999 }};
+        const PLAN_SEAT_LIMIT = {{ $plan && $plan->seat_limit > 0 ? $plan->seat_limit : 9999 }};
+
+        function openAiGeneratorModal() {
+            calculateAiQuotas();
+            document.getElementById('ai-generator-modal').style.display = 'flex';
+        }
+
+        function closeAiGeneratorModal() {
+            document.getElementById('ai-generator-modal').style.display = 'none';
+        }
+
+        function selectAiStyle(styleKey) {
+            document.querySelectorAll('.ai-style-card').forEach(el => {
+                el.classList.remove('active');
+                el.style.borderColor = 'var(--border-card)';
+                el.style.background = 'var(--bg-surface)';
+            });
+            const sel = document.getElementById('ai-style-' + styleKey);
+            if (sel) {
+                sel.classList.add('active');
+                sel.style.borderColor = 'var(--brand-primary)';
+                sel.style.background = 'rgba(16, 185, 129, 0.1)';
+            }
+            const radio = document.querySelector(`input[name="ai_style"][value="${styleKey}"]`);
+            if (radio) radio.checked = true;
+        }
+
+        function changeAiCounter(fieldId, delta, minVal, maxVal) {
+            const inp = document.getElementById(fieldId);
+            if (!inp) return;
+            let val = parseInt(inp.value) || 0;
+            val = Math.max(minVal, Math.min(maxVal, val + delta));
+            inp.value = val;
+            calculateAiQuotas();
+        }
+
+        function calculateAiQuotas() {
+            const meeting = parseInt(document.getElementById('ai-inp-meeting').value) || 0;
+            const office = parseInt(document.getElementById('ai-inp-office').value) || 0;
+            const desks = parseInt(document.getElementById('ai-inp-desks').value) || 4;
+            const thinking = parseInt(document.getElementById('ai-inp-thinking').value) || 0;
+            const rest = parseInt(document.getElementById('ai-inp-rest').value) || 0;
+            const theater = parseInt(document.getElementById('ai-inp-theater').value) || 0;
+
+            const totalRooms = meeting + office + thinking + rest + theater + 2; // + Coffee & Reception
+            const totalSeats = (office * desks) + (meeting * 6) + (thinking * 4) + (rest * 6) + (theater * 16) + 4;
+
+            const roomBadge = document.getElementById('ai-quota-rooms-val');
+            const seatBadge = document.getElementById('ai-quota-seats-val');
+            const quotaWarning = document.getElementById('ai-quota-warning-box');
+            const generateBtn = document.getElementById('btn-ai-submit-generate');
+
+            if (roomBadge) {
+                roomBadge.textContent = `${totalRooms} / ${PLAN_ROOM_LIMIT < 9999 ? PLAN_ROOM_LIMIT : '∞'}`;
+                roomBadge.style.color = (PLAN_ROOM_LIMIT < 9999 && totalRooms > PLAN_ROOM_LIMIT) ? '#EF4444' : '#10B981';
+            }
+
+            if (seatBadge) {
+                seatBadge.textContent = `${totalSeats} / ${PLAN_SEAT_LIMIT < 9999 ? PLAN_SEAT_LIMIT : '∞'}`;
+                seatBadge.style.color = (PLAN_SEAT_LIMIT < 9999 && totalSeats > PLAN_SEAT_LIMIT) ? '#EF4444' : '#3B82F6';
+            }
+
+            let hasError = false;
+            let errorMsg = '';
+
+            if (PLAN_ROOM_LIMIT < 9999 && totalRooms > PLAN_ROOM_LIMIT) {
+                hasError = true;
+                errorMsg = `{{ __('Total rooms (:total) exceed your plan limit (:limit). Please reduce room count or upgrade plan.', ['total' => '']) }}`.replace(':total', totalRooms).replace(':limit', PLAN_ROOM_LIMIT);
+            } else if (PLAN_SEAT_LIMIT < 9999 && totalSeats > PLAN_SEAT_LIMIT) {
+                hasError = true;
+                errorMsg = `{{ __('Total proposed seating (:total) exceeds your subscription capacity (:limit seats). Please adjust desk counts.', ['total' => '']) }}`.replace(':total', totalSeats).replace(':limit', PLAN_SEAT_LIMIT);
+            }
+
+            if (quotaWarning) {
+                if (hasError) {
+                    quotaWarning.style.display = 'block';
+                    quotaWarning.innerHTML = `⚠️ ${errorMsg}`;
+                    generateBtn.disabled = true;
+                    generateBtn.style.opacity = '0.5';
+                    generateBtn.style.cursor = 'not-allowed';
+                } else {
+                    quotaWarning.style.display = 'none';
+                    generateBtn.disabled = false;
+                    generateBtn.style.opacity = '1';
+                    generateBtn.style.cursor = 'pointer';
+                }
+            }
+        }
+
+        async function generateAiOfficeOnCanvas() {
+            const styleRadio = document.querySelector('input[name="ai_style"]:checked');
+            const styleKey = styleRadio ? styleRadio.value : 'modern_glass_luxury';
+            const meeting = parseInt(document.getElementById('ai-inp-meeting').value) || 1;
+            const office = parseInt(document.getElementById('ai-inp-office').value) || 2;
+            const desks = parseInt(document.getElementById('ai-inp-desks').value) || 4;
+            const thinking = parseInt(document.getElementById('ai-inp-thinking').value) || 1;
+            const rest = parseInt(document.getElementById('ai-inp-rest').value) || 1;
+            const theater = parseInt(document.getElementById('ai-inp-theater').value) || 0;
+
+            const modalContent = document.getElementById('ai-modal-form-content');
+            const loadingBox = document.getElementById('ai-modal-loading-box');
+            const statusStep = document.getElementById('ai-loading-step-text');
+
+            modalContent.style.display = 'none';
+            loadingBox.style.display = 'flex';
+
+            const steps = [
+                '🧠 {{ __("Analyzing room requirements & architectural parameters...") }}',
+                '🎨 {{ __("Calling OpenAI DALL-E 3 to generate 3D isometric blueprint...") }}',
+                '📐 {{ __("Computing geometric spatial partitions & room isolation boundaries...") }}',
+                '🚀 {{ __("Mapping isolated rooms, collision zones, and canvas layout...") }}'
+            ];
+
+            let stepIdx = 0;
+            statusStep.textContent = steps[stepIdx];
+            const interval = setInterval(() => {
+                stepIdx = (stepIdx + 1) % steps.length;
+                statusStep.textContent = steps[stepIdx];
+            }, 3500);
+
+            try {
+                const res = await fetch('/organization/ai-map/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': CSRF_TOKEN
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({
+                        target_floor_id: '{{ $floor->id }}',
+                        style: styleKey,
+                        meeting_rooms: meeting,
+                        office_rooms: office,
+                        desks_per_office: desks,
+                        thinking_rooms: thinking,
+                        rest_areas: rest,
+                        theaters: theater
+                    })
+                });
+
+                clearInterval(interval);
+
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    throw new Error(data.message || 'AI Generation failed.');
+                }
+
+                // Apply new background image
+                if (data.background_image_url) {
+                    MAP_DATA.layout_data = MAP_DATA.layout_data || {};
+                    MAP_DATA.layout_data.background_image_url = data.background_image_url;
+                    BLUEPRINT_IMAGE.src = data.background_image_url + (data.background_image_url.includes('?') ? '&' : '?') + 'v=' + Date.now();
+                }
+
+                // Update rooms array
+                if (data.rooms && Array.isArray(data.rooms)) {
+                    rooms.length = 0;
+                    data.rooms.forEach(r => {
+                        rooms.push({
+                            id: r.id,
+                            name: r.name,
+                            type: r.type,
+                            access_mode: r.access_mode || 'public',
+                            capacity: r.capacity || 10,
+                            color: r.color || '#10B981',
+                            bounds: r.bounds,
+                            metadata: r.metadata || {}
+                        });
+                    });
+                }
+
+                selectedItem = null;
+                updateInspector();
+                hideFloatingActions();
+                draw();
+
+                closeAiGeneratorModal();
+                modalContent.style.display = 'block';
+                loadingBox.style.display = 'none';
+
+                showToast('✨ ' + (data.message || 'AI Virtual Office & Isolated Rooms generated successfully!'));
+            } catch (err) {
+                clearInterval(interval);
+                modalContent.style.display = 'block';
+                loadingBox.style.display = 'none';
+                alert('⚠️ ' + (err.message || 'An error occurred during AI generation.'));
+            }
+        }
+
         // Initial draw
         draw();
     </script>
+
+    <!-- ── AI Office & Floorplan Generator Modal ── -->
+    <div id="ai-generator-modal" style="display: none; position: fixed; inset: 0; background: rgba(6, 13, 9, 0.85); backdrop-filter: blur(14px); z-index: 99999; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: var(--bg-dock); border: 1px solid var(--border-card); border-radius: var(--radius-xl); width: 100%; max-width: 820px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-modal); display: flex; flex-direction: column;">
+            
+            <!-- Modal Header -->
+            <div style="padding: 22px 26px; border-bottom: 1px solid var(--border-card); display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #10B981, #059669); color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);">
+                        ✨
+                    </div>
+                    <div>
+                        <h2 style="font-size: 17px; font-weight: 900; color: var(--text-main); margin-bottom: 2px;">
+                            {{ __('AI Virtual Office & Blueprint Generator') }}
+                        </h2>
+                        <p style="font-size: 12px; color: var(--text-dim);">
+                            {{ __('Generate bespoke 3D isometric floorplans using OpenAI DALL-E 3 with automatic room isolation.') }}
+                        </p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeAiGeneratorModal()" style="background: none; border: none; color: var(--text-dim); font-size: 22px; cursor: pointer; padding: 4px;">✕</button>
+            </div>
+
+            <!-- Loading State Overlay -->
+            <div id="ai-modal-loading-box" style="display: none; flex-direction: column; align-items: center; justify-content: center; padding: 60px 30px; text-align: center; gap: 18px;">
+                <div style="width: 64px; height: 64px; border: 4px solid rgba(16, 185, 129, 0.2); border-top-color: #10B981; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <h3 style="font-size: 18px; font-weight: 900; color: var(--text-main);">
+                    ✨ {{ __('Generating 3D Isometric Office Blueprint...') }}
+                </h3>
+                <div id="ai-loading-step-text" style="font-size: 13px; color: #34D399; font-weight: 700; max-width: 480px;">
+                    🧠 {{ __('Analyzing room requirements & architectural parameters...') }}
+                </div>
+                <p style="font-size: 11px; color: var(--text-dim); max-width: 420px;">
+                    {{ __('DALL-E 3 creates high-definition architectural renders. This process usually takes between 15 to 30 seconds.') }}
+                </p>
+            </div>
+
+            <!-- Form Content -->
+            <div id="ai-modal-form-content" style="padding: 24px 26px; display: flex; flex-direction: column; gap: 20px;">
+                
+                <!-- Plan Quota Header Pill Card -->
+                <div style="background: var(--bg-surface); border: 1px solid var(--border-card); border-radius: var(--radius-lg); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                    <div>
+                        <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-dim); display: block;">{{ __('Active Subscription Tier') }}</span>
+                        <strong style="font-size: 14px; color: var(--brand-forest);">⭐ {{ $plan->name ?? 'Standard Plan' }}</strong>
+                    </div>
+                    <div style="display: flex; gap: 16px; align-items: center;">
+                        <div style="text-align: center;">
+                            <span style="font-size: 10px; color: var(--text-dim); display: block;">🏢 {{ __('Total Rooms') }}</span>
+                            <span id="ai-quota-rooms-val" style="font-size: 14px; font-weight: 900; color: #10B981;">0 / ∞</span>
+                        </div>
+                        <div style="width: 1px; height: 26px; background: var(--border-card);"></div>
+                        <div style="text-align: center;">
+                            <span style="font-size: 10px; color: var(--text-dim); display: block;">👥 {{ __('Total Seating') }}</span>
+                            <span id="ai-quota-seats-val" style="font-size: 14px; font-weight: 900; color: #3B82F6;">0 / ∞</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 1. Architectural Style Selection -->
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-main); margin-bottom: 10px;">
+                        🎨 {{ __('1. Choose Office Architectural Style (نمط المكتب المعماري)') }}
+                    </label>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
+                        @foreach($aiStyles as $key => $style)
+                        <div class="ai-style-card {{ $loop->first ? 'active' : '' }}" id="ai-style-{{ $key }}" onclick="selectAiStyle('{{ $key }}')" style="background: {{ $loop->first ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-surface)' }}; border: 1px solid {{ $loop->first ? 'var(--brand-primary)' : 'var(--border-card)' }}; border-radius: var(--radius-md); padding: 12px; cursor: pointer; transition: all 0.2s ease;">
+                            <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer;">
+                                <input type="radio" name="ai_style" value="{{ $key }}" {{ $loop->first ? 'checked' : '' }} style="margin-top: 3px; accent-color: var(--brand-forest);">
+                                <div>
+                                    <strong style="font-size: 12px; color: var(--text-main); display: block;">{{ $style['name'] }}</strong>
+                                    <span style="font-size: 10px; color: var(--text-dim); line-height: 1.3; display: block; margin-top: 2px;">{{ $style['name_ar'] }}</span>
+                                </div>
+                            </label>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- 2. Room Breakdown & Desks Steppers -->
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-main); margin-bottom: 10px;">
+                        🏢 {{ __('2. Customize Room Quantities & Desk Counts (تخصيص الغرف والمكاتب)') }}
+                    </label>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px;">
+                        
+                        <!-- Meeting Rooms -->
+                        <div style="background: var(--bg-surface); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <div>
+                                    <strong style="font-size: 12px; color: #8B5CF6; display: block;">🏢 {{ __('Meeting Boardrooms') }}</strong>
+                                    <span style="font-size: 10px; color: var(--text-dim);">{{ __('غرف اجتماعات زجاجية') }}</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <button type="button" onclick="changeAiCounter('ai-inp-meeting', -1, 0, 6)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">-</button>
+                                    <input type="text" id="ai-inp-meeting" value="1" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--text-main); font-size: 13px;">
+                                    <button type="button" onclick="changeAiCounter('ai-inp-meeting', 1, 0, 6)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Team Offices & Desks -->
+                        <div style="background: var(--bg-surface); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <div>
+                                    <strong style="font-size: 12px; color: #3B82F6; display: block;">💼 {{ __('Team Offices') }}</strong>
+                                    <span style="font-size: 10px; color: var(--text-dim);">{{ __('مكاتب عمل جماعية/فردية') }}</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <button type="button" onclick="changeAiCounter('ai-inp-office', -1, 1, 8)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">-</button>
+                                    <input type="text" id="ai-inp-office" value="2" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--text-main); font-size: 13px;">
+                                    <button type="button" onclick="changeAiCounter('ai-inp-office', 1, 1, 8)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">+</button>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-card); padding-top: 6px; margin-top: 4px;">
+                                <span style="font-size: 10px; color: var(--text-dim);">🖥️ {{ __('Desks per office') }}:</span>
+                                <div style="display: flex; align-items: center; gap: 4px;">
+                                    <button type="button" onclick="changeAiCounter('ai-inp-desks', -1, 1, 12)" class="tactile-btn" style="width: 22px; height: 22px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 10px;">-</button>
+                                    <input type="text" id="ai-inp-desks" value="4" readonly style="width: 24px; text-align: center; background: none; border: none; font-weight: 800; color: var(--text-main); font-size: 11px;">
+                                    <button type="button" onclick="changeAiCounter('ai-inp-desks', 1, 1, 12)" class="tactile-btn" style="width: 22px; height: 22px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 10px;">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Thinking & Focus Pods -->
+                        <div style="background: var(--bg-surface); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <strong style="font-size: 12px; color: #06B6D4; display: block;">💡 {{ __('Thinking / Focus Pods') }}</strong>
+                                    <span style="font-size: 10px; color: var(--text-dim);">{{ __('غرف التركيز والعصف الذهني') }}</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <button type="button" onclick="changeAiCounter('ai-inp-thinking', -1, 0, 4)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">-</button>
+                                    <input type="text" id="ai-inp-thinking" value="1" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--text-main); font-size: 13px;">
+                                    <button type="button" onclick="changeAiCounter('ai-inp-thinking', 1, 0, 4)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rest & Gaming Lounge -->
+                        <div style="background: var(--bg-surface); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <strong style="font-size: 12px; color: #EC4899; display: block;">🛋️ {{ __('Rest & Gaming Lounge') }}</strong>
+                                    <span style="font-size: 10px; color: var(--text-dim);">{{ __('صالة الاستراحة والترفيه') }}</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <button type="button" onclick="changeAiCounter('ai-inp-rest', -1, 0, 3)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">-</button>
+                                    <input type="text" id="ai-inp-rest" value="1" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--text-main); font-size: 13px;">
+                                    <button type="button" onclick="changeAiCounter('ai-inp-rest', 1, 0, 3)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Presentation Theater / Auditorium -->
+                        <div style="background: var(--bg-surface); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 12px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <strong style="font-size: 12px; color: #E11D48; display: block;">🎭 {{ __('Presentation Theater') }}</strong>
+                                    <span style="font-size: 10px; color: var(--text-dim);">{{ __('مسرح وقاعة عروض ومؤتمرات') }}</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <button type="button" onclick="changeAiCounter('ai-inp-theater', -1, 0, 2)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">-</button>
+                                    <input type="text" id="ai-inp-theater" value="0" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--text-main); font-size: 13px;">
+                                    <button type="button" onclick="changeAiCounter('ai-inp-theater', 1, 0, 2)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Default Amenities Card -->
+                        <div style="background: rgba(16, 185, 129, 0.08); border: 1px dashed rgba(52, 211, 153, 0.35); border-radius: var(--radius-md); padding: 12px; display: flex; flex-direction: column; justify-content: center;">
+                            <strong style="font-size: 11px; color: #34D399; display: flex; align-items: center; gap: 6px;">
+                                <span>☕</span> {{ __('Coffee Corner & Reception') }}
+                            </strong>
+                            <span style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">
+                                ✓ {{ __('Always included automatically in every floorplan') }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Quota Warning Box -->
+                <div id="ai-quota-warning-box" style="display: none; background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); border-radius: 10px; padding: 12px 16px; font-size: 12px; color: #D96B5F; font-weight: 700;"></div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border-card);">
+                    <button type="button" onclick="closeAiGeneratorModal()" class="tactile-btn" style="padding: 10px 20px; font-size: 13px;">
+                        {{ __('Cancel') }}
+                    </button>
+                    <button type="button" onclick="generateAiOfficeOnCanvas()" id="btn-ai-submit-generate" class="tactile-btn btn-primary" style="padding: 12px 28px; font-size: 14px; font-weight: 900; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);">
+                        <span>✨</span> {{ __('Generate Office with AI (توليد الخريطة بالذكاء الاصطناعي)') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

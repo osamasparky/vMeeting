@@ -53,6 +53,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/offices', [WebAuthController::class, 'storeOffice'])->name('offices.store');
     Route::put('/offices/{floor}', [WebAuthController::class, 'updateOffice'])->name('offices.update');
     Route::delete('/offices/{floor}', [WebAuthController::class, 'deleteOffice'])->name('offices.delete');
+    Route::post('/organization/ai-map/generate', [WebAuthController::class, 'generateAiOffice'])->name('organization.ai_map.generate');
 
     // Departments & Teams Management
     Route::post('/departments', [WebAuthController::class, 'storeDepartment'])->name('departments.store');
@@ -166,6 +167,8 @@ Route::prefix('superadmin')->middleware(['auth', 'superadmin'])->name('superadmi
     Route::get('/settings', [\App\Http\Controllers\SuperAdminController::class, 'settings'])->name('settings');
     Route::post('/settings', [\App\Http\Controllers\SuperAdminController::class, 'updateSettings'])->name('settings.update');
     Route::post('/settings/payment', [\App\Http\Controllers\SuperAdminController::class, 'updatePaymentSettings'])->name('settings.payment');
+    Route::post('/settings/ai', [\App\Http\Controllers\SuperAdminController::class, 'updateAiSettings'])->name('settings.ai');
+    Route::post('/settings/ai/test', [\App\Http\Controllers\SuperAdminController::class, 'testAiConnection'])->name('settings.ai.test');
     Route::post('/settings/default-blueprint', [\App\Http\Controllers\SuperAdminController::class, 'uploadDefaultBlueprint'])->name('settings.blueprint');
 
     // System Translations & Localization Manager

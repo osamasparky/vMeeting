@@ -744,6 +744,81 @@ class WebAuthController extends Controller
     }
 
     /**
+     * Generate an AI-powered Office Blueprint & Spatial Rooms layout.
+     */
+    public function generateAiOffice(Request $request, \App\Domains\Workspace\Services\AiMapGeneratorService $aiMapService)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->with(['organization.plan', 'role.permissions'])->first();
+        if (!$membership) abort(403);
+
+        if (!$membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin' && !$user->isSuperAdmin()) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => __('Unauthorized: only organization admins can generate workplace blueprints.')], 403);
+            }
+            abort(403, 'Unauthorized.');
+        }
+
+        $organization = $membership->organization;
+
+        $validated = $request->validate([
+            'style' => ['nullable', 'string', 'in:modern_glass_luxury,scandinavian_minimalist,silicon_valley_tech,executive_corporate,warm_wood_botanical,cyberpunk_neon'],
+            'meeting_rooms' => ['nullable', 'integer', 'min:0', 'max:8'],
+            'office_rooms' => ['nullable', 'integer', 'min:1', 'max:10'],
+            'desks_per_office' => ['nullable', 'integer', 'min:1', 'max:20'],
+            'thinking_rooms' => ['nullable', 'integer', 'min:0', 'max:6'],
+            'rest_areas' => ['nullable', 'integer', 'min:0', 'max:4'],
+            'theaters' => ['nullable', 'integer', 'min:0', 'max:2'],
+            'floor_name' => ['nullable', 'string', 'max:100'],
+            'target_floor_id' => ['nullable', 'string'],
+        ]);
+
+        try {
+            $result = $aiMapService->generate($organization, $validated, $user);
+
+            \App\Domains\Administration\Models\AuditLog::create([
+                'organization_id' => $organization->id,
+                'actor_id' => $user->id,
+                'action' => 'map.ai_generated',
+                'metadata' => [
+                    'floor_id' => $result['floor']->id ?? null,
+                    'map_id' => $result['map']->id ?? null,
+                    'style' => $validated['style'] ?? 'modern_glass_luxury',
+                    'rooms_count' => $result['rooms_count'] ?? 0,
+                    'is_mock' => $result['is_mock'] ?? false,
+                ],
+            ]);
+
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => $result['message'],
+                    'floor' => $result['floor'],
+                    'map' => $result['map'],
+                    'background_image_url' => $result['background_image_url'],
+                    'rooms' => $result['map']->rooms ?? [],
+                    'is_mock' => $result['is_mock'] ?? false,
+                ]);
+            }
+
+            return redirect()->route('editor', ['office' => $result['floor']->id])
+                ->with('success', $result['message']);
+        } catch (\Illuminate\Validation\ValidationException $ve) {
+            $errors = $ve->errors();
+            $firstErr = reset($errors)[0] ?? __('Validation error.');
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => $firstErr], 422);
+            }
+            return back()->with('error', $firstErr);
+        } catch (\Throwable $e) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            }
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
      * Create a new Office branch for the organization.
      */
     public function storeOffice(Request $request)
@@ -947,7 +1022,10 @@ class WebAuthController extends Controller
             return \App\Domains\Workspace\Models\FurnitureItem::where('is_active', true)->get();
         });
 
-        return view('editor', compact('user', 'organization', 'floor', 'floors', 'map', 'furnitureCategories', 'furnitureItems'));
+        $plan = $organization->plan;
+        $aiStyles = (new \App\Domains\Workspace\Services\AiMapGeneratorService())->getStyles();
+
+        return view('editor', compact('user', 'organization', 'floor', 'floors', 'map', 'furnitureCategories', 'furnitureItems', 'plan', 'aiStyles'));
     }
 
     /**

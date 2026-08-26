@@ -649,7 +649,67 @@ class SuperAdminController extends Controller
             'stun_server' => 'stun:173.212.248.192:3478',
         ]);
 
-        return view('superadmin.settings', compact('user', 'plans', 'paymentSettings', 'globalSettings'));
+        $aiSettings = \App\Domains\Administration\Models\SystemSetting::get('openai_settings', [
+            'api_key' => env('OPENAI_API_KEY', ''),
+            'model' => 'dall-e-3',
+            'image_size' => '1792x1024',
+            'quality' => 'standard',
+            'prompt_prefix' => 'A clean, high-angle photorealistic 3D isometric architectural floorplan of a modern virtual workplace office.',
+            'is_enabled' => true,
+        ]);
+
+        return view('superadmin.settings', compact('user', 'plans', 'paymentSettings', 'globalSettings', 'aiSettings'));
+    }
+
+    /**
+     * Update OpenAI & AI Workplace Generator Settings.
+     */
+    public function updateAiSettings(Request $request)
+    {
+        $aiSettings = [
+            'api_key' => trim($request->input('api_key', '')),
+            'model' => $request->input('model', 'dall-e-3'),
+            'image_size' => $request->input('image_size', '1792x1024'),
+            'quality' => $request->input('quality', 'standard'),
+            'prompt_prefix' => trim($request->input('prompt_prefix', 'A clean, high-angle photorealistic 3D isometric architectural floorplan of a modern virtual workplace office.')),
+            'is_enabled' => $request->has('is_enabled'),
+        ];
+
+        \App\Domains\Administration\Models\SystemSetting::set('openai_settings', $aiSettings);
+
+        return back()->with('success', __('AI Office Generator & OpenAI settings saved successfully.'));
+    }
+
+    /**
+     * Test OpenAI API connectivity.
+     */
+    public function testAiConnection(Request $request)
+    {
+        $apiKey = trim($request->input('api_key', ''));
+        if (empty($apiKey)) {
+            $aiSettings = \App\Domains\Administration\Models\SystemSetting::get('openai_settings', []);
+            $apiKey = $aiSettings['api_key'] ?? env('OPENAI_API_KEY', '');
+        }
+
+        if (empty($apiKey)) {
+            return response()->json(['success' => false, 'message' => __('OpenAI API key is missing. Please enter an API key.')], 422);
+        }
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::withToken($apiKey)
+                ->timeout(15)
+                ->get('https://api.openai.com/v1/models');
+
+            if ($response->successful()) {
+                return response()->json(['success' => true, 'message' => __('✅ Connection to OpenAI API successful! Account is active and authenticated.')]);
+            } else {
+                $err = $response->json();
+                $errMsg = $err['error']['message'] ?? $response->body();
+                return response()->json(['success' => false, 'message' => 'OpenAI Error: ' . $errMsg], 400);
+            }
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false, 'message' => 'Network error connecting to OpenAI: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
