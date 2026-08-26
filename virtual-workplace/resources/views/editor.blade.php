@@ -2101,8 +2101,10 @@
             const rest = parseInt(document.getElementById('ai-inp-rest').value) || 0;
             const theater = parseInt(document.getElementById('ai-inp-theater').value) || 0;
 
-            const totalRooms = meeting + office + thinking + rest + theater + 2; // + Coffee & Reception
-            const totalSeats = (office * desks) + (meeting * 6) + (thinking * 4) + (rest * 6) + (theater * 16) + 4;
+            // Only count actual custom rooms selected by the user
+            const totalRooms = meeting + office + thinking + rest + theater;
+            // Only count team office workstations/desks
+            const totalDesks = (office * desks);
 
             const roomBadge = document.getElementById('ai-quota-rooms-val');
             const seatBadge = document.getElementById('ai-quota-seats-val');
@@ -2115,8 +2117,8 @@
             }
 
             if (seatBadge) {
-                seatBadge.textContent = `${totalSeats} / ${PLAN_SEAT_LIMIT < 9999 ? PLAN_SEAT_LIMIT : '∞'}`;
-                seatBadge.style.color = (PLAN_SEAT_LIMIT < 9999 && totalSeats > PLAN_SEAT_LIMIT) ? '#EF4444' : '#3B82F6';
+                seatBadge.textContent = `${totalDesks} / ${PLAN_SEAT_LIMIT < 9999 ? PLAN_SEAT_LIMIT : '∞'}`;
+                seatBadge.style.color = (PLAN_SEAT_LIMIT < 9999 && totalDesks > PLAN_SEAT_LIMIT) ? '#EF4444' : '#3B82F6';
             }
 
             let hasError = false;
@@ -2124,10 +2126,14 @@
 
             if (PLAN_ROOM_LIMIT < 9999 && totalRooms > PLAN_ROOM_LIMIT) {
                 hasError = true;
-                errorMsg = `{{ __('Total rooms (:total) exceed your plan limit (:limit). Please reduce room count or upgrade plan.', ['total' => '']) }}`.replace(':total', totalRooms).replace(':limit', PLAN_ROOM_LIMIT);
-            } else if (PLAN_SEAT_LIMIT < 9999 && totalSeats > PLAN_SEAT_LIMIT) {
+                errorMsg = `{{ __('Total rooms (:total) exceed your plan limit (:limit). Please reduce room count or upgrade plan.', ['total' => '__TOTAL__', 'limit' => '__LIMIT__']) }}`
+                    .replace('__TOTAL__', totalRooms)
+                    .replace('__LIMIT__', PLAN_ROOM_LIMIT);
+            } else if (PLAN_SEAT_LIMIT < 9999 && totalDesks > PLAN_SEAT_LIMIT) {
                 hasError = true;
-                errorMsg = `{{ __('Total proposed seating (:total) exceeds your subscription capacity (:limit seats). Please adjust desk counts.', ['total' => '']) }}`.replace(':total', totalSeats).replace(':limit', PLAN_SEAT_LIMIT);
+                errorMsg = `{{ __('Total office desks (:total) exceed your subscription capacity (:limit seats). Please reduce desk count or offices.', ['total' => '__TOTAL__', 'limit' => '__LIMIT__']) }}`
+                    .replace('__TOTAL__', totalDesks)
+                    .replace('__LIMIT__', PLAN_SEAT_LIMIT);
             }
 
             if (quotaWarning) {
@@ -2303,7 +2309,7 @@
                         </div>
                         <div style="width: 1px; height: 26px; background: var(--border-card);"></div>
                         <div style="text-align: center;">
-                            <span style="font-size: 10px; color: var(--text-dim); display: block;">👥 {{ __('Total Seating') }}</span>
+                            <span style="font-size: 10px; color: var(--text-dim); display: block;">🖥️ {{ __('Total Workstations / Desks (إجمالي المكاتب)') }}</span>
                             <span id="ai-quota-seats-val" style="font-size: 14px; font-weight: 900; color: #3B82F6;">0 / ∞</span>
                         </div>
                     </div>

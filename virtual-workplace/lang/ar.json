@@ -1059,5 +1059,9 @@
     "AI Workplace & Floorplan Blueprint generated successfully via OpenAI DALL-E 3!": "تم توليد مخطط ومساحات المكتب الافتراضي بنجاح عبر OpenAI DALL-E 3!",
     "AI Blueprint layout created using default visual studio (OpenAI API key not configured or rate-limited).": "تم إنشاء مساحات وتخطيط المكتب الافتراضي بنجاح عبر المحرك الهندسي الذكي.",
     "Total proposed seating (:total) exceeds your subscription capacity (:limit seats). Please adjust desk counts.": "إجمالي عدد المقاعد المقترح (:total) يتجاوز الحد المسموح به في باقتك (:limit مقعد). يرجى تقليل عدد المكاتب.",
-    "Total rooms (:total) exceed your plan limit (:limit). Please reduce room count or upgrade plan.": "إجمالي عدد الغرف المطلوبة (:total) يتجاوز الحد المسموح به في باقتك (:limit غرفة). يرجى تقليل عدد الغرف أو ترقية الباقة."
+    "Total rooms (:total) exceed your plan limit (:limit). Please reduce room count or upgrade plan.": "إجمالي عدد الغرف المطلوبة (:total) يتجاوز الحد المسموح به في باقتك (:limit غرفة). يرجى تقليل عدد الغرف أو ترقية الباقة.",
+    "Total Workstations / Desks (إجمالي المكاتب)": "إجمالي مكاتب العمل (Desks)",
+    "Total office desks (:total) exceed your subscription capacity (:limit seats). Please reduce desk count or offices.": "إجمالي عدد مكاتب العمل (:total) يتجاوز الحد الأقصى المسموح به في باقتك (:limit مكتب/مقعد). يرجى تقليل عدد المكاتب.",
+    "Your current subscription plan (:plan) allows up to :limit rooms. You selected :total rooms. Please upgrade your plan or reduce room counts.": "باقتك الحالية (:plan) تتيح حتى :limit غرفة. لقد اخترت :total غرفة. يرجى تقليل عدد الغرف أو ترقية الباقة.",
+    "Your current subscription plan (:plan) allows up to :limit members/seats. Your office has :total desks. Please reduce the number of desks or offices.": "باقتك الحالية (:plan) تتيح حتى :limit مقعد/مستخدم. يحتوي مخططك على :total مكتب عمل. يرجى تقليل عدد المكاتب."
 }

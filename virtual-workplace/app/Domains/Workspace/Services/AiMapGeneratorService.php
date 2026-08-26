@@ -81,17 +81,17 @@ class AiMapGeneratorService
         $styleKey = $options['style'] ?? 'modern_glass_luxury';
         $styleConfig = $this->styles[$styleKey] ?? $this->styles['modern_glass_luxury'];
 
-        // Mandatory rooms: Coffee Corner (1) + Reception Lobby (1)
-        $coffeeCount = 1;
-        $receptionCount = 1;
-
-        $totalRooms = $meetingRoomsCount + $officeRoomsCount + $thinkingRoomsCount + $restAreasCount + $theatersCount + $coffeeCount + $receptionCount;
-        $totalDesks = ($officeRoomsCount * $desksPerOffice) + ($meetingRoomsCount * 6) + ($thinkingRoomsCount * 4) + ($restAreasCount * 6) + ($theatersCount * 16) + 4;
+        // Only count actual custom rooms chosen by user against plan room_limit
+        // (Coffee Corner and Reception are free communal areas)
+        $totalRooms = $meetingRoomsCount + $officeRoomsCount + $thinkingRoomsCount + $restAreasCount + $theatersCount;
+        
+        // Only count actual team office desks against plan seat_limit
+        $totalDesks = ($officeRoomsCount * $desksPerOffice);
 
         // 2. Validate against Subscription Plan limits
         if ($plan && $plan->room_limit > 0 && $totalRooms > $plan->room_limit) {
             throw ValidationException::withMessages([
-                'rooms' => __("Your current subscription plan (:plan) allows up to :limit rooms. You requested :total rooms. Please upgrade your plan or reduce room counts.", [
+                'rooms' => __("Your current subscription plan (:plan) allows up to :limit rooms. You selected :total rooms. Please upgrade your plan or reduce room counts.", [
                     'plan' => $plan->name,
                     'limit' => $plan->room_limit,
                     'total' => $totalRooms,
@@ -101,7 +101,7 @@ class AiMapGeneratorService
 
         if ($plan && $plan->seat_limit > 0 && $totalDesks > $plan->seat_limit) {
             throw ValidationException::withMessages([
-                'seats' => __("Your current subscription plan (:plan) allows up to :limit members/seats. Your proposed office capacity is :total seats. Please adjust desk counts.", [
+                'seats' => __("Your current subscription plan (:plan) allows up to :limit members/seats. Your office has :total desks. Please reduce the number of desks or offices.", [
                     'plan' => $plan->name,
                     'limit' => $plan->seat_limit,
                     'total' => $totalDesks,
