@@ -179,12 +179,16 @@ class AiMapGeneratorService
 
                     if (!empty($b64Data)) {
                         $imageBinary = base64_decode($b64Data);
-                        File::put($destinationDir . '/' . $filename, $imageBinary);
+                        $filePath = $destinationDir . '/' . $filename;
+                        File::put($filePath, $imageBinary);
+                        @chmod($filePath, 0777);
                         $imageUrl = '/uploads/maps/' . $filename;
                         break;
                     } elseif (!empty($remoteImageUrl)) {
                         $imageBinary = Http::timeout(60)->get($remoteImageUrl)->body();
-                        File::put($destinationDir . '/' . $filename, $imageBinary);
+                        $filePath = $destinationDir . '/' . $filename;
+                        File::put($filePath, $imageBinary);
+                        @chmod($filePath, 0777);
                         $imageUrl = '/uploads/maps/' . $filename;
                         break;
                     }
