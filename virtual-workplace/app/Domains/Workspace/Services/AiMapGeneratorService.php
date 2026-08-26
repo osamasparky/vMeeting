@@ -109,47 +109,37 @@ class AiMapGeneratorService
             ]);
         }
 
-        // 3. Obtain OpenAI Configuration
-        $aiSettings = SystemSetting::get('openai_settings', [
-            'api_key' => env('OPENAI_API_KEY', ''),
-            'model' => 'dall-e-3',
-            'image_size' => '1792x1024',
-            'quality' => 'standard',
-            'prompt_prefix' => "A clean, photorealistic direct top-down 2D architectural floor plan blueprint of a modern virtual workplace office (straight 90-degree overhead bird's-eye plan view with cutaway interior walls).",
-            'is_enabled' => true,
-        ]);
+        // 3. Obtain OpenAI Configuration (Prioritize Organization-level settings, fallback to Platform SuperAdmin)
+        $orgOpenAi = $organization->settings?->openai_settings ?? [];
+        $platformOpenAi = SystemSetting::get('openai_settings', []);
 
-        $apiKey = !empty($aiSettings['api_key']) ? trim($aiSettings['api_key']) : env('OPENAI_API_KEY', '');
-        $model = $aiSettings['model'] ?? 'dall-e-3';
-        $imageSize = $aiSettings['image_size'] ?? '1792x1024';
-        $quality = $aiSettings['quality'] ?? 'standard';
-        $promptPrefix = $aiSettings['prompt_prefix'] ?? "A clean, photorealistic direct top-down 2D architectural floor plan blueprint of a modern virtual workplace office (straight 90-degree overhead bird's-eye plan view with cutaway interior walls).";
+        $apiKey = !empty($orgOpenAi['api_key']) ? trim($orgOpenAi['api_key']) : (!empty($platformOpenAi['api_key']) ? trim($platformOpenAi['api_key']) : env('OPENAI_API_KEY', ''));
+        $model = !empty($orgOpenAi['model']) ? $orgOpenAi['model'] : ($platformOpenAi['model'] ?? 'gpt-image-1-mini');
+        $imageSize = !empty($orgOpenAi['image_size']) ? $orgOpenAi['image_size'] : ($platformOpenAi['image_size'] ?? '1024x1024');
+        $quality = !empty($orgOpenAi['quality']) ? $orgOpenAi['quality'] : ($platformOpenAi['quality'] ?? 'standard');
 
-        // 4. Construct Highly Detailed & Tailored 2D Architectural Blueprint Prompt
-        $roomSummaryParts = [];
-        $roomSummaryParts[] = "1 Welcome Reception Lobby with reception desk, receptionist chair, and check-in computer";
-        $roomSummaryParts[] = "1 Espresso Coffee Bar & Cafeteria Counter with barstools, high table, and water cooler";
-        if ($meetingRoomsCount > 0) $roomSummaryParts[] = "{$meetingRoomsCount} Executive Meeting Boardroom(s) with central conference table, 8 to 10 executive chairs, acoustic carpet, and wall presentation display";
-        if ($officeRoomsCount > 0) $roomSummaryParts[] = "{$officeRoomsCount} Dedicated Team Workspace Room(s) on warm hardwood flooring, each fitted with {$desksPerOffice} computer workstation desks and ergonomic chairs";
-        if ($thinkingRoomsCount > 0) $roomSummaryParts[] = "{$thinkingRoomsCount} Creative Thinking / Brainstorming Pod(s) with comfortable armchairs, round coffee table, area rug, whiteboard, and bookshelves";
-        if ($restAreasCount > 0) $roomSummaryParts[] = "{$restAreasCount} Relaxation & Gaming Lounge(s) with sofas, coffee table, and beanbag seating";
-        if ($theatersCount > 0) $roomSummaryParts[] = "{$theatersCount} Presentation Theater / Auditorium with elevated stage, large glowing curved presentation screen, and neat rows of auditorium seating";
+        // 4. Construct Ultra-Compact & Token-Optimized 2D Architectural Blueprint Prompt (Massive Token & Cost Reduction)
+        $zones = ["Reception", "Espresso Coffee Bar"];
+        if ($meetingRoomsCount > 0) $zones[] = "{$meetingRoomsCount} Meeting Boardrooms";
+        if ($officeRoomsCount > 0) $zones[] = "{$officeRoomsCount} Workspaces ({$desksPerOffice} workstations each)";
+        if ($thinkingRoomsCount > 0) $zones[] = "{$thinkingRoomsCount} Thinking Pods";
+        if ($restAreasCount > 0) $zones[] = "{$restAreasCount} Breakout Lounges";
+        if ($theatersCount > 0) $zones[] = "{$theatersCount} Presentation Theaters";
+        $zonesText = implode(', ', $zones);
 
-        $roomsText = implode(', ', $roomSummaryParts);
-
-        $prompt = "{$promptPrefix} A complete, full-facility 2D architectural floor plan blueprint layout designed in {$styleConfig['description']}. The floorplan strictly contains the following distinct interior zones separated by clean cutaway walls and open doorways: {$roomsText}. Features polished concrete walkways, warm wood floor pods, soft circular overhead downlights, and potted green botanical plants in room corners. Crisp top-down 90-degree direct overhead bird's-eye architectural drawing, hyper-detailed furniture arrangement, completely empty with no people or human characters.";
+        $prompt = "Top-down 2D architectural blueprint floorplan, {$styleConfig['name']} office style. Empty modern workspace layout with: {$zonesText}. Overhead bird's-eye view, interior cutaway partition walls, open doorways, clean floor textures, desks, meeting tables, lounge seating, indoor potted plants, soft circular overhead lighting. Completely empty, no people.";
 
         // 5. Generate Blueprint Artwork via OpenAI DALL-E / GPT Image Model
         if (empty($apiKey)) {
             throw ValidationException::withMessages([
-                'api_key' => __('OpenAI API key is missing. Please configure an active OpenAI API key in SuperAdmin Settings.'),
+                'api_key' => __('OpenAI API key is missing. Please enter your organization OpenAI API key in Workspace Settings (⚙️ Settings -> OpenAI Settings).'),
             ]);
         }
 
         $imageUrl = null;
         try {
-            // Attempt with configured model or auto-fallback to gpt-image-1 / chatgpt-image-latest
-            $attemptModels = array_unique([$model, 'gpt-image-1', 'chatgpt-image-latest', 'dall-e-3', 'dall-e-2']);
+            // Attempt with configured model or auto-fallback to budget-efficient models
+            $attemptModels = array_unique([$model, 'gpt-image-1-mini', 'gpt-image-1', 'chatgpt-image-latest', 'dall-e-3', 'dall-e-2']);
             $lastErrMsg = null;
 
             foreach ($attemptModels as $currentModel) {

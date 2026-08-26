@@ -305,5 +305,20 @@
     "Total Workstations / Desks (إجمالي المكاتب)": "Total Workstations / Desks (إجمالي المكاتب)",
     "Total office desks (:total) exceed your subscription capacity (:limit seats). Please reduce desk count or offices.": "Total office desks (:total) exceed your subscription capacity (:limit seats). Please reduce desk count or offices.",
     "Your current subscription plan (:plan) allows up to :limit rooms. You selected :total rooms. Please upgrade your plan or reduce room counts.": "Your current subscription plan (:plan) allows up to :limit rooms. You selected :total rooms. Please upgrade your plan or reduce room counts.",
-    "Your current subscription plan (:plan) allows up to :limit members/seats. Your office has :total desks. Please reduce the number of desks or offices.": "Your current subscription plan (:plan) allows up to :limit members/seats. Your office has :total desks. Please reduce the number of desks or offices."
+    "Your current subscription plan (:plan) allows up to :limit members/seats. Your office has :total desks. Please reduce the number of desks or offices.": "Your current subscription plan (:plan) allows up to :limit members/seats. Your office has :total desks. Please reduce the number of desks or offices.",
+    "OpenAI & AI Floorplan Generator Settings": "OpenAI & AI Floorplan Generator Settings",
+    "Add your company OpenAI API key to generate bespoke 2D architectural office blueprints directly from the editor without platform rate limits.": "Add your company OpenAI API key to generate bespoke 2D architectural office blueprints directly from the editor without platform rate limits.",
+    "Token & Cost Optimization Enabled": "Token & Cost Optimization Enabled",
+    "Prompts are ultra-compressed to ~60 tokens. Choosing GPT Image 1 Mini or DALL-E 2 with 1024x1024 reduces your cost to approx $0.015 - $0.02 per generated floorplan.": "Prompts are ultra-compressed to ~60 tokens. Choosing GPT Image 1 Mini or DALL-E 2 with 1024x1024 reduces your cost to approx $0.015 - $0.02 per generated floorplan.",
+    "Company OpenAI Secret Key (sk-...)": "Company OpenAI Secret Key (sk-...)",
+    "Test Key": "Test Key",
+    "Image Generation Model": "Image Generation Model",
+    "Floorplan Dimensions": "Floorplan Dimensions",
+    "Save Workspace & Settings Changes": "Save Workspace & Settings Changes",
+    "Please enter an OpenAI API key first.": "Please enter an OpenAI API key first.",
+    "Testing OpenAI API key connectivity...": "Testing OpenAI API key connectivity...",
+    "✅ Key is valid and active!": "✅ Key is valid and active!",
+    "Connection failed.": "Connection failed.",
+    "Workspace settings, company logo, SMTP email, and OpenAI configuration updated successfully!": "Workspace settings, company logo, SMTP email, and OpenAI configuration updated successfully!",
+    "OpenAI API key is missing. Please enter your organization OpenAI API key in Workspace Settings (⚙️ Settings -> OpenAI Settings).": "OpenAI API key is missing. Please enter your organization OpenAI API key in Workspace Settings (⚙️ Settings -> OpenAI Settings)."
 }

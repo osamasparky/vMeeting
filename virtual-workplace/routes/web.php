@@ -80,11 +80,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/organization/guest-invitations/clear', [WebAuthController::class, 'clearGuestInvitations'])->name('guest_invitations.clear');
     Route::post('/organization/audit-logs/clear', [WebAuthController::class, 'clearAuditLogs'])->name('audit_logs.clear');
 
-    // Scheduled Meetings & SMTP Test Routes
+    // Scheduled Meetings & SMTP / AI Test Routes
     Route::get('/meetings/schedule', fn() => redirect('/dashboard#meetings'))->name('meetings.schedule.get');
     Route::post('/meetings/schedule', [WebAuthController::class, 'storeScheduledMeeting'])->name('meetings.schedule');
     Route::post('/meetings/{meeting}/cancel', [WebAuthController::class, 'cancelMeeting'])->name('meetings.cancel');
     Route::post('/organization/smtp/test', [WebAuthController::class, 'testSmtpConnection'])->name('organization.smtp.test');
+    Route::post('/organization/ai/test', [WebAuthController::class, 'testOrgAiConnection'])->name('organization.ai.test');
 
     // Organization Member Impersonation
     Route::post('/organization/members/{member}/impersonate', [WebAuthController::class, 'impersonateMember'])->name('organization.members.impersonate');

@@ -16,12 +16,14 @@ class OrganizationSetting extends Model
         'branding',
         'policies',
         'smtp_settings',
+        'openai_settings',
     ];
 
     protected $casts = [
         'branding' => 'array',
         'policies' => 'array',
         'smtp_settings' => 'array',
+        'openai_settings' => 'array',
     ];
 
     public function organization(): BelongsTo

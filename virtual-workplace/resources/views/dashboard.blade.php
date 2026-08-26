@@ -3625,9 +3625,85 @@
                         <div id="smtp-test-result-box" style="display: none; margin-top: 10px; padding: 10px 14px; border-radius: 10px; font-size: 12px; font-weight: 800;"></div>
                     </div>
 
+                    <!-- 6. OpenAI & AI Virtual Office Generator Settings -->
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 20px; margin-top: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                            <div>
+                                <h3 style="font-size: 15px; font-weight: 900; color: var(--text-primary); margin: 0 0 2px 0; display: flex; align-items: center; gap: 8px;">
+                                    <span>🤖</span>
+                                    <span>{{ __('OpenAI & AI Floorplan Generator Settings') }}</span>
+                                </h3>
+                                <p style="font-size: 11px; color: var(--text-muted); margin: 0;">
+                                    {{ __('Add your company OpenAI API key to generate bespoke 2D architectural office blueprints directly from the editor without platform rate limits.') }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Cost Optimization Notice -->
+                        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; font-size: 12px; line-height: 1.5; color: var(--text-primary);">
+                            <div style="font-weight: 800; color: #10B981; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                                <span>💡</span>
+                                <span>{{ __('Token & Cost Optimization Enabled') }}</span>
+                            </div>
+                            <span style="color: var(--text-secondary); font-size: 11px;">
+                                {{ __('Prompts are ultra-compressed to ~60 tokens. Choosing GPT Image 1 Mini or DALL-E 2 with 1024x1024 reduces your cost to approx $0.015 - $0.02 per generated floorplan.') }}
+                            </span>
+                        </div>
+
+                        <!-- API Key Input -->
+                        <div style="margin-bottom: 14px;">
+                            <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">
+                                🔑 {{ __('Company OpenAI Secret Key (sk-...)') }}
+                            </label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="password" name="openai_api_key" id="org-openai-key-input" placeholder="{{ !empty($openAiSettings['api_key']) ? '••••••••••••••••••••••••••••••••' : 'sk-proj-... / sk-svcacct-...' }}" style="flex: 1; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 14px; color: var(--text-primary); font-size: 13px; font-family: monospace; font-weight: 600; box-shadow: var(--shadow-inset-3d);">
+                                <button type="button" onclick="testOrgAiConnectionAction()" id="btn-test-org-ai" class="tactile-btn btn-secondary" style="padding: 0 16px; font-size: 12px; white-space: nowrap;">
+                                    ⚡ {{ __('Test Key') }}
+                                </button>
+                            </div>
+                            <div id="org-ai-test-result-box" style="display: none; margin-top: 8px; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 800;"></div>
+                        </div>
+
+                        <!-- Generation Model & Image Dimensions -->
+                        <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 12px; margin-bottom: 16px;">
+                            <div>
+                                <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">
+                                    🖼️ {{ __('Image Generation Model') }}
+                                </label>
+                                <select name="openai_model" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 14px; color: var(--text-primary); font-size: 12px; font-weight: 700; box-shadow: var(--shadow-inset-3d);">
+                                    <option value="gpt-image-1-mini" {{ ($openAiSettings['model'] ?? 'gpt-image-1-mini') === 'gpt-image-1-mini' ? 'selected' : '' }}>
+                                        GPT Image 1 Mini (💰 Ultra Low Cost ~$0.015)
+                                    </option>
+                                    <option value="gpt-image-1" {{ ($openAiSettings['model'] ?? '') === 'gpt-image-1' ? 'selected' : '' }}>
+                                        GPT Image 1 (⚡ High Quality Standard ~$0.040)
+                                    </option>
+                                    <option value="dall-e-2" {{ ($openAiSettings['model'] ?? '') === 'dall-e-2' ? 'selected' : '' }}>
+                                        DALL-E 2 (💵 Economy Legacy ~$0.020)
+                                    </option>
+                                    <option value="dall-e-3" {{ ($openAiSettings['model'] ?? '') === 'dall-e-3' ? 'selected' : '' }}>
+                                        DALL-E 3 (🎨 High Definition Art ~$0.080)
+                                    </option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">
+                                    📐 {{ __('Floorplan Dimensions') }}
+                                </label>
+                                <select name="openai_image_size" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 14px; color: var(--text-primary); font-size: 12px; font-weight: 700; box-shadow: var(--shadow-inset-3d);">
+                                    <option value="1024x1024" {{ ($openAiSettings['image_size'] ?? '1024x1024') === '1024x1024' ? 'selected' : '' }}>
+                                        1024 × 1024 (Square 1:1 - Low Cost)
+                                    </option>
+                                    <option value="1792x1024" {{ ($openAiSettings['image_size'] ?? '') === '1792x1024' ? 'selected' : '' }}>
+                                        1792 × 1024 (Widescreen 16:9)
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
                     <div style="padding-top: 10px; border-top: 1px solid var(--border-color);">
                         <button type="submit" class="tactile-btn btn-primary" style="padding: 12px 24px; font-size: 13px; cursor: pointer;">
-                            💾 {{ __('Save Workspace & SMTP Changes') }}
+                            💾 {{ __('Save Workspace & Settings Changes') }}
                         </button>
                     </div>
                 </form>
@@ -9281,6 +9357,60 @@
                 const targetUserId = currentModalMemberData.member.user_id;
                 closeMemberProfileModal();
                 openChatWithUser(targetUserId);
+            }
+        }
+
+        async function testOrgAiConnectionAction() {
+            const keyInput = document.getElementById('org-openai-key-input');
+            const resultBox = document.getElementById('org-ai-test-result-box');
+            const btn = document.getElementById('btn-test-org-ai');
+            const apiKey = keyInput ? keyInput.value.trim() : '';
+
+            if (!apiKey && (!keyInput.placeholder || keyInput.placeholder.includes('sk-'))) {
+                resultBox.style.display = 'block';
+                resultBox.style.background = 'rgba(239, 68, 68, 0.15)';
+                resultBox.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+                resultBox.style.color = '#EF4444';
+                resultBox.innerText = '{{ __("Please enter an OpenAI API key first.") }}';
+                return;
+            }
+
+            resultBox.style.display = 'block';
+            resultBox.style.background = 'rgba(59, 130, 246, 0.15)';
+            resultBox.style.border = '1px solid rgba(59, 130, 246, 0.3)';
+            resultBox.style.color = '#3B82F6';
+            resultBox.innerText = '⚡ {{ __("Testing OpenAI API key connectivity...") }}';
+            if (btn) btn.disabled = true;
+
+            try {
+                const res = await fetch('{{ route("organization.ai.test") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ api_key: apiKey })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    resultBox.style.background = 'rgba(16, 185, 129, 0.15)';
+                    resultBox.style.border = '1px solid rgba(16, 185, 129, 0.3)';
+                    resultBox.style.color = '#10B981';
+                    resultBox.innerText = data.message || '{{ __("✅ Key is valid and active!") }}';
+                } else {
+                    resultBox.style.background = 'rgba(239, 68, 68, 0.15)';
+                    resultBox.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+                    resultBox.style.color = '#EF4444';
+                    resultBox.innerText = '❌ ' + (data.message || '{{ __("Connection failed.") }}');
+                }
+            } catch (e) {
+                resultBox.style.background = 'rgba(239, 68, 68, 0.15)';
+                resultBox.style.border = '1px solid rgba(239, 68, 68, 0.3)';
+                resultBox.style.color = '#EF4444';
+                resultBox.innerText = '❌ Network error: ' + e.message;
+            } finally {
+                if (btn) btn.disabled = false;
             }
         }
 

@@ -235,6 +235,7 @@ class WebAuthController extends Controller
         })->take(10)->values();
 
         $smtpSettings = $organization->settings?->smtp_settings ?? [];
+        $openAiSettings = $organization->settings?->openai_settings ?? [];
 
         $upcomingMeetingsJson = $upcomingMeetings->map(function ($m) {
             return [
@@ -254,7 +255,7 @@ class WebAuthController extends Controller
             'user', 'membership', 'organization', 'stats', 'rooms', 'offices', 'roles', 'members',
             'departments', 'teams', 'auditLogs', 'guestInvitations', 'allPlans',
             'projects', 'tasks', 'myTasks', 'activeTimer', 'recentTimeEntries', 'allTimesheets', 'myProfile',
-            'upcomingMeetings', 'allMeetings', 'smtpSettings', 'upcomingMeetingsJson',
+            'upcomingMeetings', 'allMeetings', 'smtpSettings', 'openAiSettings', 'upcomingMeetingsJson',
             'pendingSubscriptionRequest'
         ));
     }
@@ -2189,9 +2190,58 @@ class WebAuthController extends Controller
         }));
 
         $orgSettings->smtp_settings = $newSmtp;
+
+        // Update Organization OpenAI / AI Floorplan Settings
+        $currentOpenAi = $orgSettings->openai_settings ?? [];
+        $openAiApiKey = $request->filled('openai_api_key') ? trim($request->input('openai_api_key')) : ($currentOpenAi['api_key'] ?? '');
+        $newOpenAi = [
+            'api_key' => $openAiApiKey,
+            'model' => $request->input('openai_model', 'gpt-image-1-mini'),
+            'image_size' => $request->input('openai_image_size', '1024x1024'),
+            'quality' => $request->input('openai_quality', 'standard'),
+            'is_enabled' => $request->has('openai_is_enabled') || !empty($openAiApiKey),
+        ];
+        $orgSettings->openai_settings = $newOpenAi;
+
         $orgSettings->save();
 
-        return redirect('/dashboard#settings')->with('success', __('Workspace settings, company logo, and SMTP email configuration updated successfully!'));
+        return redirect('/dashboard#settings')->with('success', __('Workspace settings, company logo, SMTP email, and OpenAI configuration updated successfully!'));
+    }
+
+    /**
+     * Test Organization OpenAI API connectivity.
+     */
+    public function testOrgAiConnection(Request $request)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        if (!$membership) abort(403);
+
+        $apiKey = trim($request->input('api_key', ''));
+        if (empty($apiKey)) {
+            $orgSettings = $membership->organization->settings?->openai_settings ?? [];
+            $apiKey = $orgSettings['api_key'] ?? '';
+        }
+
+        if (empty($apiKey)) {
+            return response()->json(['success' => false, 'message' => __('OpenAI API key is missing. Please enter your OpenAI API key.')], 422);
+        }
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::withToken($apiKey)
+                ->timeout(15)
+                ->get('https://api.openai.com/v1/models');
+
+            if ($response->successful()) {
+                return response()->json(['success' => true, 'message' => __('✅ Connection to OpenAI API successful! Your organization key is valid and active.')]);
+            } else {
+                $err = $response->json();
+                $errMsg = $err['error']['message'] ?? $response->body();
+                return response()->json(['success' => false, 'message' => 'OpenAI Error: ' . $errMsg], 400);
+            }
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false, 'message' => 'Network error connecting to OpenAI: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
