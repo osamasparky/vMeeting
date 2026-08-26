@@ -138,6 +138,7 @@ Route::get('/api/office/my-tasks', [WebAuthController::class, 'getOfficeTasksAnd
 Route::get('/api/members/{userId}/activity', [WebAuthController::class, 'getMemberActivity'])->name('members.activity');
 Route::post('/api/office/task-timer/start', [WebAuthController::class, 'startOfficeTaskTimer'])->name('office.task_timer.start');
 Route::post('/api/office/task-timer/stop', [WebAuthController::class, 'stopOfficeTaskTimer'])->name('office.task_timer.stop');
+Route::post('/api/office/tasks/{taskId}/status', [WebAuthController::class, 'updateOfficeTaskStatus'])->name('office.tasks.status');
 
 // Guest Access Routes (Public / Unauthenticated)
 Route::get('/guest/join/{token}', [WebAuthController::class, 'guestJoin'])->name('guest.join');

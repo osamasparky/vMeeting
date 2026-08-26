@@ -1500,6 +1500,7 @@
             org: @json($organization),
             allowedRoomIds: @json($userAllowedRoomIds ?? []),
             token: "{{ $realtimeToken }}",
+            csrf: "{{ csrf_token() }}",
             wsUrl: @json($wsUrl ?? null),
             attendancePolicy: @json($organization->settings?->getAttendancePolicy() ?? \App\Domains\Tenancy\Models\OrganizationSetting::getAttendancePolicy()),
         };
@@ -4165,15 +4166,16 @@
             listEl.innerHTML = tasks.map(t => {
                 const isRunning = activeOfficeTimer && activeOfficeTimer.task_id === t.id;
                 const pStyle = priorityColors[t.priority] || priorityColors['normal'];
+                const isDone = t.status === 'done';
 
                 return `
-                    <div class="task-card-item ${isRunning ? 'running' : ''}" id="office-task-${t.id}">
+                    <div class="task-card-item ${isRunning ? 'running' : ''}" id="office-task-${t.id}" style="${isDone ? 'opacity: 0.75;' : ''}">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
                             <div style="min-width: 0;">
                                 <div style="font-size: 10px; font-weight: 800; color: var(--brand-primary); margin-bottom: 2px;">
                                     📁 ${escapeHtml(t.project_name || 'General')}
                                 </div>
-                                <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); line-height: 1.3;">
+                                <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); line-height: 1.3; ${isDone ? 'text-decoration: line-through;' : ''}">
                                     ${escapeHtml(t.title)}
                                 </div>
                             </div>
@@ -4182,9 +4184,20 @@
                             </span>
                         </div>
 
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
-                            <div style="font-size: 10px; color: var(--text-muted);">
-                                ${t.due_date ? `📅 ${t.due_date}` : '—'}
+                        <!-- Status Selector & Action Row -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border-card);">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <select onchange="updateOfficeTaskStatus('${t.id}', this.value)" style="background: rgba(15, 23, 42, 0.75); border: 1px solid var(--border-card); color: var(--text-primary); border-radius: 6px; padding: 3px 6px; font-size: 10px; font-weight: 800; cursor: pointer; outline: none;">
+                                    <option value="backlog" ${t.status === 'backlog' ? 'selected' : ''}>📋 {{ __('Backlog') }}</option>
+                                    <option value="ready" ${t.status === 'ready' ? 'selected' : ''}>📌 {{ __('Ready') }}</option>
+                                    <option value="in_progress" ${t.status === 'in_progress' ? 'selected' : ''}>⚡ {{ __('In Progress') }}</option>
+                                    <option value="review" ${t.status === 'review' ? 'selected' : ''}>🔍 {{ __('Review') }}</option>
+                                    <option value="qa" ${t.status === 'qa' ? 'selected' : ''}>🧪 {{ __('QA') }}</option>
+                                    <option value="done" ${t.status === 'done' ? 'selected' : ''}>✅ {{ __('Done') }}</option>
+                                </select>
+                                <span style="font-size: 10px; color: var(--text-muted);">
+                                    ${t.due_date ? `📅 ${t.due_date}` : ''}
+                                </span>
                             </div>
 
                             ${isRunning ? `
@@ -4200,6 +4213,30 @@
                     </div>
                 `;
             }).join('');
+        }
+
+        async function updateOfficeTaskStatus(taskId, newStatus) {
+            try {
+                const res = await fetch(`/api/office/tasks/${taskId}/status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': CONFIG.csrf
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    showToast(`✅ {{ __("Task status updated to:") }} ${newStatus.replace('_', ' ')}`);
+                    loadMyOfficeTasks();
+                } else {
+                    showToast(`❌ ${data.message || '{{ __("Failed to update status") }}'}`);
+                }
+            } catch (e) {
+                console.error('Error updating task status:', e);
+                showToast('❌ {{ __("Network error updating status.") }}');
+            }
         }
 
         function filterOfficeTasks(query) {

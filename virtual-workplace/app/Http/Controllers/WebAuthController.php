@@ -2947,6 +2947,37 @@ class WebAuthController extends Controller
     }
 
     /**
+     * Update task workflow status directly from Virtual Office.
+     */
+    public function updateOfficeTaskStatus(Request $request, string $taskId)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        if (!$membership) return response()->json(['message' => 'Unauthorized'], 403);
+
+        $task = \App\Domains\Projects\Models\Task::where('organization_id', $membership->organization_id)->findOrFail($taskId);
+
+        $validated = $request->validate([
+            'status' => 'required|string|in:backlog,ready,in_progress,review,qa,done,completed',
+        ]);
+
+        $newStatus = $validated['status'] === 'completed' ? 'done' : $validated['status'];
+        $task->update([
+            'status' => $newStatus,
+            'completed_at' => $newStatus === 'done' ? now() : null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('Task status updated successfully.'),
+            'task' => [
+                'id' => $task->id,
+                'status' => $task->status,
+            ],
+        ]);
+    }
+
+    /**
      * Get user attendance hours and sessions report.
      */
     public function getAttendanceSummary(Request $request, \App\Domains\People\Services\AttendanceService $attendanceService)
