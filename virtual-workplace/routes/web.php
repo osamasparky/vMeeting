@@ -1,11 +1,10 @@
 <?php
 
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\WebAuthController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [LandingController::class, 'home'])->name('landing.home');
 
 // Language Switcher
 Route::get('/lang/{locale}', function (string $locale) {
@@ -196,6 +195,24 @@ Route::prefix('superadmin')->middleware(['auth', 'superadmin'])->name('superadmi
     Route::post('/furniture/item', [\App\Http\Controllers\SuperAdminController::class, 'storeFurnitureItem'])->name('furniture.item.store');
     Route::put('/furniture/item/{item}', [\App\Http\Controllers\SuperAdminController::class, 'updateFurnitureItem'])->name('furniture.item.update');
     Route::delete('/furniture/item/{item}', [\App\Http\Controllers\SuperAdminController::class, 'deleteFurnitureItem'])->name('furniture.item.delete');
+
+    // CMS & Website Management Routes
+    Route::get('/cms/pages', [\App\Http\Controllers\SuperAdminController::class, 'cmsPages'])->name('cms.pages');
+    Route::get('/cms/pages/{page}', [\App\Http\Controllers\SuperAdminController::class, 'editCmsPage'])->name('cms.pages.edit');
+    Route::put('/cms/sections/{section}', [\App\Http\Controllers\SuperAdminController::class, 'updateCmsSection'])->name('cms.sections.update');
+    Route::post('/cms/sections/{section}/toggle', [\App\Http\Controllers\SuperAdminController::class, 'toggleCmsSection'])->name('cms.sections.toggle');
+
+    Route::get('/cms/assets', [\App\Http\Controllers\SuperAdminController::class, 'cmsAssets'])->name('cms.assets');
+    Route::post('/cms/assets/upload', [\App\Http\Controllers\SuperAdminController::class, 'uploadCmsAsset'])->name('cms.assets.upload');
+    Route::delete('/cms/assets/{asset}', [\App\Http\Controllers\SuperAdminController::class, 'deleteCmsAsset'])->name('cms.assets.delete');
+
+    Route::get('/cms/theme', [\App\Http\Controllers\SuperAdminController::class, 'cmsTheme'])->name('cms.theme');
+    Route::post('/cms/theme', [\App\Http\Controllers\SuperAdminController::class, 'updateCmsTheme'])->name('cms.theme.update');
+
+    Route::get('/features', [\App\Http\Controllers\SuperAdminController::class, 'featureFlags'])->name('features');
+    Route::post('/features/{flag}/toggle', [\App\Http\Controllers\SuperAdminController::class, 'toggleFeature'])->name('features.toggle');
+
+    Route::get('/health', [\App\Http\Controllers\SuperAdminController::class, 'systemHealth'])->name('health');
 });
 
 

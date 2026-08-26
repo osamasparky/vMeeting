@@ -742,6 +742,24 @@
                 <span>{{ __('Furniture & Assets') }}</span>
             </a>
 
+            <div class="nav-category-title">{{ __('Website & CMS') }}</div>
+            <a href="{{ route('superadmin.cms.pages') }}" class="nav-item {{ request()->routeIs('superadmin.cms.pages*') ? 'active' : '' }}" data-tooltip="{{ __('CMS Pages & Sections') }}">
+                <span class="nav-item-icon">🌐</span>
+                <span>{{ __('Website CMS Pages') }}</span>
+            </a>
+            <a href="{{ route('superadmin.cms.assets') }}" class="nav-item {{ request()->routeIs('superadmin.cms.assets*') ? 'active' : '' }}" data-tooltip="{{ __('3D & Media Assets') }}">
+                <span class="nav-item-icon">📁</span>
+                <span>{{ __('3D & Media Assets') }}</span>
+            </a>
+            <a href="{{ route('superadmin.cms.theme') }}" class="nav-item {{ request()->routeIs('superadmin.cms.theme*') ? 'active' : '' }}" data-tooltip="{{ __('Theme & Branding Studio') }}">
+                <span class="nav-item-icon">🎨</span>
+                <span>{{ __('Theme & Branding') }}</span>
+            </a>
+            <a href="{{ route('superadmin.features') }}" class="nav-item {{ request()->routeIs('superadmin.features*') ? 'active' : '' }}" data-tooltip="{{ __('Feature Flags') }}">
+                <span class="nav-item-icon">🚩</span>
+                <span>{{ __('Feature Flags') }}</span>
+            </a>
+
             <div class="nav-category-title">{{ __('Access & Security') }}</div>
             <a href="{{ route('superadmin.matrix') }}" class="nav-item {{ request()->routeIs('superadmin.matrix') ? 'active' : '' }}" data-tooltip="{{ __('Permission Matrix') }}">
                 <span class="nav-item-icon">🔐</span>
@@ -750,6 +768,10 @@
             <a href="{{ route('superadmin.settings') }}" class="nav-item {{ request()->routeIs('superadmin.settings') ? 'active' : '' }}" data-tooltip="{{ __('System Settings') }}">
                 <span class="nav-item-icon">⚙️</span>
                 <span>{{ __('System Settings') }}</span>
+            </a>
+            <a href="{{ route('superadmin.health') }}" class="nav-item {{ request()->routeIs('superadmin.health*') ? 'active' : '' }}" data-tooltip="{{ __('System Health') }}">
+                <span class="nav-item-icon">⚡</span>
+                <span>{{ __('System Health') }}</span>
             </a>
             <a href="{{ route('superadmin.translations') }}" class="nav-item {{ request()->routeIs('superadmin.translations*') ? 'active' : '' }}" data-tooltip="{{ __('Translations') }}">
                 <span class="nav-item-icon">🌐</span>
