@@ -819,7 +819,120 @@
                 padding: 16px;
             }
         }
+
+        /* ── SortableJS Kanban 3D Drag & Drop ── */
+        .kanban-cards-container {
+            min-height: 120px;
+            padding: 4px;
+            border-radius: var(--radius-md);
+            transition: background 0.2s ease, border-color 0.2s ease;
+        }
+        .kanban-card {
+            cursor: grab !important;
+            user-select: none;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+        }
+        .kanban-card:active {
+            cursor: grabbing !important;
+        }
+        .kanban-card-ghost {
+            opacity: 0.35 !important;
+            background: rgba(79, 155, 95, 0.12) !important;
+            border: 2px dashed var(--brand-forest) !important;
+            box-shadow: none !important;
+            transform: scale(0.98);
+        }
+        .kanban-card-chosen {
+            cursor: grabbing !important;
+            background: var(--bg-surface-elevated, #FFFFFF) !important;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18) !important;
+            transform: scale(1.02);
+            z-index: 100;
+        }
+        .kanban-card-drag {
+            opacity: 0.95 !important;
+            transform: rotate(2deg) scale(1.02);
+        }
+
+        /* ── Filter Toolbar ── */
+        .hub-filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+            background: var(--bg-surface);
+            padding: 10px 14px;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-card);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        /* ── Task Inspector Tabs & Activity Timeline ── */
+        .task-inspector-tab-btn {
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+        .task-inspector-tab-btn:hover {
+            color: var(--text-primary);
+        }
+        .task-inspector-tab-btn.active {
+            color: var(--brand-forest);
+            border-bottom-color: var(--brand-forest);
+            background: rgba(79, 155, 95, 0.08);
+            border-radius: 6px 6px 0 0;
+        }
+
+        .activity-timeline-item {
+            display: flex;
+            gap: 12px;
+            position: relative;
+            padding-bottom: 16px;
+        }
+        .activity-timeline-item:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            inset-inline-start: 15px;
+            top: 30px;
+            bottom: 0;
+            width: 2px;
+            background: var(--border-color);
+        }
+        .activity-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 900;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .activity-content-box {
+            flex: 1;
+            background: var(--bg-surface-subtle);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 12px;
+        }
     </style>
+    <!-- SortableJS Library for True Fluid Drag & Drop Kanban -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 </head>
 <body>
 
@@ -1219,7 +1332,55 @@
 
             <!-- ── 6. SUB-TAB VIEWS ── -->
 
-            <!-- TAB 1: KANBAN BOARD -->
+            <!-- ── MULTI-CRITERIA TASK SEARCH & FILTER TOOLBAR ── -->
+            <div class="hub-filter-bar">
+                <!-- Search Input -->
+                <div style="position: relative; flex: 1; min-width: 220px;">
+                    <span style="position: absolute; inset-inline-start: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--text-muted); pointer-events: none;">🔍</span>
+                    <input type="text" id="hub-task-search-input" oninput="filterHubTasks()" placeholder="{{ __('Search tasks by title, #number or tags...') }}" class="form-input" style="padding-inline-start: 32px; font-size: 12px; height: 36px; border-radius: 8px; width: 100%;">
+                </div>
+
+                <!-- Assignee Filter -->
+                <div style="min-width: 150px;">
+                    <select id="hub-filter-assignee" onchange="filterHubTasks()" class="form-input" style="font-size: 12px; height: 36px; border-radius: 8px; font-weight: 700;">
+                        <option value="">👤 {{ __('All Assignees') }}</option>
+                        <option value="unassigned">— {{ __('Unassigned') }} —</option>
+                        @foreach($allMembers as $am)
+                            <option value="{{ $am->user_id }}">{{ $am->user->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Priority Filter -->
+                <div style="min-width: 130px;">
+                    <select id="hub-filter-priority" onchange="filterHubTasks()" class="form-input" style="font-size: 12px; height: 36px; border-radius: 8px; font-weight: 700;">
+                        <option value="">⚡ {{ __('All Priorities') }}</option>
+                        <option value="urgent">🔥 {{ __('Urgent') }}</option>
+                        <option value="high">⚡ {{ __('High') }}</option>
+                        <option value="medium">⚖️ {{ __('Medium') }}</option>
+                        <option value="low">🌱 {{ __('Low') }}</option>
+                    </select>
+                </div>
+
+                <!-- Due Date Filter -->
+                <div style="min-width: 140px;">
+                    <select id="hub-filter-due" onchange="filterHubTasks()" class="form-input" style="font-size: 12px; height: 36px; border-radius: 8px; font-weight: 700;">
+                        <option value="">📅 {{ __('All Due Dates') }}</option>
+                        <option value="overdue">🚨 {{ __('Overdue') }}</option>
+                        <option value="today">☀️ {{ __('Due Today') }}</option>
+                        <option value="this_week">🗓️ {{ __('Due This Week') }}</option>
+                        <option value="has_due">📌 {{ __('Has Due Date') }}</option>
+                        <option value="no_due">⏳ {{ __('No Due Date') }}</option>
+                    </select>
+                </div>
+
+                <!-- Clear Filters Button -->
+                <button type="button" onclick="clearHubTaskFilters()" id="hub-clear-filters-btn" class="tactile-btn btn-secondary" style="padding: 7px 12px; font-size: 11px; height: 36px; display: none; align-items: center; gap: 4px;">
+                    ✕ {{ __('Reset') }}
+                </button>
+            </div>
+
+            <!-- TAB 1: KANBAN BOARD (DRAG & DROP SORTABLEJS) -->
             <div id="hub-section-kanban" class="hub-section-content" style="display: block;">
                 <div class="kanban-grid">
                     @php
@@ -1240,15 +1401,22 @@
                         <div class="kanban-column" id="kanban-column-{{ $colKey }}">
                             <div class="kanban-col-header" style="color: {{ $colMeta['color'] }};">
                                 <span>{{ $colMeta['title'] }}</span>
-                                <span class="badge-pill badge-neutral">{{ $colTasks->count() }}</span>
+                                <span class="badge-pill badge-neutral" id="kanban-count-{{ $colKey }}">{{ $colTasks->count() }}</span>
                             </div>
 
-                            <div style="display: flex; flex-direction: column; gap: 10px; flex: 1;">
-                                @forelse($colTasks as $t)
+                            <div class="kanban-cards-container" id="kanban-cards-{{ $colKey }}" data-status="{{ $colKey }}" style="display: flex; flex-direction: column; gap: 10px; flex: 1; min-height: 140px;">
+                                @foreach($colTasks as $t)
                                     @php
                                         $canEditThisTask = ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || ($project && $project->manager_id === $user->id) || $t->assignee_id === $user->id || $t->creator_id === $user->id);
                                     @endphp
                                     <div class="kanban-card" 
+                                         id="task-card-{{ $t->id }}"
+                                         data-task-id="{{ $t->id }}"
+                                         data-status="{{ $t->status }}"
+                                         data-assignee="{{ $t->assignee_id ?? 'unassigned' }}"
+                                         data-priority="{{ $t->priority ?? 'medium' }}"
+                                         data-due="{{ $t->due_date ? $t->due_date->format('Y-m-d') : '' }}"
+                                         data-title="{{ strtolower($t->title) }} #{{ $t->task_number }}"
                                          onclick="openTaskInspector('{{ $t->id }}')"
                                          oncontextmenu="event.preventDefault(); event.stopPropagation(); openTaskContextMenu(event, '{{ $t->id }}', '{{ $project->id }}', '{{ addslashes($t->title) }}')">
                                         
@@ -1324,11 +1492,11 @@
                                             </span>
                                         </div>
                                     </div>
-                                @empty
-                                    <div style="text-align: center; padding: 24px 10px; color: var(--text-muted); font-size: 11px; border: 1px dashed var(--border-color); border-radius: var(--radius-md);">
-                                        {{ __('No tasks in this lane.') }}
-                                    </div>
-                                @endforelse
+                                @endforeach
+
+                                <div class="kanban-empty-drop-hint" style="display: {{ $colTasks->count() === 0 ? 'block' : 'none' }}; text-align: center; padding: 24px 10px; color: var(--text-muted); font-size: 11px; border: 1px dashed var(--border-color); border-radius: var(--radius-md);">
+                                    {{ __('Drag tasks here...') }}
+                                </div>
                             </div>
                         </div>
                     @endforeach
@@ -2199,21 +2367,24 @@
 
     <!-- Modal: Task Inspector & Activity Drawer -->
     <div id="task-details-modal" class="modal-overlay">
-        <div class="modal-card" style="max-width: 800px; width: 95vw;">
-            <div class="modal-header">
+        <div class="modal-card" style="max-width: 850px; width: 95vw; max-height: 90vh; display: flex; flex-direction: column; padding: 22px; overflow: hidden; border-radius: 20px;">
+            <div class="modal-header" style="padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--border-color);">
                 <div>
-                    <span id="task-modal-code" class="badge-pill badge-neutral" style="font-family: monospace;">#1</span>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span id="task-modal-code" class="badge-pill badge-neutral" style="font-family: monospace; font-size: 11px; font-weight: 900;">#1</span>
+                        <span id="task-modal-priority-badge" class="badge-pill badge-gold" style="font-size: 10px;">⚡ Normal</span>
+                    </div>
                     <h2 id="task-modal-title" style="font-size: 18px; font-weight: 900; color: var(--text-primary); margin-top: 4px;">Task Title</h2>
                 </div>
                 <button onclick="closeTaskInspector()" class="modal-close">✕</button>
             </div>
 
             <!-- Quick Status Change & Timer Action -->
-            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface-subtle); padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color); flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface-subtle); padding: 8px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color); flex-wrap: wrap; gap: 8px;">
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span style="font-size: 12px; font-weight: 800; color: var(--text-secondary);">⚡ {{ __('Status') }}:</span>
-                        <select id="task-modal-status-select" onchange="updateCurrentTaskStatus(this.value)" class="form-input" style="padding: 4px 8px; font-size: 12px; width: auto;">
+                        <select id="task-modal-status-select" onchange="updateCurrentTaskStatus(this.value)" class="form-input" style="padding: 4px 8px; font-size: 12px; width: auto; font-weight: 800;">
                             <option value="backlog">📌 {{ __('Backlog') }}</option>
                             <option value="ready">🎯 {{ __('Ready') }}</option>
                             <option value="in_progress">⚡ {{ __('In Progress') }}</option>
@@ -2221,69 +2392,107 @@
                             <option value="done">🎉 {{ __('Done') }}</option>
                         </select>
                     </div>
-                    <button id="task-modal-timer-btn" onclick="toggleTaskTimerAction()" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 11px;">
-                        ⏱️ {{ __('Start Timer') }}
-                    </button>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span id="task-modal-hours-pill" style="font-family: monospace; font-size: 11px; font-weight: 800; color: var(--brand-forest);">0h / 0h</span>
+                        <button id="task-modal-timer-btn" onclick="toggleTaskTimerAction()" class="tactile-btn btn-secondary" style="padding: 5px 12px; font-size: 11px;">
+                            ⏱️ {{ __('Start Timer') }}
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Approval Banner -->
-                <div id="task-modal-hub-approval-banner" style="display: none; padding: 12px 16px; border-radius: var(--radius-md); font-size: 12px; font-weight: 700; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <div id="task-modal-hub-approval-banner" style="display: none; padding: 10px 14px; border-radius: var(--radius-md); font-size: 12px; font-weight: 700; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
                     <div id="task-modal-hub-approval-text" style="display: flex; align-items: center; gap: 8px;"></div>
                     <div id="task-modal-hub-approval-actions" style="display: flex; gap: 8px;"></div>
                 </div>
             </div>
 
-            <!-- Description -->
-            <div style="margin-bottom: 16px;">
-                <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">{{ __('Description') }}</label>
-                <div id="task-modal-description" style="background: var(--bg-surface-subtle); padding: 12px; border-radius: var(--radius-md); font-size: 13px; color: var(--text-primary); border: 1px solid var(--border-color);">
-                    —
-                </div>
+            <!-- Inspector Tab Navigation -->
+            <div style="display: flex; gap: 4px; border-bottom: 1px solid var(--border-color); margin-bottom: 14px;">
+                <button type="button" onclick="switchInspectorTab('overview')" id="task-tab-btn-overview" class="task-inspector-tab-btn active">
+                    📋 {{ __('Overview & Checklist') }}
+                </button>
+                <button type="button" onclick="switchInspectorTab('discussion')" id="task-tab-btn-discussion" class="task-inspector-tab-btn">
+                    💬 {{ __('Discussions') }} (<span id="task-modal-comments-badge">0</span>)
+                </button>
+                <button type="button" onclick="switchInspectorTab('files')" id="task-tab-btn-files" class="task-inspector-tab-btn">
+                    📎 {{ __('Files') }} (<span id="task-hub-attachments-count">0</span>)
+                </button>
+                <button type="button" onclick="switchInspectorTab('activity')" id="task-tab-btn-activity" class="task-inspector-tab-btn">
+                    📜 {{ __('Activity History') }} (<span id="task-modal-activity-badge">0</span>)
+                </button>
             </div>
 
-            <!-- Attachments & Files -->
-            <div style="margin-bottom: 16px;">
-                <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">📎 {{ __('Task Attachments') }} (<span id="task-hub-attachments-count">0</span>)</label>
-                <form onsubmit="uploadHubTaskAttachmentSubmit(event)" style="background: var(--bg-surface-subtle); border: 1px dashed var(--border-color); border-radius: var(--radius-md); padding: 12px; text-align: center; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;">
-                    <input type="file" id="hub-task-file-input" required class="form-input" style="font-size: 11px; max-width: 260px;">
-                    <button type="submit" class="tactile-btn btn-primary" style="padding: 6px 12px; font-size: 11px;">📤 {{ __('Upload') }}</button>
-                </form>
-                <div id="task-hub-attachments-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px;"></div>
-            </div>
+            <!-- Scrollable Content Area -->
+            <div style="flex: 1; overflow-y: auto; padding-right: 4px;">
+                <!-- Tab 1: Overview & Checklist -->
+                <div id="task-tab-content-overview" class="task-inspector-tab-pane" style="display: block;">
+                    <!-- Description -->
+                    <div style="margin-bottom: 14px;">
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">{{ __('Description') }}</label>
+                        <div id="task-modal-description" style="background: var(--bg-surface-subtle); padding: 12px; border-radius: var(--radius-md); font-size: 13px; color: var(--text-primary); border: 1px solid var(--border-color); line-height: 1.5; white-space: pre-wrap;">
+                            —
+                        </div>
+                    </div>
 
-            <!-- Checklist -->
-            <div style="margin-bottom: 16px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <label style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">{{ __('Checklist Sub-items') }}</label>
-                </div>
-                <div id="task-checklist-container" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px;"></div>
-                <form onsubmit="addTaskChecklistItem(event)" style="display: flex; gap: 8px;">
-                    <input type="text" id="new-checklist-item-input" required placeholder="{{ __('Add sub-item...') }}" class="form-input" style="font-size: 12px; padding: 7px 10px;">
-                    <button type="submit" class="tactile-btn btn-secondary" style="padding: 7px 12px; font-size: 11px;">+ {{ __('Add') }}</button>
-                </form>
-            </div>
-
-            <!-- Comments & Discussion & Mentions -->
-            <div>
-                <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">💬 {{ __('Discussions & Updates') }}</label>
-                <div id="task-comments-feed" style="max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;"></div>
-                
-                <!-- Mention chips -->
-                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap;">
-                    <span style="font-size: 10px; font-weight: 800; color: var(--text-muted);">@ {{ __('Mention') }}:</span>
-                    @foreach($allMembers->take(6) as $chipMember)
-                        @if($chipMember->user_id !== $user->id)
-                            <button type="button" onclick="insertHubMentionHandle('{{ $chipMember->user->name }}')" class="badge-pill" style="cursor: pointer; font-size: 10px; border: 1px solid var(--border-color); background: var(--bg-surface-subtle); color: var(--brand-forest);" title="{{ __('Mention :name', ['name' => $chipMember->user->name]) }}">
-                                @<span>{{ $chipMember->user->name }}</span>
-                            </button>
-                        @endif
-                    @endforeach
+                    <!-- Checklist -->
+                    <div style="margin-bottom: 14px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <label style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">{{ __('Checklist Sub-items') }}</label>
+                        </div>
+                        <div id="task-checklist-container" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px;"></div>
+                        <form onsubmit="addTaskChecklistItem(event)" style="display: flex; gap: 8px;">
+                            <input type="text" id="new-checklist-item-input" required placeholder="{{ __('Add sub-item...') }}" class="form-input" style="font-size: 12px; padding: 7px 10px;">
+                            <button type="submit" class="tactile-btn btn-secondary" style="padding: 7px 12px; font-size: 11px;">+ {{ __('Add') }}</button>
+                        </form>
+                    </div>
                 </div>
 
-                <form onsubmit="addTaskComment(event)" style="display: flex; gap: 8px;">
-                    <input type="text" id="new-comment-input" required placeholder="{{ __('Write a comment... Type @name to mention') }}" class="form-input" style="font-size: 12px; padding: 7px 10px;">
-                    <button type="submit" class="tactile-btn btn-primary" style="padding: 7px 14px; font-size: 11px;">{{ __('Post') }}</button>
-                </form>
+                <!-- Tab 2: Discussions & Comments -->
+                <div id="task-tab-content-discussion" class="task-inspector-tab-pane" style="display: none;">
+                    <div id="task-comments-feed" style="max-height: 240px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;"></div>
+                    
+                    <!-- Mention chips -->
+                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap;">
+                        <span style="font-size: 10px; font-weight: 800; color: var(--text-muted);">@ {{ __('Mention') }}:</span>
+                        @foreach($allMembers->take(6) as $chipMember)
+                            @if($chipMember->user_id !== $user->id)
+                                <button type="button" onclick="insertHubMentionHandle('{{ $chipMember->user->name }}')" class="badge-pill" style="cursor: pointer; font-size: 10px; border: 1px solid var(--border-color); background: var(--bg-surface-subtle); color: var(--brand-forest);" title="{{ __('Mention :name', ['name' => $chipMember->user->name]) }}">
+                                    @<span>{{ $chipMember->user->name }}</span>
+                                </button>
+                            @endif
+                        @endforeach
+                    </div>
+
+                    <form onsubmit="addTaskComment(event)" style="display: flex; gap: 8px;">
+                        <input type="text" id="new-comment-input" required placeholder="{{ __('Write a comment... Type @name to mention') }}" class="form-input" style="font-size: 12px; padding: 7px 10px;">
+                        <button type="submit" class="tactile-btn btn-primary" style="padding: 7px 14px; font-size: 11px;">{{ __('Post') }}</button>
+                    </form>
+                </div>
+
+                <!-- Tab 3: Attachments & Files -->
+                <div id="task-tab-content-files" class="task-inspector-tab-pane" style="display: none;">
+                    <form onsubmit="uploadHubTaskAttachmentSubmit(event)" style="background: var(--bg-surface-subtle); border: 1px dashed var(--border-color); border-radius: var(--radius-md); padding: 12px; text-align: center; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                        <input type="file" id="hub-task-file-input" required class="form-input" style="font-size: 11px; max-width: 260px;">
+                        <button type="submit" class="tactile-btn btn-primary" style="padding: 6px 12px; font-size: 11px;">📤 {{ __('Upload') }}</button>
+                    </form>
+                    <div id="task-hub-attachments-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px;"></div>
+                </div>
+
+                <!-- Tab 4: Activity & Audit History (Harnessing AuditLog) -->
+                <div id="task-tab-content-activity" class="task-inspector-tab-pane" style="display: none;">
+                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">
+                            📜 {{ __('Chronological Audit Trail & Mutation History') }}
+                        </span>
+                        <span style="font-size: 10px; color: var(--brand-forest); font-weight: 700;">
+                            🔒 {{ __('Tamper-proof Logged') }}
+                        </span>
+                    </div>
+                    <div id="task-activity-timeline-feed" style="display: flex; flex-direction: column; gap: 10px; padding: 4px;">
+                        <!-- Injected via JavaScript from AuditLog -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -2999,9 +3208,196 @@
             showHubToast('🔒 <strong>' + "{{ __('Sharing & Permissions') }}" + '</strong>: ' + "{{ __('Inherited from Project Role Settings') }}");
         }
 
+        // ── TASK INSPECTOR TAB SWITCHER ──
+        function switchInspectorTab(tab) {
+            document.querySelectorAll('.task-inspector-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.task-inspector-tab-pane').forEach(pane => pane.style.display = 'none');
+
+            const targetBtn = document.getElementById(`task-tab-btn-${tab}`);
+            const targetPane = document.getElementById(`task-tab-content-${tab}`);
+            if (targetBtn) targetBtn.classList.add('active');
+            if (targetPane) targetPane.style.display = 'block';
+        }
+
+        // ── SORTABLEJS 3D FLUID KANBAN DRAG & DROP ENGINE ──
+        let sortableKanbanInstances = [];
+
+        function initSortableKanban() {
+            if (typeof Sortable === 'undefined') return;
+
+            // Clean up existing instances if re-initializing
+            sortableKanbanInstances.forEach(inst => {
+                if (inst && typeof inst.destroy === 'function') inst.destroy();
+            });
+            sortableKanbanInstances = [];
+
+            const containers = document.querySelectorAll('.kanban-cards-container');
+            containers.forEach(container => {
+                const inst = new Sortable(container, {
+                    group: 'project-kanban-board',
+                    animation: 220,
+                    ghostClass: 'kanban-card-ghost',
+                    chosenClass: 'kanban-card-chosen',
+                    dragClass: 'kanban-card-drag',
+                    fallbackOnBody: true,
+                    swapThreshold: 0.65,
+                    filter: 'select, button, a, [data-no-drag]',
+                    preventOnFilter: false,
+                    onEnd: async function (evt) {
+                        const itemEl = evt.item;
+                        const taskId = itemEl.getAttribute('data-task-id');
+                        const targetCol = evt.to;
+                        const fromCol = evt.from;
+                        const targetStatus = targetCol.getAttribute('data-status');
+                        const fromStatus = fromCol.getAttribute('data-status');
+
+                        if (!taskId || !targetStatus) return;
+
+                        // Same column and position - no-op
+                        if (targetStatus === fromStatus && evt.oldIndex === evt.newIndex) {
+                            return;
+                        }
+
+                        // Optimistically update card attributes and column badge counts
+                        itemEl.setAttribute('data-status', targetStatus);
+                        const statusSelect = itemEl.querySelector('select');
+                        if (statusSelect) statusSelect.value = targetStatus;
+
+                        updateKanbanBadgeCounts();
+
+                        // Async PATCH request
+                        try {
+                            const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${taskId}/status`, {
+                                method: 'PATCH',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                                    'Accept': 'application/json'
+                                },
+                                body: JSON.stringify({ status: targetStatus })
+                            });
+
+                            const data = await res.json();
+                            if (res.ok) {
+                                showHubToast(`⚡ {{ __('Task status updated to') }}: <strong>${targetStatus.replace('_', ' ')}</strong>`);
+                            } else {
+                                showHubToast(`❌ ${data.message || '{{ __('Failed to update status') }}'}`);
+                                // Revert position on error
+                                if (evt.from && evt.item) {
+                                    evt.from.insertBefore(evt.item, evt.from.children[evt.oldIndex]);
+                                    updateKanbanBadgeCounts();
+                                }
+                            }
+                        } catch (err) {
+                            console.error('Error updating task status via drag & drop:', err);
+                            showHubToast('❌ {{ __('Network error updating task status') }}');
+                        }
+                    }
+                });
+                sortableKanbanInstances.push(inst);
+            });
+        }
+
+        function updateKanbanBadgeCounts() {
+            const columns = ['backlog', 'ready', 'in_progress', 'review', 'done'];
+            columns.forEach(col => {
+                const colContainer = document.getElementById(`kanban-cards-${col}`);
+                const badge = document.getElementById(`kanban-count-${col}`);
+                if (colContainer && badge) {
+                    const cards = colContainer.querySelectorAll('.kanban-card:not([style*="display: none"])');
+                    badge.textContent = cards.length;
+
+                    // Toggle empty drop hint
+                    const emptyHint = colContainer.querySelector('.kanban-empty-drop-hint');
+                    if (emptyHint) {
+                        const totalCards = colContainer.querySelectorAll('.kanban-card').length;
+                        emptyHint.style.display = (totalCards === 0) ? 'block' : 'none';
+                    }
+                }
+            });
+        }
+
+        // ── LIVE MULTI-CRITERIA SEARCH & FILTER ENGINE ──
+        function filterHubTasks() {
+            const searchInput = document.getElementById('hub-task-search-input');
+            const assigneeSelect = document.getElementById('hub-filter-assignee');
+            const prioritySelect = document.getElementById('hub-filter-priority');
+            const dueSelect = document.getElementById('hub-filter-due');
+            const clearBtn = document.getElementById('hub-clear-filters-btn');
+
+            const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+            const assignee = assigneeSelect ? assigneeSelect.value : '';
+            const priority = prioritySelect ? prioritySelect.value : '';
+            const dueFilter = dueSelect ? dueSelect.value : '';
+
+            const hasActiveFilters = query || assignee || priority || dueFilter;
+            if (clearBtn) clearBtn.style.display = hasActiveFilters ? 'flex' : 'none';
+
+            const todayStr = new Date().toISOString().slice(0, 10);
+
+            // Filter Kanban Cards
+            document.querySelectorAll('.kanban-card').forEach(card => {
+                const cardTitle = card.getAttribute('data-title') || '';
+                const cardAssignee = card.getAttribute('data-assignee') || '';
+                const cardPriority = card.getAttribute('data-priority') || '';
+                const cardDue = card.getAttribute('data-due') || '';
+
+                let matches = true;
+
+                if (query && !cardTitle.includes(query)) {
+                    matches = false;
+                }
+                if (assignee && cardAssignee !== assignee) {
+                    matches = false;
+                }
+                if (priority && cardPriority !== priority) {
+                    matches = false;
+                }
+                if (dueFilter) {
+                    if (dueFilter === 'overdue' && (!cardDue || cardDue >= todayStr)) matches = false;
+                    else if (dueFilter === 'today' && cardDue !== todayStr) matches = false;
+                    else if (dueFilter === 'has_due' && !cardDue) matches = false;
+                    else if (dueFilter === 'no_due' && cardDue) matches = false;
+                }
+
+                card.style.display = matches ? 'block' : 'none';
+            });
+
+            // Filter Task Table Rows (List View)
+            document.querySelectorAll('#hub-section-tasks tbody tr').forEach(row => {
+                const rowText = (row.textContent || '').toLowerCase();
+                const matches = (!query || rowText.includes(query));
+                row.style.display = matches ? '' : 'none';
+            });
+
+            updateKanbanBadgeCounts();
+        }
+
+        function clearHubTaskFilters() {
+            const searchInput = document.getElementById('hub-task-search-input');
+            const assigneeSelect = document.getElementById('hub-filter-assignee');
+            const prioritySelect = document.getElementById('hub-filter-priority');
+            const dueSelect = document.getElementById('hub-filter-due');
+            const clearBtn = document.getElementById('hub-clear-filters-btn');
+
+            if (searchInput) searchInput.value = '';
+            if (assigneeSelect) assigneeSelect.value = '';
+            if (prioritySelect) prioritySelect.value = '';
+            if (dueSelect) dueSelect.value = '';
+            if (clearBtn) clearBtn.style.display = 'none';
+
+            filterHubTasks();
+        }
+
+        // Initialize Sortable on DOM ready
+        window.addEventListener('DOMContentLoaded', () => {
+            initSortableKanban();
+        });
+
         // Task Inspector
         async function openTaskInspector(taskId) {
             activeInspectedTaskId = taskId;
+            switchInspectorTab('overview');
             const modal = document.getElementById('task-details-modal');
             modal.style.display = 'flex';
 
@@ -3012,10 +3408,22 @@
                 if (!res.ok) return;
                 const data = await res.json();
                 const t = data.task || data;
+                const activities = data.activity || [];
 
                 document.getElementById('task-modal-code').textContent = '#' + (t.task_number || '');
                 document.getElementById('task-modal-title').textContent = t.title || '';
                 document.getElementById('task-modal-description').textContent = t.description || '—';
+                
+                const priorityBadge = document.getElementById('task-modal-priority-badge');
+                if (priorityBadge) {
+                    priorityBadge.textContent = '⚡ ' + (t.priority || 'Normal').toUpperCase();
+                }
+
+                const hoursPill = document.getElementById('task-modal-hours-pill');
+                if (hoursPill) {
+                    hoursPill.textContent = `${t.actual_hours || 0}h / ${t.estimated_hours || 0}h`;
+                }
+
                 const statusSelect = document.getElementById('task-modal-status-select');
                 if (statusSelect) {
                     statusSelect.value = t.status || 'backlog';
@@ -3066,9 +3474,11 @@
 
                 // Render Attachments
                 const attCount = document.getElementById('task-hub-attachments-count');
+                const filesBadge = document.getElementById('task-modal-files-badge');
                 const attCont = document.getElementById('task-hub-attachments-container');
                 const attachments = t.attachments || [];
                 if (attCount) attCount.textContent = attachments.length;
+                if (filesBadge) filesBadge.textContent = attachments.length;
                 if (attCont) {
                     attCont.innerHTML = '';
                     if (attachments.length === 0) {
@@ -3104,20 +3514,76 @@
                 });
 
                 // Render comments
+                const commCountBadge = document.getElementById('task-modal-comments-badge');
                 const commCont = document.getElementById('task-comments-feed');
+                const comments = t.comments || [];
+                if (commCountBadge) commCountBadge.textContent = comments.length;
                 commCont.innerHTML = '';
-                (t.comments || []).forEach(c => {
-                    const box = document.createElement('div');
-                    box.style = 'background: var(--bg-surface-subtle); padding: 8px 12px; border-radius: 8px; font-size: 12px; border: 1px solid var(--border-color);';
-                    box.innerHTML = `
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 2px; font-weight: 800; font-size: 11px;">
-                            <span>${c.user ? c.user.name : 'Member'}</span>
-                            <span style="color: var(--text-muted);">${new Date(c.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                        </div>
-                        <div>${c.body}</div>
-                    `;
-                    commCont.appendChild(box);
-                });
+                if (comments.length === 0) {
+                    commCont.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 11px; padding: 12px;">{{ __("No discussion comments yet. Be the first to post!") }}</div>';
+                } else {
+                    comments.forEach(c => {
+                        const box = document.createElement('div');
+                        box.style = 'background: var(--bg-surface-subtle); padding: 8px 12px; border-radius: 8px; font-size: 12px; border: 1px solid var(--border-color);';
+                        box.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 2px; font-weight: 800; font-size: 11px;">
+                                <span style="color: var(--brand-forest);">👤 ${c.user ? c.user.name : 'Member'}</span>
+                                <span style="color: var(--text-muted);">${new Date(c.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                            </div>
+                            <div style="color: var(--text-primary); line-height: 1.4;">${c.body}</div>
+                        `;
+                        commCont.appendChild(box);
+                    });
+                }
+
+                // Render Activity & Audit Timeline Feed
+                const activityBadge = document.getElementById('task-modal-activity-badge');
+                const activityFeed = document.getElementById('task-activity-timeline-feed');
+                if (activityBadge) activityBadge.textContent = activities.length;
+                if (activityFeed) {
+                    activityFeed.innerHTML = '';
+                    if (activities.length === 0) {
+                        activityFeed.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 11px; padding: 20px;">📜 {{ __("No audit entries recorded yet.") }}</div>';
+                    } else {
+                        activities.forEach(act => {
+                            const item = document.createElement('div');
+                            item.className = 'activity-timeline-item';
+                            
+                            const actorName = act.actor ? act.actor.name : 'System';
+                            const initials = actorName.slice(0, 2).toUpperCase();
+                            const meta = act.metadata || {};
+                            
+                            let changeSummary = `<strong>${actorName}</strong> ${act.action} this task.`;
+                            if (act.action === 'created') {
+                                changeSummary = `✨ <strong>${actorName}</strong> created this task.`;
+                            } else if (act.action === 'updated') {
+                                const changes = [];
+                                if (meta.status) changes.push(`status to <span class="badge-pill badge-neutral" style="font-size: 9px;">${meta.status}</span>`);
+                                if (meta.priority) changes.push(`priority to <strong>${meta.priority}</strong>`);
+                                if (meta.due_date) changes.push(`due date to <strong>${meta.due_date}</strong>`);
+                                if (meta.assignee_id) changes.push(`reassigned task`);
+                                if (meta.title) changes.push(`updated title`);
+                                if (meta.approval_status) changes.push(`approval status to <strong>${meta.approval_status}</strong>`);
+                                
+                                changeSummary = `✏️ <strong>${actorName}</strong> updated ` + (changes.length ? changes.join(', ') : 'task details.');
+                            } else if (act.action === 'deleted') {
+                                changeSummary = `🗑️ <strong>${actorName}</strong> deleted task item.`;
+                            }
+
+                            item.innerHTML = `
+                                <div class="activity-avatar">${initials}</div>
+                                <div class="activity-content-box">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
+                                        <div style="font-size: 12px; color: var(--text-primary);">${changeSummary}</div>
+                                        <span style="font-size: 10px; color: var(--text-muted); white-space: nowrap; margin-inline-start: 8px;">${act.relative_time || ''}</span>
+                                    </div>
+                                </div>
+                            `;
+                            activityFeed.appendChild(item);
+                        });
+                    }
+                }
+
             } catch (e) {
                 console.error(e);
             }
@@ -3311,8 +3777,13 @@
                 if (res.ok) {
                     showHubToast('⏹ {{ __('Timer stopped and time entry saved.') }}');
                     setTimeout(() => window.location.reload(), 400);
+                } else {
+                    const err = await res.json();
+                    showHubToast(err.message || 'Error stopping timer.');
                 }
-            } catch (e) {}
+            } catch (e) {
+                showHubToast('Network error stopping timer.');
+            }
         }
 
         // Live timer clock

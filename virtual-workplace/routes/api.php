@@ -212,6 +212,8 @@ Route::prefix('v1')->group(function () {
                     ->middleware('permission:tasks.create');
                 Route::get('/tasks/{task}', [\App\Domains\Projects\Controllers\TaskController::class, 'show'])
                     ->middleware('permission:tasks.view');
+                Route::get('/tasks/{task}/activity', [\App\Domains\Projects\Controllers\TaskController::class, 'activity'])
+                    ->middleware('permission:tasks.view');
                 Route::patch('/tasks/{task}', [\App\Domains\Projects\Controllers\TaskController::class, 'update'])
                     ->middleware('permission:tasks.edit');
                 Route::patch('/tasks/{task}/status', [\App\Domains\Projects\Controllers\TaskController::class, 'updateStatus'])
