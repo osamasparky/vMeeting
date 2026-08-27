@@ -7,6 +7,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/modern-design-system.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
     <style>
         :root {
             /* 🌿 Virtual Workplace — 3D Spatial + Soft Neumorphic Green Palette */
@@ -4363,43 +4365,43 @@
             <div class="card" style="padding: 16px 20px; margin-bottom: 20px; border-radius: var(--radius-lg);">
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; align-items: center;">
                     <div>
-                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">🔍 {{ __('Search Tasks') }}</label>
-                        <input type="text" id="alltasks-filter-search" oninput="filterAllTasksTable()" placeholder="Task title or #..." style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 9px 12px; color: var(--text-primary); outline: none; font-size: 12px; font-weight: 600; box-shadow: var(--shadow-inset-3d);">
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase;">🔍 {{ __('Search Tasks') }}</label>
+                        <input type="text" id="alltasks-filter-search" oninput="filterAllTasksTable()" placeholder="{{ __('Search title or #...') }}" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 8px 12px; color: var(--text-primary); outline: none; font-size: 12px; font-weight: 600;">
                     </div>
                     <div>
-                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">📁 {{ __('Project') }}</label>
-                        <select id="alltasks-filter-project" onchange="filterAllTasksTable()" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 9px 12px; color: var(--text-primary); outline: none; font-size: 12px; font-weight: 600;">
-                            <option value="">— {{ __('All Projects') }} —</option>
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase;">📁 {{ __('Project') }}</label>
+                        <select id="alltasks-filter-project" onchange="filterAllTasksTable()" class="custom-select-control" style="width: 100%;">
+                            <option value="">{{ __('All Projects') }}</option>
                             @foreach($projects as $p)
                                 <option value="{{ $p->id }}">{{ $p->name }} ({{ $p->code }})</option>
                             @endforeach
                         </select>
                     </div>
                     <div>
-                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">⚡ {{ __('Status') }}</label>
-                        <select id="alltasks-filter-status" onchange="filterAllTasksTable()" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 9px 12px; color: var(--text-primary); outline: none; font-size: 12px; font-weight: 600;">
-                            <option value="">— {{ __('All Statuses') }} —</option>
-                            <option value="backlog">📌 Backlog</option>
-                            <option value="ready">🎯 Ready</option>
-                            <option value="in_progress">⚡ In Progress</option>
-                            <option value="review">🔍 Review / QA</option>
-                            <option value="done">🎉 Done</option>
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase;">⚡ {{ __('Status') }}</label>
+                        <select id="alltasks-filter-status" onchange="filterAllTasksTable()" class="custom-select-control" style="width: 100%;">
+                            <option value="">{{ __('All Statuses') }}</option>
+                            <option value="backlog">📌 {{ __('Backlog') }}</option>
+                            <option value="ready">🎯 {{ __('Ready') }}</option>
+                            <option value="in_progress">⚡ {{ __('In Progress') }}</option>
+                            <option value="review">🔍 {{ __('Review / QA') }}</option>
+                            <option value="done">🎉 {{ __('Done') }}</option>
                         </select>
                     </div>
                     <div>
-                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">⚡ {{ __('Priority') }}</label>
-                        <select id="alltasks-filter-priority" onchange="filterAllTasksTable()" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 9px 12px; color: var(--text-primary); outline: none; font-size: 12px; font-weight: 600;">
-                            <option value="">— {{ __('All Priorities') }} —</option>
-                            <option value="urgent">🔥 Urgent</option>
-                            <option value="high">⚡ High</option>
-                            <option value="medium">Medium</option>
-                            <option value="low">Low</option>
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase;">⚡ {{ __('Priority') }}</label>
+                        <select id="alltasks-filter-priority" onchange="filterAllTasksTable()" class="custom-select-control" style="width: 100%;">
+                            <option value="">{{ __('All Priorities') }}</option>
+                            <option value="urgent">🔥 {{ __('Urgent') }}</option>
+                            <option value="high">⚡ {{ __('High') }}</option>
+                            <option value="medium">{{ __('Medium') }}</option>
+                            <option value="low">{{ __('Low') }}</option>
                         </select>
                     </div>
                     <div>
-                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">👤 {{ __('Assignee') }}</label>
-                        <select id="alltasks-filter-assignee" onchange="filterAllTasksTable()" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 9px 12px; color: var(--text-primary); outline: none; font-size: 12px; font-weight: 600;">
-                            <option value="">— {{ __('All Members') }} —</option>
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase;">👤 {{ __('Assignee') }}</label>
+                        <select id="alltasks-filter-assignee" onchange="filterAllTasksTable()" class="custom-select-control" style="width: 100%;">
+                            <option value="">{{ __('All Members') }}</option>
                             @foreach($members as $m)
                                 <option value="{{ $m->user_id }}">{{ $m->user->name }}</option>
                             @endforeach
@@ -4571,74 +4573,82 @@
                                      data-assignee-id="{{ $t->assignee_id }}"
                                      onclick="openTaskDetails('{{ $t->id }}')">
                                     
-                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 6px;">
-                                        <div style="display: flex; gap: 4px; align-items: center;">
-                                            <span class="nav-badge-pill" style="font-family: monospace; font-size: 10px; font-weight: 800;">
-                                                #{{ $t->task_number ?? 1 }}
-                                            </span>
-                                            <span class="nav-badge-pill" style="font-size: 9px; font-weight: 700; color: var(--brand-forest); background: rgba(79, 155, 95, 0.12);">
-                                                {{ $t->project->code ?? 'PRJ' }}
+                                    <!-- Header: Project Code & Action Buttons -->
+                                    <div class="task-card-header">
+                                        <div class="task-card-tags">
+                                            <span class="task-code-badge">
+                                                {{ $t->project->code ?? 'PRJ' }}-#{{ $t->task_number ?? 1 }}
                                             </span>
                                             @if($t->checklistItems && $t->checklistItems->count() > 0)
-                                                <span class="nav-badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.15); color: #4F9B5F;" title="{{ __('Checklist Progress') }}">
+                                                <span class="badge-pill badge-green" style="font-size: 9.5px;" title="{{ __('Checklist Progress') }}">
                                                     ⊞ {{ $t->checklistItems->where('is_completed', true)->count() }}/{{ $t->checklistItems->count() }}
                                                 </span>
                                             @endif
                                         </div>
 
-                                        <div style="display: flex; align-items: center; gap: 4px;">
+                                        <div class="task-card-actions">
                                             @if($t->priority === 'urgent')
-                                                <span class="nav-badge-pill" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F; font-size: 9px; font-weight: 800;">🚩 {{ __('Urgent') }}</span>
+                                                <span class="badge-pill badge-danger">🔥 {{ __('Urgent') }}</span>
                                             @elseif($t->priority === 'high')
-                                                <span class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.15); color: #D6A23A; font-size: 9px; font-weight: 800;">⚡ {{ __('High') }}</span>
+                                                <span class="badge-pill badge-gold">⚡ {{ __('High') }}</span>
                                             @endif
 
-                                            <select onclick="event.stopPropagation()" onchange="updateTaskStatusDirect('{{ $t->id }}', this.value)" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 10px; font-weight: 700; border-radius: 6px; padding: 2px 4px; outline: none; cursor: pointer;">
-                                                <option value="backlog" {{ $t->status === 'backlog' ? 'selected' : '' }}>📌 Backlog</option>
-                                                <option value="ready" {{ $t->status === 'ready' ? 'selected' : '' }}>🎯 Ready</option>
-                                                <option value="in_progress" {{ $t->status === 'in_progress' ? 'selected' : '' }}>⚡ In Progress</option>
-                                                <option value="review" {{ $t->status === 'review' || $t->status === 'qa' ? 'selected' : '' }}>🔍 Review</option>
-                                                <option value="done" {{ $t->status === 'done' ? 'selected' : '' }}>🎉 Done</option>
-                                            </select>
-
-                                            <button onclick="event.stopPropagation(); openTaskContextMenu(event, '{{ $t->id }}', '{{ $t->project_id }}', '{{ addslashes($t->title) }}')" class="tactile-btn btn-secondary" style="padding: 2px 6px; font-size: 10px; line-height: 1;" title="{{ __('Task Actions') }}">
+                                            <button type="button" onclick="event.stopPropagation(); openTaskContextMenu(event, '{{ $t->id }}', '{{ $t->project_id }}', '{{ addslashes($t->title) }}')" class="task-dots-btn" title="{{ __('More actions') }}">
                                                 •••
                                             </button>
                                         </div>
                                     </div>
 
-                                    <div style="font-weight: 800; font-size: 13px; color: var(--text-primary); margin-bottom: 6px; line-height: 1.4;">
+                                    <!-- Body: Title -->
+                                    <h4 class="task-card-title">
                                         {{ $t->title }}
-                                    </div>
+                                    </h4>
 
-                                    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
-                                        <span>📁 {{ $t->project->name ?? 'General' }}</span>
+                                    @if($t->approval_status === 'pending_approval')
+                                        <div style="background: rgba(214, 162, 58, 0.15); border: 1px solid rgba(214, 162, 58, 0.35); color: #D6A23A; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
+                                            <span>⏳ {{ __('Pending PM Approval') }}</span>
+                                            <button type="button" onclick="event.stopPropagation(); quickApproveTask('{{ $t->id }}')" class="tactile-btn" style="background: #4F9B5F; color: white; padding: 2px 6px; font-size: 9px; border: none; border-radius: 4px;">✓ {{ __('Approve') }}</button>
+                                        </div>
+                                    @elseif($t->approval_status === 'rejected')
+                                        <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); color: #D96B5F; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 8px;">
+                                            <span>⚠️ {{ __('Changes Requested') }}</span>
+                                        </div>
+                                    @endif
+
+                                    <!-- Metadata: Project & Due Date -->
+                                    <div class="task-card-meta">
+                                        <span class="task-project-name">📁 {{ $t->project->name ?? 'General' }}</span>
                                         @if($t->due_date)
-                                            <span>•</span>
-                                            <span style="color: {{ $t->due_date->isPast() && $t->status !== 'done' ? '#D96B5F' : 'inherit' }}; font-weight: 600;">
+                                            <span class="task-due-date {{ $t->due_date->isPast() && $t->status !== 'done' ? 'is-overdue' : '' }}">
                                                 📅 {{ $t->due_date->format('M d') }}
                                             </span>
                                         @endif
                                     </div>
 
-                                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 8px; font-size: 11px;">
-                                        <div style="display: flex; align-items: center; gap: 6px;">
+                                    <!-- Footer: Assignee & Direct Status Dropdown & Timer -->
+                                    <div class="task-card-footer">
+                                        <div class="task-assignee-chip">
                                             @if($t->assignee)
-                                                <div style="width: 22px; height: 22px; border-radius: 50%; background: var(--accent-gradient); color: white; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800;">
+                                                <div class="task-avatar-circle" title="{{ $t->assignee->name }}">
                                                     {{ strtoupper(substr($t->assignee->name, 0, 2)) }}
                                                 </div>
-                                                <span style="font-weight: 700; color: var(--text-secondary);">{{ explode(' ', $t->assignee->name)[0] }}</span>
+                                                <span style="max-width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ explode(' ', $t->assignee->name)[0] }}</span>
                                             @else
-                                                <span style="color: var(--text-muted); font-size: 10px;">— {{ __('Unassigned') }} —</span>
+                                                <span style="color: var(--text-muted); font-size: 10.5px;">👤 {{ __('Unassigned') }}</span>
                                             @endif
                                         </div>
 
                                         <div style="display: flex; align-items: center; gap: 6px;">
-                                            <span style="font-family: monospace; font-size: 10px; font-weight: 700; color: var(--text-muted);">
-                                                {{ $t->estimated_hours ? $t->estimated_hours . 'h' : '' }}
-                                            </span>
-                                            <button onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--brand-forest); border: 1px solid rgba(79, 155, 95, 0.3); padding: 3px 8px; font-size: 10px;" title="{{ __('Start Timer') }}">
-                                                ▶
+                                            <select onclick="event.stopPropagation()" onchange="updateTaskStatusDirect('{{ $t->id }}', this.value)" class="card-status-select">
+                                                <option value="backlog" {{ $t->status === 'backlog' ? 'selected' : '' }}>📌 {{ __('Backlog') }}</option>
+                                                <option value="ready" {{ $t->status === 'ready' ? 'selected' : '' }}>🎯 {{ __('Ready') }}</option>
+                                                <option value="in_progress" {{ $t->status === 'in_progress' ? 'selected' : '' }}>⚡ {{ __('In Progress') }}</option>
+                                                <option value="review" {{ $t->status === 'review' || $t->status === 'qa' ? 'selected' : '' }}>🔍 {{ __('Review') }}</option>
+                                                <option value="done" {{ $t->status === 'done' ? 'selected' : '' }}>🎉 {{ __('Done') }}</option>
+                                            </select>
+
+                                            <button type="button" onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--brand-forest); border: 1px solid rgba(79, 155, 95, 0.3); padding: 3px 8px; font-size: 10.5px; border-radius: var(--radius-full);" title="{{ __('Start Timer') }}">
+                                                ▶ {{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h
                                             </button>
                                         </div>
                                     </div>
@@ -4686,40 +4696,85 @@
                     @php
                         $colTasks = ($colKey === 'review') ? $myTasks->whereIn('status', ['review', 'qa']) : $myTasks->where('status', $colKey);
                     @endphp
-                    <div class="card" style="border-radius: var(--radius-lg); padding: 14px; background: var(--bg-surface-subtle); display: flex; flex-direction: column;">
+                    <div class="card mytasks-kanban-column" id="mytasks-kanban-zone-{{ $colKey }}" style="border-radius: var(--radius-lg); padding: 14px; background: var(--bg-surface-subtle); display: flex; flex-direction: column;">
                         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid {{ $colMeta['border'] }}; padding-bottom: 10px; margin-bottom: 12px;">
                             <h3 style="font-size: 14px; font-weight: 900; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
                                 <span>{{ $colMeta['title'] }}</span>
                             </h3>
-                            <span class="nav-badge-pill" style="font-weight: 800;">{{ $colTasks->count() }}</span>
+                            <span class="nav-badge-pill" id="mytasks-kanban-cnt-{{ $colKey }}" style="font-weight: 800;">{{ $colTasks->count() }}</span>
                         </div>
 
-                        <div style="display: flex; flex-direction: column; gap: 10px; flex: 1;">
+                        <div class="kanban-cards-container" id="mytasks-kanban-col-{{ $colKey }}" data-status="{{ $colKey }}" style="display: flex; flex-direction: column; gap: 10px; flex: 1; min-height: 120px;">
                             @forelse($colTasks as $t)
                                 @php
-                                    $canEditThisTask = ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || ($t->project && $t->project->manager_id === $user->id) || $t->assignee_id === $user->id || $t->creator_id === $user->id);
+                                    $canEditThisTask = $user->can('update', $t);
                                     $isManager = ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || ($t->project && $t->project->manager_id === $user->id));
                                 @endphp
-                                <div class="kanban-task-card" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 12px; box-shadow: var(--shadow-card); cursor: pointer;" onclick="openTaskDetails('{{ $t->id }}')">
-                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 6px;">
-                                        <div style="display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
-                                            <span class="nav-badge-pill" style="font-family: monospace; font-size: 9px; font-weight: 800;">#{{ $t->task_number ?? 1 }}</span>
-                                            <span class="nav-badge-pill" style="font-size: 9px; font-weight: 700; color: var(--brand-forest); background: rgba(79, 155, 95, 0.12);">
-                                                {{ $t->project->code ?? 'PRJ' }}
+                                <div class="kanban-task-card" 
+                                     id="mytasks-card-{{ $t->id }}" 
+                                     data-id="{{ $t->id }}" 
+                                     data-status="{{ $t->status }}" 
+                                     oncontextmenu="event.preventDefault(); event.stopPropagation(); openTaskContextMenu(event, '{{ $t->id }}', '{{ $t->project_id }}', '{{ addslashes($t->title) }}')"
+                                     onclick="openTaskDetails('{{ $t->id }}')">
+                                    
+                                    <!-- Header: Project Code & Action Buttons -->
+                                    <div class="task-card-header">
+                                        <div class="task-card-tags">
+                                            <span class="task-code-badge">
+                                                {{ $t->project->code ?? 'PRJ' }}-#{{ $t->task_number ?? 1 }}
                                             </span>
                                             @if($t->checklistItems && $t->checklistItems->count() > 0)
-                                                <span class="nav-badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.15); color: #4F9B5F;">
+                                                <span class="badge-pill badge-green" style="font-size: 9.5px;" title="{{ __('Checklist Progress') }}">
                                                     ⊞ {{ $t->checklistItems->where('is_completed', true)->count() }}/{{ $t->checklistItems->count() }}
                                                 </span>
                                             @endif
                                         </div>
-                                        <div style="display: flex; align-items: center; gap: 4px;">
+
+                                        <div class="task-card-actions">
                                             @if($t->priority === 'urgent')
-                                                <span class="nav-badge-pill" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F; font-size: 9px; font-weight: 800;">🔥</span>
+                                                <span class="badge-pill badge-danger">🔥 {{ __('Urgent') }}</span>
                                             @elseif($t->priority === 'high')
-                                                <span class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.15); color: #D6A23A; font-size: 9px; font-weight: 800;">⚡</span>
+                                                <span class="badge-pill badge-gold">⚡ {{ __('High') }}</span>
                                             @endif
-                                            <select onclick="event.stopPropagation()" onchange="updateTaskStatusDirect('{{ $t->id }}', this.value)" {{ $canEditThisTask ? '' : 'disabled' }} style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 9px; font-weight: 700; border-radius: 6px; padding: 2px 4px; outline: none; cursor: {{ $canEditThisTask ? 'pointer' : 'not-allowed' }};">
+
+                                            <button type="button" onclick="event.stopPropagation(); openTaskContextMenu(event, '{{ $t->id }}', '{{ $t->project_id }}', '{{ addslashes($t->title) }}')" class="task-dots-btn" title="{{ __('More actions') }}">
+                                                •••
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Body: Title -->
+                                    <h4 class="task-card-title">
+                                        {{ $t->title }}
+                                    </h4>
+
+                                    @if($t->approval_status === 'pending_approval')
+                                        <div style="background: rgba(214, 162, 58, 0.15); border: 1px solid rgba(214, 162, 58, 0.35); color: #D6A23A; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
+                                            <span>⏳ {{ __('Pending PM Approval') }}</span>
+                                            @if($isManager)
+                                                <button type="button" onclick="event.stopPropagation(); quickApproveTask('{{ $t->id }}')" class="tactile-btn" style="background: #4F9B5F; color: white; padding: 2px 6px; font-size: 9px; border: none; border-radius: 4px;">✓ {{ __('Approve') }}</button>
+                                            @endif
+                                        </div>
+                                    @elseif($t->approval_status === 'rejected')
+                                        <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); color: #D96B5F; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 8px;">
+                                            <span>⚠️ {{ __('Changes Requested') }}</span>
+                                        </div>
+                                    @endif
+
+                                    <!-- Metadata: Project & Due Date -->
+                                    <div class="task-card-meta">
+                                        <span class="task-project-name">📁 {{ $t->project->name ?? 'General' }}</span>
+                                        @if($t->due_date)
+                                            <span class="task-due-date {{ $t->due_date->isPast() && $t->status !== 'done' ? 'is-overdue' : '' }}">
+                                                📅 {{ $t->due_date->format('M d') }}
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    <!-- Footer: Direct Status Dropdown & Timer -->
+                                    <div class="task-card-footer">
+                                        <div style="display: flex; align-items: center; gap: 6px;">
+                                            <select onclick="event.stopPropagation()" onchange="updateTaskStatusDirect('{{ $t->id }}', this.value)" class="card-status-select" {{ $canEditThisTask ? '' : 'disabled' }}>
                                                 <option value="backlog" {{ $t->status === 'backlog' ? 'selected' : '' }}>📌 {{ __('Backlog') }}</option>
                                                 <option value="ready" {{ $t->status === 'ready' ? 'selected' : '' }}>🎯 {{ __('Ready') }}</option>
                                                 <option value="in_progress" {{ $t->status === 'in_progress' ? 'selected' : '' }}>⚡ {{ __('In Progress') }}</option>
@@ -4727,44 +4782,14 @@
                                                 <option value="done" {{ $t->status === 'done' ? 'selected' : '' }}>🎉 {{ __('Done') }}</option>
                                             </select>
                                         </div>
-                                    </div>
 
-                                    <div style="font-weight: 800; font-size: 12px; margin-bottom: 4px; color: var(--text-primary); line-height: 1.3;">{{ $t->title }}</div>
-
-                                    @if($t->approval_status === 'pending_approval')
-                                        <div style="background: rgba(214, 162, 58, 0.15); border: 1px solid rgba(214, 162, 58, 0.3); color: #D6A23A; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between;">
-                                            <span>⏳ {{ __('Pending PM Approval') }}</span>
-                                            @if($isManager)
-                                                <button onclick="event.stopPropagation(); quickApproveTask('{{ $t->id }}')" class="tactile-btn" style="background: #4F9B5F; color: white; padding: 2px 6px; font-size: 9px; border: none;">✓ {{ __('Approve') }}</button>
-                                            @endif
-                                        </div>
-                                    @elseif($t->approval_status === 'rejected')
-                                        <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.3); color: #D96B5F; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 6px; margin-bottom: 6px;">
-                                            <span>⚠️ {{ __('Changes Requested') }}</span>
-                                        </div>
-                                    @endif
-
-                                    <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 8px; display: flex; align-items: center; gap: 4px;">
-                                        <span>📁 {{ $t->project->name ?? 'General' }}</span>
-                                        @if($t->due_date)
-                                            <span>•</span>
-                                            <span style="{{ $t->due_date->isPast() && $t->status !== 'done' ? 'color: #D96B5F; font-weight: 800;' : '' }}">
-                                                📅 {{ $t->due_date->format('M d') }}
-                                            </span>
-                                        @endif
-                                    </div>
-
-                                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 6px; font-size: 10px;">
-                                        <span style="font-family: monospace; font-size: 9px; font-weight: 700; color: var(--brand-forest);">
-                                            ⏱️ {{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h{{ $t->estimated_hours ? ' / ' . $t->estimated_hours . 'h' : '' }}
-                                        </span>
-                                        <button onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--brand-forest); border: 1px solid rgba(79, 155, 95, 0.3); padding: 3px 8px; font-size: 10px; font-weight: 800;">
-                                            ▶ {{ __('Timer') }}
+                                        <button type="button" onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--brand-forest); border: 1px solid rgba(79, 155, 95, 0.3); padding: 3px 8px; font-size: 10.5px; border-radius: var(--radius-full);" title="{{ __('Start Timer') }}">
+                                            ▶ {{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h
                                         </button>
                                     </div>
                                 </div>
                             @empty
-                                <div style="text-align: center; padding: 18px 8px; color: var(--text-muted); font-size: 11px; border: 1px dashed var(--border-color); border-radius: var(--radius-md);">
+                                <div class="mytasks-empty-hint" id="mytasks-empty-{{ $colKey }}" style="text-align: center; padding: 18px 8px; color: var(--text-muted); font-size: 11px; border: 1px dashed var(--border-color); border-radius: var(--radius-md);">
                                     {{ __('No tasks in this stage.') }}
                                 </div>
                             @endforelse
@@ -6467,34 +6492,34 @@
     <!-- 🌟 CLICKUP-PARITY 3D TASK CONTEXT MENU 🌟 -->
     <div id="task-context-menu" class="task-context-menu" onclick="event.stopPropagation();">
         <div class="ctx-quick-header">
-            <button type="button" class="ctx-quick-btn" onclick="ctxActionCopyLink()">
-                🔗 {{ __('Copy link') }}
+            <button type="button" class="ctx-quick-btn" onclick="ctxActionCopyLink()" title="{{ __('Copy Task Link') }}">
+                🔗 {{ __('Link') }}
             </button>
-            <button type="button" class="ctx-quick-btn" onclick="ctxActionCopyId()">
-                # {{ __('Copy ID') }}
+            <button type="button" class="ctx-quick-btn" onclick="ctxActionCopyId()" title="{{ __('Copy Task ID') }}">
+                # {{ __('ID') }}
             </button>
-            <button type="button" class="ctx-quick-btn" onclick="ctxActionOpenNewTab()">
-                ↗ {{ __('New tab') }}
+            <button type="button" class="ctx-quick-btn" onclick="ctxActionOpenNewTab()" title="{{ __('Open in New Tab') }}">
+                ↗ {{ __('Tab') }}
             </button>
         </div>
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionInspect()">
             <span><span class="ctx-icon">🔍</span>{{ __('Inspect & Edit') }}</span>
-            <span style="font-size: 10px; color: var(--text-muted);">Enter</span>
+            <span style="font-size: 10px; color: var(--text-muted); font-family: monospace;">↵</span>
         </a>
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionStartTimer()">
-            <span><span class="ctx-icon">⏱️</span>{{ __('Start timer') }}</span>
-            <span class="nav-badge-pill" style="font-size: 9px; background: rgba(79,155,95,0.15); color: #4F9B5F;">Live</span>
+            <span><span class="ctx-icon">⏱️</span>{{ __('Start Timer') }}</span>
+            <span class="badge-pill badge-green" style="font-size: 9px;">▶ Live</span>
         </a>
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionDuplicate()">
-            <span><span class="ctx-icon">📋</span>{{ __('Duplicate') }}</span>
+            <span><span class="ctx-icon">📋</span>{{ __('Duplicate Task') }}</span>
         </a>
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionOpenMoveModal()">
-            <span><span class="ctx-icon">➡️</span>{{ __('Move to...') }}</span>
-            <span style="font-size: 10px; color: var(--text-muted);">›</span>
+            <span><span class="ctx-icon">➡️</span>{{ __('Move to Project') }}</span>
+            <span style="font-size: 11px; color: var(--text-muted);">›</span>
         </a>
 
         <div class="ctx-divider"></div>
@@ -6504,21 +6529,15 @@
         </a>
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionInspectDependencies()">
-            <span><span class="ctx-icon">🔗</span>{{ __('Relationships') }}</span>
+            <span><span class="ctx-icon">🔗</span>{{ __('Dependencies') }}</span>
         </a>
 
         <div class="ctx-divider"></div>
 
         <a href="javascript:void(0)" class="ctx-item danger" onclick="ctxActionDelete()">
-            <span><span class="ctx-icon">🗑️</span>{{ __('Delete') }}</span>
-            <span style="font-size: 10px; color: #D96B5F;">Del</span>
+            <span><span class="ctx-icon">🗑️</span>{{ __('Delete Task') }}</span>
+            <span style="font-size: 10px; color: #D96B5F; font-family: monospace;">Del</span>
         </a>
-
-        <div style="margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--border-color);">
-            <button type="button" onclick="ctxActionPermissions()" style="width: 100%; border: none; background: linear-gradient(135deg, #4F9B5F 0%, #245C3A 100%); color: white; padding: 7px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 6px rgba(36,92,58,0.25);">
-                🔒 {{ __('Sharing & Permissions') }}
-            </button>
-        </div>
     </div>
 
     <!-- Move Task Modal -->
@@ -6696,6 +6715,9 @@
                 if (window.history && window.history.pushState) {
                     window.history.pushState(null, null, '#' + tabName);
                 }
+                if (tabName === 'my-tasks' || tabName === 'all-tasks') {
+                    setTimeout(initDashboardSortableKanban, 80);
+                }
             }
 
             // Close mobile sidebar if open
@@ -6837,6 +6859,7 @@
             if (hash && document.getElementById(`tab-${hash}`)) {
                 switchAdminTab(hash);
             }
+            setTimeout(initDashboardSortableKanban, 200);
         });
 
         // ── Department Modals ──
@@ -8136,20 +8159,60 @@
         }
 
         async function updateTaskStatusDirect(taskId, newStatus) {
-            // Optimistically update Kanban card
-            const card = document.getElementById(`global-kanban-card-${taskId}`);
-            if (card) {
+            // 1. Optimistically update My Tasks Kanban card
+            const myCard = document.getElementById(`mytasks-card-${taskId}`);
+            if (myCard) {
+                const targetMyCol = document.getElementById(`mytasks-kanban-col-${newStatus}`);
+                if (targetMyCol) {
+                    const emptyHint = targetMyCol.querySelector('.mytasks-empty-hint');
+                    if (emptyHint) emptyHint.remove();
+                    targetMyCol.appendChild(myCard);
+                }
+                myCard.dataset.status = newStatus;
+                myCard.setAttribute('data-status', newStatus);
+                const mySelect = myCard.querySelector('select');
+                if (mySelect) mySelect.value = newStatus;
+
+                // Update My Tasks column count badges
+                ['backlog', 'ready', 'in_progress', 'review', 'done'].forEach(st => {
+                    const col = document.getElementById(`mytasks-kanban-col-${st}`);
+                    const badge = document.getElementById(`mytasks-kanban-cnt-${st}`);
+                    if (col && badge) {
+                        const cnt = col.querySelectorAll('.kanban-task-card').length;
+                        badge.textContent = cnt;
+                        if (cnt === 0 && !col.querySelector('.mytasks-empty-hint')) {
+                            const hint = document.createElement('div');
+                            hint.className = 'mytasks-empty-hint';
+                            hint.id = `mytasks-empty-${st}`;
+                            hint.style.cssText = 'text-align: center; padding: 18px 8px; color: var(--text-muted); font-size: 11px; border: 1px dashed var(--border-color); border-radius: var(--radius-md);';
+                            hint.textContent = "{{ __('No tasks in this stage.') }}";
+                            col.appendChild(hint);
+                        }
+                    }
+                });
+
+                // Update My Tasks Nav Badge in sidebar
+                const myNonDoneCount = document.querySelectorAll('#tab-my-tasks .kanban-task-card:not([data-status="done"])').length;
+                const myNavBadge = document.querySelector('#nav-btn-my-tasks .nav-badge-pill');
+                if (myNavBadge) myNavBadge.textContent = myNonDoneCount;
+            }
+
+            // 2. Optimistically update All Tasks Global Kanban card
+            const globalCard = document.getElementById(`global-kanban-card-${taskId}`);
+            if (globalCard) {
                 const targetContainer = document.getElementById(`global-kanban-col-${newStatus}`);
                 if (targetContainer) {
                     const emptyHint = targetContainer.querySelector('.kanban-empty-hint');
                     if (emptyHint) emptyHint.remove();
-                    targetContainer.appendChild(card);
+                    targetContainer.appendChild(globalCard);
                 }
-                card.dataset.status = newStatus;
-                const cardSelect = card.querySelector('select');
+                globalCard.dataset.status = newStatus;
+                globalCard.setAttribute('data-status', newStatus);
+                const cardSelect = globalCard.querySelector('select');
                 if (cardSelect) cardSelect.value = newStatus;
             }
 
+            // 3. Update Table View Row if present
             const matchingRow = document.querySelector(`.alltask-row[data-id="${taskId}"]`);
             if (matchingRow) {
                 matchingRow.dataset.status = newStatus;
@@ -8174,6 +8237,61 @@
             } catch (e) {
                 alert('Network error updating task.');
             }
+        }
+
+        // ── SORTABLEJS KANBAN INITIALIZER (MY TASKS & ALL TASKS) ──
+        function initDashboardSortableKanban() {
+            if (typeof Sortable === 'undefined') return;
+
+            // 1. My Tasks Kanban Columns
+            ['backlog', 'ready', 'in_progress', 'review', 'done'].forEach(st => {
+                const col = document.getElementById(`mytasks-kanban-col-${st}`);
+                if (col && !col._sortable) {
+                    col._sortable = new Sortable(col, {
+                        group: 'mytasks-kanban',
+                        animation: 180,
+                        ghostClass: 'kanban-card-ghost',
+                        chosenClass: 'kanban-card-chosen',
+                        dragClass: 'kanban-card-drag',
+                        draggable: '.kanban-task-card',
+                        onEnd: function(evt) {
+                            const item = evt.item;
+                            const toCol = evt.to;
+                            const targetStatus = toCol.getAttribute('data-status');
+                            const taskId = item.getAttribute('data-id');
+                            const oldStatus = item.getAttribute('data-status');
+                            if (taskId && targetStatus && targetStatus !== oldStatus) {
+                                updateTaskStatusDirect(taskId, targetStatus);
+                            }
+                        }
+                    });
+                }
+            });
+
+            // 2. All Tasks Global Kanban Columns
+            ['backlog', 'ready', 'in_progress', 'review', 'done'].forEach(st => {
+                const col = document.getElementById(`global-kanban-col-${st}`);
+                if (col && !col._sortable) {
+                    col._sortable = new Sortable(col, {
+                        group: 'global-kanban',
+                        animation: 180,
+                        ghostClass: 'kanban-card-ghost',
+                        chosenClass: 'kanban-card-chosen',
+                        dragClass: 'kanban-card-drag',
+                        draggable: '.global-kanban-card',
+                        onEnd: function(evt) {
+                            const item = evt.item;
+                            const toCol = evt.to;
+                            const targetStatus = toCol.getAttribute('data-status') || toCol.id.replace('global-kanban-col-', '');
+                            const taskId = item.getAttribute('data-id') || item.id.replace('global-kanban-card-', '');
+                            const oldStatus = item.getAttribute('data-status');
+                            if (taskId && targetStatus && targetStatus !== oldStatus) {
+                                updateTaskStatusDirect(taskId, targetStatus);
+                            }
+                        }
+                    });
+                }
+            });
         }
 
         // ── TASK CONTEXT MENU ENGINE (CLICKUP-PARITY) ──
