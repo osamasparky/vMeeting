@@ -5939,23 +5939,7 @@
         // ==========================================
         const upcomingMeetingsList = {!! json_encode($upcomingMeetingsJson ?? []) !!};
 
-        const projectMembersMap = {
-            @foreach($projects as $p)
-                '{{ $p->id }}': [
-                    @php
-                        $pMembers = collect();
-                        if ($p->owner) $pMembers->push($p->owner);
-                        if ($p->manager) $pMembers->push($p->manager);
-                        $pTaskUserIds = $p->tasks()->whereNotNull('assignee_id')->pluck('assignee_id')->unique();
-                        $pTaskUsers = \App\Domains\Identity\Models\User::whereIn('id', $pTaskUserIds)->get();
-                        $pMembers = $pMembers->concat($pTaskUsers)->unique('id');
-                    @endphp
-                    @foreach($pMembers as $pm)
-                        { id: '{{ $pm->id }}', name: '{{ addslashes($pm->name) }}', email: '{{ addslashes($pm->email) }}' },
-                    @endforeach
-                ],
-            @endforeach
-        };
+        const projectMembersMap = @json($projectMembersMap ?? []);
 
         function openScheduleMeetingModal(scope = 'general', projectId = null) {
             const modal = document.getElementById('schedule-meeting-modal');

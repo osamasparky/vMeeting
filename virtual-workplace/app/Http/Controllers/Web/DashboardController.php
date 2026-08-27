@@ -133,6 +133,23 @@ class DashboardController extends Controller
             ];
         })->values();
 
+        $tasksByProject = $tasks->groupBy('project_id');
+        $projectMembersMap = [];
+        foreach ($projects as $p) {
+            $pMembers = collect();
+            if ($p->owner) $pMembers->push($p->owner);
+            if ($p->manager) $pMembers->push($p->manager);
+            $pTasks = $tasksByProject->get($p->id, collect());
+            $pTaskUserIds = $pTasks->whereNotNull('assignee_id')->pluck('assignee_id')->unique();
+            $pTaskUsers = $members->whereIn('user_id', $pTaskUserIds)->pluck('user');
+            $pMembers = $pMembers->concat($pTaskUsers)->filter()->unique('id');
+            $projectMembersMap[$p->id] = $pMembers->map(fn($pm) => [
+                'id' => $pm->id,
+                'name' => $pm->name,
+                'email' => $pm->email,
+            ])->values()->all();
+        }
+
         $pendingSubscriptionRequest = $organization->pendingSubscriptionRequest()->with('plan')->first();
 
         return view('dashboard', compact(
@@ -140,7 +157,7 @@ class DashboardController extends Controller
             'departments', 'teams', 'auditLogs', 'guestInvitations', 'allPlans',
             'projects', 'tasks', 'myTasks', 'activeTimer', 'recentTimeEntries', 'allTimesheets', 'myProfile',
             'upcomingMeetings', 'allMeetings', 'smtpSettings', 'openAiSettings', 'upcomingMeetingsJson',
-            'pendingSubscriptionRequest', 'attendancePolicy'
+            'pendingSubscriptionRequest', 'attendancePolicy', 'projectMembersMap'
         ));
     }
 
