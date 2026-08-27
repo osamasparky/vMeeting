@@ -881,7 +881,7 @@
 
             @if(!empty($user->is_guest))
                 <span class="guest-badge" style="font-weight: 800;">
-                    🛡️ {{ __('دخول ضيف') }} ({{ $user->name }})
+                    🛡️ GUEST ACCESS ({{ $user->name }})
                 </span>
             @endif
         </div>

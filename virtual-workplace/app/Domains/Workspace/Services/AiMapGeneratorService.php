@@ -167,10 +167,7 @@ class AiMapGeneratorService
                     $b64Data = $openAiData['data'][0]['b64_json'] ?? null;
 
                     $filename = 'ai_map_'.$organization->id.'_'.time().'.png';
-                    $destinationDir = public_path('uploads/maps');
-                    if (! File::isDirectory($destinationDir)) {
-                        File::makeDirectory($destinationDir, 0755, true, true);
-                    }
+                    $destinationDir = \App\Services\FileUploadService::ensureDirectory(public_path('uploads/maps'), 0755);
 
                     if (! empty($b64Data)) {
                         $imageBinary = base64_decode($b64Data);

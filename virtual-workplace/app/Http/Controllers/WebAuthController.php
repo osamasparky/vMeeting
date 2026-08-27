@@ -3278,9 +3278,7 @@ class WebAuthController extends Controller
         $fileName = 'prj_' . $project->id . '_' . time() . '_' . Str::random(6) . '.' . $ext;
 
         $destDir = public_path('uploads/projects/' . $project->id);
-        if (!file_exists($destDir)) {
-            mkdir($destDir, 0755, true);
-        }
+        \App\Services\FileUploadService::ensureDirectory($destDir, 0755);
         $uploadedFile->move($destDir, $fileName);
         $fileUrl = '/uploads/projects/' . $project->id . '/' . $fileName;
 
@@ -3351,9 +3349,7 @@ class WebAuthController extends Controller
         $fileName = 'task_' . $task->id . '_' . time() . '_' . Str::random(6) . '.' . $ext;
 
         $destDir = public_path('uploads/tasks/' . $task->id);
-        if (!file_exists($destDir)) {
-            mkdir($destDir, 0755, true);
-        }
+        \App\Services\FileUploadService::ensureDirectory($destDir, 0755);
         $uploadedFile->move($destDir, $fileName);
         $fileUrl = '/uploads/tasks/' . $task->id . '/' . $fileName;
 
