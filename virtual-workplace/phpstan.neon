@@ -1,0 +1,9 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app
+
+    # Level 2 focuses on syntax, undefined methods/properties, and critical type mismatches
+    level: 2
