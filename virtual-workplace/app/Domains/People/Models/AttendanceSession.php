@@ -12,9 +12,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AttendanceSession extends Model
 {
-    use HasUuid, BelongsToOrganization;
+    use BelongsToOrganization, HasUuid;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [

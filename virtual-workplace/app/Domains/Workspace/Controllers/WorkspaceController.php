@@ -9,7 +9,6 @@ use App\Domains\Workspace\Actions\CreateRoomAction;
 use App\Domains\Workspace\Actions\CreateZoneAction;
 use App\Domains\Workspace\Actions\PublishMapAction;
 use App\Domains\Workspace\Actions\SyncMapObjectsAction;
-use App\Domains\Workspace\Models\Floor;
 use App\Domains\Workspace\Models\Map;
 use App\Domains\Workspace\Models\Room;
 use App\Domains\Workspace\Models\Zone;
@@ -23,6 +22,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class WorkspaceController extends Controller
 {
@@ -143,7 +143,7 @@ class WorkspaceController extends Controller
         ]);
     }
 
-    public function uploadBackground(\Illuminate\Http\Request $request, Organization $organization, Map $map): JsonResponse
+    public function uploadBackground(Request $request, Organization $organization, Map $map): JsonResponse
     {
         if ($map->organization_id !== $organization->id) {
             return response()->json(['message' => 'Unauthorized map access.'], 403);
@@ -154,9 +154,9 @@ class WorkspaceController extends Controller
         ]);
 
         $file = $request->file('image');
-        $filename = 'floorplan_' . $map->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $filename = 'floorplan_'.$map->id.'_'.time().'.'.$file->getClientOriginalExtension();
         $path = $file->storeAs('maps', $filename, 'public');
-        $url = \Illuminate\Support\Facades\Storage::url($path);
+        $url = Storage::url($path);
 
         $layoutData = $map->layout_data ?? [];
         $layoutData['background_image_url'] = $url;
@@ -192,7 +192,7 @@ class WorkspaceController extends Controller
         ], 201);
     }
 
-    public function updateRoom(\Illuminate\Http\Request $request, Organization $organization, Room $room): JsonResponse
+    public function updateRoom(Request $request, Organization $organization, Room $room): JsonResponse
     {
         if ($room->organization_id !== $organization->id) {
             return response()->json(['message' => 'Unauthorized room access.'], 403);
@@ -205,7 +205,7 @@ class WorkspaceController extends Controller
             'capacity',
             'color',
             'bounds',
-            'metadata'
+            'metadata',
         ]));
 
         return response()->json([

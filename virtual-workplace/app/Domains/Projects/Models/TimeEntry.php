@@ -12,17 +12,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TimeEntry extends Model
 {
-    use HasFactory, HasUuid, BelongsToOrganization, Auditable;
+    use Auditable, BelongsToOrganization, HasFactory, HasUuid;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     public const STATUS_DRAFT = 'draft';
+
     public const STATUS_SUBMITTED = 'submitted';
+
     public const STATUS_APPROVED = 'approved';
+
     public const STATUS_REJECTED = 'rejected';
 
     public const TYPE_TIMER = 'timer';
+
     public const TYPE_MANUAL = 'manual';
 
     protected $fillable = [
@@ -100,9 +105,10 @@ class TimeEntry extends Model
 
     public function billableRevenue(): float
     {
-        if (!$this->is_billable) {
+        if (! $this->is_billable) {
             return 0.00;
         }
+
         return (float) round(($this->duration_seconds / 3600) * (float) $this->billing_rate, 2);
     }
 }

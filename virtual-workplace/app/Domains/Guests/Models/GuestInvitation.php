@@ -12,9 +12,10 @@ use Illuminate\Support\Str;
 
 class GuestInvitation extends Model
 {
-    use HasUuid, BelongsToOrganization;
+    use BelongsToOrganization, HasUuid;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -58,6 +59,6 @@ class GuestInvitation extends Model
 
     public function isValid(): bool
     {
-        return $this->status === 'approved' && !$this->isExpired();
+        return $this->status === 'approved' && ! $this->isExpired();
     }
 }

@@ -10,9 +10,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Room extends Model
 {
-    use HasUuid, BelongsToOrganization, Auditable;
+    use Auditable, BelongsToOrganization, HasUuid;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [

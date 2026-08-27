@@ -2,17 +2,24 @@
 
 namespace App\Domains\Projects\Controllers;
 
+use App\Domains\Administration\Models\AuditLog;
+use App\Domains\Projects\Actions\AddTaskCommentAction;
+use App\Domains\Projects\Actions\AddTaskDependencyAction;
 use App\Domains\Projects\Actions\AssignTaskAction;
 use App\Domains\Projects\Actions\CreateTaskAction;
+use App\Domains\Projects\Actions\ManageTaskChecklistAction;
 use App\Domains\Projects\Actions\UpdateTaskAction;
 use App\Domains\Projects\Actions\UpdateTaskStatusAction;
 use App\Domains\Projects\Models\Project;
 use App\Domains\Projects\Models\Task;
+use App\Domains\Projects\Models\TaskChecklistItem;
+use App\Domains\Projects\Models\TaskCustomFieldValue;
 use App\Domains\Projects\Requests\AssignTaskRequest;
 use App\Domains\Projects\Requests\StoreTaskRequest;
 use App\Domains\Projects\Requests\UpdateTaskRequest;
 use App\Domains\Projects\Requests\UpdateTaskStatusRequest;
 use App\Domains\Tenancy\Models\Organization;
+use App\Domains\Tenancy\Models\OrganizationMember;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -75,7 +82,7 @@ class TaskController extends Controller
 
         $dueToday = $allTasks->filter(fn ($t) => $t->due_date && $t->due_date->toDateString() === $today && $t->status !== Task::STATUS_DONE);
         $overdue = $allTasks->filter(fn ($t) => $t->due_date && $t->due_date->toDateString() < $today && $t->status !== Task::STATUS_DONE);
-        $upcoming = $allTasks->filter(fn ($t) => (!$t->due_date || $t->due_date->toDateString() > $today) && $t->status !== Task::STATUS_DONE);
+        $upcoming = $allTasks->filter(fn ($t) => (! $t->due_date || $t->due_date->toDateString() > $today) && $t->status !== Task::STATUS_DONE);
         $completed = $allTasks->filter(fn ($t) => $t->status === Task::STATUS_DONE);
 
         return response()->json([
@@ -130,7 +137,7 @@ class TaskController extends Controller
             'dependencies.dependsOnTask:id,title,status',
         ]);
 
-        $auditLogs = \App\Domains\Administration\Models\AuditLog::where('target_type', Task::class)
+        $auditLogs = AuditLog::where('target_type', Task::class)
             ->where('target_id', $task->id)
             ->with(['actor:id,name,email'])
             ->latest()
@@ -170,7 +177,7 @@ class TaskController extends Controller
             return response()->json(['message' => 'Task not found.'], 404);
         }
 
-        $logs = \App\Domains\Administration\Models\AuditLog::where('target_type', Task::class)
+        $logs = AuditLog::where('target_type', Task::class)
             ->where('target_id', $task->id)
             ->with(['actor:id,name,email'])
             ->latest()
@@ -206,7 +213,7 @@ class TaskController extends Controller
     protected function authorizeTaskEdit(Organization $organization, Task $task): void
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             abort(401, 'Unauthenticated.');
         }
 
@@ -224,12 +231,12 @@ class TaskController extends Controller
             return;
         }
 
-        $membership = \App\Domains\Tenancy\Models\OrganizationMember::where('organization_id', $organization->id)
+        $membership = OrganizationMember::where('organization_id', $organization->id)
             ->where('user_id', $user->id)
             ->with('role.permissions')
             ->first();
 
-        if (!$membership) {
+        if (! $membership) {
             abort(403, 'Unauthorized.');
         }
 
@@ -281,6 +288,10 @@ class TaskController extends Controller
 
         $updated = $action->execute($task, $request->validated('status'));
 
+        // Check Milestone completion and auto-recalculate project goals
+        $updated->milestone?->checkAndUpdateStatus();
+        $updated->project?->goals->each->recalculateProgress();
+
         return response()->json([
             'message' => 'Task status updated.',
             'task' => $updated,
@@ -331,7 +342,7 @@ class TaskController extends Controller
         Request $request,
         Organization $organization,
         Task $task,
-        \App\Domains\Projects\Actions\ManageTaskChecklistAction $action
+        ManageTaskChecklistAction $action
     ): JsonResponse {
         if ($task->organization_id !== $organization->id) {
             return response()->json(['message' => 'Task not found.'], 404);
@@ -354,8 +365,8 @@ class TaskController extends Controller
     public function toggleChecklistItem(
         Organization $organization,
         Task $task,
-        \App\Domains\Projects\Models\TaskChecklistItem $item,
-        \App\Domains\Projects\Actions\ManageTaskChecklistAction $action
+        TaskChecklistItem $item,
+        ManageTaskChecklistAction $action
     ): JsonResponse {
         if ($task->organization_id !== $organization->id || $item->task_id !== $task->id) {
             return response()->json(['message' => 'Not found.'], 404);
@@ -378,7 +389,7 @@ class TaskController extends Controller
         Request $request,
         Organization $organization,
         Task $task,
-        \App\Domains\Projects\Actions\AddTaskCommentAction $action
+        AddTaskCommentAction $action
     ): JsonResponse {
         if ($task->organization_id !== $organization->id) {
             return response()->json(['message' => 'Task not found.'], 404);
@@ -404,7 +415,7 @@ class TaskController extends Controller
         Request $request,
         Organization $organization,
         Task $task,
-        \App\Domains\Projects\Actions\AddTaskDependencyAction $action
+        AddTaskDependencyAction $action
     ): JsonResponse {
         if ($task->organization_id !== $organization->id) {
             return response()->json(['message' => 'Task not found.'], 404);
@@ -447,7 +458,7 @@ class TaskController extends Controller
             'value_json' => 'nullable|array',
         ]);
 
-        $customValue = \App\Domains\Projects\Models\TaskCustomFieldValue::updateOrCreate(
+        $customValue = TaskCustomFieldValue::updateOrCreate(
             [
                 'task_id' => $task->id,
                 'custom_field_definition_id' => $validated['custom_field_definition_id'],
@@ -509,7 +520,7 @@ class TaskController extends Controller
             'created_at',
             'updated_at',
         ]);
-        $clone->title = $task->title . ' (Copy)';
+        $clone->title = $task->title.' (Copy)';
         $clone->reporter_id = $user->id;
         $clone->order = Task::where('project_id', $task->project_id)->max('order') + 1;
         $clone->save();
@@ -567,6 +578,35 @@ class TaskController extends Controller
         return response()->json([
             'message' => 'Task moved successfully.',
             'task' => $task->fresh(['project:id,name,code', 'assignee:id,name,email']),
+        ]);
+    }
+
+    /**
+     * Assign milestone to task.
+     */
+    public function setMilestone(Request $request, Organization $organization, Task $task): JsonResponse
+    {
+        if ($task->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Task not found.'], 404);
+        }
+
+        $this->authorizeTaskEdit($organization, $task);
+
+        $validated = $request->validate([
+            'milestone_id' => 'nullable|exists:project_milestones,id',
+        ]);
+
+        $oldMilestone = $task->milestone;
+        $task->milestone_id = $validated['milestone_id'] ?? null;
+        $task->save();
+
+        $oldMilestone?->checkAndUpdateStatus();
+        $task->milestone?->checkAndUpdateStatus();
+        $task->project?->goals->each->recalculateProgress();
+
+        return response()->json([
+            'message' => 'Task milestone updated.',
+            'task' => $task->load('milestone'),
         ]);
     }
 }

@@ -2,6 +2,17 @@
 
 namespace App\Domains\Tenancy\Models;
 
+use App\Domains\Administration\Models\AuditLog;
+use App\Domains\Guests\Models\GuestInvitation;
+use App\Domains\People\Models\Department;
+use App\Domains\People\Models\Team;
+use App\Domains\Projects\Models\Project;
+use App\Domains\Projects\Models\Task;
+use App\Domains\Projects\Models\TimeEntry;
+use App\Domains\Projects\Models\Timesheet;
+use App\Domains\Workspace\Models\Floor;
+use App\Domains\Workspace\Models\Map;
+use App\Domains\Workspace\Models\Room;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,6 +24,7 @@ class Organization extends Model
     use HasUuid;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -52,52 +64,52 @@ class Organization extends Model
 
     public function departments(): HasMany
     {
-        return $this->hasMany(\App\Domains\People\Models\Department::class);
+        return $this->hasMany(Department::class);
     }
 
     public function teams(): HasMany
     {
-        return $this->hasMany(\App\Domains\People\Models\Team::class);
+        return $this->hasMany(Team::class);
     }
 
     public function auditLogs(): HasMany
     {
-        return $this->hasMany(\App\Domains\Administration\Models\AuditLog::class);
+        return $this->hasMany(AuditLog::class);
     }
 
     public function floors(): HasMany
     {
-        return $this->hasMany(\App\Domains\Workspace\Models\Floor::class);
+        return $this->hasMany(Floor::class);
     }
 
     public function maps(): HasMany
     {
-        return $this->hasMany(\App\Domains\Workspace\Models\Map::class);
+        return $this->hasMany(Map::class);
     }
 
     public function rooms(): HasMany
     {
-        return $this->hasMany(\App\Domains\Workspace\Models\Room::class);
+        return $this->hasMany(Room::class);
     }
 
     public function projects(): HasMany
     {
-        return $this->hasMany(\App\Domains\Projects\Models\Project::class);
+        return $this->hasMany(Project::class);
     }
 
     public function tasks(): HasMany
     {
-        return $this->hasMany(\App\Domains\Projects\Models\Task::class);
+        return $this->hasMany(Task::class);
     }
 
     public function timeEntries(): HasMany
     {
-        return $this->hasMany(\App\Domains\Projects\Models\TimeEntry::class);
+        return $this->hasMany(TimeEntry::class);
     }
 
     public function timesheets(): HasMany
     {
-        return $this->hasMany(\App\Domains\Projects\Models\Timesheet::class);
+        return $this->hasMany(Timesheet::class);
     }
 
     public function subscriptionRequests(): HasMany
@@ -109,7 +121,6 @@ class Organization extends Model
     {
         return $this->hasOne(SubscriptionRequest::class)->where('status', 'pending')->latestOfMany();
     }
-
 
     // ── Helpers ──
 
@@ -125,7 +136,7 @@ class Organization extends Model
 
     public function hasReachedSeatLimit(): bool
     {
-        if (!$this->plan || $this->plan->seat_limit === 0) {
+        if (! $this->plan || $this->plan->seat_limit === 0) {
             return false; // Unlimited
         }
 
@@ -134,17 +145,17 @@ class Organization extends Model
 
     public function offices(): HasMany
     {
-        return $this->hasMany(\App\Domains\Workspace\Models\Floor::class)->orderBy('order', 'asc');
+        return $this->hasMany(Floor::class)->orderBy('order', 'asc');
     }
 
-    public function defaultOffice(): ?\App\Domains\Workspace\Models\Floor
+    public function defaultOffice(): ?Floor
     {
         return $this->offices()->where('is_default', true)->first() ?: $this->offices()->first();
     }
 
     public function hasReachedOfficeLimit(): bool
     {
-        if (!$this->plan || $this->plan->max_offices === 0) {
+        if (! $this->plan || $this->plan->max_offices === 0) {
             return false; // Unlimited
         }
 
@@ -153,7 +164,7 @@ class Organization extends Model
 
     public function hasReachedRoomLimit(): bool
     {
-        if (!$this->plan || $this->plan->room_limit === 0) {
+        if (! $this->plan || $this->plan->room_limit === 0) {
             return false; // Unlimited
         }
 
@@ -162,7 +173,7 @@ class Organization extends Model
 
     public function activeGuestInvitationsCount(): int
     {
-        return \App\Domains\Guests\Models\GuestInvitation::where('organization_id', $this->id)
+        return GuestInvitation::where('organization_id', $this->id)
             ->where(function ($q) {
                 $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
             })
@@ -171,9 +182,13 @@ class Organization extends Model
 
     public function hasReachedGuestInvitationLimit(): bool
     {
-        if (!$this->plan) return false;
+        if (! $this->plan) {
+            return false;
+        }
         $maxGuests = $this->plan->max_guest_invitations ?? 5;
-        if ($maxGuests === 0) return false; // Unlimited
+        if ($maxGuests === 0) {
+            return false;
+        } // Unlimited
 
         return $this->activeGuestInvitationsCount() >= $maxGuests;
     }

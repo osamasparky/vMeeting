@@ -22,8 +22,8 @@ class ManageTaskChecklistAction
     public function toggleItem(TaskChecklistItem $item): TaskChecklistItem
     {
         $item->update([
-            'is_completed' => !$item->is_completed,
-            'completed_at' => !$item->is_completed ? now() : null,
+            'is_completed' => ! $item->is_completed,
+            'completed_at' => ! $item->is_completed ? now() : null,
         ]);
 
         return $item;

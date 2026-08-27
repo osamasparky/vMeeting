@@ -2,6 +2,7 @@
 
 namespace App\Domains\People\Models;
 
+use App\Domains\Identity\Models\User;
 use App\Traits\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +23,6 @@ class Avatar extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(\App\Domains\Identity\Models\User::class);
+        return $this->belongsTo(User::class);
     }
 }

@@ -2,18 +2,22 @@
 
 namespace App\Domains\Workspace\Models;
 
+use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Traits\Auditable;
 use App\Traits\BelongsToOrganization;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Floor extends Model
 {
-    use HasUuid, BelongsToOrganization, Auditable;
+    use Auditable, BelongsToOrganization, HasUuid;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -42,14 +46,14 @@ class Floor extends Model
         return $this->hasOne(Map::class)->where('status', 'published')->latestOfMany();
     }
 
-    public function rooms(): \Illuminate\Database\Eloquent\Relations\HasManyThrough
+    public function rooms(): HasManyThrough
     {
         return $this->hasManyThrough(Room::class, Map::class);
     }
 
-    public function members(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function members(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Domains\Tenancy\Models\OrganizationMember::class, 'member_office_access', 'floor_id', 'organization_member_id')
+        return $this->belongsToMany(OrganizationMember::class, 'member_office_access', 'floor_id', 'organization_member_id')
             ->withTimestamps();
     }
 }

@@ -15,7 +15,7 @@ class SyncMapObjectsAction
             $existingIds = [];
 
             foreach ($objectsData as $item) {
-                if (!empty($item['id'])) {
+                if (! empty($item['id'])) {
                     $object = MapObject::where('id', $item['id'])
                         ->where('map_id', $map->id)
                         ->first();
@@ -31,6 +31,7 @@ class SyncMapObjectsAction
                         ]);
                         $savedObjects[] = $object;
                         $existingIds[] = $object->id;
+
                         continue;
                     }
                 }

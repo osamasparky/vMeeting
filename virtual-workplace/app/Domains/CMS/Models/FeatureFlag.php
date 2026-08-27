@@ -25,18 +25,21 @@ class FeatureFlag extends Model
     public static function isEnabled(string $key, bool $default = true): bool
     {
         $flag = static::where('flag_key', $key)->first();
-        return $flag ? (bool)$flag->is_enabled : $default;
+
+        return $flag ? (bool) $flag->is_enabled : $default;
     }
 
     public function getNameAttribute(): string
     {
         $locale = app()->getLocale();
+
         return $locale === 'ar' ? ($this->name_ar ?: $this->name_en) : ($this->name_en ?: $this->name_ar);
     }
 
     public function getDescriptionAttribute(): ?string
     {
         $locale = app()->getLocale();
+
         return $locale === 'ar' ? ($this->description_ar ?: $this->description_en) : ($this->description_en ?: $this->description_ar);
     }
 }

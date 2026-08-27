@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Domains\Administration\Models\SystemSetting;
 use App\Domains\CMS\Models\CmsPage;
-use App\Domains\CMS\Models\FeatureFlag;
 use App\Domains\CMS\Services\ThemeEngineService;
 use App\Domains\Tenancy\Models\Plan;
-use App\Domains\Administration\Models\SystemSetting;
 use Illuminate\Http\Request;
 
 class LandingController extends Controller
@@ -19,7 +18,7 @@ class LandingController extends Controller
             ->first();
 
         // If not seeded yet, create fallback
-        if (!$page) {
+        if (! $page) {
             \Artisan::call('db:seed', ['--class' => 'Database\\Seeders\\CmsDatabaseSeeder']);
             $page = CmsPage::with(['activeSections.mediaAsset'])
                 ->where('slug', 'home')
@@ -34,9 +33,9 @@ class LandingController extends Controller
         $paymentConfig = $paymentSetting ? json_decode($paymentSetting->value, true) : [];
         $rates = [
             'USD' => 1.0,
-            'SAR' => (float)($paymentConfig['usd_to_sar_rate'] ?? 3.75),
-            'EGP' => (float)($paymentConfig['usd_to_egp_rate'] ?? 48.5),
-            'AED' => (float)($paymentConfig['usd_to_aed_rate'] ?? 3.67),
+            'SAR' => (float) ($paymentConfig['usd_to_sar_rate'] ?? 3.75),
+            'EGP' => (float) ($paymentConfig['usd_to_egp_rate'] ?? 48.5),
+            'AED' => (float) ($paymentConfig['usd_to_aed_rate'] ?? 3.67),
         ];
 
         $dynamicCssVariables = ThemeEngineService::generateCssVariables();

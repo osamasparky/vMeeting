@@ -40,12 +40,13 @@ class TaskCustomFieldValue extends Model
     public function getFormattedValueAttribute()
     {
         $type = $this->definition->field_type ?? 'text';
+
         return match ($type) {
             'number' => $this->value_number,
-            'currency' => ($this->definition->options['currency_symbol'] ?? '$') . ' ' . number_format((float)$this->value_number, 2),
+            'currency' => ($this->definition->options['currency_symbol'] ?? '$').' '.number_format((float) $this->value_number, 2),
             'date' => $this->value_date ? $this->value_date->format('Y-m-d') : null,
-            'checkbox' => (bool)$this->value_boolean,
-            'rating' => $this->value_number . ' ⭐',
+            'checkbox' => (bool) $this->value_boolean,
+            'rating' => $this->value_number.' ⭐',
             'dropdown' => $this->value_text,
             default => $this->value_text,
         };

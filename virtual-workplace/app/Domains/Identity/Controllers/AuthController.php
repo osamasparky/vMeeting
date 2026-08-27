@@ -3,13 +3,12 @@
 namespace App\Domains\Identity\Controllers;
 
 use App\Domains\Identity\Actions\RegisterUserAction;
+use App\Domains\Identity\Models\User;
 use App\Domains\Identity\Requests\LoginRequest;
 use App\Domains\Identity\Requests\RegisterRequest;
-use App\Domains\Identity\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
@@ -39,7 +38,7 @@ class AuthController extends Controller
     {
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
@@ -128,7 +127,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'sometimes|string|max:255',
-            'email' => 'sometimes|email|unique:users,email,' . $request->user()->id,
+            'email' => 'sometimes|email|unique:users,email,'.$request->user()->id,
         ]);
 
         $request->user()->update($request->only(['name', 'email']));

@@ -11,7 +11,9 @@ use Illuminate\Support\Facades\Crypt;
 class OrganizationSetting extends Model
 {
     protected $primaryKey = 'organization_id';
+
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     protected $fillable = [
@@ -40,10 +42,12 @@ class OrganizationSetting extends Model
                 try {
                     $decrypted = Crypt::decryptString($value);
                     $decoded = json_decode($decrypted, true);
+
                     return is_array($decoded) ? $decoded : [];
                 } catch (DecryptException $e) {
                     // Graceful fallback for legacy plaintext JSON rows
                     $decoded = json_decode($value, true);
+
                     return is_array($decoded) ? $decoded : [];
                 }
             },
@@ -52,6 +56,7 @@ class OrganizationSetting extends Model
                     return null;
                 }
                 $json = is_array($value) ? json_encode($value) : (string) $value;
+
                 return Crypt::encryptString($json);
             }
         );
@@ -70,10 +75,12 @@ class OrganizationSetting extends Model
                 try {
                     $decrypted = Crypt::decryptString($value);
                     $decoded = json_decode($decrypted, true);
+
                     return is_array($decoded) ? $decoded : [];
                 } catch (DecryptException $e) {
                     // Graceful fallback for legacy plaintext JSON rows
                     $decoded = json_decode($value, true);
+
                     return is_array($decoded) ? $decoded : [];
                 }
             },
@@ -82,6 +89,7 @@ class OrganizationSetting extends Model
                     return null;
                 }
                 $json = is_array($value) ? json_encode($value) : (string) $value;
+
                 return Crypt::encryptString($json);
             }
         );

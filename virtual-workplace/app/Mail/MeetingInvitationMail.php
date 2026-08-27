@@ -33,7 +33,8 @@ class MeetingInvitationMail extends Mailable
      */
     public function envelope(): Envelope
     {
-        $prefix = $this->meeting->project ? "[{$this->meeting->project->name}] " : "";
+        $projectName = $this->meeting->project?->name ?? null;
+        $prefix = $projectName ? "[{$projectName}] " : "";
         return new Envelope(
             subject: "📅 {$prefix}Meeting Scheduled: {$this->meeting->title}",
         );

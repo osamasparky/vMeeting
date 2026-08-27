@@ -15,17 +15,23 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Task extends Model
 {
-    use HasFactory, HasUuid, BelongsToOrganization, Auditable;
+    use Auditable, BelongsToOrganization, HasFactory, HasUuid;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     // Default workflow statuses
     public const STATUS_BACKLOG = 'backlog';
+
     public const STATUS_READY = 'ready';
+
     public const STATUS_IN_PROGRESS = 'in_progress';
+
     public const STATUS_REVIEW = 'review';
+
     public const STATUS_QA = 'qa';
+
     public const STATUS_DONE = 'done';
 
     public const STATUSES = [
@@ -39,8 +45,11 @@ class Task extends Model
 
     // Priority levels
     public const PRIORITY_LOW = 'low';
+
     public const PRIORITY_MEDIUM = 'medium';
+
     public const PRIORITY_HIGH = 'high';
+
     public const PRIORITY_URGENT = 'urgent';
 
     public const PRIORITIES = [
@@ -217,7 +226,7 @@ class Task extends Model
             return true;
         }
 
-        if (!in_array($toStatus, self::STATUSES, true)) {
+        if (! in_array($toStatus, self::STATUSES, true)) {
             return false;
         }
 

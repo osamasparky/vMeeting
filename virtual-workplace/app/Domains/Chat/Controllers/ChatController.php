@@ -6,6 +6,7 @@ use App\Domains\Chat\Models\Channel;
 use App\Domains\Chat\Models\Message;
 use App\Domains\Identity\Models\User;
 use App\Domains\Tenancy\Models\Organization;
+use App\Domains\Tenancy\Models\OrganizationMember;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -53,7 +54,7 @@ class ChatController extends Controller
             })
             ->first();
 
-        if (!$channel) {
+        if (! $channel) {
             $channel = Channel::create([
                 'organization_id' => $organization->id,
                 'type' => 'dm',
@@ -118,12 +119,12 @@ class ChatController extends Controller
     public function webConversations(Request $request): JsonResponse
     {
         $user = Auth::user();
-        $membership = \App\Domains\Tenancy\Models\OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::where('user_id', $user->id)
             ->whereIn('status', ['active', 'invited'])
             ->with('organization')
             ->first();
 
-        if (!$membership) {
+        if (! $membership) {
             return response()->json(['message' => 'No active organization found.'], 403);
         }
 
@@ -154,6 +155,7 @@ class ChatController extends Controller
             ->get()
             ->map(function ($c) {
                 $lastMsg = $c->messages->first();
+
                 return [
                     'id' => $c->id,
                     'name' => $c->name,
@@ -167,7 +169,7 @@ class ChatController extends Controller
             });
 
         // Fetch company members for direct messaging
-        $members = \App\Domains\Tenancy\Models\OrganizationMember::where('organization_id', $organization->id)
+        $members = OrganizationMember::where('organization_id', $organization->id)
             ->where('status', 'active')
             ->with(['user.profiles' => function ($q) use ($organization) {
                 $q->where('organization_id', $organization->id);
@@ -226,22 +228,22 @@ class ChatController extends Controller
     public function webGetOrCreateDm(User $targetUser): JsonResponse
     {
         $currentUser = Auth::user();
-        $membership = \App\Domains\Tenancy\Models\OrganizationMember::where('user_id', $currentUser->id)
+        $membership = OrganizationMember::where('user_id', $currentUser->id)
             ->whereIn('status', ['active', 'invited'])
             ->first();
 
-        if (!$membership) {
+        if (! $membership) {
             return response()->json(['message' => 'Unauthorized.'], 403);
         }
 
         $organizationId = $membership->organization_id;
 
         // Verify target user belongs to same company
-        $targetMembership = \App\Domains\Tenancy\Models\OrganizationMember::where('organization_id', $organizationId)
+        $targetMembership = OrganizationMember::where('organization_id', $organizationId)
             ->where('user_id', $targetUser->id)
             ->first();
 
-        if (!$targetMembership) {
+        if (! $targetMembership) {
             return response()->json(['message' => 'Target user is not a member of your company.'], 404);
         }
 
@@ -255,7 +257,7 @@ class ChatController extends Controller
             })
             ->first();
 
-        if (!$channel) {
+        if (! $channel) {
             $channel = Channel::create([
                 'organization_id' => $organizationId,
                 'type' => 'dm',
@@ -282,18 +284,18 @@ class ChatController extends Controller
     public function webListMessages(Channel $channel): JsonResponse
     {
         $user = Auth::user();
-        $membership = \App\Domains\Tenancy\Models\OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::where('user_id', $user->id)
             ->whereIn('status', ['active', 'invited'])
             ->first();
 
-        if (!$membership || $channel->organization_id !== $membership->organization_id) {
+        if (! $membership || $channel->organization_id !== $membership->organization_id) {
             return response()->json(['message' => 'Unauthorized channel access.'], 403);
         }
 
         // If DM channel, ensure user is a participant
         if ($channel->type === 'dm') {
             $isMember = $channel->members()->where('users.id', $user->id)->exists();
-            if (!$isMember) {
+            if (! $isMember) {
                 return response()->json(['message' => 'Unauthorized DM access.'], 403);
             }
         }
@@ -333,17 +335,17 @@ class ChatController extends Controller
     public function webSendMessage(Request $request, Channel $channel): JsonResponse
     {
         $user = Auth::user();
-        $membership = \App\Domains\Tenancy\Models\OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::where('user_id', $user->id)
             ->whereIn('status', ['active', 'invited'])
             ->first();
 
-        if (!$membership || $channel->organization_id !== $membership->organization_id) {
+        if (! $membership || $channel->organization_id !== $membership->organization_id) {
             return response()->json(['message' => 'Unauthorized channel access.'], 403);
         }
 
         if ($channel->type === 'dm') {
             $isMember = $channel->members()->where('users.id', $user->id)->exists();
-            if (!$isMember) {
+            if (! $isMember) {
                 return response()->json(['message' => 'Unauthorized DM access.'], 403);
             }
         }

@@ -11,9 +11,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ProjectPhase extends Model
 {
-    use HasUuid, BelongsToOrganization, Auditable;
+    use Auditable, BelongsToOrganization, HasUuid;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [

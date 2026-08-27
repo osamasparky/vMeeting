@@ -10,10 +10,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MapVersion extends Model
 {
-    use HasUuid, BelongsToOrganization;
+    use BelongsToOrganization, HasUuid;
 
     public $timestamps = false;
+
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [

@@ -13,14 +13,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Timesheet extends Model
 {
-    use HasFactory, HasUuid, BelongsToOrganization, Auditable;
+    use Auditable, BelongsToOrganization, HasFactory, HasUuid;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     public const STATUS_DRAFT = 'draft';
+
     public const STATUS_SUBMITTED = 'submitted';
+
     public const STATUS_APPROVED = 'approved';
+
     public const STATUS_REJECTED = 'rejected';
 
     protected $fillable = [

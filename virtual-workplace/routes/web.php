@@ -46,7 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/editor/maps/{map}/publish', [WebAuthController::class, 'publishEditorMap'])->name('editor.maps.publish');
     Route::post('/editor/rooms', [WebAuthController::class, 'saveEditorRoom'])->name('editor.rooms.store');
     Route::patch('/editor/rooms/{room}', [WebAuthController::class, 'updateEditorRoom'])->name('editor.rooms.update');
-    Route::get('/projects/{project}', [WebAuthController::class, 'projectHub'])->name('projects.hub');
+    Route::get('/projects/{project}', [\App\Http\Controllers\Web\ProjectHubController::class, 'show'])->name('projects.hub');
 
     // Multi-Office & Branches Management
     Route::post('/offices', [WebAuthController::class, 'storeOffice'])->name('offices.store');
@@ -58,9 +58,41 @@ Route::middleware('auth')->group(function () {
     Route::post('/departments', [WebAuthController::class, 'storeDepartment'])->name('departments.store');
     Route::put('/departments/{department}', [WebAuthController::class, 'updateDepartment'])->name('departments.update');
     Route::delete('/departments/{department}', [WebAuthController::class, 'deleteDepartment'])->name('departments.delete');
-
     Route::post('/teams', [WebAuthController::class, 'storeTeam'])->name('teams.store');
+    Route::put('/teams/{team}', [WebAuthController::class, 'updateTeam'])->name('teams.update');
     Route::delete('/teams/{team}', [WebAuthController::class, 'deleteTeam'])->name('teams.delete');
+
+    // User Profile Update
+    Route::post('/profile', [WebAuthController::class, 'updateProfile'])->name('profile.update');
+
+    // Organization Attendance & Policies
+    Route::post('/organization/attendance-policy', [WebAuthController::class, 'updateAttendancePolicy'])->name('organization.attendance_policy.update');
+    Route::post('/organization/smtp-settings', [WebAuthController::class, 'updateSmtpSettings'])->name('organization.smtp.update');
+    Route::post('/organization/smtp-test', [WebAuthController::class, 'testSmtpConnection'])->name('organization.smtp.test');
+    Route::post('/organization/openai-settings', [WebAuthController::class, 'updateOpenAiSettings'])->name('organization.openai.update');
+    Route::post('/organization/openai-test', [WebAuthController::class, 'testOpenAiConnection'])->name('organization.openai.test');
+    Route::get('/organization/departments/tree', [WebAuthController::class, 'getDepartmentTree'])->name('organization.departments.tree');
+    Route::get('/organization/directory/search', [WebAuthController::class, 'searchDirectory'])->name('organization.directory.search');
+
+    // Timesheet Submission & Approval
+    Route::post('/timesheets/submit', [WebAuthController::class, 'submitTimesheet'])->name('timesheets.submit');
+    Route::post('/timesheets/{timesheet}/approve', [WebAuthController::class, 'approveTimesheet'])->name('timesheets.approve');
+    Route::post('/timesheets/{timesheet}/reject', [WebAuthController::class, 'rejectTimesheet'])->name('timesheets.reject');
+
+    // Projects & Files Storage
+    Route::post('/projects', [WebAuthController::class, 'storeProject'])->name('projects.store');
+    Route::post('/projects/{project}/files', [\App\Http\Controllers\Web\ProjectHubController::class, 'storeFile'])->name('projects.files.store');
+    Route::delete('/projects/{project}/files/{file}', [\App\Http\Controllers\Web\ProjectHubController::class, 'destroyFile'])->name('projects.files.destroy');
+    Route::post('/tasks/{task}/attachments', [WebAuthController::class, 'uploadTaskAttachment'])->name('tasks.attachments.store');
+    Route::delete('/tasks/{task}/attachments/{attachment}', [WebAuthController::class, 'deleteTaskAttachment'])->name('tasks.attachments.destroy');
+
+    // Task Comments & Mentions
+    Route::get('/tasks/{task}/comments', [WebAuthController::class, 'getTaskComments'])->name('tasks.comments.index');
+    Route::post('/tasks/{task}/comments', [\App\Http\Controllers\Web\ProjectHubController::class, 'addComment'])->name('tasks.comments.store');
+
+    // Task PM Review & Approvals
+    Route::post('/tasks/{task}/approve', [\App\Http\Controllers\Web\ProjectHubController::class, 'approveTask'])->name('tasks.approve');
+    Route::post('/tasks/{task}/reject', [\App\Http\Controllers\Web\ProjectHubController::class, 'rejectTask'])->name('tasks.reject');
 
     Route::get('/organization/members/{member}/details', [WebAuthController::class, 'getMemberProfileDetails'])->name('organization.members.details');
     Route::post('/organization/members/create', [WebAuthController::class, 'storeMember'])->name('organization.members.store');

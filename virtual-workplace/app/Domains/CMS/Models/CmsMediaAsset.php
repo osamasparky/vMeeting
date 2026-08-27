@@ -4,7 +4,6 @@ namespace App\Domains\CMS\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Storage;
 
 class CmsMediaAsset extends Model
 {
@@ -40,6 +39,7 @@ class CmsMediaAsset extends Model
         if (str_starts_with($this->file_path, '/')) {
             return $this->file_path;
         }
+
         return asset($this->file_path);
     }
 }

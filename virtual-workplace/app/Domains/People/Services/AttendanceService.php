@@ -4,9 +4,10 @@ namespace App\Domains\People\Services;
 
 use App\Domains\Identity\Models\User;
 use App\Domains\People\Models\AttendanceSession;
+use App\Domains\Projects\Models\ActiveTimer;
+use App\Domains\Projects\Models\TimeEntry;
 use App\Domains\Tenancy\Models\Organization;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class AttendanceService
 {
@@ -37,6 +38,7 @@ class AttendanceService
         if ($activeSession) {
             if ($activeSession->room_id === $roomId) {
                 $activeSession->update(['last_heartbeat_at' => now()]);
+
                 return $activeSession;
             }
             // User switched rooms - close previous session
@@ -133,8 +135,8 @@ class AttendanceService
         $count = 0;
 
         foreach ($staleSessions as $session) {
-            $started = \Carbon\Carbon::parse($session->started_at);
-            $endTime = $session->last_heartbeat_at ? \Carbon\Carbon::parse($session->last_heartbeat_at) : $started->copy()->addMinutes(1);
+            $started = Carbon::parse($session->started_at);
+            $endTime = $session->last_heartbeat_at ? Carbon::parse($session->last_heartbeat_at) : $started->copy()->addMinutes(1);
             $session->ended_at = $endTime;
             $session->status = 'timed_out';
             $session->duration_seconds = max(1, abs($endTime->diffInSeconds($started)));
@@ -171,6 +173,7 @@ class AttendanceService
             if ($s->isActive()) {
                 return max($s->duration_seconds, now()->diffInSeconds($s->started_at));
             }
+
             return $s->duration_seconds;
         });
 
@@ -180,7 +183,7 @@ class AttendanceService
         $daily = [];
         foreach ($sessions as $s) {
             $dayKey = $s->started_at->format('Y-m-d');
-            if (!isset($daily[$dayKey])) {
+            if (! isset($daily[$dayKey])) {
                 $daily[$dayKey] = [
                     'date' => $dayKey,
                     'day_name' => $s->started_at->format('l'),
@@ -254,20 +257,21 @@ class AttendanceService
         $endOfDay = $targetDate->copy()->endOfDay();
 
         // ── Section 1: Project & Task Time Entries ──
-        $taskEntries = \App\Domains\Projects\Models\TimeEntry::where('organization_id', $organizationId)
+        $taskEntries = TimeEntry::where('organization_id', $organizationId)
             ->where('user_id', $userId)
             ->where(function ($q) use ($startOfDay, $endOfDay) {
                 $q->whereBetween('started_at', [$startOfDay, $endOfDay])
-                  ->orWhereBetween('created_at', [$startOfDay, $endOfDay]);
+                    ->orWhereBetween('created_at', [$startOfDay, $endOfDay]);
             })
             ->with(['project:id,name,color,code', 'task:id,title,task_number,priority,status'])
             ->orderBy('started_at', 'asc')
             ->get();
 
         $totalTaskSeconds = $taskEntries->sum(function ($entry) {
-            if (!$entry->ended_at && $entry->started_at) {
+            if (! $entry->ended_at && $entry->started_at) {
                 return max(0, now()->diffInSeconds($entry->started_at));
             }
+
             return $entry->duration_seconds ?? 0;
         });
 
@@ -283,13 +287,14 @@ class AttendanceService
             if ($session->isActive()) {
                 return max($session->duration_seconds, now()->diffInSeconds($session->started_at));
             }
+
             return $session->duration_seconds ?? 0;
         });
 
         $idlePausedSeconds = $attendanceSessions->where('status', 'idle_paused')->sum('duration_seconds');
 
         // Check if there is an active running timer right now via ActiveTimer or open TimeEntry
-        $activeTimerModel = \App\Domains\Projects\Models\ActiveTimer::where('organization_id', $organizationId)
+        $activeTimerModel = ActiveTimer::where('organization_id', $organizationId)
             ->where('user_id', $userId)
             ->with(['project:id,name,color', 'task:id,title,task_number'])
             ->first();

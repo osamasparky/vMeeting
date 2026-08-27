@@ -16,16 +16,16 @@ class InviteMemberAction
     {
         $user = User::where('email', $data['email'])->first();
 
-        if (!$user) {
+        if (! $user) {
             // Create a user with specified password or temporary random password
             $user = User::create([
                 'name' => $data['name'] ?? 'Invited User',
                 'email' => $data['email'],
-                'password' => bcrypt(!empty($data['password']) ? $data['password'] : str()->random(32)),
+                'password' => bcrypt(! empty($data['password']) ? $data['password'] : str()->random(32)),
             ]);
-        } elseif (!empty($data['password'])) {
+        } elseif (! empty($data['password'])) {
             $user->password = bcrypt($data['password']);
-            if (!empty($data['name'])) {
+            if (! empty($data['name'])) {
                 $user->name = $data['name'];
             }
             $user->save();

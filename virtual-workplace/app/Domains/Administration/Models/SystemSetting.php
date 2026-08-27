@@ -8,8 +8,11 @@ use Illuminate\Support\Facades\Cache;
 class SystemSetting extends Model
 {
     protected $table = 'system_settings';
+
     protected $primaryKey = 'key';
+
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     protected $fillable = [
@@ -25,6 +28,7 @@ class SystemSetting extends Model
         try {
             $val = Cache::remember("sys_setting_{$key}", 3600, function () use ($key) {
                 $setting = static::find($key);
+
                 return $setting ? $setting->value : null;
             });
 
@@ -33,6 +37,7 @@ class SystemSetting extends Model
             }
 
             $decoded = json_decode($val, true);
+
             return (json_last_error() === JSON_ERROR_NONE) ? $decoded : $val;
         } catch (\Throwable $e) {
             return $default;

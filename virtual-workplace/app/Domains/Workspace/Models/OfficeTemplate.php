@@ -3,6 +3,7 @@
 namespace App\Domains\Workspace\Models;
 
 use App\Domains\Identity\Models\User;
+use App\Domains\Tenancy\Models\Plan;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -48,7 +49,7 @@ class OfficeTemplate extends Model
      */
     public function plan(): BelongsTo
     {
-        return $this->belongsTo(\App\Domains\Tenancy\Models\Plan::class, 'plan_id');
+        return $this->belongsTo(Plan::class, 'plan_id');
     }
 
     /**
@@ -62,7 +63,7 @@ class OfficeTemplate extends Model
     /**
      * Get or initialize the tailored default office template for a specific subscription plan.
      */
-    public static function getForPlan(?\App\Domains\Tenancy\Models\Plan $plan = null): self
+    public static function getForPlan(?Plan $plan = null): self
     {
         $slug = $plan ? $plan->slug : 'free';
         $template = self::where('plan_slug', $slug)->first();
@@ -335,7 +336,7 @@ class OfficeTemplate extends Model
         ];
 
         $targetDesign = $designs[$slug] ?? $designs['free'];
-        $planModel = $plan ?: \App\Domains\Tenancy\Models\Plan::where('slug', $slug)->first();
+        $planModel = $plan ?: Plan::where('slug', $slug)->first();
 
         return self::create([
             'name' => $targetDesign['name'],

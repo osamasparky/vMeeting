@@ -4,6 +4,7 @@ namespace App\Domains\Collaboration\Controllers;
 
 use App\Domains\Collaboration\Models\Recording;
 use App\Domains\Tenancy\Models\Organization;
+use App\Domains\Workspace\Models\Room;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -41,13 +42,13 @@ class RecordingController extends Controller
 
         $file = $request->file('video');
         $extension = $file->getClientOriginalExtension() ?: 'webm';
-        $filename = 'recording_' . Str::uuid() . '.' . $extension;
+        $filename = 'recording_'.Str::uuid().'.'.$extension;
         $path = $file->storeAs("public/recordings/{$organization->id}", $filename);
 
         $url = Storage::url($path);
 
         $roomId = $request->filled('room_id') ? $request->input('room_id') : null;
-        if ($roomId && !\App\Domains\Workspace\Models\Room::where('id', $roomId)->exists()) {
+        if ($roomId && ! Room::where('id', $roomId)->exists()) {
             $roomId = null;
         }
 
@@ -55,7 +56,7 @@ class RecordingController extends Controller
             'organization_id' => $organization->id,
             'user_id' => $request->user()?->id,
             'room_id' => $roomId,
-            'title' => $request->input('title') ?: ('Session Recording — ' . now()->toFormattedDateString()),
+            'title' => $request->input('title') ?: ('Session Recording — '.now()->toFormattedDateString()),
             'file_path' => $path,
             'file_url' => $url,
             'file_size' => $file->getSize(),
@@ -98,11 +99,11 @@ class RecordingController extends Controller
             abort(403, 'Unauthorized');
         }
 
-        if (!Storage::exists($recording->file_path)) {
+        if (! Storage::exists($recording->file_path)) {
             abort(404, 'Recording file not found');
         }
 
-        $safeTitle = \Illuminate\Support\Str::slug($recording->title) ?: 'session_recording';
+        $safeTitle = Str::slug($recording->title) ?: 'session_recording';
         $downloadName = "{$safeTitle}.mp4";
 
         return Storage::download($recording->file_path, $downloadName, [

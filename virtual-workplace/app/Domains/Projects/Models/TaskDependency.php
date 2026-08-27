@@ -11,7 +11,9 @@ class TaskDependency extends Model
     use BelongsToOrganization;
 
     public const TYPE_FINISH_TO_START = 'finish_to_start';
+
     public const TYPE_START_TO_START = 'start_to_start';
+
     public const TYPE_FINISH_TO_FINISH = 'finish_to_finish';
 
     protected $fillable = [

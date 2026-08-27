@@ -70,12 +70,13 @@ class WorkplaceNotification extends Model
      */
     public function markAsRead(): self
     {
-        if (!$this->is_read) {
+        if (! $this->is_read) {
             $this->update([
                 'is_read' => true,
                 'read_at' => now(),
             ]);
         }
+
         return $this;
     }
 }

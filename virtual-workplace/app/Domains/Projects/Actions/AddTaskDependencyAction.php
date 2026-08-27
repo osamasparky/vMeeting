@@ -68,7 +68,7 @@ class AddTaskDependencyAction
         $dependencies = TaskDependency::where('task_id', $startTaskId)->pluck('depends_on_task_id');
 
         foreach ($dependencies as $nextTaskId) {
-            if (!isset($visited[$nextTaskId])) {
+            if (! isset($visited[$nextTaskId])) {
                 if ($this->hasCycle($nextTaskId, $targetTaskId, $visited)) {
                     return true;
                 }

@@ -9,12 +9,13 @@ use App\Domains\Workspace\Models\Room;
 class LiveKitTokenService
 {
     protected string $apiKey;
+
     protected string $apiSecret;
 
     public function __construct()
     {
-        $this->apiKey = config('services.livekit.api_key') ?: (string)env('LIVEKIT_API_KEY');
-        $this->apiSecret = config('services.livekit.api_secret') ?: (string)env('LIVEKIT_API_SECRET');
+        $this->apiKey = config('services.livekit.api_key') ?: (string) env('LIVEKIT_API_KEY');
+        $this->apiSecret = config('services.livekit.api_secret') ?: (string) env('LIVEKIT_API_SECRET');
 
         if (empty($this->apiKey) || empty($this->apiSecret)) {
             throw new \RuntimeException('LiveKit credentials missing: LIVEKIT_API_KEY and LIVEKIT_API_SECRET must be configured in environment (.env).');

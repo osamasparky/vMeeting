@@ -24,8 +24,9 @@ class GuestController extends Controller
         // Strict Plan Guest Links Enforcement
         if ($organization->hasReachedGuestInvitationLimit()) {
             $limit = $organization->plan->max_guest_invitations ?? 5;
+
             return response()->json([
-                'message' => __("You have reached your plan limit of active guest links (:limit). Please upgrade your subscription plan to create more guest links.", ['limit' => $limit]),
+                'message' => __('You have reached your plan limit of active guest links (:limit). Please upgrade your subscription plan to create more guest links.', ['limit' => $limit]),
             ], 403);
         }
 
@@ -66,7 +67,7 @@ class GuestController extends Controller
             ->with(['organization:id,name,logo_url', 'room:id,name,type'])
             ->first();
 
-        if (!$invitation) {
+        if (! $invitation) {
             return response()->json(['message' => 'Invalid invitation link.'], 404);
         }
 

@@ -2,6 +2,7 @@
 
 namespace App\Domains\Projects\Actions;
 
+use App\Domains\Notifications\Services\NotificationService;
 use App\Domains\Projects\Models\Task;
 use App\Domains\Tenancy\Models\OrganizationMember;
 use Illuminate\Support\Facades\Auth;
@@ -11,7 +12,7 @@ class UpdateTaskStatusAction
 {
     public function execute(Task $task, string $newStatus): Task
     {
-        if (!in_array($newStatus, Task::STATUSES, true)) {
+        if (! in_array($newStatus, Task::STATUSES, true)) {
             throw new InvalidArgumentException("Invalid task status: {$newStatus}");
         }
 
@@ -50,11 +51,11 @@ class UpdateTaskStatusAction
                 // Notify Project Manager
                 $pmId = $task->project?->manager_id;
                 if ($pmId && $pmId !== $user?->id) {
-                    \App\Domains\Notifications\Services\NotificationService::notifyCustom(
+                    NotificationService::notifyCustom(
                         $pmId,
                         'task_approval_request',
-                        __("⏳ Task Approval Needed: \":task\"", ['task' => $task->title]),
-                        __(":user submitted task \":task\" for completion approval.", ['user' => $user?->name ?? 'Team member', 'task' => $task->title]),
+                        __('⏳ Task Approval Needed: ":task"', ['task' => $task->title]),
+                        __(':user submitted task ":task" for completion approval.', ['user' => $user?->name ?? 'Team member', 'task' => $task->title]),
                         ['task_id' => $task->id, 'project_id' => $task->project_id],
                         $user?->id
                     );

@@ -11,7 +11,6 @@ use App\Models\User;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AiMapGeneratorService
@@ -61,10 +60,6 @@ class AiMapGeneratorService
     /**
      * Generate an AI-powered Virtual Office Blueprint & Spatial Rooms layout.
      *
-     * @param Organization $organization
-     * @param array $options
-     * @param User|null $user
-     * @return array
      * @throws ValidationException
      */
     public function generate(Organization $organization, array $options, ?User $user = null): array
@@ -72,26 +67,26 @@ class AiMapGeneratorService
         $plan = $organization->plan;
 
         // 1. Parse room quantities safely
-        $meetingRoomsCount = isset($options['meeting_rooms']) ? max(0, min(6, (int)$options['meeting_rooms'])) : 0;
-        $officeRoomsCount = isset($options['office_rooms']) ? max(1, min(8, (int)$options['office_rooms'])) : 1;
-        $desksPerOffice = isset($options['desks_per_office']) ? max(1, min(12, (int)$options['desks_per_office'])) : 1;
-        $thinkingRoomsCount = isset($options['thinking_rooms']) ? max(0, min(4, (int)$options['thinking_rooms'])) : 0;
-        $restAreasCount = isset($options['rest_areas']) ? max(0, min(3, (int)$options['rest_areas'])) : 0;
-        $theatersCount = isset($options['theaters']) ? max(0, min(2, (int)$options['theaters'])) : 0;
+        $meetingRoomsCount = isset($options['meeting_rooms']) ? max(0, min(6, (int) $options['meeting_rooms'])) : 0;
+        $officeRoomsCount = isset($options['office_rooms']) ? max(1, min(8, (int) $options['office_rooms'])) : 1;
+        $desksPerOffice = isset($options['desks_per_office']) ? max(1, min(12, (int) $options['desks_per_office'])) : 1;
+        $thinkingRoomsCount = isset($options['thinking_rooms']) ? max(0, min(4, (int) $options['thinking_rooms'])) : 0;
+        $restAreasCount = isset($options['rest_areas']) ? max(0, min(3, (int) $options['rest_areas'])) : 0;
+        $theatersCount = isset($options['theaters']) ? max(0, min(2, (int) $options['theaters'])) : 0;
         $styleKey = $options['style'] ?? 'modern_glass_luxury';
         $styleConfig = $this->styles[$styleKey] ?? $this->styles['modern_glass_luxury'];
 
         // Only count actual custom rooms chosen by user against plan room_limit
         // (Coffee Corner and Reception are free communal areas)
         $totalRooms = $meetingRoomsCount + $officeRoomsCount + $thinkingRoomsCount + $restAreasCount + $theatersCount;
-        
+
         // Only count actual team office desks against plan seat_limit
         $totalDesks = ($officeRoomsCount * $desksPerOffice);
 
         // 2. Validate against Subscription Plan limits
         if ($plan && $plan->room_limit > 0 && $totalRooms > $plan->room_limit) {
             throw ValidationException::withMessages([
-                'rooms' => __("Your current subscription plan (:plan) allows up to :limit rooms. You selected :total rooms. Please upgrade your plan or reduce room counts.", [
+                'rooms' => __('Your current subscription plan (:plan) allows up to :limit rooms. You selected :total rooms. Please upgrade your plan or reduce room counts.', [
                     'plan' => $plan->name,
                     'limit' => $plan->room_limit,
                     'total' => $totalRooms,
@@ -101,7 +96,7 @@ class AiMapGeneratorService
 
         if ($plan && $plan->seat_limit > 0 && $totalDesks > $plan->seat_limit) {
             throw ValidationException::withMessages([
-                'seats' => __("Your current subscription plan (:plan) allows up to :limit members/seats. Your office has :total desks. Please reduce the number of desks or offices.", [
+                'seats' => __('Your current subscription plan (:plan) allows up to :limit members/seats. Your office has :total desks. Please reduce the number of desks or offices.', [
                     'plan' => $plan->name,
                     'limit' => $plan->seat_limit,
                     'total' => $totalDesks,
@@ -113,18 +108,28 @@ class AiMapGeneratorService
         $orgOpenAi = $organization->settings?->openai_settings ?? [];
         $platformOpenAi = SystemSetting::get('openai_settings', []);
 
-        $apiKey = !empty($orgOpenAi['api_key']) ? trim($orgOpenAi['api_key']) : (!empty($platformOpenAi['api_key']) ? trim($platformOpenAi['api_key']) : env('OPENAI_API_KEY', ''));
-        $model = !empty($orgOpenAi['model']) ? $orgOpenAi['model'] : ($platformOpenAi['model'] ?? 'gpt-image-1-mini');
-        $imageSize = !empty($orgOpenAi['image_size']) ? $orgOpenAi['image_size'] : ($platformOpenAi['image_size'] ?? '1024x1024');
-        $quality = !empty($orgOpenAi['quality']) ? $orgOpenAi['quality'] : ($platformOpenAi['quality'] ?? 'standard');
+        $apiKey = ! empty($orgOpenAi['api_key']) ? trim($orgOpenAi['api_key']) : (! empty($platformOpenAi['api_key']) ? trim($platformOpenAi['api_key']) : env('OPENAI_API_KEY', ''));
+        $model = ! empty($orgOpenAi['model']) ? $orgOpenAi['model'] : ($platformOpenAi['model'] ?? 'gpt-image-1-mini');
+        $imageSize = ! empty($orgOpenAi['image_size']) ? $orgOpenAi['image_size'] : ($platformOpenAi['image_size'] ?? '1024x1024');
+        $quality = ! empty($orgOpenAi['quality']) ? $orgOpenAi['quality'] : ($platformOpenAi['quality'] ?? 'standard');
 
         // 4. Construct Ultra-Compact & Token-Optimized 2D Architectural Blueprint Prompt (Massive Token & Cost Reduction)
-        $zones = ["Reception", "Espresso Coffee Bar"];
-        if ($meetingRoomsCount > 0) $zones[] = "{$meetingRoomsCount} Meeting Boardrooms";
-        if ($officeRoomsCount > 0) $zones[] = "{$officeRoomsCount} Workspaces ({$desksPerOffice} workstations each)";
-        if ($thinkingRoomsCount > 0) $zones[] = "{$thinkingRoomsCount} Thinking Pods";
-        if ($restAreasCount > 0) $zones[] = "{$restAreasCount} Breakout Lounges";
-        if ($theatersCount > 0) $zones[] = "{$theatersCount} Presentation Theaters";
+        $zones = ['Reception', 'Espresso Coffee Bar'];
+        if ($meetingRoomsCount > 0) {
+            $zones[] = "{$meetingRoomsCount} Meeting Boardrooms";
+        }
+        if ($officeRoomsCount > 0) {
+            $zones[] = "{$officeRoomsCount} Workspaces ({$desksPerOffice} workstations each)";
+        }
+        if ($thinkingRoomsCount > 0) {
+            $zones[] = "{$thinkingRoomsCount} Thinking Pods";
+        }
+        if ($restAreasCount > 0) {
+            $zones[] = "{$restAreasCount} Breakout Lounges";
+        }
+        if ($theatersCount > 0) {
+            $zones[] = "{$theatersCount} Presentation Theaters";
+        }
         $zonesText = implode(', ', $zones);
 
         $prompt = "Top-down 2D architectural blueprint floorplan, {$styleConfig['name']} office style. Empty modern workspace layout with: {$zonesText}. Overhead bird's-eye view, interior cutaway partition walls, open doorways, clean floor textures, desks, meeting tables, lounge seating, indoor potted plants, soft circular overhead lighting. Completely empty, no people.";
@@ -148,7 +153,7 @@ class AiMapGeneratorService
                     'prompt' => $prompt,
                     'n' => 1,
                 ];
-                if (!empty($imageSize)) {
+                if (! empty($imageSize)) {
                     $payload['size'] = $imageSize;
                 }
 
@@ -161,23 +166,23 @@ class AiMapGeneratorService
                     $remoteImageUrl = $openAiData['data'][0]['url'] ?? null;
                     $b64Data = $openAiData['data'][0]['b64_json'] ?? null;
 
-                    $filename = 'ai_map_' . $organization->id . '_' . time() . '.png';
+                    $filename = 'ai_map_'.$organization->id.'_'.time().'.png';
                     $destinationDir = public_path('uploads/maps');
-                    if (!File::isDirectory($destinationDir)) {
+                    if (! File::isDirectory($destinationDir)) {
                         File::makeDirectory($destinationDir, 0755, true, true);
                     }
 
-                    if (!empty($b64Data)) {
+                    if (! empty($b64Data)) {
                         $imageBinary = base64_decode($b64Data);
-                        $filePath = $destinationDir . '/' . $filename;
+                        $filePath = $destinationDir.'/'.$filename;
                         File::put($filePath, $imageBinary);
-                        $imageUrl = '/uploads/maps/' . $filename;
+                        $imageUrl = '/uploads/maps/'.$filename;
                         break;
-                    } elseif (!empty($remoteImageUrl)) {
+                    } elseif (! empty($remoteImageUrl)) {
                         $imageBinary = Http::timeout(60)->get($remoteImageUrl)->body();
-                        $filePath = $destinationDir . '/' . $filename;
+                        $filePath = $destinationDir.'/'.$filename;
                         File::put($filePath, $imageBinary);
-                        $imageUrl = '/uploads/maps/' . $filename;
+                        $imageUrl = '/uploads/maps/'.$filename;
                         break;
                     }
                 } else {
@@ -187,7 +192,7 @@ class AiMapGeneratorService
                 }
             }
 
-            if (!$imageUrl) {
+            if (! $imageUrl) {
                 throw ValidationException::withMessages([
                     'openai' => __('OpenAI Image Generation Error: :error', ['error' => $lastErrMsg ?? 'Could not generate image.']),
                 ]);
@@ -195,7 +200,7 @@ class AiMapGeneratorService
         } catch (ValidationException $ve) {
             throw $ve;
         } catch (\Throwable $e) {
-            Log::error('OpenAI Request Failed: ' . $e->getMessage());
+            Log::error('OpenAI Request Failed: '.$e->getMessage());
             throw ValidationException::withMessages([
                 'openai' => __('Failed to communicate with OpenAI API: :error', ['error' => $e->getMessage()]),
             ]);
@@ -213,8 +218,8 @@ class AiMapGeneratorService
             $floor = $organization->floors()->find($targetFloorId);
         }
 
-        if (!$floor) {
-            $floorName = !empty($options['floor_name']) ? trim($options['floor_name']) : ($styleConfig['name'] . ' ' . __('Office'));
+        if (! $floor) {
+            $floorName = ! empty($options['floor_name']) ? trim($options['floor_name']) : ($styleConfig['name'].' '.__('Office'));
             $isFirstFloor = ($organization->floors()->count() === 0);
             $floor = $organization->floors()->create([
                 'name' => $floorName,
@@ -225,10 +230,10 @@ class AiMapGeneratorService
 
         // Get or Create Map
         $map = $organization->maps()->where('floor_id', $floor->id)->first();
-        if (!$map) {
+        if (! $map) {
             $map = $organization->maps()->create([
                 'floor_id' => $floor->id,
-                'name' => $floor->name . ' AI Blueprint',
+                'name' => $floor->name.' AI Blueprint',
                 'status' => 'published',
                 'version' => 1,
                 'width' => $gridWidth,

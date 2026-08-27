@@ -18,7 +18,7 @@ class StopTimerAction
         return DB::transaction(function () use ($organization, $user, $description) {
             $activeTimer = ActiveTimer::where('user_id', $user->id)->lockForUpdate()->first();
 
-            if (!$activeTimer) {
+            if (! $activeTimer) {
                 throw new InvalidArgumentException('No active running timer found to stop.');
             }
 
@@ -58,6 +58,7 @@ class StopTimerAction
         }
 
         $orgMember = OrganizationMember::where('organization_id', $organization->id)->where('user_id', $user->id)->first();
+
         return [
             'cost_rate' => $orgMember->cost_rate ?? 0.00,
             'billing_rate' => $orgMember->billing_rate ?? 0.00,

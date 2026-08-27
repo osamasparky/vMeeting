@@ -6,7 +6,6 @@ use App\Domains\Identity\Models\User;
 use App\Domains\Meetings\Models\Meeting;
 use App\Domains\Notifications\Models\WorkplaceNotification;
 use App\Domains\Projects\Models\Task;
-use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Workspace\Models\Room;
 use Illuminate\Support\Facades\Log;
 
@@ -28,7 +27,7 @@ class NotificationService
         try {
             $targetUserId = $userId instanceof User ? $userId->id : $userId;
 
-            if (!$targetUserId) {
+            if (! $targetUserId) {
                 return null;
             }
 
@@ -44,7 +43,8 @@ class NotificationService
                 'is_read' => false,
             ]);
         } catch (\Throwable $e) {
-            Log::error('Failed to send WorkplaceNotification: ' . $e->getMessage());
+            Log::error('Failed to send WorkplaceNotification: '.$e->getMessage());
+
             return null;
         }
     }
@@ -55,7 +55,7 @@ class NotificationService
     public static function notifyTaskAssigned(Task $task, $assignee, ?User $actor = null): ?WorkplaceNotification
     {
         $targetUserId = $assignee instanceof User ? $assignee->id : $assignee;
-        
+
         // Don't notify if user assigned task to themselves
         if ($actor && $actor->id === $targetUserId) {
             return null;
@@ -72,7 +72,7 @@ class NotificationService
             'project' => $projectName,
         ]);
 
-        $actionUrl = '/projects/hub?project=' . ($task->project_id ?? '') . '&task=' . $task->id;
+        $actionUrl = '/projects/hub?project='.($task->project_id ?? '').'&task='.$task->id;
 
         return self::send(
             $targetUserId,
@@ -96,7 +96,7 @@ class NotificationService
      */
     public static function notifyTaskStatusChanged(Task $task, string $oldStatus, string $newStatus, ?User $actor = null): ?WorkplaceNotification
     {
-        if (!$task->assignee_id) {
+        if (! $task->assignee_id) {
             return null;
         }
 
@@ -115,7 +115,7 @@ class NotificationService
             'new' => ucfirst(str_replace('_', ' ', $newStatus)),
         ]);
 
-        $actionUrl = '/projects/hub?project=' . ($task->project_id ?? '') . '&task=' . $task->id;
+        $actionUrl = '/projects/hub?project='.($task->project_id ?? '').'&task='.$task->id;
 
         return self::send(
             $task->assignee_id,
@@ -189,7 +189,7 @@ class NotificationService
             'room' => $roomName,
         ]);
 
-        $actionUrl = '/office?room=' . $room->id;
+        $actionUrl = '/office?room='.$room->id;
 
         return self::send(
             $targetUserId,
@@ -233,4 +233,42 @@ class NotificationService
             '👋'
         );
     }
+
+    /**
+     * Send a custom workplace notification.
+     */
+    public static function notifyCustom(
+        $targetUser,
+        string $type,
+        string $title,
+        ?string $body = null,
+        array $data = [],
+        $actorId = null,
+        string $icon = '🔔',
+        ?string $actionUrl = null,
+        ?string $orgId = null
+    ): ?WorkplaceNotification {
+        $targetUserId = $targetUser instanceof User ? $targetUser->id : $targetUser;
+        $actorUserId = $actorId instanceof User ? $actorId->id : $actorId;
+
+        if ($actorUserId && $targetUserId === $actorUserId) {
+            return null;
+        }
+
+        if (! empty($data['task_id']) && empty($actionUrl)) {
+            $actionUrl = '/dashboard#all-tasks';
+        }
+
+        return self::send(
+            $targetUserId,
+            $type,
+            $title,
+            $body,
+            $actionUrl,
+            $data,
+            $icon,
+            $orgId
+        );
+    }
 }
+

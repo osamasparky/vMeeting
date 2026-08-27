@@ -5,15 +5,36 @@ namespace App\Http\Controllers;
 use App\Domains\Administration\Models\AuditLog;
 use App\Domains\Administration\Models\Permission;
 use App\Domains\Administration\Models\Role;
+use App\Domains\Administration\Models\SystemSetting;
+use App\Domains\CMS\Models\CmsMediaAsset;
+use App\Domains\CMS\Models\CmsPage;
+use App\Domains\CMS\Models\CmsSection;
+use App\Domains\CMS\Models\CmsThemeSetting;
+use App\Domains\CMS\Models\FeatureFlag;
+use App\Domains\CMS\Services\ThemeEngineService;
 use App\Domains\Identity\Models\User;
+use App\Domains\Projects\Models\Project;
+use App\Domains\Projects\Models\Task;
+use App\Domains\Projects\Models\TimeEntry;
 use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Domains\Tenancy\Models\Plan;
 use App\Domains\Tenancy\Models\Subscription;
 use App\Domains\Tenancy\Models\SubscriptionRequest;
+use App\Domains\Workspace\Models\FurnitureCategory;
+use App\Domains\Workspace\Models\FurnitureItem;
+use App\Domains\Workspace\Models\MapObject;
+use App\Domains\Workspace\Models\OfficeTemplate;
+use App\Domains\Workspace\Models\Room;
+use App\Domains\Workspace\Requests\StoreFurnitureCategoryRequest;
+use App\Domains\Workspace\Requests\StoreFurnitureItemRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -46,10 +67,10 @@ class SuperAdminController extends Controller
             'estimated_mrr' => $estimatedMrr,
             'estimated_arr' => $estimatedMrr * 12,
             'estimated_mrr_sar' => $estimatedMrr * 3.75,
-            'total_rooms' => \App\Domains\Workspace\Models\Room::count(),
-            'total_projects' => \App\Domains\Projects\Models\Project::count(),
-            'total_tasks' => \App\Domains\Projects\Models\Task::count(),
-            'total_logged_hours' => round((\App\Domains\Projects\Models\TimeEntry::sum('duration_seconds') ?? 0) / 3600, 1),
+            'total_rooms' => Room::count(),
+            'total_projects' => Project::count(),
+            'total_tasks' => Task::count(),
+            'total_logged_hours' => round((TimeEntry::sum('duration_seconds') ?? 0) / 3600, 1),
             'total_audit_events' => AuditLog::count(),
             'pending_subscriptions_count' => SubscriptionRequest::where('status', 'pending')->count(),
         ];
@@ -129,7 +150,7 @@ class SuperAdminController extends Controller
             'metadata' => ['status' => $newStatus],
         ]);
 
-        return back()->with('success', "Company {$organization->name} " . ($newStatus === 'suspended' ? 'suspended' : 'activated') . ' successfully.');
+        return back()->with('success', "Company {$organization->name} ".($newStatus === 'suspended' ? 'suspended' : 'activated').' successfully.');
     }
 
     /**
@@ -156,7 +177,7 @@ class SuperAdminController extends Controller
             'subscriptionRequests.plan',
             'subscriptionRequests.user',
             'subscriptionRequests.reviewer',
-            'auditLogs' => fn($q) => $q->latest()->take(30),
+            'auditLogs' => fn ($q) => $q->latest()->take(30),
         ]);
 
         $allPlans = Plan::where('is_active', true)->orderBy('price', 'asc')->get();
@@ -194,15 +215,15 @@ class SuperAdminController extends Controller
             ->first() ?? $organization->members()->first();
 
         // If company has no members, create an owner member linked to a user
-        if (!$adminMember || !$adminMember->user) {
+        if (! $adminMember || ! $adminMember->user) {
             $companyAdminRole = Role::where('slug', 'company_admin')->first()
                 ?? Role::firstOrCreate(['name' => 'Company Admin', 'slug' => 'company_admin']);
 
             $user = User::firstOrCreate(
-                ['email' => 'admin@' . ($organization->slug ?: 'company') . '.local'],
+                ['email' => 'admin@'.($organization->slug ?: 'company').'.local'],
                 [
-                    'name' => $organization->name . ' Admin',
-                    'password' => \Illuminate\Support\Facades\Hash::make(Str::random(16)),
+                    'name' => $organization->name.' Admin',
+                    'password' => Hash::make(Str::random(16)),
                 ]
             );
 
@@ -247,14 +268,15 @@ class SuperAdminController extends Controller
     {
         $superAdminId = session('superadmin_impersonator_id');
 
-        if (!$superAdminId) {
+        if (! $superAdminId) {
             return redirect()->route('login');
         }
 
         $superAdmin = User::find($superAdminId);
 
-        if (!$superAdmin || !$superAdmin->isSuperAdmin()) {
+        if (! $superAdmin || ! $superAdmin->isSuperAdmin()) {
             session()->forget(['superadmin_impersonator_id', 'superadmin_impersonated_org_id', 'superadmin_impersonated_org_name']);
+
             return redirect()->route('login');
         }
 
@@ -273,7 +295,7 @@ class SuperAdminController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'slug' => ['required', 'string', 'max:255', 'unique:organizations,slug,' . $organization->id],
+            'slug' => ['required', 'string', 'max:255', 'unique:organizations,slug,'.$organization->id],
             'timezone' => ['nullable', 'string', 'max:100'],
             'status' => ['required', 'in:active,suspended,trial'],
             'plan_id' => ['required', 'exists:plans,id'],
@@ -346,13 +368,13 @@ class SuperAdminController extends Controller
             'is_active' => ['nullable', 'boolean'],
         ]);
 
-        $featuresArr = !empty($validated['features'])
+        $featuresArr = ! empty($validated['features'])
             ? array_map('trim', explode(',', $validated['features']))
             : ['basic_chat', 'basic_presence', 'basic_audio'];
 
         Plan::create([
             'name' => $validated['name'],
-            'slug' => Str::slug($validated['name']) . '-' . Str::random(3),
+            'slug' => Str::slug($validated['name']).'-'.Str::random(3),
             'price' => $validated['price'],
             'seat_limit' => $validated['seat_limit'],
             'max_offices' => $validated['max_offices'],
@@ -380,7 +402,7 @@ class SuperAdminController extends Controller
             'features' => ['nullable', 'string'],
         ]);
 
-        $featuresArr = !empty($validated['features'])
+        $featuresArr = ! empty($validated['features'])
             ? array_map('trim', explode(',', $validated['features']))
             : $plan->features;
 
@@ -430,14 +452,14 @@ class SuperAdminController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('transfer_reference', 'like', "%{$search}%")
-                  ->orWhere('sender_name', 'like', "%{$search}%")
-                  ->orWhere('bank_name', 'like', "%{$search}%")
-                  ->orWhereHas('organization', function ($orgQ) use ($search) {
-                      $orgQ->where('name', 'like', "%{$search}%");
-                  })
-                  ->orWhereHas('plan', function ($planQ) use ($search) {
-                      $planQ->where('name', 'like', "%{$search}%");
-                  });
+                    ->orWhere('sender_name', 'like', "%{$search}%")
+                    ->orWhere('bank_name', 'like', "%{$search}%")
+                    ->orWhereHas('organization', function ($orgQ) use ($search) {
+                        $orgQ->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('plan', function ($planQ) use ($search) {
+                        $planQ->where('name', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -462,7 +484,7 @@ class SuperAdminController extends Controller
         $organization = $subscriptionRequest->organization;
         $plan = $subscriptionRequest->plan;
 
-        if (!$organization || !$plan) {
+        if (! $organization || ! $plan) {
             return back()->with('error', 'المنظمة أو الخطة المطلوبة غير موجودة.');
         }
 
@@ -545,11 +567,12 @@ class SuperAdminController extends Controller
      */
     public function viewSubscriptionReceipt(SubscriptionRequest $subscriptionRequest)
     {
-        if (!$subscriptionRequest->receipt_path || !Storage::disk('public')->exists($subscriptionRequest->receipt_path)) {
+        if (! $subscriptionRequest->receipt_path || ! Storage::disk('public')->exists($subscriptionRequest->receipt_path)) {
             abort(404, 'Receipt file not found.');
         }
 
         $filePath = Storage::disk('public')->path($subscriptionRequest->receipt_path);
+
         return response()->file($filePath);
     }
 
@@ -623,7 +646,7 @@ class SuperAdminController extends Controller
             ],
         ];
 
-        $paymentSettings = \App\Domains\Administration\Models\SystemSetting::get('payment_settings', [
+        $paymentSettings = SystemSetting::get('payment_settings', [
             'usd_to_sar_rate' => 3.75,
             'usd_to_egp_rate' => 48.5,
             'usd_to_aed_rate' => 3.67,
@@ -642,14 +665,14 @@ class SuperAdminController extends Controller
             'enable_wallets' => true,
         ]);
 
-        $globalSettings = \App\Domains\Administration\Models\SystemSetting::get('global_settings', [
+        $globalSettings = SystemSetting::get('global_settings', [
             'platform_name' => 'Virtual Workplace SaaS',
             'default_plan_id' => $plans->where('slug', 'free')->first()?->id ?? $plans->first()?->id,
             'ws_url' => 'ws://127.0.0.1:8080',
             'stun_server' => 'stun:173.212.248.192:3478',
         ]);
 
-        $aiSettings = \App\Domains\Administration\Models\SystemSetting::get('openai_settings', [
+        $aiSettings = SystemSetting::get('openai_settings', [
             'api_key' => env('OPENAI_API_KEY', ''),
             'model' => 'dall-e-3',
             'image_size' => '1792x1024',
@@ -672,10 +695,10 @@ class SuperAdminController extends Controller
             'image_size' => $request->input('image_size', '1024x1024'),
             'quality' => $request->input('quality', 'standard'),
             'prompt_prefix' => trim($request->input('prompt_prefix', "A clean, photorealistic direct top-down 2D architectural floor plan blueprint of a modern virtual workplace office (straight 90-degree overhead bird's-eye plan view with cutaway interior walls).")),
-            'is_enabled' => $request->has('is_enabled') || !empty(trim($request->input('api_key', ''))),
+            'is_enabled' => $request->has('is_enabled') || ! empty(trim($request->input('api_key', ''))),
         ];
 
-        \App\Domains\Administration\Models\SystemSetting::set('openai_settings', $aiSettings);
+        SystemSetting::set('openai_settings', $aiSettings);
 
         return back()->with('success', __('AI Office Generator & OpenAI settings saved successfully.'));
     }
@@ -687,7 +710,7 @@ class SuperAdminController extends Controller
     {
         $apiKey = trim($request->input('api_key', ''));
         if (empty($apiKey)) {
-            $aiSettings = \App\Domains\Administration\Models\SystemSetting::get('openai_settings', []);
+            $aiSettings = SystemSetting::get('openai_settings', []);
             $apiKey = $aiSettings['api_key'] ?? env('OPENAI_API_KEY', '');
         }
 
@@ -696,7 +719,7 @@ class SuperAdminController extends Controller
         }
 
         try {
-            $response = \Illuminate\Support\Facades\Http::withToken($apiKey)
+            $response = Http::withToken($apiKey)
                 ->timeout(15)
                 ->get('https://api.openai.com/v1/models');
 
@@ -705,10 +728,11 @@ class SuperAdminController extends Controller
             } else {
                 $err = $response->json();
                 $errMsg = $err['error']['message'] ?? $response->body();
-                return response()->json(['success' => false, 'message' => 'OpenAI Error: ' . $errMsg], 400);
+
+                return response()->json(['success' => false, 'message' => 'OpenAI Error: '.$errMsg], 400);
             }
         } catch (\Throwable $e) {
-            return response()->json(['success' => false, 'message' => 'Network error connecting to OpenAI: ' . $e->getMessage()], 500);
+            return response()->json(['success' => false, 'message' => 'Network error connecting to OpenAI: '.$e->getMessage()], 500);
         }
     }
 
@@ -724,7 +748,7 @@ class SuperAdminController extends Controller
             'stun_server' => $request->input('stun_server', 'stun:173.212.248.192:3478'),
         ];
 
-        \App\Domains\Administration\Models\SystemSetting::set('global_settings', $globalSettings);
+        SystemSetting::set('global_settings', $globalSettings);
 
         return back()->with('success', __('System settings saved successfully.'));
     }
@@ -745,7 +769,7 @@ class SuperAdminController extends Controller
         $badges = $request->input('badge', []);
 
         for ($i = 0; $i < count($bankNames); $i++) {
-            if (!empty(trim($bankNames[$i]))) {
+            if (! empty(trim($bankNames[$i]))) {
                 $bankAccounts[] = [
                     'bank_name' => trim($bankNames[$i]),
                     'account_name' => trim($accountNames[$i] ?? ''),
@@ -778,7 +802,7 @@ class SuperAdminController extends Controller
             'enable_wallets' => $request->has('enable_wallets'),
         ];
 
-        \App\Domains\Administration\Models\SystemSetting::set('payment_settings', $paymentSettings);
+        SystemSetting::set('payment_settings', $paymentSettings);
 
         return back()->with('success', __('Payment & Checkout settings saved successfully.'));
     }
@@ -811,7 +835,7 @@ class SuperAdminController extends Controller
                 $matchesKey = (stripos($key, $search) !== false);
                 $matchesAr = (stripos($arVal, $search) !== false);
                 $matchesEn = (stripos($enVal, $search) !== false);
-                if (!$matchesKey && !$matchesAr && !$matchesEn) {
+                if (! $matchesKey && ! $matchesAr && ! $matchesEn) {
                     continue;
                 }
             }
@@ -874,20 +898,20 @@ class SuperAdminController extends Controller
                 }
             }
 
-            if (!file_exists(dirname($arPath))) {
+            if (! file_exists(dirname($arPath))) {
                 @mkdir(dirname($arPath), 0775, true);
             }
-            if (file_exists($arPath) && !is_writable($arPath)) {
+            if (file_exists($arPath) && ! is_writable($arPath)) {
                 @chmod($arPath, 0666);
             }
-            if (file_exists($enPath) && !is_writable($enPath)) {
+            if (file_exists($enPath) && ! is_writable($enPath)) {
                 @chmod($enPath, 0666);
             }
 
             file_put_contents($arPath, json_encode($arJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             file_put_contents($enPath, json_encode($enJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
-            \Illuminate\Support\Facades\Artisan::call('view:clear');
+            Artisan::call('view:clear');
 
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json(['success' => true, 'message' => __('Translations saved and cache cleared.')]);
@@ -895,11 +919,12 @@ class SuperAdminController extends Controller
 
             return back()->with('success', __('Translations saved successfully across the system.'));
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('Error saving translations: ' . $e->getMessage());
+            Log::error('Error saving translations: '.$e->getMessage());
             if ($request->wantsJson() || $request->ajax()) {
-                return response()->json(['success' => false, 'message' => 'Failed to save translations: ' . $e->getMessage()], 500);
+                return response()->json(['success' => false, 'message' => 'Failed to save translations: '.$e->getMessage()], 500);
             }
-            return back()->with('error', 'Failed to save translations: ' . $e->getMessage());
+
+            return back()->with('error', 'Failed to save translations: '.$e->getMessage());
         }
     }
 
@@ -928,22 +953,23 @@ class SuperAdminController extends Controller
             $arJson[$key] = $arVal;
             $enJson[$key] = $enVal;
 
-            if (file_exists($arPath) && !is_writable($arPath)) {
+            if (file_exists($arPath) && ! is_writable($arPath)) {
                 @chmod($arPath, 0666);
             }
-            if (file_exists($enPath) && !is_writable($enPath)) {
+            if (file_exists($enPath) && ! is_writable($enPath)) {
                 @chmod($enPath, 0666);
             }
 
             file_put_contents($arPath, json_encode($arJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             file_put_contents($enPath, json_encode($enJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
-            \Illuminate\Support\Facades\Artisan::call('view:clear');
+            Artisan::call('view:clear');
 
             return back()->with('success', __('New phrase ":key" added successfully.', ['key' => $key]));
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('Error adding translation: ' . $e->getMessage());
-            return back()->with('error', 'Failed to add phrase: ' . $e->getMessage());
+            Log::error('Error adding translation: '.$e->getMessage());
+
+            return back()->with('error', 'Failed to add phrase: '.$e->getMessage());
         }
     }
 
@@ -965,22 +991,23 @@ class SuperAdminController extends Controller
             unset($arJson[$key]);
             unset($enJson[$key]);
 
-            if (file_exists($arPath) && !is_writable($arPath)) {
+            if (file_exists($arPath) && ! is_writable($arPath)) {
                 @chmod($arPath, 0666);
             }
-            if (file_exists($enPath) && !is_writable($enPath)) {
+            if (file_exists($enPath) && ! is_writable($enPath)) {
                 @chmod($enPath, 0666);
             }
 
             file_put_contents($arPath, json_encode($arJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             file_put_contents($enPath, json_encode($enJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
-            \Illuminate\Support\Facades\Artisan::call('view:clear');
+            Artisan::call('view:clear');
 
             return back()->with('success', __('Phrase removed from system.'));
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('Error deleting translation: ' . $e->getMessage());
-            return back()->with('error', 'Failed to delete phrase: ' . $e->getMessage());
+            Log::error('Error deleting translation: '.$e->getMessage());
+
+            return back()->with('error', 'Failed to delete phrase: '.$e->getMessage());
         }
     }
 
@@ -995,13 +1022,13 @@ class SuperAdminController extends Controller
 
         $file = $request->file('image');
         $dest = public_path('images');
-        if (!file_exists($dest)) {
+        if (! file_exists($dest)) {
             mkdir($dest, 0755, true);
         }
 
         // Copy to both default locations so all views pick it up immediately
         $file->move($dest, 'office_floorplan.jpg');
-        copy($dest . '/office_floorplan.jpg', $dest . '/isometric_office_blueprint.jpg');
+        copy($dest.'/office_floorplan.jpg', $dest.'/isometric_office_blueprint.jpg');
 
         return back()->with('success', 'Global system default office blueprint updated successfully for all organizations.');
     }
@@ -1012,12 +1039,12 @@ class SuperAdminController extends Controller
     public function furniture(Request $request)
     {
         $user = Auth::user();
-        $categories = \App\Domains\Workspace\Models\FurnitureCategory::withCount('items')
+        $categories = FurnitureCategory::withCount('items')
             ->orderBy('order', 'asc')
             ->get();
 
         $selectedCategoryId = $request->input('category_id');
-        $query = \App\Domains\Workspace\Models\FurnitureItem::with('category');
+        $query = FurnitureItem::with('category');
 
         if ($selectedCategoryId) {
             $query->where('category_id', $selectedCategoryId);
@@ -1030,9 +1057,9 @@ class SuperAdminController extends Controller
         $items = $query->latest()->paginate(24);
 
         $stats = [
-            'total_items' => \App\Domains\Workspace\Models\FurnitureItem::count(),
+            'total_items' => FurnitureItem::count(),
             'total_categories' => $categories->count(),
-            'custom_uploads' => \App\Domains\Workspace\Models\FurnitureItem::whereNotNull('image_url')->count(),
+            'custom_uploads' => FurnitureItem::whereNotNull('image_url')->count(),
         ];
 
         return view('superadmin.furniture', compact('user', 'categories', 'items', 'stats', 'selectedCategoryId'));
@@ -1041,13 +1068,13 @@ class SuperAdminController extends Controller
     /**
      * Store new Furniture Category.
      */
-    public function storeFurnitureCategory(\App\Domains\Workspace\Requests\StoreFurnitureCategoryRequest $request)
+    public function storeFurnitureCategory(StoreFurnitureCategoryRequest $request)
     {
         $validated = $request->validated();
 
-        \App\Domains\Workspace\Models\FurnitureCategory::create([
+        FurnitureCategory::create([
             'name' => $validated['name'],
-            'slug' => Str::slug($validated['name']) . '-' . Str::random(3),
+            'slug' => Str::slug($validated['name']).'-'.Str::random(3),
             'icon' => $validated['icon'] ?? '🪑',
             'order' => $validated['order'] ?? 0,
         ]);
@@ -1060,7 +1087,7 @@ class SuperAdminController extends Controller
     /**
      * Update Furniture Category.
      */
-    public function updateFurnitureCategory(\App\Domains\Workspace\Requests\StoreFurnitureCategoryRequest $request, \App\Domains\Workspace\Models\FurnitureCategory $category)
+    public function updateFurnitureCategory(StoreFurnitureCategoryRequest $request, FurnitureCategory $category)
     {
         $validated = $request->validated();
 
@@ -1078,7 +1105,7 @@ class SuperAdminController extends Controller
     /**
      * Delete Furniture Category.
      */
-    public function deleteFurnitureCategory(\App\Domains\Workspace\Models\FurnitureCategory $category)
+    public function deleteFurnitureCategory(FurnitureCategory $category)
     {
         $category->items()->delete();
         $category->delete();
@@ -1091,7 +1118,7 @@ class SuperAdminController extends Controller
     /**
      * Store/Upload new Furniture Item.
      */
-    public function storeFurnitureItem(\App\Domains\Workspace\Requests\StoreFurnitureItemRequest $request)
+    public function storeFurnitureItem(StoreFurnitureItemRequest $request)
     {
         $validated = $request->validated();
 
@@ -1100,7 +1127,7 @@ class SuperAdminController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $extension = strtolower($file->guessExtension() ?: 'png');
-            if (!in_array($extension, ['png', 'webp', 'jpg', 'jpeg', 'svg'])) {
+            if (! in_array($extension, ['png', 'webp', 'jpg', 'jpeg', 'svg'])) {
                 return back()->withErrors(['image' => 'Invalid image format. Allowed formats: PNG, WebP, JPG, SVG.']);
             }
 
@@ -1112,24 +1139,24 @@ class SuperAdminController extends Controller
                 }
             }
 
-            $filename = 'furn_' . Str::random(24) . '.' . $extension;
+            $filename = 'furn_'.Str::random(24).'.'.$extension;
             $destinationPath = public_path('uploads/furniture');
-            if (!file_exists($destinationPath)) {
+            if (! file_exists($destinationPath)) {
                 mkdir($destinationPath, 0755, true);
-                @file_put_contents($destinationPath . '/.htaccess', "<Files *.php>\n    Order Deny,Allow\n    Deny from all\n</Files>\nOptions -ExecCGI\n");
+                @file_put_contents($destinationPath.'/.htaccess', "<Files *.php>\n    Order Deny,Allow\n    Deny from all\n</Files>\nOptions -ExecCGI\n");
             }
             $file->move($destinationPath, $filename);
-            $imageUrl = '/uploads/furniture/' . $filename;
+            $imageUrl = '/uploads/furniture/'.$filename;
         }
 
-        $colorsArr = !empty($validated['colors'])
+        $colorsArr = ! empty($validated['colors'])
             ? array_map('trim', explode(',', $validated['colors']))
             : ['#00b4b3', '#012c41'];
 
-        \App\Domains\Workspace\Models\FurnitureItem::create([
+        FurnitureItem::create([
             'category_id' => $validated['category_id'],
             'name' => $validated['name'],
-            'slug' => Str::slug($validated['name']) . '-' . Str::random(4),
+            'slug' => Str::slug($validated['name']).'-'.Str::random(4),
             'image_url' => $imageUrl,
             'icon' => $validated['icon'] ?? '🪑',
             'width' => $validated['width'],
@@ -1147,7 +1174,7 @@ class SuperAdminController extends Controller
     /**
      * Update Furniture Item.
      */
-    public function updateFurnitureItem(\App\Domains\Workspace\Requests\StoreFurnitureItemRequest $request, \App\Domains\Workspace\Models\FurnitureItem $item)
+    public function updateFurnitureItem(StoreFurnitureItemRequest $request, FurnitureItem $item)
     {
         $validated = $request->validated();
 
@@ -1156,7 +1183,7 @@ class SuperAdminController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $extension = strtolower($file->guessExtension() ?: 'png');
-            if (!in_array($extension, ['png', 'webp', 'jpg', 'jpeg', 'svg'])) {
+            if (! in_array($extension, ['png', 'webp', 'jpg', 'jpeg', 'svg'])) {
                 return back()->withErrors(['image' => 'Invalid image format. Allowed formats: PNG, WebP, JPG, SVG.']);
             }
 
@@ -1167,19 +1194,19 @@ class SuperAdminController extends Controller
                 }
             }
 
-            $filename = 'furn_' . Str::random(24) . '.' . $extension;
+            $filename = 'furn_'.Str::random(24).'.'.$extension;
             $destinationPath = public_path('uploads/furniture');
-            if (!file_exists($destinationPath)) {
+            if (! file_exists($destinationPath)) {
                 mkdir($destinationPath, 0755, true);
-                @file_put_contents($destinationPath . '/.htaccess', "<Files *.php>\n    Order Deny,Allow\n    Deny from all\n</Files>\nOptions -ExecCGI\n");
+                @file_put_contents($destinationPath.'/.htaccess', "<Files *.php>\n    Order Deny,Allow\n    Deny from all\n</Files>\nOptions -ExecCGI\n");
             }
             $file->move($destinationPath, $filename);
-            $imageUrl = '/uploads/furniture/' . $filename;
-        } elseif (!empty($validated['image_url'])) {
+            $imageUrl = '/uploads/furniture/'.$filename;
+        } elseif (! empty($validated['image_url'])) {
             $imageUrl = $validated['image_url'];
         }
 
-        $colorsArr = !empty($validated['colors'])
+        $colorsArr = ! empty($validated['colors'])
             ? array_map('trim', explode(',', $validated['colors']))
             : $item->colors;
 
@@ -1203,7 +1230,7 @@ class SuperAdminController extends Controller
     /**
      * Delete Furniture Item.
      */
-    public function deleteFurnitureItem(\App\Domains\Workspace\Models\FurnitureItem $item)
+    public function deleteFurnitureItem(FurnitureItem $item)
     {
         $item->delete();
 
@@ -1227,12 +1254,12 @@ class SuperAdminController extends Controller
     public function defaultTemplate(Request $request)
     {
         $user = Auth::user();
-        $allPlans = \App\Domains\Tenancy\Models\Plan::where('is_active', true)->orderBy('price', 'asc')->get();
-        
+        $allPlans = Plan::where('is_active', true)->orderBy('price', 'asc')->get();
+
         $selectedPlanSlug = $request->query('plan', 'free');
         $selectedPlan = $allPlans->firstWhere('slug', $selectedPlanSlug) ?: $allPlans->first();
 
-        $template = \App\Domains\Workspace\Models\OfficeTemplate::getForPlan($selectedPlan);
+        $template = OfficeTemplate::getForPlan($selectedPlan);
         $totalCompanies = Organization::count();
         $planCompaniesCount = $selectedPlan ? Organization::where('plan_id', $selectedPlan->id)->count() : 0;
 
@@ -1245,8 +1272,8 @@ class SuperAdminController extends Controller
     public function updateDefaultTemplate(Request $request)
     {
         $template = $request->filled('template_id')
-            ? \App\Domains\Workspace\Models\OfficeTemplate::findOrFail($request->input('template_id'))
-            : \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+            ? OfficeTemplate::findOrFail($request->input('template_id'))
+            : OfficeTemplate::getDefault();
 
         $validated = $request->validate([
             'template_id' => ['nullable', 'uuid'],
@@ -1259,7 +1286,7 @@ class SuperAdminController extends Controller
         ]);
 
         $layoutData = $template->layout_data ?? [];
-        if (!empty($validated['background_image_url'])) {
+        if (! empty($validated['background_image_url'])) {
             $layoutData['background_image_url'] = $validated['background_image_url'];
         }
 
@@ -1283,8 +1310,8 @@ class SuperAdminController extends Controller
     public function saveTemplateRoom(Request $request)
     {
         $template = $request->filled('template_id')
-            ? \App\Domains\Workspace\Models\OfficeTemplate::findOrFail($request->input('template_id'))
-            : \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+            ? OfficeTemplate::findOrFail($request->input('template_id'))
+            : OfficeTemplate::getDefault();
 
         $validated = $request->validate([
             'template_id' => ['nullable', 'uuid'],
@@ -1337,14 +1364,15 @@ class SuperAdminController extends Controller
     public function deleteTemplateRoom(Request $request, int $roomIndex)
     {
         $template = $request->filled('template_id')
-            ? \App\Domains\Workspace\Models\OfficeTemplate::findOrFail($request->input('template_id'))
-            : \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+            ? OfficeTemplate::findOrFail($request->input('template_id'))
+            : OfficeTemplate::getDefault();
 
         $rooms = $template->rooms_data ?: [];
 
         if (isset($rooms[$roomIndex])) {
             unset($rooms[$roomIndex]);
             $template->update(['rooms_data' => array_values($rooms)]);
+
             return back()->with('success', __('Room removed from office template.'));
         }
 
@@ -1357,8 +1385,8 @@ class SuperAdminController extends Controller
     public function saveAllTemplateRooms(Request $request)
     {
         $template = $request->filled('template_id')
-            ? \App\Domains\Workspace\Models\OfficeTemplate::findOrFail($request->input('template_id'))
-            : \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+            ? OfficeTemplate::findOrFail($request->input('template_id'))
+            : OfficeTemplate::getDefault();
 
         $validated = $request->validate([
             'template_id' => ['nullable', 'uuid'],
@@ -1419,18 +1447,18 @@ class SuperAdminController extends Controller
         ]);
 
         $template = $request->filled('template_id')
-            ? \App\Domains\Workspace\Models\OfficeTemplate::findOrFail($request->input('template_id'))
-            : \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+            ? OfficeTemplate::findOrFail($request->input('template_id'))
+            : OfficeTemplate::getDefault();
 
         $file = $request->file('background');
-        $filename = 'template_floorplan_' . ($template->plan_slug ?: 'default') . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $filename = 'template_floorplan_'.($template->plan_slug ?: 'default').'_'.time().'.'.$file->getClientOriginalExtension();
 
         $destDir = public_path('images/maps');
-        if (!file_exists($destDir)) {
+        if (! file_exists($destDir)) {
             mkdir($destDir, 0755, true);
         }
         $file->move($destDir, $filename);
-        $url = '/images/maps/' . $filename;
+        $url = '/images/maps/'.$filename;
 
         $layoutData = $template->layout_data ?? [];
         $layoutData['background_image_url'] = $url;
@@ -1449,8 +1477,8 @@ class SuperAdminController extends Controller
     public function syncTemplateToOrganizations(Request $request)
     {
         $template = $request->filled('template_id')
-            ? \App\Domains\Workspace\Models\OfficeTemplate::findOrFail($request->input('template_id'))
-            : \App\Domains\Workspace\Models\OfficeTemplate::getDefault();
+            ? OfficeTemplate::findOrFail($request->input('template_id'))
+            : OfficeTemplate::getDefault();
 
         $scope = $request->input('sync_scope', 'all');
         $query = Organization::query();
@@ -1464,7 +1492,7 @@ class SuperAdminController extends Controller
 
         foreach ($organizations as $org) {
             $floor = $org->floors()->first();
-            if (!$floor) {
+            if (! $floor) {
                 $floor = $org->floors()->create([
                     'name' => 'الدور الرئيسي - Main Office Floor',
                     'order' => 1,
@@ -1477,7 +1505,7 @@ class SuperAdminController extends Controller
                 'background_image_url' => $template->background_image_url ?: '/images/office_floorplan.jpg',
             ];
 
-            if (!$map) {
+            if (! $map) {
                 $map = $org->maps()->create([
                     'floor_id' => $floor->id,
                     'name' => $template->name,
@@ -1499,7 +1527,7 @@ class SuperAdminController extends Controller
             }
 
             // Remove untextured blue dummy objects
-            \App\Domains\Workspace\Models\MapObject::where('map_id', $map->id)
+            MapObject::where('map_id', $map->id)
                 ->whereNull('image_url')
                 ->delete();
 
@@ -1511,7 +1539,7 @@ class SuperAdminController extends Controller
                 $roomsList = array_slice($roomsList, 0, $maxAllowed);
 
                 foreach ($roomsList as $rData) {
-                    \App\Domains\Workspace\Models\Room::create([
+                    Room::create([
                         'organization_id' => $org->id,
                         'map_id' => $map->id,
                         'name' => $rData['name'] ?? 'Meeting Room',
@@ -1528,7 +1556,7 @@ class SuperAdminController extends Controller
             $count++;
         }
 
-        return back()->with('success', __("Office Template synchronized across :count organizations successfully.", ['count' => $count]));
+        return back()->with('success', __('Office Template synchronized across :count organizations successfully.', ['count' => $count]));
     }
 
     /* ═══════════════════════════════════════════════════════════════
@@ -1540,26 +1568,28 @@ class SuperAdminController extends Controller
      */
     public function cmsPages()
     {
-        $pages = \App\Domains\CMS\Models\CmsPage::withCount('sections')->get();
+        $pages = CmsPage::withCount('sections')->get();
+
         return view('superadmin.cms.pages', compact('pages'));
     }
 
     /**
      * Edit a CMS Page and its sections.
      */
-    public function editCmsPage(\App\Domains\CMS\Models\CmsPage $page)
+    public function editCmsPage(CmsPage $page)
     {
         $page->load(['sections' => function ($q) {
             $q->orderBy('display_order');
         }, 'sections.mediaAsset']);
-        $assets = \App\Domains\CMS\Models\CmsMediaAsset::where('is_active', true)->get();
+        $assets = CmsMediaAsset::where('is_active', true)->get();
+
         return view('superadmin.cms.page_edit', compact('page', 'assets'));
     }
 
     /**
      * Update a CMS Section.
      */
-    public function updateCmsSection(Request $request, \App\Domains\CMS\Models\CmsSection $section)
+    public function updateCmsSection(Request $request, CmsSection $section)
     {
         $section->update([
             'title_en' => $request->input('title_en'),
@@ -1569,7 +1599,7 @@ class SuperAdminController extends Controller
             'badge_en' => $request->input('badge_en'),
             'badge_ar' => $request->input('badge_ar'),
             'is_active' => $request->has('is_active'),
-            'display_order' => (int)$request->input('display_order', 0),
+            'display_order' => (int) $request->input('display_order', 0),
             'media_asset_id' => $request->input('media_asset_id') ?: null,
         ]);
 
@@ -1586,9 +1616,10 @@ class SuperAdminController extends Controller
     /**
      * Toggle section active status.
      */
-    public function toggleCmsSection(\App\Domains\CMS\Models\CmsSection $section)
+    public function toggleCmsSection(CmsSection $section)
     {
-        $section->update(['is_active' => !$section->is_active]);
+        $section->update(['is_active' => ! $section->is_active]);
+
         return back()->with('success', __('Section status updated!'));
     }
 
@@ -1597,7 +1628,8 @@ class SuperAdminController extends Controller
      */
     public function cmsAssets()
     {
-        $assets = \App\Domains\CMS\Models\CmsMediaAsset::orderBy('created_at', 'desc')->paginate(20);
+        $assets = CmsMediaAsset::orderBy('created_at', 'desc')->paginate(20);
+
         return view('superadmin.cms.assets', compact('assets'));
     }
 
@@ -1614,17 +1646,17 @@ class SuperAdminController extends Controller
 
         $file = $request->file('file');
         $extension = $file->getClientOriginalExtension();
-        $filename = 'asset_' . Str::random(12) . '_' . time() . '.' . $extension;
-        
+        $filename = 'asset_'.Str::random(12).'_'.time().'.'.$extension;
+
         $destDir = public_path('uploads/cms');
-        if (!file_exists($destDir)) {
+        if (! file_exists($destDir)) {
             mkdir($destDir, 0755, true);
         }
 
         $file->move($destDir, $filename);
-        $filePath = '/uploads/cms/' . $filename;
+        $filePath = '/uploads/cms/'.$filename;
 
-        \App\Domains\CMS\Models\CmsMediaAsset::create([
+        CmsMediaAsset::create([
             'name' => $request->input('name'),
             'asset_type' => $request->input('asset_type'),
             'file_path' => $filePath,
@@ -1639,7 +1671,7 @@ class SuperAdminController extends Controller
     /**
      * Delete Media Asset.
      */
-    public function deleteCmsAsset(\App\Domains\CMS\Models\CmsMediaAsset $asset)
+    public function deleteCmsAsset(CmsMediaAsset $asset)
     {
         if (str_starts_with($asset->file_path, '/uploads/cms/')) {
             $fullPath = public_path(ltrim($asset->file_path, '/'));
@@ -1648,6 +1680,7 @@ class SuperAdminController extends Controller
             }
         }
         $asset->delete();
+
         return back()->with('success', __('Media Asset deleted successfully.'));
     }
 
@@ -1656,8 +1689,8 @@ class SuperAdminController extends Controller
      */
     public function cmsTheme()
     {
-        $tokens = \App\Domains\CMS\Services\ThemeEngineService::getThemeTokens();
-        $navItems = \App\Domains\CMS\Models\CmsThemeSetting::getByKey('main_navigation', [
+        $tokens = ThemeEngineService::getThemeTokens();
+        $navItems = CmsThemeSetting::getByKey('main_navigation', [
             ['label_en' => 'Platform', 'label_ar' => 'المنصة', 'url' => '#hero-spatial'],
             ['label_en' => 'Spatial Presence', 'label_ar' => 'التواجد المكاني', 'url' => '#spatial-presence'],
             ['label_en' => 'AI Office', 'label_ar' => 'مكتب الذكاء الاصطناعي', 'url' => '#ai-generator'],
@@ -1677,12 +1710,12 @@ class SuperAdminController extends Controller
             'color_deep_space', 'color_dark_green', 'color_emerald', 'color_mint',
             'color_soft_mint', 'color_white', 'color_text_dark', 'color_text_light',
             'color_text_muted', 'font_family_latin', 'font_family_arabic',
-            'radius_btn', 'radius_card', 'glass_blur', 'glass_bg', 'glass_border'
+            'radius_btn', 'radius_card', 'glass_blur', 'glass_bg', 'glass_border',
         ];
 
         foreach ($fields as $f) {
             if ($request->has($f)) {
-                \App\Domains\CMS\Models\CmsThemeSetting::setKey($f, $request->input($f));
+                CmsThemeSetting::setKey($f, $request->input($f));
             }
         }
 
@@ -1694,7 +1727,7 @@ class SuperAdminController extends Controller
 
             $menu = [];
             foreach ($labelsEn as $i => $en) {
-                if (!empty(trim($en))) {
+                if (! empty(trim($en))) {
                     $menu[] = [
                         'label_en' => trim($en),
                         'label_ar' => trim($labelsAr[$i] ?? $en),
@@ -1702,8 +1735,8 @@ class SuperAdminController extends Controller
                     ];
                 }
             }
-            if (!empty($menu)) {
-                \App\Domains\CMS\Models\CmsThemeSetting::setKey('main_navigation', $menu);
+            if (! empty($menu)) {
+                CmsThemeSetting::setKey('main_navigation', $menu);
             }
         }
 
@@ -1715,16 +1748,18 @@ class SuperAdminController extends Controller
      */
     public function featureFlags()
     {
-        $flags = \App\Domains\CMS\Models\FeatureFlag::orderBy('category')->get();
+        $flags = FeatureFlag::orderBy('category')->get();
+
         return view('superadmin.features', compact('flags'));
     }
 
     /**
      * Toggle Feature Flag.
      */
-    public function toggleFeature(\App\Domains\CMS\Models\FeatureFlag $flag)
+    public function toggleFeature(FeatureFlag $flag)
     {
-        $flag->update(['is_enabled' => !$flag->is_enabled]);
+        $flag->update(['is_enabled' => ! $flag->is_enabled]);
+
         return back()->with('success', __("Feature flag ':name' updated!", ['name' => $flag->name]));
     }
 
@@ -1735,7 +1770,7 @@ class SuperAdminController extends Controller
     {
         $health = [
             'database' => ['status' => 'healthy', 'latency_ms' => 1.2, 'label' => 'MySQL 8.0 Primary'],
-            'storage' => ['status' => 'healthy', 'free_space' => disk_free_space('/') ? round(disk_free_space('/') / 1073741824, 1) . ' GB' : 'N/A', 'label' => 'Local NVMe Storage'],
+            'storage' => ['status' => 'healthy', 'free_space' => disk_free_space('/') ? round(disk_free_space('/') / 1073741824, 1).' GB' : 'N/A', 'label' => 'Local NVMe Storage'],
             'livekit' => ['status' => 'healthy', 'url' => config('livekit.host', 'http://127.0.0.1:7880'), 'label' => 'LiveKit SFU WebRTC'],
             'openai' => ['status' => 'healthy', 'model' => 'gpt-image-1-mini / DALL-E', 'label' => 'OpenAI API Connectivity'],
             'websockets' => ['status' => 'healthy', 'port' => 8080, 'label' => 'Spatial WebSockets Gateway'],

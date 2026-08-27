@@ -5,6 +5,7 @@ namespace App\Domains\People\Models;
 use App\Traits\BelongsToOrganization;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Team extends Model
 {
@@ -21,7 +22,7 @@ class Team extends Model
         return $this->belongsTo(Department::class);
     }
 
-    public function userProfiles(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function userProfiles(): HasMany
     {
         return $this->hasMany(UserProfile::class);
     }

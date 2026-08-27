@@ -2,6 +2,8 @@
 
 namespace App\Domains\Administration\Models;
 
+use App\Domains\Identity\Models\User;
+use App\Domains\Tenancy\Models\Organization;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -22,12 +24,12 @@ class AuditLog extends Model
 
     public function organization(): BelongsTo
     {
-        return $this->belongsTo(\App\Domains\Tenancy\Models\Organization::class);
+        return $this->belongsTo(Organization::class);
     }
 
     public function actor(): BelongsTo
     {
-        return $this->belongsTo(\App\Domains\Identity\Models\User::class, 'actor_id');
+        return $this->belongsTo(User::class, 'actor_id');
     }
 
     /**

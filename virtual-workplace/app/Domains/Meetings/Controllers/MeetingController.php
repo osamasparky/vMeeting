@@ -38,8 +38,8 @@ class MeetingController extends Controller
             $isHost = $membership && in_array($membership->role, ['owner', 'admin', 'manager']);
             $token = $service->generateRoomToken($user, $room, $isHost);
         } else {
-            $guestName = (string)($request->input('guest_name') ?: 'Guest User');
-            $guestId = (string)($request->input('guest_id') ?: ('guest_' . uniqid()));
+            $guestName = (string) ($request->input('guest_name') ?: 'Guest User');
+            $guestId = (string) ($request->input('guest_id') ?: ('guest_'.uniqid()));
             $token = $service->generateGuestRoomToken($guestId, $guestName, $room);
         }
 
@@ -69,7 +69,7 @@ class MeetingController extends Controller
         }
 
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
@@ -134,7 +134,7 @@ class MeetingController extends Controller
             'type' => $validated['type'] ?? 'instant',
             'status' => 'active',
             'started_at' => now(),
-            'livekit_room_name' => "meeting_{$organization->id}_" . uniqid(),
+            'livekit_room_name' => "meeting_{$organization->id}_".uniqid(),
         ]);
 
         $meeting->participants()->create([
@@ -184,8 +184,8 @@ class MeetingController extends Controller
             ['urls' => $stunUrl],
             [
                 'urls' => [
-                    $turnUrl . '?transport=udp',
-                    $turnUrl . '?transport=tcp',
+                    $turnUrl.'?transport=udp',
+                    $turnUrl.'?transport=tcp',
                 ],
                 'username' => $turnUser,
                 'credential' => $turnPass,

@@ -3,8 +3,12 @@
 namespace App\Domains\Tenancy\Models;
 
 use App\Domains\Administration\Models\Role;
+use App\Domains\Identity\Models\User;
+use App\Domains\Workspace\Models\Floor;
+use App\Domains\Workspace\Models\Room;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class OrganizationMember extends Model
 {
@@ -35,7 +39,7 @@ class OrganizationMember extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(\App\Domains\Identity\Models\User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function role(): BelongsTo
@@ -43,15 +47,15 @@ class OrganizationMember extends Model
         return $this->belongsTo(Role::class);
     }
 
-    public function offices(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function offices(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Domains\Workspace\Models\Floor::class, 'member_office_access', 'organization_member_id', 'floor_id')
+        return $this->belongsToMany(Floor::class, 'member_office_access', 'organization_member_id', 'floor_id')
             ->withTimestamps();
     }
 
-    public function rooms(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function rooms(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Domains\Workspace\Models\Room::class, 'member_room_access', 'organization_member_id', 'room_id')
+        return $this->belongsToMany(Room::class, 'member_room_access', 'organization_member_id', 'room_id')
             ->withTimestamps();
     }
 
@@ -72,7 +76,7 @@ class OrganizationMember extends Model
 
     public function hasPermission(string $permissionKey): bool
     {
-        if (!$this->role) {
+        if (! $this->role) {
             return false;
         }
 
@@ -92,7 +96,7 @@ class OrganizationMember extends Model
      */
     public function hasOfficeAccess(?string $floorId): bool
     {
-        if (!$floorId) {
+        if (! $floorId) {
             return true;
         }
 
@@ -113,7 +117,7 @@ class OrganizationMember extends Model
      */
     public function hasRoomAccess(?string $roomId): bool
     {
-        if (!$roomId) {
+        if (! $roomId) {
             return true;
         }
 
@@ -121,8 +125,8 @@ class OrganizationMember extends Model
             return true;
         }
 
-        $room = \App\Domains\Workspace\Models\Room::find($roomId);
-        if (!$room) {
+        $room = Room::find($roomId);
+        if (! $room) {
             return true;
         }
 

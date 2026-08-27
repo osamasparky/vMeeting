@@ -44,18 +44,21 @@ class CmsSection extends Model
     public function getTitleAttribute(): ?string
     {
         $locale = app()->getLocale();
+
         return $locale === 'ar' ? ($this->title_ar ?: $this->title_en) : ($this->title_en ?: $this->title_ar);
     }
 
     public function getSubtitleAttribute(): ?string
     {
         $locale = app()->getLocale();
+
         return $locale === 'ar' ? ($this->subtitle_ar ?: $this->subtitle_en) : ($this->subtitle_en ?: $this->subtitle_ar);
     }
 
     public function getBadgeAttribute(): ?string
     {
         $locale = app()->getLocale();
+
         return $locale === 'ar' ? ($this->badge_ar ?: $this->badge_en) : ($this->badge_en ?: $this->badge_ar);
     }
 }

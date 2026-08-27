@@ -2,6 +2,7 @@
 
 namespace App\Domains\Projects\Controllers;
 
+use App\Domains\Identity\Models\User;
 use App\Domains\Projects\Actions\LogManualTimeAction;
 use App\Domains\Projects\Actions\StartTimerAction;
 use App\Domains\Projects\Actions\StopTimerAction;
@@ -11,6 +12,7 @@ use App\Domains\Projects\Requests\LogManualTimeRequest;
 use App\Domains\Projects\Requests\StartTimerRequest;
 use App\Domains\Projects\Requests\UpdateTimeEntryRequest;
 use App\Domains\Tenancy\Models\Organization;
+use App\Domains\Tenancy\Models\OrganizationMember;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -44,14 +46,14 @@ class TimeTrackingController extends Controller
     ): JsonResponse {
         $targetUser = Auth::user();
         if ($request->filled('user_id') && $request->input('user_id') !== $targetUser->id) {
-            $membership = \App\Domains\Tenancy\Models\OrganizationMember::where('organization_id', $organization->id)
+            $membership = OrganizationMember::where('organization_id', $organization->id)
                 ->where('user_id', $targetUser->id)
                 ->first();
-            $isPrivileged = $targetUser->isSuperAdmin() 
+            $isPrivileged = $targetUser->isSuperAdmin()
                 || ($membership && ($membership->role?->slug === 'company_admin' || $membership->hasPermission('time.create') || $membership->hasPermission('tasks.assign')));
-            
+
             if ($isPrivileged) {
-                $targetUser = \App\Domains\Identity\Models\User::findOrFail($request->input('user_id'));
+                $targetUser = User::findOrFail($request->input('user_id'));
             }
         }
 
@@ -73,14 +75,14 @@ class TimeTrackingController extends Controller
     ): JsonResponse {
         $targetUser = Auth::user();
         if ($request->filled('user_id') && $request->input('user_id') !== $targetUser->id) {
-            $membership = \App\Domains\Tenancy\Models\OrganizationMember::where('organization_id', $organization->id)
+            $membership = OrganizationMember::where('organization_id', $organization->id)
                 ->where('user_id', $targetUser->id)
                 ->first();
-            $isPrivileged = $targetUser->isSuperAdmin() 
+            $isPrivileged = $targetUser->isSuperAdmin()
                 || ($membership && ($membership->role?->slug === 'company_admin' || $membership->hasPermission('time.create')));
-            
+
             if ($isPrivileged) {
-                $targetUser = \App\Domains\Identity\Models\User::findOrFail($request->input('user_id'));
+                $targetUser = User::findOrFail($request->input('user_id'));
             }
         }
 
@@ -120,7 +122,7 @@ class TimeTrackingController extends Controller
             ->with(['project:id,name,code', 'task:id,title,task_number', 'user:id,name,email']);
 
         // Non-managers only see their own time entries
-        if (!$membership || (!$membership->hasPermission('reports.view') && $membership->role?->slug === 'employee')) {
+        if (! $membership || (! $membership->hasPermission('reports.view') && $membership->role?->slug === 'employee')) {
             $query->where('user_id', $user->id);
         } elseif ($request->filled('user_id')) {
             $query->where('user_id', $request->query('user_id'));

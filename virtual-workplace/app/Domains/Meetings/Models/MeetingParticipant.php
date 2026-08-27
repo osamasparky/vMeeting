@@ -12,6 +12,7 @@ class MeetingParticipant extends Model
     use HasUuid;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [

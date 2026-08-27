@@ -15,9 +15,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Meeting extends Model
 {
-    use HasUuid, BelongsToOrganization, Auditable;
+    use Auditable, BelongsToOrganization, HasUuid;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -78,7 +79,7 @@ class Meeting extends Model
         return $query->whereIn('status', ['scheduled', 'pending', 'active'])
             ->where(function ($q) {
                 $q->whereNull('scheduled_at')
-                  ->orWhere('scheduled_at', '>=', now()->subHours(2));
+                    ->orWhere('scheduled_at', '>=', now()->subHours(2));
             })
             ->orderByRaw('CASE WHEN status = "active" THEN 0 WHEN status = "pending" THEN 1 ELSE 2 END')
             ->orderBy('scheduled_at', 'asc');
@@ -96,4 +97,3 @@ class Meeting extends Model
         return $this->type === 'scheduled' || $this->status === 'scheduled';
     }
 }
-

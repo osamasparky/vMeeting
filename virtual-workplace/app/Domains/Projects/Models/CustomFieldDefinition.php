@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CustomFieldDefinition extends Model
 {
-    use HasFactory, BelongsToOrganization;
+    use BelongsToOrganization, HasFactory;
 
     protected $fillable = [
         'organization_id',

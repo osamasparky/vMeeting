@@ -5,6 +5,10 @@ namespace App\Domains\Projects\Controllers;
 use App\Domains\Projects\Actions\CreateProjectAction;
 use App\Domains\Projects\Actions\UpdateProjectAction;
 use App\Domains\Projects\Models\Project;
+use App\Domains\Projects\Models\ProjectDocument;
+use App\Domains\Projects\Models\ProjectGoal;
+use App\Domains\Projects\Models\ProjectGoalTarget;
+use App\Domains\Projects\Models\ProjectMilestone;
 use App\Domains\Projects\Requests\StoreProjectRequest;
 use App\Domains\Projects\Requests\UpdateProjectRequest;
 use App\Domains\Tenancy\Models\Organization;
@@ -40,7 +44,7 @@ class ProjectController extends Controller
             $search = $request->query('search');
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%");
+                    ->orWhere('code', 'like', "%{$search}%");
             });
         }
 
@@ -203,9 +207,10 @@ class ProjectController extends Controller
             ->map(function ($t) use ($project) {
                 $start = $t->start_date ?? ($t->due_date ? $t->due_date->copy()->subDays(max(1, (int) ceil(($t->estimated_hours ?? 8) / 8))) : $project->created_at);
                 $end = $t->due_date ?? $start->copy()->addDays(2);
+
                 return [
                     'id' => $t->id,
-                    'title' => '#' . $t->task_number . ' ' . $t->title,
+                    'title' => '#'.$t->task_number.' '.$t->title,
                     'status' => $t->status,
                     'priority' => $t->priority,
                     'assignee' => $t->assignee ? $t->assignee->name : 'Unassigned',
@@ -218,7 +223,7 @@ class ProjectController extends Controller
 
         $milestones = $project->milestones()->get()->map(fn ($m) => [
             'id' => $m->id,
-            'title' => '🚩 ' . $m->title,
+            'title' => '🚩 '.$m->title,
             'target_date' => $m->due_date ? $m->due_date->format('Y-m-d') : null,
             'status' => $m->status,
         ]);
@@ -276,6 +281,7 @@ class ProjectController extends Controller
         }
 
         $fields = $project->customFieldDefinitions()->get();
+
         return response()->json(['custom_fields' => $fields]);
     }
 
@@ -319,6 +325,7 @@ class ProjectController extends Controller
         }
 
         $docs = $project->documents()->with('author:id,name,email')->get();
+
         return response()->json(['documents' => $docs]);
     }
 
@@ -352,7 +359,7 @@ class ProjectController extends Controller
         ], 201);
     }
 
-    public function updateDocument(Request $request, Organization $organization, Project $project, \App\Domains\Projects\Models\ProjectDocument $document): JsonResponse
+    public function updateDocument(Request $request, Organization $organization, Project $project, ProjectDocument $document): JsonResponse
     {
         if ($project->organization_id !== $organization->id || $document->project_id !== $project->id) {
             return response()->json(['message' => 'Document not found.'], 404);
@@ -374,7 +381,7 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function destroyDocument(Organization $organization, Project $project, \App\Domains\Projects\Models\ProjectDocument $document): JsonResponse
+    public function destroyDocument(Organization $organization, Project $project, ProjectDocument $document): JsonResponse
     {
         if ($project->organization_id !== $organization->id || $document->project_id !== $project->id) {
             return response()->json(['message' => 'Document not found.'], 404);
@@ -397,6 +404,7 @@ class ProjectController extends Controller
         }
 
         $goals = $project->goals()->with(['owner:id,name', 'targets'])->get();
+
         return response()->json(['goals' => $goals]);
     }
 
@@ -428,7 +436,7 @@ class ProjectController extends Controller
         ], 201);
     }
 
-    public function storeGoalTarget(Request $request, Organization $organization, Project $project, \App\Domains\Projects\Models\ProjectGoal $goal): JsonResponse
+    public function storeGoalTarget(Request $request, Organization $organization, Project $project, ProjectGoal $goal): JsonResponse
     {
         if ($project->organization_id !== $organization->id || $goal->project_id !== $project->id) {
             return response()->json(['message' => 'Goal not found.'], 404);
@@ -453,7 +461,7 @@ class ProjectController extends Controller
         ], 201);
     }
 
-    public function updateGoalTarget(Request $request, Organization $organization, Project $project, \App\Domains\Projects\Models\ProjectGoal $goal, \App\Domains\Projects\Models\ProjectGoalTarget $target): JsonResponse
+    public function updateGoalTarget(Request $request, Organization $organization, Project $project, ProjectGoal $goal, ProjectGoalTarget $target): JsonResponse
     {
         if ($project->organization_id !== $organization->id || $target->goal_id !== $goal->id) {
             return response()->json(['message' => 'Target not found.'], 404);
@@ -484,6 +492,7 @@ class ProjectController extends Controller
         }
 
         $sprints = $project->sprints()->withCount('tasks')->get();
+
         return response()->json(['sprints' => $sprints]);
     }
 
@@ -513,5 +522,95 @@ class ProjectController extends Controller
             'message' => 'Sprint created successfully.',
             'sprint' => $sprint,
         ], 201);
+    }
+
+    /**
+     * Milestones & Delivery Roadmap.
+     */
+    public function milestones(Organization $organization, Project $project): JsonResponse
+    {
+        if ($project->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Project not found.'], 404);
+        }
+
+        $milestones = $project->milestones()
+            ->with(['tasks:id,milestone_id,title,status,priority,due_date,assignee_id'])
+            ->withCount('tasks')
+            ->orderBy('due_date')
+            ->get();
+
+        return response()->json(['milestones' => $milestones]);
+    }
+
+    public function storeMilestone(Request $request, Organization $organization, Project $project): JsonResponse
+    {
+        if ($project->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Project not found.'], 404);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:150',
+            'due_date' => 'nullable|date',
+            'status' => 'nullable|string|in:pending,completed',
+        ]);
+
+        $milestone = $project->milestones()->create([
+            'organization_id' => $organization->id,
+            'name' => $validated['name'],
+            'due_date' => $validated['due_date'] ?? null,
+            'status' => $validated['status'] ?? 'pending',
+            'completed_at' => ($validated['status'] ?? '') === 'completed' ? now() : null,
+        ]);
+
+        // Auto-recalculate project goals
+        $project->goals->each->recalculateProgress();
+
+        return response()->json([
+            'message' => 'Milestone created successfully.',
+            'milestone' => $milestone->load('tasks'),
+        ], 201);
+    }
+
+    public function updateMilestone(Request $request, Organization $organization, Project $project, ProjectMilestone $milestone): JsonResponse
+    {
+        if ($project->organization_id !== $organization->id || $milestone->project_id !== $project->id) {
+            return response()->json(['message' => 'Milestone not found.'], 404);
+        }
+
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:150',
+            'due_date' => 'nullable|date',
+            'status' => 'sometimes|string|in:pending,completed',
+        ]);
+
+        if (isset($validated['status'])) {
+            $validated['completed_at'] = $validated['status'] === 'completed' ? now() : null;
+        }
+
+        $milestone->update($validated);
+
+        // Auto-recalculate project goals
+        $project->goals->each->recalculateProgress();
+
+        return response()->json([
+            'message' => 'Milestone updated successfully.',
+            'milestone' => $milestone->fresh('tasks'),
+        ]);
+    }
+
+    public function destroyMilestone(Organization $organization, Project $project, ProjectMilestone $milestone): JsonResponse
+    {
+        if ($project->organization_id !== $organization->id || $milestone->project_id !== $project->id) {
+            return response()->json(['message' => 'Milestone not found.'], 404);
+        }
+
+        // Unlink child tasks before deleting
+        $milestone->tasks()->update(['milestone_id' => null]);
+        $milestone->delete();
+
+        // Auto-recalculate project goals
+        $project->goals->each->recalculateProgress();
+
+        return response()->json(['message' => 'Milestone deleted successfully.']);
     }
 }

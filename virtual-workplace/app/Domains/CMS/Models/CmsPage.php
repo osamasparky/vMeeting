@@ -36,18 +36,21 @@ class CmsPage extends Model
     public function getTitleAttribute(): string
     {
         $locale = app()->getLocale();
+
         return $locale === 'ar' ? ($this->title_ar ?: $this->title_en) : ($this->title_en ?: $this->title_ar);
     }
 
     public function getMetaTitleAttribute(): ?string
     {
         $locale = app()->getLocale();
+
         return $locale === 'ar' ? ($this->meta_title_ar ?: $this->title_ar) : ($this->meta_title_en ?: $this->title_en);
     }
 
     public function getMetaDescAttribute(): ?string
     {
         $locale = app()->getLocale();
+
         return $locale === 'ar' ? ($this->meta_desc_ar ?: $this->meta_desc_en) : ($this->meta_desc_en ?: $this->meta_desc_ar);
     }
 }

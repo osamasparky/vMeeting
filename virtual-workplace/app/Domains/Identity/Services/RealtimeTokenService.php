@@ -40,7 +40,8 @@ class RealtimeTokenService
      */
     public function generateGuestToken(string $guestName, Organization $organization, int $ttlSeconds = 7200): string
     {
-        $guestId = 'guest_' . uniqid();
+        $guestId = 'guest_'.uniqid();
+
         return $this->generateGuestTokenWithId($guestId, $guestName, $organization, $ttlSeconds);
     }
 
@@ -74,12 +75,11 @@ class RealtimeTokenService
      */
     private function getSecret(): string
     {
-        $secret = config('services.realtime.secret') ?: (string)env('REALTIME_SECRET') ?: (string)config('app.key');
+        $secret = config('services.realtime.secret') ?: (string) env('REALTIME_SECRET') ?: (string) config('app.key');
         if (empty($secret)) {
             throw new \RuntimeException('Realtime signing secret missing: REALTIME_SECRET or APP_KEY must be configured in environment (.env).');
         }
+
         return $secret;
     }
 }
-
-

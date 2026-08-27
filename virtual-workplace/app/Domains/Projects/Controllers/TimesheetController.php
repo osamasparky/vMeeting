@@ -27,7 +27,7 @@ class TimesheetController extends Controller
         $query = Timesheet::forOrganization($organization->id)
             ->with(['user:id,name,email', 'reviewer:id,name,email']);
 
-        if (!$membership || (!$membership->hasPermission('timesheets.approve') && $membership->role?->slug === 'employee')) {
+        if (! $membership || (! $membership->hasPermission('timesheets.approve') && $membership->role?->slug === 'employee')) {
             $query->where('user_id', $user->id);
         } elseif ($request->filled('user_id')) {
             $query->where('user_id', $request->query('user_id'));

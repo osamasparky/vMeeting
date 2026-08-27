@@ -15,9 +15,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Project extends Model
 {
-    use HasFactory, HasUuid, BelongsToOrganization, Auditable;
+    use Auditable, BelongsToOrganization, HasFactory, HasUuid;
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
@@ -167,6 +168,7 @@ class Project extends Model
             return 0;
         }
         $completed = $this->tasks()->where('status', 'done')->count();
+
         return (int) round(($completed / $total) * 100);
     }
 

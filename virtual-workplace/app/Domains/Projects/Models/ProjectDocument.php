@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 
 class ProjectDocument extends Model
 {
-    use HasFactory, BelongsToOrganization;
+    use BelongsToOrganization, HasFactory;
 
     protected $fillable = [
         'organization_id',
@@ -43,7 +43,7 @@ class ProjectDocument extends Model
         parent::boot();
         static::creating(function ($doc) {
             if (empty($doc->slug)) {
-                $doc->slug = Str::slug($doc->title) . '-' . Str::random(5);
+                $doc->slug = Str::slug($doc->title).'-'.Str::random(5);
             }
         });
     }

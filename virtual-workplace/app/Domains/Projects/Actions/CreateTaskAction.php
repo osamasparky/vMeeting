@@ -3,6 +3,7 @@
 namespace App\Domains\Projects\Actions;
 
 use App\Domains\Identity\Models\User;
+use App\Domains\Notifications\Services\NotificationService;
 use App\Domains\Projects\Models\Project;
 use App\Domains\Projects\Models\Task;
 use App\Domains\Tenancy\Models\Organization;
@@ -41,8 +42,8 @@ class CreateTaskAction
                 'order' => $nextOrder,
             ]);
 
-            if (!empty($data['assignee_id'])) {
-                \App\Domains\Notifications\Services\NotificationService::notifyTaskAssigned($task, $data['assignee_id'], $creator);
+            if (! empty($data['assignee_id'])) {
+                NotificationService::notifyTaskAssigned($task, $data['assignee_id'], $creator);
             }
 
             return $task->load(['project', 'assignee', 'reporter', 'phase', 'milestone', 'team', 'parentTask']);

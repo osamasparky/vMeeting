@@ -203,6 +203,16 @@ Route::prefix('v1')->group(function () {
                 Route::post('/projects/{project}/sprints', [\App\Domains\Projects\Controllers\ProjectController::class, 'storeSprint'])
                     ->middleware('permission:projects.edit');
 
+                // Milestones & Roadmap
+                Route::get('/projects/{project}/milestones', [\App\Domains\Projects\Controllers\ProjectController::class, 'milestones'])
+                    ->middleware('permission:projects.view');
+                Route::post('/projects/{project}/milestones', [\App\Domains\Projects\Controllers\ProjectController::class, 'storeMilestone'])
+                    ->middleware('permission:projects.edit');
+                Route::patch('/projects/{project}/milestones/{milestone}', [\App\Domains\Projects\Controllers\ProjectController::class, 'updateMilestone'])
+                    ->middleware('permission:projects.edit');
+                Route::delete('/projects/{project}/milestones/{milestone}', [\App\Domains\Projects\Controllers\ProjectController::class, 'destroyMilestone'])
+                    ->middleware('permission:projects.edit');
+
                 // ── Tasks Domain ──
                 Route::get('/tasks', [\App\Domains\Projects\Controllers\TaskController::class, 'index'])
                     ->middleware('permission:tasks.view');
@@ -220,6 +230,8 @@ Route::prefix('v1')->group(function () {
                     ->middleware('permission:tasks.edit');
                 Route::patch('/tasks/{task}/assign', [\App\Domains\Projects\Controllers\TaskController::class, 'assign'])
                     ->middleware('permission:tasks.assign');
+                Route::patch('/tasks/{task}/milestone', [\App\Domains\Projects\Controllers\TaskController::class, 'setMilestone'])
+                    ->middleware('permission:tasks.edit');
                 Route::delete('/tasks/{task}', [\App\Domains\Projects\Controllers\TaskController::class, 'destroy'])
                     ->middleware('permission:tasks.delete');
                 Route::post('/tasks/{task}/checklist', [\App\Domains\Projects\Controllers\TaskController::class, 'addChecklistItem'])

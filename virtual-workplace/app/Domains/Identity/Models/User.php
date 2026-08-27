@@ -2,12 +2,21 @@
 
 namespace App\Domains\Identity\Models;
 
-use App\Traits\HasUuid;
+use App\Domains\People\Models\UserProfile;
+use App\Domains\Projects\Models\ActiveTimer;
+use App\Domains\Projects\Models\Project;
+use App\Domains\Projects\Models\ProjectMember;
+use App\Domains\Projects\Models\Task;
+use App\Domains\Projects\Models\TimeEntry;
+use App\Domains\Projects\Models\Timesheet;
 use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Tenancy\Models\OrganizationMember;
+use App\Traits\HasUuid;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -15,14 +24,15 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens, HasUuid;
+    use HasApiTokens, HasFactory, HasUuid, Notifiable;
 
     protected static function newFactory()
     {
-        return \Database\Factories\UserFactory::new();
+        return UserFactory::new();
     }
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     /**
@@ -84,49 +94,49 @@ class User extends Authenticatable
 
     public function profiles(): HasMany
     {
-        return $this->hasMany(\App\Domains\People\Models\UserProfile::class);
+        return $this->hasMany(UserProfile::class);
     }
 
-    public function profile(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function profile(): HasOne
     {
-        return $this->hasOne(\App\Domains\People\Models\UserProfile::class);
+        return $this->hasOne(UserProfile::class);
     }
 
     public function projectMemberships(): HasMany
     {
-        return $this->hasMany(\App\Domains\Projects\Models\ProjectMember::class);
+        return $this->hasMany(ProjectMember::class);
     }
 
-    public function projects(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function projects(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Domains\Projects\Models\Project::class, 'project_members')
+        return $this->belongsToMany(Project::class, 'project_members')
             ->withPivot('project_role', 'cost_rate', 'billing_rate')
             ->withTimestamps();
     }
 
     public function assignedTasks(): HasMany
     {
-        return $this->hasMany(\App\Domains\Projects\Models\Task::class, 'assignee_id');
+        return $this->hasMany(Task::class, 'assignee_id');
     }
 
     public function createdTasks(): HasMany
     {
-        return $this->hasMany(\App\Domains\Projects\Models\Task::class, 'reporter_id');
+        return $this->hasMany(Task::class, 'reporter_id');
     }
 
     public function timeEntries(): HasMany
     {
-        return $this->hasMany(\App\Domains\Projects\Models\TimeEntry::class);
+        return $this->hasMany(TimeEntry::class);
     }
 
-    public function activeTimer(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function activeTimer(): HasOne
     {
-        return $this->hasOne(\App\Domains\Projects\Models\ActiveTimer::class);
+        return $this->hasOne(ActiveTimer::class);
     }
 
     public function timesheets(): HasMany
     {
-        return $this->hasMany(\App\Domains\Projects\Models\Timesheet::class);
+        return $this->hasMany(Timesheet::class);
     }
 
     // ── Helpers ──
@@ -150,7 +160,7 @@ class User extends Authenticatable
     {
         $membership = $this->membershipFor($organizationId);
 
-        if (!$membership) {
+        if (! $membership) {
             return false;
         }
 
@@ -159,12 +169,12 @@ class User extends Authenticatable
 
     public function hasTwoFactorEnabled(): bool
     {
-        return !is_null($this->two_factor_secret);
+        return ! is_null($this->two_factor_secret);
     }
 
     public function isSuperAdmin(): bool
     {
-        if ((bool)($this->is_super_admin ?? false)) {
+        if ((bool) ($this->is_super_admin ?? false)) {
             return true;
         }
 

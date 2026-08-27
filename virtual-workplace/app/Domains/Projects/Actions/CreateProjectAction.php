@@ -7,7 +7,6 @@ use App\Domains\Projects\Models\Project;
 use App\Domains\Projects\Models\ProjectMember;
 use App\Domains\Tenancy\Models\Organization;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class CreateProjectAction
 {
@@ -17,7 +16,7 @@ class CreateProjectAction
             $code = $data['code'] ?? null;
             if (empty($code)) {
                 $count = Project::where('organization_id', $organization->id)->count() + 1;
-                $code = 'PRJ-' . str_pad((string) $count, 3, '0', STR_PAD_LEFT);
+                $code = 'PRJ-'.str_pad((string) $count, 3, '0', STR_PAD_LEFT);
             }
 
             $project = Project::create([
@@ -47,7 +46,7 @@ class CreateProjectAction
             );
 
             // Add additional members if provided
-            if (!empty($data['members']) && is_array($data['members'])) {
+            if (! empty($data['members']) && is_array($data['members'])) {
                 foreach ($data['members'] as $m) {
                     ProjectMember::updateOrCreate(
                         ['project_id' => $project->id, 'user_id' => $m['user_id']],
