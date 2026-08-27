@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Web;
 
 use App\Domains\Administration\Models\AuditLog;
-use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Domains\Identity\Models\User;
 use App\Domains\People\Services\AttendanceService;
 use App\Domains\Projects\Actions\StartTimerAction;
@@ -11,6 +10,7 @@ use App\Domains\Projects\Actions\StopTimerAction;
 use App\Domains\Projects\Models\ActiveTimer;
 use App\Domains\Projects\Models\Task;
 use App\Domains\Projects\Models\TimeEntry;
+use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

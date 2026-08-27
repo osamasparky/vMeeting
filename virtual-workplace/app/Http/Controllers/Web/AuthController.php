@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Web;
 
 use App\Domains\Identity\Actions\CreateOrganizationAction;
-use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Domains\Identity\Models\User;
+use App\Domains\People\Models\UserProfile;
+use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Domains\Tenancy\Models\Plan;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -170,7 +171,7 @@ class AuthController extends Controller
         $user->save();
 
         // 2. Update user profile
-        $profile = \App\Domains\People\Models\UserProfile::firstOrNew([
+        $profile = UserProfile::firstOrNew([
             'user_id' => $user->id,
             'organization_id' => $membership->organization_id,
         ]);

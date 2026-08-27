@@ -19,11 +19,12 @@ use App\Domains\Projects\Requests\StoreTaskRequest;
 use App\Domains\Projects\Requests\UpdateTaskRequest;
 use App\Domains\Projects\Requests\UpdateTaskStatusRequest;
 use App\Domains\Tenancy\Models\Organization;
-use App\Domains\Tenancy\Models\OrganizationMember;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class TaskController extends Controller
 {
@@ -171,7 +172,7 @@ class TaskController extends Controller
     /**
      * Fetch formatted activity log entries for a task.
      */
-    private function getTaskActivityLog(Task $task, int $limit = 30): \Illuminate\Support\Collection
+    private function getTaskActivityLog(Task $task, int $limit = 30): Collection
     {
         return AuditLog::where('target_type', Task::class)
             ->where('target_id', $task->id)
@@ -199,7 +200,7 @@ class TaskController extends Controller
      */
     protected function authorizeTaskEdit(Organization $organization, Task $task): void
     {
-        \Illuminate\Support\Facades\Gate::authorize('update', $task);
+        Gate::authorize('update', $task);
     }
 
     /**

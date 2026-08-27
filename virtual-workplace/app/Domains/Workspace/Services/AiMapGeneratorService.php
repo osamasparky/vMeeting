@@ -8,6 +8,7 @@ use App\Domains\Workspace\Models\Floor;
 use App\Domains\Workspace\Models\Map;
 use App\Domains\Workspace\Models\Room;
 use App\Models\User;
+use App\Services\FileUploadService;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -167,7 +168,7 @@ class AiMapGeneratorService
                     $b64Data = $openAiData['data'][0]['b64_json'] ?? null;
 
                     $filename = 'ai_map_'.$organization->id.'_'.time().'.png';
-                    $destinationDir = \App\Services\FileUploadService::ensureDirectory(public_path('uploads/maps'), 0755);
+                    $destinationDir = FileUploadService::ensureDirectory(public_path('uploads/maps'), 0755);
 
                     if (! empty($b64Data)) {
                         $imageBinary = base64_decode($b64Data);

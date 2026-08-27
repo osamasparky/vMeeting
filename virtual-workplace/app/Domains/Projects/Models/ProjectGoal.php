@@ -4,6 +4,7 @@ namespace App\Domains\Projects\Models;
 
 use App\Domains\Identity\Models\User;
 use App\Traits\BelongsToOrganization;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -53,7 +54,7 @@ class ProjectGoal extends Model
             return;
         }
 
-        /** @var \Illuminate\Database\Eloquent\Collection<int, ProjectGoalTarget> $targets */
+        /** @var Collection<int, ProjectGoalTarget> $targets */
         $targets = $this->targets()->get();
         if ($targets->isEmpty()) {
             $totalTasks = $project->tasks()->count();
