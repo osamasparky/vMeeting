@@ -137,26 +137,7 @@ class TaskController extends Controller
             'dependencies.dependsOnTask:id,title,status',
         ]);
 
-        $auditLogs = AuditLog::where('target_type', Task::class)
-            ->where('target_id', $task->id)
-            ->with(['actor:id,name,email'])
-            ->latest()
-            ->take(30)
-            ->get()
-            ->map(function ($log) {
-                return [
-                    'id' => $log->id,
-                    'action' => $log->action,
-                    'actor' => [
-                        'id' => $log->actor?->id,
-                        'name' => $log->actor?->name ?? 'System',
-                        'email' => $log->actor?->email,
-                    ],
-                    'metadata' => $log->metadata ?? [],
-                    'created_at' => $log->created_at->toIso8601String(),
-                    'relative_time' => $log->created_at->diffForHumans(),
-                ];
-            });
+        $auditLogs = $this->getTaskActivityLog($task, 30);
 
         return response()->json([
             'task' => $task,
@@ -177,26 +158,7 @@ class TaskController extends Controller
             return response()->json(['message' => 'Task not found.'], 404);
         }
 
-        $logs = AuditLog::where('target_type', Task::class)
-            ->where('target_id', $task->id)
-            ->with(['actor:id,name,email'])
-            ->latest()
-            ->take(50)
-            ->get()
-            ->map(function ($log) {
-                return [
-                    'id' => $log->id,
-                    'action' => $log->action,
-                    'actor' => [
-                        'id' => $log->actor?->id,
-                        'name' => $log->actor?->name ?? 'System',
-                        'email' => $log->actor?->email,
-                    ],
-                    'metadata' => $log->metadata ?? [],
-                    'created_at' => $log->created_at->toIso8601String(),
-                    'relative_time' => $log->created_at->diffForHumans(),
-                ];
-            });
+        $logs = $this->getTaskActivityLog($task, 50);
 
         return response()->json([
             'success' => true,
@@ -207,45 +169,37 @@ class TaskController extends Controller
     }
 
     /**
+     * Fetch formatted activity log entries for a task.
+     */
+    private function getTaskActivityLog(Task $task, int $limit = 30): \Illuminate\Support\Collection
+    {
+        return AuditLog::where('target_type', Task::class)
+            ->where('target_id', $task->id)
+            ->with(['actor:id,name,email'])
+            ->latest()
+            ->take($limit)
+            ->get()
+            ->map(fn ($log) => [
+                'id' => $log->id,
+                'action' => $log->action,
+                'actor' => [
+                    'id' => $log->actor?->id,
+                    'name' => $log->actor?->name ?? 'System',
+                    'email' => $log->actor?->email,
+                ],
+                'metadata' => $log->metadata ?? [],
+                'created_at' => $log->created_at->toIso8601String(),
+                'relative_time' => $log->created_at->diffForHumans(),
+            ]);
+    }
+
+    /**
      * Determine if authenticated user is authorized to edit or update the given task.
      * Non-admin members can only modify tasks assigned to them or created by them.
      */
     protected function authorizeTaskEdit(Organization $organization, Task $task): void
     {
-        $user = Auth::user();
-        if (! $user) {
-            abort(401, 'Unauthenticated.');
-        }
-
-        if (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin()) {
-            return;
-        }
-
-        // Direct assignee or creator can edit
-        if ($task->assignee_id === $user->id || $task->creator_id === $user->id) {
-            return;
-        }
-
-        // Project manager can edit all tasks in their project
-        if ($task->project && $task->project->manager_id === $user->id) {
-            return;
-        }
-
-        $membership = OrganizationMember::where('organization_id', $organization->id)
-            ->where('user_id', $user->id)
-            ->with('role.permissions')
-            ->first();
-
-        if (! $membership) {
-            abort(403, 'Unauthorized.');
-        }
-
-        // Company admins, or roles with tasks.assign / tasks.delete can edit any task
-        if ($membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete')) {
-            return;
-        }
-
-        abort(403, 'Unauthorized. Members can only modify tasks assigned to them.');
+        \Illuminate\Support\Facades\Gate::authorize('update', $task);
     }
 
     /**
