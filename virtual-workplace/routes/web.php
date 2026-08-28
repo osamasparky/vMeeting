@@ -12,7 +12,6 @@ use App\Http\Controllers\Web\GuestAccessController;
 use App\Http\Controllers\Web\OfficeController;
 use App\Http\Controllers\Web\OrganizationSettingsController;
 use App\Http\Controllers\Web\ProjectHubController;
-use App\Http\Controllers\WebAuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LandingController::class, 'home'])->name('landing.home');
@@ -81,11 +80,11 @@ Route::middleware('auth')->group(function () {
     // Projects & Files Storage
     Route::post('/projects/{project}/files', [ProjectHubController::class, 'storeFile'])->name('projects.files.store');
     Route::delete('/projects/{project}/files/{file}', [ProjectHubController::class, 'destroyFile'])->name('projects.files.destroy');
-    Route::post('/tasks/{task}/attachments', [WebAuthController::class, 'uploadTaskAttachment'])->name('tasks.attachments.store');
-    Route::delete('/tasks/{task}/attachments/{attachment}', [WebAuthController::class, 'deleteTaskAttachment'])->name('tasks.attachments.destroy');
+    Route::post('/tasks/{task}/attachments', [ProjectHubController::class, 'uploadTaskAttachment'])->name('tasks.attachments.store');
+    Route::delete('/tasks/{task}/attachments/{attachment}', [ProjectHubController::class, 'deleteTaskAttachment'])->name('tasks.attachments.destroy');
 
     // Task Comments & Mentions
-    Route::get('/tasks/{task}/comments', [WebAuthController::class, 'getTaskComments'])->name('tasks.comments.index');
+    Route::get('/tasks/{task}/comments', [ProjectHubController::class, 'getTaskComments'])->name('tasks.comments.index');
     Route::post('/tasks/{task}/comments', [ProjectHubController::class, 'addComment'])->name('tasks.comments.store');
 
     // Task PM Review & Approvals

@@ -2,14 +2,19 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Domains\Identity\Models\User;
 use App\Domains\Meetings\Models\Meeting;
 use App\Domains\Notifications\Services\NotificationService;
 use App\Domains\Projects\Models\ActiveTimer;
 use App\Domains\Projects\Models\Project;
 use App\Domains\Projects\Models\ProjectFile;
 use App\Domains\Projects\Models\Task;
+use App\Domains\Projects\Models\TaskAttachment;
+use App\Domains\Projects\Models\TaskComment;
 use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Http\Controllers\Controller;
+use App\Services\FileUploadService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -195,46 +200,75 @@ class ProjectHubController extends Controller
     }
 
     /**
-     * Store a file asset attached to the project.
+     * Store/Upload a file asset attached to the project.
      */
     public function storeFile(Request $request, Project $project)
     {
-        $user = Auth::user();
+        return $this->uploadProjectFile($request, $project);
+    }
+
+    /**
+     * Upload a file/document to a Project.
+     */
+    public function uploadProjectFile(Request $request, Project $project)
+    {
         $request->validate([
-            'file' => 'required|file|max:51200', // 50MB max
+            'file' => 'required|file|max:102400', // 100MB max
             'category' => 'nullable|string|max:50',
             'description' => 'nullable|string|max:255',
         ]);
 
+        $user = Auth::user();
         $uploadedFile = $request->file('file');
         $originalName = $uploadedFile->getClientOriginalName();
-        $mimeType = $uploadedFile->getClientMimeType();
-        $size = $uploadedFile->getSize();
+        $fileSize = $uploadedFile->getSize();
+        $mimeType = $uploadedFile->getClientMimeType() ?: 'application/octet-stream';
+        $ext = $uploadedFile->getClientOriginalExtension() ?: pathinfo($originalName, PATHINFO_EXTENSION) ?: 'bin';
+        $fileName = 'prj_'.$project->id.'_'.time().'_'.Str::random(6).'.'.$ext;
 
-        $path = $uploadedFile->store('projects/'.$project->id.'/files', 'public');
+        $destDir = public_path('uploads/projects/'.$project->id);
+        FileUploadService::ensureDirectory($destDir, 0755);
+        $uploadedFile->move($destDir, $fileName);
+        $fileUrl = '/uploads/projects/'.$project->id.'/'.$fileName;
+
+        $actualSize = file_exists($destDir.'/'.$fileName) ? filesize($destDir.'/'.$fileName) : $fileSize;
 
         $file = $project->files()->create([
             'organization_id' => $project->organization_id,
+            'project_id' => $project->id,
             'user_id' => $user->id,
             'file_name' => $originalName,
-            'file_path' => $path,
-            'file_type' => $mimeType,
-            'file_size' => $size,
+            'file_path' => $destDir.'/'.$fileName,
+            'file_url' => $fileUrl,
+            'file_size' => $actualSize,
+            'mime_type' => $mimeType,
             'category' => $request->input('category', 'general'),
             'description' => $request->input('description'),
         ]);
 
-        return response()->json([
-            'success' => true,
-            'message' => __('File uploaded successfully.'),
-            'file' => $file->load('user:id,name,email'),
-        ], 201);
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('File uploaded successfully.'),
+                'file' => $file->load('user:id,name,email'),
+            ], 201);
+        }
+
+        return back()->with('success', __('File uploaded to project successfully.'));
     }
 
     /**
      * Delete a project file.
      */
     public function destroyFile(Project $project, ProjectFile $file)
+    {
+        return $this->deleteProjectFile($project, $file);
+    }
+
+    /**
+     * Delete a project file (alias).
+     */
+    public function deleteProjectFile(Project $project, ProjectFile $file)
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('organization_id', $project->organization_id)->where('user_id', $user->id)->first();
@@ -248,13 +282,91 @@ class ProjectHubController extends Controller
             abort(403, __('Unauthorized to delete this file.'));
         }
 
-        if (Storage::disk('public')->exists($file->file_path)) {
+        if ($file->file_path && file_exists($file->file_path)) {
+            @unlink($file->file_path);
+        } elseif (Storage::disk('public')->exists($file->file_path)) {
             Storage::disk('public')->delete($file->file_path);
         }
 
         $file->delete();
 
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json(['success' => true, 'message' => __('File deleted.')]);
+        }
+
         return redirect()->back()->with('success', __('File deleted successfully.'));
+    }
+
+    /**
+     * Upload an attachment to a Task.
+     */
+    public function uploadTaskAttachment(Request $request, Task $task)
+    {
+        $request->validate([
+            'file' => 'required|file|max:102400', // 100MB
+        ]);
+
+        $user = Auth::user();
+        $uploadedFile = $request->file('file');
+        $originalName = $uploadedFile->getClientOriginalName();
+        $fileSize = $uploadedFile->getSize();
+        $mimeType = $uploadedFile->getClientMimeType() ?: 'application/octet-stream';
+        $ext = $uploadedFile->getClientOriginalExtension() ?: pathinfo($originalName, PATHINFO_EXTENSION) ?: 'bin';
+        $fileName = 'task_'.$task->id.'_'.time().'_'.Str::random(6).'.'.$ext;
+
+        $destDir = public_path('uploads/tasks/'.$task->id);
+        FileUploadService::ensureDirectory($destDir, 0755);
+        $uploadedFile->move($destDir, $fileName);
+        $fileUrl = '/uploads/tasks/'.$task->id.'/'.$fileName;
+
+        $actualSize = file_exists($destDir.'/'.$fileName) ? filesize($destDir.'/'.$fileName) : $fileSize;
+
+        $attachment = TaskAttachment::create([
+            'organization_id' => $task->organization_id,
+            'task_id' => $task->id,
+            'user_id' => $user->id,
+            'file_name' => $originalName,
+            'file_path' => $destDir.'/'.$fileName,
+            'file_url' => $fileUrl,
+            'file_size' => $actualSize,
+            'mime_type' => $mimeType,
+        ]);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('Attachment uploaded successfully.'),
+                'attachment' => $attachment->load('user:id,name,email'),
+            ], 201);
+        }
+
+        return back()->with('success', __('Attachment uploaded.'));
+    }
+
+    /**
+     * Delete a task attachment.
+     */
+    public function deleteTaskAttachment(Task $task, TaskAttachment $attachment)
+    {
+        if ($attachment->file_path && file_exists($attachment->file_path)) {
+            @unlink($attachment->file_path);
+        }
+        $attachment->delete();
+
+        return response()->json(['success' => true, 'message' => __('Attachment deleted.')]);
+    }
+
+    /**
+     * Get task comments thread.
+     */
+    public function getTaskComments(Task $task): JsonResponse
+    {
+        $comments = $task->comments()->with('user:id,name,email')->orderBy('created_at', 'asc')->get();
+
+        return response()->json([
+            'success' => true,
+            'comments' => $comments,
+        ]);
     }
 
     /**
@@ -262,29 +374,42 @@ class ProjectHubController extends Controller
      */
     public function addComment(Request $request, Task $task)
     {
+        return $this->storeTaskComment($request, $task);
+    }
+
+    /**
+     * Store a comment on a Task with @mentions parsing and notifications.
+     */
+    public function storeTaskComment(Request $request, Task $task)
+    {
         $user = Auth::user();
         $validated = $request->validate([
             'body' => 'required|string|max:3000',
         ]);
 
-        $comment = $task->comments()->create([
+        $comment = TaskComment::create([
+            'organization_id' => $task->organization_id,
+            'task_id' => $task->id,
             'user_id' => $user->id,
             'body' => $validated['body'],
         ]);
 
         // Auto-check for mentions and notify
-        preg_match_all('/@([a-zA-Z0-9_\.\p{Arabic}]+)/u', $validated['body'], $matches);
+        preg_match_all('/@([a-zA-Z0-9_\.\-\p{Arabic}]+)/u', $validated['body'], $matches);
         if (! empty($matches[1])) {
-            $mentionedNames = $matches[1];
-            $mentionedMembers = OrganizationMember::where('organization_id', $task->organization_id)
-                ->whereHas('user', function ($q) use ($mentionedNames) {
-                    $q->whereIn('name', $mentionedNames);
-                })->with('user')->get();
+            $mentionedHandles = array_unique($matches[1]);
+            $orgUsers = User::whereIn('id', function ($q) use ($task) {
+                $q->select('user_id')->from('organization_members')->where('organization_id', $task->organization_id);
+            })->get();
 
-            foreach ($mentionedMembers as $mem) {
-                if ($mem->user_id !== $user->id) {
+            foreach ($mentionedHandles as $handle) {
+                $target = $orgUsers->first(function ($u) use ($handle) {
+                    return str_contains(strtolower($u->name), strtolower($handle)) || str_contains(strtolower($u->email), strtolower($handle));
+                });
+
+                if ($target && $target->id !== $user->id) {
                     NotificationService::notifyCustom(
-                        $mem->user_id,
+                        $target->id,
                         'task_mention',
                         __('🔔 :name mentioned you in task ":task"', ['name' => $user->name, 'task' => $task->title]),
                         Str::limit($validated['body'], 120),
