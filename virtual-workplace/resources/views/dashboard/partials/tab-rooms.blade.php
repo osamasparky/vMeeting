@@ -421,7 +421,7 @@
 
         </div>
 
-        <script>
+        <script nonce="{{ $cspNonce ?? '' }}">
             // ── Rooms Interactive Filtering & Spatial View Engine ──
             let activeBranchFilter = 'all';
             let currentRoomsView = 'cards';

@@ -1,4 +1,4 @@
-    <script>
+    <script nonce="{{ $cspNonce ?? '' }}">
         const ORG_ID = "{{ $organization->id }}";
         const CSRF_TOKEN = "{{ csrf_token() }}";
         const ALL_TEAMS = @json($teams);

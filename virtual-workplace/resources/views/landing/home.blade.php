@@ -960,7 +960,7 @@
 @endsection
 
 @section('scripts')
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     // ── Rates Matrix for Dynamic Currency Switching ──
     const currencyRates = {
         'USD': 1.0,

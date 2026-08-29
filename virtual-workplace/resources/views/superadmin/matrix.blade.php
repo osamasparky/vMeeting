@@ -110,7 +110,7 @@
     </div>
 </form>
 
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
 function filterMatrixRows() {
     const q = (document.getElementById('matrix-search-input').value || '').toLowerCase().trim();
     const rows = document.querySelectorAll('.matrix-perm-row');

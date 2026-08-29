@@ -1075,11 +1075,11 @@
 
 @include('office.partials.modals')
 
-        <script src="/js/webrtc/livekit-client.umd.min.js"></script>
-    <script src="/js/webrtc/webrtc-manager.js"></script>
+        <script src="/js/webrtc/livekit-client.umd.min.js" nonce="{{ $cspNonce ?? '' }}"></script>
+    <script src="/js/webrtc/webrtc-manager.js" nonce="{{ $cspNonce ?? '' }}"></script>
 
     <!-- ── JavaScript Realtime Engine, LiveKit SFU & Spatial Audio Pipeline ── -->
-    <script>
+    <script nonce="{{ $cspNonce ?? '' }}">
         const CONFIG = {
             map: @json($map),
             currentUser: @json($user),

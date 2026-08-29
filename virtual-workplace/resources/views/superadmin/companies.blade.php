@@ -166,7 +166,7 @@
 @endsection
 
 @section('scripts')
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     function openChangePlanModal(orgId, orgName, currentPlanId) {
         document.getElementById('modalCompanyTitle').textContent = `💎 Change Plan for ${orgName}`;
         document.getElementById('changePlanForm').action = `/superadmin/companies/${orgId}/plan`;

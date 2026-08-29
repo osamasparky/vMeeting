@@ -421,7 +421,7 @@
     </div>
 </div>
 
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
 function openApproveModal(id, orgName, planName, amount) {
     document.getElementById('approveOrgName').innerText = orgName;
     document.getElementById('approvePlanName').innerText = planName;

@@ -336,7 +336,7 @@
 @endsection
 
 @section('scripts')
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     // ── Template Data Initialization ──
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     const MAP_WIDTH_TILES = {{ $template->width ?? 32 }};

@@ -112,7 +112,7 @@
 @endsection
 
 @section('scripts')
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     function togglePassword(inputId, btn) {
         const input = document.getElementById(inputId);
         if (input.type === 'password') {

@@ -436,7 +436,7 @@
     }
 </style>
 
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     function switchSuperTab(tabKey, btnElement) {
         document.querySelectorAll('.sa-tab-pane').forEach(p => p.style.display = 'none');
         document.querySelectorAll('.sa-tab-btn').forEach(b => b.classList.remove('active'));

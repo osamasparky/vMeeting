@@ -678,7 +678,7 @@
     }
 </style>
 
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     function switchTab(tabId) {
         document.querySelectorAll('.tab-pane').forEach(el => el.style.display = 'none');
         document.querySelectorAll('.tab-nav-btn').forEach(btn => btn.classList.remove('active-tab'));

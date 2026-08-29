@@ -19,7 +19,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
     <!-- Three.js for 3D Spatial Canvas -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" nonce="{{ $cspNonce ?? '' }}"></script>
 
     <!-- Dynamic Theme Variables Injected from Super Admin -->
     <style>
@@ -505,7 +505,7 @@
         </div>
     </footer>
 
-    <script>
+    <script nonce="{{ $cspNonce ?? '' }}">
         function toggleMobileMenu() {
             const menu = document.querySelector('.ns-nav-menu');
             if (menu) {

@@ -420,7 +420,7 @@
 @endsection
 
 @section('scripts')
-    <script>
+    <script nonce="{{ $cspNonce ?? '' }}">
         function updateDimensionBadge() {
             const w = document.getElementById('item-width').value || 1;
             const h = document.getElementById('item-height').value || 1;

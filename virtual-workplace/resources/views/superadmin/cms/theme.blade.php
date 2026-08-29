@@ -228,7 +228,7 @@
 @endsection
 
 @section('scripts')
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     function addNavRow() {
         const container = document.getElementById('nav-items-container');
         const div = document.createElement('div');

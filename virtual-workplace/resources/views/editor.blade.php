@@ -997,7 +997,7 @@
     <div id="toast-bubble" class="toast-bubble"></div>
 
     <!-- ── JavaScript Realtime Engine & Editor Pipeline ── -->
-    <script>
+    <script nonce="{{ $cspNonce ?? '' }}">
         const MAP_DATA = @json($map);
         const MAP_ID = "{{ $map->id }}";
         const ORG_ID = "{{ $organization->id }}";

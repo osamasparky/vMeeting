@@ -1135,10 +1135,10 @@
         }
     </style>
     <!-- SortableJS Library for True Fluid Drag & Drop Kanban -->
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" nonce="{{ $cspNonce ?? '' }}"></script>
     <!-- Frappe Gantt — Real Date-Based Gantt Chart Library -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.js" nonce="{{ $cspNonce ?? '' }}"></script>
 </head>
 <body>
 
@@ -2572,7 +2572,7 @@
 
 @include('projects.partials.modals')
 
-        <script>
+        <script nonce="{{ $cspNonce ?? '' }}">
         const ORG_ID = "{{ $organization->id }}";
         const PROJECT_ID = "{{ $project->id }}";
         const CSRF_TOKEN = "{{ csrf_token() }}";

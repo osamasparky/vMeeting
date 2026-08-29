@@ -148,7 +148,7 @@
 @endsection
 
 @section('scripts')
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     function openCreatePlanModal() {
         document.getElementById('planModalTitle').textContent = '✨ Create New Subscription Plan';
         document.getElementById('planForm').action = '{{ route("superadmin.plans.store") }}';

@@ -219,7 +219,7 @@
     <input type="hidden" name="key" id="delete-phrase-key">
 </form>
 
-<script>
+<script nonce="{{ $cspNonce ?? '' }}">
     function openAddPhraseModal() {
         document.getElementById('add-phrase-modal').style.display = 'flex';
     }

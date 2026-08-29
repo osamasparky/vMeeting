@@ -862,7 +862,7 @@
         </main>
     </div>
 
-    <script>
+    <script nonce="{{ $cspNonce ?? '' }}">
         function toggleSidebar() {
             document.getElementById('adminSidebar').classList.toggle('open');
         }
