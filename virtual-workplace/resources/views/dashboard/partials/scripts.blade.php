@@ -135,20 +135,34 @@
             }
         }
 
-        function switchAdminTab(tabName) {
+        function switchAdminTab(tabName, updateHash = true) {
+            tabName = (tabName || 'overview').toLowerCase().trim();
+            
+            // Map common aliases
+            if (tabName === 'kanban' || tabName === 'tasks') tabName = 'all-tasks';
+            if (tabName === 'mytasks') tabName = 'my-tasks';
+            if (tabName === 'company') tabName = 'settings';
+            if (tabName === 'user-profile') tabName = 'profile';
+
+            const targetTab = document.getElementById(`tab-${tabName}`) || document.getElementById('tab-overview');
+            if (!targetTab) return;
+
+            const finalTabName = targetTab.id.replace('tab-', '');
+
+            // Deactivate all views and buttons
             document.querySelectorAll('.tab-view').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-tab-btn').forEach(el => el.classList.remove('active'));
 
-            const targetTab = document.getElementById(`tab-${tabName}`);
-            if (targetTab) {
-                targetTab.classList.add('active');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                if (window.history && window.history.pushState) {
-                    window.history.pushState(null, null, '#' + tabName);
-                }
-                if (tabName === 'my-tasks' || tabName === 'all-tasks') {
-                    setTimeout(initDashboardSortableKanban, 80);
-                }
+            // Activate target view
+            targetTab.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (updateHash && window.history && window.history.pushState) {
+                window.history.pushState(null, null, '#' + finalTabName);
+            }
+
+            if (finalTabName === 'my-tasks' || finalTabName === 'all-tasks') {
+                setTimeout(initDashboardSortableKanban, 80);
             }
 
             // Close mobile sidebar if open
@@ -159,11 +173,11 @@
 
             const breadcrumb = document.getElementById('current-tab-breadcrumb');
             if (breadcrumb) {
-                breadcrumb.textContent = tabName.replace('-', ' ');
+                breadcrumb.textContent = finalTabName.replace('-', ' ');
             }
 
             // Highlight corresponding sidebar button by ID or onclick match & expand parent accordion
-            const directNavBtn = document.getElementById(`nav-btn-${tabName}`);
+            const directNavBtn = document.getElementById(`nav-btn-${finalTabName}`);
             if (directNavBtn) {
                 directNavBtn.classList.add('active');
                 const parentAccordion = directNavBtn.closest('.sidebar-accordion');
@@ -173,7 +187,7 @@
             } else {
                 document.querySelectorAll('.nav-tab-btn').forEach(btn => {
                     const onclickAttr = btn.getAttribute('onclick') || '';
-                    if (onclickAttr.includes(`'${tabName}'`) || onclickAttr.includes(`"${tabName}"`)) {
+                    if (onclickAttr.includes(`'${finalTabName}'`) || onclickAttr.includes(`"${finalTabName}"`)) {
                         btn.classList.add('active');
                         const parentAccordion = btn.closest('.sidebar-accordion');
                         if (parentAccordion && parentAccordion.classList.contains('collapsed')) {
@@ -182,6 +196,7 @@
                     }
                 });
             }
+
             const titles = {
                 'overview': '{{ __('Dashboard') }}',
                 'chat': '{{ __('Team Chat & Direct Messages') }}',
@@ -221,13 +236,13 @@
 
             const headerTitle = document.getElementById('page-primary-title');
             const headerSub = document.getElementById('page-primary-subtitle');
-            if (headerTitle && titles[tabName]) headerTitle.textContent = titles[tabName];
-            if (headerSub && subtitles[tabName]) headerSub.textContent = subtitles[tabName];
+            if (headerTitle && titles[finalTabName]) headerTitle.textContent = titles[finalTabName];
+            if (headerSub && subtitles[finalTabName]) headerSub.textContent = subtitles[finalTabName];
 
-            if (tabName === 'chat') {
+            if (finalTabName === 'chat' && typeof loadChatConversations === 'function') {
                 loadChatConversations();
             }
-            if (tabName === 'timesheets') {
+            if (finalTabName === 'timesheets' && typeof refreshDailyTimesheet === 'function') {
                 refreshDailyTimesheet();
             }
         }
@@ -280,18 +295,26 @@
             }
         }
 
-        // Auto-open tab from URL hash on load (e.g. /dashboard#projects or #all-tasks or #kanban)
-        window.addEventListener('DOMContentLoaded', () => {
-            let hash = window.location.hash.replace('#', '');
+        // Auto-open tab from URL hash on load & popstate (e.g. /dashboard#projects or #all-tasks or #kanban)
+        function initHashRouting() {
+            let hash = window.location.hash.replace(/^#/, '').trim();
             if (hash === 'kanban') {
                 hash = 'all-tasks';
-                setTimeout(() => switchAllTasksView('kanban'), 120);
+                setTimeout(() => { if (typeof switchAllTasksView === 'function') switchAllTasksView('kanban'); }, 120);
             }
             if (hash && document.getElementById(`tab-${hash}`)) {
-                switchAdminTab(hash);
+                switchAdminTab(hash, false);
             }
             setTimeout(initDashboardSortableKanban, 200);
-        });
+        }
+
+        window.addEventListener('hashchange', initHashRouting);
+        window.addEventListener('popstate', initHashRouting);
+        if (document.readyState !== 'loading') {
+            initHashRouting();
+        } else {
+            document.addEventListener('DOMContentLoaded', initHashRouting);
+        }
 
         // ── Department Modals ──
         function openDepartmentModal() {
