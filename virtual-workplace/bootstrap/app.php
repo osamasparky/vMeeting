@@ -27,6 +27,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'superadmin' => \App\Http\Middleware\SuperAdminMiddleware::class,
         ]);
 
+        $middleware->validateCsrfTokens(except: [
+            'csp-violation-report',
+            'csp-violation-report/*',
+        ]);
+
         $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {

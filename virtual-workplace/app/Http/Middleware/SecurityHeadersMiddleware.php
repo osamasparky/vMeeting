@@ -20,6 +20,18 @@ class SecurityHeadersMiddleware
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'camera=(self), microphone=(self), display-capture=(self), geolocation=()');
 
+        $cspReportOnly = "default-src 'self'; " .
+            "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " .
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; " .
+            "font-src 'self' data: https://fonts.gstatic.com; " .
+            "img-src 'self' data: blob: https:; " .
+            "connect-src 'self' wss: ws: https:; " .
+            "media-src 'self' blob: data:; " .
+            "frame-ancestors 'self'; " .
+            "report-uri /csp-violation-report";
+
+        $response->headers->set('Content-Security-Policy-Report-Only', $cspReportOnly);
+
         return $response;
     }
 }

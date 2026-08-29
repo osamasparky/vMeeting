@@ -235,3 +235,15 @@ Route::prefix('superadmin')->middleware(['auth', 'superadmin'])->name('superadmi
 
     Route::get('/health', [SuperAdminController::class, 'systemHealth'])->name('health');
 });
+
+// Content Security Policy (CSP) Violation Reporting Endpoint
+Route::post('/csp-violation-report', function (\Illuminate\Http\Request $request) {
+    \Illuminate\Support\Facades\Log::warning('CSP Violation Report', [
+        'ip' => $request->ip(),
+        'user_agent' => $request->userAgent(),
+        'payload' => $request->json()->all() ?: $request->all(),
+    ]);
+
+    return response()->noContent();
+})->name('csp.violation.report');
+

@@ -26,6 +26,29 @@ class SecurityAndRateLimitTest extends TestCase
         $response->assertHeader('X-Frame-Options', 'SAMEORIGIN');
         $response->assertHeader('X-Content-Type-Options', 'nosniff');
         $response->assertHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+        $response->assertHeader('Content-Security-Policy-Report-Only');
+
+        $csp = $response->headers->get('Content-Security-Policy-Report-Only');
+        $this->assertStringContainsString("default-src 'self'", $csp);
+        $this->assertStringContainsString("report-uri /csp-violation-report", $csp);
+    }
+
+    public function test_csp_violation_report_endpoint_accepts_reports(): void
+    {
+        $payload = [
+            'csp-report' => [
+                'document-uri' => 'https://nextspace.munazzah.com/dashboard',
+                'referrer' => '',
+                'violated-directive' => 'script-src',
+                'effective-directive' => 'script-src',
+                'original-policy' => "default-src 'self'",
+                'blocked-uri' => 'https://unauthorized-cdn.com/evil.js',
+                'status-code' => 200,
+            ],
+        ];
+
+        $response = $this->postJson('/csp-violation-report', $payload);
+        $response->assertStatus(204);
     }
 
     public function test_realtime_token_service_generates_signed_jwt_with_tenant_claims(): void
