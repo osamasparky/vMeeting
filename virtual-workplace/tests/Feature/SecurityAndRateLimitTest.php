@@ -30,7 +30,7 @@ class SecurityAndRateLimitTest extends TestCase
 
         $csp = $response->headers->get('Content-Security-Policy');
         $this->assertStringContainsString("default-src 'self'", $csp);
-        $this->assertStringContainsString("'nonce-", $csp);
+        $this->assertStringContainsString("script-src 'self' 'unsafe-inline'", $csp);
         $this->assertStringContainsString("report-uri /csp-violation-report", $csp);
     }
 

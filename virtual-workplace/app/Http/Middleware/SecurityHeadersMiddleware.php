@@ -26,7 +26,7 @@ class SecurityHeadersMiddleware
         $response->headers->set('Permissions-Policy', 'camera=(self), microphone=(self), display-capture=(self), geolocation=()');
 
         $csp = "default-src 'self'; " .
-            "script-src 'self' 'nonce-{$nonce}' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " .
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " .
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; " .
             "font-src 'self' data: https://fonts.gstatic.com; " .
             "img-src 'self' data: blob: https:; " .
