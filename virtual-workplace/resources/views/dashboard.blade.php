@@ -1473,7 +1473,7 @@
         </div>
 
         <!-- 2. Project Management Section (Accordion) -->
-        <div class="sidebar-accordion" id="sec-projects">
+        <div class="sidebar-accordion collapsed" id="sec-projects">
             <div class="sidebar-accordion-header" onclick="toggleSidebarSection('sec-projects')" data-tooltip="{{ __('Project Management') }}">
                 <span style="display: flex; align-items: center; gap: 8px;">
                     <span class="nav-icon-tile">📋</span>
@@ -1527,7 +1527,7 @@
             $canSeeAdminSec = $membership->hasPermission('members.view') || $membership->hasPermission('rooms.manage') || $membership->hasPermission('guests.invite') || $membership->hasPermission('departments.manage') || $membership->hasPermission('audit.view') || $membership->role?->slug === 'company_admin';
         @endphp
         @if($canSeeAdminSec)
-        <div class="sidebar-accordion" id="sec-admin">
+        <div class="sidebar-accordion collapsed" id="sec-admin">
             <div class="sidebar-accordion-header" onclick="toggleSidebarSection('sec-admin')" data-tooltip="{{ __('Administration') }}">
                 <span style="display: flex; align-items: center; gap: 8px;">
                     <span class="nav-icon-tile">🛡️</span>
@@ -1611,7 +1611,7 @@
         @endif
 
         <!-- 4. Settings & Profile Section (Accordion) -->
-        <div class="sidebar-accordion" id="sec-settings">
+        <div class="sidebar-accordion collapsed" id="sec-settings">
             <div class="sidebar-accordion-header" onclick="toggleSidebarSection('sec-settings')" data-tooltip="{{ __('Settings & Profile') }}">
                 <span style="display: flex; align-items: center; gap: 8px;">
                     <span class="nav-icon-tile">⚙️</span>

@@ -89,9 +89,19 @@
         }
 
         function toggleSidebarSection(sectionId) {
-            const sec = document.getElementById(sectionId);
-            if (sec) {
-                sec.classList.toggle('collapsed');
+            const targetSec = document.getElementById(sectionId);
+            if (!targetSec) return;
+
+            const willOpen = targetSec.classList.contains('collapsed');
+
+            // Close all other accordions (Single active accordion)
+            document.querySelectorAll('.sidebar-accordion').forEach(sec => {
+                sec.classList.add('collapsed');
+            });
+
+            // If it was collapsed, now open it
+            if (willOpen) {
+                targetSec.classList.remove('collapsed');
             }
         }
 
@@ -176,25 +186,29 @@
                 breadcrumb.textContent = finalTabName.replace('-', ' ');
             }
 
-            // Highlight corresponding sidebar button by ID or onclick match & expand parent accordion
-            const directNavBtn = document.getElementById(`nav-btn-${finalTabName}`);
-            if (directNavBtn) {
-                directNavBtn.classList.add('active');
-                const parentAccordion = directNavBtn.closest('.sidebar-accordion');
-                if (parentAccordion && parentAccordion.classList.contains('collapsed')) {
-                    parentAccordion.classList.remove('collapsed');
-                }
-            } else {
+            // Highlight corresponding sidebar button by ID or onclick match & open ONLY parent accordion
+            let activeNavBtn = document.getElementById(`nav-btn-${finalTabName}`);
+            if (!activeNavBtn) {
                 document.querySelectorAll('.nav-tab-btn').forEach(btn => {
                     const onclickAttr = btn.getAttribute('onclick') || '';
                     if (onclickAttr.includes(`'${finalTabName}'`) || onclickAttr.includes(`"${finalTabName}"`)) {
-                        btn.classList.add('active');
-                        const parentAccordion = btn.closest('.sidebar-accordion');
-                        if (parentAccordion && parentAccordion.classList.contains('collapsed')) {
-                            parentAccordion.classList.remove('collapsed');
-                        }
+                        activeNavBtn = btn;
                     }
                 });
+            }
+
+            if (activeNavBtn) {
+                activeNavBtn.classList.add('active');
+                const parentAccordion = activeNavBtn.closest('.sidebar-accordion');
+                if (parentAccordion) {
+                    // Close all other accordions and open only the parent accordion
+                    document.querySelectorAll('.sidebar-accordion').forEach(sec => {
+                        if (sec !== parentAccordion) {
+                            sec.classList.add('collapsed');
+                        }
+                    });
+                    parentAccordion.classList.remove('collapsed');
+                }
             }
 
             const titles = {
