@@ -291,6 +291,10 @@ export class PresenceManager {
     return result;
   }
 
+  public getClient(ws: WebSocket): ClientConnection | undefined {
+    return this.clients.get(ws);
+  }
+
   /**
    * Send event directly to a single client socket.
    */

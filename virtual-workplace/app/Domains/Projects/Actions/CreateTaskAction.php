@@ -40,6 +40,9 @@ class CreateTaskAction
                 'estimated_hours' => $data['estimated_hours'] ?? 0.00,
                 'is_billable' => $data['is_billable'] ?? true,
                 'order' => $nextOrder,
+                'recurrence_rule' => $data['recurrence_rule'] ?? null,
+                'recurrence_interval' => $data['recurrence_interval'] ?? 1,
+                'recurrence_ends_at' => $data['recurrence_ends_at'] ?? null,
             ]);
 
             if (! empty($data['assignee_id'])) {

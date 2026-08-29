@@ -1706,6 +1706,28 @@ class SuperAdminController extends Controller
      */
     public function updateCmsTheme(Request $request)
     {
+        $validated = $request->validate([
+            'color_deep_space' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{3,8}$/'],
+            'color_dark_green' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{3,8}$/'],
+            'color_emerald' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{3,8}$/'],
+            'color_mint' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{3,8}$/'],
+            'color_soft_mint' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{3,8}$/'],
+            'color_white' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{3,8}$/'],
+            'color_text_dark' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{3,8}$/'],
+            'color_text_light' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{3,8}$/'],
+            'color_text_muted' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{3,8}$/'],
+            'font_family_latin' => ['nullable', 'string', 'max:50', 'regex:/^[a-zA-Z0-9\s,\-\'\"]+$/'],
+            'font_family_arabic' => ['nullable', 'string', 'max:50', 'regex:/^[a-zA-Z0-9\s,\-\'\"]+$/'],
+            'radius_btn' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+(px|rem|em|%)?$/'],
+            'radius_card' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+(px|rem|em|%)?$/'],
+            'glass_blur' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+(px|rem|em)?$/'],
+            'glass_bg' => ['nullable', 'string', 'max:50'],
+            'glass_border' => ['nullable', 'string', 'max:50'],
+            'nav_labels_en.*' => ['nullable', 'string', 'max:50'],
+            'nav_labels_ar.*' => ['nullable', 'string', 'max:50'],
+            'nav_urls.*' => ['nullable', 'string', 'max:255'],
+        ]);
+
         $fields = [
             'color_deep_space', 'color_dark_green', 'color_emerald', 'color_mint',
             'color_soft_mint', 'color_white', 'color_text_dark', 'color_text_light',
@@ -1714,8 +1736,8 @@ class SuperAdminController extends Controller
         ];
 
         foreach ($fields as $f) {
-            if ($request->has($f)) {
-                CmsThemeSetting::setKey($f, $request->input($f));
+            if ($request->has($f) && isset($validated[$f])) {
+                CmsThemeSetting::setKey($f, $validated[$f]);
             }
         }
 

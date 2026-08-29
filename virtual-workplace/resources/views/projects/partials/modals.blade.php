@@ -41,14 +41,40 @@
                         <input type="date" name="due_date" class="form-input">
                     </div>
                 </div>
-                <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">🚩 {{ __('Project Milestone / Phase') }}</label>
-                    <select name="milestone_id" class="form-input">
-                        <option value="">— {{ __('No Milestone (General Task)') }} —</option>
-                        @foreach($project->milestones as $pms)
-                            <option value="{{ $pms->id }}">🚩 {{ $pms->name }}</option>
-                        @endforeach
-                    </select>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">🚩 {{ __('Milestone / Phase') }}</label>
+                        <select name="milestone_id" class="form-input">
+                            <option value="">— {{ __('No Milestone') }} —</option>
+                            @foreach($project->milestones as $pms)
+                                <option value="{{ $pms->id }}">🚩 {{ $pms->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">🔄 {{ __('Repeat / Recurrence') }}</label>
+                        <select name="recurrence_rule" id="new-task-recurrence-rule" onchange="toggleRecurrenceDetails(this.value)" class="form-input">
+                            <option value="">{{ __('No Repeat (One-time)') }}</option>
+                            <option value="daily">🔁 {{ __('Daily') }}</option>
+                            <option value="weekly">📅 {{ __('Weekly') }}</option>
+                            <option value="biweekly">🗓️ {{ __('Biweekly (Every 2 weeks)') }}</option>
+                            <option value="monthly">📆 {{ __('Monthly') }}</option>
+                            <option value="quarterly">📊 {{ __('Quarterly (Every 3 months)') }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="new-task-recurrence-extra" style="display: none; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--bg-surface-subtle); padding: 10px; border-radius: var(--radius-md); border: 1px dashed var(--border-color);">
+                    <div>
+                        <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Repeat Every') }}</label>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <input type="number" name="recurrence_interval" value="1" min="1" max="99" class="form-input" style="padding: 6px 8px; font-size: 12px;">
+                            <span style="font-size: 11px; color: var(--text-muted);">{{ __('cycle(s)') }}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Repeat Until (Optional)') }}</label>
+                        <input type="date" name="recurrence_ends_at" class="form-input" style="padding: 6px 8px; font-size: 12px;">
+                    </div>
                 </div>
                 <div>
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Description / Specifications') }}</label>
@@ -215,6 +241,18 @@
                             @foreach($project->milestones as $pms)
                                 <option value="{{ $pms->id }}">🚩 {{ $pms->name }}</option>
                             @endforeach
+                        </select>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 12px; font-weight: 800; color: var(--text-secondary);">🔄 {{ __('Repeat') }}:</span>
+                        <select id="task-modal-recurrence-select" onchange="updateCurrentTaskRecurrence(this.value)" class="form-input" style="padding: 4px 8px; font-size: 12px; width: auto; font-weight: 700;">
+                            <option value="">— {{ __('One-time') }} —</option>
+                            <option value="daily">🔁 {{ __('Daily') }}</option>
+                            <option value="weekly">📅 {{ __('Weekly') }}</option>
+                            <option value="biweekly">🗓️ {{ __('Biweekly') }}</option>
+                            <option value="monthly">📆 {{ __('Monthly') }}</option>
+                            <option value="quarterly">📊 {{ __('Quarterly') }}</option>
                         </select>
                     </div>
 

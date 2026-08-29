@@ -73,7 +73,7 @@ class GuestAccessController extends Controller
 
         $guestId = 'guest_'.Str::random(24);
         $realtimeToken = $tokenService->generateGuestTokenWithId($guestId, $guestName, $organization);
-        $wsUrl = env('REALTIME_WS_URL', 'ws://127.0.0.1:8080');
+        $wsUrl = env('REALTIME_WS_URL', env('VITE_REALTIME_WS_URL', 'ws://127.0.0.1:8080'));
 
         $user = (object) [
             'id' => $guestId,
@@ -116,7 +116,10 @@ class GuestAccessController extends Controller
             ]);
         }
 
-        return view('office', compact('user', 'invitation', 'organization', 'floor', 'map', 'room', 'allOffices', 'userAllowedOffices', 'userAllowedRoomIds', 'realtimeToken', 'wsUrl', 'initialSpawn', 'branchWarning', 'isDifferentBranch', 'orgDefaultFloor'));
+        $attendancePolicy = optional($organization->settings)->getAttendancePolicy() 
+            ?? \App\Domains\Tenancy\Models\OrganizationSetting::getAttendancePolicy();
+
+        return view('office', compact('user', 'invitation', 'organization', 'floor', 'map', 'room', 'allOffices', 'userAllowedOffices', 'userAllowedRoomIds', 'realtimeToken', 'wsUrl', 'initialSpawn', 'branchWarning', 'isDifferentBranch', 'orgDefaultFloor', 'attendancePolicy'));
     }
 
     /**

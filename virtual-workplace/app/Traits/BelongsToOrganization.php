@@ -9,13 +9,13 @@ use Illuminate\Database\Eloquent\Builder;
 /**
  * Trait BelongsToOrganization
  *
- * Provides organization relationship and automatic scoping
- * for multi-tenant models.
+ * Provides organization relationship, creation context assignment,
+ * and explicit scoping helper (scopeForOrganization) for multi-tenant models.
  */
 trait BelongsToOrganization
 {
     /**
-     * Boot the trait — auto-scope queries to current organization.
+     * Boot the trait — auto-set organization_id upon model creation from request route if present.
      */
     protected static function bootBelongsToOrganization(): void
     {

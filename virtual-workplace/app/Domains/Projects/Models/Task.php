@@ -59,6 +59,21 @@ class Task extends Model
         self::PRIORITY_URGENT,
     ];
 
+    // Recurrence rules
+    public const RECURRENCE_DAILY = 'daily';
+    public const RECURRENCE_WEEKLY = 'weekly';
+    public const RECURRENCE_BIWEEKLY = 'biweekly';
+    public const RECURRENCE_MONTHLY = 'monthly';
+    public const RECURRENCE_QUARTERLY = 'quarterly';
+
+    public const RECURRENCE_RULES = [
+        self::RECURRENCE_DAILY,
+        self::RECURRENCE_WEEKLY,
+        self::RECURRENCE_BIWEEKLY,
+        self::RECURRENCE_MONTHLY,
+        self::RECURRENCE_QUARTERLY,
+    ];
+
     protected $fillable = [
         'organization_id',
         'project_id',
@@ -81,6 +96,10 @@ class Task extends Model
         'is_billable',
         'order',
         'metadata',
+        'recurrence_rule',
+        'recurrence_interval',
+        'recurrence_ends_at',
+        'last_recurred_at',
         'approval_status',
         'approved_by',
         'approved_at',
@@ -91,6 +110,9 @@ class Task extends Model
         'task_number' => 'integer',
         'start_date' => 'date',
         'due_date' => 'date',
+        'recurrence_ends_at' => 'date',
+        'last_recurred_at' => 'datetime',
+        'recurrence_interval' => 'integer',
         'completed_at' => 'datetime',
         'approved_at' => 'datetime',
         'estimated_hours' => 'decimal:2',
@@ -98,6 +120,36 @@ class Task extends Model
         'order' => 'integer',
         'metadata' => 'array',
     ];
+
+    public function isRecurring(): bool
+    {
+        return !empty($this->recurrence_rule);
+    }
+
+    public function calculateNextDueDate(): ?\Carbon\Carbon
+    {
+        if (!$this->isRecurring()) {
+            return null;
+        }
+
+        $base = $this->due_date ? $this->due_date->copy() : now();
+        $interval = max(1, (int) $this->recurrence_interval);
+
+        $nextDate = match ($this->recurrence_rule) {
+            self::RECURRENCE_DAILY => $base->addDays($interval),
+            self::RECURRENCE_WEEKLY => $base->addWeeks($interval),
+            self::RECURRENCE_BIWEEKLY => $base->addWeeks(2 * $interval),
+            self::RECURRENCE_MONTHLY => $base->addMonths($interval),
+            self::RECURRENCE_QUARTERLY => $base->addMonths(3 * $interval),
+            default => null,
+        };
+
+        if ($nextDate && $this->recurrence_ends_at && $nextDate->isAfter($this->recurrence_ends_at)) {
+            return null;
+        }
+
+        return $nextDate;
+    }
 
     // ── Relationships ──
 

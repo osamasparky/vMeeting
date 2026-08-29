@@ -1088,7 +1088,7 @@
             token: "{{ $realtimeToken }}",
             csrf: "{{ csrf_token() }}",
             wsUrl: @json($wsUrl ?? null),
-            attendancePolicy: @json($organization->settings?->getAttendancePolicy() ?? \App\Domains\Tenancy\Models\OrganizationSetting::getAttendancePolicy()),
+            attendancePolicy: @json($attendancePolicy),
         };
 
         const canvas = document.getElementById('office-canvas');
@@ -1117,10 +1117,16 @@
         }
 
         // ── Local & Remote Avatars ──
-        const isGuest = {{ !empty($user->is_guest) ? 'true' : 'false' }};
-        const guestAllowedRoomId = @json(isset($invitation) ? ($invitation->room_id ?: ($room->id ?? null)) : null);
-        const userGender = @json(!empty($user->gender) ? $user->gender : (!empty($user->profile?->gender) ? $user->profile->gender : 'male'));
-        const spawnPos = @json($initialSpawn ?? null);
+        @php
+            $isGuestJs = !empty($user->is_guest);
+            $guestAllowedRoomIdJs = isset($invitation) ? ($invitation->room_id ?: ($room->id ?? null)) : null;
+            $userGenderJs = !empty($user->gender) ? $user->gender : (!empty($user->profile?->gender) ? $user->profile->gender : 'male');
+            $spawnPosJs = $initialSpawn ?? null;
+        @endphp
+        const isGuest = @json($isGuestJs);
+        const guestAllowedRoomId = @json($guestAllowedRoomIdJs);
+        const userGender = @json($userGenderJs);
+        const spawnPos = @json($spawnPosJs);
 
         let defaultX = 250;
         let defaultY = 200;
@@ -1199,7 +1205,8 @@
             ? CONFIG.map.layout_data.background_image_url
             : '/images/office_floorplan.jpg';
         const BLUEPRINT_IMAGE = new Image();
-        BLUEPRINT_IMAGE.src = MAP_BG_URL + (MAP_BG_URL.includes('?') ? '&' : '?') + 'v=' + Date.now();
+        BLUEPRINT_IMAGE.crossOrigin = 'anonymous';
+        BLUEPRINT_IMAGE.src = MAP_BG_URL;
         let blueprintLoaded = false;
         BLUEPRINT_IMAGE.onload = () => {
             blueprintLoaded = true;
@@ -1602,13 +1609,22 @@
             ctx.scale(zoomLevel, zoomLevel);
 
             // 1. Draw Blueprint Background
-            if (BLUEPRINT_IMAGE && BLUEPRINT_IMAGE.complete && BLUEPRINT_IMAGE.naturalWidth > 0) {
+            if (BLUEPRINT_IMAGE && (BLUEPRINT_IMAGE.complete || blueprintLoaded) && BLUEPRINT_IMAGE.naturalWidth > 0) {
                 ctx.fillStyle = '#ECE8DB';
                 ctx.fillRect(0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
                 ctx.drawImage(BLUEPRINT_IMAGE, 0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
             } else {
                 ctx.fillStyle = '#0F1E16';
                 ctx.fillRect(0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
+                // Grid lines fallback
+                ctx.strokeStyle = 'rgba(79, 155, 95, 0.15)';
+                ctx.lineWidth = 1;
+                for (let gx = 0; gx <= MAP_WIDTH_PX; gx += 32) {
+                    ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, MAP_HEIGHT_PX); ctx.stroke();
+                }
+                for (let gy = 0; gy <= MAP_HEIGHT_PX; gy += 32) {
+                    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(MAP_WIDTH_PX, gy); ctx.stroke();
+                }
             }
 
             // 2. Draw Rooms & Sleek Glass Tags
@@ -1953,12 +1969,13 @@
 
         function connectWebSocket() {
             let wsUrl;
+            const encodedToken = encodeURIComponent(CONFIG.token || '');
             if (CONFIG.wsUrl && !CONFIG.wsUrl.includes('127.0.0.1') && !CONFIG.wsUrl.includes('localhost')) {
-                wsUrl = `${CONFIG.wsUrl}${CONFIG.wsUrl.includes('?') ? '&' : '?'}token=${CONFIG.token}`;
+                wsUrl = `${CONFIG.wsUrl}${CONFIG.wsUrl.includes('?') ? '&' : '?'}token=${encodedToken}`;
             } else if (window.location.protocol === 'https:') {
-                wsUrl = `wss://${window.location.host}/ws?token=${CONFIG.token}`;
+                wsUrl = `wss://${window.location.host}/ws?token=${encodedToken}`;
             } else {
-                wsUrl = `ws://${window.location.hostname || '127.0.0.1'}:8080?token=${CONFIG.token}`;
+                wsUrl = `ws://${window.location.hostname || '127.0.0.1'}:8080?token=${encodedToken}`;
             }
 
             try {
@@ -1983,6 +2000,16 @@
                         }
                     }));
 
+                    // Immediate position beacon to guarantee instant rendering for all peers
+                    setTimeout(() => {
+                        if (ws && ws.readyState === WebSocket.OPEN) {
+                            ws.send(JSON.stringify({
+                                type: 'position.update',
+                                payload: { x: localAvatar.x, y: localAvatar.y, isMoving: false }
+                            }));
+                        }
+                    }, 100);
+
                     const activeRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
                     if (activeRoom) {
                         localAvatar.currentRoomId = activeRoom.id;
@@ -1997,14 +2024,23 @@
                             ws.send(JSON.stringify({ type: 'status.update', payload: { status: 'online' } }));
                         }
                     }, 10000);
+
+                    // Continuous Fast Roster Sync Interval (every 4 seconds) to guarantee zero desync
+                    if (window._wsRosterSyncTimer) clearInterval(window._wsRosterSyncTimer);
+                    window._wsRosterSyncTimer = setInterval(() => {
+                        if (ws && ws.readyState === WebSocket.OPEN) {
+                            ws.send(JSON.stringify({ type: 'map.sync' }));
+                        }
+                    }, 4000);
                 };
 
                 ws.onclose = (ev) => {
                     console.log('⚠️ WebSocket disconnected. Code:', ev.code, 'Reason:', ev.reason);
                     if (window._wsPingTimer) clearInterval(window._wsPingTimer);
+                    if (window._wsRosterSyncTimer) clearInterval(window._wsRosterSyncTimer);
                     if (!isSessionReplaced && !wsReconnectTimer) {
                         wsReconnectAttempts++;
-                        const delay = Math.min(1000 * Math.pow(1.5, wsReconnectAttempts), 8000);
+                        const delay = Math.min(800 * Math.pow(1.3, wsReconnectAttempts), 5000);
                         console.log(`⏳ Reconnecting WebSocket (attempt #${wsReconnectAttempts}) in ${delay}ms...`);
                         wsReconnectTimer = setTimeout(() => {
                             wsReconnectTimer = null;
@@ -2017,6 +2053,66 @@
                     console.error('WebSocket Error:', err);
                 };
 
+                // Helper to synchronously reconcile occupant roster
+                function applyOccupantsRoster(occupants) {
+                    if (!Array.isArray(occupants)) return;
+                    const activeIds = new Set(occupants.map(o => o.userId).filter(id => id && id !== localAvatar.id));
+
+                    occupants.forEach(occ => {
+                        if (!occ.userId || occ.userId === localAvatar.id) return;
+                        const posX = Number(occ.position?.x) || 400;
+                        const posY = Number(occ.position?.y) || 400;
+
+                        if (!remoteAvatars.has(occ.userId)) {
+                            let avImg = null;
+                            if (occ.avatarUrl) {
+                                avImg = new Image();
+                                avImg.crossOrigin = 'anonymous';
+                                avImg.src = occ.avatarUrl;
+                            }
+                            remoteAvatars.set(occ.userId, {
+                                id: occ.userId,
+                                name: occ.name || 'Member',
+                                avatarUrl: occ.avatarUrl || null,
+                                avatarImg: avImg,
+                                isGuest: !!occ.isGuest || (occ.name && occ.name.includes('(Guest)')),
+                                x: posX,
+                                y: posY,
+                                targetX: posX,
+                                targetY: posY,
+                                camActive: !!occ.camActive,
+                                micActive: !!occ.micActive,
+                                isSpeaking: false,
+                                gender: occ.gender || 'male'
+                            });
+                        } else {
+                            const av = remoteAvatars.get(occ.userId);
+                            av.name = occ.name || av.name;
+                            av.gender = occ.gender || av.gender;
+                            if (occ.camActive !== undefined) av.camActive = !!occ.camActive;
+                            if (occ.micActive !== undefined) av.micActive = !!occ.micActive;
+                            if (occ.position && (!av.targetX || Math.hypot(av.x - posX, av.y - posY) > 300)) {
+                                av.targetX = posX;
+                                av.targetY = posY;
+                            }
+                        }
+                    });
+
+                    // Remove disconnected users
+                    for (const [id] of remoteAvatars.entries()) {
+                        if (!activeIds.has(id)) {
+                            remoteAvatars.delete(id);
+                            const card = peerVideoCards.get(id);
+                            if (card) { card.remove(); peerVideoCards.delete(id); }
+                            const audio = peerAudioElements.get(id);
+                            if (audio) { audio.remove(); peerAudioElements.delete(id); }
+                        }
+                    }
+
+                    updateOccupantsCounter();
+                    updateGalleryGrid();
+                }
+
                 ws.onmessage = (e) => {
                     try {
                         const data = JSON.parse(e.data);
@@ -2026,6 +2122,7 @@
                             isSessionReplaced = true;
                             if (wsReconnectTimer) { clearTimeout(wsReconnectTimer); wsReconnectTimer = null; }
                             if (window._wsPingTimer) { clearInterval(window._wsPingTimer); }
+                            if (window._wsRosterSyncTimer) { clearInterval(window._wsRosterSyncTimer); }
                             if (ws) { try { ws.close(); } catch(err) {} }
                             const reasonEl = document.getElementById('session-replaced-reason');
                             if (reasonEl && data.payload?.reason) {
@@ -2037,36 +2134,9 @@
                             return;
                         }
 
-                        // 1. Welcome packet with current map occupants
-                        if (data.type === 'welcome' && data.payload?.occupants) {
-                            data.payload.occupants.forEach(occ => {
-                                if (occ.userId && occ.userId !== localAvatar.id) {
-                                    let avImg = null;
-                                    if (occ.avatarUrl) {
-                                        avImg = new Image();
-                                        avImg.crossOrigin = 'anonymous';
-                                        avImg.src = occ.avatarUrl;
-                                    }
-                                    const posX = Number(occ.position?.x) || 400;
-                                    const posY = Number(occ.position?.y) || 400;
-                                    remoteAvatars.set(occ.userId, {
-                                        id: occ.userId,
-                                        name: occ.name || 'Member',
-                                        avatarUrl: occ.avatarUrl || null,
-                                        avatarImg: avImg,
-                                        isGuest: !!occ.isGuest || (occ.name && occ.name.includes('(Guest)')),
-                                        x: posX,
-                                        y: posY,
-                                        targetX: posX,
-                                        targetY: posY,
-                                        camActive: !!occ.camActive,
-                                        micActive: !!occ.micActive,
-                                        isSpeaking: false,
-                                        gender: occ.gender || 'male'
-                                    });
-                                }
-                            });
-                            updateOccupantsCounter();
+                        // 1. Welcome / Map Occupants Sync packet
+                        if ((data.type === 'welcome' || data.type === 'map.occupants_sync') && data.payload?.occupants) {
+                            applyOccupantsRoster(data.payload.occupants);
                             syncLiveKitRoom(localAvatar.currentRoomId);
                         }
 
@@ -2323,6 +2393,27 @@
         }
         connectWebSocket();
 
+        // ── Auto-resync when returning to tab from background / another window ──
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                if (!ws || ws.readyState !== WebSocket.OPEN) {
+                    connectWebSocket();
+                } else {
+                    ws.send(JSON.stringify({ type: 'map.sync' }));
+                    ws.send(JSON.stringify({
+                        type: 'position.update',
+                        payload: { x: localAvatar.x, y: localAvatar.y, isMoving: false }
+                    }));
+                }
+            }
+        });
+
+        window.addEventListener('focus', () => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'map.sync' }));
+            }
+        });
+
         function updateBranchOccupancyBadges(counts) {
             if (!counts) return;
             document.querySelectorAll('.branch-occupants-badge').forEach(badge => {
@@ -2484,6 +2575,9 @@
                     }
                     camVideoEl.play().catch(()=>{});
                 }
+                if (av && isScreen) {
+                    av.livekitScreenTrack = track;
+                }
                 updateGalleryGrid();
             }
         }
@@ -2491,26 +2585,30 @@
         function handleLiveKitTrackUnsubscribed(track, publication, participant) {
             const userId = participant.identity;
             const trackSource = publication?.source || track?.source || 'unknown';
-            console.log(`[LiveKit SFU] Track unsubscribed: ${track.kind} (${trackSource}) from ${userId}`);
+            const isScreen = trackSource === 'screen_share' || (track.mediaStreamTrack?.label || '').toLowerCase().includes('screen') || (track === remoteAvatars.get(userId)?.livekitScreenTrack);
+            console.log(`[LiveKit SFU] Track unsubscribed: ${track.kind} (${trackSource}, isScreen: ${isScreen}) from ${userId}`);
 
             if (track.kind === 'video') {
-                const av = remoteAvatars.get(userId);
-                if (av) {
-                    av.livekitVideoTrack = null;
-                    av.camActive = false;
-                    av.videoEl = null;
-                }
-                if (trackSource === 'screen_share') {
+                if (isScreen) {
                     const card = peerVideoCards.get(userId);
                     if (card) {
                         card.remove();
                         peerVideoCards.delete(userId);
                     }
-                } else {
                     const av = remoteAvatars.get(userId);
                     if (av) {
-                        av.videoEl = null;
+                        av.livekitScreenTrack = null;
+                    }
+                    if (peerVideoCards.size === 0) {
+                        const chatBtn = document.getElementById('btn-chat-focus-screen');
+                        if (chatBtn) chatBtn.style.display = 'none';
+                    }
+                } else {
+                    const av = remoteAvatars.get(userId);
+                    if (av && (av.livekitVideoTrack === track || !av.livekitVideoTrack)) {
+                        av.livekitVideoTrack = null;
                         av.camActive = false;
+                        av.videoEl = null;
                     }
                 }
                 updateGalleryGrid();
@@ -2647,6 +2745,14 @@
             document.getElementById('mic-text').textContent = micActive ? '{{ __("المايك يعمل") }}' : '{{ __("كتم المايك") }}';
         }
 
+        // Setup browser native screen-share stop handler
+        window.onScreenShareEndedByBrowser = function() {
+            console.log('[LiveKit SFU] Screen share stopped via browser floating control');
+            if (screenActive) {
+                toggleScreenShare();
+            }
+        };
+
         async function toggleCamera() {
             try {
                 camActive = !camActive;
@@ -2667,12 +2773,12 @@
                     let localTrack = null;
                     if (window.VWorkWebRTC?.livekitRoom?.localParticipant?.videoTrackPublications) {
                         const pubs = Array.from(window.VWorkWebRTC.livekitRoom.localParticipant.videoTrackPublications.values());
-                        localTrack = pubs.find(p => p.source === 'camera' || !p.source)?.track;
+                        localTrack = pubs.find(p => (p.source === 'camera' || !p.source) && p.track?.mediaStreamTrack)?.track;
                     }
 
                     if (localTrack?.mediaStreamTrack) {
                         localMediaStream = new MediaStream([localTrack.mediaStreamTrack]);
-                    } else if (!localMediaStream) {
+                    } else if (!localMediaStream || !localMediaStream.active) {
                         try {
                             localMediaStream = await navigator.mediaDevices.getUserMedia({
                                 video: { width: { ideal: 640 }, height: { ideal: 360 } },
@@ -2761,15 +2867,24 @@
                     if (ws && ws.readyState === WebSocket.OPEN) {
                         ws.send(JSON.stringify({ type: 'presentation.stop', payload: {} }));
                     }
+
+                    // Restore camera publication if camera was active
+                    if (camActive && window.VWorkWebRTC) {
+                        try {
+                            await window.VWorkWebRTC.setCameraEnabled(true);
+                        } catch(camErr) {
+                            console.warn('[Camera] Re-verify camera after screen share stopped:', camErr);
+                        }
+                    }
                 }
             } catch(e) {
                 console.error('[Screen] error:', e);
                 screenActive = false;
                 const btn = document.getElementById('btn-screen');
                 btn.classList.remove('active');
-                document.getElementById('screen-text').textContent = '{{ __("Share") }}';
+                document.getElementById('screen-text').textContent = '{{ __("مشاركة الشاشة") }}';
                 if (e.name !== 'NotAllowedError') {
-                    showToast(`❌ {{ __("Screen share error:") }} ${e.message || e.name}`);
+                    showToast(`❌ {{ __("خطأ في مشاركة الشاشة:") }} ${e.message || e.name}`);
                 }
             }
         }
@@ -3562,11 +3677,11 @@
                         }
                     }
 
-                    if (isGuest) {
+                    if (isGuest || data.is_guest_viewer) {
                         // Privacy protection: completely hide timer and tasks for guest viewers
                         if (timerBox) timerBox.style.display = 'none';
                         if (tasksCount) tasksCount.textContent = '🔒 {{ __("Restricted") }}';
-                        tasksList.innerHTML = `<div style="text-align:center; padding: 14px; color: var(--text-muted); font-size:12px;">🔒 {{ __("Internal team tasks and project tracking are private to team members.") }}</div>`;
+                        tasksList.innerHTML = `<div style="text-align:center; padding: 14px; color: var(--text-muted); font-size:12px; font-weight: 600;">🔒 {{ __("المهام خاصة بأعضاء الفريق") }}</div>`;
                     } else {
                         // Active Timer for members
                         if (data.active_timer) {

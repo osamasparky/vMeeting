@@ -232,6 +232,8 @@ Route::prefix('v1')->group(function () {
                     ->middleware('permission:tasks.assign');
                 Route::patch('/tasks/{task}/milestone', [\App\Domains\Projects\Controllers\TaskController::class, 'setMilestone'])
                     ->middleware('permission:tasks.edit');
+                Route::post('/tasks/bulk', [\App\Domains\Projects\Controllers\TaskController::class, 'bulkUpdate'])
+                    ->middleware('permission:tasks.edit');
                 Route::delete('/tasks/{task}', [\App\Domains\Projects\Controllers\TaskController::class, 'destroy'])
                     ->middleware('permission:tasks.delete');
                 Route::post('/tasks/{task}/checklist', [\App\Domains\Projects\Controllers\TaskController::class, 'addChecklistItem'])

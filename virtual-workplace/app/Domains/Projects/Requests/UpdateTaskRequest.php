@@ -30,6 +30,9 @@ class UpdateTaskRequest extends FormRequest
             'estimated_hours' => ['nullable', 'numeric', 'min:0'],
             'is_billable' => ['nullable', 'boolean'],
             'order' => ['nullable', 'integer'],
+            'recurrence_rule' => ['nullable', 'string', 'in:'.implode(',', Task::RECURRENCE_RULES)],
+            'recurrence_interval' => ['nullable', 'integer', 'min:1'],
+            'recurrence_ends_at' => ['nullable', 'date'],
         ];
     }
 }

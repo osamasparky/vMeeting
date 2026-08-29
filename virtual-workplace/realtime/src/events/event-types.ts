@@ -187,8 +187,16 @@ export interface InboundUserSit {
   };
 }
 
+export interface InboundMapSync {
+  type: 'map.sync' | 'map.get_occupants';
+  payload?: {
+    mapId?: string;
+  };
+}
+
 export type InboundEvent =
   | InboundJoinMap
+  | InboundMapSync
   | InboundPositionUpdate
   | InboundStatusUpdate
   | InboundAvatarUpdate
@@ -215,6 +223,14 @@ export interface OutboundWelcome {
   type: 'welcome';
   payload: {
     user: OfficeUser;
+    occupants: OfficeUser[];
+  };
+}
+
+export interface OutboundMapOccupantsSync {
+  type: 'map.occupants_sync';
+  payload: {
+    mapId: string;
     occupants: OfficeUser[];
   };
 }
@@ -435,6 +451,7 @@ export interface OutboundMapOccupancy {
 
 export type OutboundEvent =
   | OutboundWelcome
+  | OutboundMapOccupantsSync
   | OutboundUserJoined
   | OutboundUserLeft
   | OutboundPositionUpdated

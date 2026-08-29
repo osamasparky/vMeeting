@@ -184,7 +184,7 @@ class AttendanceController extends Controller
             'description' => 'nullable|string|max:500',
         ]);
 
-        $task = Task::findOrFail($validated['task_id']);
+        $task = Task::where('organization_id', $membership->organization_id)->findOrFail($validated['task_id']);
         $projectId = $validated['project_id'] ?? $task->project_id;
 
         $timer = $action->execute([
@@ -279,78 +279,9 @@ class AttendanceController extends Controller
     }
 
     /**
-     * Get member live activity, active timer, and assigned tasks for in-office user spotlight card.
+     * Get member live activity for in-office user spotlight card (supports guest viewers with privacy protection).
      */
-    public function getMemberActivity(Request $request, string $userId)
-    {
-        $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->first();
-        if (! $membership) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-        $organizationId = $membership->organization_id;
-
-        $targetUser = User::with('profile')->find($userId);
-        if (! $targetUser) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
-
-        $targetMember = OrganizationMember::where('organization_id', $organizationId)
-            ->where('user_id', $userId)
-            ->with(['role'])
-            ->first();
-
-        // Active running timer
-        $activeTimer = ActiveTimer::where('organization_id', $organizationId)
-            ->where('user_id', $userId)
-            ->with(['project', 'task'])
-            ->first();
-
-        // Pending assigned tasks
-        $tasks = Task::where('organization_id', $organizationId)
-            ->where('assignee_id', $userId)
-            ->whereNotIn('status', ['done', 'completed', 'cancelled'])
-            ->with('project')
-            ->orderBy('priority', 'desc')
-            ->orderBy('due_date', 'asc')
-            ->take(20)
-            ->get();
-
-        return response()->json([
-            'user' => [
-                'id' => $targetUser->id,
-                'name' => $targetUser->name,
-                'email' => $targetUser->email,
-                'role_name' => $targetMember?->role?->name ?? 'Member',
-                'job_title' => $targetMember?->job_title ?? $targetUser->profile?->job_title ?? '',
-                'department' => $targetUser->profile?->department ?? '',
-                'avatar_url' => $targetUser->avatar_url ?? null,
-            ],
-            'active_timer' => $activeTimer ? [
-                'task_title' => $activeTimer->task?->title ?? 'Task',
-                'task_number' => $activeTimer->task?->task_number ?? '',
-                'project_name' => $activeTimer->project?->name ?? 'Project',
-                'duration_seconds' => $activeTimer->elapsedSeconds(),
-                'started_at' => $activeTimer->started_at->toIso8601String(),
-            ] : null,
-            'tasks' => $tasks->map(function ($t) {
-                return [
-                    'id' => $t->id,
-                    'title' => $t->title,
-                    'task_number' => $t->task_number,
-                    'status' => $t->status,
-                    'priority' => $t->priority,
-                    'project_name' => $t->project?->name ?? 'General',
-                    'due_date' => $t->due_date ? $t->due_date->format('Y-m-d') : null,
-                ];
-            }),
-        ]);
-    }
-
-    /**
-     * Get member live activity for modal card (supports guest viewers).
-     */
-    public function memberActivity(Request $request, $userId)
+    public function memberActivity(Request $request, string $userId)
     {
         $viewer = Auth::user();
         $isGuest = empty($viewer);
@@ -386,27 +317,72 @@ class AttendanceController extends Controller
         $effectiveOrgId = $targetMembership ? $targetMembership->organization_id : $orgId;
 
         // Privacy rule: Guests are NEVER permitted to inspect team tasks or internal active timers
-        $activeTimer = null;
+        $activeTimerData = null;
         $tasks = collect([]);
 
         if (! $isGuest && $effectiveOrgId) {
-            // Active timer (what they are working on right now)
-            $activeTimer = TimeEntry::where('user_id', $targetUser->id)
-                ->where('organization_id', $effectiveOrgId)
-                ->whereNull('ended_at')
-                ->with(['task', 'project'])
-                ->latest('started_at')
+            // First check ActiveTimer
+            $activeTimer = ActiveTimer::where('organization_id', $effectiveOrgId)
+                ->where('user_id', $targetUser->id)
+                ->with(['project', 'task'])
                 ->first();
+
+            if ($activeTimer) {
+                $activeTimerData = [
+                    'id' => $activeTimer->id,
+                    'project_name' => $activeTimer->project?->name ?? 'General Work',
+                    'task_title' => $activeTimer->task ? ('#' . $activeTimer->task->task_number . ' ' . $activeTimer->task->title) : 'Focused Work Session',
+                    'task_number' => $activeTimer->task?->task_number ?? '',
+                    'started_at' => $activeTimer->started_at?->toIso8601String(),
+                    'duration_seconds' => $activeTimer->elapsedSeconds(),
+                ];
+            } else {
+                // Fallback to open TimeEntry
+                $openEntry = TimeEntry::where('user_id', $targetUser->id)
+                    ->where('organization_id', $effectiveOrgId)
+                    ->whereNull('ended_at')
+                    ->with(['task', 'project'])
+                    ->latest('started_at')
+                    ->first();
+                if ($openEntry) {
+                    $activeTimerData = [
+                        'id' => $openEntry->id,
+                        'project_name' => $openEntry->project?->name ?? 'General Work',
+                        'task_title' => $openEntry->task?->title ?? ($openEntry->description ?? 'Focused Work Session'),
+                        'task_number' => $openEntry->task?->task_number ?? '',
+                        'started_at' => $openEntry->started_at?->toIso8601String(),
+                        'duration_seconds' => $openEntry->started_at ? now()->diffInSeconds($openEntry->started_at) : 0,
+                    ];
+                }
+            }
 
             // Tasks assigned to this user
             $tasks = Task::where('organization_id', $effectiveOrgId)
-                ->where(function ($q) use ($targetUser) {
-                    $q->where('assignee_id', $targetUser->id);
-                })
+                ->where('assignee_id', $targetUser->id)
+                ->whereNotIn('status', ['done', 'completed', 'cancelled'])
                 ->with(['project'])
-                ->latest()
+                ->orderBy('priority', 'desc')
+                ->orderBy('due_date', 'asc')
                 ->take(15)
                 ->get();
+        }
+
+        $deptName = '';
+        if ($targetUser->profile) {
+            if (is_object($targetUser->profile->department)) {
+                $deptName = $targetUser->profile->department->name ?? '';
+            } elseif (is_string($targetUser->profile->department)) {
+                $deptName = $targetUser->profile->department;
+            }
+        }
+
+        $teamName = '';
+        if ($targetUser->profile) {
+            if (is_object($targetUser->profile->team)) {
+                $teamName = $targetUser->profile->team->name ?? '';
+            } elseif (is_string($targetUser->profile->team)) {
+                $teamName = $targetUser->profile->team;
+            }
         }
 
         return response()->json([
@@ -416,23 +392,18 @@ class AttendanceController extends Controller
                 'email' => $isGuest ? null : $targetUser->email,
                 'avatar_url' => $targetUser->avatar_url,
                 'role_name' => $targetMembership?->role?->name ?? 'Member',
-                'job_title' => $targetUser->profile?->job_title ?? __('Team Member'),
-                'department' => $targetUser->profile?->department?->name,
-                'team' => $targetUser->profile?->team?->name,
+                'job_title' => $targetMembership?->job_title ?? $targetUser->profile?->job_title ?? __('Team Member'),
+                'department' => $deptName,
+                'team' => $teamName,
                 'status' => $targetMembership?->status ?? 'active',
             ],
             'is_guest_viewer' => $isGuest,
-            'active_timer' => $activeTimer ? [
-                'id' => $activeTimer->id,
-                'project_name' => $activeTimer->project?->name ?? 'General Work',
-                'task_title' => $activeTimer->task?->title ?? ($activeTimer->description ?? 'Focused Work Session'),
-                'started_at' => $activeTimer->started_at?->toISOString(),
-                'duration_seconds' => $activeTimer->started_at ? now()->diffInSeconds($activeTimer->started_at) : 0,
-            ] : null,
+            'active_timer' => $activeTimerData,
             'tasks' => $tasks->map(function ($t) {
                 return [
                     'id' => $t->id,
                     'title' => $t->title,
+                    'task_number' => $t->task_number,
                     'status' => $t->status,
                     'priority' => $t->priority ?? 'medium',
                     'project_name' => $t->project?->name ?? 'Main',

@@ -2881,63 +2881,8 @@
         </div>
         @endif
 
-        <!-- 3. ROOMS TAB -->
-        @if($membership->hasPermission('rooms.manage'))
-        <div id="tab-rooms" class="tab-view">
-            <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
-                <div>
-                    <h1 class="page-title" style="font-size: 22px; font-weight: 900; color: var(--text-primary); margin-bottom: 4px;">🚪 {{ __('Meeting Rooms & Doors') }}</h1>
-                    <p class="page-subtitle" style="font-size: 13px; color: var(--text-secondary);">{{ __('Configure private offices, conference rooms, and door lock states.') }}</p>
-                </div>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <a href="{{ route('editor') }}" class="tactile-btn" style="background: linear-gradient(135deg, #10B981, #059669); color: white; padding: 10px 18px; font-size: 13px; text-decoration: none; font-weight: 800; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);">
-                        <span>✨</span> {{ __('AI Office Generator (توليد ذكي)') }}
-                    </a>
-                    <a href="{{ route('editor') }}" class="tactile-btn btn-primary" style="padding: 10px 18px; font-size: 13px; text-decoration: none;">
-                        <span>🎨</span> {{ __('Launch Floor Editor') }}
-                    </a>
-                </div>
-            </div>
-
-            <div class="card" style="border-radius: var(--radius-lg); overflow: hidden; padding: 0;">
-                <div style="padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface);">
-                    <h3 style="font-size: 16px; font-weight: 900; color: var(--text-primary);">🏢 {{ __('Configured Workplace Rooms') }} ({{ $rooms->count() }})</h3>
-                </div>
-                <div style="overflow-x: auto;">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>{{ __('Room Name') }}</th>
-                                <th>{{ __('Type') }}</th>
-                                <th>{{ __('Capacity') }}</th>
-                                <th>{{ __('Door Status') }}</th>
-                                <th>{{ __('Actions') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($rooms as $r)
-                                <tr>
-                                    <td>
-                                        <strong style="color: var(--text-primary);">🏢 {{ $r->name }}</strong>
-                                    </td>
-                                    <td><span class="nav-badge-pill">{{ ucfirst($r->type) }}</span></td>
-                                    <td style="font-weight: 700; font-family: monospace;">{{ $r->capacity }} {{ __('Seats') }}</td>
-                                    <td>
-                                        <span class="nav-badge-pill" style="{{ $r->access_mode === 'private' ? 'background: rgba(214, 162, 58, 0.15); color: #D6A23A;' : 'background: rgba(79, 155, 95, 0.15); color: #4F9B5F;' }}">
-                                            {{ $r->access_mode === 'private' ? '🔒 ' . __('Locked') : '🔓 ' . __('Open') }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a href="{{ route('office') }}" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 11px; text-decoration: none;">{{ __('Enter Office') }}</a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        @endif
+        <!-- 3. ROOMS & SPATIAL DISTRIBUTION TAB -->
+        @include('dashboard.partials.tab-rooms')
 
         <!-- 3.5 SCHEDULED MEETINGS TAB (Administration -> Meetings & Schedule) -->
         @include('dashboard.partials.tab-meetings')

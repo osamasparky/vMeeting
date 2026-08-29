@@ -237,6 +237,9 @@ class PresenceManager {
         }
         return result;
     }
+    getClient(ws) {
+        return this.clients.get(ws);
+    }
     /**
      * Send event directly to a single client socket.
      */

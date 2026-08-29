@@ -114,13 +114,16 @@ class OfficeController extends Controller
         }
 
         $realtimeToken = $tokenService->generateToken($user, $organization);
-        $wsUrl = env('REALTIME_WS_URL', 'ws://127.0.0.1:8080');
+        $wsUrl = env('REALTIME_WS_URL', env('VITE_REALTIME_WS_URL', 'ws://127.0.0.1:8080'));
 
         $furnitureItems = Cache::remember('furniture_catalog_active', 86400, function () {
             return \App\Domains\Workspace\Models\FurnitureItem::where('is_active', true)->get();
         });
 
-        return view('office', compact('user', 'organization', 'membership', 'floor', 'map', 'allOffices', 'userAllowedOffices', 'userAllowedRoomIds', 'realtimeToken', 'wsUrl', 'furnitureItems'));
+        $attendancePolicy = optional($organization->settings)->getAttendancePolicy() 
+            ?? \App\Domains\Tenancy\Models\OrganizationSetting::getAttendancePolicy();
+
+        return view('office', compact('user', 'organization', 'membership', 'floor', 'map', 'allOffices', 'userAllowedOffices', 'userAllowedRoomIds', 'realtimeToken', 'wsUrl', 'furnitureItems', 'attendancePolicy'));
     }
 
     /**
@@ -750,8 +753,8 @@ class OfficeController extends Controller
             ->where('organization_id', $room->organization_id)
             ->first();
 
-        if (!$membership) {
-            return response()->json(['message' => 'Unauthorized access.'], 403);
+        if (!$membership || (!$membership->hasPermission('rooms.manage') && $membership->role?->slug !== 'company_admin' && !$user->isSuperAdmin())) {
+            return response()->json(['message' => 'Unauthorized access: insufficient permissions.'], 403);
         }
 
         $room->delete();

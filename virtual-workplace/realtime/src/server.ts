@@ -94,6 +94,22 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
           break;
         }
 
+        case 'map.sync':
+        case 'map.get_occupants': {
+          const conn = presence.getClient(ws);
+          if (!conn || !conn.user || !conn.user.mapId) break;
+          const user = conn.user;
+          const occupants = presence.getMapOccupants(user.organizationId, user.mapId);
+          presence.send(ws, {
+            type: 'map.occupants_sync',
+            payload: {
+              mapId: user.mapId,
+              occupants: occupants.filter((u) => u.userId !== user.userId),
+            },
+          });
+          break;
+        }
+
         case 'position.update': {
           const user = presence.updatePosition(ws, event.payload);
           if (!user || !user.mapId) break;

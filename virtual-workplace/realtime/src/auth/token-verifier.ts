@@ -24,22 +24,34 @@ export class TokenVerifier {
       return null;
     }
 
-    const parts = token.split('.');
+    // Clean token: unescape query string spaces
+    const cleanToken = token.trim().replace(/ /g, '+');
+    const parts = cleanToken.split('.');
     if (parts.length !== 3) {
       return null;
     }
 
     const [headerB64, payloadB64, signatureB64] = parts;
 
+    // Normalize base64 vs base64url
+    const normalizeB64 = (s: string) => s.replace(/-/g, '+').replace(/_/g, '/');
+    const normHeader = normalizeB64(headerB64);
+    const normPayload = normalizeB64(payloadB64);
+    const normSignature = normalizeB64(signatureB64);
+
     // Verify HMAC signature against candidate secrets
     let signatureMatched = false;
     for (const sec of this.secrets) {
-      const expectedSignature = crypto
-        .createHmac('sha256', sec)
-        .update(`${headerB64}.${payloadB64}`)
-        .digest('base64');
+      const rawSig = crypto.createHmac('sha256', sec).update(`${headerB64}.${payloadB64}`).digest();
+      const expectedB64 = rawSig.toString('base64');
+      const expectedB64Url = rawSig.toString('base64url');
 
-      if (expectedSignature === signatureB64) {
+      if (
+        expectedB64 === signatureB64 ||
+        expectedB64 === normSignature ||
+        expectedB64Url === signatureB64 ||
+        rawSig.toString('base64').replace(/=/g, '') === signatureB64.replace(/=/g, '')
+      ) {
         signatureMatched = true;
         break;
       }
@@ -50,7 +62,7 @@ export class TokenVerifier {
     }
 
     try {
-      const payloadJson = Buffer.from(payloadB64, 'base64').toString('utf-8');
+      const payloadJson = Buffer.from(normPayload, 'base64').toString('utf-8');
       const payload: TokenPayload = JSON.parse(payloadJson);
 
       // Check expiration

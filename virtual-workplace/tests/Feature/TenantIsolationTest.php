@@ -64,4 +64,87 @@ class TenantIsolationTest extends TestCase
         ]);
         $response->assertStatus(403);
     }
+
+    public function test_tenant_cannot_link_task_dependency_from_another_organization(): void
+    {
+        Sanctum::actingAs($this->userA);
+
+        $projectA = \App\Domains\Projects\Models\Project::create([
+            'organization_id' => $this->orgA->id,
+            'owner_id' => $this->userA->id,
+            'name' => 'Project A',
+            'code' => 'PRJ-A',
+            'status' => 'active',
+        ]);
+        $taskA = \App\Domains\Projects\Models\Task::create([
+            'organization_id' => $this->orgA->id,
+            'project_id' => $projectA->id,
+            'reporter_id' => $this->userA->id,
+            'title' => 'Task A in Org A',
+            'status' => 'in_progress',
+        ]);
+
+        $projectB = \App\Domains\Projects\Models\Project::create([
+            'organization_id' => $this->orgB->id,
+            'owner_id' => $this->userB->id,
+            'name' => 'Project B',
+            'code' => 'PRJ-B',
+            'status' => 'active',
+        ]);
+        $taskB = \App\Domains\Projects\Models\Task::create([
+            'organization_id' => $this->orgB->id,
+            'project_id' => $projectB->id,
+            'reporter_id' => $this->userB->id,
+            'title' => 'Task B in Org B',
+            'status' => 'in_progress',
+        ]);
+
+        // Attempt to link taskA with cross-tenant taskB
+        $response = $this->postJson("/api/v1/organizations/{$this->orgA->id}/tasks/{$taskA->id}/dependencies", [
+            'depends_on_task_id' => $taskB->id,
+        ]);
+
+        // Must fail with 404 (or 422) preventing cross-tenant IDOR leak
+        $this->assertTrue(in_array($response->getStatusCode(), [404, 422]));
+    }
+
+    public function test_tenant_cannot_start_timer_on_task_from_another_organization(): void
+    {
+        $this->actingAs($this->userA);
+
+        $projectB = \App\Domains\Projects\Models\Project::create([
+            'organization_id' => $this->orgB->id,
+            'owner_id' => $this->userB->id,
+            'name' => 'Project B',
+            'code' => 'PRJ-B',
+            'status' => 'active',
+        ]);
+        $taskB = \App\Domains\Projects\Models\Task::create([
+            'organization_id' => $this->orgB->id,
+            'project_id' => $projectB->id,
+            'reporter_id' => $this->userB->id,
+            'title' => 'Secret Task in Org B',
+            'status' => 'in_progress',
+        ]);
+
+        // Attempt to start timer on Org B task from Org A web session
+        $response = $this->postJson('/api/office/task-timer/start', [
+            'task_id' => $taskB->id,
+        ]);
+
+        $response->assertStatus(404);
+    }
+
+    public function test_guest_viewer_cannot_inspect_member_tasks_or_active_timer(): void
+    {
+        // Unauthenticated guest request with organization_id
+        $response = $this->getJson("/api/members/{$this->userA->id}/activity?organization_id={$this->orgA->id}");
+        $response->assertStatus(200);
+
+        $data = $response->json();
+        $this->assertTrue($data['is_guest_viewer']);
+        $this->assertNull($data['user']['email']);
+        $this->assertNull($data['active_timer']);
+        $this->assertEmpty($data['tasks']);
+    }
 }

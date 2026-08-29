@@ -57,6 +57,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/editor/maps/{map}/publish', [OfficeController::class, 'publishEditorMap'])->name('editor.maps.publish');
     Route::post('/editor/rooms', [OfficeController::class, 'saveEditorRoom'])->name('editor.rooms.store');
     Route::patch('/editor/rooms/{room}', [OfficeController::class, 'updateEditorRoom'])->name('editor.rooms.update');
+    Route::delete('/editor/rooms/{room}', [OfficeController::class, 'deleteEditorRoom'])->name('editor.rooms.destroy');
     Route::get('/projects/{project}', [ProjectHubController::class, 'show'])->name('projects.hub');
 
     // Multi-Office & Branches Management
@@ -150,7 +151,7 @@ Route::post('/api/office/attendance/log', [AttendanceController::class, 'logRoom
 Route::get('/api/office/attendance/summary', [AttendanceController::class, 'getAttendanceSummary'])->name('office.attendance.summary');
 Route::get('/api/timesheets/daily-summary', [AttendanceController::class, 'getDailyTimesheetsReport'])->name('timesheets.daily_summary');
 Route::get('/api/office/my-tasks', [AttendanceController::class, 'getOfficeTasksAndTimer'])->name('office.my_tasks');
-Route::get('/api/members/{userId}/activity', [AttendanceController::class, 'getMemberActivity'])->name('members.activity');
+Route::get('/api/members/{userId}/activity', [AttendanceController::class, 'memberActivity'])->name('members.activity');
 Route::post('/api/office/task-timer/start', [AttendanceController::class, 'startOfficeTaskTimer'])->name('office.task_timer.start');
 Route::post('/api/office/task-timer/stop', [AttendanceController::class, 'stopOfficeTaskTimer'])->name('office.task_timer.stop');
 Route::post('/api/office/tasks/{taskId}/status', [AttendanceController::class, 'updateOfficeTaskStatus'])->name('office.tasks.status');

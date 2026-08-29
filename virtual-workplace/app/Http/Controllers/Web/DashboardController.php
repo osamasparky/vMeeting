@@ -53,12 +53,25 @@ class DashboardController extends Controller
         $organization = $membership->organization;
         $this->ensureDefaultWorkspace($organization);
 
-        $totalMembers = OrganizationMember::where('organization_id', $organization->id)->whereIn('status', ['active', 'invited'])->count();
-        $totalDepts = $organization->departments()->count();
-        $totalTeams = $organization->teams()->count();
-        $totalRooms = $organization->rooms()->count();
-        $totalGuests = \App\Domains\Guests\Models\GuestInvitation::where('organization_id', $organization->id)->count();
-        $totalAudit = \App\Domains\Administration\Models\AuditLog::where('organization_id', $organization->id)->count();
+        $rooms = $organization->rooms()->with(['floor', 'map.floor'])->get();
+        $offices = $organization->offices()->with(['rooms', 'maps.rooms', 'activeMap.rooms'])->get();
+        $roles = \App\Domains\Administration\Models\Role::where('slug', '!=', 'super_admin')
+            ->where(function($q) use ($organization) {
+                $q->where('organization_id', $organization->id)->orWhereNull('organization_id');
+            })->get();
+        $members = $organization->members()->with(['user.profiles', 'role', 'offices', 'rooms'])->get();
+        $departments = $organization->departments()->withCount('teams')->get();
+        $teams = $organization->teams()->with('department')->get();
+        $auditLogs = \App\Domains\Administration\Models\AuditLog::where('organization_id', $organization->id)->latest()->take(20)->get();
+        $guestInvitations = \App\Domains\Guests\Models\GuestInvitation::where('organization_id', $organization->id)->with('room')->latest()->take(20)->get();
+        $allPlans = \App\Domains\Tenancy\Models\Plan::where('is_active', true)->orderBy('price', 'asc')->get();
+
+        $totalMembers = $members->whereIn('status', ['active', 'invited'])->count();
+        $totalDepts = $departments->count();
+        $totalTeams = $teams->count();
+        $totalRooms = $rooms->count();
+        $totalGuests = $guestInvitations->count();
+        $totalAudit = $auditLogs->count();
 
         $stats = [
             'members' => $totalMembers,
@@ -74,19 +87,6 @@ class DashboardController extends Controller
             'screen_share_rate' => 91,
             'audio_quality' => '99.98%',
         ];
-
-        $rooms = $organization->rooms()->with(['floor', 'map.floor'])->get();
-        $offices = $organization->offices()->with(['rooms', 'activeMap'])->get();
-        $roles = \App\Domains\Administration\Models\Role::where('slug', '!=', 'super_admin')
-            ->where(function($q) use ($organization) {
-                $q->where('organization_id', $organization->id)->orWhereNull('organization_id');
-            })->get();
-        $members = $organization->members()->with(['user.profiles', 'role', 'offices', 'rooms'])->get();
-        $departments = $organization->departments()->withCount('teams')->get();
-        $teams = $organization->teams()->with('department')->get();
-        $auditLogs = \App\Domains\Administration\Models\AuditLog::where('organization_id', $organization->id)->latest()->take(20)->get();
-        $guestInvitations = \App\Domains\Guests\Models\GuestInvitation::where('organization_id', $organization->id)->with('room')->latest()->take(20)->get();
-        $allPlans = \App\Domains\Tenancy\Models\Plan::where('is_active', true)->orderBy('price', 'asc')->get();
 
         // Project Management entities
         $projects = $organization->projects()->with(['owner', 'manager', 'department'])->withCount('tasks')->latest()->get();
@@ -158,174 +158,6 @@ class DashboardController extends Controller
             'projects', 'tasks', 'myTasks', 'activeTimer', 'recentTimeEntries', 'allTimesheets', 'myProfile',
             'upcomingMeetings', 'allMeetings', 'smtpSettings', 'openAiSettings', 'upcomingMeetingsJson',
             'pendingSubscriptionRequest', 'attendancePolicy', 'projectMembersMap'
-        ));
-    }
-
-    /**
-     * Dedicated Project Hub Page with comprehensive KPIs, Kanban, Tasks, Timelogs, Meetings, Team, and Roadmap.
-     */
-    public function projectHub(Project $project)
-    {
-        $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)
-            ->whereIn('status', ['active', 'invited'])
-            ->with(['organization.plan', 'role.permissions'])
-            ->first();
-
-        if (!$membership || $project->organization_id !== $membership->organization_id) {
-            abort(404);
-        }
-
-        $organization = $membership->organization;
-
-        // Eager load project relations
-        $project->load([
-            'owner:id,name,email',
-            'manager:id,name,email',
-            'department:id,name',
-            'members.user.profiles',
-            'phases',
-            'milestones',
-            'customFieldDefinitions',
-            'documents.author',
-            'goals.targets',
-            'sprints.tasks',
-            'files.user',
-            'tasks' => function ($q) {
-                $q->with([
-                    'assignee.profiles',
-                    'subtasks',
-                    'checklistItems',
-                    'dependencies.dependsOnTask',
-                    'customFieldValues.definition',
-                    'sprint',
-                    'timeEntries',
-                    'comments.user',
-                    'attachments.user',
-                    'approver',
-                ])->orderBy('order')->orderBy('created_at');
-            },
-            'timeEntries' => function ($q) {
-                $q->with(['user', 'task'])->latest()->take(100);
-            },
-        ]);
-
-        $tasks = $project->tasks;
-        $totalTasks = $tasks->count();
-        $completedTasks = $tasks->where('status', 'done')->count();
-        $inProgressTasks = $tasks->where('status', 'in_progress')->count();
-        $reviewTasks = $tasks->whereIn('status', ['review', 'qa'])->count();
-        $backlogTasks = $tasks->whereIn('status', ['backlog', 'ready'])->count();
-
-        $today = now()->toDateString();
-        $overdueTasks = $tasks->filter(function ($t) use ($today) {
-            return $t->due_date && $t->due_date->toDateString() < $today && $t->status !== 'done';
-        })->count();
-
-        $progressPct = $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100) : 0;
-
-        $actualHours = $project->actualHours();
-        $billableHours = $project->billableHours();
-        $plannedHours = (float) ($project->planned_hours ?? 0);
-        $hoursVariance = $plannedHours > 0 ? round($plannedHours - $actualHours, 1) : 0;
-
-        $laborCost = $project->laborCost();
-        $billableRevenue = $project->billableAmount();
-        $budget = (float) ($project->budget_amount ?? 0);
-        $budgetVariance = $budget > 0 ? round($budget - $laborCost, 2) : 0;
-        $grossMargin = round($billableRevenue - $laborCost, 2);
-        $grossMarginPct = $billableRevenue > 0 ? round(($grossMargin / $billableRevenue) * 100, 1) : 0;
-
-        $kpis = [
-            'total_tasks' => $totalTasks,
-            'completed_tasks' => $completedTasks,
-            'in_progress_tasks' => $inProgressTasks,
-            'review_tasks' => $reviewTasks,
-            'backlog_tasks' => $backlogTasks,
-            'overdue_tasks' => $overdueTasks,
-            'progress_pct' => $progressPct,
-            'actual_hours' => $actualHours,
-            'billable_hours' => $billableHours,
-            'planned_hours' => $plannedHours,
-            'hours_variance' => $hoursVariance,
-            'budget' => $budget,
-            'labor_cost' => $laborCost,
-            'budget_variance' => $budgetVariance,
-            'billable_revenue' => $billableRevenue,
-            'gross_margin' => $grossMargin,
-            'gross_margin_pct' => $grossMarginPct,
-        ];
-
-        // ClickUp Workload Matrix Calculation
-        $allMembers = $organization->members()->with(['user.profiles', 'role'])->get();
-        $workloadMatrix = $allMembers->map(function ($m) use ($tasks) {
-            $assignedTasks = $tasks->where('assignee_id', $m->user_id);
-            $totalEstHours = (float) $assignedTasks->sum('estimated_hours');
-            $capacity = (float) ($m->weekly_capacity_hours ?? 40.0);
-            $utilization = $capacity > 0 ? round(($totalEstHours / $capacity) * 100, 1) : 0;
-
-            return [
-                'member' => $m,
-                'assigned_hours' => $totalEstHours,
-                'tasks_count' => $assignedTasks->count(),
-                'capacity' => $capacity,
-                'utilization' => $utilization,
-                'status' => $utilization > 100 ? 'overloaded' : ($utilization > 75 ? 'optimal' : 'underutilized'),
-            ];
-        });
-
-        // ClickUp Gantt Timeline Tasks
-        $ganttTasks = $tasks->map(function ($t) use ($project) {
-            $start = $t->start_date ?? ($t->due_date ? $t->due_date->copy()->subDays(max(1, (int) ceil(($t->estimated_hours ?? 8) / 8))) : $project->created_at);
-            $end = $t->due_date ?? $start->copy()->addDays(2);
-            return [
-                'id' => $t->id,
-                'title' => '#' . $t->task_number . ' ' . $t->title,
-                'status' => $t->status,
-                'priority' => $t->priority,
-                'assignee' => $t->assignee ? $t->assignee->name : 'Unassigned',
-                'start_date' => $start->format('Y-m-d'),
-                'due_date' => $end->format('Y-m-d'),
-                'progress' => $t->status === 'done' ? 100 : ($t->status === 'in_progress' ? 50 : 0),
-                'dependencies' => $t->dependencies->pluck('depends_on_task_id')->toArray(),
-            ];
-        });
-
-        // Project Meetings
-        $projectMeetings = Meeting::where('project_id', $project->id)
-            ->with(['room', 'creator', 'participants.user'])
-            ->latest()
-            ->get();
-
-        $upcomingProjectMeetings = $projectMeetings->filter(function ($m) {
-            return in_array($m->status, ['scheduled', 'pending', 'active'])
-                && (is_null($m->scheduled_at) || $m->scheduled_at->gte(now()->subHours(2)));
-        })->sortBy(function ($m) {
-            $statusWeight = $m->status === 'active' ? 0 : ($m->status === 'pending' ? 1 : 2);
-            $timeWeight = $m->scheduled_at ? $m->scheduled_at->timestamp : 0;
-            return sprintf('%d-%012d', $statusWeight, $timeWeight);
-        })->values();
-
-        $rooms = $organization->rooms()->get();
-        $activeTimer = \App\Domains\Projects\Models\ActiveTimer::where('user_id', $user->id)->with(['project', 'task'])->first();
-
-        $stats = [
-            'active_members' => $allMembers->where('status', 'active')->count(),
-            'total_rooms' => $rooms->count(),
-            'total_departments' => $organization->departments()->count(),
-            'total_projects' => $organization->projects()->count(),
-            'total_tasks' => $organization->tasks()->count(),
-        ];
-        $allProjects = $organization->projects()->select('id', 'name', 'code', 'status')->latest()->get();
-        $departments = $organization->departments()->withCount('teams')->get();
-        $teams = $organization->teams()->with('department')->get();
-        $myTasks = $organization->tasks()->where('assignee_id', $user->id)->get();
-
-        return view('projects.hub', compact(
-            'user', 'membership', 'organization', 'project', 'tasks', 'kpis',
-            'projectMeetings', 'upcomingProjectMeetings', 'rooms', 'allMembers', 'activeTimer',
-            'stats', 'allProjects', 'departments', 'teams', 'myTasks',
-            'workloadMatrix', 'ganttTasks'
         ));
     }
 

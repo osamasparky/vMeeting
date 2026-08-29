@@ -40,6 +40,11 @@ class UpdateTaskStatusAction
                     'completed_at' => now(),
                     'rejection_reason' => null,
                 ]);
+
+                // ── Automatically generate next recurring cycle task ──
+                if ($task->isRecurring()) {
+                    app(ProcessRecurringTaskAction::class)->execute($task);
+                }
             } else {
                 // Team member requested Done -> needs PM approval
                 $task->update([
@@ -69,6 +74,13 @@ class UpdateTaskStatusAction
             ]);
         }
 
-        return $task->fresh(['project', 'assignee', 'reporter', 'approver']);
+        $task = $task->fresh(['project', 'assignee', 'reporter', 'approver']);
+
+        // ── Auto-recalculate project goals (tasks/milestones/hours targets) ──
+        if ($task->project) {
+            $task->project->goals->each->recalculateProgress();
+        }
+
+        return $task;
     }
 }

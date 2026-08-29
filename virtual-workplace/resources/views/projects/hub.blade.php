@@ -879,6 +879,184 @@
             transform: rotate(2deg) scale(1.02);
         }
 
+        /* ── Task Card Premium Component Styles ── */
+        .task-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+        .task-card-tags {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .task-code-badge {
+            font-family: monospace;
+            font-size: 11px;
+            font-weight: 900;
+            color: var(--text-muted);
+            background: var(--bg-surface-subtle);
+            padding: 2px 6px;
+            border-radius: var(--radius-sm, 6px);
+            border: 1px solid var(--border-color);
+        }
+        .task-card-actions {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .task-dots-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 800;
+            transition: all 0.15s ease;
+        }
+        .task-dots-btn:hover {
+            background: var(--bg-surface-subtle);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        .task-card-title {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin: 0 0 8px 0;
+            line-height: 1.45;
+            word-break: break-word;
+        }
+        .task-card-milestone {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10.5px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 99px;
+            background: rgba(66, 119, 76, 0.15);
+            color: #4F9B5F;
+            border: 1px solid rgba(66, 119, 76, 0.3);
+            margin-bottom: 8px;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .task-card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .task-due-date {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 6px;
+            background: var(--bg-surface-subtle);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+        .task-due-date.is-overdue {
+            background: rgba(239, 68, 68, 0.12);
+            color: #EF4444;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+        .task-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 4px;
+        }
+        .task-assignee-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            min-width: 0;
+        }
+        .task-avatar-circle {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+
+        /* ── Frappe Gantt Dark Mode & High Contrast Styles ── */
+        .gantt-container {
+            background: var(--bg-surface) !important;
+            font-family: inherit !important;
+        }
+        .gantt .grid-background {
+            fill: var(--bg-surface) !important;
+        }
+        .gantt .grid-header {
+            fill: var(--bg-surface-subtle) !important;
+            stroke: var(--border-color) !important;
+        }
+        .gantt .grid-row {
+            fill: var(--bg-surface) !important;
+            stroke: var(--border-color) !important;
+        }
+        .gantt .grid-row:nth-child(even) {
+            fill: var(--bg-surface-subtle) !important;
+        }
+        .gantt .row-line {
+            stroke: var(--border-color) !important;
+        }
+        .gantt .tick {
+            stroke: var(--border-color) !important;
+        }
+        .gantt .lower-text, .gantt .upper-text {
+            fill: var(--text-primary) !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+        }
+        .gantt .today-highlight {
+            fill: rgba(66, 119, 76, 0.15) !important;
+        }
+        .gantt .arrow {
+            stroke: var(--text-muted) !important;
+            stroke-width: 1.5 !important;
+        }
+        .gantt .bar {
+            stroke-width: 0 !important;
+        }
+        .gantt .bar-progress {
+            fill: rgba(255, 255, 255, 0.25) !important;
+        }
+        .gantt .bar-label {
+            fill: #ffffff !important;
+            font-size: 11px !important;
+            font-weight: 800 !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
         /* ── Filter Toolbar ── */
         .hub-filter-bar {
             display: flex;
@@ -958,6 +1136,9 @@
     </style>
     <!-- SortableJS Library for True Fluid Drag & Drop Kanban -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+    <!-- Frappe Gantt — Real Date-Based Gantt Chart Library -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/frappe-gantt@0.6.1/dist/frappe-gantt.min.js"></script>
 </head>
 <body>
 
@@ -1468,6 +1649,11 @@
                                                         ⊞ {{ $t->checklistItems->where('is_completed', true)->count() }}/{{ $t->checklistItems->count() }}
                                                     </span>
                                                 @endif
+                                                @if($t->isRecurring())
+                                                    <span class="badge-pill" style="font-size: 9px; background: rgba(59,130,246,0.15); color: #2563EB; border: 1px solid rgba(59,130,246,0.3);" title="{{ __('Recurring :rule', ['rule' => $t->recurrence_rule]) }}">
+                                                        🔄 {{ ucfirst($t->recurrence_rule) }}
+                                                    </span>
+                                                @endif
                                             </div>
 
                                             <div class="task-card-actions">
@@ -1488,49 +1674,49 @@
                                             {{ $t->title }}
                                         </h4>
 
+                                        <!-- Milestone Badge (if task belongs to a milestone) -->
+                                        @if($t->milestone)
+                                            <div class="task-card-milestone" title="{{ __('Milestone: :name', ['name' => $t->milestone->name]) }}">
+                                                🚩 {{ $t->milestone->name }}
+                                            </div>
+                                        @endif
+
                                         @if($t->approval_status === 'pending_approval')
-                                            <div style="background: rgba(214, 162, 58, 0.15); border: 1px solid rgba(214, 162, 58, 0.35); color: #D6A23A; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
+                                            <div style="background: rgba(214, 162, 58, 0.15); border: 1px solid rgba(214, 162, 58, 0.35); color: #D6A23A; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                                                 <span>⏳ {{ __('Pending PM Approval') }}</span>
                                                 @if($isProjectManager)
                                                     <button type="button" onclick="event.stopPropagation(); quickApproveHubTask('{{ $t->id }}')" class="tactile-btn" style="background: #4F9B5F; color: white; border: none; padding: 2px 6px; font-size: 9px; border-radius: 4px;">✓ {{ __('Approve') }}</button>
                                                 @endif
                                             </div>
                                         @elseif($t->approval_status === 'rejected')
-                                            <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); color: #D96B5F; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 8px;">
+                                            <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); color: #D96B5F; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 8px; margin-bottom: 8px;">
                                                 <span>⚠️ {{ __('Changes Requested') }}</span>
                                             </div>
                                         @endif
 
                                         <!-- Metadata: Due Date -->
                                         <div class="task-card-meta">
-                                            <span></span>
                                             @if($t->due_date)
                                                 <span class="task-due-date {{ $t->due_date->isPast() && $t->status !== 'done' ? 'is-overdue' : '' }}">
                                                     📅 {{ $t->due_date->format('M d') }}
                                                 </span>
+                                            @else
+                                                <span></span>
                                             @endif
                                         </div>
 
-                                        <!-- Footer: Assignee, Status Dropdown, and Live Timer -->
+                                        <!-- Footer: Assignee and Live Timer -->
                                         <div class="task-card-footer">
                                             <div class="task-assignee-chip">
                                                 <div class="task-avatar-circle">
                                                     {{ strtoupper(substr($t->assignee->name ?? 'U', 0, 2)) }}
                                                 </div>
-                                                <span style="max-width: 85px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $t->assignee ? explode(' ', $t->assignee->name)[0] : __('Unassigned') }}</span>
+                                                <span style="max-width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $t->assignee ? explode(' ', $t->assignee->name)[0] : __('Unassigned') }}</span>
                                             </div>
 
-                                            <div style="display: flex; align-items: center; gap: 6px;" onclick="event.stopPropagation();">
-                                                <select onchange="updateTaskStatusFast('{{ $t->id }}', this.value)" class="card-status-select" {{ $canEditThisTask ? '' : 'disabled' }}>
-                                                    @foreach($columns as $optKey => $optMeta)
-                                                        <option value="{{ $optKey }}" {{ $t->status === $optKey ? 'selected' : '' }}>{{ $optMeta['title'] }}</option>
-                                                    @endforeach
-                                                </select>
-
-                                                <button type="button" onclick="event.stopPropagation(); startHubTaskTimerDirect('{{ $project->id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($project->name) }}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--brand-forest); border: 1px solid rgba(79, 155, 95, 0.3); padding: 3px 8px; font-size: 10.5px; border-radius: var(--radius-full);" title="{{ __('Start Timer') }}">
-                                                    ▶ {{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h
-                                                </button>
-                                            </div>
+                                            <button type="button" onclick="event.stopPropagation(); startHubTaskTimerDirect('{{ $project->id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($project->name) }}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--brand-forest); border: 1px solid rgba(79, 155, 95, 0.3); padding: 3px 8px; font-size: 10.5px; border-radius: var(--radius-full); font-weight: 800;" title="{{ __('Start Timer') }}">
+                                                ▶ {{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h
+                                            </button>
                                         </div>
                                     </div>
                                 @endforeach
@@ -1557,10 +1743,45 @@
                         </button>
                     </div>
 
+                    <!-- ── BULK ACTION TOOLBAR (appears when tasks are selected) ── -->
+                    <div id="bulk-action-toolbar" style="display: none; padding: 10px 24px; background: linear-gradient(135deg, #1E3A2A 0%, #2A5D37 100%); border-bottom: 1px solid #42774C; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <span id="bulk-selected-count" style="font-size: 13px; font-weight: 900; color: #fff;">0 {{ __('selected') }}</span>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <!-- Bulk Status -->
+                            <select id="bulk-status-select" onchange="bulkChangeStatus()" style="padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: #fff; font-size: 11px; font-weight: 700; cursor: pointer;">
+                                <option value="" disabled selected style="color:#000;">{{ __('Set Status…') }}</option>
+                                <option value="backlog" style="color:#000;">{{ __('Backlog') }}</option>
+                                <option value="ready" style="color:#000;">{{ __('Ready') }}</option>
+                                <option value="in_progress" style="color:#000;">{{ __('In Progress') }}</option>
+                                <option value="review" style="color:#000;">{{ __('Review') }}</option>
+                                <option value="qa" style="color:#000;">{{ __('QA') }}</option>
+                                <option value="done" style="color:#000;">{{ __('Done') }}</option>
+                            </select>
+                            <!-- Bulk Assign -->
+                            <select id="bulk-assign-select" onchange="bulkAssign()" style="padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: #fff; font-size: 11px; font-weight: 700; cursor: pointer;">
+                                <option value="" disabled selected style="color:#000;">{{ __('Assign to…') }}</option>
+                                @foreach($projectMembers ?? [] as $pm)
+                                    <option value="{{ $pm->user->id }}" style="color:#000;">{{ $pm->user->name }}</option>
+                                @endforeach
+                                <option value="null" style="color:#000;">{{ __('Unassign') }}</option>
+                            </select>
+                            <!-- Bulk Delete -->
+                            <button onclick="bulkDeleteTasks()" style="padding: 5px 12px; border-radius: 6px; background: rgba(239,68,68,0.25); border: 1px solid rgba(239,68,68,0.5); color: #FCA5A5; font-size: 11px; font-weight: 800; cursor: pointer;">
+                                🗑️ {{ __('Delete Selected') }}
+                            </button>
+                        </div>
+                        <button onclick="clearBulkSelection()" style="margin-inline-start: auto; padding: 5px 10px; border-radius: 6px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); font-size: 11px; cursor: pointer;">
+                            ✕ {{ __('Clear') }}
+                        </button>
+                    </div>
+
                     <div style="overflow-x: auto;">
                         <table class="data-table">
                             <thead>
                                 <tr>
+                                    <th style="width: 36px;">
+                                        <input type="checkbox" id="bulk-select-all" onchange="toggleSelectAllTasks(this)" title="{{ __('Select All') }}" style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--brand-forest);">
+                                    </th>
                                     <th>#</th>
                                     <th>{{ __('Task Title') }}</th>
                                     <th>🚩 {{ __('Milestone') }}</th>
@@ -1575,16 +1796,27 @@
                             </thead>
                             <tbody>
                                 @forelse($tasks as $t)
-                                    <tr onclick="openTaskInspector('{{ $t->id }}')" 
+                                    <tr onclick="handleTaskRowClick(event, '{{ $t->id }}')" 
                                         oncontextmenu="event.preventDefault(); event.stopPropagation(); openTaskContextMenu(event, '{{ $t->id }}', '{{ $project->id }}', '{{ addslashes($t->title) }}')"
+                                        data-task-id="{{ $t->id }}"
                                         data-milestone="{{ $t->milestone_id ?? 'none' }}"
-                                        style="cursor: pointer;">
+                                        style="cursor: pointer; transition: background 0.15s;">
+                                        <td onclick="event.stopPropagation();" style="width: 36px;">
+                                            <input type="checkbox" class="task-bulk-checkbox" value="{{ $t->id }}"
+                                                onchange="onBulkCheckboxChange()"
+                                                style="width: 15px; height: 15px; cursor: pointer; accent-color: var(--brand-forest);">
+                                        </td>
                                         <td style="font-family: monospace; font-weight: 900; color: var(--text-muted);">
                                             #{{ $t->task_number }}
                                         </td>
                                         <td>
                                             <div style="font-weight: 800; color: var(--text-primary); font-size: 13px; display: flex; align-items: center; gap: 6px;">
                                                 <span>{{ $t->title }}</span>
+                                                @if($t->isRecurring())
+                                                    <span class="badge-pill" style="font-size: 9px; background: rgba(59,130,246,0.15); color: #2563EB; border: 1px solid rgba(59,130,246,0.3);" title="{{ __('Recurring :rule', ['rule' => $t->recurrence_rule]) }}">
+                                                        🔄 {{ ucfirst($t->recurrence_rule) }}
+                                                    </span>
+                                                @endif
                                                 @if($t->checklistItems && $t->checklistItems->count() > 0)
                                                     <span class="badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.15); color: #4F9B5F;">⊞ {{ $t->checklistItems->where('is_completed', true)->count() }}/{{ $t->checklistItems->count() }}</span>
                                                 @endif
@@ -1654,7 +1886,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="10" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                                        <td colspan="11" style="text-align: center; color: var(--text-muted); padding: 40px;">
                                             <div style="font-size: 32px; margin-bottom: 8px;">📋</div>
                                             {{ __('No tasks created in this project yet.') }}
                                         </td>
@@ -2002,46 +2234,49 @@
                 </div>
             </div>
 
-            <!-- TAB: GANTT & TIMELINE MATRIX (CLICKUP GANTT) -->
+            <!-- TAB: GANTT & TIMELINE MATRIX (FRAPPE GANTT — REAL DATE-BASED) -->
             <div id="hub-section-gantt" class="hub-section-content" style="display: none;">
-                <div class="hub-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
+                <div class="hub-card" style="padding: 0; overflow: hidden;">
+                    <!-- Gantt Header -->
+                    <div style="padding: 16px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                         <div>
                             <h3 style="font-size: 16px; font-weight: 900; color: var(--text-primary);">📊 {{ __('Interactive Gantt & Schedule Timeline') }}</h3>
-                            <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">{{ __('Visual task schedules, critical paths, and predecessor dependencies.') }}</p>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">{{ __('Real date-based timeline with dependency arrows. Drag bars to reschedule.') }}</p>
                         </div>
-                        <div style="display: flex; gap: 8px;">
-                            <button onclick="zoomGantt('days')" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 11px;">{{ __('Days') }}</button>
-                            <button onclick="zoomGantt('weeks')" class="tactile-btn btn-secondary active" style="padding: 6px 12px; font-size: 11px;">{{ __('Weeks') }}</button>
+                        <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                            <span style="font-size: 11px; color: var(--text-muted); margin-inline-end: 4px;">{{ __('View:') }}</span>
+                            <button onclick="setGanttView('Quarter Day')" id="gantt-btn-Quarter_Day" class="tactile-btn btn-secondary gantt-view-btn" style="padding: 5px 10px; font-size: 11px;">6H</button>
+                            <button onclick="setGanttView('Half Day')"    id="gantt-btn-Half_Day"    class="tactile-btn btn-secondary gantt-view-btn" style="padding: 5px 10px; font-size: 11px;">12H</button>
+                            <button onclick="setGanttView('Day')"         id="gantt-btn-Day"          class="tactile-btn btn-secondary gantt-view-btn" style="padding: 5px 10px; font-size: 11px;">{{ __('Day') }}</button>
+                            <button onclick="setGanttView('Week')"        id="gantt-btn-Week"         class="tactile-btn btn-secondary gantt-view-btn active" style="padding: 5px 10px; font-size: 11px;">{{ __('Week') }}</button>
+                            <button onclick="setGanttView('Month')"       id="gantt-btn-Month"        class="tactile-btn btn-secondary gantt-view-btn" style="padding: 5px 10px; font-size: 11px;">{{ __('Month') }}</button>
                         </div>
                     </div>
 
-                    <div style="overflow-x: auto; background: var(--bg-surface-subtle); border-radius: var(--radius-lg); border: 1px solid var(--border-color); padding: 20px;">
-                        <div style="display: flex; flex-direction: column; gap: 12px; min-width: 750px;">
-                            @forelse($ganttTasks as $gt)
-                            <div style="display: grid; grid-template-columns: 240px 1fr; align-items: center; gap: 16px; background: var(--bg-surface); padding: 10px 14px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-                                <div>
-                                    <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                        {{ $gt['title'] }}
-                                    </div>
-                                    <div style="font-size: 10px; color: var(--text-muted); display: flex; gap: 6px;">
-                                        <span>👤 {{ $gt['assignee'] }}</span>
-                                        <span>•</span>
-                                        <span>📅 {{ $gt['due_date'] }}</span>
-                                    </div>
-                                </div>
-                                <div style="position: relative; background: var(--bg-surface-subtle); height: 26px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color);">
-                                    <div style="position: absolute; inset-inline-start: 10%; width: {{ max(15, min(80, $gt['progress'])) }}%; height: 100%; background: linear-gradient(90deg, #42774C 0%, #2A5D37 100%); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: 900;">
-                                        {{ $gt['status'] }}
-                                    </div>
-                                </div>
-                            </div>
-                            @empty
-                            <div style="text-align: center; color: var(--text-muted); padding: 30px;">
-                                {{ __('No tasks available for timeline visualization.') }}
-                            </div>
-                            @endforelse
+                    <!-- Gantt Legend -->
+                    <div style="padding: 8px 24px; display: flex; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid var(--border-color); background: var(--bg-surface-subtle);">
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #42774C; display: inline-block;"></span> {{ __('Done') }}</span>
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #2563EB; display: inline-block;"></span> {{ __('In Progress') }}</span>
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #D97706; display: inline-block;"></span> {{ __('Review/QA') }}</span>
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #64748B; display: inline-block;"></span> {{ __('Backlog/Ready') }}</span>
+                        <span style="font-size: 11px; margin-inline-start: auto; color: var(--text-muted);">↔ {{ __('Drag bars to reschedule') }}</span>
+                    </div>
+
+                    <!-- Frappe Gantt Mount Point -->
+                    <div id="frappe-gantt-wrapper" style="overflow-x: auto; min-height: 300px; padding: 12px 0;">
+                        <div id="frappe-gantt-container"></div>
+                        <div id="gantt-empty-state" style="display: none; text-align: center; padding: 60px 20px; color: var(--text-muted);">
+                            📊 {{ __('No tasks with dates found. Add start & due dates to tasks to see the Gantt chart.') }}
                         </div>
+                    </div>
+                </div>
+
+                <!-- Gantt Task Popover -->
+                <div id="gantt-task-popover" style="display: none; position: fixed; z-index: 9999; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 14px 18px; box-shadow: var(--shadow-xl); min-width: 260px; max-width: 340px; pointer-events: auto;">
+                    <div id="gantt-popover-content" style="font-size: 13px;"></div>
+                    <div style="margin-top: 10px; display: flex; gap: 8px;">
+                        <button id="gantt-popover-open-btn" class="tactile-btn btn-primary" style="padding: 5px 12px; font-size: 11px; flex: 1;">{{ __('Open Task') }}</button>
+                        <button onclick="document.getElementById('gantt-task-popover').style.display='none'" class="tactile-btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">✕</button>
                     </div>
                 </div>
             </div>
@@ -2423,9 +2658,186 @@
             }
         }
 
-        function zoomGantt(mode) {
-            showHubToast('🔍 {{ __('Gantt timeline view adjusted') }}: ' + mode);
+        // ── FRAPPE GANTT ENGINE ──────────────────────────────────────────────
+        let frappeGantt = null;
+        let frappeGanttCurrentView = 'Week';
+        let ganttCurrentPopoverTaskId = null;
+
+        const GANTT_STATUS_COLORS = {
+            done:        '#42774C',
+            in_progress: '#2563EB',
+            review:      '#D97706',
+            qa:          '#7C3AED',
+            ready:       '#64748B',
+            backlog:     '#94A3B8',
+        };
+
+        // Build Frappe Gantt task objects from PHP $ganttTasks
+        function buildFrappeGanttTasks() {
+            const raw = @json($ganttTasks);
+            if (!raw || raw.length === 0) return [];
+            const allIds = new Set(raw.map(t => String(t.id)));
+
+            return raw.map(t => {
+                let s = t.start_date;
+                let e = t.due_date;
+                if (!s) s = new Date().toISOString().slice(0, 10);
+                if (!e || e <= s) {
+                    const d = new Date(s);
+                    d.setDate(d.getDate() + 2);
+                    e = d.toISOString().slice(0, 10);
+                }
+
+                const validDeps = (t.dependencies || []).filter(id => allIds.has(String(id))).join(',');
+
+                return {
+                    id:           String(t.id),
+                    name:         t.title,
+                    start:        s,
+                    end:          e,
+                    progress:     t.progress || 0,
+                    dependencies: validDeps,
+                    custom_class: 'gantt-bar-' + (t.status || 'backlog'),
+                    _meta:        t,
+                };
+            });
         }
+
+        function initFrappeGantt() {
+            const container = document.getElementById('frappe-gantt-container');
+            const emptyState = document.getElementById('gantt-empty-state');
+            if (!container) return;
+
+            const tasks = buildFrappeGanttTasks();
+
+            if (tasks.length === 0) {
+                container.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            container.style.display = 'block';
+            emptyState.style.display = 'none';
+            container.innerHTML = '';
+
+            if (typeof Gantt === 'undefined') {
+                console.warn('Frappe Gantt not loaded');
+                return;
+            }
+
+            try {
+                frappeGantt = new Gantt('#frappe-gantt-container', tasks, {
+                    view_mode:      frappeGanttCurrentView,
+                    date_format:    'YYYY-MM-DD',
+                    language:       '{{ app()->getLocale() }}',
+                    popup_trigger:  'click',
+                    custom_popup_html: null, // we handle our own popover
+
+                    on_click: function (task) {
+                        showGanttTaskPopover(task);
+                    },
+
+                    on_date_change: function (task, start, end) {
+                        const orgId = '{{ $project->organization_id }}';
+                        const taskId = task.id;
+                        const startStr = formatGanttDate(start);
+                        const endStr   = formatGanttDate(end);
+
+                        fetch(`/api/v1/organizations/${orgId}/tasks/${taskId}`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': CSRF_TOKEN,
+                                'Accept': 'application/json',
+                            },
+                            body: JSON.stringify({ start_date: startStr, due_date: endStr }),
+                        })
+                        .then(r => r.json())
+                        .then(() => showHubToast('📅 {{ __('Task rescheduled') }}: ' + task.name))
+                        .catch(() => showHubToast('⚠️ {{ __('Could not reschedule task') }}', 'error'));
+                    },
+                });
+
+                injectGanttStatusStyles();
+            } catch (err) {
+                console.error('Error initializing Frappe Gantt:', err);
+            }
+        }
+
+        function injectGanttStatusStyles() {
+            if (document.getElementById('gantt-status-styles')) return;
+            const style = document.createElement('style');
+            style.id = 'gantt-status-styles';
+            style.textContent = `
+                .gantt .bar-wrapper.gantt-bar-done         .bar { fill: #42774C !important; }
+                .gantt .bar-wrapper.gantt-bar-in_progress  .bar { fill: #2563EB !important; }
+                .gantt .bar-wrapper.gantt-bar-review       .bar { fill: #D97706 !important; }
+                .gantt .bar-wrapper.gantt-bar-qa           .bar { fill: #7C3AED !important; }
+                .gantt .bar-wrapper.gantt-bar-ready        .bar { fill: #64748B !important; }
+                .gantt .bar-wrapper.gantt-bar-backlog      .bar { fill: #94A3B8 !important; }
+                .gantt .bar-label { font-size: 11px !important; font-weight: 800 !important; fill: #ffffff !important; }
+            `;
+            document.head.appendChild(style);
+        }
+
+        function setGanttView(mode) {
+            frappeGanttCurrentView = mode;
+
+            // Update active button
+            document.querySelectorAll('.gantt-view-btn').forEach(b => b.classList.remove('active'));
+            const btnId = 'gantt-btn-' + mode.replace(' ', '_');
+            const btn = document.getElementById(btnId);
+            if (btn) btn.classList.add('active');
+
+            if (frappeGantt) {
+                frappeGantt.change_view_mode(mode);
+                showHubToast('📊 {{ __('Gantt view') }}: ' + mode);
+            } else {
+                initFrappeGantt();
+            }
+        }
+
+        function showGanttTaskPopover(task) {
+            const meta = task._meta || {};
+            ganttCurrentPopoverTaskId = task.id;
+
+            const statusColors = { done: '#42774C', in_progress: '#2563EB', review: '#D97706', qa: '#7C3AED', ready: '#64748B', backlog: '#94A3B8' };
+            const color = statusColors[meta.status] || '#64748B';
+
+            document.getElementById('gantt-popover-content').innerHTML = `
+                <div style="font-weight: 900; font-size: 13px; color: var(--text-primary); margin-bottom: 8px; line-height: 1.4;">${task.name}</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
+                    <span style="background: ${color}22; color: ${color}; padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 800; border: 1px solid ${color}44;">${(meta.status || 'backlog').replace('_', ' ').toUpperCase()}</span>
+                    <span style="background: var(--bg-surface-subtle); padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 700; border: 1px solid var(--border-color);">${meta.priority || 'medium'}</span>
+                </div>
+                <div style="font-size: 11px; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px;">
+                    <span>👤 ${meta.assignee || '{{ __('Unassigned') }}'}</span>
+                    <span>📅 ${meta.start_date || '?'} → ${meta.due_date || '?'}</span>
+                    <span>📊 {{ __('Progress') }}: ${task.progress || 0}%</span>
+                </div>
+            `;
+
+            const btn = document.getElementById('gantt-popover-open-btn');
+            if (btn) btn.onclick = () => { document.getElementById('gantt-task-popover').style.display = 'none'; openTaskInspector(task.id); };
+
+            // Position near mouse (use viewport center as fallback)
+            const popover = document.getElementById('gantt-task-popover');
+            popover.style.display = 'block';
+            popover.style.top  = (window.innerHeight / 2 - 80) + 'px';
+            popover.style.left = (window.innerWidth / 2 - 140) + 'px';
+        }
+
+        function formatGanttDate(d) {
+            if (!d) return '';
+            if (typeof d === 'string') return d.substring(0, 10);
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        // Legacy alias kept for backward compat
+        function zoomGantt(mode) { setGanttView(mode === 'days' ? 'Day' : 'Week'); }
 
         // Sub-Tab Switcher
         function switchHubSection(tab) {
@@ -2441,6 +2853,11 @@
             if (window.history && window.history.pushState) {
                 window.history.pushState(null, null, '#' + tab);
             }
+
+            // ── Re-render Frappe Gantt when Gantt tab is opened ──
+            if (tab === 'gantt') {
+                setTimeout(() => initFrappeGantt(), 80);
+            }
         }
 
         // Restore active tab from hash
@@ -2448,6 +2865,12 @@
             const hash = window.location.hash.replace('#', '');
             if (hash && document.getElementById(`hub-section-${hash}`)) {
                 switchHubSection(hash);
+            } else {
+                // If default is kanban or gantt
+                const defaultActive = document.querySelector('.hub-tab-btn.active');
+                if (defaultActive && defaultActive.id === 'hub-nav-btn-gantt') {
+                    setTimeout(() => initFrappeGantt(), 100);
+                }
             }
         });
 
@@ -3060,6 +3483,139 @@
             filterHubTasks();
         }
 
+        // ── BULK ACTIONS ENGINE ──────────────────────────────────────────────
+        function handleTaskRowClick(event, taskId) {
+            const target = event.target;
+            if (target.closest('input') || target.closest('button') || target.closest('select') || target.closest('a')) {
+                return;
+            }
+            openTaskInspector(taskId);
+        }
+
+        function toggleSelectAllTasks(master) {
+            const isChecked = master.checked;
+            document.querySelectorAll('#hub-section-tasks tbody tr').forEach(row => {
+                if (row.style.display !== 'none') {
+                    const cb = row.querySelector('.task-bulk-checkbox');
+                    if (cb) cb.checked = isChecked;
+                }
+            });
+            onBulkCheckboxChange();
+        }
+
+        function onBulkCheckboxChange() {
+            const checkedBoxes = document.querySelectorAll('.task-bulk-checkbox:checked');
+            const totalVisible = document.querySelectorAll('#hub-section-tasks tbody tr:not([style*="display: none"]) .task-bulk-checkbox');
+            const master = document.getElementById('bulk-select-all');
+            const toolbar = document.getElementById('bulk-action-toolbar');
+            const countLabel = document.getElementById('bulk-selected-count');
+
+            if (master && totalVisible.length > 0) {
+                master.checked = checkedBoxes.length === totalVisible.length;
+                master.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < totalVisible.length;
+            }
+
+            if (checkedBoxes.length > 0) {
+                if (toolbar) toolbar.style.display = 'flex';
+                if (countLabel) countLabel.textContent = `${checkedBoxes.length} {{ __('selected') }}`;
+            } else {
+                if (toolbar) toolbar.style.display = 'none';
+            }
+
+            // Highlight selected rows
+            document.querySelectorAll('#hub-section-tasks tbody tr').forEach(row => {
+                const cb = row.querySelector('.task-bulk-checkbox');
+                if (cb && cb.checked) {
+                    row.style.background = 'rgba(66, 119, 76, 0.08)';
+                } else {
+                    row.style.background = '';
+                }
+            });
+        }
+
+        function getSelectedTaskIds() {
+            return Array.from(document.querySelectorAll('.task-bulk-checkbox:checked')).map(cb => cb.value);
+        }
+
+        function clearBulkSelection() {
+            document.querySelectorAll('.task-bulk-checkbox').forEach(cb => cb.checked = false);
+            const master = document.getElementById('bulk-select-all');
+            if (master) {
+                master.checked = false;
+                master.indeterminate = false;
+            }
+            onBulkCheckboxChange();
+            const statusSel = document.getElementById('bulk-status-select');
+            const assignSel = document.getElementById('bulk-assign-select');
+            if (statusSel) statusSel.value = '';
+            if (assignSel) assignSel.value = '';
+        }
+
+        async function executeBulkAction(payload, successMsg) {
+            const orgId = '{{ $project->organization_id }}';
+            try {
+                const response = await fetch(`/api/organizations/${orgId}/tasks/bulk`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Failed bulk action');
+
+                showHubToast('⚡ ' + (successMsg || data.message));
+                setTimeout(() => window.location.reload(), 700);
+            } catch (err) {
+                showHubToast('⚠️ ' + err.message, 'error');
+            }
+        }
+
+        function bulkChangeStatus() {
+            const select = document.getElementById('bulk-status-select');
+            const status = select ? select.value : '';
+            if (!status) return;
+            const taskIds = getSelectedTaskIds();
+            if (taskIds.length === 0) return;
+
+            executeBulkAction({
+                task_ids: taskIds,
+                action: 'update_status',
+                status: status
+            }, `{{ __('Updated status for') }} ${taskIds.length} {{ __('task(s)') }}`);
+        }
+
+        function bulkAssign() {
+            const select = document.getElementById('bulk-assign-select');
+            const assigneeId = select ? select.value : '';
+            if (!assigneeId) return;
+            const taskIds = getSelectedTaskIds();
+            if (taskIds.length === 0) return;
+
+            executeBulkAction({
+                task_ids: taskIds,
+                action: 'assign',
+                assignee_id: assigneeId === 'null' ? null : assigneeId
+            }, `{{ __('Reassigned') }} ${taskIds.length} {{ __('task(s)') }}`);
+        }
+
+        function bulkDeleteTasks() {
+            const taskIds = getSelectedTaskIds();
+            if (taskIds.length === 0) return;
+
+            if (!confirm(`{{ __('Are you sure you want to permanently delete') }} ${taskIds.length} {{ __('selected tasks?') }}`)) {
+                return;
+            }
+
+            executeBulkAction({
+                task_ids: taskIds,
+                action: 'delete'
+            }, `{{ __('Deleted') }} ${taskIds.length} {{ __('task(s)') }}`);
+        }
+
         // ── MILESTONE & ROADMAP CONTROLS ──
         function openNewMilestoneModal() {
             document.getElementById('new-milestone-modal').style.display = 'flex';
@@ -3241,6 +3797,37 @@
             }
         }
 
+        function toggleRecurrenceDetails(val) {
+            const extra = document.getElementById('new-task-recurrence-extra');
+            if (extra) {
+                extra.style.display = val ? 'grid' : 'none';
+            }
+        }
+
+        async function updateCurrentTaskRecurrence(rule) {
+            if (!activeInspectedTaskId) return;
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${activeInspectedTaskId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': CSRF_TOKEN,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ recurrence_rule: rule || null })
+                });
+                if (res.ok) {
+                    showHubToast('🔄 {{ __("Task repeat schedule updated!") }}');
+                    setTimeout(() => window.location.reload(), 400);
+                } else {
+                    const err = await res.json();
+                    showHubToast(`❌ ${err.message || 'Error updating recurrence'}`);
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
         // Initialize Sortable on DOM ready
         window.addEventListener('DOMContentLoaded', () => {
             initSortableKanban();
@@ -3287,6 +3874,11 @@
                 const msSelect = document.getElementById('task-modal-milestone-select');
                 if (msSelect) {
                     msSelect.value = t.milestone_id || '';
+                }
+
+                const recSelect = document.getElementById('task-modal-recurrence-select');
+                if (recSelect) {
+                    recSelect.value = t.recurrence_rule || '';
                 }
 
                 // Approval Banner handling

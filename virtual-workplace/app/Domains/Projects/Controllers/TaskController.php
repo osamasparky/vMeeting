@@ -291,6 +291,55 @@ class TaskController extends Controller
     }
 
     /**
+     * Bulk update tasks (status, assignee, delete).
+     */
+    public function bulkUpdate(Request $request, Organization $organization): JsonResponse
+    {
+        $validated = $request->validate([
+            'task_ids'    => ['required', 'array', 'min:1', 'max:100'],
+            'task_ids.*'  => ['required', 'string'],
+            'action'      => ['required', 'string', 'in:update_status,assign,delete'],
+            'status'      => ['required_if:action,update_status', 'string', 'in:backlog,ready,in_progress,review,qa,done'],
+            'assignee_id' => ['required_if:action,assign', 'nullable', 'string'],
+        ]);
+
+        $tasks = Task::where('organization_id', $organization->id)
+            ->whereIn('id', $validated['task_ids'])
+            ->get();
+
+        if ($tasks->isEmpty()) {
+            return response()->json(['message' => 'No tasks found.'], 404);
+        }
+
+        $action = $validated['action'];
+        $affected = 0;
+
+        if ($action === 'delete') {
+            $affected = $tasks->count();
+            Task::where('organization_id', $organization->id)
+                ->whereIn('id', $validated['task_ids'])
+                ->delete();
+        } elseif ($action === 'update_status') {
+            $statusAction = app(UpdateTaskStatusAction::class);
+            foreach ($tasks as $task) {
+                $statusAction->execute($task, $validated['status']);
+                $affected++;
+            }
+        } elseif ($action === 'assign') {
+            $assigneeId = $validated['assignee_id'] ?: null;
+            foreach ($tasks as $task) {
+                $task->update(['assignee_id' => $assigneeId]);
+                $affected++;
+            }
+        }
+
+        return response()->json([
+            'message'  => "Bulk {$action} applied to {$affected} task(s).",
+            'affected' => $affected,
+        ]);
+    }
+
+    /**
      * Add checklist item.
      */
     public function addChecklistItem(
@@ -379,7 +428,7 @@ class TaskController extends Controller
         $this->authorizeTaskEdit($organization, $task);
 
         $request->validate(['depends_on_task_id' => 'required|exists:tasks,id']);
-        $dependsOnTask = Task::findOrFail($request->input('depends_on_task_id'));
+        $dependsOnTask = Task::where('organization_id', $organization->id)->findOrFail($request->input('depends_on_task_id'));
 
         try {
             $dependency = $action->execute($organization, $task, $dependsOnTask);

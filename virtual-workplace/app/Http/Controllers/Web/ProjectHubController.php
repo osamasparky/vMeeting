@@ -142,21 +142,50 @@ class ProjectHubController extends Controller
             ];
         });
 
-        // Interactive Gantt Tasks
-        $ganttTasks = $tasks->map(function ($t) use ($project) {
-            $start = $t->start_date ?? ($t->due_date ? $t->due_date->copy()->subDays(max(1, (int) ceil(($t->estimated_hours ?? 8) / 8))) : $project->created_at);
-            $end = $t->due_date ?? $start->copy()->addDays(2);
+        // Interactive Gantt Tasks with safe dates & valid dependencies
+        $taskIds = $tasks->pluck('id')->toArray();
+        $minSafeYear = max(2024, now()->year - 1);
+        $maxSafeYear = now()->year + 2;
+
+        $ganttTasks = $tasks->map(function ($t) use ($project, $taskIds, $minSafeYear, $maxSafeYear) {
+            $start = $t->start_date 
+                ? $t->start_date->copy() 
+                : ($t->due_date ? $t->due_date->copy()->subDays(max(1, (int) ceil(($t->estimated_hours ?? 8) / 8))) : ($project->created_at ? $project->created_at->copy() : now()->subDays(3)));
+            
+            $end = $t->due_date 
+                ? $t->due_date->copy() 
+                : $start->copy()->addDays(max(2, (int) ceil(($t->estimated_hours ?? 8) / 8)));
+
+            // Normalize outlier/faker dates (e.g. 1979 or year 2099)
+            if ($start->year < $minSafeYear || $start->year > $maxSafeYear) {
+                $start = now()->subDays(5);
+            }
+            if ($end->year < $minSafeYear || $end->year > $maxSafeYear) {
+                $end = $start->copy()->addDays(max(2, (int) ceil(($t->estimated_hours ?? 8) / 8)));
+            }
+
+            // Frappe Gantt requires end date > start date
+            if ($end->lte($start)) {
+                $end = $start->copy()->addDays(1);
+            }
+
+            // Only keep dependencies that exist in current project tasks
+            $validDeps = $t->dependencies
+                ->pluck('depends_on_task_id')
+                ->filter(fn ($id) => in_array($id, $taskIds, true))
+                ->values()
+                ->toArray();
 
             return [
-                'id' => $t->id,
+                'id' => (string) $t->id,
                 'title' => '#'.$t->task_number.' '.$t->title,
                 'status' => $t->status,
                 'priority' => $t->priority,
-                'assignee' => $t->assignee ? $t->assignee->name : 'Unassigned',
+                'assignee' => $t->assignee ? $t->assignee->name : __('Unassigned'),
                 'start_date' => $start->format('Y-m-d'),
                 'due_date' => $end->format('Y-m-d'),
-                'progress' => $t->status === 'done' ? 100 : ($t->status === 'in_progress' ? 50 : 0),
-                'dependencies' => $t->dependencies->pluck('depends_on_task_id')->toArray(),
+                'progress' => $t->status === 'done' ? 100 : ($t->status === 'in_progress' ? 50 : ($t->status === 'review' ? 75 : 10)),
+                'dependencies' => $validDeps,
             ];
         });
 

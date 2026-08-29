@@ -599,7 +599,15 @@ class WebRTCManager {
     async setScreenShareEnabled(enabled) {
         if (!this.livekitRoom || !this.livekitRoom.localParticipant) return false;
         try {
-            await this.livekitRoom.localParticipant.setScreenShareEnabled(enabled, { audio: true });
+            const pub = await this.livekitRoom.localParticipant.setScreenShareEnabled(enabled, { audio: true });
+            if (enabled && pub && pub.track) {
+                pub.track.mediaStreamTrack?.addEventListener('ended', () => {
+                    console.log('[LiveKit SFU] Screen share mediaStreamTrack ended by browser UI');
+                    if (typeof window.onScreenShareEndedByBrowser === 'function') {
+                        window.onScreenShareEndedByBrowser();
+                    }
+                });
+            }
             return enabled;
         } catch (err) {
             console.error('[LiveKit SFU] Error setting screen share enabled:', err);
