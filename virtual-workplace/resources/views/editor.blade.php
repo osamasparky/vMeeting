@@ -968,6 +968,25 @@
                             </div>
 
                             <div>
+                                <label class="prop-label">{{ __('Door Placement (موقع باب الغرفة)') }}</label>
+                                <select class="prop-input" id="prop-room-door-side" onchange="updateRoomProp('doorSide', this.value)">
+                                    <option value="auto">🌟 {{ __('Auto Corridor (تلقائي نحو الممر المفتوح)') }}</option>
+                                    <option value="bottom">⬇️ {{ __('Bottom Wall (الجدار السفلي)') }}</option>
+                                    <option value="top">⬆️ {{ __('Top Wall (الجدار العلوي)') }}</option>
+                                    <option value="left">⬅️ {{ __('Left Wall (الجدار الأيسر)') }}</option>
+                                    <option value="right">➡️ {{ __('Right Wall (الجدار الأيمن)') }}</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="prop-label">{{ __('Door Position on Wall (موضع الباب على الجدار)') }}</label>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <input type="range" class="prop-input" id="prop-room-door-offset" min="15" max="85" value="50" step="5" oninput="updateRoomProp('doorOffset', this.value / 100); document.getElementById('door-offset-val').textContent = this.value + '%';">
+                                    <span id="door-offset-val" style="font-size: 11px; font-weight: 800; color: var(--brand-primary); min-width: 32px;">50%</span>
+                                </div>
+                            </div>
+
+                            <div>
                                 <label class="prop-label">{{ __('Capacity (السعة)') }}</label>
                                 <input type="number" class="prop-input" id="prop-room-capacity" min="1" max="200" oninput="updateRoomProp('capacity', this.value)">
                             </div>
@@ -1475,6 +1494,28 @@
                 ctx.textAlign = 'left';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(labelText, rx + 10, ry + 13);
+
+                // Visual Door Indicator on Wall
+                const doorSide = (r.bounds && r.bounds.doorSide && r.bounds.doorSide !== 'auto') ? r.bounds.doorSide : 'bottom';
+                const doorOffset = (r.bounds && typeof r.bounds.doorOffset === 'number') ? r.bounds.doorOffset : 0.5;
+                const dW = Math.min(42, (doorSide === 'top' || doorSide === 'bottom') ? rw * 0.45 : rh * 0.45);
+                let dX = rx + rw * doorOffset, dY = ry + rh;
+                if (doorSide === 'top') { dX = rx + rw * doorOffset; dY = ry; }
+                else if (doorSide === 'left') { dX = rx; dY = ry + rh * doorOffset; }
+                else if (doorSide === 'right') { dX = rx + rw; dY = ry + rh * doorOffset; }
+
+                ctx.save();
+                ctx.fillStyle = '#10B981';
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.lineWidth = 1.5;
+                if (doorSide === 'top' || doorSide === 'bottom') {
+                    ctx.fillRect(dX - dW/2, dY - 3, dW, 6);
+                    ctx.strokeRect(dX - dW/2, dY - 3, dW, 6);
+                } else {
+                    ctx.fillRect(dX - 3, dY - dW/2, 6, dW);
+                    ctx.strokeRect(dX - 3, dY - dW/2, 6, dW);
+                }
+                ctx.restore();
             });
 
             // 3. Selected Room Rectangular Acoustic Sound Isolation Aura & Handles
@@ -1671,6 +1712,12 @@
 
                 const bounds = item.bounds || { width: 1, height: 1 };
                 document.getElementById('prop-room-bounds-label').textContent = `${bounds.width}×${bounds.height} Tiles (${bounds.width * TILE_SIZE}×${bounds.height * TILE_SIZE}px)`;
+
+                const currentDoorSide = bounds.doorSide || 'auto';
+                document.getElementById('prop-room-door-side').value = currentDoorSide;
+                const currentDoorOffset = Math.round((typeof bounds.doorOffset === 'number' ? bounds.doorOffset : 0.5) * 100);
+                document.getElementById('prop-room-door-offset').value = currentDoorOffset;
+                document.getElementById('door-offset-val').textContent = currentDoorOffset + '%';
             }
         }
 
@@ -1678,12 +1725,15 @@
             if (!selectedItem || selectedItem.type !== 'room') return;
             const r = selectedItem.item;
             r.metadata = r.metadata || {};
+            r.bounds = r.bounds || {};
 
             if (prop === 'name') r.name = val;
             else if (prop === 'type') r.type = val;
             else if (prop === 'capacity') r.capacity = parseInt(val) || 10;
             else if (prop === 'color') r.color = val;
             else if (prop === 'audio_isolation') r.metadata.audio_isolation = !!val;
+            else if (prop === 'doorSide') r.bounds.doorSide = val;
+            else if (prop === 'doorOffset') r.bounds.doorOffset = parseFloat(val);
 
             draw();
         }

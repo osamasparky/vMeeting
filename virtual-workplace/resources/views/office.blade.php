@@ -1469,87 +1469,73 @@
 
             // 1. User Explicit Configuration in Room Design (if specified)
             const explicitSide = r.bounds.doorSide || r.bounds.door_side || r.door_side || r.doorSide || null;
-            const explicitOffset = (typeof r.bounds.doorOffset === 'number') ? r.bounds.doorOffset : 0.5;
+            const explicitOffset = (typeof r.bounds.doorOffset === 'number') ? r.bounds.doorOffset : null;
 
-            // Candidate wall sides
-            const candidates = [
-                {
-                    side: 'bottom',
-                    x: rx + (rw * explicitOffset),
-                    y: ry + rh,
-                    entryInsideX: rx + (rw * explicitOffset),
-                    entryInsideY: ry + rh - 26,
-                    exitOutsideX: rx + (rw * explicitOffset),
-                    exitOutsideY: ry + rh + 32,
-                    pref: 15
-                },
-                {
-                    side: 'top',
-                    x: rx + (rw * explicitOffset),
-                    y: ry,
-                    entryInsideX: rx + (rw * explicitOffset),
-                    entryInsideY: ry + 26,
-                    exitOutsideX: rx + (rw * explicitOffset),
-                    exitOutsideY: ry - 32,
-                    pref: 15
-                },
-                {
-                    side: 'right',
-                    x: rx + rw,
-                    y: ry + (rh * explicitOffset),
-                    entryInsideX: rx + rw - 26,
-                    entryInsideY: ry + (rh * explicitOffset),
-                    exitOutsideX: rx + rw + 32,
-                    exitOutsideY: ry + (rh * explicitOffset),
-                    pref: 15
-                },
-                {
-                    side: 'left',
-                    x: rx,
-                    y: ry + (rh * explicitOffset),
-                    entryInsideX: rx + 26,
-                    entryInsideY: ry + (rh * explicitOffset),
-                    exitOutsideX: rx - 32,
-                    exitOutsideY: ry + (rh * explicitOffset),
-                    pref: 15
-                }
-            ];
+            // Candidate wall sides and offset samples
+            const offsetSamples = (explicitOffset !== null) 
+                ? [explicitOffset] 
+                : [0.5, 0.75, 0.82, 0.25, 0.18, 0.65, 0.35];
 
-            // If user explicitly chose a door side in room design, use it directly!
-            if (explicitSide) {
-                const found = candidates.find(c => c.side.toLowerCase() === explicitSide.toLowerCase());
-                if (found) {
-                    const portal = {
-                        x: found.x,
-                        y: found.y,
-                        width: doorWidth,
-                        height: 20,
-                        wallSide: found.side,
-                        entryInsideX: found.entryInsideX,
-                        entryInsideY: found.entryInsideY,
-                        exitOutsideX: found.exitOutsideX,
-                        exitOutsideY: found.exitOutsideY
-                    };
-                    roomDoorPortalsCache.set(r.id, portal);
-                    return portal;
+            const candidates = [];
+            const sides = (explicitSide && explicitSide !== 'auto') 
+                ? [explicitSide.toLowerCase()] 
+                : ['bottom', 'top', 'right', 'left'];
+
+            for (const side of sides) {
+                for (const off of offsetSamples) {
+                    let cx = 0, cy = 0, inX = 0, inY = 0, outX = 0, outY = 0;
+                    if (side === 'bottom') {
+                        cx = rx + (rw * off);
+                        cy = ry + rh;
+                        inX = cx; inY = cy - 26;
+                        outX = cx; outY = cy + 32;
+                    } else if (side === 'top') {
+                        cx = rx + (rw * off);
+                        cy = ry;
+                        inX = cx; inY = cy + 26;
+                        outX = cx; outY = cy - 32;
+                    } else if (side === 'right') {
+                        cx = rx + rw;
+                        cy = ry + (rh * off);
+                        inX = cx - 26; inY = cy;
+                        outX = cx + 32; outY = cy;
+                    } else if (side === 'left') {
+                        cx = rx;
+                        cy = ry + (rh * off);
+                        inX = cx + 26; inY = cy;
+                        outX = cx - 32; outY = cy;
+                    }
+
+                    candidates.push({
+                        side: side,
+                        offset: off,
+                        x: cx,
+                        y: cy,
+                        entryInsideX: inX,
+                        entryInsideY: inY,
+                        exitOutsideX: outX,
+                        exitOutsideY: outY,
+                    });
                 }
             }
 
-            // 2. Intelligent Placement Facing the Central Open Walkway / Corridor
+            // 2. Intelligent Placement Facing the Central Open Walkway & Avoiding Shared Walls
             const mapCenter = { x: MAP_WIDTH_PX / 2, y: MAP_HEIGHT_PX / 2 };
-            const outerMargin = 64; // Outer exterior building perimeter margins
+            const outerMargin = 60; // Outer exterior building perimeter margins
 
             let bestCandidate = null;
             let bestScore = -Infinity;
 
             for (const cand of candidates) {
-                // A. Disqualify outer exterior building walls touching outer map canvas border
-                if (cand.exitOutsideX < outerMargin || cand.exitOutsideX > MAP_WIDTH_PX - outerMargin ||
-                    cand.exitOutsideY < outerMargin || cand.exitOutsideY > MAP_HEIGHT_PX - outerMargin) {
-                    continue; // Skip: Outer exterior building wall facing outside margins!
+                // A. Disqualify outer exterior building walls touching outer map canvas border (unless explicitly chosen)
+                if (!explicitSide || explicitSide === 'auto') {
+                    if (cand.exitOutsideX < outerMargin || cand.exitOutsideX > MAP_WIDTH_PX - outerMargin ||
+                        cand.exitOutsideY < outerMargin || cand.exitOutsideY > MAP_HEIGHT_PX - outerMargin) {
+                        continue; // Skip: Outer exterior building wall facing outside margins!
+                    }
                 }
 
-                // B. Check overlap with other rooms
+                // B. Check overlap with other rooms (MUST NOT touch or enter any other room!)
                 let isInsideOtherRoom = false;
                 let minDistanceToOtherRooms = 99999;
 
@@ -1560,9 +1546,16 @@
                     const orw = other.bounds.width * TILE_SIZE;
                     const orh = other.bounds.height * TILE_SIZE;
 
-                    // Test if exit outside is inside other room with 10px safety margin
-                    if (cand.exitOutsideX >= orx - 10 && cand.exitOutsideX <= orx + orw + 10 &&
-                        cand.exitOutsideY >= ory - 10 && cand.exitOutsideY <= ory + orh + 10) {
+                    // Test if exit outside point is inside or touching other room with 12px safety margin
+                    if (cand.exitOutsideX >= orx - 12 && cand.exitOutsideX <= orx + orw + 12 &&
+                        cand.exitOutsideY >= ory - 12 && cand.exitOutsideY <= ory + orh + 12) {
+                        isInsideOtherRoom = true;
+                        break;
+                    }
+
+                    // Test if door position itself on the wall falls on a shared wall segment
+                    if (cand.x >= orx - 6 && cand.x <= orx + orw + 6 &&
+                        cand.y >= ory - 6 && cand.y <= ory + orh + 6) {
                         isInsideOtherRoom = true;
                         break;
                     }
@@ -1577,12 +1570,12 @@
                 }
 
                 if (isInsideOtherRoom) {
-                    continue; // Discard if blocked by another room!
+                    continue; // Discard: this position touches another room!
                 }
 
                 // C. Score candidate: closer to Central Open Corridor + open clearance distance
                 const distToCenter = Math.hypot(cand.exitOutsideX - mapCenter.x, cand.exitOutsideY - mapCenter.y);
-                const score = (1200 - distToCenter) + (minDistanceToOtherRooms * 3);
+                const score = (1200 - distToCenter) + (minDistanceToOtherRooms * 4) + (cand.offset === 0.5 ? 25 : 0);
 
                 if (score > bestScore) {
                     bestScore = score;
@@ -1708,6 +1701,10 @@
                 return;
             }
 
+            const targetDoor = getRoomDoorPortal(targetRoom);
+            const hubX = MAP_WIDTH_PX / 2;
+            const hubY = 450; // Central corridor hub
+
             // Step 1: If inside another room, must first walk out through current room's door
             if (currentRoom) {
                 const curDoor = getRoomDoorPortal(currentRoom);
@@ -1724,10 +1721,20 @@
                     y: curDoor.exitOutsideY,
                     action: null
                 });
+
+                // Step 1b: If moving across the building corridor, add intermediate corridor hub
+                const isCrossCorridor = (Math.abs(curDoor.exitOutsideX - targetDoor.exitOutsideX) > 220) || 
+                                       (Math.abs(curDoor.exitOutsideY - targetDoor.exitOutsideY) > 220);
+                if (isCrossCorridor) {
+                    avatarWaypoints.push({
+                        x: (curDoor.exitOutsideX + hubX) / 2,
+                        y: (curDoor.exitOutsideY + hubY) / 2,
+                        action: null
+                    });
+                }
             }
 
             // Step 2: Walk to outside door portal of target room
-            const targetDoor = getRoomDoorPortal(targetRoom);
             avatarWaypoints.push({
                 x: targetDoor.exitOutsideX,
                 y: targetDoor.exitOutsideY,
@@ -2106,9 +2113,9 @@
                         if (remoteRoom) {
                             audioEl.volume = 0;
                         } else {
-                            // Only hear colleagues who are within our visible hearing circle radius (160px)
+                            // Only hear colleagues who are within our visible hearing circle radius (100px)
                             const dist = Math.hypot(localAvatar.x - av.x, localAvatar.y - av.y);
-                            const hearingCircleRadius = 160;
+                            const hearingCircleRadius = 100;
                             if (dist > hearingCircleRadius) {
                                 audioEl.volume = 0;
                             } else {
@@ -2168,6 +2175,46 @@
                     ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(MAP_WIDTH_PX, gy); ctx.stroke();
                 }
             }
+
+            // 1b. Draw Placed Furniture & Decor Objects Layer (Rendered above Floorplan & below Avatars/Walls)
+            const mapObjects = (CONFIG.map && CONFIG.map.objects) ? CONFIG.map.objects : [];
+            if (!window._officeObjImgCache) window._officeObjImgCache = new Map();
+
+            mapObjects.forEach(obj => {
+                const ox = (obj.position ? obj.position.x : (obj.x || 0)) * TILE_SIZE;
+                const oy = (obj.position ? obj.position.y : (obj.y || 0)) * TILE_SIZE;
+                const objW = (obj.width || (obj.size ? obj.size.width : 1)) * TILE_SIZE;
+                const objH = (obj.height || (obj.size ? obj.size.height : 1)) * TILE_SIZE;
+
+                ctx.save();
+                ctx.translate(ox + objW / 2, oy + objH / 2);
+                const rot = (obj.position && typeof obj.position.rotation === 'number') ? obj.position.rotation : (obj.rotation || 0);
+                if (rot) ctx.rotate((rot * Math.PI) / 180);
+
+                if (obj.image_url) {
+                    let sprImg = window._officeObjImgCache.get(obj.image_url);
+                    if (!sprImg) {
+                        sprImg = new Image();
+                        sprImg.src = obj.image_url;
+                        sprImg.onload = () => { if (typeof draw === 'function') draw(); };
+                        window._officeObjImgCache.set(obj.image_url, sprImg);
+                    }
+                    if (sprImg && sprImg.complete && sprImg.naturalWidth > 0) {
+                        ctx.drawImage(sprImg, -objW / 2, -objH / 2, objW, objH);
+                    } else {
+                        ctx.fillStyle = 'rgba(59, 130, 246, 0.25)';
+                        if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
+                        else ctx.rect(-objW / 2, -objH / 2, objW, objH);
+                        ctx.fill();
+                    }
+                } else if (obj.color) {
+                    ctx.fillStyle = obj.color;
+                    if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
+                    else ctx.rect(-objW / 2, -objH / 2, objW, objH);
+                    ctx.fill();
+                }
+                ctx.restore();
+            });
 
             // 2. Draw Solid Architectural Room Walls, Door Openings & Animated Doors
             rooms.forEach(r => {
@@ -2420,20 +2467,20 @@
 
             // 1. Spatial Voice Hearing Circle (Visible when outside in open area)
             if (!avRoom) {
-                const hearingRadius = 160;
-                const circleGrad = ctx.createRadialGradient(x, y, 10, x, y, hearingRadius);
-                circleGrad.addColorStop(0, isSelf ? 'rgba(16, 185, 129, 0.22)' : 'rgba(59, 130, 246, 0.16)');
-                circleGrad.addColorStop(0.7, isSelf ? 'rgba(16, 185, 129, 0.06)' : 'rgba(59, 130, 246, 0.04)');
+                const hearingRadius = 100;
+                const circleGrad = ctx.createRadialGradient(x, y, 8, x, y, hearingRadius);
+                circleGrad.addColorStop(0, isSelf ? 'rgba(16, 185, 129, 0.28)' : 'rgba(59, 130, 246, 0.22)');
+                circleGrad.addColorStop(0.7, isSelf ? 'rgba(16, 185, 129, 0.08)' : 'rgba(59, 130, 246, 0.06)');
                 circleGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
                 ctx.fillStyle = circleGrad;
                 ctx.beginPath();
                 ctx.arc(x, y, hearingRadius, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Subtle circular boundary line for voice range
-                ctx.strokeStyle = isSelf ? 'rgba(16, 185, 129, 0.35)' : 'rgba(59, 130, 246, 0.25)';
-                ctx.lineWidth = 1;
-                ctx.setLineDash([4, 4]);
+                // Clear, crisp circular boundary ring for voice range
+                ctx.strokeStyle = isSelf ? '#10B981' : '#3B82F6';
+                ctx.lineWidth = 1.8;
+                ctx.setLineDash([5, 4]);
                 ctx.beginPath();
                 ctx.arc(x, y, hearingRadius, 0, Math.PI * 2);
                 ctx.stroke();
