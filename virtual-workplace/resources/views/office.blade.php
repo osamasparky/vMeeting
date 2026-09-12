@@ -1460,7 +1460,7 @@
             const ry = r.bounds.y * TILE_SIZE;
             const rw = r.bounds.width * TILE_SIZE;
             const rh = r.bounds.height * TILE_SIZE;
-            const doorWidth = 44;
+            const doorWidth = 56; // High visibility wider portal
 
             // Default door is bottom-center of room wall perimeter
             const doorX = rx + (rw / 2);
@@ -1470,13 +1470,49 @@
                 x: doorX,
                 y: doorY,
                 width: doorWidth,
-                height: 14,
+                height: 20,
                 wallSide: 'bottom',
                 entryInsideX: doorX,
-                entryInsideY: doorY - 24, // Inside room step
+                entryInsideY: doorY - 26, // Inside room step
                 exitOutsideX: doorX,
-                exitOutsideY: doorY + 24  // Outside corridor step
+                exitOutsideY: doorY + 28  // Outside corridor step
             };
+        }
+
+        function isClickOnDoorPortal(clickX, clickY) {
+            for (const r of rooms) {
+                const door = getRoomDoorPortal(r);
+                if (door) {
+                    if (Math.abs(clickX - door.x) <= (door.width / 2) + 12 && Math.abs(clickY - door.y) <= 20) {
+                        return { room: r, door: door };
+                    }
+                }
+            }
+            return null;
+        }
+
+        function toggleDoorByClick(room) {
+            const isCurrentlyLocked = !!roomDoorStates.get(room.id);
+            const nextLocked = !isCurrentlyLocked;
+            roomDoorStates.set(room.id, nextLocked);
+
+            let animState = doorAnimationStates.get(room.id) || { openProgress: 0, isAnimating: false };
+            animState.openProgress = nextLocked ? 0.0 : 1.0;
+            animState.isAnimating = false;
+            doorAnimationStates.set(room.id, animState);
+
+            if (nextLocked) {
+                playDoorKnockSound();
+                showToast(`🔒 ${room.name} {{ __("door closed & locked (تم إغلاق الباب)") }}`);
+            } else {
+                playDoorSlideSound();
+                showToast(`🔓 ${room.name} {{ __("door opened (تم فتح الباب)") }}`);
+            }
+
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'room.door_toggle', payload: { roomId: room.id, isClosed: nextLocked } }));
+            }
+            updateRoomPresence();
         }
 
         function checkLineCrossesRoomWall(x1, y1, x2, y2, room) {
@@ -1616,6 +1652,13 @@
                 return;
             }
 
+            // 1b. Check if clicking directly on any Room Door to Open / Close / Lock
+            const doorHit = isClickOnDoorPortal(clickX, clickY);
+            if (doorHit) {
+                toggleDoorByClick(doorHit.room);
+                return;
+            }
+
             // Check room boundary & locking guards
             const targetRoom = getCurrentRoom(clickX, clickY);
             const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
@@ -1687,13 +1730,16 @@
 
         function checkAutoUnlockEmptyRooms() {
             rooms.forEach(r => {
-                if (roomDoorStates.get(r.id)) {
-                    const occupants = countRoomOccupants(r.id);
-                    if (occupants === 0) {
-                        roomDoorStates.set(r.id, false);
-                        if (ws && ws.readyState === WebSocket.OPEN) {
-                            ws.send(JSON.stringify({ type: 'room.door_toggle', payload: { roomId: r.id, isClosed: false } }));
-                        }
+                const occupants = countRoomOccupants(r.id);
+                if (occupants === 0) {
+                    // Empty rooms must always have their doors open & unlocked!
+                    roomDoorStates.set(r.id, false);
+                    let animState = doorAnimationStates.get(r.id) || { openProgress: 1.0, isAnimating: false };
+                    animState.openProgress = 1.0;
+                    doorAnimationStates.set(r.id, animState);
+
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'room.door_toggle', payload: { roomId: r.id, isClosed: false } }));
                     }
                 }
             });
@@ -1860,16 +1906,26 @@
                 }
             }
 
-            // Update Door Proximity Animation
+            // Update Door Proximity Animation & Auto Open for Empty Rooms
             rooms.forEach(r => {
                 const door = getRoomDoorPortal(r);
                 if (door) {
-                    const distToDoor = Math.hypot(localAvatar.x - door.x, localAvatar.y - door.y);
+                    const isLocked = !!roomDoorStates.get(r.id);
+                    const occupants = countRoomOccupants(r.id);
                     let state = doorAnimationStates.get(r.id) || { openProgress: 0, isAnimating: false };
-                    if (distToDoor < 40) {
-                        state.openProgress = Math.min(1.0, state.openProgress + 0.12);
-                    } else if (!state.isAnimating) {
-                        state.openProgress = Math.max(0.0, state.openProgress - 0.08);
+
+                    if (isLocked) {
+                        state.openProgress = 0.0;
+                    } else if (occupants === 0) {
+                        // Empty rooms are always open!
+                        state.openProgress = 1.0;
+                    } else {
+                        const distToDoor = Math.hypot(localAvatar.x - door.x, localAvatar.y - door.y);
+                        if (distToDoor < 45) {
+                            state.openProgress = Math.min(1.0, state.openProgress + 0.15);
+                        } else if (!state.isAnimating) {
+                            state.openProgress = Math.max(0.0, state.openProgress - 0.06);
+                        }
                     }
                     doorAnimationStates.set(r.id, state);
                 }
@@ -1890,24 +1946,25 @@
                 const remoteRoom = getCurrentRoom(av.x, av.y);
                 const isInSameRoom = localRoom ? (remoteRoom && remoteRoom.id === localRoom.id) : (!remoteRoom && Math.hypot(localAvatar.x - av.x, localAvatar.y - av.y) <= 250);
 
-                // 1. Spatial Audio Isolation Engine
+                // 1. Spatial Audio & Voice Isolation Engine (Strict Circle / Wall Boundary)
                 const audioEl = peerAudioElements.get(av.id);
                 if (audioEl) {
                     if (localRoom) {
                         // Inside Room: Only hear occupants in the SAME room
                         audioEl.volume = (remoteRoom && remoteRoom.id === localRoom.id) ? 1.0 : 0;
                     } else {
-                        // In Open Area: Never hear occupants inside closed rooms
+                        // Outside in Open Area: NEVER hear occupants inside rooms!
                         if (remoteRoom) {
                             audioEl.volume = 0;
                         } else {
+                            // Only hear colleagues who are within our visible hearing circle radius (160px)
                             const dist = Math.hypot(localAvatar.x - av.x, localAvatar.y - av.y);
-                            const maxDist = 250;
-                            if (dist > maxDist) {
+                            const hearingCircleRadius = 160;
+                            if (dist > hearingCircleRadius) {
                                 audioEl.volume = 0;
                             } else {
-                                const factor = 1 - (dist / maxDist);
-                                audioEl.volume = Math.max(0, Math.min(1, factor * factor));
+                                const factor = 1 - (dist / hearingCircleRadius);
+                                audioEl.volume = Math.max(0, Math.min(1.0, factor * 1.2));
                             }
                         }
                     }
@@ -2020,14 +2077,22 @@
                     ctx.lineTo(rx + rw, ry + rh);
                     ctx.stroke();
 
-                    // Door Threshold / Mat
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
-                    ctx.fillRect(doorLeft, ry + rh - 3, door.width, 6);
+                    // High Visibility Door Threshold Mat / Floor Marker
+                    ctx.fillStyle = isLocked ? 'rgba(239, 68, 68, 0.25)' : 'rgba(16, 185, 129, 0.22)';
+                    ctx.fillRect(doorLeft - 4, ry + rh - 4, door.width + 8, 8);
+                    ctx.strokeStyle = isLocked ? '#EF4444' : '#10B981';
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeRect(doorLeft - 4, ry + rh - 4, door.width + 8, 8);
 
-                    // Door Posts (Hinges & Frame)
-                    ctx.fillStyle = '#10B981';
-                    ctx.fillRect(doorLeft - 2, ry + rh - 4, 4, 8);
-                    ctx.fillRect(doorRight - 2, ry + rh - 4, 4, 8);
+                    // Door Posts (Sturdy Architectural Pillars)
+                    ctx.fillStyle = '#064E3B';
+                    ctx.fillRect(doorLeft - 5, ry + rh - 6, 6, 12);
+                    ctx.fillRect(doorRight - 1, ry + rh - 6, 6, 12);
+
+                    // Door Post Gold Accent Caps
+                    ctx.fillStyle = '#F59E0B';
+                    ctx.fillRect(doorLeft - 5, ry + rh - 8, 6, 3);
+                    ctx.fillRect(doorRight - 1, ry + rh - 8, 6, 3);
 
                     // Animated Door Leaf (Rotates / Swings when opening)
                     ctx.save();
@@ -2035,29 +2100,40 @@
                     const swingAngle = openProg * (Math.PI * 0.45); // Swing 80 degrees inward
                     ctx.rotate(-swingAngle);
 
-                    // Door leaf body
-                    ctx.fillStyle = isLocked ? '#EF4444' : '#10B981';
-                    ctx.strokeStyle = '#FFFFFF';
-                    ctx.lineWidth = 1;
-                    if (ctx.roundRect) ctx.roundRect(0, -3, door.width * 0.95, 6, 2);
-                    else ctx.rect(0, -3, door.width * 0.95, 6);
+                    // Thick Solid Door Leaf Body (Wood/Glass Composite with Gold Trim)
+                    ctx.fillStyle = isLocked ? '#DC2626' : (openProg > 0.5 ? 'rgba(16, 185, 129, 0.85)' : '#059669');
+                    ctx.strokeStyle = isLocked ? '#FCA5A5' : '#6EE7B7';
+                    ctx.lineWidth = 2;
+                    if (ctx.roundRect) ctx.roundRect(0, -4, door.width * 0.95, 8, 3);
+                    else ctx.rect(0, -4, door.width * 0.95, 8);
                     ctx.fill();
                     ctx.stroke();
 
-                    // Door Handle / Lock Badge Icon
-                    ctx.fillStyle = '#FFFFFF';
+                    // Door Handle (Gleaming Metallic)
+                    ctx.fillStyle = '#FBBF24';
                     ctx.beginPath();
-                    ctx.arc(door.width * 0.75, 0, 2, 0, Math.PI * 2);
+                    ctx.arc(door.width * 0.78, 0, 3, 0, Math.PI * 2);
                     ctx.fill();
+                    ctx.strokeStyle = '#78350F';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
                     ctx.restore();
+
+                    // Door Status Label Pill ("OPEN" / "LOCKED / CLICK TO OPEN")
+                    const statusText = isLocked ? '🔒 CLOSED' : (openProg > 0.4 ? '🚪 OPEN' : '🚪 UNLOCKED');
+                    ctx.font = 'bold 8px Cairo, Inter, sans-serif';
+                    ctx.fillStyle = isLocked ? '#EF4444' : '#10B981';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(statusText, door.x, ry + rh + 12);
 
                     // Animated Door Arc Trace Indicator
                     if (openProg > 0.05 && openProg < 0.95) {
-                        ctx.strokeStyle = 'rgba(16, 185, 129, 0.35)';
-                        ctx.lineWidth = 1;
-                        ctx.setLineDash([2, 3]);
+                        ctx.strokeStyle = 'rgba(16, 185, 129, 0.5)';
+                        ctx.lineWidth = 1.5;
+                        ctx.setLineDash([3, 3]);
                         ctx.beginPath();
-                        ctx.arc(doorLeft, ry + rh, door.width * 0.9, -Math.PI * 0.45, 0);
+                        ctx.arc(doorLeft, ry + rh, door.width * 0.95, -Math.PI * 0.45, 0);
                         ctx.stroke();
                         ctx.setLineDash([]);
                     }
@@ -2161,22 +2237,36 @@
             requestAnimationFrame(draw);
         }
 
-        // ── Modern Profile & Live Video Node Rendering (Replacing Sprite Characters) ──
+        // ── Modern Profile & Live Video Node Rendering ──
         function drawAvatar(av, isSelf) {
             const x = Number(av.x) || 400;
             const y = Number(av.y) || 400;
             const cardSize = 46;
             const radius = cardSize / 2;
+            const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+            const avRoom = getCurrentRoom(av.x, av.y);
 
-            // 1. Spatial Audio Hearing Aura (Translucent Ambient Glow)
-            const auraRadius = isSelf ? 150 : 130;
-            const auraGrad = ctx.createRadialGradient(x, y, 10, x, y, auraRadius);
-            auraGrad.addColorStop(0, isSelf ? 'rgba(16, 185, 129, 0.18)' : 'rgba(59, 130, 246, 0.14)');
-            auraGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-            ctx.fillStyle = auraGrad;
-            ctx.beginPath();
-            ctx.arc(x, y, auraRadius, 0, Math.PI * 2);
-            ctx.fill();
+            // 1. Spatial Voice Hearing Circle (Visible when outside in open area)
+            if (!avRoom) {
+                const hearingRadius = 160;
+                const circleGrad = ctx.createRadialGradient(x, y, 10, x, y, hearingRadius);
+                circleGrad.addColorStop(0, isSelf ? 'rgba(16, 185, 129, 0.22)' : 'rgba(59, 130, 246, 0.16)');
+                circleGrad.addColorStop(0.7, isSelf ? 'rgba(16, 185, 129, 0.06)' : 'rgba(59, 130, 246, 0.04)');
+                circleGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = circleGrad;
+                ctx.beginPath();
+                ctx.arc(x, y, hearingRadius, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Subtle circular boundary line for voice range
+                ctx.strokeStyle = isSelf ? 'rgba(16, 185, 129, 0.35)' : 'rgba(59, 130, 246, 0.25)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([4, 4]);
+                ctx.beginPath();
+                ctx.arc(x, y, hearingRadius, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
 
             // 2. Speaking Audio Pulsing Ring (Acoustic Wave)
             const isSpeaking = isSelf ? (micActive && localAvatar.isSpeaking) : (av.micActive && av.isSpeaking);
