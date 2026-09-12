@@ -64,14 +64,49 @@ class AuthController extends Controller
     }
 
     /**
-     * Get the authenticated user.
+     * Get the authenticated user with active memberships, permissions, and guest restrictions.
      */
     public function me(Request $request): JsonResponse
     {
         $user = $request->user();
-        $user->load('memberships.organization', 'memberships.role');
+        $user->load('memberships.organization', 'memberships.role.permissions');
 
-        return response()->json(['user' => $user]);
+        $membershipsData = $user->memberships->map(function ($membership) {
+            $isGuest = $membership->role && strtolower($membership->role->slug ?? '') === 'guest';
+            $permissions = $membership->role ? $membership->role->permissions->pluck('key')->toArray() : [];
+
+            return [
+                'id' => $membership->id,
+                'organization_id' => $membership->organization_id,
+                'organization' => $membership->organization,
+                'role' => $membership->role ? [
+                    'id' => $membership->role->id,
+                    'name' => $membership->role->name,
+                    'slug' => $membership->role->slug,
+                    'is_system' => $membership->role->is_system,
+                ] : null,
+                'status' => $membership->status,
+                'is_guest' => $isGuest,
+                'permissions' => $permissions,
+                'guest_restrictions' => $isGuest ? [
+                    'can_view_tasks' => false,
+                    'can_edit_floorplans' => false,
+                    'can_manage_members' => false,
+                    'restricted_to_invited_rooms' => true,
+                ] : null,
+            ];
+        });
+
+        return response()->json([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'avatar_url' => $user->avatar_url ?? null,
+                'status' => $user->status ?? 'online',
+            ],
+            'memberships' => $membershipsData,
+        ]);
     }
 
     /**

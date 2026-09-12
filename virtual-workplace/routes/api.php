@@ -289,6 +289,22 @@ Route::prefix('v1')->group(function () {
                 Route::post('/timesheets/{timesheet}/reject', [\App\Domains\Projects\Controllers\TimesheetController::class, 'reject'])
                     ->middleware('permission:timesheets.approve');
 
+                // ── Attendance & Clock In/Out Domain ──
+                Route::get('/attendance/summary', [\App\Domains\People\Controllers\AttendanceApiController::class, 'summary']);
+                Route::post('/attendance/clock-in', [\App\Domains\People\Controllers\AttendanceApiController::class, 'clockIn']);
+                Route::post('/attendance/clock-out', [\App\Domains\People\Controllers\AttendanceApiController::class, 'clockOut']);
+                Route::get('/attendance/logs', [\App\Domains\People\Controllers\AttendanceApiController::class, 'logs']);
+
+                // ── Billing & Regional Subscriptions Domain ──
+                Route::get('/billing/plans', [\App\Domains\Tenancy\Controllers\BillingApiController::class, 'plans']);
+                Route::get('/billing/subscription', [\App\Domains\Tenancy\Controllers\BillingApiController::class, 'subscription']);
+                Route::post('/billing/checkout', [\App\Domains\Tenancy\Controllers\BillingApiController::class, 'checkout']);
+
+                // ── Spatial Interactions & Knock / Wave / Ring Domain ──
+                Route::post('/interactions/knock', [\App\Domains\Workspace\Controllers\SpatialInteractionsApiController::class, 'knock']);
+                Route::post('/interactions/wave', [\App\Domains\Workspace\Controllers\SpatialInteractionsApiController::class, 'wave']);
+                Route::post('/interactions/ring', [\App\Domains\Workspace\Controllers\SpatialInteractionsApiController::class, 'ring']);
+
                 // ── WebRTC & LiveKit Meetings Domain ──
                 Route::get('/meetings', [\App\Domains\Meetings\Controllers\MeetingController::class, 'listMeetings']);
                 Route::post('/meetings', [\App\Domains\Meetings\Controllers\MeetingController::class, 'createMeeting']);
@@ -297,6 +313,10 @@ Route::prefix('v1')->group(function () {
                 Route::post('/rooms/{room}/livekit-token', [\App\Domains\Meetings\Controllers\MeetingController::class, 'getLiveKitToken']);
                 Route::get('/webrtc/diagnostics-config', [\App\Domains\Meetings\Controllers\MeetingController::class, 'getDiagnosticsConfig']);
             });
+
+        // ── In-App Notifications (authenticated) ──
+        Route::get('/notifications', [\App\Domains\Workspace\Controllers\SpatialInteractionsApiController::class, 'notifications']);
+        Route::post('/notifications/{id}/read', [\App\Domains\Workspace\Controllers\SpatialInteractionsApiController::class, 'markAsRead']);
 
         // ── Plans (public listing) ──
         Route::get('/plans', function () {

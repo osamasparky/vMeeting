@@ -1227,6 +1227,140 @@
         let camActive = false;
         let screenActive = false;
         let currentLiveKitRoomId = null;
+        // ── Procedural Web Audio API Sound Synthesizer ──
+        let audioCtx = null;
+        function getAudioContext() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) audioCtx = new AudioContextClass();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            return audioCtx;
+        }
+
+        // 1. Realistic Two-Tone Melodic Doorbell (Ding-Dong)
+        function playDoorbellSound() {
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const now = ctx.currentTime;
+
+                // First chime tone: 880Hz (A5)
+                const osc1 = ctx.createOscillator();
+                const gain1 = ctx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(880, now);
+                gain1.gain.setValueAtTime(0.35, now);
+                gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+                osc1.connect(gain1);
+                gain1.connect(ctx.destination);
+                osc1.start(now);
+                osc1.stop(now + 0.75);
+
+                // Second chime tone: 659.25Hz (E5) after 280ms
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(659.25, now + 0.28);
+                gain2.gain.setValueAtTime(0.38, now + 0.28);
+                gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+                osc2.connect(gain2);
+                gain2.connect(ctx.destination);
+                osc2.start(now + 0.28);
+                osc2.stop(now + 1.25);
+            } catch(e) {
+                console.warn('[Audio] playDoorbellSound failed:', e);
+            }
+        }
+
+        // 2. Multi-Tone Telephone Attention Ring Sound
+        function playRingSound() {
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const now = ctx.currentTime;
+
+                // Ring sequence: 2 bursts
+                [0, 0.4].forEach(offset => {
+                    const oscA = ctx.createOscillator();
+                    const oscB = ctx.createOscillator();
+                    const gain = ctx.createGain();
+
+                    oscA.type = 'sine';
+                    oscB.type = 'sine';
+                    oscA.frequency.setValueAtTime(440, now + offset); // Standard 440Hz
+                    oscB.frequency.setValueAtTime(480, now + offset); // Standard 480Hz
+
+                    gain.gain.setValueAtTime(0.28, now + offset);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.32);
+
+                    oscA.connect(gain);
+                    oscB.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    oscA.start(now + offset);
+                    oscB.start(now + offset);
+                    oscA.stop(now + offset + 0.35);
+                    oscB.stop(now + offset + 0.35);
+                });
+            } catch(e) {
+                console.warn('[Audio] playRingSound failed:', e);
+            }
+        }
+
+        // 3. Crisp Wooden Door Knock Sound
+        function playDoorKnockSound() {
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const now = ctx.currentTime;
+
+                [0, 0.14, 0.28].forEach((offset) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(160, now + offset);
+                    osc.frequency.exponentialRampToValueAtTime(50, now + offset + 0.08);
+
+                    gain.gain.setValueAtTime(0.4, now + offset);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.08);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.start(now + offset);
+                    osc.stop(now + offset + 0.09);
+                });
+            } catch(e) {
+                console.warn('[Audio] playDoorKnockSound failed:', e);
+            }
+        }
+
+        // 4. Subtle Tactile Door Slide / Swish Sound
+        function playDoorSlideSound() {
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const now = ctx.currentTime;
+
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(320, now);
+                osc.frequency.exponentialRampToValueAtTime(560, now + 0.2);
+
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.25);
+            } catch(e) {}
+        }
 
         // ── Movement & Controls ──
         const keys = {};
@@ -1314,10 +1448,155 @@
             }
         }
 
+        // ── Room Door Portals, Physical Walls & Waypoint Navigation Engine ──
+        let avatarWaypoints = []; // [{x, y, onArrival: fn}]
+        let doorAnimationStates = new Map(); // roomId -> { openProgress: 0..1 (0=closed, 1=open), isAnimating: bool }
+        let lastCanvasClickTime = 0;
+        let lastCanvasClickPos = { x: 0, y: 0 };
+
+        function getRoomDoorPortal(r) {
+            if (!r || !r.bounds) return null;
+            const rx = r.bounds.x * TILE_SIZE;
+            const ry = r.bounds.y * TILE_SIZE;
+            const rw = r.bounds.width * TILE_SIZE;
+            const rh = r.bounds.height * TILE_SIZE;
+            const doorWidth = 44;
+
+            // Default door is bottom-center of room wall perimeter
+            const doorX = rx + (rw / 2);
+            const doorY = ry + rh; // on bottom wall edge
+
+            return {
+                x: doorX,
+                y: doorY,
+                width: doorWidth,
+                height: 14,
+                wallSide: 'bottom',
+                entryInsideX: doorX,
+                entryInsideY: doorY - 24, // Inside room step
+                exitOutsideX: doorX,
+                exitOutsideY: doorY + 24  // Outside corridor step
+            };
+        }
+
+        function checkLineCrossesRoomWall(x1, y1, x2, y2, room) {
+            if (!room || !room.bounds) return false;
+            const rx = room.bounds.x * TILE_SIZE;
+            const ry = room.bounds.y * TILE_SIZE;
+            const rw = room.bounds.width * TILE_SIZE;
+            const rh = room.bounds.height * TILE_SIZE;
+
+            const door = getRoomDoorPortal(room);
+            const doorMargin = (door.width / 2) + 6;
+
+            // Check if moving between inside and outside
+            const p1Inside = (x1 >= rx && x1 <= rx + rw && y1 >= ry && y1 <= ry + rh);
+            const p2Inside = (x2 >= rx && x2 <= rx + rw && y2 >= ry && y2 <= ry + rh);
+
+            if (p1Inside !== p2Inside) {
+                // Crossing the boundary! Allowed ONLY if crossing through door portal
+                const midX = (x1 + x2) / 2;
+                const midY = (y1 + y2) / 2;
+
+                const isNearDoor = Math.abs(midX - door.x) <= doorMargin && Math.abs(midY - door.y) <= 22;
+                if (!isNearDoor) {
+                    return true; // Blocked: tried to walk through wall!
+                }
+            }
+            return false;
+        }
+
+        function navigateToRoomWithRoute(targetRoom, finalX, finalY) {
+            if (!targetRoom || !targetRoom.bounds) {
+                localAvatar.targetX = finalX;
+                localAvatar.targetY = finalY;
+                return;
+            }
+
+            const currentRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+            avatarWaypoints = []; // Reset any ongoing route
+
+            // If already inside the target room, just walk directly
+            if (currentRoom && currentRoom.id === targetRoom.id) {
+                localAvatar.targetX = finalX;
+                localAvatar.targetY = finalY;
+                return;
+            }
+
+            // Step 1: If inside another room, must first walk out through current room's door
+            if (currentRoom) {
+                const curDoor = getRoomDoorPortal(currentRoom);
+                avatarWaypoints.push({
+                    x: curDoor.entryInsideX,
+                    y: curDoor.entryInsideY,
+                    action: () => {
+                        playDoorSlideSound();
+                        triggerDoorAnimation(currentRoom.id);
+                    }
+                });
+                avatarWaypoints.push({
+                    x: curDoor.exitOutsideX,
+                    y: curDoor.exitOutsideY,
+                    action: null
+                });
+            }
+
+            // Step 2: Walk to outside door portal of target room
+            const targetDoor = getRoomDoorPortal(targetRoom);
+            avatarWaypoints.push({
+                x: targetDoor.exitOutsideX,
+                y: targetDoor.exitOutsideY,
+                action: () => {
+                    playDoorSlideSound();
+                    triggerDoorAnimation(targetRoom.id);
+                }
+            });
+
+            // Step 3: Enter through target room's door
+            avatarWaypoints.push({
+                x: targetDoor.entryInsideX,
+                y: targetDoor.entryInsideY,
+                action: null
+            });
+
+            // Step 4: Arrive at clicked destination point
+            avatarWaypoints.push({
+                x: finalX,
+                y: finalY,
+                action: null
+            });
+
+            // Start first waypoint immediately
+            if (avatarWaypoints.length > 0) {
+                const firstWp = avatarWaypoints.shift();
+                localAvatar.targetX = firstWp.x;
+                localAvatar.targetY = firstWp.y;
+                if (firstWp.action) firstWp.action();
+            }
+        }
+
+        function triggerDoorAnimation(roomId) {
+            let state = doorAnimationStates.get(roomId);
+            if (!state) {
+                state = { openProgress: 0, isAnimating: true };
+                doorAnimationStates.set(roomId, state);
+            }
+            state.openProgress = 1.0; // Open door
+            state.isAnimating = true;
+
+            // Auto close door smoothly after avatar passes
+            setTimeout(() => {
+                if (doorAnimationStates.has(roomId)) {
+                    doorAnimationStates.get(roomId).openProgress = 0.0;
+                }
+            }, 2400);
+        }
+
         canvas.addEventListener('click', (e) => {
             const rect = canvas.getBoundingClientRect();
             const clickX = (e.clientX - rect.left - cameraOffset.x) / zoomLevel;
             const clickY = (e.clientY - rect.top - cameraOffset.y) / zoomLevel;
+            const now = Date.now();
 
             // 1. Check if clicking an avatar (local or remote) to open Spotlight & Task List
             if (Math.hypot(clickX - localAvatar.x, clickY - localAvatar.y) < 32) {
@@ -1340,13 +1619,26 @@
             // Check room boundary & locking guards
             const targetRoom = getCurrentRoom(clickX, clickY);
             const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
-            if (isGuest && guestAllowedRoomId) {
-                if (!targetRoom || targetRoom.id !== guestAllowedRoomId) {
-                    showToast(`🚫 {{ __("Guests are only permitted in their designated invited room.") }}`);
+
+            // Double Click Detection for Entering Rooms
+            const isDblClick = (now - lastCanvasClickTime < 380) && (Math.hypot(clickX - lastCanvasClickPos.x, clickY - lastCanvasClickPos.y) < 25);
+            lastCanvasClickTime = now;
+            lastCanvasClickPos = { x: clickX, y: clickY };
+
+            if (targetRoom && targetRoom !== myRoom) {
+                // Moving into another room REQUIRES Double-Click!
+                if (!isDblClick) {
+                    showToast(`💡 {{ __("Double-click to navigate into (انقر مرتين للدخول):") }} ${targetRoom.name}`);
                     return;
                 }
-            } else if (targetRoom && targetRoom !== myRoom) {
-                if (roomDoorStates.get(targetRoom.id)) {
+
+                if (isGuest && guestAllowedRoomId) {
+                    if (targetRoom.id !== guestAllowedRoomId) {
+                        showToast(`🚫 {{ __("Guests are only permitted in their designated invited room.") }}`);
+                        return;
+                    }
+                } else if (roomDoorStates.get(targetRoom.id)) {
+                    playDoorKnockSound();
                     if (confirm(`🚪 ${targetRoom.name} {{ __("is locked. Would you like to knock?") }}`)) {
                         if (ws && ws.readyState === WebSocket.OPEN) {
                             ws.send(JSON.stringify({ type: 'room.knock', payload: { roomId: targetRoom.id, roomName: targetRoom.name } }));
@@ -1355,8 +1647,14 @@
                     }
                     return;
                 }
+
+                // Execute animated pathfinding through doors
+                navigateToRoomWithRoute(targetRoom, clickX, clickY);
+                return;
             }
 
+            // Single click inside same room or open corridor
+            avatarWaypoints = []; // Clear waypoints on manual direct click
             localAvatar.targetX = Math.max(10, Math.min(MAP_WIDTH_PX - 10, clickX));
             localAvatar.targetY = Math.max(10, Math.min(MAP_HEIGHT_PX - 10, clickY));
         });
@@ -1469,7 +1767,7 @@
             showToast(nextState ? '🔒 {{ __("Room locked") }}' : '🔓 {{ __("Room unlocked") }}');
         }
 
-        // ── Main Game & Render Loop ──
+        // ── Main Game & Render Loop with Solid Wall Collisions & Waypoint Following ──
         function update() {
             let dx = 0, dy = 0;
             if (keys['w'] || keys['arrowup']) dy -= 1;
@@ -1492,6 +1790,7 @@
                 }
             } else {
                 if (dx !== 0 || dy !== 0) {
+                    avatarWaypoints = []; // Clear waypoints if manual key pressed
                     const len = Math.sqrt(dx * dx + dy * dy);
                     nextX += (dx / len) * localAvatar.speed;
                     nextY += (dy / len) * localAvatar.speed;
@@ -1501,20 +1800,28 @@
                     const diffX = localAvatar.targetX - localAvatar.x;
                     const diffY = localAvatar.targetY - localAvatar.y;
                     const dist = Math.sqrt(diffX * diffX + diffY * diffY);
-                    if (dist > 2) {
+                    if (dist > 3) {
                         nextX += (diffX / dist) * localAvatar.speed;
                         nextY += (diffY / dist) * localAvatar.speed;
+                    } else if (avatarWaypoints.length > 0) {
+                        // Reached waypoint, advance to next waypoint!
+                        const nextWp = avatarWaypoints.shift();
+                        localAvatar.targetX = nextWp.x;
+                        localAvatar.targetY = nextWp.y;
+                        if (nextWp.action) nextWp.action();
                     }
                 }
             }
 
             checkNearbyFurniture();
 
-            // Door lock & Room Permission Guard collision detection
+            // Check Physical Solid Wall Collisions for all rooms
             const currentR = getCurrentRoom(localAvatar.x, localAvatar.y);
             const targetR = getCurrentRoom(nextX, nextY);
+
+            // Door lock & Room Permission Guard collision detection
             if (targetR && targetR !== currentR) {
-                // 1. Guest Restriction Check: Guests can ONLY enter their designated invited room
+                // 1. Guest Restriction Check
                 if (isGuest && guestAllowedRoomId && targetR.id !== guestAllowedRoomId) {
                     nextX = localAvatar.x;
                     nextY = localAvatar.y;
@@ -1538,6 +1845,35 @@
                     localAvatar.targetY = localAvatar.y;
                 }
             }
+
+            // 4. Solid Wall Physics: Block avatar from crossing room perimeter except through Door
+            if (currentR) {
+                if (checkLineCrossesRoomWall(localAvatar.x, localAvatar.y, nextX, nextY, currentR)) {
+                    nextX = localAvatar.x;
+                    nextY = localAvatar.y;
+                }
+            }
+            if (targetR && targetR !== currentR) {
+                if (checkLineCrossesRoomWall(localAvatar.x, localAvatar.y, nextX, nextY, targetR)) {
+                    nextX = localAvatar.x;
+                    nextY = localAvatar.y;
+                }
+            }
+
+            // Update Door Proximity Animation
+            rooms.forEach(r => {
+                const door = getRoomDoorPortal(r);
+                if (door) {
+                    const distToDoor = Math.hypot(localAvatar.x - door.x, localAvatar.y - door.y);
+                    let state = doorAnimationStates.get(r.id) || { openProgress: 0, isAnimating: false };
+                    if (distToDoor < 40) {
+                        state.openProgress = Math.min(1.0, state.openProgress + 0.12);
+                    } else if (!state.isAnimating) {
+                        state.openProgress = Math.max(0.0, state.openProgress - 0.08);
+                    }
+                    doorAnimationStates.set(r.id, state);
+                }
+            });
 
             localAvatar.x = Math.max(10, Math.min(MAP_WIDTH_PX - 10, nextX));
             localAvatar.y = Math.max(10, Math.min(MAP_HEIGHT_PX - 10, nextY));
@@ -1627,7 +1963,7 @@
                 }
             }
 
-            // 2. Draw Rooms & Sleek Glass Tags
+            // 2. Draw Solid Architectural Room Walls, Door Openings & Animated Doors
             rooms.forEach(r => {
                 if (!r.bounds) return;
                 const rx = r.bounds.x * TILE_SIZE;
@@ -1635,24 +1971,117 @@
                 const rw = r.bounds.width * TILE_SIZE;
                 const rh = r.bounds.height * TILE_SIZE;
                 const isLocked = !!roomDoorStates.get(r.id);
+                const door = getRoomDoorPortal(r);
+                const doorState = doorAnimationStates.get(r.id) || { openProgress: 0 };
+                const openProg = isLocked ? 0 : (doorState.openProgress || 0);
 
-                ctx.strokeStyle = isLocked ? 'rgba(239, 68, 68, 0.6)' : 'rgba(79, 155, 95, 0.40)';
-                ctx.lineWidth = 1.2;
-                ctx.setLineDash([4, 4]);
-                ctx.strokeRect(rx, ry, rw, rh);
-                ctx.setLineDash([]);
+                // A. Room Interior Subtle Floor Glow Tint
+                ctx.fillStyle = isLocked ? 'rgba(239, 68, 68, 0.04)' : 'rgba(79, 155, 95, 0.05)';
+                ctx.fillRect(rx, ry, rw, rh);
 
+                // B. Solid Physical Perimeter Walls (3D Beveled Architectural Outline)
+                ctx.save();
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = isLocked ? 'rgba(239, 68, 68, 0.85)' : 'rgba(30, 58, 45, 0.95)';
+                ctx.fillStyle = isLocked ? '#7F1D1D' : '#14281E';
+
+                // Draw Top Wall
+                ctx.beginPath();
+                ctx.moveTo(rx, ry);
+                ctx.lineTo(rx + rw, ry);
+                ctx.stroke();
+
+                // Draw Left Wall
+                ctx.beginPath();
+                ctx.moveTo(rx, ry);
+                ctx.lineTo(rx, ry + rh);
+                ctx.stroke();
+
+                // Draw Right Wall
+                ctx.beginPath();
+                ctx.moveTo(rx + rw, ry);
+                ctx.lineTo(rx + rw, ry + rh);
+                ctx.stroke();
+
+                // Draw Bottom Wall with Door Gap
+                if (door) {
+                    const doorLeft = door.x - (door.width / 2);
+                    const doorRight = door.x + (door.width / 2);
+
+                    // Left segment of bottom wall
+                    ctx.beginPath();
+                    ctx.moveTo(rx, ry + rh);
+                    ctx.lineTo(doorLeft, ry + rh);
+                    ctx.stroke();
+
+                    // Right segment of bottom wall
+                    ctx.beginPath();
+                    ctx.moveTo(doorRight, ry + rh);
+                    ctx.lineTo(rx + rw, ry + rh);
+                    ctx.stroke();
+
+                    // Door Threshold / Mat
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+                    ctx.fillRect(doorLeft, ry + rh - 3, door.width, 6);
+
+                    // Door Posts (Hinges & Frame)
+                    ctx.fillStyle = '#10B981';
+                    ctx.fillRect(doorLeft - 2, ry + rh - 4, 4, 8);
+                    ctx.fillRect(doorRight - 2, ry + rh - 4, 4, 8);
+
+                    // Animated Door Leaf (Rotates / Swings when opening)
+                    ctx.save();
+                    ctx.translate(doorLeft, ry + rh);
+                    const swingAngle = openProg * (Math.PI * 0.45); // Swing 80 degrees inward
+                    ctx.rotate(-swingAngle);
+
+                    // Door leaf body
+                    ctx.fillStyle = isLocked ? '#EF4444' : '#10B981';
+                    ctx.strokeStyle = '#FFFFFF';
+                    ctx.lineWidth = 1;
+                    if (ctx.roundRect) ctx.roundRect(0, -3, door.width * 0.95, 6, 2);
+                    else ctx.rect(0, -3, door.width * 0.95, 6);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Door Handle / Lock Badge Icon
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.beginPath();
+                    ctx.arc(door.width * 0.75, 0, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+
+                    // Animated Door Arc Trace Indicator
+                    if (openProg > 0.05 && openProg < 0.95) {
+                        ctx.strokeStyle = 'rgba(16, 185, 129, 0.35)';
+                        ctx.lineWidth = 1;
+                        ctx.setLineDash([2, 3]);
+                        ctx.beginPath();
+                        ctx.arc(doorLeft, ry + rh, door.width * 0.9, -Math.PI * 0.45, 0);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                    }
+                } else {
+                    // Fallback continuous bottom wall
+                    ctx.beginPath();
+                    ctx.moveTo(rx, ry + rh);
+                    ctx.lineTo(rx + rw, ry + rh);
+                    ctx.stroke();
+                }
+                ctx.restore();
+
+                // C. Floating Sleek Glass Room Header Label Badge
                 const labelText = `${isLocked ? '🔒 ' : '🏢 '}${r.name.split(' - ')[0]}`;
                 ctx.font = 'bold 9px Cairo, Inter, sans-serif';
                 const textWidth = ctx.measureText(labelText).width;
                 const badgeW = Math.min(rw - 8, textWidth + 14);
 
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
                 if (ctx.roundRect) ctx.roundRect(rx + 4, ry + 4, badgeW, 18, 9);
                 else ctx.rect(rx + 4, ry + 4, badgeW, 18);
                 ctx.fill();
 
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+                ctx.strokeStyle = isLocked ? 'rgba(239, 68, 68, 0.4)' : 'rgba(255, 255, 255, 0.15)';
                 ctx.lineWidth = 1;
                 if (ctx.roundRect) ctx.roundRect(rx + 4, ry + 4, badgeW, 18, 9);
                 else ctx.rect(rx + 4, ry + 4, badgeW, 18);
@@ -2228,6 +2657,8 @@
                             const myR = getCurrentRoom(localAvatar.x, localAvatar.y);
                             if (myR && myR.id === data.payload.roomId) {
                                 pendingKnock = data.payload;
+                                playDoorbellSound();
+                                playDoorKnockSound();
                                 document.getElementById('knock-requester-name').textContent = `${data.payload.requesterName || 'A colleague'} is knocking on the door...`;
                                 document.getElementById('knock-alert-modal').style.display = 'flex';
                             }
@@ -2236,6 +2667,7 @@
                         // 7. Knock Response Result
                         else if (data.type === 'room.knock_result' && data.payload) {
                             if (data.payload.approved) {
+                                playDoorSlideSound();
                                 showToast(`🚪 {{ __("Access granted by") }} ${data.payload.responderName}!`);
                                 roomDoorStates.set(data.payload.roomId, false);
                                 updateRoomPresence();
@@ -2299,6 +2731,22 @@
                             if (data.payload.targetUserId === localAvatar.id) {
                                 showToast(`👋 ${data.payload.senderName} {{ __("waved at you for a quick chat! (ألقى التحية عليك)") }}`);
                                 spawnSpeechBubble(data.payload.senderUserId, data.payload.senderName, null, '👋');
+                            }
+                        }
+
+                        // 8d-2. Colleague Ring / Attention Call
+                        else if (data.type === 'user.ring' && data.payload) {
+                            if (data.payload.targetUserId === localAvatar.id) {
+                                currentIncomingRing = data.payload;
+                                playRingSound();
+                                spawnSpeechBubble(data.payload.senderUserId, data.payload.senderName, null, '🔔');
+                                const titleEl = document.getElementById('incoming-ring-title');
+                                const descEl = document.getElementById('incoming-ring-desc');
+                                if (titleEl) titleEl.textContent = `🔔 ${data.payload.senderName || 'A Colleague'} {{ __("is ringing you!") }}`;
+                                if (descEl) descEl.textContent = `{{ __("Immediate attention requested by") }} ${data.payload.senderName}.`;
+                                const ringModal = document.getElementById('incoming-ring-modal');
+                                if (ringModal) ringModal.style.display = 'flex';
+                                showToast(`🔔 ${data.payload.senderName} {{ __("is ringing you! (رنين تنبيه مباشر)") }}`);
                             }
                         }
 
@@ -3100,6 +3548,46 @@
             }
         }
 
+        function ringSpotlightUser() {
+            const modal = document.getElementById('user-spotlight-modal');
+            const targetId = modal ? modal.getAttribute('data-active-user-id') : null;
+            if (targetId && ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'user.ring',
+                    payload: { targetUserId: targetId, senderName: localAvatar.name }
+                }));
+                playRingSound();
+                spawnSpeechBubble(localAvatar.id, localAvatar.name, null, '🔔');
+                showToast('🔔 {{ __("Ringing colleague for immediate attention... (تم إرسال الرنين)") }}');
+            }
+        }
+
+        let currentIncomingRing = null;
+        function acceptIncomingRing() {
+            dismissIncomingRing();
+            if (currentIncomingRing) {
+                const senderId = currentIncomingRing.senderUserId;
+                const senderAv = remoteAvatars.get(senderId);
+                if (senderAv) {
+                    // Navigate user near the calling colleague
+                    const destRoom = getCurrentRoom(senderAv.x, senderAv.y);
+                    if (destRoom) {
+                        navigateToRoomWithRoute(destRoom, senderAv.x, senderAv.y);
+                    } else {
+                        localAvatar.targetX = senderAv.x + 35;
+                        localAvatar.targetY = senderAv.y;
+                    }
+                    openUserSpotlight(senderId);
+                }
+            }
+        }
+
+        function dismissIncomingRing() {
+            const modal = document.getElementById('incoming-ring-modal');
+            if (modal) modal.style.display = 'none';
+            currentIncomingRing = null;
+        }
+
         function toggleMoreMenu(e) {
             if (e) e.stopPropagation();
             const p = document.getElementById('floating-more-popover');
@@ -3578,6 +4066,11 @@
             const waveBtn = document.getElementById('spotlight-wave-btn');
             if (waveBtn) {
                 waveBtn.style.display = isSelf ? 'none' : 'inline-flex';
+            }
+
+            const ringBtn = document.getElementById('spotlight-ring-btn');
+            if (ringBtn) {
+                ringBtn.style.display = isSelf ? 'none' : 'inline-flex';
             }
 
             const videoPlayer = document.getElementById('spotlight-video-player');

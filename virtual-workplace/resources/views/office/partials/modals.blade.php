@@ -124,6 +124,9 @@
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
+                    <button id="spotlight-ring-btn" onclick="ringSpotlightUser()" class="action-link-btn" style="background: rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.4); color: #FCD34D; font-size: 11px; padding: 4px 10px;">
+                        <span>🔔</span> {{ __('Ring (تنبيه بالرنين)') }}
+                    </button>
                     <button id="spotlight-wave-btn" onclick="sendWaveToSpotlightUser()" class="action-link-btn" style="background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.4); color: #93C5FD; font-size: 11px; padding: 4px 10px;">
                         <span>👋</span> {{ __('Wave (استئذان)') }}
                     </button>
@@ -409,6 +412,34 @@
             </button>
         </div>
     </div>
+
+    <!-- ── 10. Direct Ring Attention Alert Modal (Incoming Ring) ── -->
+    <div id="incoming-ring-modal" class="modal-overlay" style="display: none; z-index: 1000007;">
+        <div class="modal-card" style="max-width: 440px; text-align: center; padding: 26px 22px; border: 2px solid #F59E0B; box-shadow: 0 20px 60px rgba(0,0,0,0.85), 0 0 40px rgba(245, 158, 11, 0.4); animation: pulseRing 1.2s infinite ease-in-out;">
+            <div style="font-size: 54px; margin-bottom: 8px;">🔔</div>
+            <h3 id="incoming-ring-title" style="font-size: 18px; font-weight: 900; color: #FCD34D; margin-bottom: 6px;">
+                {{ __('Incoming Ring Call (تنبيه صوتي عاجل)') }}
+            </h3>
+            <p id="incoming-ring-desc" style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;">
+                {{ __('A colleague is ringing you for immediate attention.') }}
+            </p>
+            <div style="display: flex; gap: 10px;">
+                <button type="button" onclick="acceptIncomingRing()" class="action-link-btn" style="flex: 1; justify-content: center; background: #10B981; color: white; padding: 12px; font-size: 14px; font-weight: 800;">
+                    📞 {{ __('Answer & Focus (رد وتوجه)') }}
+                </button>
+                <button type="button" onclick="dismissIncomingRing()" class="action-link-btn" style="flex: 1; justify-content: center; background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #F87171; padding: 12px; font-size: 14px; font-weight: 800;">
+                    ✕ {{ __('Dismiss (تجاهل)') }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes pulseRing {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+    </style>
 
     <!-- Toast Notification -->
     <div id="toast-bubble" class="toast-bubble"></div>
