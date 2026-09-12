@@ -1467,62 +1467,89 @@
             const rh = r.bounds.height * TILE_SIZE;
             const doorWidth = 56; // High visibility wider portal
 
-            // Candidate wall sides to test for open space clearance
-            // Order of natural preference: bottom, top, right, left
+            // 1. User Explicit Configuration in Room Design (if specified)
+            const explicitSide = r.bounds.doorSide || r.bounds.door_side || r.door_side || r.doorSide || null;
+            const explicitOffset = (typeof r.bounds.doorOffset === 'number') ? r.bounds.doorOffset : 0.5;
+
+            // Candidate wall sides
             const candidates = [
                 {
                     side: 'bottom',
-                    x: rx + (rw / 2),
+                    x: rx + (rw * explicitOffset),
                     y: ry + rh,
-                    entryInsideX: rx + (rw / 2),
+                    entryInsideX: rx + (rw * explicitOffset),
                     entryInsideY: ry + rh - 26,
-                    exitOutsideX: rx + (rw / 2),
+                    exitOutsideX: rx + (rw * explicitOffset),
                     exitOutsideY: ry + rh + 32,
                     pref: 15
                 },
                 {
                     side: 'top',
-                    x: rx + (rw / 2),
+                    x: rx + (rw * explicitOffset),
                     y: ry,
-                    entryInsideX: rx + (rw / 2),
+                    entryInsideX: rx + (rw * explicitOffset),
                     entryInsideY: ry + 26,
-                    exitOutsideX: rx + (rw / 2),
+                    exitOutsideX: rx + (rw * explicitOffset),
                     exitOutsideY: ry - 32,
-                    pref: 12
+                    pref: 15
                 },
                 {
                     side: 'right',
                     x: rx + rw,
-                    y: ry + (rh / 2),
+                    y: ry + (rh * explicitOffset),
                     entryInsideX: rx + rw - 26,
-                    entryInsideY: ry + (rh / 2),
+                    entryInsideY: ry + (rh * explicitOffset),
                     exitOutsideX: rx + rw + 32,
-                    exitOutsideY: ry + (rh / 2),
-                    pref: 8
+                    exitOutsideY: ry + (rh * explicitOffset),
+                    pref: 15
                 },
                 {
                     side: 'left',
                     x: rx,
-                    y: ry + (rh / 2),
+                    y: ry + (rh * explicitOffset),
                     entryInsideX: rx + 26,
-                    entryInsideY: ry + (rh / 2),
+                    entryInsideY: ry + (rh * explicitOffset),
                     exitOutsideX: rx - 32,
-                    exitOutsideY: ry + (rh / 2),
-                    pref: 8
+                    exitOutsideY: ry + (rh * explicitOffset),
+                    pref: 15
                 }
             ];
+
+            // If user explicitly chose a door side in room design, use it directly!
+            if (explicitSide) {
+                const found = candidates.find(c => c.side.toLowerCase() === explicitSide.toLowerCase());
+                if (found) {
+                    const portal = {
+                        x: found.x,
+                        y: found.y,
+                        width: doorWidth,
+                        height: 20,
+                        wallSide: found.side,
+                        entryInsideX: found.entryInsideX,
+                        entryInsideY: found.entryInsideY,
+                        exitOutsideX: found.exitOutsideX,
+                        exitOutsideY: found.exitOutsideY
+                    };
+                    roomDoorPortalsCache.set(r.id, portal);
+                    return portal;
+                }
+            }
+
+            // 2. Intelligent Placement Facing the Central Open Walkway / Corridor
+            const mapCenter = { x: MAP_WIDTH_PX / 2, y: MAP_HEIGHT_PX / 2 };
+            const outerMargin = 64; // Outer exterior building perimeter margins
 
             let bestCandidate = null;
             let bestScore = -Infinity;
 
             for (const cand of candidates) {
-                // 1. Boundary check: Exit outside must be well inside map boundary
-                if (cand.exitOutsideX < 24 || cand.exitOutsideX > MAP_WIDTH_PX - 24 ||
-                    cand.exitOutsideY < 24 || cand.exitOutsideY > MAP_HEIGHT_PX - 24) {
-                    continue; // Skip out of map
+                // A. Disqualify outer exterior building walls touching outer map canvas border
+                if (cand.exitOutsideX < outerMargin || cand.exitOutsideX > MAP_WIDTH_PX - outerMargin ||
+                    cand.exitOutsideY < outerMargin || cand.exitOutsideY > MAP_HEIGHT_PX - outerMargin) {
+                    continue; // Skip: Outer exterior building wall facing outside margins!
                 }
 
-                // 2. Check if exitOutside point is inside ANY other room
+                // B. Check overlap with other rooms
                 let isInsideOtherRoom = false;
                 let minDistanceToOtherRooms = 99999;
 
@@ -1533,9 +1560,9 @@
                     const orw = other.bounds.width * TILE_SIZE;
                     const orh = other.bounds.height * TILE_SIZE;
 
-                    // Test if exit outside is inside other room with 12px safety margin
-                    if (cand.exitOutsideX >= orx - 12 && cand.exitOutsideX <= orx + orw + 12 &&
-                        cand.exitOutsideY >= ory - 12 && cand.exitOutsideY <= ory + orh + 12) {
+                    // Test if exit outside is inside other room with 10px safety margin
+                    if (cand.exitOutsideX >= orx - 10 && cand.exitOutsideX <= orx + orw + 10 &&
+                        cand.exitOutsideY >= ory - 10 && cand.exitOutsideY <= ory + orh + 10) {
                         isInsideOtherRoom = true;
                         break;
                     }
@@ -1550,20 +1577,27 @@
                 }
 
                 if (isInsideOtherRoom) {
-                    continue; // Discard completely if blocked by another room!
+                    continue; // Discard if blocked by another room!
                 }
 
-                // Score candidate based on clearance distance + preference
-                const score = minDistanceToOtherRooms + cand.pref;
+                // C. Score candidate: closer to Central Open Corridor + open clearance distance
+                const distToCenter = Math.hypot(cand.exitOutsideX - mapCenter.x, cand.exitOutsideY - mapCenter.y);
+                const score = (1200 - distToCenter) + (minDistanceToOtherRooms * 3);
+
                 if (score > bestScore) {
                     bestScore = score;
                     bestCandidate = cand;
                 }
             }
 
-            // Fallback if all sides are bordered
+            // Fallback if all sides were outer perimeter
             if (!bestCandidate) {
-                bestCandidate = candidates[0]; // fallback to bottom
+                candidates.sort((a, b) => {
+                    const da = Math.hypot(a.exitOutsideX - mapCenter.x, a.exitOutsideY - mapCenter.y);
+                    const db = Math.hypot(b.exitOutsideX - mapCenter.x, b.exitOutsideY - mapCenter.y);
+                    return da - db;
+                });
+                bestCandidate = candidates[0];
             }
 
             const portal = {
