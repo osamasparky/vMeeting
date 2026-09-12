@@ -1453,38 +1453,147 @@
         let doorAnimationStates = new Map(); // roomId -> { openProgress: 0..1 (0=closed, 1=open), isAnimating: bool }
         let lastCanvasClickTime = 0;
         let lastCanvasClickPos = { x: 0, y: 0 };
+        const roomDoorPortalsCache = new Map();
 
         function getRoomDoorPortal(r) {
             if (!r || !r.bounds) return null;
+            if (roomDoorPortalsCache.has(r.id)) {
+                return roomDoorPortalsCache.get(r.id);
+            }
+
             const rx = r.bounds.x * TILE_SIZE;
             const ry = r.bounds.y * TILE_SIZE;
             const rw = r.bounds.width * TILE_SIZE;
             const rh = r.bounds.height * TILE_SIZE;
             const doorWidth = 56; // High visibility wider portal
 
-            // Default door is bottom-center of room wall perimeter
-            const doorX = rx + (rw / 2);
-            const doorY = ry + rh; // on bottom wall edge
+            // Candidate wall sides to test for open space clearance
+            // Order of natural preference: bottom, top, right, left
+            const candidates = [
+                {
+                    side: 'bottom',
+                    x: rx + (rw / 2),
+                    y: ry + rh,
+                    entryInsideX: rx + (rw / 2),
+                    entryInsideY: ry + rh - 26,
+                    exitOutsideX: rx + (rw / 2),
+                    exitOutsideY: ry + rh + 32,
+                    pref: 15
+                },
+                {
+                    side: 'top',
+                    x: rx + (rw / 2),
+                    y: ry,
+                    entryInsideX: rx + (rw / 2),
+                    entryInsideY: ry + 26,
+                    exitOutsideX: rx + (rw / 2),
+                    exitOutsideY: ry - 32,
+                    pref: 12
+                },
+                {
+                    side: 'right',
+                    x: rx + rw,
+                    y: ry + (rh / 2),
+                    entryInsideX: rx + rw - 26,
+                    entryInsideY: ry + (rh / 2),
+                    exitOutsideX: rx + rw + 32,
+                    exitOutsideY: ry + (rh / 2),
+                    pref: 8
+                },
+                {
+                    side: 'left',
+                    x: rx,
+                    y: ry + (rh / 2),
+                    entryInsideX: rx + 26,
+                    entryInsideY: ry + (rh / 2),
+                    exitOutsideX: rx - 32,
+                    exitOutsideY: ry + (rh / 2),
+                    pref: 8
+                }
+            ];
 
-            return {
-                x: doorX,
-                y: doorY,
+            let bestCandidate = null;
+            let bestScore = -Infinity;
+
+            for (const cand of candidates) {
+                // 1. Boundary check: Exit outside must be well inside map boundary
+                if (cand.exitOutsideX < 24 || cand.exitOutsideX > MAP_WIDTH_PX - 24 ||
+                    cand.exitOutsideY < 24 || cand.exitOutsideY > MAP_HEIGHT_PX - 24) {
+                    continue; // Skip out of map
+                }
+
+                // 2. Check if exitOutside point is inside ANY other room
+                let isInsideOtherRoom = false;
+                let minDistanceToOtherRooms = 99999;
+
+                for (const other of rooms) {
+                    if (other.id === r.id || !other.bounds) continue;
+                    const orx = other.bounds.x * TILE_SIZE;
+                    const ory = other.bounds.y * TILE_SIZE;
+                    const orw = other.bounds.width * TILE_SIZE;
+                    const orh = other.bounds.height * TILE_SIZE;
+
+                    // Test if exit outside is inside other room with 12px safety margin
+                    if (cand.exitOutsideX >= orx - 12 && cand.exitOutsideX <= orx + orw + 12 &&
+                        cand.exitOutsideY >= ory - 12 && cand.exitOutsideY <= ory + orh + 12) {
+                        isInsideOtherRoom = true;
+                        break;
+                    }
+
+                    // Calculate clearance distance to other room's rectangle
+                    const dx = Math.max(orx - cand.exitOutsideX, 0, cand.exitOutsideX - (orx + orw));
+                    const dy = Math.max(ory - cand.exitOutsideY, 0, cand.exitOutsideY - (ory + orh));
+                    const dist = Math.hypot(dx, dy);
+                    if (dist < minDistanceToOtherRooms) {
+                        minDistanceToOtherRooms = dist;
+                    }
+                }
+
+                if (isInsideOtherRoom) {
+                    continue; // Discard completely if blocked by another room!
+                }
+
+                // Score candidate based on clearance distance + preference
+                const score = minDistanceToOtherRooms + cand.pref;
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestCandidate = cand;
+                }
+            }
+
+            // Fallback if all sides are bordered
+            if (!bestCandidate) {
+                bestCandidate = candidates[0]; // fallback to bottom
+            }
+
+            const portal = {
+                x: bestCandidate.x,
+                y: bestCandidate.y,
                 width: doorWidth,
                 height: 20,
-                wallSide: 'bottom',
-                entryInsideX: doorX,
-                entryInsideY: doorY - 26, // Inside room step
-                exitOutsideX: doorX,
-                exitOutsideY: doorY + 28  // Outside corridor step
+                wallSide: bestCandidate.side,
+                entryInsideX: bestCandidate.entryInsideX,
+                entryInsideY: bestCandidate.entryInsideY,
+                exitOutsideX: bestCandidate.exitOutsideX,
+                exitOutsideY: bestCandidate.exitOutsideY
             };
+
+            roomDoorPortalsCache.set(r.id, portal);
+            return portal;
         }
 
         function isClickOnDoorPortal(clickX, clickY) {
             for (const r of rooms) {
                 const door = getRoomDoorPortal(r);
                 if (door) {
-                    if (Math.abs(clickX - door.x) <= (door.width / 2) + 12 && Math.abs(clickY - door.y) <= 20) {
-                        return { room: r, door: door };
+                    if (door.wallSide === 'bottom' || door.wallSide === 'top') {
+                        if (Math.abs(clickX - door.x) <= (door.width / 2) + 14 && Math.abs(clickY - door.y) <= 24) {
+                            return { room: r, door: door };
+                        }
+                    } else { // 'left' or 'right'
+                        if (Math.abs(clickY - door.y) <= (door.width / 2) + 14 && Math.abs(clickX - door.x) <= 24) {
+                            return { room: r, door: door };
+                        }
                     }
                 }
             }
@@ -1523,7 +1632,7 @@
             const rh = room.bounds.height * TILE_SIZE;
 
             const door = getRoomDoorPortal(room);
-            const doorMargin = (door.width / 2) + 6;
+            const doorMargin = (door.width / 2) + 8;
 
             // Check if moving between inside and outside
             const p1Inside = (x1 >= rx && x1 <= rx + rw && y1 >= ry && y1 <= ry + rh);
@@ -1534,7 +1643,13 @@
                 const midX = (x1 + x2) / 2;
                 const midY = (y1 + y2) / 2;
 
-                const isNearDoor = Math.abs(midX - door.x) <= doorMargin && Math.abs(midY - door.y) <= 22;
+                let isNearDoor = false;
+                if (door.wallSide === 'bottom' || door.wallSide === 'top') {
+                    isNearDoor = Math.abs(midX - door.x) <= doorMargin && Math.abs(midY - door.y) <= 28;
+                } else {
+                    isNearDoor = Math.abs(midY - door.y) <= doorMargin && Math.abs(midX - door.x) <= 28;
+                }
+
                 if (!isNearDoor) {
                     return true; // Blocked: tried to walk through wall!
                 }
@@ -2043,61 +2158,81 @@
                 ctx.fillStyle = isLocked ? '#7F1D1D' : '#14281E';
 
                 // Draw Top Wall
-                ctx.beginPath();
-                ctx.moveTo(rx, ry);
-                ctx.lineTo(rx + rw, ry);
-                ctx.stroke();
-
-                // Draw Left Wall
-                ctx.beginPath();
-                ctx.moveTo(rx, ry);
-                ctx.lineTo(rx, ry + rh);
-                ctx.stroke();
-
-                // Draw Right Wall
-                ctx.beginPath();
-                ctx.moveTo(rx + rw, ry);
-                ctx.lineTo(rx + rw, ry + rh);
-                ctx.stroke();
-
-                // Draw Bottom Wall with Door Gap
-                if (door) {
+                if (door && door.wallSide === 'top') {
                     const doorLeft = door.x - (door.width / 2);
                     const doorRight = door.x + (door.width / 2);
+                    ctx.beginPath(); ctx.moveTo(rx, ry); ctx.lineTo(doorLeft, ry); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(doorRight, ry); ctx.lineTo(rx + rw, ry); ctx.stroke();
+                } else {
+                    ctx.beginPath(); ctx.moveTo(rx, ry); ctx.lineTo(rx + rw, ry); ctx.stroke();
+                }
 
-                    // Left segment of bottom wall
-                    ctx.beginPath();
-                    ctx.moveTo(rx, ry + rh);
-                    ctx.lineTo(doorLeft, ry + rh);
-                    ctx.stroke();
+                // Draw Left Wall
+                if (door && door.wallSide === 'left') {
+                    const doorTop = door.y - (door.width / 2);
+                    const doorBottom = door.y + (door.width / 2);
+                    ctx.beginPath(); ctx.moveTo(rx, ry); ctx.lineTo(rx, doorTop); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(rx, doorBottom); ctx.lineTo(rx, ry + rh); ctx.stroke();
+                } else {
+                    ctx.beginPath(); ctx.moveTo(rx, ry); ctx.lineTo(rx, ry + rh); ctx.stroke();
+                }
 
-                    // Right segment of bottom wall
-                    ctx.beginPath();
-                    ctx.moveTo(doorRight, ry + rh);
-                    ctx.lineTo(rx + rw, ry + rh);
-                    ctx.stroke();
+                // Draw Right Wall
+                if (door && door.wallSide === 'right') {
+                    const doorTop = door.y - (door.width / 2);
+                    const doorBottom = door.y + (door.width / 2);
+                    ctx.beginPath(); ctx.moveTo(rx + rw, ry); ctx.lineTo(rx + rw, doorTop); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(rx + rw, doorBottom); ctx.lineTo(rx + rw, ry + rh); ctx.stroke();
+                } else {
+                    ctx.beginPath(); ctx.moveTo(rx + rw, ry); ctx.lineTo(rx + rw, ry + rh); ctx.stroke();
+                }
+
+                // Draw Bottom Wall
+                if (door && door.wallSide === 'bottom') {
+                    const doorLeft = door.x - (door.width / 2);
+                    const doorRight = door.x + (door.width / 2);
+                    ctx.beginPath(); ctx.moveTo(rx, ry + rh); ctx.lineTo(doorLeft, ry + rh); ctx.stroke();
+                    ctx.beginPath(); ctx.moveTo(doorRight, ry + rh); ctx.lineTo(rx + rw, ry + rh); ctx.stroke();
+                } else {
+                    ctx.beginPath(); ctx.moveTo(rx, ry + rh); ctx.lineTo(rx + rw, ry + rh); ctx.stroke();
+                }
+
+                // Draw Door Portal & Animated Swinging Door Leaf
+                if (door) {
+                    ctx.save();
+                    ctx.translate(door.x, door.y);
+
+                    // Orientation angle: 0 for bottom, PI for top, PI/2 for right, -PI/2 for left
+                    let wallAngle = 0;
+                    if (door.wallSide === 'top') wallAngle = Math.PI;
+                    else if (door.wallSide === 'right') wallAngle = Math.PI / 2;
+                    else if (door.wallSide === 'left') wallAngle = -Math.PI / 2;
+
+                    ctx.rotate(wallAngle);
+
+                    const halfW = door.width / 2;
 
                     // High Visibility Door Threshold Mat / Floor Marker
                     ctx.fillStyle = isLocked ? 'rgba(239, 68, 68, 0.25)' : 'rgba(16, 185, 129, 0.22)';
-                    ctx.fillRect(doorLeft - 4, ry + rh - 4, door.width + 8, 8);
+                    ctx.fillRect(-halfW - 4, -4, door.width + 8, 8);
                     ctx.strokeStyle = isLocked ? '#EF4444' : '#10B981';
                     ctx.lineWidth = 1.5;
-                    ctx.strokeRect(doorLeft - 4, ry + rh - 4, door.width + 8, 8);
+                    ctx.strokeRect(-halfW - 4, -4, door.width + 8, 8);
 
                     // Door Posts (Sturdy Architectural Pillars)
                     ctx.fillStyle = '#064E3B';
-                    ctx.fillRect(doorLeft - 5, ry + rh - 6, 6, 12);
-                    ctx.fillRect(doorRight - 1, ry + rh - 6, 6, 12);
+                    ctx.fillRect(-halfW - 5, -6, 6, 12);
+                    ctx.fillRect(halfW - 1, -6, 6, 12);
 
                     // Door Post Gold Accent Caps
                     ctx.fillStyle = '#F59E0B';
-                    ctx.fillRect(doorLeft - 5, ry + rh - 8, 6, 3);
-                    ctx.fillRect(doorRight - 1, ry + rh - 8, 6, 3);
+                    ctx.fillRect(-halfW - 5, -8, 6, 3);
+                    ctx.fillRect(halfW - 1, -8, 6, 3);
 
-                    // Animated Door Leaf (Rotates / Swings when opening)
+                    // Animated Door Leaf (Rotates / Swings inward when opening)
                     ctx.save();
-                    ctx.translate(doorLeft, ry + rh);
-                    const swingAngle = openProg * (Math.PI * 0.45); // Swing 80 degrees inward
+                    ctx.translate(-halfW, 0);
+                    const swingAngle = openProg * (Math.PI * 0.45); // Swing 80 degrees inward (-Y is inside)
                     ctx.rotate(-swingAngle);
 
                     // Thick Solid Door Leaf Body (Wood/Glass Composite with Gold Trim)
@@ -2119,30 +2254,33 @@
                     ctx.stroke();
                     ctx.restore();
 
-                    // Door Status Label Pill ("OPEN" / "LOCKED / CLICK TO OPEN")
-                    const statusText = isLocked ? '🔒 CLOSED' : (openProg > 0.4 ? '🚪 OPEN' : '🚪 UNLOCKED');
-                    ctx.font = 'bold 8px Cairo, Inter, sans-serif';
-                    ctx.fillStyle = isLocked ? '#EF4444' : '#10B981';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(statusText, door.x, ry + rh + 12);
-
                     // Animated Door Arc Trace Indicator
                     if (openProg > 0.05 && openProg < 0.95) {
                         ctx.strokeStyle = 'rgba(16, 185, 129, 0.5)';
                         ctx.lineWidth = 1.5;
                         ctx.setLineDash([3, 3]);
                         ctx.beginPath();
-                        ctx.arc(doorLeft, ry + rh, door.width * 0.95, -Math.PI * 0.45, 0);
+                        ctx.arc(-halfW, 0, door.width * 0.95, -Math.PI * 0.45, 0);
                         ctx.stroke();
                         ctx.setLineDash([]);
                     }
-                } else {
-                    // Fallback continuous bottom wall
-                    ctx.beginPath();
-                    ctx.moveTo(rx, ry + rh);
-                    ctx.lineTo(rx + rw, ry + rh);
-                    ctx.stroke();
+
+                    ctx.restore(); // Restore local transform
+
+                    // Door Status Label Pill ("OPEN" / "LOCKED / CLICK TO OPEN") in world coordinates
+                    const statusText = isLocked ? '🔒 CLOSED' : (openProg > 0.4 ? '🚪 OPEN' : '🚪 UNLOCKED');
+                    ctx.font = 'bold 8px Cairo, Inter, sans-serif';
+                    ctx.fillStyle = isLocked ? '#EF4444' : '#10B981';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+
+                    let labelX = door.x;
+                    let labelY = door.y + 14;
+                    if (door.wallSide === 'top') labelY = door.y - 14;
+                    else if (door.wallSide === 'left') { labelX = door.x - 20; labelY = door.y; }
+                    else if (door.wallSide === 'right') { labelX = door.x + 20; labelY = door.y; }
+
+                    ctx.fillText(statusText, labelX, labelY);
                 }
                 ctx.restore();
 
