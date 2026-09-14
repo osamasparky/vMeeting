@@ -1267,34 +1267,38 @@
             width = canvas.width = container.clientWidth || window.innerWidth;
             height = canvas.height = container.clientHeight || window.innerHeight;
 
-            const availW = Math.max(100, width - 16);
-            const availH = Math.max(100, height - 16);
+            const topInset = 76;
+            const bottomInset = 76;
+            const sideInset = 32;
+
+            const availW = Math.max(100, width - sideInset);
+            const availH = Math.max(100, height - topInset - bottomInset);
             const scaleX = availW / MAP_WIDTH_PX;
             const scaleY = availH / MAP_HEIGHT_PX;
-            // Contain full floor plan with 100% architectural perimeter visibility centered from the middle
+            // Contain full floor plan 100% inside unobstructed view between top bar and bottom dock
             zoomLevel = Math.min(scaleX, scaleY);
 
             cameraOffset.x = (width - MAP_WIDTH_PX * zoomLevel) / 2;
-            cameraOffset.y = (height - MAP_HEIGHT_PX * zoomLevel) / 2;
+            cameraOffset.y = topInset + (availH - MAP_HEIGHT_PX * zoomLevel) / 2;
         }
 
         function zoomIn() {
-            setZoomLevel(zoomLevel * 1.25);
+            setZoomLevel(zoomLevel * 1.08);
         }
 
         function zoomOut() {
-            setZoomLevel(zoomLevel * 0.8);
+            setZoomLevel(zoomLevel * 0.92);
         }
 
         function resetCameraView() {
             centerCamera();
             if (typeof draw === 'function') draw();
-            showToast('🎯 {{ __("Center & Fit View (إعادة ضبط الخريطة)") }}');
+            showToast('🎯 {{ __("Center & Fit View (إعادة ضبط الخريطة للمركز)") }}');
         }
 
         function setZoomLevel(newZoom, centerX = (width / 2), centerY = (height / 2)) {
             const minZoom = 0.20;
-            const maxZoom = 2.5;
+            const maxZoom = 3.0;
             const clamped = Math.max(minZoom, Math.min(maxZoom, newZoom));
             if (Math.abs(clamped - zoomLevel) < 0.001) return;
 
@@ -1315,14 +1319,14 @@
         window.addEventListener('resize', resizeCanvas);
         centerCamera();
 
-        // Canvas Mouse Wheel Zoom
+        // Canvas Mouse Wheel Zoom with Smooth Micro-Steps
         if (canvas) {
             canvas.addEventListener('wheel', (e) => {
                 e.preventDefault();
                 const rect = canvas.getBoundingClientRect();
                 const mouseX = e.clientX - rect.left;
                 const mouseY = e.clientY - rect.top;
-                const factor = e.deltaY < 0 ? 1.15 : 0.87;
+                const factor = e.deltaY < 0 ? 1.05 : 0.95;
                 setZoomLevel(zoomLevel * factor, mouseX, mouseY);
             }, { passive: false });
         }
