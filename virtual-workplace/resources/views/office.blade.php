@@ -1267,11 +1267,12 @@
             width = canvas.width = container.clientWidth || window.innerWidth;
             height = canvas.height = container.clientHeight || window.innerHeight;
 
-            const availW = Math.max(100, width);
-            const availH = Math.max(100, height);
+            const availW = Math.max(100, width - 16);
+            const availH = Math.max(100, height - 16);
             const scaleX = availW / MAP_WIDTH_PX;
             const scaleY = availH / MAP_HEIGHT_PX;
-            zoomLevel = Math.max(scaleX, scaleY);
+            // Contain full floor plan with 100% architectural perimeter visibility centered from the middle
+            zoomLevel = Math.min(scaleX, scaleY);
 
             cameraOffset.x = (width - MAP_WIDTH_PX * zoomLevel) / 2;
             cameraOffset.y = (height - MAP_HEIGHT_PX * zoomLevel) / 2;

@@ -636,17 +636,19 @@ body {
     font-size: 20px;
 }
 
-/* ── UlaSpace System Card Notifications (Toasts) ── */
+/* ── UlaSpace System Card Notifications (Toasts - Center of Canvas) ── */
 .nx-toast-container {
     position: fixed;
-    top: 76px;
-    inset-inline-end: 24px;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 10px;
     z-index: 100000;
     pointer-events: none;
-    max-width: 360px;
+    max-width: 440px;
     width: calc(100vw - 48px);
 }
 
