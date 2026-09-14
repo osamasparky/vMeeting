@@ -1709,13 +1709,16 @@
                 if (res.ok) {
                     if (MAP_DATA.layout_data) {
                         delete MAP_DATA.layout_data.background_image_url;
+                        MAP_DATA.layout_data.background_width = 2839;
+                        MAP_DATA.layout_data.background_height = 1696;
                     }
                     blueprintLoaded = false;
                     BLUEPRINT_IMAGE.src = '';
-                    MAP_WIDTH_PX = (MAP_DATA.width && MAP_DATA.width > 30) ? MAP_DATA.width * TILE_SIZE : 2194;
-                    MAP_HEIGHT_PX = (MAP_DATA.height && MAP_DATA.height > 20) ? MAP_DATA.height * TILE_SIZE : 1952;
+                    MAP_WIDTH_PX = 2839;
+                    MAP_HEIGHT_PX = 1696;
                     fitAndCenterView();
                     renderFloorsCatalog();
+                    draw();
                     showToast('✅ {{ __("Background removed (تمت إزالة صورة الأرضية)") }}');
                 }
             } catch (err) {
@@ -2978,8 +2981,8 @@
                 if (res.ok) {
                     MAP_DATA.layout_data = MAP_DATA.layout_data || {};
                     delete MAP_DATA.layout_data.background_image_url;
-                    delete MAP_DATA.layout_data.background_width;
-                    delete MAP_DATA.layout_data.background_height;
+                    MAP_DATA.layout_data.background_width = 2839;
+                    MAP_DATA.layout_data.background_height = 1696;
                     BLUEPRINT_IMAGE.src = '/images/office_floorplan.jpg?v=' + Date.now();
                     BLUEPRINT_IMAGE.onload = () => {
                         blueprintLoaded = true;
@@ -2987,9 +2990,16 @@
                             MAP_WIDTH_PX = BLUEPRINT_IMAGE.naturalWidth;
                             MAP_HEIGHT_PX = BLUEPRINT_IMAGE.naturalHeight;
                         } else {
-                            MAP_WIDTH_PX = 2194;
-                            MAP_HEIGHT_PX = 1952;
+                            MAP_WIDTH_PX = 2839;
+                            MAP_HEIGHT_PX = 1696;
                         }
+                        fitAndCenterView();
+                        draw();
+                    };
+                    BLUEPRINT_IMAGE.onerror = () => {
+                        blueprintLoaded = false;
+                        MAP_WIDTH_PX = 2839;
+                        MAP_HEIGHT_PX = 1696;
                         fitAndCenterView();
                         draw();
                     };
@@ -3018,12 +3028,12 @@
                     selectedItem = null;
                     MAP_DATA.layout_data = MAP_DATA.layout_data || {};
                     delete MAP_DATA.layout_data.background_image_url;
-                    delete MAP_DATA.layout_data.background_width;
-                    delete MAP_DATA.layout_data.background_height;
+                    MAP_DATA.layout_data.background_width = 2839;
+                    MAP_DATA.layout_data.background_height = 1696;
                     BLUEPRINT_IMAGE.src = '';
                     blueprintLoaded = false;
-                    MAP_WIDTH_PX = 2194;
-                    MAP_HEIGHT_PX = 1952;
+                    MAP_WIDTH_PX = 2839;
+                    MAP_HEIGHT_PX = 1696;
                     fitAndCenterView();
                     updateInspector();
                     hideFloatingActions();

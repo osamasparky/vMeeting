@@ -522,6 +522,8 @@ class OfficeController extends Controller
 
         $layoutData = $map->layout_data ?? [];
         $layoutData['background_image_url'] = '/images/office_floorplan.jpg';
+        $layoutData['background_width'] = 2839;
+        $layoutData['background_height'] = 1696;
 
         $map->update([
             'layout_data' => $layoutData,
@@ -555,8 +557,8 @@ class OfficeController extends Controller
         // Clear custom background image
         $layoutData = $map->layout_data ?? [];
         unset($layoutData['background_image_url']);
-        unset($layoutData['background_width']);
-        unset($layoutData['background_height']);
+        $layoutData['background_width'] = 2839;
+        $layoutData['background_height'] = 1696;
 
         $map->update([
             'layout_data' => $layoutData,
