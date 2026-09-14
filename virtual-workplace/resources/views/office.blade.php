@@ -822,155 +822,182 @@
 
         <!-- ── Top Floating Overlay Bar (UlaSpace Figma Floor Map Spec) ── -->
         <header class="nx-map-toolbar">
-        <div class="nx-toolbar-group">
-            @if(empty($user->is_guest))
-            <a href="{{ route('dashboard') }}" class="nx-toolbar-btn" title="{{ __('Back to Dashboard (الخروج إلى لوحة التحكم)') }}">
-                <span class="material-symbols-rounded" style="font-size: 18px;">dashboard</span>
-                <span>{{ __('Dashboard') }}</span>
-            </a>
-            @endif
-
-            @if(session('superadmin_impersonator_id'))
-            <form method="POST" action="{{ route('impersonate.leave') }}" style="margin: 0; display: inline-flex;">
-                @csrf
-                <button type="submit" class="nx-toolbar-btn btn-accent" title="{{ __('Return to Super Admin (الرجوع للوحة التحكم)') }}">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">shield</span>
-                    <span>{{ __('Super Admin') }}</span>
-                </button>
-            </form>
-            @endif
-
-            <!-- Office / Branch Switcher (Internal Team Members Only) -->
-            @if(isset($userAllowedOffices) && $userAllowedOffices->count() > 1 && empty($user->is_guest))
-            <div style="position: relative; display: inline-block;">
-                <button type="button" onclick="toggleOfficeDropdown(event)" class="nx-toolbar-btn" style="color: var(--nx-map-gold); border-color: rgba(211, 165, 83, 0.35); font-weight: 600;" title="{{ __('Switch Office Branch (تغيير الفرع)') }}">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">domain</span>
-                    <span>{{ $floor->name }}</span>
-                    <span class="material-symbols-rounded" style="font-size: 16px;">arrow_drop_down</span>
-                </button>
-                <div id="office-switcher-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); inset-inline-start: 0; min-width: 250px; background: rgba(18, 28, 22, 0.96); backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; box-shadow: 0 16px 36px rgba(0,0,0,0.6); padding: 6px; z-index: 100000;">
-                    <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 4px;">
-                        🏢 {{ __('Office Branches (فروع الشركة)') }}
-                    </div>
-                    @foreach($userAllowedOffices as $off)
-                    @php
-                        $offMap = $off->activeMap ?: $off->maps->first();
-                        $offMapId = $offMap ? $offMap->id : '';
-                    @endphp
-                    <a href="{{ route('office', ['office' => $off->id]) }}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: {{ $off->id === $floor->id ? '#86EFAC' : '#E2E8F0' }}; background: {{ $off->id === $floor->id ? 'rgba(36, 92, 58, 0.45)' : 'transparent' }}; font-weight: 700; font-size: 12px; transition: background 0.15s ease;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span class="material-symbols-rounded" style="font-size: 16px;">apartment</span>
-                            <span>{{ $off->name }}</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <span class="branch-occupants-badge" data-map-id="{{ $offMapId }}" style="font-size: 10px; padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.05); color: #94A3B8; font-weight: 700;">
-                                <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: {{ $off->id === $floor->id ? '#10B981' : '#64748B' }}; margin-inline-end: 4px;"></span>
-                                {{ $off->id === $floor->id ? __('Current') : __('0 active') }}
-                            </span>
-                            @if($off->id === $floor->id)
-                                <span style="font-size: 10px; color: #86EFAC;">●</span>
+            <!-- 1. Start Group (Top Right on RTL): Burger Menu + Brand Lockup + Branch Switcher -->
+            <div class="nx-toolbar-group">
+                <!-- Main App Burger Menu Dropdown -->
+                <div style="position: relative; display: inline-block;">
+                    <button type="button" onclick="toggleOfficeMainMenu(event)" class="nx-toolbar-btn" style="padding: 6px 10px;" title="{{ __('Menu (القائمة الرئيسية)') }}">
+                        <span class="material-symbols-rounded" style="font-size: 20px;">menu</span>
+                    </button>
+                    
+                    <div id="office-main-menu-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); inset-inline-start: 0; min-width: 260px; background: rgba(14, 25, 19, 0.98); backdrop-filter: blur(24px); border: 1px solid rgba(237, 230, 217, 0.20); border-radius: 16px; box-shadow: 0 16px 40px rgba(0,0,0,0.65); padding: 8px; z-index: 100000;">
+                        <!-- Menu Header with User / Brand Info -->
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px 12px; border-bottom: 1px solid rgba(237, 230, 217, 0.12); margin-bottom: 6px;">
+                            @if(!empty($organization->logo_url))
+                                <img src="{{ $organization->logo_url }}" alt="{{ $organization->name }}" style="height: 24px; width: auto; object-fit: contain;">
+                            @else
+                                <span class="material-symbols-rounded" style="color: var(--nx-map-gold); font-size: 24px;">apartment</span>
                             @endif
+                            <div style="overflow: hidden;">
+                                <strong style="display: block; font-size: 13px; color: var(--nx-map-text); white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">{{ $organization->name }}</strong>
+                                <span style="font-size: 11px; color: var(--nx-map-muted);">{{ $user->name ?? 'User' }}</span>
+                            </div>
                         </div>
-                    </a>
-                    @endforeach
+
+                        <!-- Menu Actions -->
+                        @if(empty($user->is_guest))
+                        <a href="{{ route('dashboard') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #F9F4EE; font-size: 12px; font-weight: 600; transition: background 0.15s ease;">
+                            <span class="material-symbols-rounded" style="font-size: 18px; color: var(--nx-map-gold);">dashboard</span>
+                            <span>{{ __('Dashboard (لوحة التحكم)') }}</span>
+                        </a>
+                        @endif
+
+                        @if(session('superadmin_impersonator_id'))
+                        <form method="POST" action="{{ route('impersonate.leave') }}" style="margin: 0;">
+                            @csrf
+                            <button type="submit" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #93C5FD; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                                <span class="material-symbols-rounded" style="font-size: 18px;">shield</span>
+                                <span>{{ __('Return to Super Admin (الرجوع للمشرف العام)') }}</span>
+                            </button>
+                        </form>
+                        @endif
+
+                        @if(!empty($user) && in_array($user->role ?? 'member', ['superadmin', 'company_admin', 'manager']))
+                        <a href="{{ route('editor') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #86EFAC; font-size: 12px; font-weight: 600;">
+                            <span class="material-symbols-rounded" style="font-size: 18px;">draw</span>
+                            <span>{{ __('Map Editor (محرر الخريطة)') }}</span>
+                        </a>
+                        @endif
+
+                        <button type="button" onclick="openDiagnosticsModal(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #F9F4EE; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                            <span class="material-symbols-rounded" style="font-size: 18px;">network_check</span>
+                            <span>{{ __('Diagnostics (فحص جودة الاتصال)') }}</span>
+                        </button>
+
+                        <button type="button" onclick="toggleChatDrawer(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #F9F4EE; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                            <span class="material-symbols-rounded" style="font-size: 18px;">chat</span>
+                            <span>{{ __('Chat & Notes (المحادثة والملاحظات)') }}</span>
+                        </button>
+
+                        <button type="button" onclick="toggleAppTheme(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #F9F4EE; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                            <span class="material-symbols-rounded" style="font-size: 18px;">light_mode</span>
+                            <span>{{ __('Toggle Theme (المظهر الداكن/الفاتح)') }}</span>
+                        </button>
+
+                        @if(app()->getLocale() === 'ar')
+                            <a href="{{ route('lang.switch', 'en') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #F9F4EE; font-size: 12px; font-weight: 600;">
+                                <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
+                                <span>English (EN)</span>
+                            </a>
+                        @else
+                            <a href="{{ route('lang.switch', 'ar') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #F9F4EE; font-size: 12px; font-weight: 600;">
+                                <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
+                                <span>العربية (AR)</span>
+                            </a>
+                        @endif
+                    </div>
                 </div>
-            </div>
-            @endif
 
-            <div class="nx-brand-capsule">
-                <span class="nx-presence-dot"></span>
-                @if(!empty($organization->logo_url))
-                    <img src="{{ $organization->logo_url }}" alt="{{ $organization->name }}" style="height: 18px; width: auto; object-fit: contain;">
-                @elseif(!empty($organization->settings?->logo_url))
-                    <img src="{{ $organization->settings->logo_url }}" alt="{{ $organization->name }}" style="height: 18px; width: auto; object-fit: contain;">
-                @else
-                    <span class="material-symbols-rounded" style="color: var(--nx-map-gold); font-size: 18px;">apartment</span>
+                <!-- Brand Capsule with Logo -->
+                <div class="nx-brand-capsule" onclick="toggleOfficeMainMenu(event)" style="cursor: pointer;" title="{{ __('Click to open menu') }}">
+                    <span class="nx-presence-dot"></span>
+                    @if(!empty($organization->logo_url))
+                        <img src="{{ $organization->logo_url }}" alt="{{ $organization->name }}" style="height: 18px; width: auto; object-fit: contain;">
+                    @elseif(!empty($organization->settings?->logo_url))
+                        <img src="{{ $organization->settings->logo_url }}" alt="{{ $organization->name }}" style="height: 18px; width: auto; object-fit: contain;">
+                    @else
+                        <span class="material-symbols-rounded" style="color: var(--nx-map-gold); font-size: 18px;">apartment</span>
+                    @endif
+                    <span>{{ $organization->name }}</span>
+                </div>
+
+                <!-- Branch / Floor Switcher Button -->
+                @if(isset($userAllowedOffices) && $userAllowedOffices->count() > 1 && empty($user->is_guest))
+                <div style="position: relative; display: inline-block;">
+                    <button type="button" onclick="toggleOfficeDropdown(event)" class="nx-toolbar-btn" style="color: var(--nx-map-gold); border-color: rgba(211, 165, 83, 0.35); font-weight: 600;" title="{{ __('Switch Office Branch (تغيير الفرع)') }}">
+                        <span class="material-symbols-rounded" style="font-size: 18px;">domain</span>
+                        <span>{{ $floor->name }}</span>
+                        <span class="material-symbols-rounded" style="font-size: 16px;">arrow_drop_down</span>
+                    </button>
+                    <div id="office-switcher-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); inset-inline-start: 0; min-width: 250px; background: rgba(14, 25, 19, 0.98); backdrop-filter: blur(18px); border: 1px solid rgba(237, 230, 217, 0.20); border-radius: 14px; box-shadow: 0 16px 36px rgba(0,0,0,0.65); padding: 6px; z-index: 100000;">
+                        <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 4px;">
+                            🏢 {{ __('Office Branches (فروع الشركة)') }}
+                        </div>
+                        @foreach($userAllowedOffices as $off)
+                        @php
+                            $offMap = $off->activeMap ?: $off->maps->first();
+                            $offMapId = $offMap ? $offMap->id : '';
+                        @endphp
+                        <a href="{{ route('office', ['office' => $off->id]) }}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: {{ $off->id === $floor->id ? '#86EFAC' : '#E2E8F0' }}; background: {{ $off->id === $floor->id ? 'rgba(36, 92, 58, 0.45)' : 'transparent' }}; font-weight: 700; font-size: 12px; transition: background 0.15s ease;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="material-symbols-rounded" style="font-size: 16px;">apartment</span>
+                                <span>{{ $off->name }}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <span class="branch-occupants-badge" data-map-id="{{ $offMapId }}" style="font-size: 10px; padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.05); color: #94A3B8; font-weight: 700;">
+                                    <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: {{ $off->id === $floor->id ? '#10B981' : '#64748B' }}; margin-inline-end: 4px;"></span>
+                                    {{ $off->id === $floor->id ? __('Current') : __('0 active') }}
+                                </span>
+                                @if($off->id === $floor->id)
+                                    <span style="font-size: 10px; color: #86EFAC;">●</span>
+                                @endif
+                            </div>
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
                 @endif
-                <span>{{ $organization->name }}</span>
+
+                @if(!empty($user->is_guest))
+                    <span class="nx-toolbar-btn btn-accent" style="font-weight: 700;">
+                        🛡️ GUEST ACCESS ({{ $user->name }})
+                    </span>
+                @endif
             </div>
 
-            @if(!empty($user->is_guest))
-                <span class="nx-toolbar-btn btn-accent" style="font-weight: 700;">
-                    🛡️ GUEST ACCESS ({{ $user->name }})
+            <!-- 2. Center: Active Room Scrim Capsule (Room Name, Room Files, Door Lock) -->
+            <div class="nx-map-room-label" id="room-status-pill" style="display: none;">
+                <span id="current-room-name" style="font-weight: 600; font-size: 12px; color: #86EFAC; display: flex; align-items: center; gap: 6px;">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">meeting_room</span>
+                    <span>{{ __('غرفة الاجتماعات') }}</span>
                 </span>
-            @endif
-        </div>
+                
+                <button onclick="openRoomFilesModal()" id="btn-room-files" class="nx-toolbar-btn" style="height: 28px; padding: 2px 10px; font-size: 11px;">
+                    <span class="material-symbols-rounded" style="font-size: 15px;">folder_open</span>
+                    <span>{{ __('ملفات الغرفة') }}</span>
+                </button>
 
-        @if(!empty($branchWarning))
-            <div id="guest-branch-warning-banner" style="position: absolute; top: 65px; left: 50%; transform: translateX(-50%); background: rgba(214, 162, 58, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 20px; padding: 8px 18px; color: #1E1B18; font-size: 12px; font-weight: 800; box-shadow: 0 10px 25px rgba(0,0,0,0.4); z-index: 99999; display: flex; align-items: center; gap: 8px; max-width: 90vw; pointer-events: auto;">
-                <span>⚠️</span>
-                <span>{{ $branchWarning }}</span>
-                <button onclick="document.getElementById('guest-branch-warning-banner').remove()" style="background: none; border: none; font-size: 14px; font-weight: 900; cursor: pointer; color: #1E1B18; margin-inline-start: 6px;">✕</button>
+                @if(empty($user->is_guest))
+                <button onclick="toggleRoomDoorLock()" id="btn-lock-room" class="nx-toolbar-btn" style="height: 28px; padding: 2px 10px; font-size: 11px;">
+                    <span id="lock-icon" class="material-symbols-rounded" style="font-size: 15px;">lock_open</span>
+                    <span id="lock-text">{{ __('قفل الباب') }}</span>
+                </button>
+                @endif
             </div>
-        @endif
 
-        <!-- Active Room Label Scrim Capsule -->
-        <div class="nx-map-room-label" id="room-status-pill" style="display: none;">
-            <span id="current-room-name" style="font-weight: 600; font-size: 12px; color: #86EFAC; display: flex; align-items: center; gap: 6px;">
-                <span class="material-symbols-rounded" style="font-size: 18px;">meeting_room</span>
-                <span>{{ __('غرفة الاجتماعات') }}</span>
-            </span>
-            
-            <button onclick="openRoomFilesModal()" id="btn-room-files" class="nx-toolbar-btn" style="height: 28px; padding: 2px 10px; font-size: 11px;">
-                <span class="material-symbols-rounded" style="font-size: 15px;">folder_open</span>
-                <span>{{ __('ملفات الغرفة') }}</span>
-            </button>
+            <!-- 3. End Group (Top Left on RTL): Workhour Clock + Presence + Invite -->
+            <div class="nx-toolbar-group">
+                <!-- Live Office Attendance Timer -->
+                @if(empty($user->is_guest))
+                <div id="office-attendance-timer-pill" class="nx-toolbar-btn" style="background: rgba(60, 107, 76, 0.25); border-color: rgba(60, 107, 76, 0.5); color: #86EFAC; font-weight: 600; cursor: pointer;" onclick="openMyTaskDrawer()" title="{{ __('Your active time in the virtual office today (ساعات تواجدك بالعمل اليوم)') }}">
+                    <span class="nx-presence-dot"></span>
+                    <span class="material-symbols-rounded" style="font-size: 16px;">schedule</span>
+                    <span id="office-attendance-clock" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">00:00:00</span>
+                </div>
+                @endif
 
-            @if(empty($user->is_guest))
-            <button onclick="toggleRoomDoorLock()" id="btn-lock-room" class="nx-toolbar-btn" style="height: 28px; padding: 2px 10px; font-size: 11px;">
-                <span id="lock-icon" class="material-symbols-rounded" style="font-size: 15px;">lock_open</span>
-                <span id="lock-text">{{ __('قفل الباب') }}</span>
-            </button>
-            @endif
-        </div>
+                <button onclick="openOccupantsModal()" class="nx-presence-capsule" id="btn-occupants-pill" title="{{ __('المتواجدون في المكتب') }}" style="cursor: pointer; border: 1px solid rgba(60, 107, 76, 0.4);">
+                    <span class="nx-presence-dot"></span>
+                    <span class="material-symbols-rounded" style="font-size: 16px;">group</span>
+                    <span id="occupants-counter">1 {{ __('متصل الآن') }}</span>
+                </button>
 
-        <div class="nx-toolbar-group">
-            <!-- Live Office Attendance Timer -->
-            @if(empty($user->is_guest))
-            <div id="office-attendance-timer-pill" class="nx-toolbar-btn" style="background: rgba(60, 107, 76, 0.25); border-color: rgba(60, 107, 76, 0.5); color: #86EFAC; font-weight: 600; cursor: pointer;" onclick="openMyTaskDrawer()" title="{{ __('Your active time in the virtual office today (ساعات تواجدك بالعمل اليوم)') }}">
-                <span class="nx-presence-dot"></span>
-                <span class="material-symbols-rounded" style="font-size: 16px;">schedule</span>
-                <span id="office-attendance-clock" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">00:00:00</span>
+                <button onclick="openGuestInviteModal()" class="nx-toolbar-btn btn-accent" title="{{ __('دعوة ضيف خارجي للمكتب') }}">
+                    <span class="material-symbols-rounded" style="font-size: 16px;">person_add</span>
+                    <span>{{ __('دعوة') }}</span>
+                </button>
             </div>
-            @endif
-
-            <button onclick="openOccupantsModal()" class="nx-presence-capsule" id="btn-occupants-pill" title="{{ __('المتواجدون في المكتب') }}" style="cursor: pointer; border: 1px solid rgba(60, 107, 76, 0.4);">
-                <span class="nx-presence-dot"></span>
-                <span class="material-symbols-rounded" style="font-size: 16px;">group</span>
-                <span id="occupants-counter">1 {{ __('متصل الآن') }}</span>
-            </button>
-
-            <button onclick="openDiagnosticsModal()" class="nx-toolbar-btn" id="btn-webrtc-quality-pill" title="{{ __('جودة الاتصال بالسيرفر') }}">
-                <span id="webrtc-quality-dot" class="nx-presence-dot" style="background: #10B981; box-shadow: 0 0 8px #10B981;"></span>
-                <span id="webrtc-quality-text">{{ __('ممتاز') }}</span>
-            </button>
-
-            <button onclick="toggleChatDrawer()" class="nx-toolbar-btn" title="{{ __('المحادثة والمستندات') }}">
-                <span class="material-symbols-rounded" style="font-size: 18px;">chat</span>
-                <span>{{ __('المحادثة') }}</span>
-            </button>
-
-            <button onclick="toggleAppTheme()" class="nx-toolbar-btn" style="padding: 6px 10px;" title="{{ __('تغيير مظهر الشاشة') }}">
-                <span id="theme-icon" class="material-symbols-rounded" style="font-size: 18px;">light_mode</span>
-            </button>
-
-            @if(app()->getLocale() === 'ar')
-                <a href="{{ route('lang.switch', 'en') }}" class="nx-toolbar-btn" style="padding: 6px 10px;" title="English">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">language</span> EN
-                </a>
-            @else
-                <a href="{{ route('lang.switch', 'ar') }}" class="nx-toolbar-btn" style="padding: 6px 10px;" title="العربية">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">language</span> عربي
-                </a>
-            @endif
-
-            @if(!empty($user) && in_array($user->role ?? 'member', ['superadmin', 'company_admin', 'manager']))
-                <a href="{{ route('editor') }}" class="nx-toolbar-btn btn-accent" style="font-weight: 600;">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">draw</span> {{ __('محرر الخريطة') }}
-                </a>
-            @endif
-        </div>
-    </header>
+        </header>
 
     <!-- ── Interactive Canvas Viewport ── -->
     <div class="canvas-container" id="canvas-container">
@@ -5665,13 +5692,46 @@
             setTimeout(() => { t.style.display = 'none'; }, 3200);
         }
 
-        function toggleOfficeDropdown(e) {
-            e.stopPropagation();
-            const dd = document.getElementById('office-switcher-dropdown');
-            if (dd) {
-                dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+        function toggleOfficeMainMenu(e) {
+            if (e) e.stopPropagation();
+            const menu = document.getElementById('office-main-menu-dropdown');
+            const branchDD = document.getElementById('office-switcher-dropdown');
+            if (branchDD) branchDD.style.display = 'none';
+            if (menu) {
+                menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
             }
         }
+
+        function closeOfficeMainMenu() {
+            const menu = document.getElementById('office-main-menu-dropdown');
+            if (menu) menu.style.display = 'none';
+        }
+
+        function toggleOfficeDropdown(e) {
+            if (e) e.stopPropagation();
+            const menu = document.getElementById('office-main-menu-dropdown');
+            if (menu) menu.style.display = 'none';
+            const dd = document.getElementById('office-switcher-dropdown');
+            if (dd) {
+                dd.style.display = (dd.style.display === 'none' || dd.style.display === '') ? 'block' : 'none';
+            }
+        }
+
+        // Close dropdowns on outside click
+        window.addEventListener('click', function(e) {
+            const menu = document.getElementById('office-main-menu-dropdown');
+            if (menu && menu.style.display === 'block') {
+                if (!e.target.closest('#office-main-menu-dropdown') && !e.target.closest('button[onclick*="toggleOfficeMainMenu"]') && !e.target.closest('.nx-brand-capsule')) {
+                    menu.style.display = 'none';
+                }
+            }
+            const branchDD = document.getElementById('office-switcher-dropdown');
+            if (branchDD && branchDD.style.display === 'block') {
+                if (!e.target.closest('#office-switcher-dropdown') && !e.target.closest('button[onclick*="toggleOfficeDropdown"]')) {
+                    branchDD.style.display = 'none';
+                }
+            }
+        });
 
         // ══════════════════════════════════════════════════════════════════════
         // ⏱️ TIME & ATTENDANCE, IN-OFFICE TASK TRACKING & SMART IDLE DETECTOR
@@ -5705,8 +5765,8 @@
                 });
                 if (res.ok) {
                     const data = await res.json();
-                    if (typeof data.today_total_seconds === 'number') {
-                        officeAttendanceTotalSeconds = data.today_total_seconds;
+                    if (data && typeof data.today_total_seconds !== 'undefined') {
+                        officeAttendanceTotalSeconds = Math.floor(Number(data.today_total_seconds) || 0);
                     }
                 }
             } catch(e) {}
@@ -5719,11 +5779,12 @@
             
             function tick() {
                 if (!isOfficePresencePaused) {
-                    officeAttendanceTotalSeconds++;
+                    officeAttendanceTotalSeconds = Math.floor(officeAttendanceTotalSeconds) + 1;
                     if (clockEl) {
-                        const hrs = String(Math.floor(officeAttendanceTotalSeconds / 3600)).padStart(2, '0');
-                        const mins = String(Math.floor((officeAttendanceTotalSeconds % 3600) / 60)).padStart(2, '0');
-                        const secs = String(officeAttendanceTotalSeconds % 60).padStart(2, '0');
+                        const totalSecs = Math.floor(officeAttendanceTotalSeconds);
+                        const hrs = String(Math.floor(totalSecs / 3600)).padStart(2, '0');
+                        const mins = String(Math.floor((totalSecs % 3600) / 60)).padStart(2, '0');
+                        const secs = String(totalSecs % 60).padStart(2, '0');
                         clockEl.textContent = `${hrs}:${mins}:${secs}`;
                     }
                 }
