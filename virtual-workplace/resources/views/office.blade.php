@@ -1293,6 +1293,12 @@
                 blueprintLoaded = false;
                 resizeCanvas();
             };
+            if (BLUEPRINT_IMAGE.complete && BLUEPRINT_IMAGE.naturalWidth > 0) {
+                blueprintLoaded = true;
+                MAP_WIDTH_PX = BLUEPRINT_IMAGE.naturalWidth;
+                MAP_HEIGHT_PX = BLUEPRINT_IMAGE.naturalHeight;
+                resizeCanvas();
+            }
         }
 
         // ── LiveKit SFU Real-Time Media ──
@@ -2466,6 +2472,14 @@
         }
 
         function draw() {
+            if (container && container.clientWidth > 0 && container.clientHeight > 0) {
+                if (canvas.width !== container.clientWidth || canvas.height !== container.clientHeight) {
+                    width = canvas.width = container.clientWidth;
+                    height = canvas.height = container.clientHeight;
+                    centerCamera();
+                }
+            }
+
             update();
 
             ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -2576,8 +2590,8 @@
 
                 // B. Solid Physical Perimeter Walls (3D Beveled Architectural Outline)
                 ctx.save();
-                ctx.lineWidth = 4;
-                ctx.strokeStyle = isLocked ? 'rgba(239, 68, 68, 0.85)' : 'rgba(30, 58, 45, 0.95)';
+                ctx.lineWidth = hasBlueprint ? 2 : 3.5;
+                ctx.strokeStyle = isLocked ? 'rgba(239, 68, 68, 0.85)' : (hasBlueprint ? 'rgba(45, 106, 79, 0.70)' : 'rgba(30, 58, 45, 0.95)');
                 ctx.fillStyle = isLocked ? '#7F1D1D' : '#14281E';
 
                 // Draw Top Wall
@@ -2719,8 +2733,8 @@
                 const arWidth = ctx.measureText(arName).width;
                 ctx.font = '400 9px "IBM Plex Sans", sans-serif';
                 const enWidth = enName ? ctx.measureText(enName).width : 0;
-                const badgeW = Math.max(arWidth, enWidth, 80) + 24;
-                const badgeH = enName ? 34 : 22;
+                const badgeW = Math.min(rw - 4, Math.max(arWidth, enWidth, 60) + 20);
+                const badgeH = (enName && rh > 50) ? 34 : 22;
                 const badgeX = rx + (rw / 2) - (badgeW / 2);
                 const badgeY = ry + 8;
 
@@ -3059,6 +3073,9 @@
                     speechBubbles.delete(av.id);
                 }
             }
+
+            ctx.restore();
+            requestAnimationFrame(draw);
         }
 
         // ── WebSocket Realtime Connection & Presence Protocol ──
