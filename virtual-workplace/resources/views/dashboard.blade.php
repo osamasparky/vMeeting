@@ -6,151 +6,162 @@
     <title>{{ $organization->name }} — Workspace Admin Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/ulaspace-tokens.css') }}">
     <link rel="stylesheet" href="{{ asset('css/modern-design-system.css') }}">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" nonce="{{ $cspNonce ?? '' }}"></script>
     <style>
+        /* ═══════════════════════════════════════════════════════════════
+           ULASPACE DESIGN SYSTEM — WORKSPACE DASHBOARD
+           ═══════════════════════════════════════════════════════════════ */
         :root {
-            /* 🌿 Virtual Workplace — 3D Spatial + Soft Neumorphic Green Palette */
-            --bg-primary: #F5F3E8;          /* Warm Ivory Background Canvas */
-            --bg-secondary: #FFFDF6;        /* Creamy Elevated Sidebar / Navigation */
-            --bg-surface: #FFFDF6;          /* Primary Surface */
-            --bg-surface-subtle: #E8EFE2;   /* Soft Sage Secondary Inset Surface */
-            --bg-card: #FFFDF6;             /* Card Surface */
-            --bg-elevated: #E8EFE2;         /* Raised & Tag Containers */
-            --bg-glass: rgba(255, 253, 246, 0.92);
+            /* Light Theme (Warm Ivory & Forest Green Baseline) */
+            --bg-primary: var(--nx-bg-page, #F9F4EE);
+            --bg-secondary: var(--nx-bg-surface, #FFFFFF);
+            --bg-surface: var(--nx-bg-surface, #FFFFFF);
+            --bg-surface-subtle: var(--nx-sand-200, #F4EDE1);
+            --bg-card: var(--nx-bg-card, #FFFFFF);
+            --bg-elevated: var(--nx-bg-surface-elevated, #FFFFFF);
+            --bg-glass: rgba(255, 255, 255, 0.92);
 
             /* Core Green Identity */
-            --brand-forest: #245C3A;        /* Primary Forest Green */
-            --brand-workspace: #3F7D4F;     /* Mid Workspace Green */
-            --brand-sage: #719B73;          /* Sage Accent */
-            --brand-soft-sage: #BFD4B8;     /* Soft Sage Highlight */
-            --brand-primary: #245C3A;
-            --brand-secondary: #3F7D4F;
-            --brand-teal: #245C3A;
-            --brand-pine: #3F7D4F;
-            --brand-ocean: #245C3A;
-            --brand-navy: #26352A;
-            --brand-green: #3F7D4F;
+            --brand-forest: var(--nx-palm-900, #142B24);
+            --brand-workspace: var(--nx-palm-700, #1B3223);
+            --brand-sage: var(--nx-palm-500, #1E412F);
+            --brand-soft-sage: #BFD4B8;
+            --brand-primary: var(--nx-palm-900, #142B24);
+            --brand-secondary: var(--nx-palm-700, #1B3223);
+            --brand-teal: var(--nx-palm-900, #142B24);
+            --brand-pine: var(--nx-palm-700, #1B3223);
+            --brand-ocean: var(--nx-palm-900, #142B24);
+            --brand-navy: var(--nx-palm-950, #0B1410);
+            --brand-green: var(--nx-palm-300, #3C6B4C);
             --brand-lime: #719B73;
-            --brand-gold: #D6A23A;
-            --brand-orange: #D6A23A;
+            --brand-gold: var(--nx-gold-400, #D3A553);
+            --brand-orange: #b46c34;
             --brand-coral: #D96B5F;
             --brand-crimson: #D96B5F;
 
             /* Gradients & Accents */
-            --accent-primary: #245C3A;
-            --accent-gradient: linear-gradient(180deg, #2D6C45 0%, #245C3A 100%);
-            --accent-green: #3F7D4F;
-            --accent-amber: #D6A23A;
+            --accent-primary: var(--nx-palm-900, #142B24);
+            --accent-gradient: linear-gradient(135deg, #142B24 0%, #1E412F 100%);
+            --accent-green: var(--nx-palm-300, #3C6B4C);
+            --accent-amber: var(--nx-gold-400, #D3A553);
 
             /* Typography Colors */
-            --text-primary: #26352A;        /* Deep Forest Charcoal */
-            --text-secondary: #66756A;      /* Calm Sage Slate */
-            --text-muted: #8B9B8F;          /* Subtle Gray-Green */
-            --text-dim: #9FAEA3;
+            --text-primary: var(--nx-text-primary, #142B24);
+            --text-secondary: var(--nx-text-secondary, #5A6B63);
+            --text-muted: var(--nx-text-muted, #8E9D95);
+            --text-dim: var(--nx-sand-500, #C1B6A6);
 
             /* Borders */
-            --border-color: #D5DED0;        /* Soft Organic Border */
-            --border-panel: #D5DED0;
-            --border-focus: #245C3A;
+            --border-color: var(--nx-border-subtle, rgba(27, 50, 35, 0.08));
+            --border-panel: var(--nx-border-subtle, rgba(27, 50, 35, 0.08));
+            --border-focus: var(--nx-palm-900, #142B24);
 
             /* Status */
-            --status-success: #4F9B5F;
-            --status-warning: #D6A23A;
-            --status-danger: #D96B5F;
-            --status-info: #6E9E9A;
+            --status-success: var(--nx-status-live, #3C6B4C);
+            --status-warning: var(--nx-status-scheduled, #D3A553);
+            --status-danger: var(--nx-status-attention, #9A5827);
+            --status-info: var(--nx-palm-900, #142B24);
 
-            /* 3D Soft Neumorphic Shadows & Elevation (Deepened & Tactile) */
-            --radius-sm: 10px;
-            --radius-md: 14px;
-            --radius-lg: 20px;
-            --radius-xl: 24px;
+            /* Shadows & Elevation */
+            --radius-xs: 6px;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
             --radius-full: 9999px;
 
-            --shadow-card: 0 14px 34px rgba(32, 64, 42, 0.08), 0 3px 8px rgba(32, 64, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95);
-            --shadow-hover: 0 20px 44px rgba(32, 64, 42, 0.14), 0 6px 14px rgba(32, 64, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 1);
-            --shadow-soft-3d: 5px 5px 12px rgba(32, 64, 42, 0.07), -4px -4px 10px rgba(255, 255, 255, 0.95);
-            --shadow-inset-3d: inset 2px 2px 6px rgba(32, 64, 42, 0.07), inset -2px -2px 6px rgba(255, 255, 255, 0.95);
-            --shadow-tactile-btn: 0 6px 18px rgba(36, 92, 58, 0.32), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.45);
-            --shadow-kpi-icon: 0 8px 18px rgba(36, 92, 58, 0.32), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.55), inset 0 -2px 4px rgba(0, 0, 0, 0.2);
+            --shadow-card: var(--nx-shadow-sm, 0 2px 8px -2px rgba(27, 50, 35, 0.10));
+            --shadow-hover: var(--nx-shadow-md, 0 8px 24px -8px rgba(27, 50, 35, 0.14));
+            --shadow-soft-3d: 0 1px 3px rgba(27, 50, 35, 0.08);
+            --shadow-inset-3d: inset 0 1px 2px rgba(27, 50, 35, 0.05);
+            --shadow-tactile-btn: var(--nx-shadow-sm);
+            --shadow-kpi-icon: var(--nx-shadow-sm);
 
-            --font-family: 'Cairo', 'Inter', sans-serif;
+            --font-family: var(--nx-font-family);
         }
 
-        [data-theme="light"] {
-            --bg-primary: #F5F3E8;
-            --bg-secondary: #FFFDF6;
-            --bg-surface: #FFFDF6;
-            --bg-surface-subtle: #E8EFE2;
-            --bg-card: #FFFDF6;
-            --bg-elevated: #E8EFE2;
-            --border-color: #D5DED0;
-            --text-primary: #26352A;
-            --text-secondary: #66756A;
-            --text-muted: #8B9B8F;
-            --brand-forest: #245C3A;
-            --brand-workspace: #3F7D4F;
-            --brand-sage: #719B73;
+        [dir="rtl"], [lang="ar"] {
+            --font-family: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
-        /* 🌌 Dark Spatial Workspace Theme Tokens */
+        [dir="ltr"], [lang="en"] {
+            --font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        /* ── Tabs Visibility Enforcement ── */
+        .tab-view {
+            display: none !important;
+        }
+        .tab-view.active {
+            display: block !important;
+            animation: tabViewFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes tabViewFadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 🌌 Dark Theme Tokens */
         [data-theme="dark"], html.dark, body.dark-mode {
-            --bg-primary: #07100C;          /* Deep Green-Black Canvas */
-            --bg-secondary: #0B1510;        /* Secondary Dark Surface / Sidebar */
-            --bg-surface: #101C15;          /* Primary Surface Cards */
-            --bg-surface-subtle: #15251B;   /* Dark Inset Surface & Badges */
-            --bg-card: #101C15;             /* Card Surface */
-            --bg-elevated: #15251B;         /* Raised Containers & Widgets */
-            --bg-glass: rgba(16, 28, 21, 0.94);
+            --bg-primary: var(--nx-palm-950, #0B1410);
+            --bg-secondary: var(--nx-palm-900, #142B24);
+            --bg-surface: var(--nx-palm-900, #142B24);
+            --bg-surface-subtle: #17221F;
+            --bg-card: var(--nx-palm-900, #142B24);
+            --bg-elevated: var(--nx-palm-700, #1B3223);
+            --bg-glass: rgba(20, 43, 36, 0.94);
 
             /* Core Green Accents */
-            --brand-forest: #4F9B5F;        /* Primary Green */
-            --brand-workspace: #3F7D4F;     /* Mid Workspace Green */
-            --brand-sage: #7BC47F;          /* Bright Green Highlight */
-            --brand-soft-sage: #719B73;     /* Soft Green */
-            --brand-primary: #4F9B5F;
-            --brand-secondary: #3F7D4F;
-            --brand-teal: #4F9B5F;
-            --brand-pine: #3F7D4F;
-            --brand-ocean: #4F9B5F;
-            --brand-navy: #F1F5EF;
-            --brand-green: #4F9B5F;
+            --brand-forest: var(--nx-palm-300, #4EA66F);
+            --brand-workspace: var(--nx-palm-500, #1E412F);
+            --brand-sage: var(--nx-palm-300, #4EA66F);
+            --brand-soft-sage: #719B73;
+            --brand-primary: var(--nx-palm-300, #4EA66F);
+            --brand-secondary: var(--nx-palm-500, #1E412F);
+            --brand-teal: var(--nx-palm-300, #4EA66F);
+            --brand-pine: var(--nx-palm-500, #1E412F);
+            --brand-ocean: var(--nx-palm-300, #4EA66F);
+            --brand-navy: var(--nx-sand-100, #F9F4EE);
+            --brand-green: var(--nx-palm-300, #4EA66F);
             --brand-lime: #7BC47F;
-            --brand-gold: #D6A23A;
-            --brand-orange: #D6A23A;
+            --brand-gold: var(--nx-gold-400, #E5B765);
+            --brand-orange: #e5b765;
             --brand-coral: #D96B5F;
             --brand-crimson: #D96B5F;
 
             /* Gradients & Accents */
-            --accent-primary: #3F7D4F;
-            --accent-gradient: linear-gradient(180deg, #4F9B5F 0%, #3F7D4F 100%);
-            --accent-green: #4F9B5F;
-            --accent-amber: #D6A23A;
+            --accent-primary: var(--nx-palm-500, #1E412F);
+            --accent-gradient: linear-gradient(135deg, #1E412F 0%, #3C6B4C 100%);
+            --accent-green: var(--nx-palm-300, #4EA66F);
+            --accent-amber: #E5B765;
 
             /* Typography Colors */
-            --text-primary: #F1F5EF;        /* High-Contrast Off-White */
-            --text-secondary: #9AA99D;      /* Calm Sage Slate */
-            --text-muted: #718077;          /* Muted Gray-Green */
-            --text-dim: #5C6A61;
+            --text-primary: var(--nx-sand-100, #F9F4EE);
+            --text-secondary: var(--nx-sand-400, #E3D2BB);
+            --text-muted: var(--nx-text-muted, #A4B5AD);
+            --text-dim: #63756D;
 
             /* Borders */
-            --border-color: #26382B;        /* Controlled Dark Border */
-            --border-panel: #26382B;
-            --border-focus: #4F9B5F;
+            --border-color: var(--nx-border-subtle, rgba(237, 230, 217, 0.12));
+            --border-panel: var(--nx-border-subtle, rgba(237, 230, 217, 0.12));
+            --border-focus: var(--nx-palm-300, #4EA66F);
 
             /* Status */
-            --status-success: #5FAE68;
-            --status-warning: #D6A23A;
-            --status-danger: #D96B5F;
-            --status-info: #6E9E9A;
+            --status-success: var(--nx-status-live, #4EA66F);
+            --status-warning: var(--nx-status-scheduled, #E5B765);
+            --status-danger: var(--nx-status-attention, #C9743A);
+            --status-info: var(--nx-palm-300, #4EA66F);
 
-            /* 3D Soft Neumorphic Shadows for Dark Mode */
-            --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.2);
-            --shadow-hover: 0 16px 36px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(79, 155, 95, 0.08);
-            --shadow-soft-3d: 3px 3px 8px rgba(0, 0, 0, 0.35), -2px -2px 6px rgba(255, 255, 255, 0.02);
-            --shadow-inset-3d: inset 2px 2px 6px rgba(0, 0, 0, 0.35), inset -1px -1px 3px rgba(255, 255, 255, 0.02);
-            --shadow-tactile-btn: 0 4px 14px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+            /* Shadows */
+            --shadow-card: 0 2px 8px -2px rgba(0, 0, 0, 0.40);
+            --shadow-hover: 0 8px 24px -8px rgba(0, 0, 0, 0.50);
+            --shadow-soft-3d: 0 1px 3px rgba(0, 0, 0, 0.3);
+            --shadow-inset-3d: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+            --shadow-tactile-btn: 0 2px 8px -2px rgba(0, 0, 0, 0.40);
         }
 
         /* Dark Mode specific component refinements */
