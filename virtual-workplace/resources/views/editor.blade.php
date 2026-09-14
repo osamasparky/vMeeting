@@ -961,6 +961,9 @@
                 <div class="drawer-tab active" id="tab-btn-furniture" onclick="switchDrawerTab('furniture')">
                     {{ __('3D Furniture') }}
                 </div>
+                <div class="drawer-tab" id="tab-btn-floors" onclick="switchDrawerTab('floors')">
+                    🎨 {{ __('Floor Styles') }}
+                </div>
                 <div class="drawer-tab" id="tab-btn-inspector" onclick="switchDrawerTab('inspector')">
                     {{ __('Selected Item') }}
                 </div>
@@ -1398,6 +1401,31 @@
                     <div id="rooms-list-container" style="display: flex; flex-direction: column; gap: 8px;"></div>
                 </div>
 
+                <!-- 4. FLOORS & BACKGROUNDS TAB -->
+                <div id="drawer-view-floors" style="display: none; flex-direction: column; gap: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 12px; font-weight: 800; color: #A7F3D0;">🎨 {{ __('18 Floor Styles (2400×1200)') }}</span>
+                        <label class="tool-btn" style="cursor: pointer; margin: 0; font-size: 11px;">
+                            📤 {{ __('Upload Custom') }}
+                            <input type="file" accept="image/*" style="display:none;" onchange="handleCustomFloorUpload(this)">
+                        </label>
+                    </div>
+
+                    <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+                        {{ __('اختر نمط الأرضية لتطبيقه فوراً كخلفية للمكتب بمقاس 2400×1200 بكسل:') }}
+                    </div>
+
+                    <div id="floors-catalog-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-height: calc(100vh - 280px); overflow-y: auto; padding-right: 4px;">
+                        <!-- Injected via JavaScript -->
+                    </div>
+
+                    <div style="padding-top: 8px; border-top: 1px solid var(--border-panel); display: flex; justify-content: space-between; align-items: center;">
+                        <button type="button" class="tool-btn" onclick="clearCurrentFloorBackground()" style="color: #F87171; border-color: rgba(239,68,68,0.3); font-size: 11px;">
+                            🗑️ {{ __('Remove Floor Background (إزالة الخلفية)') }}
+                        </button>
+                    </div>
+                </div>
+
             </div>
         </aside>
     </div> <!-- .editor-workspace -->
@@ -1481,11 +1509,13 @@
             if (!canvas || !container) return;
             width = canvas.width = container.clientWidth;
             height = canvas.height = container.clientHeight;
-            const scaleX = (width - 40) / MAP_WIDTH_PX;
-            const scaleY = (height - 40) / MAP_HEIGHT_PX;
-            zoomLevel = Math.min(1.0, Math.max(0.2, Math.min(scaleX, scaleY)));
-            panOffset.x = (width - MAP_WIDTH_PX * zoomLevel) / 2;
-            panOffset.y = (height - MAP_HEIGHT_PX * zoomLevel) / 2;
+            const scaleX = (width - 48) / MAP_WIDTH_PX;
+            const scaleY = (height - 48) / MAP_HEIGHT_PX;
+            // Scale dynamically to fill viewport comfortably
+            zoomLevel = Math.max(0.15, Math.min(3.0, Math.min(scaleX, scaleY)));
+            panOffset.x = Math.round((width - MAP_WIDTH_PX * zoomLevel) / 2);
+            panOffset.y = Math.round((height - MAP_HEIGHT_PX * zoomLevel) / 2);
+            if (typeof draw === 'function') draw();
         }
 
         // ── Resize Engine ──
@@ -1498,7 +1528,7 @@
 
         // ── Background Blueprint Artwork ──
         const BLUEPRINT_IMAGE = new Image();
-        const initialBgUrl = (MAP_DATA.layout_data && MAP_DATA.layout_data.background_image_url)
+        let initialBgUrl = (MAP_DATA.layout_data && MAP_DATA.layout_data.background_image_url)
             ? MAP_DATA.layout_data.background_image_url
             : null;
         let blueprintLoaded = false;
@@ -1537,12 +1567,168 @@
             setTimeout(resizeCanvas, 320);
         }
 
+        const FLOOR_CATALOG = [
+            { id: 'floor_natural_oak', name_en: 'Natural Oak Parquet', name_ar: 'باركيه بلوط طبيعي دافئ', url: '/images/floors/floor_natural_oak.jpg', thumb: '/images/floors/thumb_floor_natural_oak.jpg' },
+            { id: 'floor_dark_walnut', name_en: 'Dark Walnut Herringbone', name_ar: 'خشب جوز داكن متعرج', url: '/images/floors/floor_dark_walnut.jpg', thumb: '/images/floors/thumb_floor_dark_walnut.jpg' },
+            { id: 'floor_light_birch', name_en: 'Scandinavian Light Birch', name_ar: 'خشب زان إسكندنافي فاتح', url: '/images/floors/floor_light_birch.jpg', thumb: '/images/floors/thumb_floor_light_birch.jpg' },
+            { id: 'floor_carrara_marble', name_en: 'Carrara White Marble', name_ar: 'رخام كرارا أبيض فاخر', url: '/images/floors/floor_carrara_marble.jpg', thumb: '/images/floors/thumb_floor_carrara_marble.jpg' },
+            { id: 'floor_nero_marquina', name_en: 'Nero Marquina Black Marble', name_ar: 'رخام أسود مذهب ملكي', url: '/images/floors/floor_nero_marquina.jpg', thumb: '/images/floors/thumb_floor_nero_marquina.jpg' },
+            { id: 'floor_industrial_concrete', name_en: 'Polished Industrial Concrete', name_ar: 'خرسانة صناعية مصقولة', url: '/images/floors/floor_industrial_concrete.jpg', thumb: '/images/floors/thumb_floor_industrial_concrete.jpg' },
+            { id: 'floor_slate_tile', name_en: 'Urban Slate Grey Stone', name_ar: 'بلاط حجري رمادي حضري', url: '/images/floors/floor_slate_tile.jpg', thumb: '/images/floors/thumb_floor_slate_tile.jpg' },
+            { id: 'floor_terrazzo', name_en: 'Italian Venetian Terrazzo', name_ar: 'تيرازو إيطالي حديث مذهب', url: '/images/floors/floor_terrazzo.jpg', thumb: '/images/floors/thumb_floor_terrazzo.jpg' },
+            { id: 'floor_chevron_timber', name_en: 'Modern Chevron Walnut', name_ar: 'أرضية خشب شيفرون مودرن', url: '/images/floors/floor_chevron_timber.jpg', thumb: '/images/floors/thumb_floor_chevron_timber.jpg' },
+            { id: 'floor_executive_carpet', name_en: 'Executive Midnight Carpet', name_ar: 'سجاد مكتبي تنفيذي كحلي', url: '/images/floors/floor_executive_carpet.jpg', thumb: '/images/floors/thumb_floor_executive_carpet.jpg' },
+            { id: 'floor_charcoal_carpet', name_en: 'Charcoal Commercial Weave', name_ar: 'موكيت رمادي فحمي مكتبي', url: '/images/floors/floor_charcoal_carpet.jpg', thumb: '/images/floors/thumb_floor_charcoal_carpet.jpg' },
+            { id: 'floor_ceramic_beige', name_en: 'Warm Ceramic Beige Tiles', name_ar: 'بلاط سيراميك بيج دافئ', url: '/images/floors/floor_ceramic_beige.jpg', thumb: '/images/floors/thumb_floor_ceramic_beige.jpg' },
+            { id: 'floor_geometric_porcelain', name_en: 'Geometric Porcelain Grid', name_ar: 'بورسلين هندسي حديث', url: '/images/floors/floor_geometric_porcelain.jpg', thumb: '/images/floors/thumb_floor_geometric_porcelain.jpg' },
+            { id: 'floor_biophilic_garden', name_en: 'Biophilic Moss & Stone Garden', name_ar: 'أرضية عشبية وحجرية بيوفيلك', url: '/images/floors/floor_biophilic_garden.jpg', thumb: '/images/floors/thumb_floor_biophilic_garden.jpg' },
+            { id: 'floor_japanese_tatami', name_en: 'Japanese Tatami & Bamboo', name_ar: 'خيزران وتاتامي ياباني', url: '/images/floors/floor_japanese_tatami.jpg', thumb: '/images/floors/thumb_floor_japanese_tatami.jpg' },
+            { id: 'floor_emerald_epoxy', name_en: 'Emerald Gloss Epoxy', name_ar: 'إيبوكسي أخضر زمردي لامع', url: '/images/floors/floor_emerald_epoxy.jpg', thumb: '/images/floors/thumb_floor_emerald_epoxy.jpg' },
+            { id: 'floor_open_office_blueprint', name_en: 'Open Plan Architectural Plan', name_ar: 'مخطط معماري مكتبي مفتوح', url: '/images/floors/floor_open_office_blueprint.jpg', thumb: '/images/floors/thumb_floor_open_office_blueprint.jpg' },
+            { id: 'floor_executive_suite_blueprint', name_en: 'Executive Suite Architectural Plan', name_ar: 'مخطط جناح تنفيذي متكامل', url: '/images/floors/floor_executive_suite_blueprint.jpg', thumb: '/images/floors/thumb_floor_executive_suite_blueprint.jpg' },
+        ];
+
+        function renderFloorsCatalog() {
+            const grid = document.getElementById('floors-catalog-grid');
+            if (!grid) return;
+            const currentBg = MAP_DATA.layout_data?.background_image_url || '';
+            const isAr = document.documentElement.lang === 'ar' || document.documentElement.dir === 'rtl';
+
+            grid.innerHTML = FLOOR_CATALOG.map(f => {
+                const isActive = currentBg.includes(f.id);
+                return `
+                    <div class="furn-card ${isActive ? 'selected' : ''}" style="display:flex; flex-direction:column; gap:4px; padding:6px; cursor:pointer; position:relative; border-radius:12px; border:1px solid ${isActive ? 'var(--brand-primary)' : 'var(--border-card)'}; background:var(--bg-input);" onclick="applyFloorBackground('${f.url}', 2400, 1200)">
+                        <div style="position:relative; width:100%; height:75px; border-radius:8px; overflow:hidden; background:#0B1C13;">
+                            <img src="${f.thumb}" alt="${f.name_en}" style="width:100%; height:100%; object-fit:cover;">
+                            <span style="position:absolute; bottom:3px; inset-inline-end:3px; background:rgba(0,0,0,0.7); font-size:9px; font-family:monospace; padding:1px 4px; border-radius:4px; color:#A7F3D0;">2400×1200</span>
+                            ${isActive ? '<span style="position:absolute; top:3px; inset-inline-start:3px; background:#10B981; font-size:9px; font-weight:800; padding:1px 6px; border-radius:4px; color:#fff;">✓ نشط</span>' : ''}
+                        </div>
+                        <div style="font-size:11px; font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:start;">
+                            ${isAr ? f.name_ar : f.name_en}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function applyFloorBackground(floorUrl, width = 2400, height = 1200) {
+            showToast('⏳ {{ __("Applying Floor Style (جاري تطبيق نمط الأرضية)...") }}');
+            try {
+                const res = await fetch(`/editor/maps/${MAP_ID}/background`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': CSRF_TOKEN,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        floor_url: floorUrl,
+                        width: width,
+                        height: height
+                    })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    MAP_DATA.layout_data = MAP_DATA.layout_data || {};
+                    MAP_DATA.layout_data.background_image_url = floorUrl;
+                    MAP_DATA.layout_data.background_width = width;
+                    MAP_DATA.layout_data.background_height = height;
+                    
+                    MAP_WIDTH_PX = width;
+                    MAP_HEIGHT_PX = height;
+                    
+                    BLUEPRINT_IMAGE.src = floorUrl + (floorUrl.includes('?') ? '&' : '?') + 'v=' + Date.now();
+                    blueprintLoaded = true;
+                    
+                    fitAndCenterView();
+                    renderFloorsCatalog();
+                    showToast('✅ {{ __("Floor Style Applied Successfully (تم تطبيق نمط الأرضية بنجاح)") }}');
+                } else {
+                    showToast('❌ ' + (data.message || 'Failed to apply floor style'));
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('❌ Failed to apply floor style');
+            }
+        }
+
+        async function handleCustomFloorUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+            const formData = new FormData();
+            formData.append('image', file);
+
+            showToast('⏳ {{ __("Uploading Custom Floor Image (جاري رفع صورة الأرضية)...") }}');
+            try {
+                const res = await fetch(`/editor/maps/${MAP_ID}/background`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': CSRF_TOKEN,
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                });
+                const data = await res.json();
+                if (res.ok && data.image_url) {
+                    const uploadedUrl = data.image_url;
+                    MAP_DATA.layout_data = MAP_DATA.layout_data || {};
+                    MAP_DATA.layout_data.background_image_url = uploadedUrl;
+                    
+                    BLUEPRINT_IMAGE.src = uploadedUrl + '?v=' + Date.now();
+                    BLUEPRINT_IMAGE.onload = () => {
+                        blueprintLoaded = true;
+                        if (BLUEPRINT_IMAGE.naturalWidth > 0 && BLUEPRINT_IMAGE.naturalHeight > 0) {
+                            MAP_WIDTH_PX = BLUEPRINT_IMAGE.naturalWidth;
+                            MAP_HEIGHT_PX = BLUEPRINT_IMAGE.naturalHeight;
+                        }
+                        fitAndCenterView();
+                        renderFloorsCatalog();
+                        showToast('✅ {{ __("Floor Background Uploaded & Applied (تم تطبيق الأرضية بنجاح)") }}');
+                    };
+                } else {
+                    showToast('❌ ' + (data.message || 'Upload failed'));
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('❌ Upload failed');
+            }
+        }
+
+        async function clearCurrentFloorBackground() {
+            if (!confirm('{{ __("Are you sure you want to remove the floor background? (هل أنت متأكد من رغبتك في إزالة صورة الأرضية؟)") }}')) return;
+            try {
+                const res = await fetch(`/editor/maps/${MAP_ID}/background`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': CSRF_TOKEN,
+                        'Accept': 'application/json'
+                    }
+                });
+                if (res.ok) {
+                    if (MAP_DATA.layout_data) {
+                        delete MAP_DATA.layout_data.background_image_url;
+                    }
+                    blueprintLoaded = false;
+                    BLUEPRINT_IMAGE.src = '';
+                    MAP_WIDTH_PX = (MAP_DATA.width && MAP_DATA.width > 30) ? MAP_DATA.width * TILE_SIZE : 2194;
+                    MAP_HEIGHT_PX = (MAP_DATA.height && MAP_DATA.height > 20) ? MAP_DATA.height * TILE_SIZE : 1952;
+                    fitAndCenterView();
+                    renderFloorsCatalog();
+                    showToast('✅ {{ __("Background removed (تمت إزالة صورة الأرضية)") }}');
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
         function switchDrawerTab(tab) {
             document.querySelectorAll('.drawer-tab').forEach(el => el.classList.remove('active'));
             document.getElementById(`tab-btn-${tab}`)?.classList.add('active');
             document.getElementById('drawer-view-furniture').style.display = tab === 'furniture' ? 'flex' : 'none';
+            document.getElementById('drawer-view-floors').style.display = tab === 'floors' ? 'flex' : 'none';
             document.getElementById('drawer-view-inspector').style.display = tab === 'inspector' ? 'flex' : 'none';
             document.getElementById('drawer-view-rooms').style.display = tab === 'rooms' ? 'flex' : 'none';
+            if (tab === 'floors') renderFloorsCatalog();
             if (tab === 'rooms') renderRoomsDirectory();
         }
 

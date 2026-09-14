@@ -1014,6 +1014,9 @@
         <button type="button" class="nx-viewport-ctrl-btn" onclick="zoomIn()" title="{{ __('Zoom In (تكبير الخريطة)') }}">
             <span class="material-symbols-rounded">zoom_in</span>
         </button>
+        <button type="button" class="nx-viewport-ctrl-btn" onclick="toggleFitMode()" title="{{ __('Switch View Mode: Fill Edge-to-Edge / Fit (تبديل وضع العرض: ملء الشاشة / احتواء)') }}">
+            <span class="material-symbols-rounded">aspect_ratio</span>
+        </button>
         <button type="button" class="nx-viewport-ctrl-btn" onclick="resetCameraView()" title="{{ __('Reset & Center View (إعادة ضبط الخريطة للمركز)') }}">
             <span class="material-symbols-rounded">center_focus_strong</span>
         </button>
@@ -1262,24 +1265,46 @@
         let wsReconnectAttempts = 0;
 
         // ── Resize, Zoom, Pan & Camera ──
-        function centerCamera() {
+        let cameraFitMode = 'fill'; // 'fill' | 'contain' | 'width'
+
+        function centerCamera(mode = cameraFitMode) {
             if (!canvas || !container) return;
             width = canvas.width = container.clientWidth || window.innerWidth;
             height = canvas.height = container.clientHeight || window.innerHeight;
 
-            const topInset = 76;
-            const bottomInset = 76;
-            const sideInset = 32;
+            const scaleX = width / MAP_WIDTH_PX;
+            const scaleY = height / MAP_HEIGHT_PX;
 
-            const availW = Math.max(100, width - (sideInset * 2));
-            const availH = Math.max(100, height - topInset - bottomInset);
-            const scaleX = availW / MAP_WIDTH_PX;
-            const scaleY = availH / MAP_HEIGHT_PX;
-            // Contain full floor plan 100% inside unobstructed view between top bar and bottom dock
-            zoomLevel = Math.min(scaleX, scaleY);
+            if (mode === 'fill') {
+                // Widescreen Edge-to-Edge Fill: covers width & height with zero empty black bars
+                zoomLevel = Math.max(scaleX, scaleY);
+            } else if (mode === 'width') {
+                // Fit Width exactly to screen edges
+                zoomLevel = scaleX;
+            } else {
+                // Contain all within viewport
+                const topInset = 76;
+                const bottomInset = 76;
+                const sideInset = 32;
+                const availW = Math.max(100, width - (sideInset * 2));
+                const availH = Math.max(100, height - topInset - bottomInset);
+                zoomLevel = Math.min(availW / MAP_WIDTH_PX, availH / MAP_HEIGHT_PX);
+            }
 
             cameraOffset.x = Math.round((width - MAP_WIDTH_PX * zoomLevel) / 2);
             cameraOffset.y = Math.round((height - MAP_HEIGHT_PX * zoomLevel) / 2);
+        }
+
+        function toggleFitMode() {
+            cameraFitMode = (cameraFitMode === 'fill') ? 'contain' : (cameraFitMode === 'contain' ? 'width' : 'fill');
+            centerCamera(cameraFitMode);
+            if (typeof draw === 'function') draw();
+            const labels = {
+                'fill': '🌟 {{ __("Edge-to-Edge Full Screen (ملء الشاشة بالكامل)") }}',
+                'contain': '📦 {{ __("Contain Full Floor (احتواء كامل الخريطة)") }}',
+                'width': '↔️ {{ __("Fit Screen Width (ملاءمة عرض الشاشة)") }}'
+            };
+            showToast(labels[cameraFitMode] || '🎯 View Updated');
         }
 
         function zoomIn() {
@@ -1291,7 +1316,7 @@
         }
 
         function resetCameraView() {
-            centerCamera();
+            centerCamera('fill');
             if (typeof draw === 'function') draw();
             showToast('🎯 {{ __("Center & Fit View (إعادة ضبط الخريطة للمركز)") }}');
         }

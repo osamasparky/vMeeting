@@ -1,0 +1,182 @@
+[
+  {
+    "id": "floor_natural_oak",
+    "name_en": "Natural Oak Parquet",
+    "name_ar": "باركيه بلوط طبيعي دافئ",
+    "image_url": "/images/floors/floor_natural_oak.jpg",
+    "thumbnail_url": "/images/floors/thumb_floor_natural_oak.jpg",
+    "width": 2400,
+    "height": 1200,
+    "aspect_ratio": "2:1"
+  },
+  {
+    "id": "floor_dark_walnut",
+    "name_en": "Dark Walnut Herringbone",
+    "name_ar": "خشب جوز داكن متعرج",
+    "image_url": "/images/floors/floor_dark_walnut.jpg",
+    "thumbnail_url": "/images/floors/thumb_floor_dark_walnut.jpg",
+    "width": 2400,
+    "height": 1200,
+    "aspect_ratio": "2:1"
+  },
+  {
+    "id": "floor_light_birch",
+    "name_en": "Scandinavian Light Birch",
+    "name_ar": "خشب زان إسكندنافي فاتح",
+    "image_url": "/images/floors/floor_light_birch.jpg",
+    "thumbnail_url": "/images/floors/thumb_floor_light_birch.jpg",
+    "width": 2400,
+    "height": 1200,
+    "aspect_ratio": "2:1"
+  },
+  {
+    "id": "floor_carrara_marble",
+    "name_en": "Carrara White Marble",
+    "name_ar": "رخام كرارا أبيض فاخر",
+    "image_url": "/images/floors/floor_carrara_marble.jpg",
+    "thumbnail_url": "/images/floors/thumb_floor_carrara_marble.jpg",
+    "width": 2400,
+    "height": 1200,
+    "aspect_ratio": "2:1"
+  },
+  {
+    "id": "floor_nero_marquina",
+    "name_en": "Nero Marquina Black Marble",
+    "name_ar": "رخام أسود مذهب ملكي",
+    "image_url": "/images/floors/floor_nero_marquina.jpg",
+    "thumbnail_url": "/images/floors/thumb_floor_nero_marquina.jpg",
+    "width": 2400,
+    "height": 1200,
+    "aspect_ratio": "2:1"
+  },
+  {
+    "id": "floor_industrial_concrete",
+    "name_en": "Polished Industrial Concrete",
+    "name_ar": "خرسانة صناعية مصقولة",
+    "image_url": "/images/floors/floor_industrial_concrete.jpg",
+    "thumbnail_url": "/images/floors/thumb_floor_industrial_concrete.jpg",
+    "width": 2400,
+    "height": 1200,
+    "aspect_ratio": "2:1"
+  },
+  {
+    "id": "floor_slate_tile",
+    "name_en": "Urban Slate Grey Stone",
+    "name_ar": "بلاط حجري رمادي حضري",
+    "image_url": "/images/floors/floor_slate_tile.jpg",
+    "thumbnail_url": "/images/floors/thumb_floor_slate_tile.jpg",
+    "width": 2400,
+    "height": 1200,
+    "aspect_ratio": "2:1"
+  },
+  {
+    "id": "floor_terrazzo",
+    "name_en": "Italian Venetian Terrazzo",
+    "name_ar": "تيرازو إيطالي حديث مذهب",
+    "image_url": "/images/floors/floor_terrazzo.jpg",
+    "thumbnail_url": "/images/floors/thumb_floor_terrazzo.jpg",
+    "width": 2400,
+    "height": 1200,
+    "aspect_ratio": "2:1"
+  },
+  {
+    "id": "floor_chevron_timber",
+    "name_en": "Modern Chevron Walnut",
+    "name_ar": "أرضية خشب شيفرون مودرن",
+    "image_url": "/images/floors/floor_chevron_timber.jpg",
+    "thumbnail_url": "/images/floors/thumb_floor_chevron_timber.jpg",
+    "width": 2400,
+    "height": 1200,
+    "aspect_ratio": "2:1"
+  },
+  {
+    "id": "floor_executive_carpet",
+    "name_en": "Executive Midnight Carpet",
+    "name_ar": "سجاد مكتبي تنفيذي كحلي",
+    "image_url": "/images/floors/floor_executive_carpet.jpg",
+    "thumbnail_url": "/images/floors/thumb_floor_executive_carpet.jpg",
+    "width": 2400,
+    "height": 1200,
+    "aspect_ratio": "2:1"
+  },
+  {
+    "id": "floor_charcoal_carpet",
+    "name_en": "Charcoal Commercial Weave",
+    "name_ar": "موكيت رمادي فحمي مكتبي",
+    "image_url": "/images/floors/floor_charcoal_carpet.jpg",
+    "thumbnail_url": "/images/floors/thumb_floor_charcoal_carpet.jpg",
+    "width": 2400,
+    "height": 1200,
+    "aspect_ratio": "2:1"
+  },
+  {
+    "id": "floor_ceramic_beige",
+    "name_en": "Warm Ceramic Beige Tiles",
+    "name_ar": "بلاط سيراميك بيج دافئ",
+    "image_url": "/images/floors/floor_ceramic_beige.jpg",
+    "thumbnail_url": "/images/floors/thumb_floor_ceramic_beige.jpg",
+    "width": 2400,
+    "height": 1200,
+    "aspect_ratio": "2:1"
+  },
+  {
+    "id": "floor_geometric_porcelain",
+    "name_en": "Geometric Porcelain Grid",
+    "name_ar": "بورسلين هندسي حديث",
+    "image_url": "/images/floors/floor_geometric_porcelain.jpg",
+    "thumbnail_url": "/images/floors/thumb_floor_geometric_porcelain.jpg",
+    "width": 2400,
+    "height": 1200,
+    "aspect_ratio": "2:1"
+  },
+  {
+    "id": "floor_biophilic_garden",
+    "name_en": "Biophilic Moss & Stone Garden",
+    "name_ar": "أرضية عشبية وحجرية بيوفيلك",
+    "image_url": "/images/floors/floor_biophilic_garden.jpg",
+    "thumbnail_url": "/images/floors/thumb_floor_biophilic_garden.jpg",
+    "width": 2400,
+    "height": 1200,
+    "aspect_ratio": "2:1"
+  },
+  {
+    "id": "floor_japanese_tatami",
+    "name_en": "Japanese Tatami & Bamboo",
+    "name_ar": "خيزران وتاتامي ياباني",
+    "image_url": "/images/floors/floor_japanese_tatami.jpg",
+    "thumbnail_url": "/images/floors/thumb_floor_japanese_tatami.jpg",
+    "width": 2400,
+    "height": 1200,
+    "aspect_ratio": "2:1"
+  },
+  {
+    "id": "floor_emerald_epoxy",
+    "name_en": "Emerald Gloss Epoxy",
+    "name_ar": "إيبوكسي أخضر زمردي لامع",
+    "image_url": "/images/floors/floor_emerald_epoxy.jpg",
+    "thumbnail_url": "/images/floors/thumb_floor_emerald_epoxy.jpg",
+    "width": 2400,
+    "height": 1200,
+    "aspect_ratio": "2:1"
+  },
+  {
+    "id": "floor_open_office_blueprint",
+    "name_en": "Open Plan Architectural Plan",
+    "name_ar": "مخطط معماري مكتبي مفتوح",
+    "image_url": "/images/floors/floor_open_office_blueprint.jpg",
+    "thumbnail_url": "/images/floors/thumb_floor_open_office_blueprint.jpg",
+    "width": 2400,
+    "height": 1200,
+    "aspect_ratio": "2:1"
+  },
+  {
+    "id": "floor_executive_suite_blueprint",
+    "name_en": "Executive Suite Architectural Plan",
+    "name_ar": "مخطط جناح تنفيذي متكامل",
+    "image_url": "/images/floors/floor_executive_suite_blueprint.jpg",
+    "thumbnail_url": "/images/floors/thumb_floor_executive_suite_blueprint.jpg",
+    "width": 2400,
+    "height": 1200,
+    "aspect_ratio": "2:1"
+  }
+]

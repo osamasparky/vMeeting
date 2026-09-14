@@ -426,32 +426,43 @@ class OfficeController extends Controller
         }
 
         $file = $request->file('image') ?? $request->file('background');
+        $catalogFloorUrl = $request->input('floor_url') ?? $request->input('image_url');
 
-        if (!$file) {
-            return response()->json(['message' => 'No image file provided.'], 422);
+        if (!$file && !$catalogFloorUrl) {
+            return response()->json(['message' => 'No image file or catalog floor URL provided.'], 422);
         }
-
-        $request->validate([
-            'image' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:51200'],
-            'background' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:51200'],
-        ]);
-
-        $filename = 'floorplan_' . $map->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-        
-        $destDir = public_path('images/maps');
-        if (!file_exists($destDir)) {
-            mkdir($destDir, 0755, true);
-        }
-        $file->move($destDir, $filename);
-        $url = '/images/maps/' . $filename;
 
         $layoutData = $map->layout_data ?? [];
-        $layoutData['background_image_url'] = $url;
 
-        $imageSize = @getimagesize(public_path('images/maps/' . $filename));
-        if ($imageSize) {
-            $layoutData['background_width'] = $imageSize[0];
-            $layoutData['background_height'] = $imageSize[1];
+        if ($catalogFloorUrl) {
+            $url = $catalogFloorUrl;
+            $localPath = public_path(ltrim($url, '/'));
+            $imageSize = file_exists($localPath) ? @getimagesize($localPath) : null;
+            $layoutData['background_image_url'] = $url;
+            $layoutData['background_width'] = $imageSize ? $imageSize[0] : 2400;
+            $layoutData['background_height'] = $imageSize ? $imageSize[1] : 1200;
+        } else {
+            $request->validate([
+                'image' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:51200'],
+                'background' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:51200'],
+            ]);
+
+            $filename = 'floorplan_' . $map->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            
+            $destDir = public_path('images/maps');
+            if (!file_exists($destDir)) {
+                mkdir($destDir, 0755, true);
+            }
+            $file->move($destDir, $filename);
+            $url = '/images/maps/' . $filename;
+
+            $layoutData['background_image_url'] = $url;
+
+            $imageSize = @getimagesize(public_path('images/maps/' . $filename));
+            if ($imageSize) {
+                $layoutData['background_width'] = $imageSize[0];
+                $layoutData['background_height'] = $imageSize[1];
+            }
         }
 
         $map->update([
@@ -459,7 +470,7 @@ class OfficeController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Floorplan uploaded successfully.',
+            'message' => 'Floor background updated successfully.',
             'image_url' => $url,
             'map' => $map->fresh(['floor', 'rooms', 'zones', 'objects']),
         ]);
