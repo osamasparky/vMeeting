@@ -1020,11 +1020,11 @@
         <button type="button" class="nx-viewport-ctrl-btn" onclick="zoomIn()" title="{{ __('Zoom In (تكبير الخريطة)') }}">
             <span class="material-symbols-rounded">zoom_in</span>
         </button>
-        <button type="button" class="nx-viewport-ctrl-btn" onclick="toggleFitMode()" title="{{ __('Switch View Mode: Fill Edge-to-Edge / Fit (تبديل وضع العرض: ملء الشاشة / احتواء)') }}">
+        <button type="button" class="nx-viewport-ctrl-btn" onclick="toggleFitMode()" title="{{ __('Fit Map to Canvas / Fill (ملاءمة الخريطة مع الشاشة بالضبط)') }}">
             <span class="material-symbols-rounded">aspect_ratio</span>
         </button>
-        <button type="button" class="nx-viewport-ctrl-btn" onclick="resetCameraView()" title="{{ __('Reset & Center View (إعادة ضبط الخريطة للمركز)') }}">
-            <span class="material-symbols-rounded">center_focus_strong</span>
+        <button type="button" class="nx-viewport-ctrl-btn" onclick="locateMe()" title="{{ __('Locate Me & Focus on My Avatar (تحديد موقعي والتقريب علي)') }}">
+            <span class="material-symbols-rounded" style="color: #34D399;">location_on</span>
         </button>
         <button type="button" class="nx-viewport-ctrl-btn" onclick="zoomOut()" title="{{ __('Zoom Out (تصغير الخريطة)') }}">
             <span class="material-symbols-rounded">zoom_out</span>
@@ -1271,7 +1271,7 @@
         let wsReconnectAttempts = 0;
 
         // ── Resize, Zoom, Pan & Camera ──
-        let cameraFitMode = 'fill'; // 'fill' | 'contain' | 'width'
+        let cameraFitMode = 'fit'; // 'fit' (exact map containment) | 'fill' (edge-to-edge cover)
 
         function centerCamera(mode = cameraFitMode) {
             if (!canvas || !container) return;
@@ -1282,19 +1282,11 @@
             const scaleY = height / MAP_HEIGHT_PX;
 
             if (mode === 'fill') {
-                // Widescreen Edge-to-Edge Fill: covers width & height with zero empty black bars
+                // Edge-to-Edge Fill: covers width & height with zero black bars
                 zoomLevel = Math.max(scaleX, scaleY);
-            } else if (mode === 'width') {
-                // Fit Width exactly to screen edges
-                zoomLevel = scaleX;
             } else {
-                // Contain all within viewport
-                const topInset = 76;
-                const bottomInset = 76;
-                const sideInset = 32;
-                const availW = Math.max(100, width - (sideInset * 2));
-                const availH = Math.max(100, height - topInset - bottomInset);
-                zoomLevel = Math.min(availW / MAP_WIDTH_PX, availH / MAP_HEIGHT_PX);
+                // Exact Fit: fits the entire floor map (2839×1696) precisely inside the canvas, centered, 0 cutoff
+                zoomLevel = Math.min(scaleX, scaleY);
             }
 
             cameraOffset.x = Math.round((width - MAP_WIDTH_PX * zoomLevel) / 2);
@@ -1302,36 +1294,73 @@
         }
 
         function toggleFitMode() {
-            cameraFitMode = (cameraFitMode === 'fill') ? 'contain' : (cameraFitMode === 'contain' ? 'width' : 'fill');
+            cameraFitMode = (cameraFitMode === 'fit') ? 'fill' : 'fit';
             centerCamera(cameraFitMode);
             if (typeof draw === 'function') draw();
             const labels = {
-                'fill': '🌟 {{ __("Edge-to-Edge Full Screen (ملء الشاشة بالكامل)") }}',
-                'contain': '📦 {{ __("Contain Full Floor (احتواء كامل الخريطة)") }}',
-                'width': '↔️ {{ __("Fit Screen Width (ملاءمة عرض الشاشة)") }}'
+                'fit': '📦 {{ __("Fit Map to Canvas (احتواء كامل الخريطة بالضبط)") }}',
+                'fill': '🌟 {{ __("Edge-to-Edge Full Screen (ملء الشاشة بالكامل)") }}'
             };
             showToast(labels[cameraFitMode] || '🎯 View Updated');
         }
 
         function zoomIn() {
-            setZoomLevel(zoomLevel * 1.08);
+            setZoomLevel(zoomLevel * 1.04);
         }
 
         function zoomOut() {
-            setZoomLevel(zoomLevel * 0.92);
+            setZoomLevel(zoomLevel * 0.96);
+        }
+
+        let locateBeaconEndTime = 0;
+        function locateMe() {
+            if (!localAvatar) return;
+            const targetX = localAvatar.x;
+            const targetY = localAvatar.y;
+            const targetZoom = 1.35; // Comfortable close-up view focusing on avatar
+
+            const startX = cameraOffset.x;
+            const startY = cameraOffset.y;
+            const startZoom = zoomLevel;
+
+            const endX = Math.round((width / 2) - (targetX * targetZoom));
+            const endY = Math.round((height / 2) - (targetY * targetZoom));
+
+            const duration = 450; // ms smooth glide
+            const startTime = performance.now();
+
+            function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+            function animateLocate(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(1.0, elapsed / duration);
+                const ease = easeOutCubic(progress);
+
+                zoomLevel = startZoom + (targetZoom - startZoom) * ease;
+                cameraOffset.x = startX + (endX - startX) * ease;
+                cameraOffset.y = startY + (endY - startY) * ease;
+
+                if (typeof draw === 'function') draw();
+
+                if (progress < 1.0) {
+                    requestAnimationFrame(animateLocate);
+                }
+            }
+
+            requestAnimationFrame(animateLocate);
+            locateBeaconEndTime = Date.now() + 3500;
+            showToast('📍 {{ __("Locating You (تم تحديد وتوسيط موقعك والتقريب عليك)") }}');
         }
 
         function resetCameraView() {
-            centerCamera('fill');
-            if (typeof draw === 'function') draw();
-            showToast('🎯 {{ __("Center & Fit View (إعادة ضبط الخريطة للمركز)") }}');
+            locateMe();
         }
 
         function setZoomLevel(newZoom, centerX = (width / 2), centerY = (height / 2)) {
-            const minZoom = 0.20;
-            const maxZoom = 3.0;
+            const minZoom = 0.15;
+            const maxZoom = 4.0;
             const clamped = Math.max(minZoom, Math.min(maxZoom, newZoom));
-            if (Math.abs(clamped - zoomLevel) < 0.001) return;
+            if (Math.abs(clamped - zoomLevel) < 0.0005) return;
 
             const worldX = (centerX - cameraOffset.x) / zoomLevel;
             const worldY = (centerY - cameraOffset.y) / zoomLevel;
@@ -1357,7 +1386,7 @@
                 const rect = canvas.getBoundingClientRect();
                 const mouseX = e.clientX - rect.left;
                 const mouseY = e.clientY - rect.top;
-                const factor = e.deltaY < 0 ? 1.05 : 0.95;
+                const factor = e.deltaY < 0 ? 1.025 : 0.975;
                 setZoomLevel(zoomLevel * factor, mouseX, mouseY);
             }, { passive: false });
         }
@@ -3213,6 +3242,31 @@
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(displayName, x, badgeY + (badgeH / 2));
+
+            // 9. Locate Me Beacon Radar Rings & Pin Marker
+            if (isSelf && Date.now() < locateBeaconEndTime) {
+                const remaining = locateBeaconEndTime - Date.now();
+                const cycle = (Date.now() % 900) / 900;
+                const beaconRadius = radius + (cycle * 54);
+                const alpha = (1 - cycle) * Math.min(1, remaining / 1000);
+                
+                ctx.save();
+                ctx.strokeStyle = `rgba(52, 211, 153, ${alpha})`;
+                ctx.fillStyle = `rgba(52, 211, 153, ${alpha * 0.20})`;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(x, y, beaconRadius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                // Draw bouncing pin icon above head
+                ctx.fillStyle = '#34D399';
+                ctx.font = 'bold 20px "Material Symbols Rounded", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('location_on', x, y - radius - 8 - Math.sin(Date.now() / 120) * 5);
+                ctx.restore();
+            }
 
             // 8. In-World Floating Speech / Reaction Comic Bubble
             const bubble = speechBubbles.get(av.id);
