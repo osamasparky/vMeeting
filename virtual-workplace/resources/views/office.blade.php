@@ -9,7 +9,9 @@
     <!-- Google Fonts & Material Symbols -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Round|Material+Icons+Outlined" />
 
     <!-- UlaSpace Design Tokens & Office Stylesheet -->
     <link rel="stylesheet" href="{{ asset('css/ulaspace-tokens.css') }}">
@@ -1124,8 +1126,8 @@
     </div>
 
     <!-- ── Floating In-World Contextual Prompts & Menus ── -->
-    <div id="furniture-sit-prompt" style="display: none; position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); background: rgba(16, 185, 129, 0.95); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.4); border-radius: 24px; padding: 6px 18px; color: #FFFFFF; font-size: 12px; font-weight: 900; box-shadow: 0 10px 28px rgba(16,185,129,0.45); z-index: 9999; pointer-events: none; transition: opacity 0.2s ease;">
-        <span>🪑 {{ __('Press') }} <kbd style="background: rgba(0,0,0,0.35); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px;">E</kbd> {{ __('to Sit at Desk / Table (الجلوس)') }}</span>
+    <div id="furniture-sit-prompt" style="display: none; position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); background: rgba(14, 25, 19, 0.94); backdrop-filter: blur(20px); border: 1px solid rgba(211, 165, 83, 0.45); border-radius: 24px; padding: 6px 18px; color: var(--nx-sand-100, #F9F4EE); font-size: 12px; font-weight: 700; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5); z-index: 9999; pointer-events: none; transition: opacity 0.2s ease;">
+        <span id="furniture-sit-prompt-text">🪑 {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> {{ __('to Sit at Desk (الجلوس)') }}</span>
     </div>
 
     <div id="floating-reaction-popover" style="display: none; position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.96); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.18); border-radius: 32px; padding: 6px 14px; align-items: center; gap: 8px; box-shadow: 0 16px 36px rgba(0,0,0,0.6); z-index: 100000;">
@@ -1249,20 +1251,14 @@
             width = canvas.width = container.clientWidth || window.innerWidth;
             height = canvas.height = container.clientHeight || window.innerHeight;
 
-            const scaleX = (width - 40) / MAP_WIDTH_PX;
-            const scaleY = (height - 40) / MAP_HEIGHT_PX;
-            zoomLevel = Math.min(1.0, Math.max(0.3, Math.min(scaleX, scaleY)));
+            const availW = Math.max(100, width - 24);
+            const availH = Math.max(100, height - 24);
+            const scaleX = availW / MAP_WIDTH_PX;
+            const scaleY = availH / MAP_HEIGHT_PX;
+            zoomLevel = Math.min(1.0, Math.min(scaleX, scaleY));
 
-            const targetX = (typeof localAvatar !== 'undefined' && localAvatar && localAvatar.x) ? localAvatar.x : (MAP_WIDTH_PX / 2);
-            const targetY = (typeof localAvatar !== 'undefined' && localAvatar && localAvatar.y) ? localAvatar.y : (MAP_HEIGHT_PX / 2);
-
-            if (MAP_WIDTH_PX * zoomLevel <= width && MAP_HEIGHT_PX * zoomLevel <= height) {
-                cameraOffset.x = (width - MAP_WIDTH_PX * zoomLevel) / 2;
-                cameraOffset.y = (height - MAP_HEIGHT_PX * zoomLevel) / 2;
-            } else {
-                cameraOffset.x = (width / 2) - (targetX * zoomLevel);
-                cameraOffset.y = (height / 2) - (targetY * zoomLevel);
-            }
+            cameraOffset.x = (width - MAP_WIDTH_PX * zoomLevel) / 2;
+            cameraOffset.y = (height - MAP_HEIGHT_PX * zoomLevel) / 2;
         }
 
         function resizeCanvas() {
@@ -1546,8 +1542,13 @@
         });
 
         let nearbyInteractive = null;
+        let lastFurnitureCheck = 0;
 
-        function checkNearbyFurniture() {
+        function checkNearbyFurniture(force = false) {
+            const now = Date.now();
+            if (!force && now - lastFurnitureCheck < 150) return;
+            lastFurnitureCheck = now;
+
             const promptEl = document.getElementById('furniture-sit-prompt');
             if (localAvatar.isSitting) {
                 if (promptEl) promptEl.style.display = 'none';
@@ -1560,53 +1561,43 @@
                 const ox = (obj.position ? obj.position.x : (obj.x || 0)) * 32 + ((obj.width || (obj.size ? obj.size.width : 1)) * 16);
                 const oy = (obj.position ? obj.position.y : (obj.y || 0)) * 32 + ((obj.height || (obj.size ? obj.size.height : 1)) * 16);
                 const dist = Math.hypot(localAvatar.x - ox, localAvatar.y - oy);
-                if (dist < 52) {
-                    const behType = obj.interaction_type || (obj.interaction_config && obj.interaction_config.behavior?.type) || ((obj.type && (obj.type.includes('chair') || obj.type.includes('desk') || obj.type.includes('sofa') || obj.type.includes('seating'))) ? 'sit' : 'none');
-                    found = {
-                        id: obj.id || `obj_${ox}_${oy}`,
-                        x: ox,
-                        y: oy,
-                        name: obj.name || 'Furniture',
-                        type: obj.type,
-                        interaction_type: behType,
-                        config: obj.interaction_config
-                    };
-                    break;
-                }
-            }
-
-            if (!found && CONFIG.map && CONFIG.map.rooms) {
-                for (const r of CONFIG.map.rooms) {
-                    const rx = (r.bounds.x + r.bounds.width / 2) * 32;
-                    const ry = (r.bounds.y + r.bounds.height / 2) * 32;
-                    const dist = Math.hypot(localAvatar.x - rx, localAvatar.y - ry);
-                    if (dist < 55) {
-                        found = { id: `room_center_${r.id}`, x: rx, y: ry, name: r.name, interaction_type: 'sit' };
+                if (dist < 48) {
+                    const behType = obj.interaction_type || (obj.interaction_config && obj.interaction_config.behavior?.type) || ((obj.type && (obj.type.includes('chair') || obj.type.includes('desk') || obj.type.includes('sofa') || obj.type.includes('seating'))) ? 'sit' : null);
+                    if (behType && behType !== 'none') {
+                        found = {
+                            id: obj.id || `obj_${ox}_${oy}`,
+                            x: ox,
+                            y: oy,
+                            name: obj.name || 'Furniture',
+                            type: obj.type,
+                            interaction_type: behType,
+                            config: obj.interaction_config
+                        };
                         break;
                     }
                 }
             }
 
             nearbyInteractive = found;
-            nearbyChair = (found && (found.interaction_type === 'sit' || !found.interaction_type || found.interaction_type === 'none')) ? found : null;
+            nearbyChair = (found && (found.interaction_type === 'sit' || !found.interaction_type)) ? found : null;
 
             if (promptEl) {
                 if (found) {
                     promptEl.style.display = 'block';
                     if (found.interaction_type === 'drink') {
-                        promptEl.innerHTML = `<span>☕ {{ __('Press E to Grab Drink (تناول مشروب)') }}</span>`;
+                        promptEl.innerHTML = `<span>☕ {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> {{ __('to Grab Drink (تناول مشروب)') }}</span>`;
                     } else if (found.interaction_type === 'whiteboard') {
-                        promptEl.innerHTML = `<span>📋 {{ __('Press E to Open Whiteboard (فتح السبورة التشاركية)') }}</span>`;
+                        promptEl.innerHTML = `<span>📋 {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> {{ __('to Open Whiteboard (السبورة)') }}</span>`;
                     } else if (found.interaction_type === 'youtube') {
-                        promptEl.innerHTML = `<span>📺 {{ __('Press E to Watch Stream (شاشة العرض)') }}</span>`;
+                        promptEl.innerHTML = `<span>📺 {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> {{ __('to Watch Stream (الشاشة)') }}</span>`;
                     } else if (found.interaction_type === 'soundEffect') {
-                        promptEl.innerHTML = `<span>🔔 {{ __('Press E to Ring Bell / Sound (تشغيل المؤثر)') }}</span>`;
+                        promptEl.innerHTML = `<span>🔔 {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> {{ __('to Ring Bell (تشغيل المؤثر)') }}</span>`;
                     } else if (found.interaction_type === 'instrument' || found.interaction_type === 'staticMusic') {
-                        promptEl.innerHTML = `<span>🎹 {{ __('Press E to Play Music (عزف موسيقي)') }}</span>`;
+                        promptEl.innerHTML = `<span>🎹 {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> {{ __('to Play Music (عزف موسيقي)') }}</span>`;
                     } else if (found.interaction_type === 'stickyNote') {
-                        promptEl.innerHTML = `<span>📝 {{ __('Press E to Read Note (ملاحظة مكتبية)') }}</span>`;
+                        promptEl.innerHTML = `<span>📝 {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> {{ __('to Read Note (ملاحظة)') }}</span>`;
                     } else {
-                        promptEl.innerHTML = `<span>🪑 {{ __('Press E to Sit / Stand (اضغط E للجلوس بالمكتب)') }}</span>`;
+                        promptEl.innerHTML = `<span>🪑 {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> {{ __('to Sit at Desk (الجلوس)') }}</span>`;
                     }
                 } else {
                     promptEl.style.display = 'none';
@@ -2216,44 +2207,53 @@
             });
         }
 
+        let cachedCurrentRoomId = undefined;
+        let cachedRoomLockState = undefined;
         function updateRoomPresence() {
             const r = getCurrentRoom(localAvatar.x, localAvatar.y);
-            const statusPill = document.getElementById('room-status-pill');
-            const roomNameEl = document.getElementById('current-room-name');
-            const lockIcon = document.getElementById('lock-icon');
-            const lockText = document.getElementById('lock-text');
+            const currentId = r ? r.id : null;
+            const isLocked = r ? !!roomDoorStates.get(r.id) : false;
 
-            if (r) {
-                if (statusPill) statusPill.style.display = 'flex';
-                if (roomNameEl) roomNameEl.textContent = `🏢 ${r.name}`;
-                const isLocked = !!roomDoorStates.get(r.id);
-                if (lockIcon) lockIcon.textContent = isLocked ? 'lock' : 'lock_open';
-                if (lockText) lockText.textContent = isLocked ? '{{ __("Unlock Door") }}' : '{{ __("Lock Door") }}';
+            if (cachedCurrentRoomId !== currentId || cachedRoomLockState !== isLocked) {
+                cachedCurrentRoomId = currentId;
+                cachedRoomLockState = isLocked;
 
-                if (localAvatar.currentRoomId !== r.id) {
-                    const prevId = localAvatar.currentRoomId;
-                    localAvatar.currentRoomId = r.id;
-                    if (ws && ws.readyState === WebSocket.OPEN) {
-                        ws.send(JSON.stringify({ type: 'room.enter', payload: { roomId: r.id } }));
+                const statusPill = document.getElementById('room-status-pill');
+                const roomNameEl = document.getElementById('current-room-name');
+                const lockIcon = document.getElementById('lock-icon');
+                const lockText = document.getElementById('lock-text');
+
+                if (r) {
+                    if (statusPill) statusPill.style.display = 'flex';
+                    if (roomNameEl) roomNameEl.textContent = `🏢 ${r.name}`;
+                    if (lockIcon) lockIcon.textContent = isLocked ? 'lock' : 'lock_open';
+                    if (lockText) lockText.textContent = isLocked ? '{{ __("Unlock Door") }}' : '{{ __("Lock Door") }}';
+
+                    if (localAvatar.currentRoomId !== r.id) {
+                        const prevId = localAvatar.currentRoomId;
+                        localAvatar.currentRoomId = r.id;
+                        if (ws && ws.readyState === WebSocket.OPEN) {
+                            ws.send(JSON.stringify({ type: 'room.enter', payload: { roomId: r.id } }));
+                        }
+                        syncLiveKitRoom(r.id);
+                        logAttendanceInterval('enter', r.id);
+                        if (prevId) {
+                            logAttendanceInterval('leave', prevId);
+                            checkAutoUnlockEmptyRooms();
+                        }
                     }
-                    syncLiveKitRoom(r.id);
-                    logAttendanceInterval('enter', r.id);
-                    if (prevId) {
+                } else {
+                    if (statusPill) statusPill.style.display = 'none';
+                    if (localAvatar.currentRoomId) {
+                        const prevId = localAvatar.currentRoomId;
+                        localAvatar.currentRoomId = null;
+                        if (ws && ws.readyState === WebSocket.OPEN) {
+                            ws.send(JSON.stringify({ type: 'room.leave', payload: { roomId: prevId } }));
+                        }
+                        syncLiveKitRoom(null);
                         logAttendanceInterval('leave', prevId);
                         checkAutoUnlockEmptyRooms();
                     }
-                }
-            } else {
-                statusPill.style.display = 'none';
-                if (localAvatar.currentRoomId) {
-                    const prevId = localAvatar.currentRoomId;
-                    localAvatar.currentRoomId = null;
-                    if (ws && ws.readyState === WebSocket.OPEN) {
-                        ws.send(JSON.stringify({ type: 'room.leave', payload: { roomId: prevId } }));
-                    }
-                    syncLiveKitRoom(null);
-                    logAttendanceInterval('leave', prevId);
-                    checkAutoUnlockEmptyRooms();
                 }
             }
         }
@@ -2459,17 +2459,35 @@
             broadcastPosition();
         }
 
+        let lastSentX = -999, lastSentY = -999;
         let lastPosSend = 0;
         function broadcastPosition() {
             const now = Date.now();
-            if (now - lastPosSend > 45 && ws && ws.readyState === WebSocket.OPEN) {
+            const distMoved = Math.hypot(localAvatar.x - lastSentX, localAvatar.y - lastSentY);
+            if ((distMoved >= 1 || (now - lastPosSend > 1500)) && (now - lastPosSend > 45) && ws && ws.readyState === WebSocket.OPEN) {
                 lastPosSend = now;
+                lastSentX = localAvatar.x;
+                lastSentY = localAvatar.y;
                 ws.send(JSON.stringify({
                     type: 'position.update',
                     payload: { x: Math.round(localAvatar.x), y: Math.round(localAvatar.y), orientation: 'down' }
                 }));
             }
         }
+
+        let sortedMapObjects = [];
+        function refreshSortedMapObjects() {
+            const raw = (CONFIG.map && CONFIG.map.objects) ? CONFIG.map.objects : [];
+            sortedMapObjects = [...raw].sort((a, b) => {
+                const elevA = typeof a.elevation === 'number' ? a.elevation : (a.interaction_config?.elevation || 1);
+                const elevB = typeof b.elevation === 'number' ? b.elevation : (b.interaction_config?.elevation || 1);
+                if (elevA !== elevB) return elevA - elevB;
+                const yA = (a.position ? a.position.y : (a.y || 0));
+                const yB = (b.position ? b.position.y : (b.y || 0));
+                return yA - yB;
+            });
+        }
+        refreshSortedMapObjects();
 
         function draw() {
             if (container && container.clientWidth > 0 && container.clientHeight > 0) {
@@ -2510,17 +2528,9 @@
             }
 
             // 1b. Draw Placed Furniture & Decor Objects Layer (Rendered with 3D Elevation Depth Sorting)
-            const mapObjects = ((CONFIG.map && CONFIG.map.objects) ? [...CONFIG.map.objects] : []).sort((a, b) => {
-                const elevA = typeof a.elevation === 'number' ? a.elevation : (a.interaction_config?.elevation || 1);
-                const elevB = typeof b.elevation === 'number' ? b.elevation : (b.interaction_config?.elevation || 1);
-                if (elevA !== elevB) return elevA - elevB;
-                const yA = (a.position ? a.position.y : (a.y || 0));
-                const yB = (b.position ? b.position.y : (b.y || 0));
-                return yA - yB;
-            });
             if (!window._officeObjImgCache) window._officeObjImgCache = new Map();
 
-            mapObjects.forEach(obj => {
+            sortedMapObjects.forEach(obj => {
                 const ox = (obj.position ? obj.position.x : (obj.x || 0)) * TILE_SIZE;
                 const oy = (obj.position ? obj.position.y : (obj.y || 0)) * TILE_SIZE;
                 const objW = (obj.width || (obj.size ? obj.size.width : 1)) * TILE_SIZE;
@@ -3075,7 +3085,6 @@
             }
 
             ctx.restore();
-            requestAnimationFrame(draw);
         }
 
         // ── WebSocket Realtime Connection & Presence Protocol ──
