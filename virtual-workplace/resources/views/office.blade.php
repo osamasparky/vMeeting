@@ -1194,12 +1194,12 @@
         let height = canvas.height = (container && container.clientHeight) ? container.clientHeight : window.innerHeight;
 
         const TILE_SIZE = (CONFIG.map && CONFIG.map.tile_size) ? Number(CONFIG.map.tile_size) : 16;
-        let MAP_WIDTH_PX = (CONFIG.map && CONFIG.map.layout_data && CONFIG.map.layout_data.background_width)
+        let MAP_WIDTH_PX = (CONFIG.map && CONFIG.map.layout_data && CONFIG.map.layout_data.background_width && Number(CONFIG.map.layout_data.background_width) >= 500)
             ? Number(CONFIG.map.layout_data.background_width)
-            : ((CONFIG.map && CONFIG.map.width && CONFIG.map.width > 30) ? CONFIG.map.width * TILE_SIZE : 2839);
-        let MAP_HEIGHT_PX = (CONFIG.map && CONFIG.map.layout_data && CONFIG.map.layout_data.background_height)
+            : 2839;
+        let MAP_HEIGHT_PX = (CONFIG.map && CONFIG.map.layout_data && CONFIG.map.layout_data.background_height && Number(CONFIG.map.layout_data.background_height) >= 500)
             ? Number(CONFIG.map.layout_data.background_height)
-            : ((CONFIG.map && CONFIG.map.height && CONFIG.map.height > 20) ? CONFIG.map.height * TILE_SIZE : 1696);
+            : 1696;
 
         let zoomLevel = 1.0;
         let cameraOffset = { x: 0, y: 0 };
@@ -2703,7 +2703,7 @@
             ctx.translate(cameraOffset.x, cameraOffset.y);
             ctx.scale(zoomLevel, zoomLevel);
 
-            const hasBlueprint = BLUEPRINT_IMAGE && (BLUEPRINT_IMAGE.complete || blueprintLoaded) && BLUEPRINT_IMAGE.naturalWidth > 0;
+            const hasBlueprint = blueprintLoaded && BLUEPRINT_IMAGE && BLUEPRINT_IMAGE.complete && BLUEPRINT_IMAGE.naturalWidth > 0 && BLUEPRINT_IMAGE.src && !BLUEPRINT_IMAGE.src.endsWith('/');
 
             // 1. Draw Blueprint Background
             if (hasBlueprint) {

@@ -1455,12 +1455,12 @@
         let height = canvas.height = container.clientHeight;
 
         const TILE_SIZE = 16;
-        let MAP_WIDTH_PX = (MAP_DATA.layout_data && MAP_DATA.layout_data.background_width)
+        let MAP_WIDTH_PX = (MAP_DATA.layout_data && MAP_DATA.layout_data.background_width && Number(MAP_DATA.layout_data.background_width) >= 500)
             ? Number(MAP_DATA.layout_data.background_width)
-            : ((MAP_DATA.width && MAP_DATA.width > 30) ? MAP_DATA.width * TILE_SIZE : 2839);
-        let MAP_HEIGHT_PX = (MAP_DATA.layout_data && MAP_DATA.layout_data.background_height)
+            : 2839;
+        let MAP_HEIGHT_PX = (MAP_DATA.layout_data && MAP_DATA.layout_data.background_height && Number(MAP_DATA.layout_data.background_height) >= 500)
             ? Number(MAP_DATA.layout_data.background_height)
-            : ((MAP_DATA.height && MAP_DATA.height > 20) ? MAP_DATA.height * TILE_SIZE : 1696);
+            : 1696;
 
         let zoomLevel = 1.0;
         let panOffset = { x: 0, y: 0 };
@@ -1541,16 +1541,24 @@
                 if (BLUEPRINT_IMAGE.naturalWidth > 0 && BLUEPRINT_IMAGE.naturalHeight > 0) {
                     MAP_WIDTH_PX = BLUEPRINT_IMAGE.naturalWidth;
                     MAP_HEIGHT_PX = BLUEPRINT_IMAGE.naturalHeight;
+                } else {
+                    MAP_WIDTH_PX = 2839;
+                    MAP_HEIGHT_PX = 1696;
                 }
                 fitAndCenterView();
                 draw();
             };
             BLUEPRINT_IMAGE.onerror = () => {
                 blueprintLoaded = false;
+                MAP_WIDTH_PX = 2839;
+                MAP_HEIGHT_PX = 1696;
                 fitAndCenterView();
                 draw();
             };
         } else {
+            blueprintLoaded = false;
+            MAP_WIDTH_PX = 2839;
+            MAP_HEIGHT_PX = 1696;
             setTimeout(fitAndCenterView, 50);
         }
 
@@ -1713,6 +1721,7 @@
                         MAP_DATA.layout_data.background_height = 1696;
                     }
                     blueprintLoaded = false;
+                    BLUEPRINT_IMAGE.removeAttribute('src');
                     BLUEPRINT_IMAGE.src = '';
                     MAP_WIDTH_PX = 2839;
                     MAP_HEIGHT_PX = 1696;
@@ -2152,7 +2161,7 @@
             ctx.translate(panOffset.x, panOffset.y);
             ctx.scale(zoomLevel, zoomLevel);
 
-            const hasBlueprint = BLUEPRINT_IMAGE && BLUEPRINT_IMAGE.complete && BLUEPRINT_IMAGE.naturalWidth > 0;
+            const hasBlueprint = blueprintLoaded && BLUEPRINT_IMAGE && BLUEPRINT_IMAGE.complete && BLUEPRINT_IMAGE.naturalWidth > 0 && BLUEPRINT_IMAGE.src && !BLUEPRINT_IMAGE.src.endsWith('/');
 
             // 1. Draw Background Blueprint Layer
             if (hasBlueprint) {
@@ -2969,8 +2978,8 @@
         }
 
         async function deleteFloorplan() {
-            if (!confirm('{{ __("Are you sure you want to remove the custom floorplan and reset to system default?") }}')) return;
-            showToast('🗑️ {{ __("Removing floorplan...") }}');
+            if (!confirm('{{ __("Are you sure you want to reset the floorplan to default 2839×1696? (هل أنت متأكد من استعادة المخطط الافتراضي؟)") }}')) return;
+            showToast('🗑️ {{ __("Resetting floorplan...") }}');
             try {
                 const res = await fetch(`/editor/maps/${MAP_ID}/background`, {
                     method: 'DELETE',
@@ -2983,27 +2992,15 @@
                     delete MAP_DATA.layout_data.background_image_url;
                     MAP_DATA.layout_data.background_width = 2839;
                     MAP_DATA.layout_data.background_height = 1696;
-                    BLUEPRINT_IMAGE.src = '/images/office_floorplan.jpg?v=' + Date.now();
-                    BLUEPRINT_IMAGE.onload = () => {
-                        blueprintLoaded = true;
-                        if (BLUEPRINT_IMAGE.naturalWidth > 0 && BLUEPRINT_IMAGE.naturalHeight > 0) {
-                            MAP_WIDTH_PX = BLUEPRINT_IMAGE.naturalWidth;
-                            MAP_HEIGHT_PX = BLUEPRINT_IMAGE.naturalHeight;
-                        } else {
-                            MAP_WIDTH_PX = 2839;
-                            MAP_HEIGHT_PX = 1696;
-                        }
-                        fitAndCenterView();
-                        draw();
-                    };
-                    BLUEPRINT_IMAGE.onerror = () => {
-                        blueprintLoaded = false;
-                        MAP_WIDTH_PX = 2839;
-                        MAP_HEIGHT_PX = 1696;
-                        fitAndCenterView();
-                        draw();
-                    };
-                    showToast('✅ {{ __("Floorplan reset to default!") }}');
+                    blueprintLoaded = false;
+                    BLUEPRINT_IMAGE.removeAttribute('src');
+                    BLUEPRINT_IMAGE.src = '';
+                    MAP_WIDTH_PX = 2839;
+                    MAP_HEIGHT_PX = 1696;
+                    fitAndCenterView();
+                    renderFloorsCatalog();
+                    draw();
+                    showToast('✅ {{ __("Floorplan reset to default (2839×1696)!") }}');
                 } else {
                     showToast('❌ ' + (data.message || 'Reset failed'));
                 }
@@ -3030,6 +3027,7 @@
                     delete MAP_DATA.layout_data.background_image_url;
                     MAP_DATA.layout_data.background_width = 2839;
                     MAP_DATA.layout_data.background_height = 1696;
+                    BLUEPRINT_IMAGE.removeAttribute('src');
                     BLUEPRINT_IMAGE.src = '';
                     blueprintLoaded = false;
                     MAP_WIDTH_PX = 2839;
@@ -3037,6 +3035,7 @@
                     fitAndCenterView();
                     updateInspector();
                     hideFloatingActions();
+                    renderFloorsCatalog();
                     draw();
                     showToast('✨ {{ __("Canvas cleared! You can now upload a new floorplan and place rooms/furniture.") }}');
                 } else {

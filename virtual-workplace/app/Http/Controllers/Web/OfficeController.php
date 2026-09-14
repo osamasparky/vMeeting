@@ -247,12 +247,14 @@ class OfficeController extends Controller
             'name' => $floor->name . ' Blueprint',
             'status' => 'published',
             'version' => 1,
-            'width' => 32,
-            'height' => 26,
+            'width' => 177,
+            'height' => 106,
             'tile_size' => 16,
             'layout_data' => [
                 'theme' => 'open_spatial_blueprint',
                 'wall_sign_text' => strtoupper($floor->name),
+                'background_width' => 2839,
+                'background_height' => 1696,
             ],
             'published_at' => now(),
         ]);
@@ -381,12 +383,14 @@ class OfficeController extends Controller
                 'name' => $floor->name . ' Blueprint',
                 'status' => 'published',
                 'version' => 1,
-                'width' => 32,
-                'height' => 26,
+                'width' => 177,
+                'height' => 106,
                 'tile_size' => 16,
                 'layout_data' => [
                     'theme' => 'open_spatial_blueprint',
                     'wall_sign_text' => strtoupper($floor->name),
+                    'background_width' => 2839,
+                    'background_height' => 1696,
                 ],
                 'published_at' => now(),
             ]);
@@ -439,8 +443,8 @@ class OfficeController extends Controller
             $localPath = public_path(ltrim($url, '/'));
             $imageSize = file_exists($localPath) ? @getimagesize($localPath) : null;
             $layoutData['background_image_url'] = $url;
-            $layoutData['background_width'] = $imageSize ? $imageSize[0] : 2400;
-            $layoutData['background_height'] = $imageSize ? $imageSize[1] : 1200;
+            $layoutData['background_width'] = $imageSize ? $imageSize[0] : 2839;
+            $layoutData['background_height'] = $imageSize ? $imageSize[1] : 1696;
         } else {
             $request->validate([
                 'image' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:51200'],
@@ -459,13 +463,17 @@ class OfficeController extends Controller
             $layoutData['background_image_url'] = $url;
 
             $imageSize = @getimagesize(public_path('images/maps/' . $filename));
-            if ($imageSize) {
-                $layoutData['background_width'] = $imageSize[0];
-                $layoutData['background_height'] = $imageSize[1];
-            }
+            $layoutData['background_width'] = $imageSize ? $imageSize[0] : 2839;
+            $layoutData['background_height'] = $imageSize ? $imageSize[1] : 1696;
         }
 
+        $bgW = $layoutData['background_width'] ?? 2839;
+        $bgH = $layoutData['background_height'] ?? 1696;
+
         $map->update([
+            'width' => ceil($bgW / 16),
+            'height' => ceil($bgH / 16),
+            'tile_size' => 16,
             'layout_data' => $layoutData,
         ]);
 
@@ -521,18 +529,21 @@ class OfficeController extends Controller
         }
 
         $layoutData = $map->layout_data ?? [];
-        $layoutData['background_image_url'] = '/images/office_floorplan.jpg';
+        unset($layoutData['background_image_url']);
         $layoutData['background_width'] = 2839;
         $layoutData['background_height'] = 1696;
 
         $map->update([
+            'width' => 177,
+            'height' => 106,
+            'tile_size' => 16,
             'layout_data' => $layoutData,
             'status' => 'published',
             'published_at' => now(),
         ]);
 
         return response()->json([
-            'message' => 'Floorplan reset to default successfully.',
+            'message' => 'Floor background removed successfully (2839×1696).',
             'map' => $map->fresh(['floor', 'rooms', 'zones', 'objects']),
         ]);
     }
@@ -561,6 +572,9 @@ class OfficeController extends Controller
         $layoutData['background_height'] = 1696;
 
         $map->update([
+            'width' => 177,
+            'height' => 106,
+            'tile_size' => 16,
             'layout_data' => $layoutData,
             'status' => 'published',
             'published_at' => now(),
