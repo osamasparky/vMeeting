@@ -817,8 +817,11 @@
 </head>
 <body>
 
-    <!-- ── Top Floating Overlay Bar (UlaSpace Figma Floor Map Spec) ── -->
-    <header class="nx-map-toolbar">
+    <div class="nx-office-viewport-container">
+        <div class="nx-floor-map-screen">
+
+        <!-- ── Top Floating Overlay Bar (UlaSpace Figma Floor Map Spec) ── -->
+        <header class="nx-map-toolbar">
         <div class="nx-toolbar-group">
             @if(empty($user->is_guest))
             <a href="{{ route('dashboard') }}" class="nx-toolbar-btn" title="{{ __('Back to Dashboard (الخروج إلى لوحة التحكم)') }}">
@@ -1104,9 +1107,11 @@
         <button class="reaction-emoji-btn" onclick="sendEmojiReaction('☕')" title="Coffee Break (استراحة)">☕</button>
         <button class="reaction-emoji-btn" onclick="sendEmojiReaction('💡')" title="Idea (فكرة)">💡</button>
         <button class="reaction-emoji-btn" onclick="sendEmojiReaction('👏')" title="Applause (تصفيق)">👏</button>
-        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('🎯')" title="Focus Mode (تركيز)">🎯</button>
         <button class="reaction-emoji-btn" onclick="sendEmojiReaction('❓')" title="Question (سؤال)">❓</button>
         <button class="reaction-emoji-btn" onclick="sendEmojiReaction('🔥')" title="Great Work (رائع)">🔥</button>
+    </div>
+
+        </div>
     </div>
 
 @include('office.partials.modals')
@@ -2660,27 +2665,46 @@
                 }
                 ctx.restore();
 
-                // C. Floating Sleek Glass Room Header Label Badge
-                const labelText = `${isLocked ? '🔒 ' : '🏢 '}${r.name.split(' - ')[0]}`;
-                ctx.font = 'bold 9px Cairo, Inter, sans-serif';
-                const textWidth = ctx.measureText(labelText).width;
-                const badgeW = Math.min(rw - 8, textWidth + 14);
+                // C. Floating Sleek Glass Room Header Scrim Capsule Badge (Figma Room Component)
+                const rawName = r.name || '';
+                const parts = rawName.split(' - ');
+                const arName = (parts[0] || rawName).trim();
+                const enName = parts.length > 1 ? parts[1].trim() : (r.english_name || '');
+                const occupantsCount = countRoomOccupants(r.id);
 
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
-                if (ctx.roundRect) ctx.roundRect(rx + 4, ry + 4, badgeW, 18, 9);
-                else ctx.rect(rx + 4, ry + 4, badgeW, 18);
-                ctx.fill();
+                ctx.save();
+                ctx.font = '600 11px "IBM Plex Sans Arabic", sans-serif';
+                const arWidth = ctx.measureText(arName).width;
+                ctx.font = '400 9px "IBM Plex Sans", sans-serif';
+                const enWidth = enName ? ctx.measureText(enName).width : 0;
+                const badgeW = Math.max(arWidth, enWidth, 80) + 24;
+                const badgeH = enName ? 34 : 22;
+                const badgeX = rx + (rw / 2) - (badgeW / 2);
+                const badgeY = ry + 8;
 
-                ctx.strokeStyle = isLocked ? 'rgba(239, 68, 68, 0.4)' : 'rgba(255, 255, 255, 0.15)';
+                // Scrim Glass Capsule Background
+                ctx.fillStyle = isLocked ? 'rgba(127, 29, 29, 0.90)' : 'rgba(20, 43, 36, 0.88)';
+                ctx.strokeStyle = isLocked ? 'rgba(239, 68, 68, 0.50)' : 'rgba(237, 230, 217, 0.24)';
                 ctx.lineWidth = 1;
-                if (ctx.roundRect) ctx.roundRect(rx + 4, ry + 4, badgeW, 18, 9);
-                else ctx.rect(rx + 4, ry + 4, badgeW, 18);
+                if (ctx.roundRect) ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 10);
+                else ctx.rect(badgeX, badgeY, badgeW, badgeH);
+                ctx.fill();
                 ctx.stroke();
 
-                ctx.fillStyle = isLocked ? '#FCA5A5' : '#F8FAFC';
-                ctx.textAlign = 'left';
+                // Arabic Headline
+                ctx.fillStyle = isLocked ? '#FCA5A5' : '#F9F4EE';
+                ctx.font = '600 11px "IBM Plex Sans Arabic", sans-serif';
+                ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(labelText, rx + 10, ry + 13);
+                ctx.fillText((isLocked ? '🔒 ' : '') + arName, rx + (rw / 2), badgeY + (enName ? 11 : 11));
+
+                // English Companion
+                if (enName) {
+                    ctx.fillStyle = isLocked ? '#FECACA' : '#D3A553';
+                    ctx.font = '400 9px "IBM Plex Sans", sans-serif';
+                    ctx.fillText(enName, rx + (rw / 2), badgeY + 24);
+                }
+                ctx.restore();
             });
 
             // 3. Rectangular Acoustic Sound Isolation Aura for Active Room
