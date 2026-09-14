@@ -1,39 +1,71 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ __('Map Editor & Floor Designer') }} — {{ $map->name }}</title>
 
-    <!-- Google Fonts: Cairo (Arabic) & Inter (English) -->
+    <!-- Google Fonts & Material Symbols -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+
+    <!-- UlaSpace Design Tokens & Office Stylesheet -->
+    <link rel="stylesheet" href="{{ asset('css/ulaspace-tokens.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/ulaspace-office.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/modern-design-system.css') }}">
 
     <style>
-        :root {
-            --brand-primary: #10B981;
-            --brand-primary-hover: #059669;
-            --brand-accent: #3B82F6;
-            --brand-gold: #F59E0B;
-            --brand-crimson: #EF4444;
-            --brand-teal: #14B8A6;
+        :root[data-theme="dark"], :root {
+            --brand-primary: var(--nx-palm-300, #3c6b4c);
+            --brand-primary-hover: var(--nx-palm-500, #1e412f);
+            --brand-accent: var(--nx-accent, #d3a553);
+            --brand-gold: var(--nx-gold-400, #d3a553);
+            --brand-crimson: var(--nx-terracotta-500, #9a5827);
+            --brand-teal: var(--nx-palm-300, #3c6b4c);
 
-            --bg-body: #09120E;
-            --bg-header: rgba(13, 27, 20, 0.94);
-            --bg-panel: rgba(18, 36, 27, 0.96);
-            --bg-card: rgba(24, 48, 36, 0.85);
-            --bg-input: rgba(11, 22, 16, 0.85);
-            --border-panel: rgba(52, 211, 153, 0.18);
-            --border-card: rgba(52, 211, 153, 0.12);
+            --bg-body: var(--nx-palm-950, #0b1410);
+            --bg-dock: rgba(20, 43, 36, 0.92);
+            --bg-surface: var(--nx-palm-900, #142b24);
+            --bg-card: var(--nx-palm-700, #1b3223);
+            --bg-input: rgba(11, 20, 16, 0.90);
+            --border-color: rgba(237, 230, 217, 0.15);
+            --border-card: rgba(237, 230, 217, 0.12);
+            --border-panel: rgba(237, 230, 217, 0.18);
 
-            --text-main: #F8FAFC;
-            --text-muted: #94A3B8;
-            --text-dim: #64748B;
+            --text-primary: var(--nx-sand-100, #f9f4ee);
+            --text-secondary: var(--nx-sand-400, #e3d2bb);
+            --text-muted: var(--nx-sand-500, #c1b6a6);
+            --text-main: var(--nx-sand-100, #f9f4ee);
+            --text-dim: var(--nx-sand-500, #c1b6a6);
 
             --shadow-elevated: 0 16px 36px rgba(0, 0, 0, 0.4);
             --shadow-panel: 0 8px 24px rgba(0, 0, 0, 0.35);
+        }
+
+        :root[data-theme="light"] {
+            --brand-primary: #059669;
+            --brand-primary-hover: #047857;
+            --brand-accent: #2563EB;
+            --brand-gold: #D97706;
+            --brand-crimson: #DC2626;
+            --brand-teal: #0D9488;
+
+            --bg-body: #F4F7F4;
+            --bg-dock: rgba(255, 255, 255, 0.95);
+            --bg-surface: rgba(255, 255, 255, 0.98);
+            --bg-card: rgba(240, 248, 243, 0.92);
+            --bg-input: rgba(245, 250, 247, 0.95);
+            --border-color: rgba(5, 150, 105, 0.20);
+            --border-card: rgba(5, 150, 105, 0.14);
+            --border-panel: rgba(5, 150, 105, 0.18);
+
+            --text-primary: #0F172A;
+            --text-secondary: #475569;
+            --text-muted: #94A3B8;
+            --text-main: #0F172A;
+            --text-dim: #64748B;
         }
 
         * {
@@ -44,9 +76,9 @@
         }
 
         body {
-            font-family: 'Cairo', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             background: var(--bg-body);
-            color: var(--text-main);
+            color: var(--text-primary);
             height: 100vh;
             overflow: hidden;
             display: flex;
@@ -54,75 +86,48 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ── Header Navigation ── */
-        .editor-header {
-            height: 60px;
-            background: var(--bg-header);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border-panel);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 18px;
-            z-index: 100;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-        }
-
-        .header-left, .header-center, .header-right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .brand-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 14px;
-            background: var(--bg-input);
-            border: 1px solid var(--border-panel);
-            border-radius: 10px;
-            color: var(--text-main);
-            font-size: 12px;
-            font-weight: 800;
-            text-decoration: none;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .brand-btn:hover {
-            border-color: var(--brand-primary);
-            color: var(--brand-primary);
-            transform: translateY(-1px);
-        }
-
-        .map-meta {
+        .nx-editor-screen {
+            width: 95%;
+            max-width: 1720px;
+            height: calc(100vh - 24px);
+            background: radial-gradient(circle at center, #0B1C13 0%, #050B08 100%);
+            border: 2px solid rgba(237, 230, 217, 0.16);
+            border-radius: 28px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), inset 0 0 80px rgba(0, 0, 0, 0.6);
             display: flex;
             flex-direction: column;
-            gap: 2px;
-        }
-        .map-name {
-            font-size: 13px;
-            font-weight: 800;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .map-version-badge {
-            font-size: 10px;
-            font-weight: 800;
-            padding: 1px 8px;
-            border-radius: 6px;
-            background: rgba(16, 185, 129, 0.15);
-            color: #6EE7B7;
-            border: 1px solid rgba(16, 185, 129, 0.35);
-            width: fit-content;
+            overflow: hidden;
+            position: relative;
         }
 
-        /* ── Tools Bar ── */
+        .editor-workspace {
+            flex: 1;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+            height: calc(100% - 56px);
+        }
+
+        .canvas-viewport {
+            flex: 1;
+            height: 100%;
+            position: relative;
+            background: transparent;
+            overflow: hidden;
+            cursor: default;
+        }
+
+        #editor-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ── Tools Bar & Buttons ── */
         .segmented-tool-pill {
             display: flex;
             align-items: center;
-            background: rgba(11, 22, 16, 0.9);
+            background: rgba(11, 20, 16, 0.9);
             border: 1px solid var(--border-panel);
             border-radius: 12px;
             padding: 3px;
@@ -139,19 +144,19 @@
             border-radius: 9px;
             color: var(--text-muted);
             font-size: 12px;
-            font-weight: 800;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .tool-btn:hover {
-            background: rgba(52, 211, 153, 0.1);
-            color: var(--text-main);
+            background: rgba(60, 107, 76, 0.2);
+            color: var(--text-primary);
         }
         .tool-btn.active {
-            background: rgba(16, 185, 129, 0.22);
-            border-color: rgba(52, 211, 153, 0.45);
-            color: #6EE7B7;
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+            background: rgba(60, 107, 76, 0.35);
+            border-color: rgba(134, 239, 172, 0.4);
+            color: #86EFAC;
+            box-shadow: 0 2px 8px rgba(60, 107, 76, 0.3);
         }
 
         .tool-icon-btn {
@@ -169,9 +174,9 @@
             transition: all 0.18s;
         }
         .tool-icon-btn:hover {
-            background: rgba(52, 211, 153, 0.12);
+            background: rgba(60, 107, 76, 0.2);
             border-color: var(--brand-primary);
-            color: var(--text-main);
+            color: var(--text-primary);
             transform: scale(1.05);
         }
         .tool-icon-btn.danger:hover {
@@ -185,13 +190,13 @@
             position: absolute;
             top: calc(100% + 8px);
             inset-inline-start: 0;
-            background: rgba(14, 28, 20, 0.98);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(52, 211, 153, 0.25);
-            border-radius: 12px;
-            box-shadow: 0 16px 36px rgba(0,0,0,0.6);
+            background: rgba(14, 25, 19, 0.98);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(237, 230, 217, 0.20);
+            border-radius: 14px;
+            box-shadow: 0 16px 36px rgba(0,0,0,0.65);
             padding: 6px;
-            z-index: 10000;
+            z-index: 100000;
             display: flex;
             flex-direction: column;
             gap: 2px;
@@ -211,21 +216,42 @@
             text-decoration: none;
             background: transparent;
             border: none;
-            color: var(--text-main);
+            color: var(--text-primary);
             font-size: 12px;
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
             width: 100%;
             text-align: start;
             transition: background 0.15s ease;
         }
         .editor-dropdown-item:hover {
-            background: rgba(52, 211, 153, 0.12);
-            color: #6EE7B7;
+            background: rgba(60, 107, 76, 0.25);
+            color: #86EFAC;
         }
         .editor-dropdown-item.active {
-            background: rgba(16, 185, 129, 0.2);
-            color: #6EE7B7;
+            background: rgba(60, 107, 76, 0.4);
+            color: #86EFAC;
+        }
+
+        .more-menu-item {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            padding: 9px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            text-align: start;
+            transition: all 0.15s ease;
+        }
+        .more-menu-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #86EFAC;
         }
 
         .act-btn {
@@ -235,7 +261,7 @@
             padding: 7px 12px;
             border-radius: 10px;
             font-size: 12px;
-            font-weight: 800;
+            font-weight: 700;
             cursor: pointer;
             border: none;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -250,54 +276,14 @@
             box-shadow: 0 6px 16px rgba(16, 185, 129, 0.45);
             transform: translateY(-1px);
         }
-        .act-btn-amber {
-            background: rgba(245, 158, 11, 0.15);
-            border: 1px solid rgba(245, 158, 11, 0.4);
-            color: #FBBF24;
-        }
-        .act-btn-amber:hover {
-            background: rgba(245, 158, 11, 0.25);
-            transform: translateY(-1px);
-        }
-        .act-btn-crimson {
-            background: rgba(239, 68, 68, 0.14);
-            border: 1px solid rgba(239, 68, 68, 0.35);
-            color: #F87171;
-        }
-        .act-btn-crimson:hover {
-            background: rgba(239, 68, 68, 0.25);
-            transform: translateY(-1px);
-        }
         .act-btn-secondary {
             background: var(--bg-input);
             border: 1px solid var(--border-panel);
-            color: var(--text-main);
+            color: var(--text-primary);
         }
         .act-btn-secondary:hover {
             border-color: var(--brand-primary);
             color: var(--brand-primary);
-        }
-
-        /* ── Workspace Layout ── */
-        .editor-workspace {
-            flex: 1;
-            display: flex;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .canvas-viewport {
-            flex: 1;
-            height: calc(100vh - 60px);
-            position: relative;
-            background: radial-gradient(circle at center, #0F2319 0%, #08120D 100%);
-            overflow: hidden;
-            cursor: default;
-        }
-        #editor-canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
         }
 
         /* Floating View Nav Overlay */
@@ -308,7 +294,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            background: var(--bg-header);
+            background: rgba(14, 25, 19, 0.95);
             backdrop-filter: blur(14px);
             border: 1px solid var(--border-panel);
             padding: 6px 10px;
@@ -319,7 +305,7 @@
         .view-btn {
             background: var(--bg-input);
             border: 1px solid var(--border-card);
-            color: var(--text-main);
+            color: var(--text-primary);
             width: 32px;
             height: 32px;
             border-radius: 8px;
@@ -356,7 +342,7 @@
         .float-act-btn {
             background: var(--bg-input);
             border: 1px solid var(--border-card);
-            color: var(--text-main);
+            color: var(--text-primary);
             padding: 4px 8px;
             border-radius: 6px;
             font-size: 11px;
@@ -365,22 +351,22 @@
             transition: all 0.15s;
         }
         .float-act-btn:hover {
-            background: rgba(52, 211, 153, 0.15);
+            background: rgba(60, 107, 76, 0.25);
             border-color: var(--brand-primary);
-            color: #6EE7B7;
+            color: #86EFAC;
         }
 
         /* ── Right Customizer Drawer ── */
         .customizer-drawer {
             width: 380px;
-            height: calc(100vh - 60px);
-            background: var(--bg-panel);
-            backdrop-filter: blur(24px);
+            height: 100%;
+            background: rgba(14, 25, 19, 0.96);
+            backdrop-filter: blur(28px);
             border-inline-start: 1px solid var(--border-panel);
             display: flex;
             flex-direction: column;
             z-index: 20;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: var(--shadow-panel);
         }
         .customizer-drawer.collapsed {
@@ -401,8 +387,8 @@
         }
         .drawer-title {
             font-size: 14px;
-            font-weight: 900;
-            color: var(--text-main);
+            font-weight: 700;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -413,7 +399,7 @@
             background: var(--bg-input);
             padding: 4px;
             margin: 10px 14px;
-            border-radius: 10px;
+            border-radius: 12px;
             gap: 4px;
             border: 1px solid var(--border-card);
         }
@@ -423,18 +409,18 @@
             padding: 8px 4px;
             border-radius: 8px;
             font-size: 11px;
-            font-weight: 800;
+            font-weight: 700;
             color: var(--text-muted);
             cursor: pointer;
             transition: all 0.18s;
         }
         .drawer-tab:hover {
-            color: var(--text-main);
+            color: var(--text-primary);
         }
         .drawer-tab.active {
             background: var(--brand-primary);
             color: white;
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 2px 8px rgba(60, 107, 76, 0.4);
         }
 
         .drawer-body {
@@ -458,7 +444,7 @@
             border: 1px solid var(--border-panel);
             border-radius: 10px;
             padding: 9px 36px 9px 12px;
-            color: var(--text-main);
+            color: var(--text-primary);
             font-size: 12px;
             font-weight: 600;
             outline: none;
@@ -469,7 +455,7 @@
         }
         .search-box:focus {
             border-color: var(--brand-primary);
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+            box-shadow: 0 0 10px rgba(60, 107, 76, 0.3);
         }
         .search-clear-btn {
             position: absolute;
@@ -483,7 +469,7 @@
             padding: 2px 4px;
         }
         .search-clear-btn:hover {
-            color: var(--text-main);
+            color: var(--text-primary);
         }
 
         .category-filter-bar {
@@ -492,13 +478,13 @@
             overflow-x: auto;
             padding: 2px 2px 6px 2px;
             scrollbar-width: thin;
-            scrollbar-color: rgba(52, 211, 153, 0.3) transparent;
+            scrollbar-color: rgba(60, 107, 76, 0.4) transparent;
         }
         .category-filter-bar::-webkit-scrollbar {
             height: 3px;
         }
         .category-filter-bar::-webkit-scrollbar-thumb {
-            background: rgba(52, 211, 153, 0.3);
+            background: rgba(60, 107, 76, 0.4);
             border-radius: 3px;
         }
         .cat-pill {
@@ -511,7 +497,7 @@
             border-radius: 18px;
             color: var(--text-muted);
             font-size: 11px;
-            font-weight: 800;
+            font-weight: 700;
             white-space: nowrap;
             cursor: pointer;
             transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
@@ -520,25 +506,24 @@
         }
         .cat-pill:hover {
             border-color: var(--brand-primary);
-            color: var(--text-main);
-            background: rgba(16, 185, 129, 0.12);
+            color: var(--text-primary);
+            background: rgba(60, 107, 76, 0.2);
             transform: translateY(-1px);
         }
         .cat-pill.active {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.25));
+            background: linear-gradient(135deg, rgba(60, 107, 76, 0.4), rgba(30, 65, 47, 0.4));
             border-color: var(--brand-primary);
-            color: #6EE7B7;
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+            color: #86EFAC;
+            box-shadow: 0 2px 8px rgba(60, 107, 76, 0.3);
         }
         .cat-pill-count {
             font-size: 9px;
             padding: 1px 5px;
             border-radius: 8px;
             background: rgba(0, 0, 0, 0.4);
-            color: #A7F3D0;
+            color: #86EFAC;
         }
 
-        /* ── Furniture Category Accordions & 2-Column Cards ── */
         .category-group {
             background: var(--bg-input);
             border: 1px solid var(--border-card);
@@ -547,7 +532,7 @@
             transition: border-color 0.2s;
         }
         .category-group:hover {
-            border-color: rgba(52, 211, 153, 0.3);
+            border-color: rgba(60, 107, 76, 0.4);
         }
         .category-title-bar {
             padding: 9px 12px;
@@ -555,14 +540,14 @@
             align-items: center;
             justify-content: space-between;
             font-size: 12px;
-            font-weight: 800;
-            color: var(--text-main);
+            font-weight: 700;
+            color: var(--text-primary);
             cursor: pointer;
             background: rgba(255, 255, 255, 0.02);
             transition: background 0.15s;
         }
         .category-title-bar:hover {
-            background: rgba(16, 185, 129, 0.08);
+            background: rgba(60, 107, 76, 0.12);
         }
         .cat-chevron {
             font-size: 11px;
@@ -582,7 +567,7 @@
             width: 4px;
         }
         .furniture-grid::-webkit-scrollbar-thumb {
-            background: rgba(52, 211, 153, 0.25);
+            background: rgba(60, 107, 76, 0.35);
             border-radius: 4px;
         }
 
@@ -603,14 +588,14 @@
         }
         .furn-card:hover {
             border-color: var(--brand-primary);
-            background: rgba(16, 185, 129, 0.12);
+            background: rgba(60, 107, 76, 0.2);
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4), 0 0 10px rgba(16, 185, 129, 0.2);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4), 0 0 10px rgba(60, 107, 76, 0.3);
         }
         .furn-card.active {
-            border-color: #10B981;
-            background: rgba(16, 185, 129, 0.22);
-            box-shadow: 0 0 14px rgba(16, 185, 129, 0.4);
+            border-color: #86EFAC;
+            background: rgba(60, 107, 76, 0.35);
+            box-shadow: 0 0 14px rgba(60, 107, 76, 0.5);
         }
 
         .furn-card-top-badges {
@@ -630,8 +615,8 @@
             border-radius: 4px;
         }
         .furn-type-badge {
-            background: rgba(16, 185, 129, 0.2);
-            color: #6EE7B7;
+            background: rgba(60, 107, 76, 0.3);
+            color: #86EFAC;
             padding: 1px 5px;
             border-radius: 4px;
         }
@@ -643,7 +628,7 @@
             align-items: center;
             justify-content: center;
             border-radius: 8px;
-            background: radial-gradient(circle at center, rgba(24, 48, 36, 0.9) 0%, rgba(10, 22, 16, 0.95) 100%);
+            background: radial-gradient(circle at center, rgba(27, 50, 35, 0.9) 0%, rgba(11, 20, 16, 0.95) 100%);
             border: 1px solid rgba(255, 255, 255, 0.06);
             overflow: hidden;
             position: relative;
@@ -661,8 +646,8 @@
         }
         .furn-label {
             font-size: 11px;
-            font-weight: 800;
-            color: var(--text-main);
+            font-weight: 700;
+            color: var(--text-primary);
             line-height: 1.25;
             max-width: 100%;
             overflow: hidden;
@@ -682,7 +667,7 @@
         }
         .prop-label {
             font-size: 11px;
-            font-weight: 800;
+            font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.04em;
@@ -693,9 +678,9 @@
             border: 1px solid var(--border-panel);
             border-radius: 8px;
             padding: 8px 12px;
-            color: var(--text-main);
+            color: var(--text-primary);
             font-size: 12px;
-            font-weight: 700;
+            font-weight: 600;
             outline: none;
             transition: border-color 0.2s;
         }
@@ -714,9 +699,9 @@
             background: var(--bg-card);
             border: 1px solid var(--border-card);
             border-radius: 6px;
-            color: var(--text-main);
+            color: var(--text-primary);
             font-size: 11px;
-            font-weight: 800;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.15s;
         }
@@ -730,15 +715,16 @@
             position: fixed;
             bottom: 24px;
             inset-inline-start: 24px;
-            background: #10B981;
+            background: rgba(60, 107, 76, 0.95);
+            backdrop-filter: blur(12px);
             color: white;
             padding: 12px 20px;
-            border-radius: 12px;
+            border-radius: 14px;
             font-size: 13px;
-            font-weight: 800;
+            font-weight: 700;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
             display: none;
-            z-index: 1000;
+            z-index: 100000;
             animation: popToast 0.3s ease;
         }
         @keyframes popToast {
@@ -749,136 +735,194 @@
 </head>
 <body>
 
-    <!-- ── Header Navigation ── -->
-    <header class="editor-header">
-        <!-- Left: Navigation & Branch Selector -->
-        <div class="header-left">
-            <a href="{{ route('dashboard') }}" class="brand-btn" title="{{ __('Back to Dashboard') }}">
-                <span>📊</span>
-                <span>{{ __('Dashboard') }}</span>
-            </a>
+    <div class="nx-office-viewport-container" style="display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; position: relative;">
+        
+        <div class="nx-editor-screen">
+            
+            <!-- ── Top Map & Editor Toolbar (UlaSpace Figma Standard) ── -->
+            <header class="nx-map-toolbar" style="position: relative; top: 0; left: 0; right: 0; border-radius: 0; border-inline: none; border-block-start: none; background: rgba(14, 25, 19, 0.95); backdrop-filter: blur(24px); border-block-end: 1px solid rgba(237, 230, 217, 0.15); padding: 10px 16px; margin: 0; display: flex; align-items: center; justify-content: space-between; z-index: 100;">
+                
+                <!-- 1. Start Group (Top Right on RTL): Burger Menu + Brand Capsule + Branch Switcher + Version -->
+                <div class="nx-toolbar-group">
+                    <!-- Main Burger Dropdown -->
+                    <div style="position: relative; display: inline-block;">
+                        <button type="button" onclick="toggleEditorMainMenu(event)" class="nx-toolbar-btn" style="padding: 6px 10px;" title="{{ __('Menu (القائمة الرئيسية)') }}">
+                            <span class="material-symbols-rounded" style="font-size: 20px;">menu</span>
+                        </button>
+                        
+                        <div id="editor-main-menu-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); inset-inline-start: 0; min-width: 260px; background: rgba(14, 25, 19, 0.98); backdrop-filter: blur(24px); border: 1px solid rgba(237, 230, 217, 0.20); border-radius: 16px; box-shadow: 0 16px 40px rgba(0,0,0,0.65); padding: 8px; z-index: 100000;">
+                            <!-- Header Info -->
+                            <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px 12px; border-bottom: 1px solid rgba(237, 230, 217, 0.12); margin-bottom: 6px;">
+                                @if(!empty($organization->logo_url))
+                                    <img src="{{ $organization->logo_url }}" alt="{{ $organization->name }}" style="height: 24px; width: auto; object-fit: contain;">
+                                @else
+                                    <span class="material-symbols-rounded" style="color: var(--nx-map-gold); font-size: 24px;">apartment</span>
+                                @endif
+                                <div style="overflow: hidden;">
+                                    <strong style="display: block; font-size: 13px; color: var(--nx-map-text); white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">{{ $organization->name }}</strong>
+                                    <span style="font-size: 11px; color: var(--nx-map-muted);">{{ __('Floor Map Designer') }}</span>
+                                </div>
+                            </div>
 
-            <div style="display: flex; align-items: center; gap: 6px; padding: 0 4px;">
-                <strong style="font-size: 13px; font-weight: 900; color: #FFFFFF; letter-spacing: -0.01em;">{{ __('Map Editor') }}</strong>
-                <span style="font-size: 11px; font-weight: 700; color: var(--brand-primary); background: rgba(16, 185, 129, 0.12); padding: 2px 8px; border-radius: 6px; border: 1px solid rgba(52, 211, 153, 0.25);">{{ $organization->name }}</span>
-            </div>
+                            <!-- Actions -->
+                            <a href="{{ route('dashboard') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #F9F4EE; font-size: 12px; font-weight: 600;">
+                                <span class="material-symbols-rounded" style="font-size: 18px; color: var(--nx-map-gold);">dashboard</span>
+                                <span>{{ __('Dashboard (لوحة التحكم)') }}</span>
+                            </a>
 
-            <!-- Office / Branch Switcher Dropdown -->
-            <div style="position: relative; display: inline-block;">
-                <button type="button" onclick="toggleBranchDropdown(event)" class="brand-btn" style="background: rgba(16, 185, 129, 0.12); border-color: rgba(52, 211, 153, 0.35); color: #6EE7B7; display: flex; align-items: center; gap: 8px;" title="{{ __('Select Office Branch to Edit') }}">
-                    <span>🏢</span>
-                    <span style="max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $floor->name }}</span>
-                    <span style="font-size: 8px; opacity: 0.7;">▼</span>
-                </button>
+                            <a href="{{ route('office', ['office' => $floor->id]) }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #86EFAC; font-size: 12px; font-weight: 600;">
+                                <span class="material-symbols-rounded" style="font-size: 18px;">meeting_room</span>
+                                <span>{{ __('Enter Live Office (دخول المكتب)') }}</span>
+                            </a>
 
-                <div id="branch-select-dropdown" class="editor-dropdown-menu" style="display: none; min-width: 230px;">
-                    <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); padding: 8px 12px; border-bottom: 1px solid var(--border-card);">
-                        🏢 {{ __('Select Office Branch (اختر الفرع للتعديل)') }}
-                    </div>
-                    @foreach($floors as $f)
-                    <a href="{{ route('editor', ['office' => $f->id]) }}" class="editor-dropdown-item {{ $f->id === $floor->id ? 'active' : '' }}">
-                        <div style="display: flex; flex-direction: column; gap: 2px;">
-                            <strong style="font-size: 12px; color: {{ $f->id === $floor->id ? '#6EE7B7' : 'var(--text-main)' }};">
-                                {{ $f->name }}
-                            </strong>
-                            <span style="font-size: 10px; color: var(--text-dim);">
-                                📍 {{ $f->city_location ?: __('Primary Location') }}
-                            </span>
+                            @if(session('superadmin_impersonator_id'))
+                            <form method="POST" action="{{ route('impersonate.leave') }}" style="margin: 0;">
+                                @csrf
+                                <button type="submit" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #93C5FD; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                                    <span class="material-symbols-rounded" style="font-size: 18px;">shield</span>
+                                    <span>{{ __('Return to Super Admin (الرجوع للمشرف العام)') }}</span>
+                                </button>
+                            </form>
+                            @endif
+
+                            <div style="height: 1px; background: rgba(237, 230, 217, 0.12); margin: 6px 0;"></div>
+
+                            <!-- Floorplan Actions -->
+                            <button type="button" onclick="triggerFloorplanUpload(); closeEditorMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #F9F4EE; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                                <span class="material-symbols-rounded" style="font-size: 18px; color: var(--nx-map-gold);">upload_file</span>
+                                <span>{{ __('Upload Custom Floorplan (رفع مخطط مخصص)') }}</span>
+                            </button>
+
+                            <button type="button" onclick="deleteFloorplan(); closeEditorMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #F87171; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                                <span class="material-symbols-rounded" style="font-size: 18px;">restart_alt</span>
+                                <span>{{ __('Reset to Default Floorplan (استعادة المخطط الافتراضي)') }}</span>
+                            </button>
+
+                            <button type="button" onclick="clearWorkspace(); closeEditorMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #FBBF24; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                                <span class="material-symbols-rounded" style="font-size: 18px;">cleaning_services</span>
+                                <span>{{ __('Clear All Furniture (تفريغ الأثاث)') }}</span>
+                            </button>
+
+                            <div style="height: 1px; background: rgba(237, 230, 217, 0.12); margin: 6px 0;"></div>
+
+                            <button type="button" onclick="toggleAppTheme(); closeEditorMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #F9F4EE; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                                <span class="material-symbols-rounded" style="font-size: 18px;">light_mode</span>
+                                <span>{{ __('Toggle Theme (المظهر)') }}</span>
+                            </button>
+
+                            @if(app()->getLocale() === 'ar')
+                                <a href="{{ route('lang.switch', 'en') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #F9F4EE; font-size: 12px; font-weight: 600;">
+                                    <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
+                                    <span>English (EN)</span>
+                                </a>
+                            @else
+                                <a href="{{ route('lang.switch', 'ar') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #F9F4EE; font-size: 12px; font-weight: 600;">
+                                    <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
+                                    <span>العربية (AR)</span>
+                                </a>
+                            @endif
                         </div>
-                        @if($f->id === $floor->id)
-                            <span style="font-size: 10px; color: #6EE7B7; font-weight: 800;">● {{ __('Editing') }}</span>
+                    </div>
+
+                    <!-- Brand Capsule with Logo -->
+                    <div class="nx-brand-capsule" onclick="toggleEditorMainMenu(event)" style="cursor: pointer;" title="{{ __('Click to open menu') }}">
+                        <span class="nx-presence-dot"></span>
+                        @if(!empty($organization->logo_url))
+                            <img src="{{ $organization->logo_url }}" alt="{{ $organization->name }}" style="height: 18px; width: auto; object-fit: contain;">
+                        @else
+                            <span class="material-symbols-rounded" style="color: var(--nx-map-gold); font-size: 18px;">apartment</span>
                         @endif
-                    </a>
-                    @endforeach
+                        <span>{{ $organization->name }}</span>
+                    </div>
+
+                    <!-- Branch Switcher -->
+                    <div style="position: relative; display: inline-block;">
+                        <button type="button" onclick="toggleBranchDropdown(event)" class="nx-toolbar-btn" style="color: var(--nx-map-gold); border-color: rgba(211, 165, 83, 0.35); font-weight: 600;" title="{{ __('Switch Office Branch (تغيير الفرع للتعديل)') }}">
+                            <span class="material-symbols-rounded" style="font-size: 18px;">domain</span>
+                            <span style="max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $floor->name }}</span>
+                            <span class="material-symbols-rounded" style="font-size: 16px;">arrow_drop_down</span>
+                        </button>
+                        <div id="branch-select-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); inset-inline-start: 0; min-width: 250px; background: rgba(14, 25, 19, 0.98); backdrop-filter: blur(18px); border: 1px solid rgba(237, 230, 217, 0.20); border-radius: 14px; box-shadow: 0 16px 36px rgba(0,0,0,0.65); padding: 6px; z-index: 100000;">
+                            <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 4px;">
+                                🏢 {{ __('Select Office Branch (اختر الفرع للتعديل)') }}
+                            </div>
+                            @foreach($floors as $f)
+                            <a href="{{ route('editor', ['office' => $f->id]) }}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: {{ $f->id === $floor->id ? '#86EFAC' : '#E2E8F0' }}; background: {{ $f->id === $floor->id ? 'rgba(36, 92, 58, 0.45)' : 'transparent' }}; font-weight: 700; font-size: 12px; transition: background 0.15s ease;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="material-symbols-rounded" style="font-size: 16px;">apartment</span>
+                                    <span>{{ $f->name }}</span>
+                                </div>
+                                @if($f->id === $floor->id)
+                                    <span style="font-size: 10px; color: #86EFAC; font-weight: 800;">● {{ __('Editing') }}</span>
+                                @endif
+                            </a>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <span class="nx-presence-capsule" id="header-version-badge" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 4px 10px;" title="Map version and status">
+                        v{{ $map->version }} • {{ ucfirst($map->status) }}
+                    </span>
                 </div>
-            </div>
 
-            <span class="map-version-badge" id="header-version-badge" title="Map version and publishing status">
-                v{{ $map->version }} • {{ ucfirst($map->status) }}
-            </span>
-        </div>
+                <!-- 2. Center: Tools Selector & Quick Actions -->
+                <div class="nx-toolbar-group" style="gap: 8px;">
+                    <div class="segmented-tool-pill" style="background: rgba(11, 20, 16, 0.90); border: 1px solid rgba(237, 230, 217, 0.15); border-radius: 14px; padding: 3px; display: flex; gap: 2px;">
+                        <button class="tool-btn active" id="tool-select" onclick="setTool('select')" title="{{ __('Select & Move Objects (V)') }}">
+                            <span class="material-symbols-rounded" style="font-size: 16px;">pan_tool_alt</span>
+                            <span>{{ __('Select') }}</span>
+                        </button>
+                        <button class="tool-btn" id="tool-room" onclick="setTool('room')" title="{{ __('Draw Meeting / Private Rooms (R)') }}">
+                            <span class="material-symbols-rounded" style="font-size: 16px;">meeting_room</span>
+                            <span>{{ __('Room') }}</span>
+                        </button>
+                        <button class="tool-btn" id="tool-object" onclick="setTool('object')" title="{{ __('Place Furniture & Decor (F)') }}">
+                            <span class="material-symbols-rounded" style="font-size: 16px;">chair</span>
+                            <span>{{ __('Furniture') }}</span>
+                        </button>
+                    </div>
 
-        <!-- Center: Tool Selector Segmented Pill -->
-        <div class="header-center">
-            <div class="segmented-tool-pill">
-                <button class="tool-btn active" id="tool-select" onclick="setTool('select')" title="{{ __('Select & Move Objects (V)') }}">
-                    <span>🖱️</span> <span>{{ __('Select') }}</span>
-                </button>
-                <button class="tool-btn" id="tool-room" onclick="setTool('room')" title="{{ __('Draw Meeting / Private Rooms (R)') }}">
-                    <span>🚪</span> <span>{{ __('Room') }}</span>
-                </button>
-                <button class="tool-btn" id="tool-object" onclick="setTool('object')" title="{{ __('Place Furniture & Decor (F)') }}">
-                    <span>🪑</span> <span>{{ __('Furniture') }}</span>
-                </button>
-            </div>
+                    <div style="display: flex; gap: 4px; align-items: center;">
+                        <button class="nx-toolbar-btn" onclick="rotateSelectedItem(90)" title="{{ __('Rotate 90° (R)') }}" style="width: 34px; height: 34px; padding: 0; justify-content: center;">
+                            <span class="material-symbols-rounded" style="font-size: 18px;">rotate_right</span>
+                        </button>
+                        <button class="nx-toolbar-btn" onclick="duplicateSelectedItem()" title="{{ __('Clone / Duplicate') }}" style="width: 34px; height: 34px; padding: 0; justify-content: center;">
+                            <span class="material-symbols-rounded" style="font-size: 18px;">content_copy</span>
+                        </button>
+                        <button class="nx-toolbar-btn" onclick="deleteSelectedItem()" title="{{ __('Delete Selected (Del)') }}" style="width: 34px; height: 34px; padding: 0; justify-content: center; color: #F87171; border-color: rgba(239, 68, 68, 0.3);">
+                            <span class="material-symbols-rounded" style="font-size: 18px;">delete</span>
+                        </button>
+                    </div>
+                </div>
 
-            <div style="display: flex; gap: 4px; align-items: center;">
-                <button class="tool-icon-btn" onclick="rotateSelectedItem(90)" title="{{ __('Rotate 90° (R)') }}">
-                    <span>🔄</span>
-                </button>
-                <button class="tool-icon-btn danger" onclick="deleteSelectedItem()" title="{{ __('Delete Selected (Del)') }}">
-                    <span>🗑️</span>
-                </button>
-            </div>
-        </div>
+                <!-- 3. End Group (Top Left on RTL): AI Generator + Save + Publish + Catalog Drawer -->
+                <div class="nx-toolbar-group">
+                    <input type="file" id="floorplan-file-input" accept="image/jpeg,image/png,image/webp,image/jpg" style="display:none;" onchange="handleFloorplanUpload(this)">
 
-        <!-- Right: Actions Group -->
-        <div class="header-right">
-            <!-- ✨ AI Office & Blueprint Generator Button -->
-            <button type="button" onclick="openAiGeneratorModal()" class="act-btn" style="background: linear-gradient(135deg, #10B981, #059669); color: white; border: 1px solid rgba(52, 211, 153, 0.4); display: flex; align-items: center; gap: 6px; font-weight: 800; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);" title="{{ __('Generate 3D Isometric Office Floorplan & Rooms with AI') }}">
-                <span>✨</span>
-                <span>{{ __('AI Office Generator (توليد بالذكاء الاصطناعي)') }}</span>
-            </button>
-
-            <input type="file" id="floorplan-file-input" accept="image/jpeg,image/png,image/webp,image/jpg" style="display:none;" onchange="handleFloorplanUpload(this)">
-
-            <!-- Floorplan Dropdown Menu -->
-            <div style="position: relative; display: inline-block;">
-                <button type="button" onclick="toggleFloorplanDropdown(event)" class="act-btn act-btn-secondary" style="display: flex; align-items: center; gap: 6px;" title="{{ __('Floorplan Background & Clear Options') }}">
-                    <span>🖼️</span>
-                    <span>{{ __('Floorplan') }}</span>
-                    <span style="font-size: 8px; opacity: 0.7;">▼</span>
-                </button>
-
-                <div id="floorplan-actions-dropdown" class="editor-dropdown-menu" style="display: none; min-width: 220px; inset-inline-end: 0; inset-inline-start: auto;">
-                    <button type="button" onclick="triggerFloorplanUpload(); closeDropdowns();" class="editor-dropdown-item">
-                        <span>⬆️</span>
-                        <span>{{ __('Upload Custom Floorplan') }}</span>
+                    <button type="button" onclick="openAiGeneratorModal()" class="nx-toolbar-btn btn-accent" style="font-weight: 700; background: linear-gradient(135deg, rgba(211, 165, 83, 0.35), rgba(184, 137, 50, 0.35)); border-color: rgba(211, 165, 83, 0.6); color: #F59E0B;" title="{{ __('Generate 3D Isometric Office Floorplan & Rooms with AI') }}">
+                        <span class="material-symbols-rounded" style="font-size: 18px;">auto_awesome</span>
+                        <span>{{ __('AI Generator') }}</span>
                     </button>
-                    <button type="button" onclick="deleteFloorplan(); closeDropdowns();" class="editor-dropdown-item" style="color: #F87171;">
-                        <span>🔄</span>
-                        <span>{{ __('Reset to Default Floorplan') }}</span>
+
+                    <button class="nx-toolbar-btn" onclick="saveMapDraft()" title="{{ __('Save Map Draft') }}">
+                        <span class="material-symbols-rounded" style="font-size: 18px;">save</span>
+                        <span>{{ __('Save') }}</span>
                     </button>
-                    <div style="height: 1px; background: var(--border-card); margin: 4px 0;"></div>
-                    <button type="button" onclick="clearWorkspace(); closeDropdowns();" class="editor-dropdown-item" style="color: #FBBF24;">
-                        <span>🧹</span>
-                        <span>{{ __('Clear All Furniture (تفريغ)') }}</span>
+
+                    <button class="nx-toolbar-btn" onclick="publishMap()" style="background: rgba(60, 107, 76, 0.4); border-color: #3C6B4C; color: #86EFAC; font-weight: 700;" title="{{ __('Publish Map to Live Office') }}">
+                        <span class="material-symbols-rounded" style="font-size: 18px;">rocket_launch</span>
+                        <span>{{ __('Publish') }}</span>
+                    </button>
+
+                    <button class="nx-toolbar-btn" onclick="toggleCustomizerDrawer()" title="{{ __('Toggle 3D Catalog & Inspector') }}" style="background: rgba(255, 255, 255, 0.08);">
+                        <span class="material-symbols-rounded" style="font-size: 18px;">dashboard_customize</span>
+                        <span>{{ __('Catalog') }}</span>
                     </button>
                 </div>
-            </div>
+            </header>
 
-            <button class="act-btn act-btn-secondary" onclick="saveMapDraft()" title="{{ __('Save Map Draft') }}">
-                <span>💾</span> <span>{{ __('Save') }}</span>
-            </button>
-
-            <button class="act-btn act-btn-emerald" onclick="publishMap()" title="{{ __('Publish Map to Live Office') }}">
-                <span>🚀</span> <span>{{ __('Publish') }}</span>
-            </button>
-
-            <a href="{{ route('office', ['office' => $floor->id]) }}" class="act-btn act-btn-secondary" style="background: rgba(37, 99, 235, 0.15); border-color: rgba(59, 130, 246, 0.35); color: #93C5FD;" title="{{ __('Enter Live Office Branch') }}">
-                <span>👁️</span> <span>{{ __('Live View') }}</span>
-            </a>
-
-            @if(app()->getLocale() === 'ar')
-                <a href="{{ route('lang.switch', 'en') }}" class="brand-btn" style="padding: 6px 10px; font-size: 11px;" title="Switch to English">EN</a>
-            @else
-                <a href="{{ route('lang.switch', 'ar') }}" class="brand-btn" style="padding: 6px 10px; font-size: 11px;" title="التبديل إلى العربية">عربي</a>
-            @endif
-        </div>
-    </header>
-
-    <!-- ── Main Workspace ── -->
-    <div class="editor-workspace">
+            <!-- ── Main Workspace ── -->
+            <div class="editor-workspace">
         
         <!-- Canvas Viewport -->
         <div class="canvas-viewport" id="canvas-container">
@@ -1354,7 +1398,9 @@
 
             </div>
         </aside>
-    </div>
+    </div> <!-- .editor-workspace -->
+    </div> <!-- .nx-editor-screen -->
+    </div> <!-- .nx-office-viewport-container -->
 
     <!-- Toast Notification -->
     <div id="toast-bubble" class="toast-bubble"></div>
@@ -2752,33 +2798,58 @@
             }
         }
 
-        // ── Dropdown Handlers ──
-        function toggleBranchDropdown(e) {
-            e.stopPropagation();
-            const dd = document.getElementById('branch-select-dropdown');
-            const other = document.getElementById('floorplan-actions-dropdown');
-            if (other) other.style.display = 'none';
-            if (dd) dd.style.display = dd.style.display === 'none' ? 'flex' : 'none';
+        // ── Dropdown & Menu Handlers ──
+        function toggleEditorMainMenu(e) {
+            if (e) e.stopPropagation();
+            const menu = document.getElementById('editor-main-menu-dropdown');
+            const branchDD = document.getElementById('branch-select-dropdown');
+            if (branchDD) branchDD.style.display = 'none';
+            if (menu) {
+                menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
+            }
         }
 
-        function toggleFloorplanDropdown(e) {
-            e.stopPropagation();
-            const dd = document.getElementById('floorplan-actions-dropdown');
-            const other = document.getElementById('branch-select-dropdown');
-            if (other) other.style.display = 'none';
-            if (dd) dd.style.display = dd.style.display === 'none' ? 'flex' : 'none';
+        function closeEditorMainMenu() {
+            const menu = document.getElementById('editor-main-menu-dropdown');
+            if (menu) menu.style.display = 'none';
+        }
+
+        function toggleBranchDropdown(e) {
+            if (e) e.stopPropagation();
+            const menu = document.getElementById('editor-main-menu-dropdown');
+            if (menu) menu.style.display = 'none';
+            const dd = document.getElementById('branch-select-dropdown');
+            if (dd) {
+                dd.style.display = (dd.style.display === 'none' || dd.style.display === '') ? 'block' : 'none';
+            }
         }
 
         function closeDropdowns() {
             const d1 = document.getElementById('branch-select-dropdown');
-            const d2 = document.getElementById('floorplan-actions-dropdown');
+            const d2 = document.getElementById('editor-main-menu-dropdown');
             if (d1) d1.style.display = 'none';
             if (d2) d2.style.display = 'none';
         }
 
+        function toggleAppTheme() {
+            const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+            const next = cur === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            showToast(next === 'dark' ? '🌙 {{ __("Dark mode active") }}' : '☀️ {{ __("Light mode active") }}');
+        }
+
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('#branch-select-dropdown') && !e.target.closest('#floorplan-actions-dropdown')) {
-                closeDropdowns();
+            const menu = document.getElementById('editor-main-menu-dropdown');
+            if (menu && menu.style.display === 'block') {
+                if (!e.target.closest('#editor-main-menu-dropdown') && !e.target.closest('button[onclick*="toggleEditorMainMenu"]') && !e.target.closest('.nx-brand-capsule')) {
+                    menu.style.display = 'none';
+                }
+            }
+            const branchDD = document.getElementById('branch-select-dropdown');
+            if (branchDD && branchDD.style.display === 'block') {
+                if (!e.target.closest('#branch-select-dropdown') && !e.target.closest('button[onclick*="toggleBranchDropdown"]')) {
+                    branchDD.style.display = 'none';
+                }
             }
         });
 
