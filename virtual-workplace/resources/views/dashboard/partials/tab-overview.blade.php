@@ -1,276 +1,308 @@
 <div id="tab-overview" class="tab-view active">
 
     <!-- ── 1. Welcome Hero Banner (Figma Dashboard Screen) ── -->
-    <div class="relative overflow-hidden rounded-[var(--nx-radius-xl)] border border-[var(--nx-border-subtle)] bg-[var(--nx-bg-surface)] p-6 sm:p-8 mb-6 shadow-[var(--nx-shadow-sm)]">
-        <!-- Subtle Arch Gradient Glow -->
-        <div class="absolute inset-0 bg-gradient-to-br from-[var(--nx-palm-900)]/[0.02] via-transparent to-[var(--nx-gold-400)]/[0.05] pointer-events-none"></div>
-
-        <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <!-- Left (RTL Start): Greeting & Actions -->
-            <div class="flex-1 min-w-0">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--nx-sand-200)] border border-[var(--nx-border-subtle)] text-[12px] font-medium text-[var(--nx-palm-900)] mb-3">
-                    <span class="w-2 h-2 rounded-full bg-[var(--nx-status-live)] animate-pulse"></span>
-                    <span>{{ __('Ready to Collaborate') }}</span>
-                    <span class="text-[var(--nx-text-muted)]">·</span>
-                    <span class="text-[var(--nx-text-muted)]">{{ $organization->name }}</span>
-                </div>
-
-                <h1 class="text-[24px] sm:text-[28px] font-semibold text-[var(--nx-text-primary)] leading-tight mb-1.5 font-['IBM_Plex_Sans_Arabic',sans-serif]">
-                    {{ __('Good morning, :name!', ['name' => explode(' ', $user->name)[0]]) }}
-                </h1>
-                
-                <p class="text-[13px] sm:text-[14px] text-[var(--nx-text-secondary)] font-normal mb-5 max-w-xl">
-                    {{ __('Your workspace is ready. Let\'s make today productive!') }}
-                    <span class="text-[var(--nx-text-muted)] block text-[12px] mt-0.5 font-['IBM_Plex_Sans',sans-serif]">
-                        ” كل فكرة عظيمة تبدأ بمحادثة “
-                    </span>
-                </p>
-
-                <!-- Action CTAs -->
-                <div class="flex items-center gap-3 flex-wrap">
-                    <x-btn href="{{ route('office') }}" variant="primary" size="md" icon="apartment">
-                        <span>{{ __('Enter Workspace') }}</span>
-                    </x-btn>
-                    
-                    <x-btn onclick="openScheduleMeetingModal('general')" variant="secondary" size="md" icon="calendar_add_on">
-                        <span>{{ __('Schedule Meeting') }}</span>
-                    </x-btn>
-
-                    @if($membership->hasPermission('maps.manage'))
-                        <x-btn href="{{ route('editor') }}" variant="ghost" size="md" icon="design_services">
-                            <span>{{ __('Floor Editor') }}</span>
-                        </x-btn>
-                    @endif
-                </div>
+    <div class="nx-hero-welcome">
+        <!-- Left / RTL Start: Greeting & Actions -->
+        <div style="flex: 1; min-width: 280px;">
+            <div class="nx-hero-greeting-pill">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: #3C6B4C; display: inline-block;"></span>
+                <span>{{ __('Ready to Collaborate') }}</span>
+                <span style="color: var(--nx-text-mute);">·</span>
+                <span style="color: var(--nx-text-mute);">{{ $organization->name }}</span>
             </div>
 
-            <!-- Right (RTL End): Date Capsule & User Mini Card -->
-            <div class="flex items-center gap-4 shrink-0 p-4 rounded-[var(--nx-radius-lg)] bg-[var(--nx-sand-100)] border border-[var(--nx-border-subtle)]">
-                <!-- User Avatar -->
-                <div class="relative cursor-pointer" onclick="switchAdminTab('profile')" title="{{ __('View Profile') }}">
-                    <div class="w-14 h-14 rounded-full border-2 border-[var(--nx-bg-surface)] shadow-[var(--nx-shadow-sm)] overflow-hidden bg-[var(--nx-sand-200)] flex items-center justify-center text-[var(--nx-palm-900)] font-bold text-lg">
-                        @if($user->avatar_url)
-                            <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="w-full h-full object-cover">
-                        @else
-                            <span>{{ strtoupper(substr($user->name, 0, 2)) }}</span>
-                        @endif
-                    </div>
-                    <div class="absolute bottom-0 inset-inline-end-0 w-3.5 h-3.5 rounded-full bg-[var(--nx-status-live)] border-2 border-[var(--nx-bg-surface)]" title="{{ __('Online') }}"></div>
-                </div>
+            <h1 class="nx-hero-title">
+                {{ __('Good morning, :name!', ['name' => explode(' ', $user->name)[0]]) }}
+            </h1>
+            
+            <p class="nx-hero-tagline">
+                {{ __('Your workspace is ready. Let\'s make today productive!') }}
+                <span style="display: block; font-size: 12px; color: var(--nx-text-mute); margin-top: 2px;">
+                    ” كل فكرة عظيمة تبدأ بمحادثة “
+                </span>
+            </p>
 
-                <!-- Date Info Block -->
-                <div class="flex flex-col text-start">
-                    <span class="text-[11px] font-semibold text-[var(--nx-accent)] uppercase tracking-wider">
-                        {{ now()->locale(app()->getLocale())->translatedFormat('l') }}
-                    </span>
-                    <span class="text-[20px] font-light text-[var(--nx-text-primary)] font-['IBM_Plex_Sans_Arabic',sans-serif] leading-tight">
-                        {{ now()->format('d') }} {{ now()->locale(app()->getLocale())->translatedFormat('F') }}
-                    </span>
-                    <span class="text-[11px] text-[var(--nx-text-muted)] font-mono">
-                        {{ now()->format('Y') }}
-                    </span>
+            <!-- Action CTAs -->
+            <div class="nx-hero-actions">
+                <a href="{{ route('office') }}" class="nx-btn-primary">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">apartment</span>
+                    <span>{{ __('Enter Workspace') }}</span>
+                </a>
+                
+                <button type="button" onclick="openScheduleMeetingModal('general')" class="nx-btn-secondary">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">calendar_add_on</span>
+                    <span>{{ __('Schedule Meeting') }}</span>
+                </button>
+
+                @if($membership->hasPermission('maps.manage'))
+                    <a href="{{ route('editor') }}" class="nx-btn-outline">
+                        <span class="material-symbols-rounded" style="font-size: 18px;">design_services</span>
+                        <span>{{ __('Floor Editor') }}</span>
+                    </a>
+                @endif
+            </div>
+        </div>
+
+        <!-- Right / RTL End: Date Capsule & User Avatar -->
+        <div class="nx-hero-date-card">
+            <!-- User Avatar with Online status -->
+            <div style="position: relative; cursor: pointer;" onclick="switchAdminTab('profile')" title="{{ __('View Profile') }}">
+                <div style="width: 52px; height: 52px; border-radius: 50%; border: 2px solid #FFFFFF; box-shadow: 0 2px 8px rgba(20,43,36,0.08); overflow: hidden; background: #F4EDE1; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: #142B24;">
+                    @if($user->avatar_url)
+                        <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    @else
+                        <span>{{ strtoupper(substr($user->name, 0, 2)) }}</span>
+                    @endif
                 </div>
+                <div style="position: absolute; bottom: 0; inset-inline-end: 0; width: 13px; height: 13px; border-radius: 50%; background: #3C6B4C; border: 2px solid #FFFFFF;" title="{{ __('Online') }}"></div>
+            </div>
+
+            <!-- Date Info Block -->
+            <div style="display: flex; flex-direction: column; text-align: start;">
+                <span style="font-size: 11px; font-weight: 600; color: #D3A553; text-transform: uppercase; letter-spacing: 0.5px;">
+                    {{ now()->locale(app()->getLocale())->translatedFormat('l') }}
+                </span>
+                <span style="font-size: 18px; font-weight: 300; color: #142B24; line-height: 1.2;">
+                    {{ now()->format('d') }} {{ now()->locale(app()->getLocale())->translatedFormat('F') }}
+                </span>
+                <span style="font-size: 11px; color: #8E9D95; font-family: 'IBM Plex Mono', monospace;">
+                    {{ now()->format('Y') }}
+                </span>
             </div>
         </div>
     </div>
 
-    <!-- ── 2. Stat Cards Grid (4 Columns · Figma Density=Compact) ── -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        @php
-            $todayMeetings = $upcomingMeetings->filter(fn($m) => $m->scheduled_at && $m->scheduled_at->isToday());
-            $openRooms = $rooms->where('door_status', 'open')->count();
-            $pendingGuests = $guestInvitations->where('status', 'pending')->count() ?? 0;
-            $activeMembersCount = $stats['members'] ?? 1;
-        @endphp
+    <!-- ── 2. Stat Cards Grid (4 Columns · Weight 300 Numbers) ── -->
+    @php
+        $todayMeetings = $upcomingMeetings->filter(fn($m) => $m->scheduled_at && $m->scheduled_at->isToday());
+        $openRooms = $rooms->where('door_status', 'open')->count();
+        $pendingGuests = $guestInvitations->where('status', 'pending')->count() ?? 0;
+        $activeMembersCount = $stats['members'] ?? 1;
+    @endphp
 
+    <div class="nx-stat-grid">
         <!-- 1. Active Presence -->
-        <x-kpi-card 
-            title="المتواجدون الآن"
-            subtitle="Active Presence"
-            value="{{ $activeMembersCount }}"
-            caption="من فريقك متصل حالياً"
-            icon="group"
-            iconColor="emerald"
-            density="compact"
-        />
+        <div class="nx-stat-card">
+            <div class="nx-stat-top">
+                <div>
+                    <span class="nx-stat-title">المتواجدون الآن</span>
+                    <span class="nx-stat-subtitle">Active Presence</span>
+                </div>
+                <div class="nx-stat-icon-wrap emerald">
+                    <span class="material-symbols-rounded" style="font-size: 19px;">group</span>
+                </div>
+            </div>
+            <div>
+                <div class="nx-stat-number {{ $activeMembersCount == 0 ? 'is-zero' : '' }}">
+                    {{ $activeMembersCount }}
+                </div>
+                <div class="nx-stat-caption">من فريقك متصل حالياً</div>
+            </div>
+        </div>
 
         <!-- 2. Today's Meetings -->
-        <x-kpi-card 
-            title="اجتماعات اليوم"
-            subtitle="Today's Sessions"
-            value="{{ $todayMeetings->count() }}"
-            caption="مواعيد مجدولة لليوم"
-            icon="calendar_month"
-            iconColor="gold"
-            density="compact"
-        />
+        <div class="nx-stat-card">
+            <div class="nx-stat-top">
+                <div>
+                    <span class="nx-stat-title">اجتماعات اليوم</span>
+                    <span class="nx-stat-subtitle">Today's Sessions</span>
+                </div>
+                <div class="nx-stat-icon-wrap gold">
+                    <span class="material-symbols-rounded" style="font-size: 19px;">calendar_month</span>
+                </div>
+            </div>
+            <div>
+                <div class="nx-stat-number {{ $todayMeetings->count() == 0 ? 'is-zero' : '' }}">
+                    {{ $todayMeetings->count() }}
+                </div>
+                <div class="nx-stat-caption">مواعيد مجدولة لليوم</div>
+            </div>
+        </div>
 
-        <!-- 3. Active Rooms -->
-        <x-kpi-card 
-            title="مكاتب نشطة"
-            subtitle="Active Workspaces"
-            value="{{ $openRooms }}"
-            caption="قاعات مفتوحة للعمل"
-            icon="meeting_room"
-            iconColor="sage"
-            density="compact"
-        />
+        <!-- 3. Active Workspaces -->
+        <div class="nx-stat-card">
+            <div class="nx-stat-top">
+                <div>
+                    <span class="nx-stat-title">مكاتب نشطة</span>
+                    <span class="nx-stat-subtitle">Active Workspaces</span>
+                </div>
+                <div class="nx-stat-icon-wrap sage">
+                    <span class="material-symbols-rounded" style="font-size: 19px;">meeting_room</span>
+                </div>
+            </div>
+            <div>
+                <div class="nx-stat-number {{ $openRooms == 0 ? 'is-zero' : '' }}">
+                    {{ $openRooms }}
+                </div>
+                <div class="nx-stat-caption">قاعات مفتوحة للعمل</div>
+            </div>
+        </div>
 
         <!-- 4. Pending Invitations -->
-        <x-kpi-card 
-            title="الدعوات الجديدة"
-            subtitle="Pending Invites"
-            value="{{ $pendingGuests }}"
-            caption="بانتظار الانضمام"
-            icon="mail"
-            iconColor="muted"
-            density="compact"
-        />
+        <div class="nx-stat-card">
+            <div class="nx-stat-top">
+                <div>
+                    <span class="nx-stat-title">الدعوات الجديدة</span>
+                    <span class="nx-stat-subtitle">Pending Invites</span>
+                </div>
+                <div class="nx-stat-icon-wrap muted">
+                    <span class="material-symbols-rounded" style="font-size: 19px;">mail</span>
+                </div>
+            </div>
+            <div>
+                <div class="nx-stat-number {{ $pendingGuests == 0 ? 'is-zero' : '' }}">
+                    {{ $pendingGuests }}
+                </div>
+                <div class="nx-stat-caption">بانتظار الانضمام</div>
+            </div>
+        </div>
     </div>
 
     <!-- ── 3. Three Panels (Figma Screen Layout) ── -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+    <div class="nx-panels-grid">
         
-        <!-- Panel 1: Quick Actions (3 Cols on LG) -->
-        <div class="lg:col-span-4 flex flex-col gap-3">
-            <div class="flex items-center justify-between">
-                <h3 class="text-[15px] font-semibold text-[var(--nx-text-primary)] font-['IBM_Plex_Sans_Arabic',sans-serif]">
-                    {{ __('Quick Actions (إجراءات سريعة)') }}
-                </h3>
+        <!-- Panel 1: Quick Actions -->
+        <div class="nx-panel-card">
+            <div class="nx-panel-header">
+                <h3 class="nx-panel-title">{{ __('Quick Actions (إجراءات سريعة)') }}</h3>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <x-quick-tile 
-                    icon="calendar_add_on"
-                    title="جدولة اجتماع"
-                    subtitle="Schedule Meeting"
-                    onclick="openScheduleMeetingModal('general')"
-                />
-                <x-quick-tile 
-                    icon="person_add"
-                    title="دعوة عضو"
-                    subtitle="Invite Member"
-                    onclick="openInviteMemberModal()"
-                />
-                <x-quick-tile 
-                    icon="meeting_room"
-                    title="إدارة القاعات"
-                    subtitle="Manage Rooms"
-                    onclick="switchAdminTab('rooms')"
-                />
-                <x-quick-tile 
-                    icon="add_task"
-                    title="مهمة جديدة"
-                    subtitle="Create Task"
-                    onclick="openCreateTaskModal()"
-                />
+            <div class="nx-quick-grid">
+                <button type="button" class="nx-quick-tile" onclick="openScheduleMeetingModal('general')">
+                    <span class="material-symbols-rounded nx-quick-tile-icon">calendar_add_on</span>
+                    <div>
+                        <span class="nx-quick-tile-title">جدولة اجتماع</span>
+                        <span class="nx-quick-tile-subtitle">Schedule</span>
+                    </div>
+                </button>
+
+                <button type="button" class="nx-quick-tile" onclick="openInviteModal()">
+                    <span class="material-symbols-rounded nx-quick-tile-icon">person_add</span>
+                    <div>
+                        <span class="nx-quick-tile-title">دعوة عضو</span>
+                        <span class="nx-quick-tile-subtitle">Invite</span>
+                    </div>
+                </button>
+
+                <button type="button" class="nx-quick-tile" onclick="switchAdminTab('rooms')">
+                    <span class="material-symbols-rounded nx-quick-tile-icon">meeting_room</span>
+                    <div>
+                        <span class="nx-quick-tile-title">إدارة القاعات</span>
+                        <span class="nx-quick-tile-subtitle">Rooms</span>
+                    </div>
+                </button>
+
+                <button type="button" class="nx-quick-tile" onclick="openCreateTaskModal()">
+                    <span class="material-symbols-rounded nx-quick-tile-icon">add_task</span>
+                    <div>
+                        <span class="nx-quick-tile-title">مهمة جديدة</span>
+                        <span class="nx-quick-tile-subtitle">Task</span>
+                    </div>
+                </button>
             </div>
         </div>
 
-        <!-- Panel 2: Today's Meetings (5 Cols on LG) -->
-        <div class="lg:col-span-5 flex flex-col gap-3">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <h3 class="text-[15px] font-semibold text-[var(--nx-text-primary)] font-['IBM_Plex_Sans_Arabic',sans-serif]">
-                        {{ __('Today\'s Scheduled Meetings (اجتماعات اليوم)') }}
-                    </h3>
-                    <x-badge variant="live" size="sm" :dot="true">
+        <!-- Panel 2: Today's Meetings -->
+        <div class="nx-panel-card">
+            <div class="nx-panel-header">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <h3 class="nx-panel-title">{{ __('Today\'s Scheduled Meetings (اجتماعات اليوم)') }}</h3>
+                    <span style="font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 9999px; background: #E7F3EC; color: #3C6B4C;">
                         {{ $todayMeetings->count() }}
-                    </x-badge>
+                    </span>
                 </div>
-                <button type="button" onclick="switchAdminTab('meetings')" class="text-[12px] font-medium text-[var(--nx-accent)] hover:underline">
+                <button type="button" onclick="switchAdminTab('meetings')" style="background: none; border: none; font-size: 12px; font-weight: 600; color: #D3A553; cursor: pointer;">
                     {{ __('View All (عرض الكل)') }} →
                 </button>
             </div>
 
-            <div class="flex flex-col gap-2.5">
-                @forelse($todayMeetings->take(4) as $meeting)
-                    <x-meeting-row 
-                        :time="$meeting->scheduled_at ? $meeting->scheduled_at->format('h:i A') : 'الآن'"
-                        :title="$meeting->title"
-                        :room="$meeting->room->name ?? ($meeting->project->name ?? 'قاعة عامة')"
-                        :status="$meeting->status === 'live' ? 'live' : ($meeting->status === 'cancelled' ? 'cancelled' : 'scheduled')"
-                        density="compact"
-                    />
-                @empty
-                    @if($upcomingMeetings->count() > 0)
-                        @foreach($upcomingMeetings->take(3) as $meeting)
-                            <x-meeting-row 
-                                :time="$meeting->scheduled_at ? $meeting->scheduled_at->format('M d, h:i A') : 'قريباً'"
-                                :title="$meeting->title"
-                                :room="$meeting->room->name ?? ($meeting->project->name ?? 'قاعة عامة')"
-                                :status="$meeting->status === 'live' ? 'live' : ($meeting->status === 'cancelled' ? 'cancelled' : 'scheduled')"
-                                density="compact"
-                            />
-                        @endforeach
-                    @else
-                        <div class="p-6 text-center rounded-[var(--nx-radius-lg)] border border-dashed border-[var(--nx-border-default)] bg-[var(--nx-bg-surface)]">
-                            <div class="w-10 h-10 mx-auto rounded-full bg-[var(--nx-sand-200)] flex items-center justify-center text-[var(--nx-accent)] mb-2">
-                                <span class="material-symbols-rounded text-[20px]">calendar_month</span>
+            <div class="nx-meeting-list">
+                @forelse($todayMeetings->take(3) as $meeting)
+                    <div class="nx-meeting-row">
+                        <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
+                            <span class="nx-meeting-time">
+                                {{ $meeting->scheduled_at ? $meeting->scheduled_at->format('h:i A') : 'الآن' }}
+                            </span>
+                            <div style="display: flex; flex-direction: column; min-width: 0;">
+                                <span style="font-size: 13px; font-weight: 500; color: #142B24; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    {{ $meeting->title }}
+                                </span>
+                                <span style="font-size: 11px; color: #5A6B63;">
+                                    {{ $meeting->room->name ?? ($meeting->project->name ?? 'قاعة عامة') }}
+                                </span>
                             </div>
-                            <p class="text-[13px] font-medium text-[var(--nx-text-primary)] mb-1">
-                                {{ __('No meetings scheduled for today') }}
-                            </p>
-                            <p class="text-[11px] text-[var(--nx-text-muted)] mb-3">
-                                {{ __('All clear for today. You can schedule a new meeting anytime.') }}
-                            </p>
-                            <x-btn onclick="openScheduleMeetingModal('general')" variant="outline" size="sm" icon="add">
-                                <span>{{ __('Schedule Meeting') }}</span>
-                            </x-btn>
                         </div>
-                    @endif
+
+                        <div class="nx-meeting-status-badge {{ $meeting->status === 'live' ? 'live' : 'scheduled' }}" title="{{ $meeting->status === 'live' ? 'مباشر الآن' : 'مجدول' }}">
+                            <span class="material-symbols-rounded" style="font-size: 16px;">
+                                {{ $meeting->status === 'live' ? 'videocam' : 'schedule' }}
+                            </span>
+                        </div>
+                    </div>
+                @empty
+                    <div style="padding: 24px 16px; text-align: center; border-radius: 12px; border: 1px dashed rgba(20,43,36,0.12); background: #FAF6F0;">
+                        <span class="material-symbols-rounded" style="font-size: 28px; color: #D3A553; display: block; margin-bottom: 6px;">calendar_month</span>
+                        <p style="font-size: 13px; font-weight: 500; color: #142B24; margin: 0 0 4px 0;">
+                            {{ __('No meetings scheduled for today') }}
+                        </p>
+                        <p style="font-size: 11px; color: #8E9D95; margin: 0 0 12px 0;">
+                            {{ __('All clear for today. You can schedule a new meeting anytime.') }}
+                        </p>
+                        <button type="button" onclick="openScheduleMeetingModal('general')" class="nx-btn-secondary" style="height: 34px; padding: 0 14px; font-size: 12px;">
+                            <span class="material-symbols-rounded" style="font-size: 15px;">add</span>
+                            <span>{{ __('Schedule Meeting') }}</span>
+                        </button>
+                    </div>
                 @endforelse
             </div>
         </div>
 
-        <!-- Panel 3: Workspace Utilization Donut (3 Cols on LG) -->
+        <!-- Panel 3: Workspace Utilization Donut -->
         @php
             $totalRooms = max(1, $rooms->count());
             $occupancyPercent = round(($openRooms / $totalRooms) * 100);
             $closedRooms = $totalRooms - $openRooms;
         @endphp
-        <div class="lg:col-span-3 flex flex-col gap-3">
-            <div class="flex items-center justify-between">
-                <h3 class="text-[15px] font-semibold text-[var(--nx-text-primary)] font-['IBM_Plex_Sans_Arabic',sans-serif]">
-                    {{ __('Workspace (مساحة العمل)') }}
-                </h3>
+        <div class="nx-panel-card">
+            <div class="nx-panel-header">
+                <h3 class="nx-panel-title">{{ __('Workspace (مساحة العمل)') }}</h3>
             </div>
 
-            <div class="flex flex-col items-center justify-between rounded-[var(--nx-radius-lg)] border border-[var(--nx-border-subtle)] bg-[var(--nx-bg-surface)] p-5 shadow-[var(--nx-shadow-sm)]">
-                <!-- Donut Chart -->
-                <div class="my-2">
-                    <x-donut-chart 
-                        :percent="$occupancyPercent" 
-                        size="default" 
-                        label="{{ $occupancyPercent }}%" 
-                        caption="قيد الاستخدام"
-                    />
-                </div>
+            <div class="nx-donut-wrap">
+                <!-- SVG Donut Chart -->
+                <x-donut-chart 
+                    :percent="$occupancyPercent" 
+                    size="default" 
+                    label="{{ $occupancyPercent }}%" 
+                    caption="قيد الاستخدام"
+                    accentColor="#142B24"
+                    trackColor="#F4EDE1"
+                />
 
                 <!-- Legend -->
-                <div class="w-full flex flex-col gap-2 mt-4 pt-3 border-t border-[var(--nx-border-subtle)] text-[12px]">
-                    <div class="flex items-center justify-between">
-                        <span class="flex items-center gap-2 text-[var(--nx-text-secondary)]">
-                            <span class="w-2.5 h-2.5 rounded-full bg-[var(--nx-status-live)]"></span>
+                <div class="nx-legend-list">
+                    <div class="nx-legend-item">
+                        <span style="display: flex; align-items: center;">
+                            <span class="nx-legend-dot" style="background: #3C6B4C;"></span>
                             <span>غرف مفتوحة</span>
                         </span>
-                        <span class="font-mono font-medium text-[var(--nx-text-primary)]">{{ $openRooms }}</span>
+                        <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: #142B24;">{{ $openRooms }}</span>
                     </div>
 
-                    <div class="flex items-center justify-between">
-                        <span class="flex items-center gap-2 text-[var(--nx-text-secondary)]">
-                            <span class="w-2.5 h-2.5 rounded-full bg-[var(--nx-gold-400)]"></span>
+                    <div class="nx-legend-item">
+                        <span style="display: flex; align-items: center;">
+                            <span class="nx-legend-dot" style="background: #D3A553;"></span>
                             <span>غرف مغلقة</span>
                         </span>
-                        <span class="font-mono font-medium text-[var(--nx-text-primary)]">{{ $closedRooms }}</span>
+                        <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: #142B24;">{{ $closedRooms }}</span>
                     </div>
 
-                    <div class="flex items-center justify-between">
-                        <span class="flex items-center gap-2 text-[var(--nx-text-muted)]">
-                            <span class="w-2.5 h-2.5 rounded-full bg-[var(--nx-stone-track)]"></span>
+                    <div class="nx-legend-item">
+                        <span style="display: flex; align-items: center;">
+                            <span class="nx-legend-dot" style="background: #E8DECC;"></span>
                             <span>معدل الشغور</span>
                         </span>
-                        <span class="font-mono font-medium text-[var(--nx-text-muted)]">{{ 100 - $occupancyPercent }}%</span>
+                        <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 500; color: #8E9D95;">{{ 100 - $occupancyPercent }}%</span>
                     </div>
                 </div>
             </div>
@@ -278,19 +310,19 @@
     </div>
 
     <!-- ── 4. Quote Banner Strip (Figma Spec) ── -->
-    <div class="relative overflow-hidden rounded-[var(--nx-radius-lg)] border border-[var(--nx-border-subtle)] bg-[var(--nx-sand-100)] p-4 shadow-[var(--nx-shadow-sm)] flex items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-            <span class="material-symbols-rounded text-[22px] text-[var(--nx-accent)]">format_quote</span>
-            <div class="flex flex-col">
-                <span class="text-[13px] font-medium text-[var(--nx-text-primary)] font-['IBM_Plex_Sans_Arabic',sans-serif]">
+    <div class="nx-quote-banner">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span class="material-symbols-rounded" style="font-size: 22px; color: #D3A553;">format_quote</span>
+            <div style="display: flex; flex-direction: column;">
+                <span style="font-size: 13px; font-weight: 500; color: #142B24;">
                     ” مساحات أفضل تصنع فرقاً أعظم “
                 </span>
-                <span class="text-[11px] text-[var(--nx-text-muted)] font-['IBM_Plex_Sans',sans-serif]">
+                <span style="font-size: 11px; color: #8E9D95;">
                     Better spaces carve greater teams.
                 </span>
             </div>
         </div>
-        <div class="hidden sm:flex items-center gap-2 text-[11px] text-[var(--nx-text-muted)]">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: #8E9D95;">
             <span>UlaSpace Workplace</span>
             <span>·</span>
             <span>ALULA</span>
