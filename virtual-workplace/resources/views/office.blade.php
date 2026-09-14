@@ -1271,15 +1271,15 @@
             const bottomInset = 76;
             const sideInset = 32;
 
-            const availW = Math.max(100, width - sideInset);
+            const availW = Math.max(100, width - (sideInset * 2));
             const availH = Math.max(100, height - topInset - bottomInset);
             const scaleX = availW / MAP_WIDTH_PX;
             const scaleY = availH / MAP_HEIGHT_PX;
             // Contain full floor plan 100% inside unobstructed view between top bar and bottom dock
             zoomLevel = Math.min(scaleX, scaleY);
 
-            cameraOffset.x = (width - MAP_WIDTH_PX * zoomLevel) / 2;
-            cameraOffset.y = topInset + (availH - MAP_HEIGHT_PX * zoomLevel) / 2;
+            cameraOffset.x = Math.round((width - MAP_WIDTH_PX * zoomLevel) / 2);
+            cameraOffset.y = Math.round((height - MAP_HEIGHT_PX * zoomLevel) / 2);
         }
 
         function zoomIn() {
