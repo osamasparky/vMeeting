@@ -789,24 +789,6 @@
 
                             <div style="height: 1px; background: rgba(237, 230, 217, 0.12); margin: 6px 0;"></div>
 
-                            <!-- Floorplan Actions -->
-                            <button type="button" onclick="triggerFloorplanUpload(); closeEditorMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #F9F4EE; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
-                                <span class="material-symbols-rounded" style="font-size: 18px; color: var(--nx-map-gold);">upload_file</span>
-                                <span>{{ __('Upload Custom Floorplan (رفع مخطط مخصص)') }}</span>
-                            </button>
-
-                            <button type="button" onclick="deleteFloorplan(); closeEditorMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #F87171; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
-                                <span class="material-symbols-rounded" style="font-size: 18px;">restart_alt</span>
-                                <span>{{ __('Reset to Default Floorplan (استعادة المخطط الافتراضي)') }}</span>
-                            </button>
-
-                            <button type="button" onclick="clearWorkspace(); closeEditorMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #FBBF24; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
-                                <span class="material-symbols-rounded" style="font-size: 18px;">cleaning_services</span>
-                                <span>{{ __('Clear All Furniture (تفريغ الأثاث)') }}</span>
-                            </button>
-
-                            <div style="height: 1px; background: rgba(237, 230, 217, 0.12); margin: 6px 0;"></div>
-
                             <button type="button" onclick="toggleAppTheme(); closeEditorMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #F9F4EE; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                                 <span class="material-symbols-rounded" style="font-size: 18px;">light_mode</span>
                                 <span>{{ __('Toggle Theme (المظهر)') }}</span>
@@ -961,8 +943,9 @@
                 <div class="drawer-tab active" id="tab-btn-furniture" onclick="switchDrawerTab('furniture')">
                     {{ __('3D Furniture') }}
                 </div>
-                <div class="drawer-tab" id="tab-btn-floors" onclick="switchDrawerTab('floors')">
-                    🎨 {{ __('Floor Styles') }}
+                <div class="drawer-tab" id="tab-btn-floors" onclick="switchDrawerTab('floors')" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 4px 6px;">
+                    <span style="font-size: 11px; font-weight: 700;">Floor Styles</span>
+                    <span style="font-size: 9px; opacity: 0.85; font-family: 'IBM Plex Sans Arabic', sans-serif;">الأرضيات</span>
                 </div>
                 <div class="drawer-tab" id="tab-btn-inspector" onclick="switchDrawerTab('inspector')">
                     {{ __('Selected Item') }}
@@ -1403,25 +1386,44 @@
 
                 <!-- 4. FLOORS & BACKGROUNDS TAB -->
                 <div id="drawer-view-floors" style="display: none; flex-direction: column; gap: 12px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 12px; font-weight: 800; color: #A7F3D0;">🎨 {{ __('18 Floor Styles (2400×1200)') }}</span>
-                        <label class="tool-btn" style="cursor: pointer; margin: 0; font-size: 11px;">
-                            📤 {{ __('Upload Custom') }}
+                    <!-- Quick Action Tools Bar (Moved from Burger Menu) -->
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 6px; background: rgba(0,0,0,0.35); border: 1px solid var(--border-panel); border-radius: 12px;">
+                        <label class="tool-btn" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; margin: 0; background: rgba(255,255,255,0.05);" title="{{ __('Upload Custom Floorplan (رفع مخطط مخصص)') }}">
+                            <span class="material-symbols-rounded" style="font-size: 20px; color: #F59E0B;">upload_file</span>
+                            <span style="font-weight: 700;">{{ __('Upload') }}</span>
+                            <span style="font-size: 9px; opacity: 0.8; font-family: 'IBM Plex Sans Arabic', sans-serif;">رفع مخصص</span>
                             <input type="file" accept="image/*" style="display:none;" onchange="handleCustomFloorUpload(this)">
                         </label>
+
+                        <button type="button" class="tool-btn" onclick="deleteFloorplan()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; color: #F87171; background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3);" title="{{ __('Reset to Default Floorplan (استعادة المخطط الافتراضي)') }}">
+                            <span class="material-symbols-rounded" style="font-size: 20px; color: #F87171;">restart_alt</span>
+                            <span style="font-weight: 700;">{{ __('Reset') }}</span>
+                            <span style="font-size: 9px; opacity: 0.8; font-family: 'IBM Plex Sans Arabic', sans-serif;">استعادة</span>
+                        </button>
+
+                        <button type="button" class="tool-btn" onclick="clearWorkspace()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; color: #FBBF24; background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3);" title="{{ __('Clear All Placed Furniture (تفريغ الأثاث)') }}">
+                            <span class="material-symbols-rounded" style="font-size: 20px; color: #FBBF24;">cleaning_services</span>
+                            <span style="font-weight: 700;">{{ __('Clear') }}</span>
+                            <span style="font-size: 9px; opacity: 0.8; font-family: 'IBM Plex Sans Arabic', sans-serif;">تفريغ الأثاث</span>
+                        </button>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 11px; font-weight: 800; color: #A7F3D0;">🎨 {{ __('Floor Styles Library (2839×1696)') }}</span>
+                        <span style="font-size: 10px; color: var(--text-muted); font-family: monospace;">18 Styles</span>
                     </div>
 
                     <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
-                        {{ __('اختر نمط الأرضية لتطبيقه فوراً كخلفية للمكتب بمقاس 2400×1200 بكسل:') }}
+                        {{ __('اختر نمط الأرضية لتطبيقه فوراً كخلفية للمكتب بمقاس 2839×1696 بكسل:') }}
                     </div>
 
-                    <div id="floors-catalog-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-height: calc(100vh - 280px); overflow-y: auto; padding-right: 4px;">
+                    <div id="floors-catalog-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-height: calc(100vh - 360px); overflow-y: auto; padding-right: 4px;">
                         <!-- Injected via JavaScript -->
                     </div>
 
                     <div style="padding-top: 8px; border-top: 1px solid var(--border-panel); display: flex; justify-content: space-between; align-items: center;">
-                        <button type="button" class="tool-btn" onclick="clearCurrentFloorBackground()" style="color: #F87171; border-color: rgba(239,68,68,0.3); font-size: 11px;">
-                            🗑️ {{ __('Remove Floor Background (إزالة الخلفية)') }}
+                        <button type="button" class="tool-btn" onclick="clearCurrentFloorBackground()" style="color: #F87171; border-color: rgba(239,68,68,0.3); font-size: 11px; width: 100%; justify-content: center;">
+                            🗑️ {{ __('Remove Floor Background (إزالة صورة الأرضية)') }}
                         </button>
                     </div>
                 </div>
@@ -1455,10 +1457,10 @@
         const TILE_SIZE = 16;
         let MAP_WIDTH_PX = (MAP_DATA.layout_data && MAP_DATA.layout_data.background_width)
             ? Number(MAP_DATA.layout_data.background_width)
-            : ((MAP_DATA.width && MAP_DATA.width > 30) ? MAP_DATA.width * TILE_SIZE : 2194);
+            : ((MAP_DATA.width && MAP_DATA.width > 30) ? MAP_DATA.width * TILE_SIZE : 2839);
         let MAP_HEIGHT_PX = (MAP_DATA.layout_data && MAP_DATA.layout_data.background_height)
             ? Number(MAP_DATA.layout_data.background_height)
-            : ((MAP_DATA.height && MAP_DATA.height > 20) ? MAP_DATA.height * TILE_SIZE : 1952);
+            : ((MAP_DATA.height && MAP_DATA.height > 20) ? MAP_DATA.height * TILE_SIZE : 1696);
 
         let zoomLevel = 1.0;
         let panOffset = { x: 0, y: 0 };
@@ -1597,10 +1599,10 @@
             grid.innerHTML = FLOOR_CATALOG.map(f => {
                 const isActive = currentBg.includes(f.id);
                 return `
-                    <div class="furn-card ${isActive ? 'selected' : ''}" style="display:flex; flex-direction:column; gap:4px; padding:6px; cursor:pointer; position:relative; border-radius:12px; border:1px solid ${isActive ? 'var(--brand-primary)' : 'var(--border-card)'}; background:var(--bg-input);" onclick="applyFloorBackground('${f.url}', 2400, 1200)">
+                    <div class="furn-card ${isActive ? 'selected' : ''}" style="display:flex; flex-direction:column; gap:4px; padding:6px; cursor:pointer; position:relative; border-radius:12px; border:1px solid ${isActive ? 'var(--brand-primary)' : 'var(--border-card)'}; background:var(--bg-input);" onclick="applyFloorBackground('${f.url}', 2839, 1696)">
                         <div style="position:relative; width:100%; height:75px; border-radius:8px; overflow:hidden; background:#0B1C13;">
                             <img src="${f.thumb}" alt="${f.name_en}" style="width:100%; height:100%; object-fit:cover;">
-                            <span style="position:absolute; bottom:3px; inset-inline-end:3px; background:rgba(0,0,0,0.7); font-size:9px; font-family:monospace; padding:1px 4px; border-radius:4px; color:#A7F3D0;">2400×1200</span>
+                            <span style="position:absolute; bottom:3px; inset-inline-end:3px; background:rgba(0,0,0,0.7); font-size:9px; font-family:monospace; padding:1px 4px; border-radius:4px; color:#A7F3D0;">2839×1696</span>
                             ${isActive ? '<span style="position:absolute; top:3px; inset-inline-start:3px; background:#10B981; font-size:9px; font-weight:800; padding:1px 6px; border-radius:4px; color:#fff;">✓ نشط</span>' : ''}
                         </div>
                         <div style="font-size:11px; font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:start;">
@@ -1611,7 +1613,7 @@
             }).join('');
         }
 
-        async function applyFloorBackground(floorUrl, width = 2400, height = 1200) {
+        async function applyFloorBackground(floorUrl, width = 2839, height = 1696) {
             showToast('⏳ {{ __("Applying Floor Style (جاري تطبيق نمط الأرضية)...") }}');
             try {
                 const res = await fetch(`/editor/maps/${MAP_ID}/background`, {

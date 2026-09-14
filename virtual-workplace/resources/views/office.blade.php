@@ -864,7 +864,13 @@
                         </form>
                         @endif
 
-                        @if(!empty($user) && in_array($user->role ?? 'member', ['superadmin', 'company_admin', 'manager']))
+                        @if(!empty($user) && in_array($user->role ?? 'member', ['superadmin', 'company_admin', 'manager', 'admin']))
+                        <label class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; color: #F59E0B; font-size: 12px; font-weight: 600; cursor: pointer; margin: 0;">
+                            <span class="material-symbols-rounded" style="font-size: 18px; color: #F59E0B;">upload_file</span>
+                            <span>{{ __('Upload Floor Image (رفع صورة الأرضية)') }}</span>
+                            <input type="file" accept="image/*" style="display:none;" onchange="uploadOfficeFloorImage(this); closeOfficeMainMenu();">
+                        </label>
+
                         <a href="{{ route('editor') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #86EFAC; font-size: 12px; font-weight: 600;">
                             <span class="material-symbols-rounded" style="font-size: 18px;">draw</span>
                             <span>{{ __('Map Editor (محرر الخريطة)') }}</span>
@@ -1190,10 +1196,10 @@
         const TILE_SIZE = (CONFIG.map && CONFIG.map.tile_size) ? Number(CONFIG.map.tile_size) : 16;
         let MAP_WIDTH_PX = (CONFIG.map && CONFIG.map.layout_data && CONFIG.map.layout_data.background_width)
             ? Number(CONFIG.map.layout_data.background_width)
-            : ((CONFIG.map && CONFIG.map.width && CONFIG.map.width > 30) ? CONFIG.map.width * TILE_SIZE : 2194);
+            : ((CONFIG.map && CONFIG.map.width && CONFIG.map.width > 30) ? CONFIG.map.width * TILE_SIZE : 2839);
         let MAP_HEIGHT_PX = (CONFIG.map && CONFIG.map.layout_data && CONFIG.map.layout_data.background_height)
             ? Number(CONFIG.map.layout_data.background_height)
-            : ((CONFIG.map && CONFIG.map.height && CONFIG.map.height > 20) ? CONFIG.map.height * TILE_SIZE : 1952);
+            : ((CONFIG.map && CONFIG.map.height && CONFIG.map.height > 20) ? CONFIG.map.height * TILE_SIZE : 1696);
 
         let zoomLevel = 1.0;
         let cameraOffset = { x: 0, y: 0 };
@@ -1437,6 +1443,50 @@
                 MAP_WIDTH_PX = BLUEPRINT_IMAGE.naturalWidth;
                 MAP_HEIGHT_PX = BLUEPRINT_IMAGE.naturalHeight;
                 resizeCanvas();
+            }
+        }
+
+        async function uploadOfficeFloorImage(input) {
+            if (!input.files || !input.files[0]) return;
+            const file = input.files[0];
+            const formData = new FormData();
+            formData.append('image', file);
+            const mapId = CONFIG.map?.id;
+            if (!mapId) {
+                showToast('❌ {{ __("No active map ID found") }}');
+                return;
+            }
+
+            showToast('⏳ {{ __("Uploading Floor Image (جاري رفع صورة الأرضية)...") }}');
+            try {
+                const res = await fetch(`/editor/maps/${mapId}/background`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': CONFIG.csrf,
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                });
+                const data = await res.json();
+                if (res.ok && data.image_url) {
+                    const uploadedUrl = data.image_url;
+                    BLUEPRINT_IMAGE.src = uploadedUrl + '?v=' + Date.now();
+                    BLUEPRINT_IMAGE.onload = () => {
+                        blueprintLoaded = true;
+                        if (BLUEPRINT_IMAGE.naturalWidth > 0 && BLUEPRINT_IMAGE.naturalHeight > 0) {
+                            MAP_WIDTH_PX = BLUEPRINT_IMAGE.naturalWidth;
+                            MAP_HEIGHT_PX = BLUEPRINT_IMAGE.naturalHeight;
+                        }
+                        centerCamera('fill');
+                        if (typeof draw === 'function') draw();
+                        showToast('✅ {{ __("Floor Image Updated (تم تحديث صورة الأرضية بنجاح)") }}');
+                    };
+                } else {
+                    showToast('❌ ' + (data.message || 'Upload failed'));
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('❌ Upload failed');
             }
         }
 
