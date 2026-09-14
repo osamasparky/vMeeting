@@ -1196,10 +1196,10 @@
         const TILE_SIZE = (CONFIG.map && CONFIG.map.tile_size) ? Number(CONFIG.map.tile_size) : 16;
         let MAP_WIDTH_PX = (CONFIG.map && CONFIG.map.layout_data && CONFIG.map.layout_data.background_width && Number(CONFIG.map.layout_data.background_width) >= 500)
             ? Number(CONFIG.map.layout_data.background_width)
-            : 2839;
+            : 1500;
         let MAP_HEIGHT_PX = (CONFIG.map && CONFIG.map.layout_data && CONFIG.map.layout_data.background_height && Number(CONFIG.map.layout_data.background_height) >= 500)
             ? Number(CONFIG.map.layout_data.background_height)
-            : 1696;
+            : 900;
 
         let zoomLevel = 1.0;
         let cameraOffset = { x: 0, y: 0 };
@@ -1285,7 +1285,7 @@
                 // Edge-to-Edge Fill: covers width & height with zero black bars
                 zoomLevel = Math.max(scaleX, scaleY);
             } else {
-                // Exact Fit: fits the entire floor map (2839×1696) precisely inside the canvas, centered, 0 cutoff
+                // Exact Fit: fits the entire floor map (1500×900) precisely inside the canvas, centered, 0 cutoff
                 zoomLevel = Math.min(scaleX, scaleY);
             }
 
