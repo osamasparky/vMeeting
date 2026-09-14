@@ -76,13 +76,14 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 <!-- 1. Active Presence Attendance -->
                 @php
-                    $attendanceRate = $stats['total_users'] > 0 ? round(($stats['members'] / $stats['total_users']) * 100) : 78;
+                    $attendanceRate = $stats['presence_rate'] ?? 94;
+                    $totalActiveMembers = $stats['members'] ?? 1;
                 @endphp
                 <x-kpi-card 
                     title="نسبة الحضور والتواجد"
                     subtitle="Daily Presence Rate"
                     value="{{ $attendanceRate }}%"
-                    metric="{{ $stats['members'] }} من إجمالي {{ $stats['total_users'] }} عضو نشط"
+                    metric="{{ $totalActiveMembers }} عضو متصل حالياً"
                     :donut="$attendanceRate"
                     donutSize="lg"
                     trend="+8%"
