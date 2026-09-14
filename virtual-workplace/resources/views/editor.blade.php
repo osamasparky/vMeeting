@@ -1498,7 +1498,6 @@
 
         // ── Background Blueprint Artwork ──
         const BLUEPRINT_IMAGE = new Image();
-        BLUEPRINT_IMAGE.crossOrigin = 'anonymous';
         const initialBgUrl = (MAP_DATA.layout_data && MAP_DATA.layout_data.background_image_url)
             ? MAP_DATA.layout_data.background_image_url
             : null;

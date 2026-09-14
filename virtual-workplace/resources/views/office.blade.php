@@ -1006,6 +1006,19 @@
         <canvas id="office-canvas"></canvas>
     </div>
 
+    <!-- ── Floating Canvas Viewport Zoom & Navigation Controls ── -->
+    <div class="nx-floating-viewport-controls" aria-label="Map Zoom & Navigation Controls">
+        <button type="button" class="nx-viewport-ctrl-btn" onclick="zoomIn()" title="{{ __('Zoom In (تكبير الخريطة)') }}">
+            <span class="material-symbols-rounded">zoom_in</span>
+        </button>
+        <button type="button" class="nx-viewport-ctrl-btn" onclick="resetCameraView()" title="{{ __('Reset & Center View (إعادة ضبط الخريطة للمركز)') }}">
+            <span class="material-symbols-rounded">center_focus_strong</span>
+        </button>
+        <button type="button" class="nx-viewport-ctrl-btn" onclick="zoomOut()" title="{{ __('Zoom Out (تصغير الخريطة)') }}">
+            <span class="material-symbols-rounded">zoom_out</span>
+        </button>
+    </div>
+
     <!-- ── Floating Local Self Camera PiP ── -->
     <div class="local-cam-card" id="local-video-card" style="display: none;">
         <div class="local-cam-header">
@@ -1245,7 +1258,7 @@
         let isSessionReplaced = false;
         let wsReconnectAttempts = 0;
 
-        // ── Resize & Camera ──
+        // ── Resize, Zoom, Pan & Camera ──
         function centerCamera() {
             if (!canvas || !container) return;
             width = canvas.width = container.clientWidth || window.innerWidth;
@@ -1261,6 +1274,36 @@
             cameraOffset.y = (height - MAP_HEIGHT_PX * zoomLevel) / 2;
         }
 
+        function zoomIn() {
+            setZoomLevel(zoomLevel * 1.25);
+        }
+
+        function zoomOut() {
+            setZoomLevel(zoomLevel * 0.8);
+        }
+
+        function resetCameraView() {
+            centerCamera();
+            if (typeof draw === 'function') draw();
+            showToast('🎯 {{ __("Center & Fit View (إعادة ضبط الخريطة)") }}');
+        }
+
+        function setZoomLevel(newZoom, centerX = (width / 2), centerY = (height / 2)) {
+            const minZoom = 0.20;
+            const maxZoom = 2.5;
+            const clamped = Math.max(minZoom, Math.min(maxZoom, newZoom));
+            if (Math.abs(clamped - zoomLevel) < 0.001) return;
+
+            const worldX = (centerX - cameraOffset.x) / zoomLevel;
+            const worldY = (centerY - cameraOffset.y) / zoomLevel;
+
+            zoomLevel = clamped;
+            cameraOffset.x = centerX - worldX * zoomLevel;
+            cameraOffset.y = centerY - worldY * zoomLevel;
+
+            if (typeof draw === 'function') draw();
+        }
+
         function resizeCanvas() {
             centerCamera();
             if (typeof draw === 'function') draw();
@@ -1268,12 +1311,79 @@
         window.addEventListener('resize', resizeCanvas);
         centerCamera();
 
+        // Canvas Mouse Wheel Zoom
+        if (canvas) {
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                const factor = e.deltaY < 0 ? 1.15 : 0.87;
+                setZoomLevel(zoomLevel * factor, mouseX, mouseY);
+            }, { passive: false });
+        }
+
+        // Canvas Pan Drag Engine
+        let isPanning = false;
+        let panStartX = 0;
+        let panStartY = 0;
+        let panCamStartX = 0;
+        let panCamStartY = 0;
+        let hasMovedMouseDuringDrag = false;
+
+        if (canvas) {
+            canvas.addEventListener('mousedown', (e) => {
+                if (e.button === 1 || e.button === 2 || e.altKey || e.shiftKey) {
+                    isPanning = true;
+                    panStartX = e.clientX;
+                    panStartY = e.clientY;
+                    panCamStartX = cameraOffset.x;
+                    panCamStartY = cameraOffset.y;
+                    canvas.style.cursor = 'grab';
+                    e.preventDefault();
+                } else if (e.button === 0) {
+                    panStartX = e.clientX;
+                    panStartY = e.clientY;
+                    panCamStartX = cameraOffset.x;
+                    panCamStartY = cameraOffset.y;
+                    hasMovedMouseDuringDrag = false;
+                }
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (isPanning) {
+                    cameraOffset.x = panCamStartX + (e.clientX - panStartX);
+                    cameraOffset.y = panCamStartY + (e.clientY - panStartY);
+                    canvas.style.cursor = 'grabbing';
+                    if (typeof draw === 'function') draw();
+                } else if (e.buttons === 1) {
+                    const dist = Math.hypot(e.clientX - panStartX, e.clientY - panStartY);
+                    if (dist > 8) {
+                        hasMovedMouseDuringDrag = true;
+                        cameraOffset.x = panCamStartX + (e.clientX - panStartX);
+                        cameraOffset.y = panCamStartY + (e.clientY - panStartY);
+                        if (typeof draw === 'function') draw();
+                    }
+                }
+            });
+
+            window.addEventListener('mouseup', (e) => {
+                if (isPanning) {
+                    isPanning = false;
+                    canvas.style.cursor = 'default';
+                }
+            });
+
+            canvas.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+            });
+        }
+
         // ── Preloaded Background & Realtime User Profile Avatars ──
         const MAP_BG_URL = (CONFIG.map && CONFIG.map.layout_data && CONFIG.map.layout_data.background_image_url)
             ? CONFIG.map.layout_data.background_image_url
             : null;
         const BLUEPRINT_IMAGE = new Image();
-        BLUEPRINT_IMAGE.crossOrigin = 'anonymous';
         let blueprintLoaded = false;
         if (MAP_BG_URL) {
             BLUEPRINT_IMAGE.src = MAP_BG_URL;
@@ -1968,6 +2078,10 @@
         }
 
         canvas.addEventListener('click', (e) => {
+            if (hasMovedMouseDuringDrag) {
+                hasMovedMouseDuringDrag = false;
+                return;
+            }
             const rect = canvas.getBoundingClientRect();
             const clickX = (e.clientX - rect.left - cameraOffset.x) / zoomLevel;
             const clickY = (e.clientY - rect.top - cameraOffset.y) / zoomLevel;

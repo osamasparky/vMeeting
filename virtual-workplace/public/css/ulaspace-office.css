@@ -588,3 +588,50 @@ body {
     z-index: 100000;
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
+
+/* ── Floating Viewport Zoom & Pan Controls (Floating Glass) ── */
+.nx-floating-viewport-controls {
+    position: absolute;
+    bottom: 24px;
+    inset-inline-start: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 65;
+    background: rgba(14, 25, 19, 0.88);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--nx-map-border);
+    border-radius: 14px;
+    padding: 6px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+}
+
+.nx-viewport-ctrl-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(20, 43, 36, 0.6);
+    border: 1px solid transparent;
+    color: var(--nx-map-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nx-viewport-ctrl-btn:hover {
+    background: rgba(60, 107, 76, 0.45);
+    border-color: var(--nx-map-gold);
+    color: #FFFFFF;
+    transform: scale(1.05);
+}
+
+.nx-viewport-ctrl-btn:active {
+    transform: scale(0.95);
+}
+
+.nx-viewport-ctrl-btn span.material-symbols-rounded {
+    font-size: 20px;
+}
