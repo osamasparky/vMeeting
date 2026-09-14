@@ -1790,9 +1790,12 @@ class SuperAdminController extends Controller
      */
     public function systemHealth()
     {
+        $freeSpaceBytes = @disk_free_space(base_path());
+        $freeSpaceFormatted = $freeSpaceBytes ? round($freeSpaceBytes / 1073741824, 1).' GB' : 'N/A';
+
         $health = [
             'database' => ['status' => 'healthy', 'latency_ms' => 1.2, 'label' => 'MySQL 8.0 Primary'],
-            'storage' => ['status' => 'healthy', 'free_space' => disk_free_space('/') ? round(disk_free_space('/') / 1073741824, 1).' GB' : 'N/A', 'label' => 'Local NVMe Storage'],
+            'storage' => ['status' => 'healthy', 'free_space' => $freeSpaceFormatted, 'label' => 'Local NVMe Storage'],
             'livekit' => ['status' => 'healthy', 'url' => config('livekit.host', 'http://127.0.0.1:7880'), 'label' => 'LiveKit SFU WebRTC'],
             'openai' => ['status' => 'healthy', 'model' => 'gpt-image-1-mini / DALL-E', 'label' => 'OpenAI API Connectivity'],
             'websockets' => ['status' => 'healthy', 'port' => 8080, 'label' => 'Spatial WebSockets Gateway'],

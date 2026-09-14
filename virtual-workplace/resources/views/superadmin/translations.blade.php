@@ -89,7 +89,7 @@
                                         name="ar[]"
                                         rows="2"
                                         dir="rtl"
-                                        style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; font-size: 13px; font-family: 'Cairo', sans-serif; color: var(--text-primary); resize: vertical; outline: none; font-weight: 600;"
+                                        style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; font-size: 13px; font-family: var(--font-ar); color: var(--text-primary); resize: vertical; outline: none; font-weight: 600;"
                                     >{{ $item['ar'] }}</textarea>
                                 </td>
                                 <td style="padding: 12px 20px; vertical-align: top;">
@@ -97,7 +97,7 @@
                                         name="en[]"
                                         rows="2"
                                         dir="ltr"
-                                        style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; font-size: 13px; font-family: 'Inter', sans-serif; color: var(--text-primary); resize: vertical; outline: none; font-weight: 600;"
+                                        style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; font-size: 13px; font-family: var(--font-en); color: var(--text-primary); resize: vertical; outline: none; font-weight: 600;"
                                     >{{ $item['en'] }}</textarea>
                                 </td>
                                 <td style="padding: 12px 20px; vertical-align: top; text-align: center;">

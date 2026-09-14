@@ -19,64 +19,64 @@
     </div>
 
     <!-- Health Telemetry Grid -->
-    <div class="kpi-grid">
-        <div class="kpi-card" style="border-top: 4px solid #10B981;">
-            <div class="kpi-icon-wrapper" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
-                🗄️
+    <div class="metrics-grid">
+        <div class="metric-card" style="border-top: 4px solid var(--status-success);">
+            <div class="metric-header">
+                <span class="metric-title">{{ __('Primary Database') }}</span>
+                <div class="metric-icon-badge" style="background: rgba(60, 107, 76, 0.15); color: var(--status-success);">
+                    🗄️
+                </div>
             </div>
-            <div class="kpi-value" style="color: #10B981;">
+            <div class="metric-value" style="color: var(--status-success);">
                 {{ __('Healthy') }}
             </div>
-            <div class="kpi-label">
-                {{ __('Primary Database (MySQL 8.0)') }}
-            </div>
-            <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
-                Latency: <strong>1.2ms</strong> • Connections: Active
+            <div class="metric-trend">
+                <span>MySQL 8.0</span> • <span>Latency: 1.2ms</span>
             </div>
         </div>
 
-        <div class="kpi-card" style="border-top: 4px solid #10B981;">
-            <div class="kpi-icon-wrapper" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
-                📹
+        <div class="metric-card" style="border-top: 4px solid var(--status-success);">
+            <div class="metric-header">
+                <span class="metric-title">{{ __('WebRTC SFU') }}</span>
+                <div class="metric-icon-badge" style="background: rgba(60, 107, 76, 0.15); color: var(--status-success);">
+                    📹
+                </div>
             </div>
-            <div class="kpi-value" style="color: #10B981;">
+            <div class="metric-value" style="color: var(--status-success);">
                 {{ __('Operational') }}
             </div>
-            <div class="kpi-label">
-                {{ __('LiveKit SFU WebRTC Server') }}
-            </div>
-            <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
-                Port 7880 • STUN/TURN 3478 Active
+            <div class="metric-trend">
+                <span>LiveKit SFU</span> • <span>Port 7880 Active</span>
             </div>
         </div>
 
-        <div class="kpi-card" style="border-top: 4px solid #10B981;">
-            <div class="kpi-icon-wrapper" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
-                ⚡
+        <div class="metric-card" style="border-top: 4px solid var(--status-success);">
+            <div class="metric-header">
+                <span class="metric-title">{{ __('Spatial WebSockets') }}</span>
+                <div class="metric-icon-badge" style="background: rgba(60, 107, 76, 0.15); color: var(--status-success);">
+                    ⚡
+                </div>
             </div>
-            <div class="kpi-value" style="color: #10B981;">
+            <div class="metric-value" style="color: var(--status-success);">
                 {{ __('Active') }}
             </div>
-            <div class="kpi-label">
-                {{ __('Spatial Realtime WebSockets') }}
-            </div>
-            <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
-                Port 8080 • Spatial Interpolation Running
+            <div class="metric-trend">
+                <span>Port 8080</span> • <span>Interpolation Running</span>
             </div>
         </div>
 
-        <div class="kpi-card" style="border-top: 4px solid #10B981;">
-            <div class="kpi-icon-wrapper" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
-                🤖
+        <div class="metric-card" style="border-top: 4px solid var(--status-success);">
+            <div class="metric-header">
+                <span class="metric-title">{{ __('AI Blueprint Engine') }}</span>
+                <div class="metric-icon-badge" style="background: rgba(60, 107, 76, 0.15); color: var(--status-success);">
+                    🤖
+                </div>
             </div>
-            <div class="kpi-value" style="color: #10B981;">
+            <div class="metric-value" style="color: var(--status-success);">
                 {{ __('Ready') }}
             </div>
-            <div class="kpi-label">
-                {{ __('AI Blueprint Engine') }}
-            </div>
-            <div style="font-size: 11px; color: var(--text-muted); margin-top: 6px;">
-                GPT Image 1 Mini & DALL-E Available
+            <div class="metric-trend">
+                <span>GPT Image 1 Mini</span> • <span>DALL-E Ready</span>
             </div>
         </div>
     </div>
@@ -103,7 +103,7 @@
 
             <div style="background: var(--bg-surface-subtle); padding: 14px 18px; border-radius: 12px; border: 1px solid var(--border-color);">
                 <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 800; display: block; margin-bottom: 4px;">Disk Free Space</span>
-                <strong style="font-size: 14px; color: var(--brand-forest);">{{ disk_free_space('/') ? round(disk_free_space('/') / 1073741824, 1) . ' GB Available' : 'N/A' }}</strong>
+                <strong style="font-size: 14px; color: var(--brand-forest);">{{ ($freeBytes = @disk_free_space(base_path())) ? round($freeBytes / 1073741824, 1) . ' GB Available' : ($health['storage']['free_space'] ?? 'Available') }}</strong>
             </div>
 
             <div style="background: var(--bg-surface-subtle); padding: 14px 18px; border-radius: 12px; border: 1px solid var(--border-color);">
