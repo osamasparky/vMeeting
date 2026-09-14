@@ -247,14 +247,14 @@ class OfficeController extends Controller
             'name' => $floor->name . ' Blueprint',
             'status' => 'published',
             'version' => 1,
-            'width' => 94,
-            'height' => 57,
+            'width' => 75,
+            'height' => 45,
             'tile_size' => 16,
             'layout_data' => [
                 'theme' => 'open_spatial_blueprint',
                 'wall_sign_text' => strtoupper($floor->name),
-                'background_width' => 1500,
-                'background_height' => 900,
+                'background_width' => 1200,
+                'background_height' => 708,
             ],
             'published_at' => now(),
         ]);
@@ -383,14 +383,14 @@ class OfficeController extends Controller
                 'name' => $floor->name . ' Blueprint',
                 'status' => 'published',
                 'version' => 1,
-                'width' => 94,
-                'height' => 57,
+                'width' => 75,
+                'height' => 45,
                 'tile_size' => 16,
                 'layout_data' => [
                     'theme' => 'open_spatial_blueprint',
                     'wall_sign_text' => strtoupper($floor->name),
-                    'background_width' => 1500,
-                    'background_height' => 900,
+                    'background_width' => 1200,
+                    'background_height' => 708,
                 ],
                 'published_at' => now(),
             ]);
@@ -443,8 +443,8 @@ class OfficeController extends Controller
             $localPath = public_path(ltrim($url, '/'));
             $imageSize = file_exists($localPath) ? @getimagesize($localPath) : null;
             $layoutData['background_image_url'] = $url;
-            $layoutData['background_width'] = $imageSize ? $imageSize[0] : 1500;
-            $layoutData['background_height'] = $imageSize ? $imageSize[1] : 900;
+            $layoutData['background_width'] = $imageSize ? $imageSize[0] : 1200;
+            $layoutData['background_height'] = $imageSize ? $imageSize[1] : 708;
         } else {
             $request->validate([
                 'image' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:51200'],
@@ -463,12 +463,12 @@ class OfficeController extends Controller
             $layoutData['background_image_url'] = $url;
 
             $imageSize = @getimagesize(public_path('images/maps/' . $filename));
-            $layoutData['background_width'] = $imageSize ? $imageSize[0] : 1500;
-            $layoutData['background_height'] = $imageSize ? $imageSize[1] : 900;
+            $layoutData['background_width'] = $imageSize ? $imageSize[0] : 1200;
+            $layoutData['background_height'] = $imageSize ? $imageSize[1] : 708;
         }
 
-        $bgW = $layoutData['background_width'] ?? 1500;
-        $bgH = $layoutData['background_height'] ?? 900;
+        $bgW = $layoutData['background_width'] ?? 1200;
+        $bgH = $layoutData['background_height'] ?? 708;
 
         $map->update([
             'width' => ceil($bgW / 16),
@@ -530,12 +530,12 @@ class OfficeController extends Controller
 
         $layoutData = $map->layout_data ?? [];
         unset($layoutData['background_image_url']);
-        $layoutData['background_width'] = 1500;
-        $layoutData['background_height'] = 900;
+        $layoutData['background_width'] = 1200;
+        $layoutData['background_height'] = 708;
 
         $map->update([
-            'width' => 94,
-            'height' => 57,
+            'width' => 75,
+            'height' => 45,
             'tile_size' => 16,
             'layout_data' => $layoutData,
             'status' => 'published',
@@ -543,7 +543,7 @@ class OfficeController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Floor background removed successfully (1500×900).',
+            'message' => 'Floor background removed successfully (1200×708).',
             'map' => $map->fresh(['floor', 'rooms', 'zones', 'objects']),
         ]);
     }
@@ -568,12 +568,12 @@ class OfficeController extends Controller
         // Clear custom background image
         $layoutData = $map->layout_data ?? [];
         unset($layoutData['background_image_url']);
-        $layoutData['background_width'] = 1500;
-        $layoutData['background_height'] = 900;
+        $layoutData['background_width'] = 1200;
+        $layoutData['background_height'] = 708;
 
         $map->update([
-            'width' => 94,
-            'height' => 57,
+            'width' => 75,
+            'height' => 45,
             'tile_size' => 16,
             'layout_data' => $layoutData,
             'status' => 'published',

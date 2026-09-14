@@ -1020,7 +1020,7 @@
         <button type="button" class="nx-viewport-ctrl-btn" onclick="zoomIn()" title="{{ __('Zoom In (تكبير الخريطة)') }}">
             <span class="material-symbols-rounded">zoom_in</span>
         </button>
-        <button type="button" class="nx-viewport-ctrl-btn" onclick="toggleFitMode()" title="{{ __('Fit Map to Canvas / Fill (ملاءمة الخريطة مع الشاشة بالضبط)') }}">
+        <button type="button" class="nx-viewport-ctrl-btn" onclick="fitMapToCanvas()" title="{{ __('Fit Map to Canvas (ملاءمة الخريطة مع الشاشة بالضبط)') }}">
             <span class="material-symbols-rounded">aspect_ratio</span>
         </button>
         <button type="button" class="nx-viewport-ctrl-btn" onclick="locateMe()" title="{{ __('Locate Me & Focus on My Avatar (تحديد موقعي والتقريب علي)') }}">
@@ -1196,10 +1196,10 @@
         const TILE_SIZE = (CONFIG.map && CONFIG.map.tile_size) ? Number(CONFIG.map.tile_size) : 16;
         let MAP_WIDTH_PX = (CONFIG.map && CONFIG.map.layout_data && CONFIG.map.layout_data.background_width && Number(CONFIG.map.layout_data.background_width) >= 500)
             ? Number(CONFIG.map.layout_data.background_width)
-            : 1500;
+            : 1200;
         let MAP_HEIGHT_PX = (CONFIG.map && CONFIG.map.layout_data && CONFIG.map.layout_data.background_height && Number(CONFIG.map.layout_data.background_height) >= 500)
             ? Number(CONFIG.map.layout_data.background_height)
-            : 900;
+            : 708;
 
         let zoomLevel = 1.0;
         let cameraOffset = { x: 0, y: 0 };
@@ -1285,7 +1285,7 @@
                 // Edge-to-Edge Fill: covers width & height with zero black bars
                 zoomLevel = Math.max(scaleX, scaleY);
             } else {
-                // Exact Fit: fits the entire floor map (1500×900) precisely inside the canvas, centered, 0 cutoff
+                // Exact Fit: fits the entire floor map (1200×708) precisely inside the canvas, centered, 0 cutoff
                 zoomLevel = Math.min(scaleX, scaleY);
             }
 
@@ -1293,15 +1293,25 @@
             cameraOffset.y = Math.round((height - MAP_HEIGHT_PX * zoomLevel) / 2);
         }
 
-        function toggleFitMode() {
-            cameraFitMode = (cameraFitMode === 'fit') ? 'fill' : 'fit';
-            centerCamera(cameraFitMode);
+        function fitMapToCanvas() {
+            if (!canvas || !container) return;
+            width = canvas.width = container.clientWidth || window.innerWidth;
+            height = canvas.height = container.clientHeight || window.innerHeight;
+
+            const scaleX = width / MAP_WIDTH_PX;
+            const scaleY = height / MAP_HEIGHT_PX;
+
+            // Contain scale: map is fully visible from edge to edge without distortion or cutoffs
+            zoomLevel = Math.min(scaleX, scaleY);
+            cameraOffset.x = Math.round((width - MAP_WIDTH_PX * zoomLevel) / 2);
+            cameraOffset.y = Math.round((height - MAP_HEIGHT_PX * zoomLevel) / 2);
+
             if (typeof draw === 'function') draw();
-            const labels = {
-                'fit': '📦 {{ __("Fit Map to Canvas (احتواء كامل الخريطة بالضبط)") }}',
-                'fill': '🌟 {{ __("Edge-to-Edge Full Screen (ملء الشاشة بالكامل)") }}'
-            };
-            showToast(labels[cameraFitMode] || '🎯 View Updated');
+            showToast('📐 {{ __("Fit Map to Canvas (تمت ملاءمة الخريطة مع الشاشة بالضبط)") }}');
+        }
+
+        function toggleFitMode() {
+            fitMapToCanvas();
         }
 
         function zoomIn() {

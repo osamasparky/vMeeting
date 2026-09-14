@@ -1409,12 +1409,12 @@
                     </div>
 
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 11px; font-weight: 800; color: #A7F3D0;">🎨 {{ __('Floor Styles Library (1500×900)') }}</span>
+                        <span style="font-size: 11px; font-weight: 800; color: #A7F3D0;">🎨 {{ __('Floor Styles Library (1200×708)') }}</span>
                         <span style="font-size: 10px; color: var(--text-muted); font-family: monospace;">18 Styles</span>
                     </div>
 
                     <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
-                        {{ __('اختر نمط الأرضية لتطبيقه فوراً كخلفية للمكتب بمقاس 1500×900 بكسل:') }}
+                        {{ __('اختر نمط الأرضية لتطبيقه فوراً كخلفية للمكتب بمقاس 1200×708 بكسل:') }}
                     </div>
 
                     <div id="floors-catalog-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-height: calc(100vh - 360px); overflow-y: auto; padding-right: 4px;">
@@ -1457,10 +1457,10 @@
         const TILE_SIZE = 16;
         let MAP_WIDTH_PX = (MAP_DATA.layout_data && MAP_DATA.layout_data.background_width && Number(MAP_DATA.layout_data.background_width) >= 500)
             ? Number(MAP_DATA.layout_data.background_width)
-            : 1500;
+            : 1200;
         let MAP_HEIGHT_PX = (MAP_DATA.layout_data && MAP_DATA.layout_data.background_height && Number(MAP_DATA.layout_data.background_height) >= 500)
             ? Number(MAP_DATA.layout_data.background_height)
-            : 900;
+            : 708;
 
         let zoomLevel = 1.0;
         let panOffset = { x: 0, y: 0 };
@@ -1542,23 +1542,23 @@
                     MAP_WIDTH_PX = BLUEPRINT_IMAGE.naturalWidth;
                     MAP_HEIGHT_PX = BLUEPRINT_IMAGE.naturalHeight;
                 } else {
-                    MAP_WIDTH_PX = 1500;
-                    MAP_HEIGHT_PX = 900;
+                    MAP_WIDTH_PX = 1200;
+                    MAP_HEIGHT_PX = 708;
                 }
                 fitAndCenterView();
                 draw();
             };
             BLUEPRINT_IMAGE.onerror = () => {
                 blueprintLoaded = false;
-                MAP_WIDTH_PX = 1500;
-                MAP_HEIGHT_PX = 900;
+                MAP_WIDTH_PX = 1200;
+                MAP_HEIGHT_PX = 708;
                 fitAndCenterView();
                 draw();
             };
         } else {
             blueprintLoaded = false;
-            MAP_WIDTH_PX = 1500;
-            MAP_HEIGHT_PX = 900;
+            MAP_WIDTH_PX = 1200;
+            MAP_HEIGHT_PX = 708;
             setTimeout(fitAndCenterView, 50);
         }
 
@@ -1607,10 +1607,10 @@
             grid.innerHTML = FLOOR_CATALOG.map(f => {
                 const isActive = currentBg.includes(f.id);
                 return `
-                    <div class="furn-card ${isActive ? 'selected' : ''}" style="display:flex; flex-direction:column; gap:4px; padding:6px; cursor:pointer; position:relative; border-radius:12px; border:1px solid ${isActive ? 'var(--brand-primary)' : 'var(--border-card)'}; background:var(--bg-input);" onclick="applyFloorBackground('${f.url}', 1500, 900)">
+                    <div class="furn-card ${isActive ? 'selected' : ''}" style="display:flex; flex-direction:column; gap:4px; padding:6px; cursor:pointer; position:relative; border-radius:12px; border:1px solid ${isActive ? 'var(--brand-primary)' : 'var(--border-card)'}; background:var(--bg-input);" onclick="applyFloorBackground('${f.url}', 1200, 708)">
                         <div style="position:relative; width:100%; height:75px; border-radius:8px; overflow:hidden; background:#0B1C13;">
                             <img src="${f.thumb}" alt="${f.name_en}" style="width:100%; height:100%; object-fit:cover;">
-                            <span style="position:absolute; bottom:3px; inset-inline-end:3px; background:rgba(0,0,0,0.7); font-size:9px; font-family:monospace; padding:1px 4px; border-radius:4px; color:#A7F3D0;">1500×900</span>
+                            <span style="position:absolute; bottom:3px; inset-inline-end:3px; background:rgba(0,0,0,0.7); font-size:9px; font-family:monospace; padding:1px 4px; border-radius:4px; color:#A7F3D0;">1200×708</span>
                             ${isActive ? '<span style="position:absolute; top:3px; inset-inline-start:3px; background:#10B981; font-size:9px; font-weight:800; padding:1px 6px; border-radius:4px; color:#fff;">✓ نشط</span>' : ''}
                         </div>
                         <div style="font-size:11px; font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:start;">
@@ -1621,7 +1621,7 @@
             }).join('');
         }
 
-        async function applyFloorBackground(floorUrl, width = 1500, height = 900) {
+        async function applyFloorBackground(floorUrl, width = 1200, height = 708) {
             showToast('⏳ {{ __("Applying Floor Style (جاري تطبيق نمط الأرضية)...") }}');
             try {
                 const res = await fetch(`/editor/maps/${MAP_ID}/background`, {
@@ -1717,14 +1717,14 @@
                 if (res.ok) {
                     if (MAP_DATA.layout_data) {
                         delete MAP_DATA.layout_data.background_image_url;
-                        MAP_DATA.layout_data.background_width = 1500;
-                        MAP_DATA.layout_data.background_height = 900;
+                        MAP_DATA.layout_data.background_width = 1200;
+                        MAP_DATA.layout_data.background_height = 708;
                     }
                     blueprintLoaded = false;
                     BLUEPRINT_IMAGE.removeAttribute('src');
                     BLUEPRINT_IMAGE.src = '';
-                    MAP_WIDTH_PX = 1500;
-                    MAP_HEIGHT_PX = 900;
+                    MAP_WIDTH_PX = 1200;
+                    MAP_HEIGHT_PX = 708;
                     fitAndCenterView();
                     renderFloorsCatalog();
                     draw();
@@ -2978,7 +2978,7 @@
         }
 
         async function deleteFloorplan() {
-            if (!confirm('{{ __("Are you sure you want to reset the floorplan to default 1500×900? (هل أنت متأكد من استعادة المخطط الافتراضي؟)") }}')) return;
+            if (!confirm('{{ __("Are you sure you want to reset the floorplan to default 1200×708? (هل أنت متأكد من استعادة المخطط الافتراضي؟)") }}')) return;
             showToast('🗑️ {{ __("Resetting floorplan...") }}');
             try {
                 const res = await fetch(`/editor/maps/${MAP_ID}/background`, {
@@ -2990,17 +2990,17 @@
                 if (res.ok) {
                     MAP_DATA.layout_data = MAP_DATA.layout_data || {};
                     delete MAP_DATA.layout_data.background_image_url;
-                    MAP_DATA.layout_data.background_width = 1500;
-                    MAP_DATA.layout_data.background_height = 900;
+                    MAP_DATA.layout_data.background_width = 1200;
+                    MAP_DATA.layout_data.background_height = 708;
                     blueprintLoaded = false;
                     BLUEPRINT_IMAGE.removeAttribute('src');
                     BLUEPRINT_IMAGE.src = '';
-                    MAP_WIDTH_PX = 1500;
-                    MAP_HEIGHT_PX = 900;
+                    MAP_WIDTH_PX = 1200;
+                    MAP_HEIGHT_PX = 708;
                     fitAndCenterView();
                     renderFloorsCatalog();
                     draw();
-                    showToast('✅ {{ __("Floorplan reset to default (1500×900)!") }}');
+                    showToast('✅ {{ __("Floorplan reset to default (1200×708)!") }}');
                 } else {
                     showToast('❌ ' + (data.message || 'Reset failed'));
                 }
@@ -3025,13 +3025,13 @@
                     selectedItem = null;
                     MAP_DATA.layout_data = MAP_DATA.layout_data || {};
                     delete MAP_DATA.layout_data.background_image_url;
-                    MAP_DATA.layout_data.background_width = 1500;
-                    MAP_DATA.layout_data.background_height = 900;
+                    MAP_DATA.layout_data.background_width = 1200;
+                    MAP_DATA.layout_data.background_height = 708;
                     BLUEPRINT_IMAGE.removeAttribute('src');
                     BLUEPRINT_IMAGE.src = '';
                     blueprintLoaded = false;
-                    MAP_WIDTH_PX = 1500;
-                    MAP_HEIGHT_PX = 900;
+                    MAP_WIDTH_PX = 1200;
+                    MAP_HEIGHT_PX = 708;
                     fitAndCenterView();
                     updateInspector();
                     hideFloatingActions();
