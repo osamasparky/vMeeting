@@ -1423,11 +1423,15 @@
         let height = canvas.height = container.clientHeight;
 
         const TILE_SIZE = 16;
-        const MAP_WIDTH_PX = 1024;
-        const MAP_HEIGHT_PX = 909;
+        let MAP_WIDTH_PX = (MAP_DATA.layout_data && MAP_DATA.layout_data.background_width)
+            ? Number(MAP_DATA.layout_data.background_width)
+            : ((MAP_DATA.width && MAP_DATA.width > 30) ? MAP_DATA.width * TILE_SIZE : 2194);
+        let MAP_HEIGHT_PX = (MAP_DATA.layout_data && MAP_DATA.layout_data.background_height)
+            ? Number(MAP_DATA.layout_data.background_height)
+            : ((MAP_DATA.height && MAP_DATA.height > 20) ? MAP_DATA.height * TILE_SIZE : 1952);
 
         let zoomLevel = 1.0;
-        let panOffset = { x: 50, y: 40 };
+        let panOffset = { x: 0, y: 0 };
         let showGrid = true;
 
         let currentTool = 'select'; // select | room | object
@@ -1471,6 +1475,17 @@
         let currentRect = null;
         let roomContainedObjects = [];
 
+        function fitAndCenterView() {
+            if (!canvas || !container) return;
+            width = canvas.width = container.clientWidth;
+            height = canvas.height = container.clientHeight;
+            const scaleX = (width - 40) / MAP_WIDTH_PX;
+            const scaleY = (height - 40) / MAP_HEIGHT_PX;
+            zoomLevel = Math.min(1.0, Math.max(0.2, Math.min(scaleX, scaleY)));
+            panOffset.x = (width - MAP_WIDTH_PX * zoomLevel) / 2;
+            panOffset.y = (height - MAP_HEIGHT_PX * zoomLevel) / 2;
+        }
+
         // ── Resize Engine ──
         function resizeCanvas() {
             width = canvas.width = container.clientWidth;
@@ -1481,6 +1496,7 @@
 
         // ── Background Blueprint Artwork ──
         const BLUEPRINT_IMAGE = new Image();
+        BLUEPRINT_IMAGE.crossOrigin = 'anonymous';
         const initialBgUrl = (MAP_DATA.layout_data && MAP_DATA.layout_data.background_image_url)
             ? MAP_DATA.layout_data.background_image_url
             : null;
@@ -1489,12 +1505,20 @@
             BLUEPRINT_IMAGE.src = initialBgUrl + (initialBgUrl.includes('?') ? '&' : '?') + 'v=' + Date.now();
             BLUEPRINT_IMAGE.onload = () => {
                 blueprintLoaded = true;
+                if (BLUEPRINT_IMAGE.naturalWidth > 0 && BLUEPRINT_IMAGE.naturalHeight > 0) {
+                    MAP_WIDTH_PX = BLUEPRINT_IMAGE.naturalWidth;
+                    MAP_HEIGHT_PX = BLUEPRINT_IMAGE.naturalHeight;
+                }
+                fitAndCenterView();
                 draw();
             };
             BLUEPRINT_IMAGE.onerror = () => {
                 blueprintLoaded = false;
+                fitAndCenterView();
                 draw();
             };
+        } else {
+            setTimeout(fitAndCenterView, 50);
         }
 
         // ── Navigation & Tools ──
@@ -1618,7 +1642,7 @@
 
         function zoomIn() { zoomLevel = Math.min(2.5, zoomLevel + 0.15); draw(); }
         function zoomOut() { zoomLevel = Math.max(0.4, zoomLevel - 0.15); draw(); }
-        function resetView() { zoomLevel = 1.0; panOffset = { x: 50, y: 40 }; draw(); }
+        function resetView() { fitAndCenterView(); draw(); }
         function toggleGrid() { showGrid = !showGrid; draw(); }
 
         // ── Canvas Interaction Handlers ──
@@ -1988,21 +2012,23 @@
                 const textWidth = ctx.measureText(labelText).width;
                 const badgeW = Math.min(rw - 8, textWidth + 14);
 
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-                if (ctx.roundRect) ctx.roundRect(rx + 4, ry + 4, badgeW, 18, 9);
-                else ctx.rect(rx + 4, ry + 4, badgeW, 18);
-                ctx.fill();
+                if (badgeW > 16 && rw > 20 && rh > 18) {
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+                    if (ctx.roundRect) ctx.roundRect(rx + 4, ry + 4, badgeW, 18, 6);
+                    else ctx.rect(rx + 4, ry + 4, badgeW, 18);
+                    ctx.fill();
 
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-                ctx.lineWidth = 1;
-                if (ctx.roundRect) ctx.roundRect(rx + 4, ry + 4, badgeW, 18, 9);
-                else ctx.rect(rx + 4, ry + 4, badgeW, 18);
-                ctx.stroke();
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+                    ctx.lineWidth = 1;
+                    if (ctx.roundRect) ctx.roundRect(rx + 4, ry + 4, badgeW, 18, 6);
+                    else ctx.rect(rx + 4, ry + 4, badgeW, 18);
+                    ctx.stroke();
 
-                ctx.fillStyle = '#F8FAFC';
-                ctx.textAlign = 'left';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(labelText, rx + 10, ry + 13);
+                    ctx.fillStyle = '#F8FAFC';
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(labelText, rx + 10, ry + 13);
+                }
 
                 // Visual Door Indicator on Wall
                 const doorSide = (r.bounds && r.bounds.doorSide && r.bounds.doorSide !== 'auto') ? r.bounds.doorSide : 'bottom';
@@ -2117,8 +2143,8 @@
                 const objH = (obj.height || (obj.size ? obj.size.height : 1)) * TILE_SIZE;
                 const imgUrl = obj.image_url || (obj.interaction_config && obj.interaction_config.image_url);
 
-                // If map has blueprint artwork, seeded untextured placeholder collision items should not be painted as blue blocks
-                if (hasBlueprint && !imgUrl && !obj.is_custom) {
+                // If map has blueprint artwork, untextured collision items should not be painted as blue blocks
+                if (hasBlueprint && !imgUrl) {
                     if (isSelected) {
                         ctx.save();
                         ctx.strokeStyle = '#10B981';
@@ -2725,15 +2751,22 @@
                 const data = await res.json();
                 if (res.ok && data.image_url) {
                     const newUrl = data.image_url + (data.image_url.includes('?') ? '&' : '?') + 'v=' + Date.now();
+                    MAP_DATA.layout_data = MAP_DATA.layout_data || {};
+                    MAP_DATA.layout_data.background_image_url = data.image_url;
+                    
                     BLUEPRINT_IMAGE.src = newUrl;
                     BLUEPRINT_IMAGE.onload = () => {
                         blueprintLoaded = true;
+                        if (BLUEPRINT_IMAGE.naturalWidth > 0 && BLUEPRINT_IMAGE.naturalHeight > 0) {
+                            MAP_WIDTH_PX = BLUEPRINT_IMAGE.naturalWidth;
+                            MAP_HEIGHT_PX = BLUEPRINT_IMAGE.naturalHeight;
+                            MAP_DATA.layout_data.background_width = BLUEPRINT_IMAGE.naturalWidth;
+                            MAP_DATA.layout_data.background_height = BLUEPRINT_IMAGE.naturalHeight;
+                        }
+                        fitAndCenterView();
                         draw();
                     };
-                    MAP_DATA.layout_data = MAP_DATA.layout_data || {};
-                    MAP_DATA.layout_data.background_image_url = data.image_url;
                     showToast('✅ {{ __("Floorplan uploaded and active!") }}');
-                    draw();
                 } else {
                     showToast('❌ ' + (data.message || 'Upload failed'));
                 }
@@ -2756,9 +2789,22 @@
                 if (res.ok) {
                     MAP_DATA.layout_data = MAP_DATA.layout_data || {};
                     delete MAP_DATA.layout_data.background_image_url;
+                    delete MAP_DATA.layout_data.background_width;
+                    delete MAP_DATA.layout_data.background_height;
                     BLUEPRINT_IMAGE.src = '/images/office_floorplan.jpg?v=' + Date.now();
+                    BLUEPRINT_IMAGE.onload = () => {
+                        blueprintLoaded = true;
+                        if (BLUEPRINT_IMAGE.naturalWidth > 0 && BLUEPRINT_IMAGE.naturalHeight > 0) {
+                            MAP_WIDTH_PX = BLUEPRINT_IMAGE.naturalWidth;
+                            MAP_HEIGHT_PX = BLUEPRINT_IMAGE.naturalHeight;
+                        } else {
+                            MAP_WIDTH_PX = 2194;
+                            MAP_HEIGHT_PX = 1952;
+                        }
+                        fitAndCenterView();
+                        draw();
+                    };
                     showToast('✅ {{ __("Floorplan reset to default!") }}');
-                    draw();
                 } else {
                     showToast('❌ ' + (data.message || 'Reset failed'));
                 }
@@ -2783,8 +2829,13 @@
                     selectedItem = null;
                     MAP_DATA.layout_data = MAP_DATA.layout_data || {};
                     delete MAP_DATA.layout_data.background_image_url;
+                    delete MAP_DATA.layout_data.background_width;
+                    delete MAP_DATA.layout_data.background_height;
                     BLUEPRINT_IMAGE.src = '';
                     blueprintLoaded = false;
+                    MAP_WIDTH_PX = 2194;
+                    MAP_HEIGHT_PX = 1952;
+                    fitAndCenterView();
                     updateInspector();
                     hideFloatingActions();
                     draw();

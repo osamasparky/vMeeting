@@ -1167,8 +1167,12 @@
         let height = canvas.height = (container && container.clientHeight) ? container.clientHeight : window.innerHeight;
 
         const TILE_SIZE = (CONFIG.map && CONFIG.map.tile_size) ? Number(CONFIG.map.tile_size) : 16;
-        const MAP_WIDTH_PX = 1024;
-        const MAP_HEIGHT_PX = 909;
+        let MAP_WIDTH_PX = (CONFIG.map && CONFIG.map.layout_data && CONFIG.map.layout_data.background_width)
+            ? Number(CONFIG.map.layout_data.background_width)
+            : ((CONFIG.map && CONFIG.map.width && CONFIG.map.width > 30) ? CONFIG.map.width * TILE_SIZE : 2194);
+        let MAP_HEIGHT_PX = (CONFIG.map && CONFIG.map.layout_data && CONFIG.map.layout_data.background_height)
+            ? Number(CONFIG.map.layout_data.background_height)
+            : ((CONFIG.map && CONFIG.map.height && CONFIG.map.height > 20) ? CONFIG.map.height * TILE_SIZE : 1952);
 
         let zoomLevel = 1.0;
         let cameraOffset = { x: 0, y: 0 };
@@ -1247,7 +1251,7 @@
 
             const scaleX = (width - 40) / MAP_WIDTH_PX;
             const scaleY = (height - 40) / MAP_HEIGHT_PX;
-            zoomLevel = Math.min(1.0, Math.max(0.65, Math.min(scaleX, scaleY)));
+            zoomLevel = Math.min(1.0, Math.max(0.3, Math.min(scaleX, scaleY)));
 
             const targetX = (typeof localAvatar !== 'undefined' && localAvatar && localAvatar.x) ? localAvatar.x : (MAP_WIDTH_PX / 2);
             const targetY = (typeof localAvatar !== 'undefined' && localAvatar && localAvatar.y) ? localAvatar.y : (MAP_HEIGHT_PX / 2);
@@ -1279,6 +1283,10 @@
             BLUEPRINT_IMAGE.src = MAP_BG_URL;
             BLUEPRINT_IMAGE.onload = () => {
                 blueprintLoaded = true;
+                if (BLUEPRINT_IMAGE.naturalWidth > 0 && BLUEPRINT_IMAGE.naturalHeight > 0) {
+                    MAP_WIDTH_PX = BLUEPRINT_IMAGE.naturalWidth;
+                    MAP_HEIGHT_PX = BLUEPRINT_IMAGE.naturalHeight;
+                }
                 resizeCanvas();
             };
             BLUEPRINT_IMAGE.onerror = () => {
@@ -2466,8 +2474,10 @@
             ctx.translate(cameraOffset.x, cameraOffset.y);
             ctx.scale(zoomLevel, zoomLevel);
 
+            const hasBlueprint = BLUEPRINT_IMAGE && (BLUEPRINT_IMAGE.complete || blueprintLoaded) && BLUEPRINT_IMAGE.naturalWidth > 0;
+
             // 1. Draw Blueprint Background
-            if (BLUEPRINT_IMAGE && (BLUEPRINT_IMAGE.complete || blueprintLoaded) && BLUEPRINT_IMAGE.naturalWidth > 0) {
+            if (hasBlueprint) {
                 ctx.fillStyle = '#ECE8DB';
                 ctx.fillRect(0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
                 ctx.drawImage(BLUEPRINT_IMAGE, 0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
@@ -2508,6 +2518,11 @@
                     }
                 }
 
+                // If map has blueprint artwork, seeded untextured placeholder collision items should not be painted as blue blocks
+                if (hasBlueprint && !imgUrl) {
+                    return;
+                }
+
                 ctx.save();
                 ctx.translate(ox + objW / 2, oy + objH / 2);
                 const rot = (obj.position && typeof obj.position.rotation === 'number') ? obj.position.rotation : (obj.rotation || 0);
@@ -2529,7 +2544,7 @@
                         else ctx.rect(-objW / 2, -objH / 2, objW, objH);
                         ctx.fill();
                     }
-                } else if (obj.color || obj.is_custom || (obj.interaction_config && obj.interaction_config.is_custom)) {
+                } else if (!hasBlueprint && (obj.color || obj.is_custom || (obj.interaction_config && obj.interaction_config.is_custom))) {
                     ctx.fillStyle = obj.color ? (obj.color.length === 7 ? obj.color + '99' : obj.color) : 'rgba(59, 130, 246, 0.45)';
                     if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
                     else ctx.rect(-objW / 2, -objH / 2, objW, objH);
