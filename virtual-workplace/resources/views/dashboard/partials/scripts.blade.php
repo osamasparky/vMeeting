@@ -3414,7 +3414,7 @@
                     if (!taskEntries.length) {
                         tasksTbody.innerHTML = `
                             <tr>
-                                <td colspan="6" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                                <td colspan="7" style="text-align: center; padding: 36px; color: var(--text-muted);">
                                     <div style="font-size: 28px; margin-bottom: 6px;">📋</div>
                                     {{ __('No task work sessions recorded on this date.') }}
                                 </td>
@@ -3435,8 +3435,20 @@
                                 ? '<span class="nav-badge-pill" style="background: rgba(36, 92, 58, 0.15); color: var(--brand-forest); font-weight: 800;">💎 {{ __('Billable') }}</span>'
                                 : '<span class="nav-badge-pill" style="color: var(--text-muted);">{{ __('Standard') }}</span>';
 
+                            const empInitials = (te.user_name || 'U').substring(0, 2).toUpperCase();
+                            const empCell = `
+                                <div onclick="openMemberProfileModal('${te.user_id}')" style="display: flex; align-items: center; gap: 8px; cursor: pointer;" title="{{ __('Inspect Member Sessions') }}">
+                                    ${te.user_avatar
+                                        ? `<img src="${te.user_avatar}" style="width: 26px; height: 26px; border-radius: 8px; object-fit: cover;">`
+                                        : `<div style="width: 26px; height: 26px; border-radius: 8px; background: var(--accent-gradient); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 10px;">${empInitials}</div>`
+                                    }
+                                    <span style="font-weight: 800; color: var(--brand-forest); font-size: 12px;">${escapeHtml(te.user_name || 'Member')}</span>
+                                </div>
+                            `;
+
                             return `
                                 <tr>
+                                    <td>${empCell}</td>
                                     <td>
                                         <div style="font-weight: 800; color: var(--text-primary);">${escapeHtml(te.task_title || 'Work Session')}</div>
                                         ${te.description ? `<div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">${escapeHtml(te.description)}</div>` : ''}
@@ -3471,7 +3483,7 @@
                     if (!attSessions.length) {
                         attTbody.innerHTML = `
                             <tr>
-                                <td colspan="5" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                                <td colspan="6" style="text-align: center; padding: 36px; color: var(--text-muted);">
                                     <div style="font-size: 28px; margin-bottom: 6px;">🏢</div>
                                     {{ __('No virtual office presence recorded on this date.') }}
                                 </td>
@@ -3488,8 +3500,20 @@
                                 statusPill = '<span class="nav-badge-pill" style="background: var(--bg-surface-subtle); color: var(--text-muted);">⚪ {{ __('Completed') }}</span>';
                             }
 
+                            const empInitials = (s.user_name || 'U').substring(0, 2).toUpperCase();
+                            const empCell = `
+                                <div onclick="openMemberProfileModal('${s.user_id}')" style="display: flex; align-items: center; gap: 8px; cursor: pointer;" title="{{ __('Inspect Member Sessions') }}">
+                                    ${s.user_avatar
+                                        ? `<img src="${s.user_avatar}" style="width: 26px; height: 26px; border-radius: 8px; object-fit: cover;">`
+                                        : `<div style="width: 26px; height: 26px; border-radius: 8px; background: var(--accent-gradient); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 10px;">${empInitials}</div>`
+                                    }
+                                    <span style="font-weight: 800; color: var(--brand-forest); font-size: 12px;">${escapeHtml(s.user_name || 'Member')}</span>
+                                </div>
+                            `;
+
                             return `
                                 <tr>
+                                    <td>${empCell}</td>
                                     <td>
                                         <div style="display: flex; align-items: center; gap: 8px;">
                                             <span style="font-size: 16px;">📍</span>
@@ -3520,10 +3544,230 @@
             }
         }
 
+        // ── Team Presence & Today Attendance across All Offices ──
+        async function loadTeamPresenceOverview() {
+            const tbody = document.getElementById('ts-team-roster-tbody');
+            const onlinePill = document.getElementById('ts-online-count-pill');
+            const totalPill = document.getElementById('ts-total-members-pill');
+            if (!tbody) return;
+
+            try {
+                const res = await fetch('/api/office/team-presence-overview', {
+                    headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin'
+                });
+                if (!res.ok) return;
+
+                const data = await res.json();
+                if (onlinePill) onlinePill.innerHTML = `🟢 ${data.online_count} {{ __('Online Now') }}`;
+                if (totalPill) totalPill.innerHTML = `${data.total_count} {{ __('Total Team') }}`;
+
+                const roster = data.roster || [];
+                if (!roster.length) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 24px; color: var(--text-muted);">
+                                {{ __('No team members found in organization.') }}
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tbody.innerHTML = roster.map(m => {
+                    const initials = (m.name || 'U').substring(0, 2).toUpperCase();
+                    const statusBadge = m.is_online
+                        ? '<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F; font-weight: 800;">🟢 {{ __("Online (In Office)") }}</span>'
+                        : '<span class="nav-badge-pill" style="background: var(--bg-surface-subtle); color: var(--text-muted);">⚪ {{ __("Offline") }}</span>';
+
+                    let activeTaskLabel = '—';
+                    if (m.active_task) {
+                        activeTaskLabel = `<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F; font-weight: 800; font-size: 11px;">⏱️ ${escapeHtml(m.active_task.task_title)} (${escapeHtml(m.active_task.project_name)})</span>`;
+                    }
+
+                    const officeLoc = m.is_online
+                        ? `<div style="font-weight: 800; color: var(--brand-forest);">${escapeHtml(m.office_name)}</div><div style="font-size: 10px; color: var(--text-muted);">🚪 ${escapeHtml(m.room_name)}</div>`
+                        : `<span style="color: var(--text-muted);">—</span>`;
+
+                    return `
+                        <tr>
+                            <td>
+                                <div onclick="openMemberProfileModal('${m.user_id}')" style="display: flex; align-items: center; gap: 10px; cursor: pointer;" title="{{ __('Click to inspect member sessions & details') }}">
+                                    ${m.avatar_url
+                                        ? `<img src="${m.avatar_url}" style="width: 32px; height: 32px; border-radius: 10px; object-fit: cover;">`
+                                        : `<div style="width: 32px; height: 32px; border-radius: 10px; background: var(--accent-gradient); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px;">${initials}</div>`
+                                    }
+                                    <div>
+                                        <div style="font-weight: 800; color: var(--brand-forest); display: flex; align-items: center; gap: 4px;">
+                                            <span>${escapeHtml(m.name)}</span>
+                                            <span style="font-size: 10px; opacity: 0.7;">👁️</span>
+                                        </div>
+                                        <div style="font-size: 11px; color: var(--text-muted);">${escapeHtml(m.job_title || m.role_name)}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>${statusBadge}</td>
+                            <td>${officeLoc}</td>
+                            <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--brand-forest);">
+                                ${m.total_office_formatted}
+                            </td>
+                            <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: #4F9B5F;">
+                                ${m.total_task_formatted}
+                            </td>
+                            <td>${activeTaskLabel}</td>
+                            <td>
+                                <div style="display: flex; gap: 6px;">
+                                    <button type="button" onclick="openMemberProfileModal('${m.user_id}')" class="tactile-btn btn-secondary" style="padding: 4px 8px; font-size: 11px;" title="{{ __('View Sessions') }}">
+                                        🔍 {{ __('Sessions') }}
+                                    </button>
+                                    <button type="button" onclick="selectMemberInTimesheet('${m.user_id}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--brand-forest); border: 1px solid rgba(79, 155, 95, 0.3); padding: 4px 8px; font-size: 11px;" title="{{ __('Filter Timesheet') }}">
+                                        ⏱️ {{ __('Timesheet') }}
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                console.error('Error loading team presence overview:', err);
+            }
+        }
+
+        function selectMemberInTimesheet(userId) {
+            const filterUser = document.getElementById('ts-filter-user');
+            if (filterUser) {
+                filterUser.value = userId;
+                currentTimesheetUserId = userId;
+            }
+            switchAdminTab('timesheets');
+            loadDailyTimesheetsData(currentTimesheetDate, userId);
+            window.scrollTo({ top: document.getElementById('ts-live-timer-banner')?.offsetTop || 300, behavior: 'smooth' });
+        }
+
+        // ── Comprehensive Member Profile & Session Details Inspector ──
+        let activeInspectingUserId = null;
+
+        async function openMemberProfileModal(userId) {
+            activeInspectingUserId = userId;
+            const modal = document.getElementById('member-profile-modal');
+            if (!modal) return;
+            modal.style.display = 'flex';
+
+            const nameEl = document.getElementById('mp-name');
+            const subEl = document.getElementById('mp-sub');
+            const avatarBox = document.getElementById('mp-avatar-box');
+            const statusPill = document.getElementById('mp-status-pill');
+            const officeKpi = document.getElementById('mp-kpi-office-time');
+            const taskKpi = document.getElementById('mp-kpi-task-time');
+            const locKpi = document.getElementById('mp-kpi-location');
+            const attTbody = document.getElementById('mp-attendance-tbody');
+            const tasksTbody = document.getElementById('mp-tasks-tbody');
+
+            if (attTbody) attTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--text-muted);">⏳ {{ __('Loading sessions...') }}</td></tr>`;
+            if (tasksTbody) tasksTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--text-muted);">⏳ {{ __('Loading tasks...') }}</td></tr>`;
+
+            try {
+                // 1. Fetch user profile + activity
+                const [actRes, tsRes] = await Promise.all([
+                    fetch(`/api/members/${userId}/activity`, { headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN } }),
+                    fetch(`/api/timesheets/daily-summary?date=${encodeURIComponent(currentTimesheetDate)}&user_id=${encodeURIComponent(userId)}`, { headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN } })
+                ]);
+
+                if (actRes.ok) {
+                    const actData = await actRes.json();
+                    const u = actData.user;
+                    if (nameEl) nameEl.textContent = u.name;
+                    if (subEl) subEl.textContent = `${u.role_name || 'Member'} • ${u.department || 'General'} • ${u.job_title || ''}`;
+                    if (statusPill) {
+                        statusPill.textContent = u.status || 'Active';
+                        statusPill.style.background = u.status === 'active' ? 'rgba(79, 155, 95, 0.2)' : 'var(--bg-surface-subtle)';
+                    }
+                    if (avatarBox) {
+                        if (u.avatar_url) {
+                            avatarBox.innerHTML = `<img src="${u.avatar_url}" style="width: 100%; height: 100%; border-radius: 14px; object-fit: cover;">`;
+                        } else {
+                            avatarBox.innerHTML = (u.name || 'U').substring(0, 2).toUpperCase();
+                        }
+                    }
+
+                    // Render Tasks
+                    const tasks = actData.tasks || [];
+                    if (tasksTbody) {
+                        if (!tasks.length) {
+                            tasksTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 18px; color: var(--text-muted);">{{ __('No active tasks assigned.') }}</td></tr>`;
+                        } else {
+                            tasksTbody.innerHTML = tasks.map(t => `
+                                <tr>
+                                    <td style="font-weight: 800; color: var(--text-primary);">${escapeHtml(t.title)}</td>
+                                    <td><span class="nav-badge-pill">📁 ${escapeHtml(t.project_name)}</span></td>
+                                    <td style="font-size: 11px; color: var(--text-muted);">${t.due_date || '—'}</td>
+                                    <td><span class="nav-badge-pill" style="font-size: 10px;">${t.priority}</span></td>
+                                    <td><span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F;">${t.status}</span></td>
+                                </tr>
+                            `).join('');
+                        }
+                    }
+                }
+
+                if (tsRes.ok) {
+                    const tsData = await tsRes.json();
+                    if (officeKpi) officeKpi.textContent = tsData.total_office_formatted || '00:00:00';
+                    if (taskKpi) taskKpi.textContent = tsData.total_task_formatted || '00:00:00';
+                    if (locKpi) {
+                        locKpi.textContent = tsData.is_in_office ? '🟢 {{ __("In Virtual Office") }}' : '⚪ {{ __("Offline") }}';
+                        locKpi.style.color = tsData.is_in_office ? 'var(--brand-forest)' : 'var(--text-muted)';
+                    }
+
+                    const sessions = tsData.attendance_sessions || [];
+                    if (attTbody) {
+                        if (!sessions.length) {
+                            attTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 18px; color: var(--text-muted);">{{ __('No presence sessions logged today.') }}</td></tr>`;
+                        } else {
+                            attTbody.innerHTML = sessions.map(s => {
+                                const stPill = s.status === 'active'
+                                    ? '<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F; font-weight: 800;">🟢 {{ __("Live") }}</span>'
+                                    : '<span class="nav-badge-pill" style="color: var(--text-muted);">⚪ {{ __("Completed") }}</span>';
+
+                                return `
+                                    <tr>
+                                        <td>
+                                            <div style="font-weight: 800; color: var(--text-primary);">${escapeHtml(s.branch_name || 'Main Office')}</div>
+                                            <div style="font-size: 11px; color: var(--text-muted);">🚪 ${escapeHtml(s.room_name || 'General Space')}</div>
+                                        </td>
+                                        <td style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">🟢 ${s.check_in || '—'}</td>
+                                        <td style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">🔴 ${s.check_out || '{{ __("Still in Office") }}'}</td>
+                                        <td style="font-family: monospace; font-weight: 900; color: var(--brand-forest);">${s.duration_formatted || '00m'}</td>
+                                        <td>${stPill}</td>
+                                    </tr>
+                                `;
+                            }).join('');
+                        }
+                    }
+                }
+
+            } catch (err) {
+                console.error('Failed to open member profile modal:', err);
+            }
+        }
+
+        function closeMemberProfileModal() {
+            const modal = document.getElementById('member-profile-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function inspectMemberTimesheetTab() {
+            if (activeInspectingUserId) {
+                closeMemberProfileModal();
+                selectMemberInTimesheet(activeInspectingUserId);
+            }
+        }
+
         // Auto-load timesheet on DOM load if timesheets tab is active
         document.addEventListener('DOMContentLoaded', () => {
             if (window.location.hash === '#timesheets' || document.getElementById('tab-timesheets')?.classList.contains('active')) {
                 refreshDailyTimesheet();
+                loadTeamPresenceOverview();
             }
         });
 
@@ -3532,3 +3776,4 @@
             return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
         }
     </script>
+

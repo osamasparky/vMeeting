@@ -12,10 +12,14 @@ class FurnitureItem extends Model
         'name',
         'slug',
         'image_url',
+        'thumbnail_url',
         'icon',
         'width',
         'height',
         'collision',
+        'elevation',
+        'interaction_type',
+        'interaction_config',
         'colors',
         'is_active',
     ];
@@ -24,8 +28,10 @@ class FurnitureItem extends Model
         'collision' => 'boolean',
         'is_active' => 'boolean',
         'colors' => 'array',
+        'interaction_config' => 'array',
         'width' => 'integer',
         'height' => 'integer',
+        'elevation' => 'integer',
     ];
 
     public function category(): BelongsTo

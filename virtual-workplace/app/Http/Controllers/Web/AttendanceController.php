@@ -85,11 +85,13 @@ class AttendanceController extends Controller
         $targetUserId = $user->id;
         $requestedUserId = $request->query('user_id');
 
-        // If manager/admin wants to view another member's timesheet
+        // If manager/admin wants to view another member's timesheet or all members
         if ($requestedUserId && $requestedUserId !== $user->id) {
             $isPrivileged = $user->isSuperAdmin()
                 || ($membership->role?->slug === 'company_admin')
                 || $membership->hasPermission('timesheets.approve')
+                || $membership->hasPermission('timesheets.view')
+                || $membership->hasPermission('reports.view')
                 || $membership->hasPermission('organizations.manage');
 
             if ($isPrivileged) {
@@ -410,6 +412,125 @@ class AttendanceController extends Controller
                     'due_date' => $t->due_date ? $t->due_date->format('Y-m-d') : null,
                 ];
             }),
+        ]);
+    }
+
+    /**
+     * Get live team presence across all offices + today's total attendance seconds for each member.
+     */
+    public function getTeamPresenceOverview(Request $request, AttendanceService $attendanceService)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        if (! $membership) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $organization = $membership->organization;
+        $attendanceService->cleanupStaleSessions();
+
+        $startOfDay = now()->startOfDay();
+        $endOfDay = now()->endOfDay();
+
+        // 1. Get all members of the organization (excluding platform super admins)
+        $members = $organization->members()
+            ->whereHas('user', function ($q) {
+                $q->where('is_super_admin', false);
+            })
+            ->with(['user.profiles', 'role'])
+            ->get();
+
+        // 2. Active office sessions right now
+        $activeSessions = \App\Domains\People\Models\AttendanceSession::where('organization_id', $organization->id)
+            ->where('status', 'active')
+            ->whereNull('ended_at')
+            ->with(['room', 'room.floor', 'room.map'])
+            ->get()
+            ->keyBy('user_id');
+
+        // 3. All today's attendance sessions for sum
+        $todaySessions = \App\Domains\People\Models\AttendanceSession::where('organization_id', $organization->id)
+            ->whereBetween('started_at', [$startOfDay, $endOfDay])
+            ->get()
+            ->groupBy('user_id');
+
+        // 4. All today's task entries
+        $todayTaskEntries = TimeEntry::where('organization_id', $organization->id)
+            ->where(function ($q) use ($startOfDay, $endOfDay) {
+                $q->whereBetween('started_at', [$startOfDay, $endOfDay])
+                    ->orWhereBetween('created_at', [$startOfDay, $endOfDay]);
+            })
+            ->get()
+            ->groupBy('user_id');
+
+        // 5. Active Task Timers
+        $activeTimers = ActiveTimer::where('organization_id', $organization->id)
+            ->with(['project:id,name', 'task:id,title,task_number'])
+            ->get()
+            ->keyBy('user_id');
+
+        $roster = $members->map(function ($m) use ($activeSessions, $todaySessions, $todayTaskEntries, $activeTimers) {
+            $u = $m->user;
+            if (!$u) return null;
+
+            $activeSession = $activeSessions->get($u->id);
+            $isOnline = (bool) $activeSession;
+            $userTodaySessions = $todaySessions->get($u->id, collect());
+            $userTodayTasks = $todayTaskEntries->get($u->id, collect());
+            $activeTimer = $activeTimers->get($u->id);
+
+            // Calculate total office seconds today
+            $totalOfficeSec = $userTodaySessions->sum(function ($s) {
+                if ($s->isActive()) {
+                    return max($s->duration_seconds ?? 0, now()->diffInSeconds($s->started_at));
+                }
+                return $s->duration_seconds ?? 0;
+            });
+
+            // Calculate total task seconds today
+            $totalTaskSec = $userTodayTasks->sum(function ($te) {
+                if (!$te->ended_at && $te->started_at) {
+                    return max(0, now()->diffInSeconds($te->started_at));
+                }
+                return $te->duration_seconds ?? 0;
+            });
+
+            if ($activeTimer) {
+                $totalTaskSec += $activeTimer->elapsedSeconds();
+            }
+
+            $currentRoom = $activeSession?->room?->name ?? ($isOnline ? 'Open Space' : null);
+            $currentOffice = $activeSession?->room?->floor?->name ?? ($activeSession?->room?->map?->floor?->name ?? ($isOnline ? 'Main Office' : 'Offline'));
+
+            return [
+                'user_id' => $u->id,
+                'member_id' => $m->id,
+                'name' => $u->name,
+                'nickname' => $u->nickname,
+                'email' => $u->email,
+                'avatar_url' => $u->avatar_url,
+                'role_name' => $m->role?->name ?? 'Member',
+                'job_title' => $m->job_title ?? ($u->profiles?->first()?->job_title ?? ''),
+                'is_online' => $isOnline,
+                'office_name' => $currentOffice,
+                'room_name' => $currentRoom,
+                'total_office_seconds' => $totalOfficeSec,
+                'total_office_formatted' => sprintf('%02d:%02d:%02d', floor($totalOfficeSec / 3600), floor(($totalOfficeSec % 3600) / 60), $totalOfficeSec % 60),
+                'total_task_seconds' => $totalTaskSec,
+                'total_task_formatted' => sprintf('%02d:%02d:%02d', floor($totalTaskSec / 3600), floor(($totalTaskSec % 3600) / 60), $totalTaskSec % 60),
+                'active_task' => $activeTimer ? [
+                    'task_title' => $activeTimer->task?->title ?? 'Work Session',
+                    'project_name' => $activeTimer->project?->name ?? 'General',
+                    'elapsed_seconds' => $activeTimer->elapsedSeconds(),
+                ] : null,
+            ];
+        })->filter()->values();
+
+        return response()->json([
+            'success' => true,
+            'online_count' => $roster->where('is_online', true)->count(),
+            'total_count' => $roster->count(),
+            'roster' => $roster,
         ]);
     }
 }

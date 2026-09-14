@@ -1425,5 +1425,115 @@
             </form>
         </div>
     </div>
+    <!-- Modal: Member Profile & Comprehensive Attendance Session Details -->
+    <div id="member-profile-modal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 850px; width: 95vw; max-height: 90vh; display: flex; flex-direction: column; padding: 24px; overflow: hidden; border-radius: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 14px;">
+                <div style="display: flex; align-items: center; gap: 14px;">
+                    <div id="mp-avatar-box" style="width: 48px; height: 48px; border-radius: 14px; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; color: white; box-shadow: var(--shadow-soft-3d);">
+                        US
+                    </div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <h2 id="mp-name" style="font-size: 18px; font-weight: 900; margin: 0; color: var(--text-primary);">Member Name</h2>
+                            <span id="mp-status-pill" class="nav-badge-pill" style="font-size: 11px;">Active</span>
+                        </div>
+                        <div id="mp-sub" style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+                            Role • Department • Job Title
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <button type="button" onclick="inspectMemberTimesheetTab()" class="tactile-btn btn-primary" style="padding: 6px 14px; font-size: 11px;">
+                        ⏱️ {{ __('Open In Timesheets') }}
+                    </button>
+                    <button onclick="closeMemberProfileModal()" class="modal-close" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-primary); font-weight: 800;">✕</button>
+                </div>
+            </div>
+
+            <!-- Member Today KPI Summary -->
+            <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px;">
+                <div class="kpi-card" style="padding: 12px;">
+                    <div class="kpi-header">
+                        <span class="kpi-title">{{ __('Today Office Time') }}</span>
+                        <div class="kpi-icon-box">🏢</div>
+                    </div>
+                    <div id="mp-kpi-office-time" class="kpi-value" style="font-size: 18px; font-family: monospace; color: var(--brand-forest);">00:00:00</div>
+                </div>
+                <div class="kpi-card" style="padding: 12px;">
+                    <div class="kpi-header">
+                        <span class="kpi-title">{{ __('Today Task Time') }}</span>
+                        <div class="kpi-icon-box">⏱️</div>
+                    </div>
+                    <div id="mp-kpi-task-time" class="kpi-value" style="font-size: 18px; font-family: monospace; color: #4F9B5F;">00:00:00</div>
+                </div>
+                <div class="kpi-card" style="padding: 12px;">
+                    <div class="kpi-header">
+                        <span class="kpi-title">{{ __('Current Location') }}</span>
+                        <div class="kpi-icon-box">📍</div>
+                    </div>
+                    <div id="mp-kpi-location" class="kpi-value" style="font-size: 13px; font-weight: 800; color: var(--text-primary);">Main Office</div>
+                </div>
+            </div>
+
+            <!-- Member Session Details Content -->
+            <div style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;">
+                <!-- Attendance Sessions Section -->
+                <div>
+                    <h4 style="font-size: 13px; font-weight: 900; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                        <span>🏢</span> {{ __('Today Attendance & Room Presence Sessions') }}
+                    </h4>
+                    <div style="border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden;">
+                        <table class="data-table" style="font-size: 12px;">
+                            <thead>
+                                <tr>
+                                    <th>{{ __('Office / Room') }}</th>
+                                    <th>{{ __('Check-In') }}</th>
+                                    <th>{{ __('Check-Out') }}</th>
+                                    <th>{{ __('Duration') }}</th>
+                                    <th>{{ __('Status') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mp-attendance-tbody">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 20px; color: var(--text-muted);">
+                                        ⏳ {{ __('Loading member session details...') }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Assigned Tasks Section -->
+                <div>
+                    <h4 style="font-size: 13px; font-weight: 900; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                        <span>📋</span> {{ __('Assigned Active Tasks & Work In Progress') }}
+                    </h4>
+                    <div style="border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden;">
+                        <table class="data-table" style="font-size: 12px;">
+                            <thead>
+                                <tr>
+                                    <th>{{ __('Task') }}</th>
+                                    <th>{{ __('Project') }}</th>
+                                    <th>{{ __('Due Date') }}</th>
+                                    <th>{{ __('Priority') }}</th>
+                                    <th>{{ __('Status') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mp-tasks-tbody">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 20px; color: var(--text-muted);">
+                                        ⏳ {{ __('Loading tasks...') }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     

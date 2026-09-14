@@ -33,11 +33,12 @@
                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                     @if($canSelectMember)
                     <div style="display: flex; align-items: center; gap: 6px;">
-                        <span style="font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase;">👤 {{ __('Member') }}:</span>
+                        <span style="font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase;">👤 {{ __('Member / View') }}:</span>
                         <select id="ts-filter-user" onchange="handleTimesheetUserChange(this.value)" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-size: 12px; font-weight: 700; outline: none;">
-                            <option value="{{ $user->id }}">{{ __('My Timesheet') }} ({{ $user->name }})</option>
+                            <option value="all">👥 {{ __('All Employees (Company Overview)') }} ({{ __('جميع موظفي الشركة') }})</option>
+                            <option value="{{ $user->id }}" selected>{{ __('My Timesheet') }} ({{ $user->name }})</option>
                             @foreach($members as $m)
-                                @if($m->user_id !== $user->id)
+                                @if($m->user_id !== $user->id && $m->user)
                                     <option value="{{ $m->user_id }}">{{ $m->user->name }} ({{ $m->role->name ?? 'Member' }})</option>
                                 @endif
                             @endforeach
@@ -50,6 +51,47 @@
                     <button type="button" onclick="refreshDailyTimesheet()" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" title="{{ __('Refresh Data') }}">
                         🔄 {{ __('Refresh') }}
                     </button>
+                </div>
+            </div>
+
+            <!-- ========================================== -->
+            <!-- ALL OFFICES LIVE PRESENCE & DAILY ATTENDANCE ROSTER -->
+            <!-- ========================================== -->
+            <div class="card" style="border-radius: var(--radius-lg); overflow: hidden; padding: 0; margin-bottom: 24px; border: 1px solid var(--border-color); box-shadow: var(--shadow-card);">
+                <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); flex-wrap: wrap; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(79, 155, 95, 0.15); color: #4F9B5F; display: flex; align-items: center; justify-content: center; font-size: 16px;">🌐</div>
+                        <div>
+                            <h3 style="font-size: 15px; font-weight: 900; color: var(--text-primary); margin: 0;">{{ __('Team Live Presence & Daily Attendance Across All Offices') }} ({{ __('حالة التواجد لجميع الموظفين ومجموع ساعات اليوم') }})</h3>
+                            <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">{{ __('Realtime online / offline status across all company branches, today total tracked time, and detailed session inspector.') }}</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="nav-badge-pill" id="ts-online-count-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F; font-weight: 800; font-size: 11px;">🟢 0 {{ __('Online Now') }}</span>
+                        <span class="nav-badge-pill" id="ts-total-members-pill" style="background: var(--bg-surface-subtle); color: var(--text-secondary); font-size: 11px;">{{ count($members) }} {{ __('Total Team') }}</span>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="data-table" style="font-size: 12px;">
+                        <thead>
+                            <tr>
+                                <th>{{ __('Employee') }}</th>
+                                <th>{{ __('Live Status') }}</th>
+                                <th>{{ __('Current Office / Zone') }}</th>
+                                <th>{{ __('Today Office Time') }}</th>
+                                <th>{{ __('Today Task Time') }}</th>
+                                <th>{{ __('Active Task / Focus') }}</th>
+                                <th>{{ __('Actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ts-team-roster-tbody">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 24px; color: var(--text-muted);">
+                                    ⏳ {{ __('Loading team presence across all offices...') }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -144,6 +186,7 @@
                     <table class="data-table">
                         <thead>
                             <tr>
+                                <th>{{ __('Employee') }}</th>
                                 <th>{{ __('Task & Code') }}</th>
                                 <th>{{ __('Project') }}</th>
                                 <th>{{ __('Time Window') }}</th>
@@ -154,7 +197,7 @@
                         </thead>
                         <tbody id="ts-tasks-tbody">
                             <tr>
-                                <td colspan="6" style="text-align: center; padding: 32px; color: var(--text-muted);">
+                                <td colspan="7" style="text-align: center; padding: 32px; color: var(--text-muted);">
                                     ⏳ {{ __('Loading task time entries...') }}
                                 </td>
                             </tr>
@@ -181,6 +224,7 @@
                     <table class="data-table">
                         <thead>
                             <tr>
+                                <th>{{ __('Employee') }}</th>
                                 <th>{{ __('Branch Office / Zone') }}</th>
                                 <th>{{ __('Check-In Time') }}</th>
                                 <th>{{ __('Check-Out Time') }}</th>
@@ -190,7 +234,7 @@
                         </thead>
                         <tbody id="ts-attendance-tbody">
                             <tr>
-                                <td colspan="5" style="text-align: center; padding: 32px; color: var(--text-muted);">
+                                <td colspan="6" style="text-align: center; padding: 32px; color: var(--text-muted);">
                                     ⏳ {{ __('Loading office attendance sessions...') }}
                                 </td>
                             </tr>

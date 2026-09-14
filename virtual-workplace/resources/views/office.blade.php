@@ -6,34 +6,33 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $organization->name }} — {{ __('Virtual Interactive Office') }}</title>
 
-    <!-- Google Fonts: Cairo (Arabic) & Inter (English) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- UlaSpace Design Tokens & Fonts -->
+    <link rel="stylesheet" href="{{ asset('css/ulaspace-tokens.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/modern-design-system.css') }}">
 
     <style>
-        :root[data-theme="dark"] {
-            --brand-primary: #10B981;
-            --brand-primary-hover: #059669;
-            --brand-accent: #3B82F6;
-            --brand-gold: #F59E0B;
-            --brand-crimson: #EF4444;
-            --brand-teal: #14B8A6;
+        :root[data-theme="dark"], :root {
+            --brand-primary: var(--nx-palm-300, #3c6b4c);
+            --brand-primary-hover: var(--nx-palm-500, #1e412f);
+            --brand-accent: var(--nx-accent, #d3a553);
+            --brand-gold: var(--nx-gold-400, #d3a553);
+            --brand-crimson: var(--nx-terracotta-500, #9a5827);
+            --brand-teal: var(--nx-palm-300, #3c6b4c);
 
-            --bg-body: #060D09;
-            --bg-dock: rgba(10, 22, 16, 0.95);
-            --bg-surface: rgba(15, 30, 22, 0.98);
-            --bg-card: rgba(22, 44, 32, 0.88);
-            --bg-input: rgba(8, 17, 12, 0.90);
-            --border-color: rgba(52, 211, 153, 0.18);
-            --border-card: rgba(52, 211, 153, 0.12);
+            --bg-body: var(--nx-palm-950, #0b1410);
+            --bg-dock: rgba(20, 43, 36, 0.92);
+            --bg-surface: var(--nx-palm-900, #142b24);
+            --bg-card: var(--nx-palm-700, #1b3223);
+            --bg-input: rgba(11, 20, 16, 0.90);
+            --border-color: rgba(237, 230, 217, 0.15);
+            --border-card: rgba(237, 230, 217, 0.12);
 
-            --text-primary: #F8FAFC;
-            --text-secondary: #94A3B8;
-            --text-muted: #64748B;
+            --text-primary: var(--nx-sand-100, #f9f4ee);
+            --text-secondary: var(--nx-sand-400, #e3d2bb);
+            --text-muted: var(--nx-sand-500, #c1b6a6);
 
-            --shadow-dock: 0 20px 40px rgba(0, 0, 0, 0.55);
-            --shadow-card: 0 10px 25px rgba(0, 0, 0, 0.45);
+            --shadow-dock: var(--nx-shadow-xl);
+            --shadow-card: var(--nx-shadow-lg);
         }
 
         :root[data-theme="light"] {
@@ -909,6 +908,15 @@
         </div>
 
         <div class="glass-pill">
+            <!-- Live Office Attendance Timer -->
+            @if(empty($user->is_guest))
+            <div id="office-attendance-timer-pill" class="action-link-btn" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(52, 211, 153, 0.4); color: #6EE7B7; font-weight: 800; cursor: pointer;" onclick="openMyTaskDrawer()" title="{{ __('Your active time in the virtual office today (ساعات تواجدك بالعمل اليوم)') }}">
+                <span class="live-dot" style="width: 7px; height: 7px;"></span>
+                <span>⏱️</span>
+                <span id="office-attendance-clock" style="font-family: monospace; letter-spacing: 0.5px; font-size: 12px;">00:00:00</span>
+            </div>
+            @endif
+
             <button onclick="openOccupantsModal()" class="action-link-btn" id="btn-occupants-pill" title="{{ __('المتواجدون في المكتب') }}">
                 <span class="live-dot" style="width: 7px; height: 7px;"></span>
                 <span>👥</span> <span id="occupants-counter">1 {{ __('متصل الآن') }}</span>
@@ -1203,19 +1211,21 @@
         // ── Preloaded Background & Realtime User Profile Avatars ──
         const MAP_BG_URL = (CONFIG.map && CONFIG.map.layout_data && CONFIG.map.layout_data.background_image_url)
             ? CONFIG.map.layout_data.background_image_url
-            : '/images/office_floorplan.jpg';
+            : null;
         const BLUEPRINT_IMAGE = new Image();
         BLUEPRINT_IMAGE.crossOrigin = 'anonymous';
-        BLUEPRINT_IMAGE.src = MAP_BG_URL;
         let blueprintLoaded = false;
-        BLUEPRINT_IMAGE.onload = () => {
-            blueprintLoaded = true;
-            resizeCanvas();
-        };
-        BLUEPRINT_IMAGE.onerror = () => {
-            blueprintLoaded = false;
-            resizeCanvas();
-        };
+        if (MAP_BG_URL) {
+            BLUEPRINT_IMAGE.src = MAP_BG_URL;
+            BLUEPRINT_IMAGE.onload = () => {
+                blueprintLoaded = true;
+                resizeCanvas();
+            };
+            BLUEPRINT_IMAGE.onerror = () => {
+                blueprintLoaded = false;
+                resizeCanvas();
+            };
+        }
 
         // ── LiveKit SFU Real-Time Media ──
         const peerAudioElements = new Map(); // targetUserId -> HTMLAudioElement
@@ -1275,15 +1285,15 @@
             }
         }
 
-        // 2. Multi-Tone Telephone Attention Ring Sound
+        // 2. Multi-Tone Telephone Attention Ring Sound (Loud & Clear Ringtone)
         function playRingSound() {
             try {
                 const ctx = getAudioContext();
                 if (!ctx) return;
                 const now = ctx.currentTime;
 
-                // Ring sequence: 2 bursts
-                [0, 0.4].forEach(offset => {
+                // Ring sequence: 3 energetic bursts of dual US/EU telephone frequencies
+                [0, 0.35, 0.70].forEach(offset => {
                     const oscA = ctx.createOscillator();
                     const oscB = ctx.createOscillator();
                     const gain = ctx.createGain();
@@ -1293,8 +1303,8 @@
                     oscA.frequency.setValueAtTime(440, now + offset); // Standard 440Hz
                     oscB.frequency.setValueAtTime(480, now + offset); // Standard 480Hz
 
-                    gain.gain.setValueAtTime(0.28, now + offset);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.32);
+                    gain.gain.setValueAtTime(0.35, now + offset);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + offset + 0.28);
 
                     oscA.connect(gain);
                     oscB.connect(gain);
@@ -1302,11 +1312,42 @@
 
                     oscA.start(now + offset);
                     oscB.start(now + offset);
-                    oscA.stop(now + offset + 0.35);
-                    oscB.stop(now + offset + 0.35);
+                    oscA.stop(now + offset + 0.30);
+                    oscB.stop(now + offset + 0.30);
                 });
             } catch(e) {
                 console.warn('[Audio] playRingSound failed:', e);
+            }
+        }
+
+        // 2b. Friendly Cheerful "Hi / Wave" Chime Sound
+        function playWaveSound() {
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const now = ctx.currentTime;
+
+                // Ascending bright major triad notes (C6 -> E6 -> G6)
+                const notes = [1046.50, 1318.51, 1567.98];
+                notes.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    const t = now + (idx * 0.10);
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, t);
+
+                    gain.gain.setValueAtTime(0.30, t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.start(t);
+                    osc.stop(t + 0.38);
+                });
+            } catch(e) {
+                console.warn('[Audio] playWaveSound failed:', e);
             }
         }
 
@@ -1371,7 +1412,7 @@
                 keys[k] = true;
             }
 
-            // 'E' Key to Sit / Stand at Desk or Chair
+            // 'E' Key to Sit / Interact with Furniture (Drinks, Whiteboard, Instruments, Bells, Seating)
             if (k === 'e') {
                 if (localAvatar.isSitting) {
                     localAvatar.isSitting = false;
@@ -1380,24 +1421,43 @@
                         ws.send(JSON.stringify({ type: 'user.sit', payload: { isSitting: false } }));
                     }
                     showToast('🧍 {{ __("Stood up (نهوض)") }}');
-                } else if (nearbyChair) {
-                    localAvatar.isSitting = true;
-                    localAvatar.sittingFurnitureId = nearbyChair.id;
-                    localAvatar.x = nearbyChair.x;
-                    localAvatar.y = nearbyChair.y;
-                    localAvatar.targetX = nearbyChair.x;
-                    localAvatar.targetY = nearbyChair.y;
-                    if (ws && ws.readyState === WebSocket.OPEN) {
-                        ws.send(JSON.stringify({
-                            type: 'user.sit',
-                            payload: {
-                                isSitting: true,
-                                furnitureId: nearbyChair.id,
-                                seatPosition: { x: nearbyChair.x, y: nearbyChair.y }
-                            }
-                        }));
+                } else if (nearbyInteractive) {
+                    const item = nearbyInteractive;
+                    if (item.interaction_type === 'drink') {
+                        playDoorSlideSound();
+                        showToast(`☕ {{ __("Enjoying fresh drink from") }} ${item.name}! Cheers! 🎉`);
+                        triggerSpeechReaction('☕', 'emoji');
+                    } else if (item.interaction_type === 'whiteboard') {
+                        const boardModal = document.getElementById('whiteboard-modal');
+                        if (boardModal) boardModal.style.display = 'flex';
+                        else showToast(`📋 {{ __("Interactive Strategy Whiteboard") }}: ${item.name}`);
+                    } else if (item.interaction_type === 'soundEffect') {
+                        playDoorKnockSound();
+                        showToast(`🔔 {{ __("Chime sound effect triggered on") }} ${item.name}!`);
+                        triggerSpeechReaction('🎉', 'emoji');
+                    } else if (item.interaction_type === 'instrument' || item.interaction_type === 'staticMusic') {
+                        playDoorSlideSound();
+                        showToast(`🎹 {{ __("Playing musical note on") }} ${item.name}! 🎶`);
+                        triggerSpeechReaction('🎶', 'emoji');
+                    } else if (nearbyChair) {
+                        localAvatar.isSitting = true;
+                        localAvatar.sittingFurnitureId = nearbyChair.id;
+                        localAvatar.x = nearbyChair.x;
+                        localAvatar.y = nearbyChair.y;
+                        localAvatar.targetX = nearbyChair.x;
+                        localAvatar.targetY = nearbyChair.y;
+                        if (ws && ws.readyState === WebSocket.OPEN) {
+                            ws.send(JSON.stringify({
+                                type: 'user.sit',
+                                payload: {
+                                    isSitting: true,
+                                    furnitureId: nearbyChair.id,
+                                    seatPosition: { x: nearbyChair.x, y: nearbyChair.y }
+                                }
+                            }));
+                        }
+                        showToast('🪑 {{ __("Seated at Desk / Table (جلوس في المكتب)") }}');
                     }
-                    showToast('🪑 {{ __("Seated at Desk / Table (جلوس في المكتب)") }}');
                 }
             }
 
@@ -1411,6 +1471,8 @@
             if (keys[k] !== undefined) keys[k] = false;
         });
 
+        let nearbyInteractive = null;
+
         function checkNearbyFurniture() {
             const promptEl = document.getElementById('furniture-sit-prompt');
             if (localAvatar.isSitting) {
@@ -1421,11 +1483,20 @@
             const objects = (CONFIG.map && CONFIG.map.objects) || [];
             let found = null;
             for (const obj of objects) {
-                const ox = (obj.x + (obj.width || 1) / 2) * 32;
-                const oy = (obj.y + (obj.height || 1) / 2) * 32;
+                const ox = (obj.position ? obj.position.x : (obj.x || 0)) * 32 + ((obj.width || (obj.size ? obj.size.width : 1)) * 16);
+                const oy = (obj.position ? obj.position.y : (obj.y || 0)) * 32 + ((obj.height || (obj.size ? obj.size.height : 1)) * 16);
                 const dist = Math.hypot(localAvatar.x - ox, localAvatar.y - oy);
-                if (dist < 48) {
-                    found = { id: obj.id || `chair_${obj.x}_${obj.y}`, x: ox, y: oy, name: obj.name || 'Desk / Chair' };
+                if (dist < 52) {
+                    const behType = obj.interaction_type || (obj.interaction_config && obj.interaction_config.behavior?.type) || ((obj.type && (obj.type.includes('chair') || obj.type.includes('desk') || obj.type.includes('sofa') || obj.type.includes('seating'))) ? 'sit' : 'none');
+                    found = {
+                        id: obj.id || `obj_${ox}_${oy}`,
+                        x: ox,
+                        y: oy,
+                        name: obj.name || 'Furniture',
+                        type: obj.type,
+                        interaction_type: behType,
+                        config: obj.interaction_config
+                    };
                     break;
                 }
             }
@@ -1436,15 +1507,36 @@
                     const ry = (r.bounds.y + r.bounds.height / 2) * 32;
                     const dist = Math.hypot(localAvatar.x - rx, localAvatar.y - ry);
                     if (dist < 55) {
-                        found = { id: `room_center_${r.id}`, x: rx, y: ry, name: r.name };
+                        found = { id: `room_center_${r.id}`, x: rx, y: ry, name: r.name, interaction_type: 'sit' };
                         break;
                     }
                 }
             }
 
-            nearbyChair = found;
+            nearbyInteractive = found;
+            nearbyChair = (found && (found.interaction_type === 'sit' || !found.interaction_type || found.interaction_type === 'none')) ? found : null;
+
             if (promptEl) {
-                promptEl.style.display = found ? 'block' : 'none';
+                if (found) {
+                    promptEl.style.display = 'block';
+                    if (found.interaction_type === 'drink') {
+                        promptEl.innerHTML = `<span>☕ {{ __('Press E to Grab Drink (تناول مشروب)') }}</span>`;
+                    } else if (found.interaction_type === 'whiteboard') {
+                        promptEl.innerHTML = `<span>📋 {{ __('Press E to Open Whiteboard (فتح السبورة التشاركية)') }}</span>`;
+                    } else if (found.interaction_type === 'youtube') {
+                        promptEl.innerHTML = `<span>📺 {{ __('Press E to Watch Stream (شاشة العرض)') }}</span>`;
+                    } else if (found.interaction_type === 'soundEffect') {
+                        promptEl.innerHTML = `<span>🔔 {{ __('Press E to Ring Bell / Sound (تشغيل المؤثر)') }}</span>`;
+                    } else if (found.interaction_type === 'instrument' || found.interaction_type === 'staticMusic') {
+                        promptEl.innerHTML = `<span>🎹 {{ __('Press E to Play Music (عزف موسيقي)') }}</span>`;
+                    } else if (found.interaction_type === 'stickyNote') {
+                        promptEl.innerHTML = `<span>📝 {{ __('Press E to Read Note (ملاحظة مكتبية)') }}</span>`;
+                    } else {
+                        promptEl.innerHTML = `<span>🪑 {{ __('Press E to Sit / Stand (اضغط E للجلوس بالمكتب)') }}</span>`;
+                    }
+                } else {
+                    promptEl.style.display = 'none';
+                }
             }
         }
 
@@ -1628,8 +1720,34 @@
         }
 
         function toggleDoorByClick(room) {
+            const myCurrentRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+            const isInside = myCurrentRoom && myCurrentRoom.id === room.id;
+
+            if (!isInside) {
+                const isCurrentlyLocked = !!roomDoorStates.get(room.id);
+                if (isCurrentlyLocked) {
+                    playDoorKnockSound();
+                    if (confirm(`🚪 ${room.name} {{ __("is locked. Would you like to knock?") }}`)) {
+                        if (ws && ws.readyState === WebSocket.OPEN) {
+                            ws.send(JSON.stringify({ type: 'room.knock', payload: { roomId: room.id, roomName: room.name } }));
+                            showToast('⏳ {{ __("Knocked on door... waiting for occupant response.") }}');
+                        }
+                    }
+                } else {
+                    showToast(`💡 {{ __("Only occupants inside this room can control its door (لا يمكن التحكم بالباب إلا من داخل الغرفة). Double-click inside to enter.") }}`);
+                }
+                return;
+            }
+
+            const occupants = countRoomOccupants(room.id);
             const isCurrentlyLocked = !!roomDoorStates.get(room.id);
             const nextLocked = !isCurrentlyLocked;
+
+            if (occupants === 0 && nextLocked) {
+                showToast('⚠️ {{ __("Cannot lock an empty room. The door must remain open when empty (لا يمكن قفل غرفة فارغة).") }}');
+                return;
+            }
+
             roomDoorStates.set(room.id, nextLocked);
 
             let animState = doorAnimationStates.get(room.id) || { openProgress: 0, isAnimating: false };
@@ -1815,6 +1933,29 @@
                 return;
             }
 
+            // 1c. Check if clicking on an interactive Media / Furniture Object
+            const mapObjectsList = ((CONFIG.map && CONFIG.map.objects) ? [...CONFIG.map.objects] : []);
+            let clickedInteractiveObj = null;
+            for (let i = mapObjectsList.length - 1; i >= 0; i--) {
+                const obj = mapObjectsList[i];
+                const ox = (obj.position ? obj.position.x : (obj.x || 0)) * TILE_SIZE;
+                const oy = (obj.position ? obj.position.y : (obj.y || 0)) * TILE_SIZE;
+                const ow = (obj.width || (obj.size ? obj.size.width : 1)) * TILE_SIZE;
+                const oh = (obj.height || (obj.size ? obj.size.height : 1)) * TILE_SIZE;
+                if (clickX >= ox && clickX <= ox + ow && clickY >= oy && clickY <= oy + oh) {
+                    const iType = obj.interaction_type || (obj.interaction_config && obj.interaction_config.behavior?.type) || obj.type;
+                    if (['stickyNote', 'sticky_note', 'link', 'custom_link', 'customImage', 'custom_image', 'branding'].includes(iType) || (obj.interaction_config && (obj.interaction_config.noteText || obj.interaction_config.url))) {
+                        clickedInteractiveObj = obj;
+                        break;
+                    }
+                }
+            }
+
+            if (clickedInteractiveObj) {
+                handleInteractiveObjectClick(clickedInteractiveObj);
+                return;
+            }
+
             // Check room boundary & locking guards
             const targetRoom = getCurrentRoom(clickX, clickY);
             const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
@@ -1836,6 +1977,12 @@
                         showToast(`🚫 {{ __("Guests are only permitted in their designated invited room.") }}`);
                         return;
                     }
+                } else if (CONFIG.allowedRoomIds && CONFIG.allowedRoomIds.length > 0 && !CONFIG.allowedRoomIds.includes(targetRoom.id)) {
+                    showToast(`🚫 {{ __("Restricted Room: You do not have permission to access ':name'.", ['name' => '']) }} ${targetRoom.name}`);
+                    return;
+                } else if (targetRoom.capacity && targetRoom.capacity > 0 && countRoomOccupants(targetRoom.id) >= targetRoom.capacity) {
+                    showToast(`⚠️ {{ __("Room ':name' has reached full capacity (:max max occupants).", ['name' => '', 'max' => '']) }} ${targetRoom.name} (${targetRoom.capacity})`);
+                    return;
                 } else if (roomDoorStates.get(targetRoom.id)) {
                     playDoorKnockSound();
                     if (confirm(`🚪 ${targetRoom.name} {{ __("is locked. Would you like to knock?") }}`)) {
@@ -1857,6 +2004,100 @@
             localAvatar.targetX = Math.max(10, Math.min(MAP_WIDTH_PX - 10, clickX));
             localAvatar.targetY = Math.max(10, Math.min(MAP_HEIGHT_PX - 10, clickY));
         });
+
+        // ── Interactive Media & Objects Click Controller ──
+        function handleInteractiveObjectClick(obj) {
+            const iType = obj.interaction_type || (obj.interaction_config && obj.interaction_config.behavior?.type) || obj.type;
+            const cfg = obj.interaction_config || {};
+
+            if (iType === 'stickyNote' || iType === 'sticky_note' || cfg.noteText || cfg.behavior?.type === 'stickyNote') {
+                const noteText = cfg.noteText || cfg.behavior?.data?.text || obj.name || '{{ __("No note content.") }}';
+                const modal = document.getElementById('sticky-note-modal');
+                const title = document.getElementById('sticky-modal-title');
+                const body = document.getElementById('sticky-modal-body');
+                const card = document.getElementById('sticky-note-card');
+                
+                if (modal && body) {
+                    body.textContent = noteText;
+                    if (title) title.textContent = obj.name || '📌 {{ __("Sticky Note") }}';
+                    
+                    const col = cfg.color || 'yellow';
+                    if (card) {
+                        if (col === 'orange') {
+                            card.style.background = '#FFEDD5';
+                            card.style.borderColor = '#F97316';
+                            card.style.color = '#7C2D12';
+                        } else if (col === 'purple') {
+                            card.style.background = '#F3E8FF';
+                            card.style.borderColor = '#A855F7';
+                            card.style.color = '#581C87';
+                        } else if (col === 'green') {
+                            card.style.background = '#DCFCE7';
+                            card.style.borderColor = '#10B981';
+                            card.style.color = '#14532D';
+                        } else if (col === 'blue') {
+                            card.style.background = '#E0F2FE';
+                            card.style.borderColor = '#38BDF8';
+                            card.style.color = '#0C4A6E';
+                        } else {
+                            card.style.background = '#FEF3C7';
+                            card.style.borderColor = '#F59E0B';
+                            card.style.color = '#78350F';
+                        }
+                    }
+                    modal.style.display = 'flex';
+                }
+            } else if (iType === 'link' || iType === 'custom_link' || cfg.url || cfg.behavior?.type === 'link') {
+                const targetUrl = cfg.url || cfg.behavior?.data?.url || '#';
+                const linkTitle = cfg.title || cfg.behavior?.data?.title || obj.name || '{{ __("Interactive Link") }}';
+                const openInNewTab = cfg.openInNewTab !== false && cfg.behavior?.data?.openInNewTab !== false;
+
+                if (openInNewTab && targetUrl && targetUrl !== '#') {
+                    window.open(targetUrl, '_blank');
+                    showToast(`🚀 {{ __("Opening link:") }} ${linkTitle}`);
+                } else {
+                    const modal = document.getElementById('custom-link-modal');
+                    const title = document.getElementById('custom-link-modal-title');
+                    const urlBox = document.getElementById('custom-link-modal-url');
+                    const btn = document.getElementById('custom-link-modal-btn');
+                    if (modal && urlBox) {
+                        if (title) title.textContent = linkTitle;
+                        urlBox.textContent = targetUrl;
+                        if (btn) btn.href = targetUrl;
+                        modal.style.display = 'flex';
+                    }
+                }
+            } else if (iType === 'customImage' || iType === 'custom_image' || cfg.behavior?.type === 'customImage') {
+                const imgUrl = obj.image_url || cfg.image_url || cfg.behavior?.data?.imageUrl;
+                if (imgUrl) {
+                    const modal = document.getElementById('custom-image-modal');
+                    const imgEl = document.getElementById('custom-image-modal-img');
+                    const title = document.getElementById('custom-image-modal-title');
+                    if (modal && imgEl) {
+                        imgEl.src = imgUrl;
+                        if (title) title.textContent = `🖼️ ${obj.name || '{{ __("Custom Image") }}'}`;
+                        modal.style.display = 'flex';
+                    }
+                }
+            } else if (iType === 'branding' || obj.type === 'branding') {
+                showToast(`🏢 ${CONFIG.organization ? CONFIG.organization.name : '{{ __("Company Workplace") }}'}`);
+            }
+        }
+
+        function closeStickyNoteModal() {
+            const m = document.getElementById('sticky-note-modal');
+            if (m) m.style.display = 'none';
+        }
+
+        function closeCustomImageModal() {
+            const m = document.getElementById('custom-image-modal');
+            if (m) m.style.display = 'none';
+        }
+
+        function closeCustomLinkModal() {
+            const m = document.getElementById('custom-link-modal');
+            if (m) m.style.display = 'none';
+        }
 
         // ── Room Detection & Locking Logic ──
         function getCurrentRoom(x, y) {
@@ -2039,7 +2280,15 @@
                     localAvatar.targetY = localAvatar.y;
                     showToast(`🚫 {{ __("Restricted Room: Access not permitted for ':name'.", ['name' => '']) }} ${targetR.name}`);
                 }
-                // 3. Door Lock Check
+                // 3. Room Capacity Check
+                else if (targetR.capacity && targetR.capacity > 0 && countRoomOccupants(targetR.id) >= targetR.capacity) {
+                    nextX = localAvatar.x;
+                    nextY = localAvatar.y;
+                    localAvatar.targetX = localAvatar.x;
+                    localAvatar.targetY = localAvatar.y;
+                    showToast(`⚠️ {{ __("Room ':name' has reached full capacity (:max max occupants).", ['name' => '', 'max' => '']) }} ${targetR.name} (${targetR.capacity})`);
+                }
+                // 4. Door Lock Check
                 else if (roomDoorStates.get(targetR.id)) {
                     nextX = localAvatar.x;
                     nextY = localAvatar.y;
@@ -2176,8 +2425,15 @@
                 }
             }
 
-            // 1b. Draw Placed Furniture & Decor Objects Layer (Rendered above Floorplan & below Avatars/Walls)
-            const mapObjects = (CONFIG.map && CONFIG.map.objects) ? CONFIG.map.objects : [];
+            // 1b. Draw Placed Furniture & Decor Objects Layer (Rendered with 3D Elevation Depth Sorting)
+            const mapObjects = ((CONFIG.map && CONFIG.map.objects) ? [...CONFIG.map.objects] : []).sort((a, b) => {
+                const elevA = typeof a.elevation === 'number' ? a.elevation : (a.interaction_config?.elevation || 1);
+                const elevB = typeof b.elevation === 'number' ? b.elevation : (b.interaction_config?.elevation || 1);
+                if (elevA !== elevB) return elevA - elevB;
+                const yA = (a.position ? a.position.y : (a.y || 0));
+                const yB = (b.position ? b.position.y : (b.y || 0));
+                return yA - yB;
+            });
             if (!window._officeObjImgCache) window._officeObjImgCache = new Map();
 
             mapObjects.forEach(obj => {
@@ -2185,33 +2441,44 @@
                 const oy = (obj.position ? obj.position.y : (obj.y || 0)) * TILE_SIZE;
                 const objW = (obj.width || (obj.size ? obj.size.width : 1)) * TILE_SIZE;
                 const objH = (obj.height || (obj.size ? obj.size.height : 1)) * TILE_SIZE;
+                let imgUrl = obj.image_url || (obj.interaction_config && obj.interaction_config.image_url);
+                if (obj.type === 'branding' || obj.interaction_type === 'branding' || (obj.interaction_config && obj.interaction_config.use_company_logo)) {
+                    if (CONFIG.organization && CONFIG.organization.logo_url) {
+                        imgUrl = CONFIG.organization.logo_url;
+                    }
+                }
 
                 ctx.save();
                 ctx.translate(ox + objW / 2, oy + objH / 2);
                 const rot = (obj.position && typeof obj.position.rotation === 'number') ? obj.position.rotation : (obj.rotation || 0);
                 if (rot) ctx.rotate((rot * Math.PI) / 180);
 
-                if (obj.image_url) {
-                    let sprImg = window._officeObjImgCache.get(obj.image_url);
+                if (imgUrl) {
+                    let sprImg = window._officeObjImgCache.get(imgUrl);
                     if (!sprImg) {
                         sprImg = new Image();
-                        sprImg.src = obj.image_url;
+                        sprImg.src = imgUrl;
                         sprImg.onload = () => { if (typeof draw === 'function') draw(); };
-                        window._officeObjImgCache.set(obj.image_url, sprImg);
+                        window._officeObjImgCache.set(imgUrl, sprImg);
                     }
                     if (sprImg && sprImg.complete && sprImg.naturalWidth > 0) {
                         ctx.drawImage(sprImg, -objW / 2, -objH / 2, objW, objH);
                     } else {
-                        ctx.fillStyle = 'rgba(59, 130, 246, 0.25)';
+                        ctx.fillStyle = obj.color || 'rgba(59, 130, 246, 0.45)';
                         if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
                         else ctx.rect(-objW / 2, -objH / 2, objW, objH);
                         ctx.fill();
                     }
-                } else if (obj.color) {
-                    ctx.fillStyle = obj.color;
+                } else if (obj.color || obj.is_custom || (obj.interaction_config && obj.interaction_config.is_custom)) {
+                    ctx.fillStyle = obj.color ? (obj.color.length === 7 ? obj.color + '99' : obj.color) : 'rgba(59, 130, 246, 0.45)';
                     if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
                     else ctx.rect(-objW / 2, -objH / 2, objW, objH);
                     ctx.fill();
+                    ctx.strokeStyle = '#FFFFFF';
+                    ctx.lineWidth = 1;
+                    if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
+                    else ctx.rect(-objW / 2, -objH / 2, objW, objH);
+                    ctx.stroke();
                 }
                 ctx.restore();
             });
@@ -2460,8 +2727,8 @@
         function drawAvatar(av, isSelf) {
             const x = Number(av.x) || 400;
             const y = Number(av.y) || 400;
-            const cardSize = 46;
-            const radius = cardSize / 2;
+            const cardSize = 36;
+            const radius = 18;
             const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
             const avRoom = getCurrentRoom(av.x, av.y);
 
@@ -2492,16 +2759,16 @@
             if (isSpeaking) {
                 const pulse = (Math.sin(Date.now() / 120) + 1) / 2;
                 ctx.strokeStyle = '#10B981';
-                ctx.lineWidth = 3 + pulse * 3;
+                ctx.lineWidth = 2.5 + pulse * 2.5;
                 ctx.beginPath();
-                ctx.arc(x, y, radius + 5 + pulse * 5, 0, Math.PI * 2);
+                ctx.arc(x, y, radius + 4 + pulse * 4, 0, Math.PI * 2);
                 ctx.stroke();
             }
 
             // 3. Drop Shadow under Profile Card
             ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
             ctx.beginPath();
-            ctx.ellipse(x, y + radius + 4, radius + 2, 7, 0, 0, Math.PI * 2);
+            ctx.ellipse(x, y + radius + 3, radius + 1, 5, 0, 0, Math.PI * 2);
             ctx.fill();
 
             // 4. Live Camera Video OR User Profile Picture / Gradient Monogram
@@ -2524,7 +2791,7 @@
 
             ctx.save();
             ctx.beginPath();
-            if (ctx.roundRect) ctx.roundRect(x - radius, y - radius, cardSize, cardSize, 14);
+            if (ctx.roundRect) ctx.roundRect(x - radius, y - radius, cardSize, cardSize, 11);
             else ctx.rect(x - radius, y - radius, cardSize, cardSize);
             ctx.clip();
 
@@ -2558,7 +2825,7 @@
                 const initials = nameParts.length >= 2 
                     ? (nameParts[0][0] + nameParts[1][0]).toUpperCase()
                     : (nameParts[0].substring(0, 2)).toUpperCase();
-                ctx.font = '900 15px Cairo, Inter, sans-serif';
+                ctx.font = '900 12px Cairo, Inter, sans-serif';
                 ctx.fillStyle = '#FFFFFF';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -2568,9 +2835,9 @@
 
             // 5. Card Border Frame
             ctx.strokeStyle = isSelf ? '#10B981' : (isCamOn ? '#3B82F6' : 'rgba(255, 255, 255, 0.4)');
-            ctx.lineWidth = isSelf ? 2.5 : 2;
+            ctx.lineWidth = isSelf ? 2 : 1.5;
             ctx.beginPath();
-            if (ctx.roundRect) ctx.roundRect(x - radius, y - radius, cardSize, cardSize, 14);
+            if (ctx.roundRect) ctx.roundRect(x - radius, y - radius, cardSize, cardSize, 11);
             else ctx.rect(x - radius, y - radius, cardSize, cardSize);
             ctx.stroke();
 
@@ -2580,56 +2847,55 @@
             // Mic Badge
             ctx.fillStyle = isMicOn ? '#10B981' : 'rgba(15, 23, 42, 0.85)';
             ctx.beginPath();
-            ctx.arc(x + radius - 4, y - radius + 4, 8, 0, Math.PI * 2);
+            ctx.arc(x + radius - 3, y - radius + 3, 6.5, 0, Math.PI * 2);
             ctx.fill();
             ctx.strokeStyle = '#FFFFFF';
             ctx.lineWidth = 1;
             ctx.stroke();
-            ctx.font = '8px Cairo, Inter, sans-serif';
+            ctx.font = '7px Cairo, Inter, sans-serif';
             ctx.fillStyle = '#FFFFFF';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(isMicOn ? '🎙️' : '🔇', x + radius - 4, y - radius + 4);
+            ctx.fillText(isMicOn ? '🎙️' : '🔇', x + radius - 3, y - radius + 3);
 
             // Cam Badge if live
             if (isCamOn) {
                 ctx.fillStyle = '#3B82F6';
                 ctx.beginPath();
-                ctx.arc(x + radius - 4, y + radius - 4, 8, 0, Math.PI * 2);
+                ctx.arc(x + radius - 3, y + radius - 3, 6.5, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.strokeStyle = '#FFFFFF';
                 ctx.lineWidth = 1;
                 ctx.stroke();
-                ctx.font = '8px Cairo, Inter, sans-serif';
+                ctx.font = '7px Cairo, Inter, sans-serif';
                 ctx.fillStyle = '#FFFFFF';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('📷', x + radius - 4, y + radius - 4);
+                ctx.fillText('📷', x + radius - 3, y + radius - 3);
             }
 
-            // 7. Sleek User Name Pill
             // 7. Sleek User Name Pill (with Seated Desk indicator)
             const isSitting = isSelf ? localAvatar.isSitting : av.isSitting;
             const displayName = isSelf 
                 ? (isSitting ? `🪑 ${av.name} ({{ __("At Desk") }})` : `${av.name} ({{ __("You") }})`)
                 : (isSitting ? `🪑 ${av.name}` : av.name);
-            ctx.font = 'bold 10px Cairo, Inter, sans-serif';
-            const nameW = ctx.measureText(displayName).width + 16;
+            ctx.font = 'bold 9px Cairo, Inter, sans-serif';
+            const nameW = ctx.measureText(displayName).width + 12;
             ctx.fillStyle = isSitting ? 'rgba(16, 185, 129, 0.95)' : 'rgba(15, 23, 42, 0.92)';
-            if (ctx.roundRect) ctx.roundRect(x - nameW / 2, y + radius + 8, nameW, 18, 6);
-            else ctx.rect(x - nameW / 2, y + radius + 8, nameW, 18);
+            if (ctx.roundRect) ctx.roundRect(x - nameW / 2, y + radius + 5, nameW, 16, 5);
+            else ctx.rect(x - nameW / 2, y + radius + 5, nameW, 16);
             ctx.fill();
 
             ctx.strokeStyle = isSelf ? 'rgba(16, 185, 129, 0.6)' : 'rgba(255, 255, 255, 0.2)';
             ctx.lineWidth = 1;
-            if (ctx.roundRect) ctx.roundRect(x - nameW / 2, y + radius + 8, nameW, 18, 6);
-            else ctx.rect(x - nameW / 2, y + radius + 8, nameW, 18);
+            if (ctx.roundRect) ctx.roundRect(x - nameW / 2, y + radius + 5, nameW, 16, 5);
+            else ctx.rect(x - nameW / 2, y + radius + 5, nameW, 16);
             ctx.stroke();
 
             ctx.fillStyle = isSitting ? '#FFFFFF' : (isSelf ? '#6EE7B7' : '#F8FAFC');
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(displayName, x, y + radius + 17);
+            ctx.fillText(displayName, x, y + radius + 13);
 
             // 8. In-World Floating Speech / Reaction Comic Bubble
             const bubble = speechBubbles.get(av.id);
@@ -2639,7 +2905,7 @@
                     const progress = Math.min(1, elapsed / 250);
                     const scale = progress < 1 ? Math.sin(progress * Math.PI / 2) * 1.08 : (elapsed > 4000 ? (4800 - elapsed) / 800 : 1.0);
                     const alpha = elapsed > 4000 ? (4800 - elapsed) / 800 : 1.0;
-                    const bubbleY = y - radius - 18 - (scale * 10);
+                    const bubbleY = y - radius - 14 - (scale * 8);
 
                     ctx.save();
                     ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
@@ -3035,11 +3301,12 @@
                             spawnSpeechBubble(data.payload.userId, data.payload.userName, null, data.payload.emoji);
                         }
 
-                        // 8d. Shoulder-Tap / Wave
+                        // 8d. Shoulder-Tap / Wave (Say Hi)
                         else if (data.type === 'user.wave' && data.payload) {
                             if (data.payload.targetUserId === localAvatar.id) {
-                                showToast(`👋 ${data.payload.senderName} {{ __("waved at you for a quick chat! (ألقى التحية عليك)") }}`);
-                                spawnSpeechBubble(data.payload.senderUserId, data.payload.senderName, null, '👋');
+                                playWaveSound();
+                                showToast(`👋 ${data.payload.senderName || 'A Colleague'} {{ __("says HI to you! (يلقي التحية عليك)") }}`);
+                                spawnSpeechBubble(data.payload.senderUserId, data.payload.senderName, `👋 ${data.payload.senderName || 'Colleague'} says HI!`, '👋');
                             }
                         }
 
@@ -3048,7 +3315,7 @@
                             if (data.payload.targetUserId === localAvatar.id) {
                                 currentIncomingRing = data.payload;
                                 playRingSound();
-                                spawnSpeechBubble(data.payload.senderUserId, data.payload.senderName, null, '🔔');
+                                spawnSpeechBubble(data.payload.senderUserId, data.payload.senderName, `🔔 Ringing!`, '🔔');
                                 const titleEl = document.getElementById('incoming-ring-title');
                                 const descEl = document.getElementById('incoming-ring-desc');
                                 if (titleEl) titleEl.textContent = `🔔 ${data.payload.senderName || 'A Colleague'} {{ __("is ringing you!") }}`;
@@ -3850,10 +4117,11 @@
             if (targetId && ws && ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({
                     type: 'user.wave',
-                    payload: { targetUserId: targetId }
+                    payload: { targetUserId: targetId, senderUserId: localAvatar.id, senderName: localAvatar.name }
                 }));
-                spawnSpeechBubble(localAvatar.id, localAvatar.name, null, '👋');
-                showToast('👋 {{ __("Waved at colleague! (تم إلقاء التحية)") }}');
+                playWaveSound();
+                spawnSpeechBubble(localAvatar.id, localAvatar.name, `👋 Hi!`, '👋');
+                showToast('👋 {{ __("Sent Hi wave to colleague! (تم إلقاء التحية)") }}');
             }
         }
 
@@ -3863,10 +4131,10 @@
             if (targetId && ws && ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({
                     type: 'user.ring',
-                    payload: { targetUserId: targetId, senderName: localAvatar.name }
+                    payload: { targetUserId: targetId, senderUserId: localAvatar.id, senderName: localAvatar.name }
                 }));
                 playRingSound();
-                spawnSpeechBubble(localAvatar.id, localAvatar.name, null, '🔔');
+                spawnSpeechBubble(localAvatar.id, localAvatar.name, `🔔 Ringing...`, '🔔');
                 showToast('🔔 {{ __("Ringing colleague for immediate attention... (تم إرسال الرنين)") }}');
             }
         }
@@ -3979,11 +4247,15 @@
         let wbDrawing = false;
         let wbStartX = 0, wbStartY = 0;
         let wbHistory = [];
+        let selectedStickyColor = { bg: '#FEF08A', border: '#FACC15', text: '#713F12' };
 
         function setWbTool(tool) {
             wbTool = tool;
             document.querySelectorAll('.wb-tool-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`wb-tool-${tool}`)?.classList.add('active');
+            if (tool === 'note') {
+                toggleWbStickyForm(true);
+            }
         }
         function setWbColor(color) {
             wbColor = color;
@@ -3994,11 +4266,106 @@
             document.getElementById('whiteboard-modal').style.display = 'flex';
             wbCanvas = document.getElementById('wb-canvas');
             wbCtx = wbCanvas.getContext('2d');
-            wbCanvas.width = wbCanvas.parentElement.clientWidth;
+            wbCanvas.width = wbCanvas.parentElement.clientWidth - 260;
             wbCanvas.height = wbCanvas.parentElement.clientHeight;
             setupWhiteboardEvents();
+            loadWbStickyNotes();
         }
         function closeWhiteboardModal() { document.getElementById('whiteboard-modal').style.display = 'none'; }
+
+        function toggleWbStickyForm(forceOpen = null) {
+            const form = document.getElementById('wb-sticky-form');
+            if (!form) return;
+            const isOpen = (forceOpen !== null) ? forceOpen : (form.style.display !== 'flex');
+            form.style.display = isOpen ? 'flex' : 'none';
+            if (isOpen) {
+                const inp = document.getElementById('wb-sticky-text-input');
+                if (inp) inp.focus();
+            }
+        }
+
+        function selectWbStickyColor(bg, border, text, el) {
+            selectedStickyColor = { bg, border, text };
+            document.querySelectorAll('.sticky-color-pick').forEach(p => {
+                p.style.border = '1px solid ' + p.getAttribute('data-border');
+            });
+            if (el) el.style.border = '2px solid #000000';
+            const form = document.getElementById('wb-sticky-form');
+            if (form) form.style.background = bg;
+        }
+
+        function getWbStorageKey() {
+            return `wb_stickies_${CONFIG.org?.id || 'org'}_${CONFIG.currentUser?.id || 'usr'}`;
+        }
+
+        function loadWbStickyNotes() {
+            const list = document.getElementById('wb-sticky-list');
+            if (!list) return;
+            try {
+                const raw = localStorage.getItem(getWbStorageKey());
+                const stickies = raw ? JSON.parse(raw) : [];
+                if (stickies.length === 0) {
+                    list.innerHTML = `
+                        <div style="text-align: center; color: #94A3B8; font-size: 11px; padding: 24px 10px;">
+                            📌 {{ __('No sticky notes saved yet. Click + Add to create notes.') }}
+                        </div>
+                    `;
+                    return;
+                }
+                list.innerHTML = stickies.map((s, idx) => `
+                    <div style="background: ${s.bg || '#FEF08A'}; border: 1px solid ${s.border || '#FACC15'}; color: ${s.text || '#713F12'}; border-radius: 10px; padding: 10px 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); display: flex; flex-direction: column; gap: 6px; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 6px;">
+                            <span style="font-size: 10px; font-weight: 800; opacity: 0.75;">📌 ${s.time || ''}</span>
+                            <button onclick="deleteWbStickyNote(${idx})" style="background: none; border: none; color: ${s.text || '#713F12'}; opacity: 0.6; cursor: pointer; font-size: 12px; line-height: 1;" title="{{ __('Delete Note') }}">✕</button>
+                        </div>
+                        <div style="font-size: 12px; font-weight: 700; line-height: 1.4; word-break: break-word; white-space: pre-wrap;">${escapeHtml(s.content)}</div>
+                    </div>
+                `).join('');
+            } catch(e) {
+                console.warn('Error loading sticky notes:', e);
+            }
+        }
+
+        function saveWbStickyNote() {
+            const input = document.getElementById('wb-sticky-text-input');
+            const text = input ? input.value.trim() : '';
+            if (!text) {
+                showToast('⚠️ {{ __("Please enter text for the sticky note.") }}');
+                return;
+            }
+            try {
+                const key = getWbStorageKey();
+                const raw = localStorage.getItem(key);
+                const stickies = raw ? JSON.parse(raw) : [];
+                stickies.unshift({
+                    content: text,
+                    bg: selectedStickyColor.bg,
+                    border: selectedStickyColor.border,
+                    text: selectedStickyColor.text,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    timestamp: Date.now()
+                });
+                localStorage.setItem(key, JSON.stringify(stickies));
+                if (input) input.value = '';
+                toggleWbStickyForm(false);
+                loadWbStickyNotes();
+                showToast('📌 {{ __("Sticky note saved to your office whiteboard!") }}');
+            } catch(e) {
+                console.error(e);
+            }
+        }
+
+        function deleteWbStickyNote(idx) {
+            try {
+                const key = getWbStorageKey();
+                const raw = localStorage.getItem(key);
+                const stickies = raw ? JSON.parse(raw) : [];
+                stickies.splice(idx, 1);
+                localStorage.setItem(key, JSON.stringify(stickies));
+                loadWbStickyNotes();
+                showToast('🗑️ {{ __("Sticky note removed.") }}');
+            } catch(e) {}
+        }
 
         function setupWhiteboardEvents() {
             wbCanvas.onmousedown = (e) => {
@@ -4021,14 +4388,7 @@
                     }
                     wbDrawing = false;
                 } else if (wbTool === 'note') {
-                    wbCtx.fillStyle = '#FEF08A';
-                    wbCtx.fillRect(wbStartX, wbStartY, 140, 100);
-                    wbCtx.strokeRect(wbStartX, wbStartY, 140, 100);
-                    wbCtx.fillStyle = '#0F172A';
-                    wbCtx.font = '12px Cairo, sans-serif';
-                    wbCtx.fillText('📌 Note', wbStartX + 10, wbStartY + 20);
-                    broadcastWbStroke({ tool: 'note', startX: wbStartX, startY: wbStartY });
-                    saveWbState();
+                    toggleWbStickyForm(true);
                     wbDrawing = false;
                 }
             };
@@ -5278,7 +5638,45 @@
         let idleCountdownInterval = null;
         let isIdleCheckModalOpen = false;
 
-        // 1. Attendance Heartbeat & Presence Logger
+        // 1. Attendance Heartbeat & Presence Logger & Live Office Clock
+        let officeAttendanceTotalSeconds = 0;
+        let officeAttendanceTimerInterval = null;
+
+        async function fetchInitialAttendanceSummary() {
+            if (isGuest) return;
+            try {
+                const res = await fetch(`/api/office/attendance/summary?organization_id=${CONFIG.org?.id}`, {
+                    headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CONFIG.csrf }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (typeof data.today_total_seconds === 'number') {
+                        officeAttendanceTotalSeconds = data.today_total_seconds;
+                    }
+                }
+            } catch(e) {}
+            startOfficeAttendanceTicker();
+        }
+
+        function startOfficeAttendanceTicker() {
+            if (officeAttendanceTimerInterval) clearInterval(officeAttendanceTimerInterval);
+            const clockEl = document.getElementById('office-attendance-clock');
+            
+            function tick() {
+                if (!isOfficePresencePaused) {
+                    officeAttendanceTotalSeconds++;
+                    if (clockEl) {
+                        const hrs = String(Math.floor(officeAttendanceTotalSeconds / 3600)).padStart(2, '0');
+                        const mins = String(Math.floor((officeAttendanceTotalSeconds % 3600) / 60)).padStart(2, '0');
+                        const secs = String(officeAttendanceTotalSeconds % 60).padStart(2, '0');
+                        clockEl.textContent = `${hrs}:${mins}:${secs}`;
+                    }
+                }
+            }
+            tick();
+            officeAttendanceTimerInterval = setInterval(tick, 1000);
+        }
+
         async function logAttendance(action, duration = null, roomId = null) {
             if (isGuest) return; // Only log for registered members
             try {
@@ -5304,6 +5702,7 @@
         // Initialize Attendance on Office Join
         if (!isGuest && (idlePolicy.auto_attendance_enabled !== false)) {
             logAttendance('enter');
+            fetchInitialAttendanceSummary();
 
             // Periodic heartbeat every 45 seconds
             setInterval(() => {

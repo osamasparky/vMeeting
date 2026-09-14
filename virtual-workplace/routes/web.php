@@ -55,8 +55,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/editor/maps/{map}/save', [OfficeController::class, 'saveEditorMap'])->name('editor.maps.save');
     Route::post('/editor/maps/{map}/clear', [OfficeController::class, 'clearEditorMap'])->name('editor.maps.clear');
     Route::post('/editor/maps/{map}/publish', [OfficeController::class, 'publishEditorMap'])->name('editor.maps.publish');
+    Route::post('/editor/upload-object-image', [OfficeController::class, 'uploadObjectImage'])->name('editor.upload_object_image');
     Route::post('/editor/rooms', [OfficeController::class, 'saveEditorRoom'])->name('editor.rooms.store');
-    Route::patch('/editor/rooms/{room}', [OfficeController::class, 'updateEditorRoom'])->name('editor.rooms.update');
+    Route::match(['post', 'patch', 'put'], '/editor/rooms/{room}', [OfficeController::class, 'updateEditorRoom'])->name('editor.rooms.update');
     Route::delete('/editor/rooms/{room}', [OfficeController::class, 'deleteEditorRoom'])->name('editor.rooms.destroy');
     Route::get('/projects/{project}', [ProjectHubController::class, 'show'])->name('projects.hub');
 
@@ -149,6 +150,7 @@ Route::delete('/organizations/{organization}/rooms/{room}/files/{file}', [Office
 Route::post('/organizations/{organization}/chat/upload', [DashboardController::class, 'uploadChatAttachment'])->name('chat.upload');
 Route::post('/api/office/attendance/log', [AttendanceController::class, 'logRoomAttendance'])->name('office.attendance.log');
 Route::get('/api/office/attendance/summary', [AttendanceController::class, 'getAttendanceSummary'])->name('office.attendance.summary');
+Route::get('/api/office/team-presence-overview', [AttendanceController::class, 'getTeamPresenceOverview'])->name('office.team_presence.overview');
 Route::get('/api/timesheets/daily-summary', [AttendanceController::class, 'getDailyTimesheetsReport'])->name('timesheets.daily_summary');
 Route::get('/api/office/my-tasks', [AttendanceController::class, 'getOfficeTasksAndTimer'])->name('office.my_tasks');
 Route::get('/api/members/{userId}/activity', [AttendanceController::class, 'memberActivity'])->name('members.activity');

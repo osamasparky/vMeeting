@@ -271,7 +271,7 @@
                             @endphp
 
                             @forelse($colTasks as $t)
-                                <div class="global-kanban-card kanban-card" 
+                                <div class="kanban-task-card global-kanban-card" 
                                      id="global-kanban-card-{{ $t->id }}"
                                      draggable="true" 
                                      ondragstart="handleGlobalDragStart(event, '{{ $t->id }}')" 
@@ -327,42 +327,41 @@
                                         </div>
                                     @endif
 
-                                    <!-- Metadata: Project & Due Date -->
+                                    <!-- Metadata: Project & Assignee & Due Date -->
                                     <div class="task-card-meta">
                                         <span class="task-project-name">📁 {{ $t->project->name ?? 'General' }}</span>
-                                        @if($t->due_date)
-                                            <span class="task-due-date {{ $t->due_date->isPast() && $t->status !== 'done' ? 'is-overdue' : '' }}">
-                                                📅 {{ $t->due_date->format('M d') }}
-                                            </span>
-                                        @endif
-                                    </div>
-
-                                    <!-- Footer: Assignee & Direct Status Dropdown & Timer -->
-                                    <div class="task-card-footer">
-                                        <div class="task-assignee-chip">
+                                        <div style="display: flex; align-items: center; gap: 6px;">
                                             @if($t->assignee)
-                                                <div class="task-avatar-circle" title="{{ $t->assignee->name }}">
-                                                    {{ strtoupper(substr($t->assignee->name, 0, 2)) }}
+                                                <div class="task-assignee-chip" title="{{ $t->assignee->name }}">
+                                                    <div class="task-avatar-circle">
+                                                        {{ strtoupper(substr($t->assignee->name, 0, 2)) }}
+                                                    </div>
+                                                    <span style="max-width: 65px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ explode(' ', $t->assignee->name)[0] }}</span>
                                                 </div>
-                                                <span style="max-width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ explode(' ', $t->assignee->name)[0] }}</span>
-                                            @else
-                                                <span style="color: var(--text-muted); font-size: 10.5px;">👤 {{ __('Unassigned') }}</span>
+                                            @endif
+                                            @if($t->due_date)
+                                                <span class="task-due-date {{ $t->due_date->isPast() && $t->status !== 'done' ? 'is-overdue' : '' }}">
+                                                    📅 {{ $t->due_date->format('M d') }}
+                                                </span>
                                             @endif
                                         </div>
+                                    </div>
 
-                                        <div style="display: flex; align-items: center; gap: 6px;">
-                                            <select onclick="event.stopPropagation()" onchange="updateTaskStatusDirect('{{ $t->id }}', this.value)" class="card-status-select">
+                                    <!-- Footer: Direct Status Dropdown & Timer -->
+                                    <div class="task-card-footer">
+                                        <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;">
+                                            <select onclick="event.stopPropagation()" onchange="updateTaskStatusDirect('{{ $t->id }}', this.value)" class="card-status-select" style="max-width: 100%;">
                                                 <option value="backlog" {{ $t->status === 'backlog' ? 'selected' : '' }}>📌 {{ __('Backlog') }}</option>
                                                 <option value="ready" {{ $t->status === 'ready' ? 'selected' : '' }}>🎯 {{ __('Ready') }}</option>
                                                 <option value="in_progress" {{ $t->status === 'in_progress' ? 'selected' : '' }}>⚡ {{ __('In Progress') }}</option>
                                                 <option value="review" {{ $t->status === 'review' || $t->status === 'qa' ? 'selected' : '' }}>🔍 {{ __('Review') }}</option>
                                                 <option value="done" {{ $t->status === 'done' ? 'selected' : '' }}>🎉 {{ __('Done') }}</option>
                                             </select>
-
-                                            <button type="button" onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--brand-forest); border: 1px solid rgba(79, 155, 95, 0.3); padding: 3px 8px; font-size: 10.5px; border-radius: var(--radius-full);" title="{{ __('Start Timer') }}">
-                                                ▶ {{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h
-                                            </button>
                                         </div>
+
+                                        <button type="button" onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--brand-forest); border: 1px solid rgba(79, 155, 95, 0.3); padding: 3px 8px; font-size: 10.5px; border-radius: var(--radius-full); white-space: nowrap; flex-shrink: 0;" title="{{ __('Start Timer') }}">
+                                            ▶ {{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h
+                                        </button>
                                     </div>
                                 </div>
                             @empty

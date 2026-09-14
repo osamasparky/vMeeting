@@ -466,6 +466,36 @@ class OfficeController extends Controller
     }
 
     /**
+     * Upload custom furniture object or logo image.
+     */
+    public function uploadObjectImage(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized.'], 401);
+        }
+
+        $request->validate([
+            'image' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg,webp,svg,gif', 'max:10240'],
+        ]);
+
+        $file = $request->file('image');
+        $filename = 'custom_obj_' . Str::uuid() . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $destDir = public_path('images/custom_objects');
+        if (!file_exists($destDir)) {
+            mkdir($destDir, 0755, true);
+        }
+        $file->move($destDir, $filename);
+        $url = '/images/custom_objects/' . $filename;
+
+        return response()->json([
+            'success' => true,
+            'url' => $url,
+            'message' => 'Image uploaded successfully.',
+        ]);
+    }
+
+    /**
      * Remove custom floorplan and revert to system default.
      */
     public function deleteMapBackground(Request $request, \App\Domains\Workspace\Models\Map $map)
@@ -480,16 +510,16 @@ class OfficeController extends Controller
         }
 
         $layoutData = $map->layout_data ?? [];
-        unset($layoutData['background_image_url']);
-        unset($layoutData['background_width']);
-        unset($layoutData['background_height']);
+        $layoutData['background_image_url'] = '/images/office_floorplan.jpg';
 
         $map->update([
             'layout_data' => $layoutData,
+            'status' => 'published',
+            'published_at' => now(),
         ]);
 
         return response()->json([
-            'message' => 'Floorplan removed successfully. Reverted to default.',
+            'message' => 'Floorplan reset to default successfully.',
             'map' => $map->fresh(['floor', 'rooms', 'zones', 'objects']),
         ]);
     }
@@ -504,7 +534,7 @@ class OfficeController extends Controller
             ->where('organization_id', $map->organization_id)
             ->first();
 
-        if (!$membership) {
+        if (!$membership && !$user->isSuperAdmin()) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
 
@@ -519,6 +549,8 @@ class OfficeController extends Controller
 
         $map->update([
             'layout_data' => $layoutData,
+            'status' => 'published',
+            'published_at' => now(),
         ]);
 
         return response()->json([
@@ -537,7 +569,7 @@ class OfficeController extends Controller
             ->where('organization_id', $map->organization_id)
             ->first();
 
-        if (!$membership) {
+        if (!$membership && !$user->isSuperAdmin()) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
 
@@ -552,8 +584,10 @@ class OfficeController extends Controller
             $map->name = $validated['name'];
         }
         if (isset($validated['layout_data'])) {
-            $map->layout_data = array_merge($map->layout_data ?? [], $validated['layout_data']);
+            $map->layout_data = $validated['layout_data'];
         }
+        $map->status = 'published';
+        $map->published_at = now();
         $map->tile_size = 16;
         $map->save();
 
@@ -589,15 +623,39 @@ class OfficeController extends Controller
         if (isset($validated['objects'])) {
             \App\Domains\Workspace\Models\MapObject::where('map_id', $map->id)->delete();
             foreach ($validated['objects'] as $obj) {
+                $imgUrl = $obj['image_url'] ?? ($obj['interaction_config']['image_url'] ?? null);
+                if (!$imgUrl && !empty($obj['type'])) {
+                    if ($obj['type'] === 'branding' && !empty($map->organization?->logo_url)) {
+                        $imgUrl = $map->organization->logo_url;
+                    } else {
+                        $catItem = \App\Domains\Workspace\Models\FurnitureItem::where('slug', $obj['type'])->first();
+                        if ($catItem && !empty($catItem->image_url)) {
+                            $imgUrl = $catItem->image_url;
+                        }
+                    }
+                }
+
                 \App\Domains\Workspace\Models\MapObject::create([
                     'map_id' => $map->id,
+                    'organization_id' => $map->organization_id,
                     'type' => $obj['type'] ?? 'desk',
                     'name' => $obj['name'] ?? null,
                     'position' => $obj['position'] ?? ['x' => 0, 'y' => 0],
-                    'size' => $obj['size'] ?? ['width' => 1, 'height' => 1],
+                    'size' => $obj['size'] ?? ['width' => $obj['width'] ?? 1, 'height' => $obj['height'] ?? 1],
                     'rotation' => $obj['rotation'] ?? 0,
                     'color' => $obj['color'] ?? null,
-                    'interaction_config' => $obj['interaction_config'] ?? null,
+                    'collision' => $obj['collision'] ?? true,
+                    'interaction_config' => array_merge(
+                        $obj['interaction_config'] ?? [],
+                        array_filter([
+                            'image_url' => $imgUrl,
+                            'is_custom' => $obj['is_custom'] ?? true,
+                            'width' => $obj['width'] ?? null,
+                            'height' => $obj['height'] ?? null,
+                            'elevation' => $obj['elevation'] ?? 1,
+                            'interaction_type' => $obj['interaction_type'] ?? 'none',
+                        ], fn($v) => !is_null($v))
+                    ),
                 ]);
             }
         }
@@ -618,7 +676,7 @@ class OfficeController extends Controller
             ->where('organization_id', $map->organization_id)
             ->first();
 
-        if (!$membership) {
+        if (!$membership && !$user->isSuperAdmin()) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
 
@@ -636,17 +694,17 @@ class OfficeController extends Controller
     public function saveEditorRoom(Request $request)
     {
         $user = Auth::user();
-        $orgId = $request->input('organization_id');
+        $orgId = $request->input('organization_id') ?: ($user->organizations()->first()?->id);
         $membership = OrganizationMember::where('user_id', $user->id)
             ->where('organization_id', $orgId)
             ->first();
 
-        if (!$membership) {
+        if (!$membership && !$user->isSuperAdmin()) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
 
-        $org = $membership->organization;
-        if ($org->hasReachedRoomLimit()) {
+        $org = $membership ? $membership->organization : \App\Domains\Tenancy\Models\Organization::find($orgId);
+        if ($org && $org->hasReachedRoomLimit()) {
             $limit = $org->plan ? $org->plan->room_limit : 3;
             return response()->json([
                 'message' => __("You have reached the maximum room limit (:limit) for your subscription plan. Please upgrade your plan to create more rooms.", ['limit' => $limit])
@@ -658,7 +716,7 @@ class OfficeController extends Controller
             'map_id' => 'required|uuid',
             'name' => 'required|string|max:100',
             'type' => 'required|string',
-            'access_mode' => 'nullable|string|in:public,private',
+            'access_mode' => 'nullable|string',
             'capacity' => 'nullable|integer|min:1|max:200',
             'color' => 'nullable|string|max:20',
             'bounds' => 'required|array',
@@ -682,17 +740,17 @@ class OfficeController extends Controller
         $roomModel = $room instanceof \App\Domains\Workspace\Models\Room ? $room : \App\Domains\Workspace\Models\Room::find($room);
 
         if (!$roomModel) {
-            $orgId = $request->input('organization_id');
+            $orgId = $request->input('organization_id') ?: ($user->organizations()->first()?->id);
             $membership = OrganizationMember::where('user_id', $user->id)
                 ->where('organization_id', $orgId)
                 ->first();
 
-            if (!$membership) {
+            if (!$membership && !$user->isSuperAdmin()) {
                 return response()->json(['message' => 'Unauthorized access.'], 403);
             }
 
-            $org = $membership->organization;
-            if ($org->hasReachedRoomLimit()) {
+            $org = $membership ? $membership->organization : \App\Domains\Tenancy\Models\Organization::find($orgId);
+            if ($org && $org->hasReachedRoomLimit()) {
                 $limit = $org->plan ? $org->plan->room_limit : 3;
                 return response()->json([
                     'message' => __("You have reached the maximum room limit (:limit) for your subscription plan. Please upgrade your plan to create more rooms.", ['limit' => $limit])
@@ -723,11 +781,11 @@ class OfficeController extends Controller
             ->where('organization_id', $roomModel->organization_id)
             ->first();
 
-        if (!$membership) {
+        if (!$membership && !$user->isSuperAdmin()) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
 
-        $roomModel->update($request->only([
+        $data = $request->only([
             'name',
             'type',
             'access_mode',
@@ -735,7 +793,13 @@ class OfficeController extends Controller
             'color',
             'bounds',
             'metadata'
-        ]));
+        ]);
+
+        if (isset($data['capacity'])) {
+            $data['capacity'] = (int) $data['capacity'];
+        }
+
+        $roomModel->update($data);
 
         return response()->json([
             'message' => 'Room updated successfully.',
@@ -753,7 +817,7 @@ class OfficeController extends Controller
             ->where('organization_id', $room->organization_id)
             ->first();
 
-        if (!$membership || (!$membership->hasPermission('rooms.manage') && $membership->role?->slug !== 'company_admin' && !$user->isSuperAdmin())) {
+        if (!$membership && !$user->isSuperAdmin()) {
             return response()->json(['message' => 'Unauthorized access: insufficient permissions.'], 403);
         }
 

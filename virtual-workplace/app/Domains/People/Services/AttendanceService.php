@@ -171,10 +171,10 @@ class AttendanceService
 
         $totalSeconds = $sessions->sum(function ($s) {
             if ($s->isActive()) {
-                return max($s->duration_seconds, now()->diffInSeconds($s->started_at));
+                return max($s->duration_seconds ?? 0, now()->diffInSeconds($s->started_at));
             }
 
-            return $s->duration_seconds;
+            return $s->duration_seconds ?? 0;
         });
 
         $totalHours = round($totalSeconds / 3600, 2);
@@ -192,7 +192,7 @@ class AttendanceService
                     'session_count' => 0,
                 ];
             }
-            $dur = $s->isActive() ? now()->diffInSeconds($s->started_at) : $s->duration_seconds;
+            $dur = $s->isActive() ? now()->diffInSeconds($s->started_at) : ($s->duration_seconds ?? 0);
             $daily[$dayKey]['duration_seconds'] += $dur;
             $daily[$dayKey]['hours'] = round($daily[$dayKey]['duration_seconds'] / 3600, 2);
             $daily[$dayKey]['session_count']++;
@@ -203,6 +203,7 @@ class AttendanceService
             'start_date' => $startDate->toIso8601String(),
             'end_date' => $now->toIso8601String(),
             'total_seconds' => $totalSeconds,
+            'today_total_seconds' => $totalSeconds,
             'total_hours' => $totalHours,
             'sessions_count' => $sessions->count(),
             'daily_breakdown' => array_values($daily),
@@ -250,22 +251,31 @@ class AttendanceService
     /**
      * Get dual-section Daily Timesheet & Attendance Data for dashboard.
      */
-    public function getDailyTimesheetData(string $userId, string $organizationId, ?string $date = null): array
+    public function getDailyTimesheetData(?string $userId, string $organizationId, ?string $date = null): array
     {
+        // First cleanup any stale dead sessions to keep data 100% accurate
+        $this->cleanupStaleSessions();
+
         $targetDate = $date ? Carbon::parse($date)->startOfDay() : now()->startOfDay();
         $startOfDay = $targetDate->copy()->startOfDay();
         $endOfDay = $targetDate->copy()->endOfDay();
 
+        $isAll = empty($userId) || $userId === 'all';
+
         // ── Section 1: Project & Task Time Entries ──
-        $taskEntries = TimeEntry::where('organization_id', $organizationId)
-            ->where('user_id', $userId)
+        $taskQuery = TimeEntry::where('organization_id', $organizationId)
             ->where(function ($q) use ($startOfDay, $endOfDay) {
                 $q->whereBetween('started_at', [$startOfDay, $endOfDay])
                     ->orWhereBetween('created_at', [$startOfDay, $endOfDay]);
             })
-            ->with(['project:id,name,color,code', 'task:id,title,task_number,priority,status'])
-            ->orderBy('started_at', 'asc')
-            ->get();
+            ->with(['user.profiles', 'project:id,name,color,code', 'task:id,title,task_number,priority,status'])
+            ->orderBy('started_at', 'desc');
+
+        if (! $isAll) {
+            $taskQuery->where('user_id', $userId);
+        }
+
+        $taskEntries = $taskQuery->get();
 
         $totalTaskSeconds = $taskEntries->sum(function ($entry) {
             if (! $entry->ended_at && $entry->started_at) {
@@ -276,16 +286,20 @@ class AttendanceService
         });
 
         // ── Section 2: Virtual Office Attendance Sessions ──
-        $attendanceSessions = AttendanceSession::where('organization_id', $organizationId)
-            ->where('user_id', $userId)
+        $attQuery = AttendanceSession::where('organization_id', $organizationId)
             ->whereBetween('started_at', [$startOfDay, $endOfDay])
-            ->with(['room', 'room.floor', 'room.map'])
-            ->orderBy('started_at', 'asc')
-            ->get();
+            ->with(['user.profiles', 'room', 'room.floor', 'room.map'])
+            ->orderBy('started_at', 'desc');
+
+        if (! $isAll) {
+            $attQuery->where('user_id', $userId);
+        }
+
+        $attendanceSessions = $attQuery->get();
 
         $totalOfficeSeconds = $attendanceSessions->sum(function ($session) {
             if ($session->isActive()) {
-                return max($session->duration_seconds, now()->diffInSeconds($session->started_at));
+                return max($session->duration_seconds ?? 0, now()->diffInSeconds($session->started_at));
             }
 
             return $session->duration_seconds ?? 0;
@@ -293,16 +307,20 @@ class AttendanceService
 
         $idlePausedSeconds = $attendanceSessions->where('status', 'idle_paused')->sum('duration_seconds');
 
-        // Check if there is an active running timer right now via ActiveTimer or open TimeEntry
-        $activeTimerModel = ActiveTimer::where('organization_id', $organizationId)
-            ->where('user_id', $userId)
-            ->with(['project:id,name,color', 'task:id,title,task_number'])
-            ->first();
+        // Check active timers
+        $activeTimerQuery = ActiveTimer::where('organization_id', $organizationId)
+            ->with(['user', 'project:id,name,color', 'task:id,title,task_number']);
+        if (! $isAll) {
+            $activeTimerQuery->where('user_id', $userId);
+        }
+        $activeTimerModel = $activeTimerQuery->first();
 
         $activeTaskTimer = null;
         if ($activeTimerModel) {
             $activeTaskTimer = [
                 'id' => $activeTimerModel->id,
+                'user_id' => $activeTimerModel->user_id,
+                'user_name' => $activeTimerModel->user?->name ?? 'Member',
                 'task_id' => $activeTimerModel->task_id,
                 'project_id' => $activeTimerModel->project_id,
                 'task_title' => $activeTimerModel->task?->title ?? 'Task',
@@ -316,14 +334,81 @@ class AttendanceService
         }
 
         // Check if currently active in office
-        $activeOfficeSession = AttendanceSession::where('organization_id', $organizationId)
-            ->where('user_id', $userId)
+        $activeOfficeQuery = AttendanceSession::where('organization_id', $organizationId)
             ->where('status', 'active')
             ->whereNull('ended_at')
-            ->latest('started_at')
-            ->first();
+            ->latest('started_at');
+        if (! $isAll) {
+            $activeOfficeQuery->where('user_id', $userId);
+        }
+        $activeOfficeSession = $activeOfficeQuery->first();
+
+        // Format task entries with clean human readable duration & timestamps
+        $formattedTaskEntries = $taskEntries->map(function ($te) {
+            $sec = $te->duration_seconds ?? 0;
+            if (! $te->ended_at && $te->started_at) {
+                $sec = max(0, now()->diffInSeconds($te->started_at));
+            }
+            $durFormatted = sprintf('%02dh %02dm', floor($sec / 3600), floor(($sec % 3600) / 60));
+            if ($sec < 3600) {
+                $durFormatted = sprintf('%02dm %02ds', floor($sec / 60), $sec % 60);
+            }
+
+            return [
+                'id' => $te->id,
+                'user_id' => $te->user_id,
+                'user_name' => $te->user?->name ?? 'Unknown',
+                'user_avatar' => $te->user?->avatar_url,
+                'task_title' => $te->task?->title ?? ($te->description ?? 'Focused Work Session'),
+                'task_number' => $te->task?->task_number ?? '',
+                'project_name' => $te->project?->name ?? 'General',
+                'project_color' => $te->project?->color ?? '#34D399',
+                'description' => $te->description,
+                'started_at' => $te->started_at ? Carbon::parse($te->started_at)->format('h:i A') : '—',
+                'ended_at' => $te->ended_at ? Carbon::parse($te->ended_at)->format('h:i A') : ($te->started_at ? 'Live Now' : '—'),
+                'duration_seconds' => $sec,
+                'duration_formatted' => $durFormatted,
+                'is_billable' => (bool) $te->is_billable,
+                'status' => $te->status ?? 'completed',
+            ];
+        });
+
+        // Format attendance sessions with room name, branch name, timestamps, and formatted durations
+        $formattedAttendanceSessions = $attendanceSessions->map(function ($s) {
+            $sec = $s->duration_seconds ?? 0;
+            if ($s->isActive()) {
+                $sec = max(0, now()->diffInSeconds($s->started_at));
+            }
+
+            $durFormatted = sprintf('%02dh %02dm %02ds', floor($sec / 3600), floor(($sec % 3600) / 60), $sec % 60);
+            if ($sec < 3600) {
+                $durFormatted = sprintf('%02dm %02ds', floor($sec / 60), $sec % 60);
+            }
+
+            $roomName = $s->room?->name ?? 'General Space';
+            $branchName = $s->room?->floor?->name ?? ($s->room?->map?->floor?->name ?? 'Main Office');
+
+            return [
+                'id' => $s->id,
+                'user_id' => $s->user_id,
+                'user_name' => $s->user?->name ?? 'Unknown',
+                'user_avatar' => $s->user?->avatar_url,
+                'branch_name' => $branchName,
+                'room_name' => $roomName,
+                'room_id' => $s->room_id,
+                'check_in' => $s->started_at ? Carbon::parse($s->started_at)->format('h:i:s A') : '—',
+                'check_out' => $s->ended_at ? Carbon::parse($s->ended_at)->format('h:i:s A') : null,
+                'started_at' => $s->started_at ? $s->started_at->toIso8601String() : null,
+                'ended_at' => $s->ended_at ? $s->ended_at->toIso8601String() : null,
+                'duration_seconds' => $sec,
+                'duration_formatted' => $durFormatted,
+                'status' => $s->status,
+                'is_active' => $s->isActive(),
+            ];
+        });
 
         return [
+            'is_all_members' => $isAll,
             'date' => $targetDate->format('Y-m-d'),
             'date_formatted' => $targetDate->isoFormat('dddd, D MMMM YYYY'),
             'total_office_seconds' => $totalOfficeSeconds,
@@ -337,8 +422,8 @@ class AttendanceService
             'has_running_task' => (bool) $activeTaskTimer,
             'active_task_timer' => $activeTaskTimer,
             'active_timer' => $activeTaskTimer,
-            'task_entries' => $taskEntries,
-            'attendance_sessions' => $attendanceSessions,
+            'task_entries' => $formattedTaskEntries,
+            'attendance_sessions' => $formattedAttendanceSessions,
         ];
     }
 }

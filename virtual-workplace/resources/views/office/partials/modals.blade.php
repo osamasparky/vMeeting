@@ -288,9 +288,55 @@
                 <button onclick="closeWhiteboardModal()" style="background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer; margin-inline-start: auto;">✕</button>
             </div>
 
-            <!-- Whiteboard Drawing Canvas -->
-            <div style="flex: 1; position: relative; background: #FFFFFF;" id="wb-container">
-                <canvas id="wb-canvas" style="width: 100%; height: 100%; cursor: crosshair;"></canvas>
+            <!-- Whiteboard Main Workspace & Sticky Notes Sidebar -->
+            <div style="flex: 1; display: flex; position: relative; background: #FFFFFF; overflow: hidden;" id="wb-container">
+                <!-- Whiteboard Drawing Canvas -->
+                <canvas id="wb-canvas" style="flex: 1; width: 100%; height: 100%; cursor: crosshair;"></canvas>
+
+                <!-- Whiteboard Sticky Notes Sidebar -->
+                <div id="wb-sticky-sidebar" style="width: 260px; background: #F8FAFC; border-inline-start: 1px solid #E2E8F0; display: flex; flex-direction: column; z-index: 10;">
+                    <!-- Sidebar Header -->
+                    <div style="padding: 12px 14px; background: #FFFFFF; border-bottom: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 12px; color: #1E293B;">
+                            <span>📌</span>
+                            <span>{{ __('Sticky Notes (الملاحظات)') }}</span>
+                        </div>
+                        <button type="button" onclick="toggleWbStickyForm()" class="tactile-btn" style="background: #10B981; color: white; padding: 4px 8px; font-size: 11px; font-weight: 800; border-radius: 6px;">
+                            + {{ __('Add') }}
+                        </button>
+                    </div>
+
+                    <!-- Create Sticky Note Drawer/Form -->
+                    <div id="wb-sticky-form" style="display: none; padding: 12px; background: #FEF3C7; border-bottom: 1px solid #FDE68A; flex-direction: column; gap: 8px;">
+                        <textarea id="wb-sticky-text-input" placeholder="{{ __('Write note content...') }}" rows="3" style="width: 100%; background: #FFFFFF; border: 1px solid #F59E0B; border-radius: 8px; padding: 8px; font-size: 12px; color: #78350F; outline: none; resize: none; font-family: Cairo, Inter, sans-serif;"></textarea>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <!-- Color Swatches for sticky note -->
+                            <div style="display: flex; gap: 4px;" id="wb-sticky-color-swatches">
+                                <div class="sticky-color-pick active" data-color="#FEF08A" data-border="#FACC15" data-text="#713F12" style="width: 18px; height: 18px; border-radius: 50%; background: #FEF08A; border: 2px solid #CA8A04; cursor: pointer;" onclick="selectWbStickyColor('#FEF08A', '#FACC15', '#713F12', this)"></div>
+                                <div class="sticky-color-pick" data-color="#BAE6FD" data-border="#38BDF8" data-text="#0369A1" style="width: 18px; height: 18px; border-radius: 50%; background: #BAE6FD; border: 1px solid #38BDF8; cursor: pointer;" onclick="selectWbStickyColor('#BAE6FD', '#38BDF8', '#0369A1', this)"></div>
+                                <div class="sticky-color-pick" data-color="#BBF7D0" data-border="#4ADE80" data-text="#15803D" style="width: 18px; height: 18px; border-radius: 50%; background: #BBF7D0; border: 1px solid #4ADE80; cursor: pointer;" onclick="selectWbStickyColor('#BBF7D0', '#4ADE80', '#15803D', this)"></div>
+                                <div class="sticky-color-pick" data-color="#FBCFE8" data-border="#F472B6" data-text="#BE185D" style="width: 18px; height: 18px; border-radius: 50%; background: #FBCFE8; border: 1px solid #F472B6; cursor: pointer;" onclick="selectWbStickyColor('#FBCFE8', '#F472B6', '#BE185D', this)"></div>
+                                <div class="sticky-color-pick" data-color="#DDD6FE" data-border="#A78BFA" data-text="#6D28D9" style="width: 18px; height: 18px; border-radius: 50%; background: #DDD6FE; border: 1px solid #A78BFA; cursor: pointer;" onclick="selectWbStickyColor('#DDD6FE', '#A78BFA', '#6D28D9', this)"></div>
+                            </div>
+                            <div style="display: flex; gap: 4px;">
+                                <button type="button" onclick="saveWbStickyNote()" class="tactile-btn" style="background: #D97706; color: white; padding: 4px 10px; font-size: 11px; font-weight: 800; border-radius: 6px;">
+                                    💾 {{ __('Save') }}
+                                </button>
+                                <button type="button" onclick="toggleWbStickyForm()" style="background: none; border: none; color: #92400E; font-size: 14px; cursor: pointer;">
+                                    ✕
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sticky Notes Cards Feed -->
+                    <div id="wb-sticky-list" style="flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+                        <div style="text-align: center; color: #94A3B8; font-size: 11px; padding: 20px;">
+                            📌 {{ __('No sticky notes saved yet. Click + Add to save notes to your office whiteboard.') }}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -440,6 +486,59 @@
             50% { transform: scale(1.03); }
         }
     </style>
+
+    <!-- ── 11. Interactive Sticky Note Viewer Modal ── -->
+    <div id="sticky-note-modal" class="modal-overlay" style="display: none; z-index: 1000008; background: rgba(5, 12, 8, 0.75); backdrop-filter: blur(12px);">
+        <div id="sticky-note-card" class="modal-card" style="max-width: 420px; background: #FEF3C7; color: #78350F; border: 2px solid #F59E0B; box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px rgba(245,158,11,0.25); border-radius: 16px; padding: 24px; position: relative; transform: rotate(-1deg);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px dashed rgba(120, 53, 15, 0.3); padding-bottom: 8px;">
+                <div style="display: flex; align-items: center; gap: 6px; font-weight: 900; font-size: 14px;">
+                    <span style="font-size: 20px;">📌</span>
+                    <span id="sticky-modal-title">{{ __('Workplace Sticky Note (ملاحظة المكتب)') }}</span>
+                </div>
+                <button type="button" onclick="closeStickyNoteModal()" style="background: none; border: none; font-size: 20px; color: #78350F; cursor: pointer; line-height: 1;">✕</button>
+            </div>
+            <div id="sticky-modal-body" style="font-size: 15px; font-weight: 700; line-height: 1.7; white-space: pre-wrap; word-break: break-word; min-height: 80px; padding: 6px 0; color: #92400E; font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif;">
+            </div>
+            <div style="display: flex; justify-content: flex-end; margin-top: 14px;">
+                <button type="button" onclick="closeStickyNoteModal()" style="background: #D97706; color: white; border: none; border-radius: 8px; padding: 6px 16px; font-size: 12px; font-weight: 800; cursor: pointer;">
+                    ✓ {{ __('Close (إغلاق)') }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 12. Interactive Custom Image Lightbox Modal ── -->
+    <div id="custom-image-modal" class="modal-overlay" style="display: none; z-index: 1000008; background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(16px);" onclick="closeCustomImageModal()">
+        <div class="modal-card" style="max-width: 85vw; max-height: 85vh; padding: 12px; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255,255,255,0.15); display: flex; flex-direction: column; align-items: center;" onclick="event.stopPropagation()">
+            <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 6px 12px 10px;">
+                <span id="custom-image-modal-title" style="font-size: 14px; font-weight: 800; color: var(--text-main);">🖼️ {{ __('Image Viewer') }}</span>
+                <button type="button" onclick="closeCustomImageModal()" style="background: none; border: none; font-size: 22px; color: var(--text-muted); cursor: pointer;">✕</button>
+            </div>
+            <div style="overflow: auto; max-height: 75vh; display: flex; align-items: center; justify-content: center; width: 100%;">
+                <img id="custom-image-modal-img" src="" alt="Custom Artwork" style="max-width: 100%; max-height: 70vh; object-fit: contain; border-radius: 8px;">
+            </div>
+        </div>
+    </div>
+
+    <!-- ── 13. Interactive Custom Link Modal ── -->
+    <div id="custom-link-modal" class="modal-overlay" style="display: none; z-index: 1000008; background: rgba(5, 12, 8, 0.8); backdrop-filter: blur(14px);">
+        <div class="modal-card" style="max-width: 460px; text-align: center; padding: 28px 24px; border: 1px solid rgba(59, 130, 246, 0.4);">
+            <div style="font-size: 48px; margin-bottom: 10px;">🔗</div>
+            <h3 id="custom-link-modal-title" style="font-size: 17px; font-weight: 900; color: #93C5FD; margin-bottom: 8px;">
+                {{ __('Open Interactive Portal (فتح الرابط التفاعلي)') }}
+            </h3>
+            <p id="custom-link-modal-url" style="font-size: 13px; color: var(--text-muted); margin-bottom: 22px; word-break: break-all; background: rgba(15, 23, 42, 0.6); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); font-family: monospace;">
+            </p>
+            <div style="display: flex; gap: 10px;">
+                <a id="custom-link-modal-btn" href="#" target="_blank" rel="noopener noreferrer" class="action-link-btn" style="flex: 1; justify-content: center; background: #3B82F6; color: white; padding: 12px; font-size: 13px; font-weight: 800; text-decoration: none;">
+                    🚀 {{ __('Visit Link (زيارة الرابط)') }}
+                </a>
+                <button type="button" onclick="closeCustomLinkModal()" class="action-link-btn" style="background: rgba(255,255,255,0.1); color: var(--text-muted); padding: 12px 18px; font-size: 13px; font-weight: 800;">
+                    ✕ {{ __('Cancel') }}
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Toast Notification -->
     <div id="toast-bubble" class="toast-bubble"></div>

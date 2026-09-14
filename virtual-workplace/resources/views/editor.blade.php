@@ -372,7 +372,7 @@
 
         /* ── Right Customizer Drawer ── */
         .customizer-drawer {
-            width: 370px;
+            width: 380px;
             height: calc(100vh - 60px);
             background: var(--bg-panel);
             backdrop-filter: blur(24px);
@@ -385,15 +385,15 @@
         }
         .customizer-drawer.collapsed {
             transform: translateX(100%);
-            margin-inline-end: -370px;
+            margin-inline-end: -380px;
         }
         [dir="rtl"] .customizer-drawer.collapsed {
             transform: translateX(-100%);
-            margin-inline-end: -370px;
+            margin-inline-end: -380px;
         }
 
         .drawer-header {
-            padding: 16px 20px;
+            padding: 14px 18px;
             border-bottom: 1px solid var(--border-panel);
             display: flex;
             align-items: center;
@@ -412,7 +412,7 @@
             display: flex;
             background: var(--bg-input);
             padding: 4px;
-            margin: 12px 16px;
+            margin: 10px 14px;
             border-radius: 10px;
             gap: 4px;
             border: 1px solid var(--border-card);
@@ -440,62 +440,117 @@
         .drawer-body {
             flex: 1;
             overflow-y: auto;
-            padding: 0 16px 20px 16px;
+            padding: 0 14px 20px 14px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
 
-        /* ── Search & Filter Bars ── */
+        /* ── Search & Category Filter Navigation ── */
+        .search-box-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
         .search-box {
             width: 100%;
             background: var(--bg-input);
             border: 1px solid var(--border-panel);
             border-radius: 10px;
-            padding: 10px 12px;
+            padding: 9px 36px 9px 12px;
             color: var(--text-main);
             font-size: 12px;
             font-weight: 600;
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        [dir="rtl"] .search-box {
+            padding: 9px 12px 9px 36px;
         }
         .search-box:focus {
             border-color: var(--brand-primary);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+        }
+        .search-clear-btn {
+            position: absolute;
+            inset-inline-end: 10px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 13px;
+            display: none;
+            padding: 2px 4px;
+        }
+        .search-clear-btn:hover {
+            color: var(--text-main);
         }
 
         .category-filter-bar {
             display: flex;
             gap: 6px;
             overflow-x: auto;
-            padding-bottom: 4px;
+            padding: 2px 2px 6px 2px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(52, 211, 153, 0.3) transparent;
+        }
+        .category-filter-bar::-webkit-scrollbar {
+            height: 3px;
+        }
+        .category-filter-bar::-webkit-scrollbar-thumb {
+            background: rgba(52, 211, 153, 0.3);
+            border-radius: 3px;
         }
         .cat-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
             padding: 5px 10px;
             background: var(--bg-input);
             border: 1px solid var(--border-card);
-            border-radius: 8px;
+            border-radius: 18px;
             color: var(--text-muted);
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 800;
             white-space: nowrap;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+            flex-shrink: 0;
         }
-        .cat-pill:hover, .cat-pill.active {
-            background: rgba(16, 185, 129, 0.18);
+        .cat-pill:hover {
+            border-color: var(--brand-primary);
+            color: var(--text-main);
+            background: rgba(16, 185, 129, 0.12);
+            transform: translateY(-1px);
+        }
+        .cat-pill.active {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(5, 150, 105, 0.25));
             border-color: var(--brand-primary);
             color: #6EE7B7;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+        }
+        .cat-pill-count {
+            font-size: 9px;
+            padding: 1px 5px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.4);
+            color: #A7F3D0;
         }
 
-        /* ── Furniture Cards ── */
+        /* ── Furniture Category Accordions & 2-Column Cards ── */
         .category-group {
             background: var(--bg-input);
             border: 1px solid var(--border-card);
             border-radius: 12px;
             overflow: hidden;
+            transition: border-color 0.2s;
+        }
+        .category-group:hover {
+            border-color: rgba(52, 211, 153, 0.3);
         }
         .category-title-bar {
-            padding: 10px 14px;
+            padding: 9px 12px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -504,55 +559,115 @@
             color: var(--text-main);
             cursor: pointer;
             background: rgba(255, 255, 255, 0.02);
+            transition: background 0.15s;
         }
+        .category-title-bar:hover {
+            background: rgba(16, 185, 129, 0.08);
+        }
+        .cat-chevron {
+            font-size: 11px;
+            color: var(--text-muted);
+            transition: transform 0.2s;
+        }
+
         .furniture-grid {
-            padding: 10px;
+            padding: 8px;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 8px;
+            max-height: 480px;
+            overflow-y: auto;
         }
+        .furniture-grid::-webkit-scrollbar {
+            width: 4px;
+        }
+        .furniture-grid::-webkit-scrollbar-thumb {
+            background: rgba(52, 211, 153, 0.25);
+            border-radius: 4px;
+        }
+
         .furn-card {
             background: var(--bg-card);
             border: 1px solid var(--border-card);
             border-radius: 10px;
-            padding: 10px;
+            padding: 8px 6px;
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
             cursor: pointer;
-            gap: 6px;
-            transition: all 0.18s;
+            gap: 5px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
         .furn-card:hover {
             border-color: var(--brand-primary);
-            background: rgba(16, 185, 129, 0.1);
+            background: rgba(16, 185, 129, 0.12);
             transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4), 0 0 10px rgba(16, 185, 129, 0.2);
         }
         .furn-card.active {
-            border-color: var(--brand-primary);
-            box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
+            border-color: #10B981;
+            background: rgba(16, 185, 129, 0.22);
+            box-shadow: 0 0 14px rgba(16, 185, 129, 0.4);
         }
+
+        .furn-card-top-badges {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 0 2px;
+        }
+        .furn-dim-badge {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94A3B8;
+            padding: 1px 5px;
+            border-radius: 4px;
+        }
+        .furn-type-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: #6EE7B7;
+            padding: 1px 5px;
+            border-radius: 4px;
+        }
+
         .furn-icon {
-            width: 44px;
-            height: 44px;
+            width: 60px;
+            height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 8px;
-            background: rgba(0, 0, 0, 0.25);
+            background: radial-gradient(circle at center, rgba(24, 48, 36, 0.9) 0%, rgba(10, 22, 16, 0.95) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             overflow: hidden;
+            position: relative;
+            padding: 3px;
         }
         .furn-icon img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5));
+            transition: transform 0.2s ease;
+        }
+        .furn-card:hover .furn-icon img {
+            transform: scale(1.1);
         }
         .furn-label {
             font-size: 11px;
             font-weight: 800;
             color: var(--text-main);
-            line-height: 1.3;
+            line-height: 1.25;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         /* ── Inspector Controls ── */
@@ -812,96 +927,225 @@
                 
                 <!-- 1. FURNITURE CATALOG TAB -->
                 <div id="drawer-view-furniture" style="display: flex; flex-direction: column; gap: 10px;">
-                    <input type="text" class="search-box" placeholder="🔍 {{ __('Search 3D furniture, desks, chairs...') }}" oninput="filterFurniture(this.value)">
+                    
+                    <!-- Search Box with Clear Button -->
+                    <div class="search-box-wrapper">
+                        <input type="text" id="furniture-search-input" class="search-box" placeholder="🔍 {{ __('Search 3D furniture, desks, rugs, plants...') }}" oninput="filterFurniture(this.value)">
+                        <button type="button" id="search-clear-btn" class="search-clear-btn" onclick="clearFurnitureSearch()">✕</button>
+                    </div>
 
+                    <!-- Catalog Quick Stats & Expand/Collapse Toggle -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-muted); padding: 0 4px;">
+                        @php
+                            $totalCatalogCount = $furnitureCategories->sum(function($c) { return $c->items->count(); }) + 12;
+                        @endphp
+                        <span id="catalog-count-label" style="font-weight: 700; color: #A7F3D0;">✨ {{ $totalCatalogCount }} {{ __('Items Available') }}</span>
+                        <button type="button" onclick="expandAllCategories()" style="background:none; border:none; color:var(--brand-primary); font-size:11px; font-weight:800; cursor:pointer; text-decoration: underline;">
+                            {{ __('Toggle All') }}
+                        </button>
+                    </div>
+
+                    <!-- Modern Category Filter Horizontal Bar -->
                     <div class="category-filter-bar">
-                        <button class="cat-pill active" onclick="filterByCategory('all')">🌟 {{ __('All') }}</button>
-                        <button class="cat-pill" onclick="filterByCategory('blueprint')">📐 {{ __('Blueprint Assets') }}</button>
+                        <button type="button" class="cat-pill active" onclick="filterByCategory('all')">
+                            <span>🌟</span>
+                            <span>{{ __('All') }}</span>
+                            <span class="cat-pill-count">{{ $totalCatalogCount }}</span>
+                        </button>
+                        <button type="button" class="cat-pill" onclick="filterByCategory('blueprint')">
+                            <span>📐</span>
+                            <span>{{ __('Blueprint') }}</span>
+                            <span class="cat-pill-count">12</span>
+                        </button>
                         @foreach($furnitureCategories as $cat)
-                            <button class="cat-pill" onclick="filterByCategory('{{ $cat->slug }}')">{{ $cat->icon }} {{ $cat->name }}</button>
+                            @php
+                                $shortName = trim(preg_replace('/\s*\(.*?\)\s*/', '', $cat->name));
+                            @endphp
+                            <button type="button" class="cat-pill" onclick="filterByCategory('{{ $cat->slug }}')" title="{{ $cat->name }}">
+                                <span>{{ $cat->icon }}</span>
+                                <span>{{ $shortName }}</span>
+                                <span class="cat-pill-count">{{ $cat->items->count() }}</span>
+                            </button>
                         @endforeach
                     </div>
 
-                    <!-- Blueprint Suite Assets -->
+                    <!-- 1. Blueprint Suite Assets -->
                     <div class="category-group" id="cat-blueprint">
                         <div class="category-title-bar" onclick="toggleCategoryGroup('cat-blueprint')">
-                            <span>📐 {{ __('Isometric Blueprint Objects') }} (18)</span>
-                            <span>▾</span>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 15px;">📐</span>
+                                <span>{{ __('Isometric Blueprint Objects') }}</span>
+                                <span class="cat-pill-count">12</span>
+                            </div>
+                            <span class="cat-chevron" id="chevron-cat-blueprint">▾</span>
                         </div>
                         <div class="furniture-grid">
-                            <div class="furn-card" onclick="selectFurnitureItem('living_wall', '#2D6A4F', null, 5, 2, true)">
-                                <div class="furn-icon"><span style="font-size: 24px;">🌿</span></div>
-                                <div class="furn-label">{{ __('Living Plant Wall') }} (5x2)</div>
+                            <div class="furn-card" data-name="living plant wall botanical" onclick="selectFurnitureItem('living_wall', '#2D6A4F', null, 5, 2, true, 'none', null, 3, '{{ __('Living Plant Wall') }}')">
+                                <div class="furn-card-top-badges">
+                                    <span class="furn-dim-badge">5×2</span>
+                                    <span class="furn-type-badge">🌿 {{ __('Plant') }}</span>
+                                </div>
+                                <div class="furn-icon"><span style="font-size: 30px;">🌿</span></div>
+                                <div class="furn-label" title="{{ __('Living Plant Wall') }}">{{ __('Living Plant Wall') }}</div>
                             </div>
-                            <div class="furn-card" onclick="selectFurnitureItem('conference_table', '#D8B589', null, 8, 3, true)">
-                                <div class="furn-icon"><span style="font-size: 24px;">🤝</span></div>
-                                <div class="furn-label">{{ __('Oak Boardroom Table') }} (8x3)</div>
+
+                            <div class="furn-card" data-name="oak boardroom table conference" onclick="selectFurnitureItem('conference_table', '#D8B589', null, 8, 3, true, 'sit', null, 2, '{{ __('Oak Boardroom Table') }}')">
+                                <div class="furn-card-top-badges">
+                                    <span class="furn-dim-badge">8×3</span>
+                                    <span class="furn-type-badge">🤝 {{ __('Table') }}</span>
+                                </div>
+                                <div class="furn-icon"><span style="font-size: 30px;">🤝</span></div>
+                                <div class="furn-label" title="{{ __('Oak Boardroom Table') }}">{{ __('Oak Boardroom Table') }}</div>
                             </div>
-                            <div class="furn-card" onclick="selectFurnitureItem('chair_white', '#FFFFFF', null, 1, 1, false)">
-                                <div class="furn-icon"><span style="font-size: 24px;">🪑</span></div>
-                                <div class="furn-label">{{ __('White Executive Chair') }}</div>
+
+                            <div class="furn-card" data-name="white executive chair seating" onclick="selectFurnitureItem('chair_white', '#FFFFFF', null, 1, 1, false, 'sit', null, 1, '{{ __('White Executive Chair') }}')">
+                                <div class="furn-card-top-badges">
+                                    <span class="furn-dim-badge">1×1</span>
+                                    <span class="furn-type-badge">🪑 {{ __('Sit') }}</span>
+                                </div>
+                                <div class="furn-icon"><span style="font-size: 30px;">🪑</span></div>
+                                <div class="furn-label" title="{{ __('White Executive Chair') }}">{{ __('White Executive Chair') }}</div>
                             </div>
-                            <div class="furn-card" onclick="selectFurnitureItem('pod_workstation', '#D8B589', null, 3, 2, true)">
-                                <div class="furn-icon"><span style="font-size: 24px;">🎧</span></div>
-                                <div class="furn-label">{{ __('Focus Pod Desk') }} (3x2)</div>
+
+                            <div class="furn-card" data-name="focus pod desk workstation" onclick="selectFurnitureItem('pod_workstation', '#D8B589', null, 3, 2, true, 'sit', null, 2, '{{ __('Focus Pod Desk') }}')">
+                                <div class="furn-card-top-badges">
+                                    <span class="furn-dim-badge">3×2</span>
+                                    <span class="furn-type-badge">🎧 {{ __('Desk') }}</span>
+                                </div>
+                                <div class="furn-icon"><span style="font-size: 30px;">🎧</span></div>
+                                <div class="furn-label" title="{{ __('Focus Pod Desk') }}">{{ __('Focus Pod Desk') }}</div>
                             </div>
-                            <div class="furn-card" onclick="selectFurnitureItem('wood_panel_wall', '#C49A6C', null, 7, 1, true)">
-                                <div class="furn-icon"><span style="font-size: 24px;">🪵</span></div>
-                                <div class="furn-label">{{ __('Wood Feature Wall') }} (7x1)</div>
+
+                            <div class="furn-card" data-name="wood feature wall partition" onclick="selectFurnitureItem('wood_panel_wall', '#C49A6C', null, 7, 1, true, 'none', null, 3, '{{ __('Wood Feature Wall') }}')">
+                                <div class="furn-card-top-badges">
+                                    <span class="furn-dim-badge">7×1</span>
+                                    <span class="furn-type-badge">🪵 {{ __('Wall') }}</span>
+                                </div>
+                                <div class="furn-icon"><span style="font-size: 30px;">🪵</span></div>
+                                <div class="furn-label" title="{{ __('Wood Feature Wall') }}">{{ __('Wood Feature Wall') }}</div>
                             </div>
-                            <div class="furn-card" onclick="selectFurnitureItem('stairs_wood', '#C49A6C', null, 3, 4, true)">
-                                <div class="furn-icon"><span style="font-size: 24px;">🪜</span></div>
-                                <div class="furn-label">{{ __('Wooden Staircase') }} (3x4)</div>
+
+                            <div class="furn-card" data-name="wooden staircase stairs" onclick="selectFurnitureItem('stairs_wood', '#C49A6C', null, 3, 4, true, 'none', null, 2, '{{ __('Wooden Staircase') }}')">
+                                <div class="furn-card-top-badges">
+                                    <span class="furn-dim-badge">3×4</span>
+                                    <span class="furn-type-badge">🪜 {{ __('Stairs') }}</span>
+                                </div>
+                                <div class="furn-icon"><span style="font-size: 30px;">🪜</span></div>
+                                <div class="furn-label" title="{{ __('Wooden Staircase') }}">{{ __('Wooden Staircase') }}</div>
                             </div>
-                            <div class="furn-card" onclick="selectFurnitureItem('tech_workbench', '#D8B589', null, 4, 2, true)">
-                                <div class="furn-icon"><span style="font-size: 24px;">🛠️</span></div>
-                                <div class="furn-label">{{ __('Tech 3D Workbench') }} (4x2)</div>
+
+                            <div class="furn-card" data-name="tech 3d workbench desk" onclick="selectFurnitureItem('tech_workbench', '#D8B589', null, 4, 2, true, 'none', null, 2, '{{ __('Tech 3D Workbench') }}')">
+                                <div class="furn-card-top-badges">
+                                    <span class="furn-dim-badge">4×2</span>
+                                    <span class="furn-type-badge">🛠️ {{ __('Bench') }}</span>
+                                </div>
+                                <div class="furn-icon"><span style="font-size: 30px;">🛠️</span></div>
+                                <div class="furn-label" title="{{ __('Tech 3D Workbench') }}">{{ __('Tech 3D Workbench') }}</div>
                             </div>
-                            <div class="furn-card" onclick="selectFurnitureItem('reception_counter', '#F4EFE6', null, 4, 2, true)">
-                                <div class="furn-icon"><span style="font-size: 24px;">🛎️</span></div>
-                                <div class="furn-label">{{ __('Reception Desk') }} (4x2)</div>
+
+                            <div class="furn-card" data-name="reception counter desk" onclick="selectFurnitureItem('reception_counter', '#F4EFE6', null, 4, 2, true, 'drink', null, 2, '{{ __('Reception Desk') }}')">
+                                <div class="furn-card-top-badges">
+                                    <span class="furn-dim-badge">4×2</span>
+                                    <span class="furn-type-badge">🛎️ {{ __('Lobby') }}</span>
+                                </div>
+                                <div class="furn-icon"><span style="font-size: 30px;">🛎️</span></div>
+                                <div class="furn-label" title="{{ __('Reception Desk') }}">{{ __('Reception Desk') }}</div>
                             </div>
-                            <div class="furn-card" onclick="selectFurnitureItem('sofa_cream', '#F4EFE6', null, 3, 2, true)">
-                                <div class="furn-icon"><span style="font-size: 24px;">🛋️</span></div>
-                                <div class="furn-label">{{ __('Cream 3-Seater Sofa') }} (3x2)</div>
+
+                            <div class="furn-card" data-name="cream 3 seater sofa lounge" onclick="selectFurnitureItem('sofa_cream', '#F4EFE6', null, 3, 2, true, 'sit', null, 1, '{{ __('Cream 3-Seater Sofa') }}')">
+                                <div class="furn-card-top-badges">
+                                    <span class="furn-dim-badge">3×2</span>
+                                    <span class="furn-type-badge">🛋️ {{ __('Sofa') }}</span>
+                                </div>
+                                <div class="furn-icon"><span style="font-size: 30px;">🛋️</span></div>
+                                <div class="furn-label" title="{{ __('Cream 3-Seater Sofa') }}">{{ __('Cream 3-Seater Sofa') }}</div>
                             </div>
-                            <div class="furn-card" onclick="selectFurnitureItem('armchair_sage', '#8BA888', null, 2, 2, true)">
-                                <div class="furn-icon"><span style="font-size: 24px;">🛋️</span></div>
-                                <div class="furn-label">{{ __('Sage Armchair') }} (2x2)</div>
+
+                            <div class="furn-card" data-name="sage armchair single lounge" onclick="selectFurnitureItem('armchair_sage', '#8BA888', null, 2, 2, true, 'sit', null, 1, '{{ __('Sage Armchair') }}')">
+                                <div class="furn-card-top-badges">
+                                    <span class="furn-dim-badge">2×2</span>
+                                    <span class="furn-type-badge">🛋️ {{ __('Chair') }}</span>
+                                </div>
+                                <div class="furn-icon"><span style="font-size: 30px;">🛋️</span></div>
+                                <div class="furn-label" title="{{ __('Sage Armchair') }}">{{ __('Sage Armchair') }}</div>
                             </div>
-                            <div class="furn-card" onclick="selectFurnitureItem('coffee_table_oak', '#D8B589', null, 2, 1, true)">
-                                <div class="furn-icon"><span style="font-size: 24px;">☕</span></div>
-                                <div class="furn-label">{{ __('Oak Coffee Table') }} (2x1)</div>
+
+                            <div class="furn-card" data-name="oak coffee table lounge" onclick="selectFurnitureItem('coffee_table_oak', '#D8B589', null, 2, 1, true, 'drink', null, 2, '{{ __('Oak Coffee Table') }}')">
+                                <div class="furn-card-top-badges">
+                                    <span class="furn-dim-badge">2×1</span>
+                                    <span class="furn-type-badge">☕ {{ __('Table') }}</span>
+                                </div>
+                                <div class="furn-icon"><span style="font-size: 30px;">☕</span></div>
+                                <div class="furn-label" title="{{ __('Oak Coffee Table') }}">{{ __('Oak Coffee Table') }}</div>
                             </div>
-                            <div class="furn-card" onclick="selectFurnitureItem('whiteboard_strategy', '#FFFFFF', null, 4, 1, true)">
-                                <div class="furn-icon"><span style="font-size: 24px;">📋</span></div>
-                                <div class="furn-label">{{ __('Strategy Board') }} (4x1)</div>
+
+                            <div class="furn-card" data-name="strategy whiteboard presentation" onclick="selectFurnitureItem('whiteboard_strategy', '#FFFFFF', null, 4, 1, true, 'whiteboard', null, 3, '{{ __('Strategy Board') }}')">
+                                <div class="furn-card-top-badges">
+                                    <span class="furn-dim-badge">4×1</span>
+                                    <span class="furn-type-badge">📋 {{ __('Board') }}</span>
+                                </div>
+                                <div class="furn-icon"><span style="font-size: 30px;">📋</span></div>
+                                <div class="furn-label" title="{{ __('Strategy Board') }}">{{ __('Strategy Board') }}</div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Dynamic Catalog Categories -->
+                    <!-- 2. Dynamic Catalog Categories (936+ Items) -->
                     @foreach($furnitureCategories as $cat)
+                    @php
+                        $cleanCatName = trim(preg_replace('/\s*\(.*?\)\s*/', '', $cat->name));
+                        $itemsList = $cat->items;
+                        if ($cat->slug === 'custom') {
+                            $allowedCustomSlugs = ['branding', 'sticky_note', 'custom_link', 'custom_image'];
+                            $itemsList = $itemsList->whereIn('slug', $allowedCustomSlugs);
+                        }
+                    @endphp
+                    @if($itemsList->count() > 0)
                     <div class="category-group" id="cat-{{ $cat->slug }}">
                         <div class="category-title-bar" onclick="toggleCategoryGroup('cat-{{ $cat->slug }}')">
-                            <span>{{ $cat->icon }} {{ $cat->name }} ({{ $cat->items->count() }})</span>
-                            <span>▾</span>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 15px;">{{ $cat->icon }}</span>
+                                <span>{{ $cleanCatName }}</span>
+                                <span class="cat-pill-count">{{ $itemsList->count() }}</span>
+                            </div>
+                            <span class="cat-chevron" id="chevron-cat-{{ $cat->slug }}">▾</span>
                         </div>
                         <div class="furniture-grid" style="display: none;">
-                            @foreach($cat->items as $item)
-                                <div class="furn-card" onclick="selectFurnitureItem('{{ $item->slug }}', '{{ $item->colors[0] ?? '#3b82f6' }}', '{{ $item->image_url }}', {{ $item->width }}, {{ $item->height }}, {{ $item->collision ? 'true' : 'false' }})">
+                            @foreach($itemsList as $item)
+                                @php
+                                    $itemWidth = $item->width ?? 1;
+                                    $itemHeight = $item->height ?? 1;
+                                    $itemElev = $item->elevation ?? ($cat->slug === 'rugs' ? 0 : 1);
+                                    $itemImg = $item->image_url;
+                                    if ($item->slug === 'branding' && !empty($organization->logo_url)) {
+                                        $itemImg = asset($organization->logo_url);
+                                    }
+                                    $itemTypeTag = ($cat->slug === 'rugs' || $itemElev === 0) ? '🧶 ' . __('Rug') : ($item->interaction_type !== 'none' ? '⚡ ' . ucfirst($item->interaction_type) : "{$itemWidth}×{$itemHeight}");
+                                    if ($item->slug === 'branding') $itemTypeTag = '🏢 ' . __('Logo');
+                                    if ($item->slug === 'sticky_note') $itemTypeTag = '📝 ' . __('Note');
+                                    if ($item->slug === 'custom_link') $itemTypeTag = '🔗 ' . __('URL');
+                                    if ($item->slug === 'custom_image') $itemTypeTag = '🖼️ ' . __('Image');
+                                @endphp
+                                <div class="furn-card" 
+                                     data-name="{{ strtolower($item->name . ' ' . $cleanCatName . ' ' . $cat->slug) }}"
+                                     onclick="selectFurnitureItem('{{ $item->slug }}', '{{ $item->colors[0] ?? '#3b82f6' }}', '{{ $itemImg }}', {{ $itemWidth }}, {{ $itemHeight }}, {{ $item->collision ? 'true' : 'false' }}, '{{ $item->interaction_type }}', {{ json_encode($item->interaction_config) }}, {{ $itemElev }}, '{{ addslashes($item->name) }}')">
+                                    <div class="furn-card-top-badges">
+                                        <span class="furn-dim-badge">{{ $itemWidth }}×{{ $itemHeight }}</span>
+                                        <span class="furn-type-badge">{{ $itemTypeTag }}</span>
+                                    </div>
                                     <div class="furn-icon">
-                                        @if($item->image_url)
-                                            <img src="{{ $item->image_url }}" alt="{{ $item->name }}" loading="lazy">
+                                        @if($itemImg)
+                                            <img src="{{ $itemImg }}" alt="{{ $item->name }}" loading="lazy" style="max-height: 48px; max-width: 48px; object-fit: contain;">
                                         @else
-                                            <span style="font-size: 24px;">{{ $item->icon }}</span>
+                                            <span style="font-size: 26px;">{{ $item->icon }}</span>
                                         @endif
                                     </div>
-                                    <div class="furn-label">{{ $item->name }}</div>
+                                    <div class="furn-label" title="{{ $item->name }}">{{ $item->name }}</div>
                                 </div>
                             @endforeach
                         </div>
                     </div>
+                    @endif
                     @endforeach
                 </div>
 
@@ -936,6 +1180,106 @@
                                 <div style="display: flex; gap: 8px;">
                                     <input type="number" class="prop-input" id="prop-width" placeholder="W" min="1" max="20" oninput="updateSelectedProp('width', parseInt(this.value) || 1)">
                                     <input type="number" class="prop-input" id="prop-height" placeholder="H" min="1" max="20" oninput="updateSelectedProp('height', parseInt(this.value) || 1)">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="prop-label">{{ __('Layer & Elevation (الطبقة والارتفاع)') }}</label>
+                                <select class="prop-input" id="prop-elevation" onchange="updateSelectedProp('elevation', parseInt(this.value))">
+                                    <option value="0">🧶 {{ __('Ground / Rug (أرضية / سجاد)') }}</option>
+                                    <option value="1">🪑 {{ __('Default Furniture (أثاث عادي)') }}</option>
+                                    <option value="2">💼 {{ __('Desk / Table Surface (سطح مكتب)') }}</option>
+                                    <option value="3">🌿 {{ __('Tall Plant / Partition (حاجز / نبتة طويلة)') }}</option>
+                                    <option value="5">💡 {{ __('Ceiling / Overhead (إضاءة وسقف)') }}</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="prop-label">{{ __('Interaction (نوع التفاعل)') }}</label>
+                                <div id="prop-interaction-badge" style="font-size: 11px; font-weight: 700; color: var(--brand-primary); padding: 4px 8px; background: rgba(16,185,129,0.1); border-radius: 6px; display: inline-block;">NONE</div>
+                            </div>
+
+                            <!-- 🏢 1. Company Logo / Branding Inspector Box -->
+                            <div id="inspector-branding-box" style="display: none; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(52, 211, 153, 0.25); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <span style="font-size: 12px; font-weight: 800; color: #34D399;">🏢 {{ __('Company Logo (شعار الشركة)') }}</span>
+                                    <span class="furn-type-badge" style="background: rgba(16, 185, 129, 0.2); color: #6EE7B7;">Logo</span>
+                                </div>
+                                <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+                                    {{ __('Displays your company logo on the workplace floor or reception.') }}
+                                </div>
+                                @if($organization->logo_url)
+                                <button type="button" class="act-btn act-btn-emerald" onclick="applyOrgLogoToSelected()" style="justify-content: center; padding: 8px; font-size: 11px; width: 100%;">
+                                    <span>🏢</span> <span>{{ __('Use Official Logo from Settings') }}</span>
+                                </button>
+                                @endif
+                                <div>
+                                    <label class="prop-label">{{ __('Custom Logo URL') }}</label>
+                                    <input type="text" class="prop-input" id="prop-branding-url" placeholder="https://.../logo.png" oninput="updateSelectedLogoUrl(this.value)">
+                                </div>
+                                <div>
+                                    <input type="file" id="branding-upload-input" accept="image/*" style="display: none;" onchange="uploadObjectImageDirectly(this, 'branding')">
+                                    <button type="button" class="tool-btn" onclick="document.getElementById('branding-upload-input').click()" style="width: 100%; justify-content: center; padding: 7px; font-size: 11px;">
+                                        📤 {{ __('Upload Custom Logo File') }}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 📝 2. Sticky Note Inspector Box -->
+                            <div id="inspector-stickynote-box" style="display: none; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <span style="font-size: 12px; font-weight: 800; color: #FBBF24;">📝 {{ __('Sticky Note (ملاحظة لاصقة)') }}</span>
+                                    <span class="furn-type-badge" style="background: rgba(245, 158, 11, 0.2); color: #FCD34D;">Note</span>
+                                </div>
+                                <div>
+                                    <label class="prop-label">{{ __('Note Text (نص الملاحظة التفاعلية)') }}</label>
+                                    <textarea class="prop-input" id="prop-stickynote-text" rows="3" placeholder="{{ __('Write your note or announcement here...') }}" oninput="updateSelectedStickyText(this.value)" style="resize: vertical; min-height: 65px;"></textarea>
+                                </div>
+                                <div>
+                                    <label class="prop-label">{{ __('Color Theme (لون الملاحظة)') }}</label>
+                                    <div style="display: flex; gap: 6px;">
+                                        <button type="button" class="rot-btn" style="flex: 1; background: rgba(245, 158, 11, 0.2); border-color: #F59E0B; color: #FCD34D;" onclick="setStickyColor('yellow')" title="Yellow">🟡</button>
+                                        <button type="button" class="rot-btn" style="flex: 1; background: rgba(234, 88, 12, 0.2); border-color: #EA580C; color: #FDBA74;" onclick="setStickyColor('orange')" title="Orange">🟠</button>
+                                        <button type="button" class="rot-btn" style="flex: 1; background: rgba(168, 85, 247, 0.2); border-color: #A855F7; color: #D8B4FE;" onclick="setStickyColor('purple')" title="Purple">🌸</button>
+                                        <button type="button" class="rot-btn" style="flex: 1; background: rgba(16, 185, 129, 0.2); border-color: #10B981; color: #6EE7B7;" onclick="setStickyColor('green')" title="Green">🟢</button>
+                                        <button type="button" class="rot-btn" style="flex: 1; background: rgba(59, 130, 246, 0.2); border-color: #3B82F6; color: #93C5FD;" onclick="setStickyColor('blue')" title="Blue">🔵</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 🔗 3. Custom Link Inspector Box -->
+                            <div id="inspector-link-box" style="display: none; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <span style="font-size: 12px; font-weight: 800; color: #60A5FA;">🔗 {{ __('Interactive Web Link (رابط مخصص)') }}</span>
+                                    <span class="furn-type-badge" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD;">URL</span>
+                                </div>
+                                <div>
+                                    <label class="prop-label">{{ __('Target URL (رابط الموقع أو المستند)') }}</label>
+                                    <input type="url" class="prop-input" id="prop-link-url" placeholder="https://example.com/doc" oninput="updateSelectedLinkProp('url', this.value)">
+                                </div>
+                                <div>
+                                    <label class="prop-label">{{ __('Link Title / Label (عنوان الرابط)') }}</label>
+                                    <input type="text" class="prop-input" id="prop-link-title" placeholder="{{ __('e.g. Project Notion Board') }}" oninput="updateSelectedLinkProp('title', this.value)">
+                                </div>
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
+                                    <span style="font-size: 11px; color: var(--text-secondary);">{{ __('Open in New Browser Tab (فتح بنافذة جديدة)') }}</span>
+                                    <input type="checkbox" id="prop-link-newtab" checked onchange="updateSelectedLinkProp('openInNewTab', this.checked)" style="accent-color: var(--brand-primary); cursor: pointer; width: 16px; height: 16px;">
+                                </div>
+                            </div>
+
+                            <!-- 🖼️ 4. Custom Image Inspector Box -->
+                            <div id="inspector-customimage-box" style="display: none; background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <span style="font-size: 12px; font-weight: 800; color: #C084FC;">🖼️ {{ __('Custom Image / Banner (صورة مخصصة)') }}</span>
+                                    <span class="furn-type-badge" style="background: rgba(139, 92, 246, 0.2); color: #D8B4FE;">Image</span>
+                                </div>
+                                <div>
+                                    <label class="prop-label">{{ __('Image URL (رابط الصورة)') }}</label>
+                                    <input type="url" class="prop-input" id="prop-customimage-url" placeholder="https://.../banner.png" oninput="updateSelectedCustomImageUrl(this.value)">
+                                </div>
+                                <div>
+                                    <input type="file" id="customimage-upload-input" accept="image/*" style="display: none;" onchange="uploadObjectImageDirectly(this, 'custom_image')">
+                                    <button type="button" class="tool-btn" onclick="document.getElementById('customimage-upload-input').click()" style="width: 100%; justify-content: center; padding: 7px; font-size: 11px;">
+                                        📤 {{ __('Upload Image File (رفع صورة من جهازك)') }}
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1022,6 +1366,8 @@
         const ORG_ID = "{{ $organization->id }}";
         const PLAN_MAX_ROOMS = {{ ($organization->plan && $organization->plan->room_limit > 0) ? $organization->plan->room_limit : 0 }};
         const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const COMPANY_LOGO_URL = @json($organization->logo_url ? asset($organization->logo_url) : '');
+        const COMPANY_NAME = @json($organization->name);
 
         const canvas = document.getElementById('editor-canvas');
         const ctx = canvas.getContext('2d');
@@ -1055,7 +1401,14 @@
             bounds: r.bounds || { x: 1, y: 1, width: 10, height: 8 },
             metadata: r.metadata || { audio_isolation: true }
         }));
-        let objects = MAP_DATA.objects || [];
+        let objects = (MAP_DATA.objects || []).map(o => ({
+            ...o,
+            image_url: o.image_url || (o.interaction_config && o.interaction_config.image_url) || null,
+            is_custom: typeof o.is_custom !== 'undefined' ? o.is_custom : (o.interaction_config && typeof o.interaction_config.is_custom !== 'undefined' ? o.interaction_config.is_custom : true),
+            width: o.width || (o.size ? o.size.width : (o.interaction_config && o.interaction_config.width ? o.interaction_config.width : 1)),
+            height: o.height || (o.size ? o.size.height : (o.interaction_config && o.interaction_config.height ? o.interaction_config.height : 1)),
+            collision: typeof o.collision === 'boolean' ? o.collision : true
+        }));
 
         let selectedItem = null;
         let isDragging = false;
@@ -1084,13 +1437,19 @@
         const BLUEPRINT_IMAGE = new Image();
         const initialBgUrl = (MAP_DATA.layout_data && MAP_DATA.layout_data.background_image_url)
             ? MAP_DATA.layout_data.background_image_url
-            : '/images/office_floorplan.jpg';
-        BLUEPRINT_IMAGE.src = initialBgUrl + (initialBgUrl.includes('?') ? '&' : '?') + 'v=' + Date.now();
+            : null;
         let blueprintLoaded = false;
-        BLUEPRINT_IMAGE.onload = () => {
-            blueprintLoaded = true;
-            draw();
-        };
+        if (initialBgUrl) {
+            BLUEPRINT_IMAGE.src = initialBgUrl + (initialBgUrl.includes('?') ? '&' : '?') + 'v=' + Date.now();
+            BLUEPRINT_IMAGE.onload = () => {
+                blueprintLoaded = true;
+                draw();
+            };
+            BLUEPRINT_IMAGE.onerror = () => {
+                blueprintLoaded = false;
+                draw();
+            };
+        }
 
         // ── Navigation & Tools ──
         function setTool(tool) {
@@ -1118,34 +1477,97 @@
 
         function toggleCategoryGroup(id) {
             const grid = document.querySelector(`#${id} .furniture-grid`);
-            if (grid) grid.style.display = grid.style.display === 'none' ? 'grid' : 'none';
+            const chevron = document.querySelector(`#chevron-${id}`);
+            if (grid) {
+                const isHidden = (grid.style.display === 'none' || getComputedStyle(grid).display === 'none');
+                grid.style.display = isHidden ? 'grid' : 'none';
+                if (chevron) chevron.textContent = isHidden ? '▴' : '▾';
+            }
         }
 
         function filterByCategory(slug) {
             document.querySelectorAll('.cat-pill').forEach(c => c.classList.remove('active'));
-            if (event && event.currentTarget) event.currentTarget.classList.add('active');
+            if (window.event && window.event.currentTarget) window.event.currentTarget.classList.add('active');
+            
+            let visibleCount = 0;
             document.querySelectorAll('.category-group').forEach(acc => {
-                acc.style.display = (slug === 'all' || acc.id === `cat-${slug}`) ? 'block' : 'none';
+                const match = (slug === 'all' || acc.id === `cat-${slug}`);
+                acc.style.display = match ? 'block' : 'none';
                 const grid = acc.querySelector('.furniture-grid');
-                if (grid && (slug === 'all' || acc.id === `cat-${slug}`)) grid.style.display = 'grid';
+                const chevron = acc.querySelector('.cat-chevron');
+                if (grid) {
+                    if (match) {
+                        grid.style.display = 'grid';
+                        if (chevron) chevron.textContent = '▴';
+                        visibleCount += grid.querySelectorAll('.furn-card').length;
+                    } else {
+                        grid.style.display = 'none';
+                        if (chevron) chevron.textContent = '▾';
+                    }
+                }
             });
+            const countLabel = document.getElementById('catalog-count-label');
+            if (countLabel) countLabel.textContent = `✨ ${visibleCount} {{ __('Items shown') }}`;
         }
 
         function filterFurniture(q) {
-            const term = q.toLowerCase();
-            document.querySelectorAll('.furn-card').forEach(card => {
-                const name = card.querySelector('.furn-label')?.textContent.toLowerCase() || '';
-                card.style.display = name.includes(term) ? 'flex' : 'none';
+            const term = (q || '').trim().toLowerCase();
+            const clearBtn = document.getElementById('search-clear-btn');
+            if (clearBtn) clearBtn.style.display = term ? 'block' : 'none';
+
+            let visibleTotal = 0;
+            document.querySelectorAll('.category-group').forEach(group => {
+                let groupHasMatch = false;
+                group.querySelectorAll('.furn-card').forEach(card => {
+                    const name = card.getAttribute('data-name') || card.querySelector('.furn-label')?.textContent.toLowerCase() || '';
+                    const match = !term || name.includes(term);
+                    card.style.display = match ? 'flex' : 'none';
+                    if (match) {
+                        groupHasMatch = true;
+                        visibleTotal++;
+                    }
+                });
+                group.style.display = (groupHasMatch || !term) ? 'block' : 'none';
+                const grid = group.querySelector('.furniture-grid');
+                const chevron = group.querySelector('.cat-chevron');
+                if (term) {
+                    if (grid) grid.style.display = groupHasMatch ? 'grid' : 'none';
+                    if (chevron) chevron.textContent = groupHasMatch ? '▴' : '▾';
+                }
             });
+
+            const countLabel = document.getElementById('catalog-count-label');
+            if (countLabel) countLabel.textContent = term ? `🔍 ${visibleTotal} {{ __('Matches found') }}` : `✨ ${visibleTotal} {{ __('Items available') }}`;
         }
 
-        function selectFurnitureItem(slug, color, imgUrl = null, w = 1, h = 1, col = true) {
+        function clearFurnitureSearch() {
+            const inp = document.getElementById('furniture-search-input');
+            if (inp) { inp.value = ''; filterFurniture(''); }
+        }
+
+        function expandAllCategories() {
+            const grids = document.querySelectorAll('.furniture-grid');
+            const anyClosed = Array.from(grids).some(g => g.style.display === 'none' || getComputedStyle(g).display === 'none');
+            grids.forEach(g => g.style.display = anyClosed ? 'grid' : 'none');
+            document.querySelectorAll('.cat-chevron').forEach(ch => ch.textContent = anyClosed ? '▴' : '▾');
+        }
+
+        function selectFurnitureItem(slug, color, imgUrl = null, w = 1, h = 1, col = true, interactionType = 'none', interactionConfig = null, elevation = 1, itemName = null) {
             setTool('object');
             currentObjectType = slug;
             currentObjectColor = color || '#3B82F6';
-            currentObjectCustom = { imageUrl: imgUrl, width: w, height: h, collision: Boolean(col) };
+            currentObjectCustom = {
+                name: itemName,
+                imageUrl: imgUrl,
+                width: parseInt(w) || 1,
+                height: parseInt(h) || 1,
+                collision: Boolean(col),
+                interactionType: interactionType || 'none',
+                interactionConfig: interactionConfig || null,
+                elevation: (typeof elevation !== 'undefined' && elevation !== null) ? parseInt(elevation) : 1
+            };
             document.querySelectorAll('.furn-card').forEach(el => el.classList.remove('active'));
-            if (event && event.currentTarget) event.currentTarget.classList.add('active');
+            if (window.event && window.event.currentTarget) window.event.currentTarget.classList.add('active');
         }
 
         function zoomIn() { zoomLevel = Math.min(2.5, zoomLevel + 0.15); draw(); }
@@ -1249,15 +1671,56 @@
                 startY = tileY;
                 currentRect = { x: tileX, y: tileY, width: 1, height: 1 };
             } else if (currentTool === 'object') {
+                let objImgUrl = currentObjectCustom?.imageUrl || null;
+                let initConfig = currentObjectCustom?.interactionConfig ? JSON.parse(JSON.stringify(currentObjectCustom.interactionConfig)) : {};
+                let iType = currentObjectCustom?.interactionType || 'none';
+
+                if (currentObjectType === 'branding') {
+                    iType = 'branding';
+                    if (COMPANY_LOGO_URL) {
+                        objImgUrl = COMPANY_LOGO_URL;
+                    }
+                    initConfig = {
+                        behavior: { type: 'branding', data: { use_company_logo: true } },
+                        use_company_logo: true,
+                        image_url: objImgUrl
+                    };
+                } else if (currentObjectType === 'sticky_note') {
+                    iType = 'stickyNote';
+                    initConfig = {
+                        behavior: { type: 'stickyNote', data: { text: '' } },
+                        noteText: '',
+                        color: 'yellow'
+                    };
+                } else if (currentObjectType === 'custom_link') {
+                    iType = 'link';
+                    initConfig = {
+                        behavior: { type: 'link', data: { url: '', title: '', openInNewTab: true } },
+                        url: '',
+                        title: '',
+                        openInNewTab: true
+                    };
+                } else if (currentObjectType === 'custom_image') {
+                    iType = 'customImage';
+                    initConfig = {
+                        behavior: { type: 'customImage', data: { imageUrl: objImgUrl, openInNewTab: false } },
+                        image_url: objImgUrl
+                    };
+                }
+
                 const newObj = {
                     type: currentObjectType,
-                    name: `Object #${objects.length + 1}`,
+                    name: currentObjectCustom?.name || `${currentObjectType.replace(/_/g, ' ')} #${objects.length + 1}`,
                     position: { x: tileX, y: tileY, rotation: 0 },
                     color: currentObjectColor,
-                    image_url: currentObjectCustom?.imageUrl || null,
+                    image_url: objImgUrl,
                     width: currentObjectCustom?.width || 1,
                     height: currentObjectCustom?.height || 1,
-                    collision: currentObjectCustom ? currentObjectCustom.collision : true
+                    collision: currentObjectCustom ? currentObjectCustom.collision : true,
+                    elevation: currentObjectCustom?.elevation || 1,
+                    interaction_type: iType,
+                    interaction_config: initConfig,
+                    is_custom: true
                 };
                 objects.push(newObj);
                 selectedItem = { type: 'object', item: newObj };
@@ -1586,16 +2049,31 @@
                 ctx.fillText(badgeText, rx + rw / 2, ry - 18);
             }
 
-            // 4. Draw Furniture Objects
-            objects.forEach(obj => {
+            // 4. Draw Furniture Objects with Elevation Depth Sorting (Floor Rugs -> Furniture -> Surfaces -> Ceiling)
+            const sortedObjects = [...objects].sort((a, b) => {
+                const isRugA = (a.type && (a.type.includes('rug') || a.type.includes('carpet'))) || (a.name && (a.name.toLowerCase().includes('rug') || a.name.toLowerCase().includes('carpet') || a.name.includes('سجاد')));
+                const isRugB = (b.type && (b.type.includes('rug') || b.type.includes('carpet'))) || (b.name && (b.name.toLowerCase().includes('rug') || b.name.toLowerCase().includes('carpet') || b.name.includes('سجاد')));
+                const defaultElevA = isRugA ? 0 : 1;
+                const defaultElevB = isRugB ? 0 : 1;
+                const elevA = typeof a.elevation === 'number' ? a.elevation : (a.interaction_config?.elevation ?? defaultElevA);
+                const elevB = typeof b.elevation === 'number' ? b.elevation : (b.interaction_config?.elevation ?? defaultElevB);
+                if (elevA !== elevB) return elevA - elevB;
+                const yA = (a.position ? a.position.y : 0);
+                const yB = (b.position ? b.position.y : 0);
+                return yA - yB;
+            });
+
+            sortedObjects.forEach(obj => {
+                const isSelected = selectedItem && selectedItem.type === 'object' && selectedItem.item === obj;
+                const ox = (obj.position ? obj.position.x : 0) * TILE_SIZE;
+                const oy = (obj.position ? obj.position.y : 0) * TILE_SIZE;
+                const objW = (obj.width || (obj.size ? obj.size.width : 1)) * TILE_SIZE;
+                const objH = (obj.height || (obj.size ? obj.size.height : 1)) * TILE_SIZE;
+                const imgUrl = obj.image_url || (obj.interaction_config && obj.interaction_config.image_url);
+
                 // If map has blueprint artwork, seeded untextured placeholder collision items should not be painted as blue blocks
-                if (hasBlueprint && !obj.image_url && !obj.is_custom) {
-                    // Only show subtle dashed selection box when user specifically selects it
-                    if (selectedItem && selectedItem.type === 'object' && selectedItem.item === obj) {
-                        const ox = (obj.position ? obj.position.x : 0) * TILE_SIZE;
-                        const oy = (obj.position ? obj.position.y : 0) * TILE_SIZE;
-                        const objW = (obj.width || (obj.size ? obj.size.width : 1)) * TILE_SIZE;
-                        const objH = (obj.height || (obj.size ? obj.size.height : 1)) * TILE_SIZE;
+                if (hasBlueprint && !imgUrl && !obj.is_custom) {
+                    if (isSelected) {
                         ctx.save();
                         ctx.strokeStyle = '#10B981';
                         ctx.lineWidth = 1.5;
@@ -1606,39 +2084,40 @@
                     return;
                 }
 
-                const ox = (obj.position ? obj.position.x : 0) * TILE_SIZE;
-                const oy = (obj.position ? obj.position.y : 0) * TILE_SIZE;
-                const objW = (obj.width || (obj.size ? obj.size.width : 1)) * TILE_SIZE;
-                const objH = (obj.height || (obj.size ? obj.size.height : 1)) * TILE_SIZE;
-                const isSelected = selectedItem && selectedItem.type === 'object' && selectedItem.item === obj;
-
                 ctx.save();
                 ctx.translate(ox + objW / 2, oy + objH / 2);
                 const rot = (obj.position && typeof obj.position.rotation === 'number') ? obj.position.rotation : (obj.rotation || 0);
                 if (rot) ctx.rotate((rot * Math.PI) / 180);
 
-                if (obj.image_url) {
+                if (imgUrl) {
                     if (!window._objImgCache) window._objImgCache = new Map();
-                    let sprImg = window._objImgCache.get(obj.image_url);
+                    let sprImg = window._objImgCache.get(imgUrl);
                     if (!sprImg) {
                         sprImg = new Image();
-                        sprImg.src = obj.image_url;
+                        sprImg.src = imgUrl;
                         sprImg.onload = () => { if (typeof draw === 'function') draw(); };
-                        window._objImgCache.set(obj.image_url, sprImg);
+                        sprImg.onerror = () => { sprImg._error = true; };
+                        window._objImgCache.set(imgUrl, sprImg);
                     }
                     if (sprImg && sprImg.complete && sprImg.naturalWidth > 0) {
                         ctx.drawImage(sprImg, -objW / 2, -objH / 2, objW, objH);
-                    } else {
-                        ctx.fillStyle = 'rgba(59, 130, 246, 0.15)';
+                    } else if (isSelected) {
+                        // Subtle emerald placeholder box only when actively selected
+                        ctx.fillStyle = 'rgba(16, 185, 129, 0.15)';
                         if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
                         else ctx.rect(-objW / 2, -objH / 2, objW, objH);
                         ctx.fill();
                     }
-                } else if (obj.is_custom) {
-                    ctx.fillStyle = obj.color ? (obj.color + '44') : 'rgba(59, 130, 246, 0.25)';
+                } else if (obj.is_custom || obj.color) {
+                    ctx.fillStyle = obj.color ? (obj.color.length === 7 ? obj.color + '99' : obj.color) : 'rgba(59, 130, 246, 0.35)';
                     if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
                     else ctx.rect(-objW / 2, -objH / 2, objW, objH);
                     ctx.fill();
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+                    ctx.lineWidth = 1;
+                    if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
+                    else ctx.rect(-objW / 2, -objH / 2, objW, objH);
+                    ctx.stroke();
                 }
 
                 if (isSelected) {
@@ -1649,6 +2128,23 @@
                     else ctx.rect(-objW / 2 - 2, -objH / 2 - 2, objW + 4, objH + 4);
                     ctx.stroke();
                     ctx.setLineDash([]);
+
+                    // Corner Accent Grab Nodes
+                    const hw = objW / 2 + 2;
+                    const hh = objH / 2 + 2;
+                    const grabPoints = [
+                        { x: -hw, y: -hh }, { x: hw, y: -hh },
+                        { x: hw, y: hh }, { x: -hw, y: hh }
+                    ];
+                    grabPoints.forEach(p => {
+                        ctx.fillStyle = '#10B981';
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.strokeStyle = '#FFFFFF';
+                        ctx.lineWidth = 1.2;
+                        ctx.stroke();
+                    });
                 }
 
                 ctx.restore();
@@ -1700,6 +2196,47 @@
                 document.querySelectorAll('.rot-btn').forEach(btn => {
                     btn.classList.toggle('active', btn.textContent.includes(`${rot}°`));
                 });
+                const elevEl = document.getElementById('prop-elevation');
+                if (elevEl) elevEl.value = item.elevation || 1;
+                const badgeEl = document.getElementById('prop-interaction-badge');
+                const iType = item.interaction_type || (item.interaction_config && item.interaction_config.behavior?.type) || (item.type === 'branding' ? 'branding' : (item.type === 'sticky_note' ? 'stickyNote' : (item.type === 'custom_link' ? 'link' : (item.type === 'custom_image' ? 'customImage' : 'none'))));
+                if (badgeEl) {
+                    badgeEl.textContent = iType.toUpperCase();
+                }
+
+                // ── Interactive Media Panels Toggle ──
+                const brandingBox = document.getElementById('inspector-branding-box');
+                const stickyBox = document.getElementById('inspector-stickynote-box');
+                const linkBox = document.getElementById('inspector-link-box');
+                const imgBox = document.getElementById('inspector-customimage-box');
+
+                if (brandingBox) brandingBox.style.display = (item.type === 'branding' || iType === 'branding') ? 'flex' : 'none';
+                if (stickyBox) stickyBox.style.display = (item.type === 'sticky_note' || iType === 'stickyNote' || iType === 'stickynote') ? 'flex' : 'none';
+                if (linkBox) linkBox.style.display = (item.type === 'custom_link' || iType === 'link') ? 'flex' : 'none';
+                if (imgBox) imgBox.style.display = (item.type === 'custom_image' || (iType === 'customImage' && item.type !== 'branding')) ? 'flex' : 'none';
+
+                // Populate values
+                if (item.type === 'branding' || iType === 'branding') {
+                    const bUrlInp = document.getElementById('prop-branding-url');
+                    if (bUrlInp) bUrlInp.value = item.image_url || (item.interaction_config?.image_url) || '';
+                }
+                if (item.type === 'sticky_note' || iType === 'stickyNote' || iType === 'stickynote') {
+                    const sTxtInp = document.getElementById('prop-stickynote-text');
+                    const noteContent = item.interaction_config?.noteText || item.interaction_config?.behavior?.data?.text || '';
+                    if (sTxtInp) sTxtInp.value = noteContent;
+                }
+                if (item.type === 'custom_link' || iType === 'link') {
+                    const lUrlInp = document.getElementById('prop-link-url');
+                    const lTitleInp = document.getElementById('prop-link-title');
+                    const lNewTabInp = document.getElementById('prop-link-newtab');
+                    if (lUrlInp) lUrlInp.value = item.interaction_config?.url || item.interaction_config?.behavior?.data?.url || '';
+                    if (lTitleInp) lTitleInp.value = item.interaction_config?.title || item.interaction_config?.behavior?.data?.title || item.name || '';
+                    if (lNewTabInp) lNewTabInp.checked = item.interaction_config?.openInNewTab !== false;
+                }
+                if (item.type === 'custom_image' || (iType === 'customImage' && item.type !== 'branding')) {
+                    const imgUrlInp = document.getElementById('prop-customimage-url');
+                    if (imgUrlInp) imgUrlInp.value = item.image_url || item.interaction_config?.behavior?.data?.imageUrl || '';
+                }
             } else if (selectedItem.type === 'room') {
                 objFields.style.display = 'none';
                 roomFields.style.display = 'flex';
@@ -1744,7 +2281,140 @@
             if (prop === 'color') selectedItem.item.color = val;
             if (prop === 'width') selectedItem.item.width = val;
             if (prop === 'height') selectedItem.item.height = val;
+            if (prop === 'elevation') selectedItem.item.elevation = parseInt(val) || 1;
             draw();
+        }
+
+        // ── Custom Media & Interactive Helpers ──
+        function applyOrgLogoToSelected() {
+            if (!selectedItem || selectedItem.type !== 'object') return;
+            const obj = selectedItem.item;
+            if (COMPANY_LOGO_URL) {
+                obj.image_url = COMPANY_LOGO_URL;
+                if (!obj.interaction_config) obj.interaction_config = {};
+                obj.interaction_config.image_url = COMPANY_LOGO_URL;
+                obj.interaction_config.use_company_logo = true;
+                const input = document.getElementById('prop-branding-url');
+                if (input) input.value = COMPANY_LOGO_URL;
+                if (window._objImgCache) window._objImgCache.delete(obj.image_url);
+                draw();
+                showToast('🏢 {{ __("Company logo applied!") }}');
+            }
+        }
+
+        function updateSelectedLogoUrl(val) {
+            if (!selectedItem || selectedItem.type !== 'object') return;
+            const obj = selectedItem.item;
+            obj.image_url = val;
+            if (!obj.interaction_config) obj.interaction_config = {};
+            obj.interaction_config.image_url = val;
+            if (window._objImgCache) window._objImgCache.delete(val);
+            draw();
+        }
+
+        function updateSelectedStickyText(val) {
+            if (!selectedItem || selectedItem.type !== 'object') return;
+            const obj = selectedItem.item;
+            if (!obj.interaction_config) obj.interaction_config = {};
+            obj.interaction_config.noteText = val;
+            if (!obj.interaction_config.behavior) obj.interaction_config.behavior = { type: 'stickyNote' };
+            if (!obj.interaction_config.behavior.data) obj.interaction_config.behavior.data = {};
+            obj.interaction_config.behavior.data.text = val;
+            obj.name = val ? `Sticky: ${val.substring(0, 14)}...` : 'Sticky Note';
+            const nameInput = document.getElementById('prop-name');
+            if (nameInput) nameInput.value = obj.name;
+        }
+
+        const STICKY_COLOR_MAP = {
+            yellow: 'https://assets.kumospace.com/furniture/decor/sticky-yellow-01/yella-large_240.png',
+            orange: 'https://assets.kumospace.com/furniture/decor/sticky-orange-01/orange-large_240.png',
+            purple: 'https://assets.kumospace.com/furniture/decor/sticky-purple-01/purple-large_240.png',
+            green: 'https://assets.kumospace.com/furniture/decor/sticky-green-01/green-large_240.png',
+            blue: 'https://assets.kumospace.com/furniture/decor/sticky-blue-01/blue-large_240.png'
+        };
+
+        function setStickyColor(colorKey) {
+            if (!selectedItem || selectedItem.type !== 'object') return;
+            const obj = selectedItem.item;
+            const imgUrl = STICKY_COLOR_MAP[colorKey] || STICKY_COLOR_MAP.yellow;
+            obj.image_url = imgUrl;
+            if (!obj.interaction_config) obj.interaction_config = {};
+            obj.interaction_config.image_url = imgUrl;
+            obj.interaction_config.color = colorKey;
+            if (window._objImgCache) window._objImgCache.delete(imgUrl);
+            draw();
+            showToast('🎨 {{ __("Sticky note color changed!") }}');
+        }
+
+        function updateSelectedLinkProp(prop, val) {
+            if (!selectedItem || selectedItem.type !== 'object') return;
+            const obj = selectedItem.item;
+            if (!obj.interaction_config) obj.interaction_config = {};
+            if (!obj.interaction_config.behavior) obj.interaction_config.behavior = { type: 'link' };
+            if (!obj.interaction_config.behavior.data) obj.interaction_config.behavior.data = {};
+            
+            if (prop === 'url') {
+                obj.interaction_config.url = val;
+                obj.interaction_config.behavior.data.url = val;
+            } else if (prop === 'title') {
+                obj.interaction_config.title = val;
+                obj.interaction_config.behavior.data.title = val;
+                obj.name = val || 'Custom Link';
+                const nameInp = document.getElementById('prop-name');
+                if (nameInp) nameInp.value = obj.name;
+            } else if (prop === 'openInNewTab') {
+                obj.interaction_config.openInNewTab = !!val;
+                obj.interaction_config.behavior.data.openInNewTab = !!val;
+            }
+        }
+
+        function updateSelectedCustomImageUrl(val) {
+            if (!selectedItem || selectedItem.type !== 'object') return;
+            const obj = selectedItem.item;
+            obj.image_url = val;
+            if (!obj.interaction_config) obj.interaction_config = {};
+            obj.interaction_config.image_url = val;
+            if (!obj.interaction_config.behavior) obj.interaction_config.behavior = { type: 'customImage' };
+            if (!obj.interaction_config.behavior.data) obj.interaction_config.behavior.data = {};
+            obj.interaction_config.behavior.data.imageUrl = val;
+            if (window._objImgCache) window._objImgCache.delete(val);
+            draw();
+        }
+
+        async function uploadObjectImageDirectly(fileInput, targetType) {
+            const file = fileInput.files[0];
+            if (!file) return;
+            showToast('⏳ {{ __("Uploading image...") }}');
+
+            const fd = new FormData();
+            fd.append('image', file);
+            fd.append('_token', CSRF_TOKEN);
+
+            try {
+                const res = await fetch('/editor/upload-object-image', {
+                    method: 'POST',
+                    body: fd,
+                    credentials: 'same-origin'
+                });
+                const data = await res.json();
+                if (data.success && data.url) {
+                    if (targetType === 'branding') {
+                        updateSelectedLogoUrl(data.url);
+                        const inp = document.getElementById('prop-branding-url');
+                        if (inp) inp.value = data.url;
+                    } else {
+                        updateSelectedCustomImageUrl(data.url);
+                        const inp = document.getElementById('prop-customimage-url');
+                        if (inp) inp.value = data.url;
+                    }
+                    showToast('✅ {{ __("Image uploaded successfully!") }}');
+                } else {
+                    showToast('❌ ' + (data.message || '{{ __("Upload failed") }}'));
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('❌ {{ __("Failed to upload image.") }}');
+            }
         }
 
         function setRotation(deg) {
@@ -1769,9 +2439,18 @@
             if (!selectedItem || selectedItem.type !== 'object') return;
             const orig = selectedItem.item;
             const cloned = JSON.parse(JSON.stringify(orig));
+            delete cloned.id;
+            cloned.is_custom = true;
             cloned.name = `${orig.name || 'Object'} (Copy)`;
-            cloned.position.x = Math.min(Math.floor(MAP_WIDTH_PX / TILE_SIZE) - 2, cloned.position.x + 2);
-            cloned.position.y = Math.min(Math.floor(MAP_HEIGHT_PX / TILE_SIZE) - 2, cloned.position.y + 2);
+            const maxTx = Math.floor(MAP_WIDTH_PX / TILE_SIZE);
+            const maxTy = Math.floor(MAP_HEIGHT_PX / TILE_SIZE);
+            const w = cloned.width || 1;
+            const h = cloned.height || 1;
+            cloned.position = {
+                x: Math.min(maxTx - w, (orig.position ? orig.position.x : 0) + 1),
+                y: Math.min(maxTy - h, (orig.position ? orig.position.y : 0) + 1),
+                rotation: orig.position?.rotation || orig.rotation || 0
+            };
             objects.push(cloned);
             selectedItem = { type: 'object', item: cloned };
             updateInspector();
@@ -1920,10 +2599,15 @@
                         type: o.type,
                         name: o.name,
                         position: o.position || { x: 0, y: 0, rotation: 0 },
-                        size: o.size || { width: o.width || 1, height: o.height || 1 },
+                        size: { width: o.width || (o.size ? o.size.width : 1), height: o.height || (o.size ? o.size.height : 1) },
+                        width: o.width || (o.size ? o.size.width : 1),
+                        height: o.height || (o.size ? o.size.height : 1),
                         rotation: o.position?.rotation || o.rotation || 0,
                         color: o.color,
-                        interaction_config: o.interaction_config
+                        image_url: o.image_url || null,
+                        is_custom: typeof o.is_custom !== 'undefined' ? o.is_custom : true,
+                        collision: typeof o.collision === 'boolean' ? o.collision : true,
+                        interaction_config: o.interaction_config || { image_url: o.image_url, is_custom: true }
                     }))
                 };
 

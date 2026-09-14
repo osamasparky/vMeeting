@@ -59,7 +59,12 @@ class DashboardController extends Controller
             ->where(function($q) use ($organization) {
                 $q->where('organization_id', $organization->id)->orWhereNull('organization_id');
             })->get();
-        $members = $organization->members()->with(['user.profiles', 'role', 'offices', 'rooms'])->get();
+        $members = $organization->members()
+            ->whereHas('user', function($q) {
+                $q->where('is_super_admin', false);
+            })
+            ->with(['user.profiles', 'role', 'offices', 'rooms'])
+            ->get();
         $departments = $organization->departments()->withCount('teams')->get();
         $teams = $organization->teams()->with('department')->get();
         $auditLogs = \App\Domains\Administration\Models\AuditLog::where('organization_id', $organization->id)->latest()->take(20)->get();

@@ -1,42 +1,76 @@
 @props([
     'title' => '',
-    'value' => '',
-    'icon' => '📊',
     'subtitle' => null,
-    'subvalue' => null,
-    'progress' => null,
-    'delta' => null,
-    'deltaPositive' => true,
-    'color' => null
+    'value' => '',
+    'metric' => null,
+    'donut' => null,       // percentage e.g. 78
+    'donutSize' => 'lg',   // lg, default, sm
+    'trend' => null,       // e.g. "+12%" or "-5%"
+    'trendDirection' => 'up', // up, down, neutral
+    'icon' => null,
 ])
 
-<div class="kpi-card">
-    <div class="kpi-header">
-        <span class="kpi-title">{{ $title }}</span>
-        <div class="kpi-icon-box">{{ $icon }}</div>
-    </div>
-    <div class="kpi-value" @if($color) style="color: {{ $color }};" @endif>
-        {{ $value }}
-    </div>
-
-    @if(!is_null($progress))
-        <div style="width: 100%; background: var(--bg-surface-subtle); height: 7px; border-radius: 9999px; overflow: hidden; margin-bottom: 6px; border: 1px solid var(--border-color-subtle);">
-            <div style="width: {{ min(100, max(0, $progress)) }}%; height: 100%; background: linear-gradient(90deg, #42774C 0%, #245C3A 100%); border-radius: 9999px; transition: width 0.3s ease;"></div>
-        </div>
-    @endif
-
-    @if($subtitle || $delta)
-        <div style="font-size: 11px; color: var(--text-secondary); display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+<div {{ $attributes->merge(['class' => 'relative flex flex-col justify-between rounded-[var(--nx-radius-lg)] border border-[var(--nx-border-subtle)] bg-[var(--nx-bg-surface)] p-6 shadow-[var(--nx-shadow-sm)] transition-all duration-200 hover:border-[var(--nx-border-strong)] hover:shadow-[var(--nx-shadow-md)]']) }}>
+    
+    <!-- Top Header -->
+    <div class="flex items-start justify-between gap-3 w-full">
+        <div class="flex flex-col">
+            <span class="text-[15px] font-semibold text-[var(--nx-text-primary)] leading-tight">
+                {{ $title }}
+            </span>
             @if($subtitle)
-                <span>{{ $subtitle }} @if($subvalue)<strong>{{ $subvalue }}</strong>@endif</span>
-            @endif
-            @if($delta)
-                <span class="badge-pill {{ $deltaPositive ? 'badge-green' : 'badge-danger' }}" style="font-size: 10px;">
-                    {{ $delta }}
+                <span class="text-[12px] text-[var(--nx-text-muted)] font-normal mt-0.5">
+                    {{ $subtitle }}
                 </span>
             @endif
         </div>
-    @endif
 
-    {{ $slot }}
+        @if($icon)
+            <div class="w-9 h-9 rounded-full bg-[var(--nx-sand-200)] flex items-center justify-center text-[var(--nx-accent)] shrink-0">
+                <span class="material-symbols-rounded text-[20px]">{{ $icon }}</span>
+            </div>
+        @endif
+    </div>
+
+    <!-- Middle Body: Numbers + Donut -->
+    <div class="flex items-center justify-between mt-4 gap-4">
+        <div class="flex flex-col">
+            <span class="text-[40px] font-light text-[var(--nx-text-primary)] font-['IBM_Plex_Sans_Arabic',sans-serif] leading-none tracking-tight">
+                {{ $value }}
+            </span>
+            @if($metric)
+                <span class="text-[13px] text-[var(--nx-text-secondary)] font-normal mt-2">
+                    {{ $metric }}
+                </span>
+            @endif
+        </div>
+
+        @if($donut !== null)
+            <div class="shrink-0">
+                <x-donut-chart :percent="$donut" :size="$donutSize" />
+            </div>
+        @endif
+    </div>
+
+    <!-- Bottom Footer: Trend -->
+    @if($trend)
+        <div class="flex items-center gap-2 mt-4 pt-3 border-t border-[var(--nx-border-subtle)] text-[12px]">
+            @if($trendDirection === 'up')
+                <span class="inline-flex items-center text-[var(--nx-status-live)] font-semibold gap-0.5">
+                    <span class="material-symbols-rounded text-[16px]">trending_up</span>
+                    {{ $trend }}
+                </span>
+            @elseif($trendDirection === 'down')
+                <span class="inline-flex items-center text-[var(--nx-status-attention)] font-semibold gap-0.5">
+                    <span class="material-symbols-rounded text-[16px]">trending_down</span>
+                    {{ $trend }}
+                </span>
+            @else
+                <span class="inline-flex items-center text-[var(--nx-text-muted)] font-medium">
+                    {{ $trend }}
+                </span>
+            @endif
+            <span class="text-[var(--nx-text-muted)]">مقارنة بالأسبوع السابق</span>
+        </div>
+    @endif
 </div>

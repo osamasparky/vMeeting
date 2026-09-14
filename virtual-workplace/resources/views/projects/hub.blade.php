@@ -1626,7 +1626,7 @@
                                     @php
                                         $canEditThisTask = $user->can('update', $t);
                                     @endphp
-                                    <div class="kanban-card" 
+                                    <div class="kanban-task-card kanban-card" 
                                          id="task-card-{{ $t->id }}"
                                          data-task-id="{{ $t->id }}"
                                          data-status="{{ $t->status }}"
@@ -1694,27 +1694,39 @@
                                             </div>
                                         @endif
 
-                                        <!-- Metadata: Due Date -->
+                                        <!-- Metadata: Assignee & Due Date -->
                                         <div class="task-card-meta">
-                                            @if($t->due_date)
-                                                <span class="task-due-date {{ $t->due_date->isPast() && $t->status !== 'done' ? 'is-overdue' : '' }}">
-                                                    📅 {{ $t->due_date->format('M d') }}
-                                                </span>
-                                            @else
-                                                <span></span>
-                                            @endif
+                                            <span class="task-project-name">📁 {{ $project->name }}</span>
+                                            <div style="display: flex; align-items: center; gap: 6px;">
+                                                @if($t->assignee)
+                                                    <div class="task-assignee-chip" title="{{ $t->assignee->name }}">
+                                                        <div class="task-avatar-circle">
+                                                            {{ strtoupper(substr($t->assignee->name, 0, 2)) }}
+                                                        </div>
+                                                        <span style="max-width: 65px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ explode(' ', $t->assignee->name)[0] }}</span>
+                                                    </div>
+                                                @endif
+                                                @if($t->due_date)
+                                                    <span class="task-due-date {{ $t->due_date->isPast() && $t->status !== 'done' ? 'is-overdue' : '' }}">
+                                                        📅 {{ $t->due_date->format('M d') }}
+                                                    </span>
+                                                @endif
+                                            </div>
                                         </div>
 
-                                        <!-- Footer: Assignee and Live Timer -->
+                                        <!-- Footer: Direct Status Dropdown & Timer -->
                                         <div class="task-card-footer">
-                                            <div class="task-assignee-chip">
-                                                <div class="task-avatar-circle">
-                                                    {{ strtoupper(substr($t->assignee->name ?? 'U', 0, 2)) }}
-                                                </div>
-                                                <span style="max-width: 90px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $t->assignee ? explode(' ', $t->assignee->name)[0] : __('Unassigned') }}</span>
+                                            <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;">
+                                                <select onclick="event.stopPropagation()" onchange="updateHubTaskStatusDirect('{{ $t->id }}', this.value)" class="card-status-select" style="max-width: 100%;">
+                                                    <option value="backlog" {{ $t->status === 'backlog' ? 'selected' : '' }}>📌 {{ __('Backlog') }}</option>
+                                                    <option value="ready" {{ $t->status === 'ready' ? 'selected' : '' }}>🎯 {{ __('Ready') }}</option>
+                                                    <option value="in_progress" {{ $t->status === 'in_progress' ? 'selected' : '' }}>⚡ {{ __('In Progress') }}</option>
+                                                    <option value="review" {{ $t->status === 'review' || $t->status === 'qa' ? 'selected' : '' }}>🔍 {{ __('Review') }}</option>
+                                                    <option value="done" {{ $t->status === 'done' ? 'selected' : '' }}>🎉 {{ __('Done') }}</option>
+                                                </select>
                                             </div>
 
-                                            <button type="button" onclick="event.stopPropagation(); startHubTaskTimerDirect('{{ $project->id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($project->name) }}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--brand-forest); border: 1px solid rgba(79, 155, 95, 0.3); padding: 3px 8px; font-size: 10.5px; border-radius: var(--radius-full); font-weight: 800;" title="{{ __('Start Timer') }}">
+                                            <button type="button" onclick="event.stopPropagation(); startHubTaskTimerDirect('{{ $project->id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($project->name) }}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--brand-forest); border: 1px solid rgba(79, 155, 95, 0.3); padding: 3px 8px; font-size: 10.5px; border-radius: var(--radius-full); font-weight: 800; white-space: nowrap; flex-shrink: 0;" title="{{ __('Start Timer') }}">
                                                 ▶ {{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h
                                             </button>
                                         </div>
