@@ -455,9 +455,9 @@
             box-shadow: 0 0 6px rgba(79, 155, 95, 0.6);
         }
 
-        /* ── Sidebar Accordions (3D Soft Neumorphic Pill Design) ── */
+        /* ── Sidebar Accordions (UlaSpace Clean Design) ── */
         .sidebar-accordion {
-            margin-bottom: 10px;
+            margin-bottom: 6px;
         }
 
         .sidebar-accordion-header {
@@ -465,33 +465,29 @@
             align-items: center;
             justify-content: space-between;
             font-size: 11px;
-            font-weight: 800;
-            color: var(--brand-forest);
+            font-weight: 600;
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.6px;
-            padding: 10px 12px;
-            border-radius: 12px;
+            padding: 8px 10px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
             user-select: none;
-            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-            background: #EBF2E5;
-            border: 1px solid #D5E1CE;
-            box-shadow: 2px 2px 6px rgba(36, 92, 58, 0.04), -1px -1px 4px #FFFFFF;
-            margin-bottom: 3px;
+            transition: all 0.15s ease;
+            background: transparent;
+            border: 1px solid transparent;
+            margin-bottom: 2px;
         }
 
         .sidebar-accordion-header:hover {
-            color: var(--brand-forest);
-            background: #E1ECDA;
-            border-color: var(--brand-forest);
-            transform: translateY(-1px);
-            box-shadow: 3px 3px 8px rgba(36, 92, 58, 0.08), -2px -2px 6px #FFFFFF;
+            color: var(--text-primary);
+            background: var(--bg-surface-subtle);
         }
 
         .sidebar-accordion-chevron {
             font-size: 9px;
             transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            color: var(--brand-forest);
+            color: var(--text-muted);
             display: inline-block;
         }
 
@@ -502,12 +498,12 @@
         .sidebar-accordion-content {
             display: flex;
             flex-direction: column;
-            gap: 3px;
+            gap: 2px;
             overflow: hidden;
             transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
             max-height: 2000px;
             opacity: 1;
-            padding: 4px 2px;
+            padding: 2px 0;
         }
 
         .sidebar-accordion.collapsed .sidebar-accordion-content {
@@ -522,40 +518,36 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 10px;
-            padding: 9px 12px;
-            border-radius: 12px;
-            color: #3A4E3E;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
             background: transparent;
             border: 1px solid transparent;
             font-family: inherit;
             font-size: 13px;
-            font-weight: 700;
+            font-weight: 500;
             cursor: pointer;
             text-align: {{ app()->getLocale() === 'ar' ? 'right' : 'left' }};
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.15s ease;
             text-decoration: none;
             margin-bottom: 2px;
         }
 
         .nav-tab-btn:hover {
-            background: #F1F6EC;
-            color: var(--brand-forest);
-            transform: translateX({{ app()->getLocale() === 'ar' ? '-3px' : '3px' }});
-            border-color: #DDE8D6;
-            box-shadow: 2px 2px 8px rgba(36, 92, 58, 0.04);
+            background: var(--bg-surface-subtle);
+            color: var(--text-primary);
         }
 
         .nav-tab-btn.active {
-            background: linear-gradient(135deg, #356F46 0%, #204E32 100%) !important;
-            color: #FFFFFF !important;
-            border: 1px solid #184128 !important;
-            box-shadow: 0 8px 20px rgba(32, 78, 50, 0.32), inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
-            font-weight: 800;
-            transform: translateY(-1px);
+            background: var(--brand-forest) !important;
+            color: var(--bg-primary) !important;
+            border-color: var(--brand-forest) !important;
+            font-weight: 600;
+            box-shadow: var(--shadow-card) !important;
         }
         .nav-tab-btn.active span {
-            color: #FFFFFF !important;
+            color: var(--bg-primary) !important;
         }
 
         .org-settings-tabs-nav .org-subtab-btn {
@@ -1446,7 +1438,7 @@
         <div class="sidebar-accordion" id="sec-workspace">
             <div class="sidebar-accordion-header" onclick="toggleSidebarSection('sec-workspace')" data-tooltip="{{ __('Workspace') }}">
                 <span style="display: flex; align-items: center; gap: 8px;">
-                    <span class="nav-icon-tile">🏢</span>
+                    <span class="material-symbols-rounded text-[18px] text-[var(--nx-accent)]">apartment</span>
                     <span>{{ __('Workspace') }}</span>
                 </span>
                 <span class="sidebar-accordion-chevron">▼</span>
@@ -1454,20 +1446,20 @@
             <div class="sidebar-accordion-content">
                 <button class="nav-tab-btn active" id="nav-btn-overview" onclick="switchAdminTab('overview')" data-tooltip="{{ __('Overview') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="nav-icon-tile">📊</span>
+                        <span class="material-symbols-rounded text-[18px]">dashboard</span>
                         <span>{{ __('Overview') }}</span>
                     </span>
                 </button>
                 <a href="{{ route('office') }}" class="nav-tab-btn" style="text-decoration: none;" data-tooltip="{{ __('Virtual Office') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="nav-icon-tile">🚀</span>
+                        <span class="material-symbols-rounded text-[18px]">view_in_ar</span>
                         <span>{{ __('Virtual Office') }}</span>
                     </span>
                     <span class="nav-badge-pill">3D</span>
                 </a>
                 <button class="nav-tab-btn" id="nav-btn-chat" onclick="switchAdminTab('chat')" data-tooltip="{{ __('Team Chat & DMs') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="nav-icon-tile">💬</span>
+                        <span class="material-symbols-rounded text-[18px]">chat</span>
                         <span>{{ __('Team Chat & DMs') }}</span>
                     </span>
                     <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F;">Live</span>
@@ -1475,7 +1467,7 @@
                 @if($membership->hasPermission('maps.manage'))
                 <a href="{{ route('editor') }}" class="nav-tab-btn" style="text-decoration: none;" data-tooltip="{{ __('Floor Map Editor') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="nav-icon-tile">🎨</span>
+                        <span class="material-symbols-rounded text-[18px]">draw</span>
                         <span>{{ __('Floor Map Editor') }}</span>
                     </span>
                 </a>
@@ -1487,7 +1479,7 @@
         <div class="sidebar-accordion collapsed" id="sec-projects">
             <div class="sidebar-accordion-header" onclick="toggleSidebarSection('sec-projects')" data-tooltip="{{ __('Project Management') }}">
                 <span style="display: flex; align-items: center; gap: 8px;">
-                    <span class="nav-icon-tile">📋</span>
+                    <span class="material-symbols-rounded text-[18px] text-[var(--nx-accent)]">assignment</span>
                     <span>{{ __('Project Management') }}</span>
                 </span>
                 <span class="sidebar-accordion-chevron">▼</span>
@@ -1495,7 +1487,7 @@
             <div class="sidebar-accordion-content">
                 <button class="nav-tab-btn" id="nav-btn-projects" onclick="switchAdminTab('projects')" data-tooltip="{{ __('Projects Portfolio') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="nav-icon-tile">📁</span>
+                        <span class="material-symbols-rounded text-[18px]">folder</span>
                         <span>{{ __('Projects Portfolio') }}</span>
                     </span>
                     <span class="nav-badge-pill">{{ $projects->count() }}</span>
@@ -1503,7 +1495,7 @@
                 @if($membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || $membership->role?->slug === 'company_admin')
                 <button class="nav-tab-btn" id="nav-btn-all-tasks" onclick="switchAdminTab('all-tasks')" data-tooltip="{{ __('All Tasks Manager') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="nav-icon-tile">📑</span>
+                        <span class="material-symbols-rounded text-[18px]">list_alt</span>
                         <span>{{ __('All Tasks Manager') }}</span>
                     </span>
                     <span class="nav-badge-pill">{{ $tasks->count() }}</span>
@@ -1511,21 +1503,21 @@
                 @endif
                 <button class="nav-tab-btn" id="nav-btn-my-tasks" onclick="switchAdminTab('my-tasks')" data-tooltip="{{ __('My Tasks') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="nav-icon-tile">✅</span>
+                        <span class="material-symbols-rounded text-[18px]">task_alt</span>
                         <span>{{ __('My Tasks') }}</span>
                     </span>
                     <span class="nav-badge-pill">{{ $myTasks->where('status', '!=', 'done')->count() }}</span>
                 </button>
                 <button class="nav-tab-btn" id="nav-btn-timesheets" onclick="switchAdminTab('timesheets')" data-tooltip="{{ __('Timesheets & Time') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="nav-icon-tile">⏱️</span>
+                        <span class="material-symbols-rounded text-[18px]">timer</span>
                         <span>{{ __('Timesheets & Time') }}</span>
                     </span>
                 </button>
                 @if($membership->hasPermission('reports.view') || $membership->role?->slug === 'company_admin')
                 <button class="nav-tab-btn" id="nav-btn-workload" onclick="switchAdminTab('workload')" data-tooltip="{{ __('Team Workload') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="nav-icon-tile">👥</span>
+                        <span class="material-symbols-rounded text-[18px]">badge</span>
                         <span>{{ __('Team Workload') }}</span>
                     </span>
                 </button>
@@ -1541,7 +1533,7 @@
         <div class="sidebar-accordion collapsed" id="sec-admin">
             <div class="sidebar-accordion-header" onclick="toggleSidebarSection('sec-admin')" data-tooltip="{{ __('Administration') }}">
                 <span style="display: flex; align-items: center; gap: 8px;">
-                    <span class="nav-icon-tile">🛡️</span>
+                    <span class="material-symbols-rounded text-[18px] text-[var(--nx-accent)]">shield</span>
                     <span>{{ __('Administration') }}</span>
                 </span>
                 <span class="sidebar-accordion-chevron">▼</span>
@@ -1550,7 +1542,7 @@
                 @if($membership->hasPermission('members.view') || $membership->hasPermission('members.manage'))
                 <button class="nav-tab-btn" id="nav-btn-members" onclick="switchAdminTab('members')" data-tooltip="{{ __('Team Members') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="nav-icon-tile">👥</span>
+                        <span class="material-symbols-rounded text-[18px]">group</span>
                         <span>{{ __('Team Members') }}</span>
                     </span>
                     <span class="nav-badge-pill">{{ $members->count() }}</span>
@@ -1559,7 +1551,7 @@
                 @if($membership->hasPermission('maps.manage') || $membership->role?->slug === 'company_admin')
                 <button class="nav-tab-btn" id="nav-btn-offices" onclick="switchAdminTab('offices')" data-tooltip="{{ __('Offices & Branches (الفروع والمكاتب)') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="nav-icon-tile">🏢</span>
+                        <span class="material-symbols-rounded text-[18px]">domain</span>
                         <span>{{ __('Offices & Branches') }}</span>
                     </span>
                     <span class="nav-badge-pill" style="background: rgba(36, 92, 58, 0.2); color: var(--brand-forest);">{{ $offices->count() }}</span>
@@ -1568,7 +1560,7 @@
                 @if($membership->hasPermission('rooms.manage'))
                 <button class="nav-tab-btn" id="nav-btn-rooms" onclick="switchAdminTab('rooms')" data-tooltip="{{ __('Rooms & Doors') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="nav-icon-tile">🚪</span>
+                        <span class="material-symbols-rounded text-[18px]">meeting_room</span>
                         <span>{{ __('Rooms & Doors') }}</span>
                     </span>
                     <span class="nav-badge-pill">{{ $rooms->count() }}</span>
@@ -1576,7 +1568,7 @@
                 @endif
                 <button class="nav-tab-btn" id="nav-btn-meetings" onclick="switchAdminTab('meetings')" data-tooltip="{{ __('Meetings & Schedule') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="nav-icon-tile">📅</span>
+                        <span class="material-symbols-rounded text-[18px]">calendar_month</span>
                         <span>{{ __('Meetings & Schedule') }}</span>
                     </span>
                     <span class="nav-badge-pill">{{ $upcomingMeetings->count() }}</span>
@@ -1584,7 +1576,7 @@
                 @if($membership->hasPermission('guests.invite'))
                 <button class="nav-tab-btn" id="nav-btn-guests" onclick="switchAdminTab('guests')" data-tooltip="{{ __('Guest Links') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="nav-icon-tile">🔗</span>
+                        <span class="material-symbols-rounded text-[18px]">link</span>
                         <span>{{ __('Guest Links') }}</span>
                     </span>
                     <span class="nav-badge-pill">{{ $guestInvitations->count() }}</span>
@@ -1593,7 +1585,7 @@
                 @if($membership->hasPermission('departments.manage') || $membership->hasPermission('teams.manage'))
                 <button class="nav-tab-btn" id="nav-btn-departments" onclick="switchAdminTab('departments')" data-tooltip="{{ __('Departments & Teams') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="nav-icon-tile">🏛️</span>
+                        <span class="material-symbols-rounded text-[18px]">corporate_fare</span>
                         <span>{{ __('Departments & Teams') }}</span>
                     </span>
                 </button>
@@ -1601,7 +1593,7 @@
                 @if($membership->hasPermission('audit.view'))
                 <button class="nav-tab-btn" id="nav-btn-audit" onclick="switchAdminTab('audit')" data-tooltip="{{ __('Audit Logs') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="nav-icon-tile">📋</span>
+                        <span class="material-symbols-rounded text-[18px]">history</span>
                         <span>{{ __('Audit Logs') }}</span>
                     </span>
                 </button>
@@ -1613,7 +1605,7 @@
         <div style="padding: 0 10px; margin-bottom: 8px;">
             <button class="nav-tab-btn" id="nav-btn-meetings" onclick="switchAdminTab('meetings')" data-tooltip="{{ __('Meetings & Schedule') }}">
                 <span style="display: flex; align-items: center; gap: 8px;">
-                    <span class="nav-icon-tile">📅</span>
+                    <span class="material-symbols-rounded text-[18px]">calendar_month</span>
                     <span>{{ __('Meetings & Schedule') }}</span>
                 </span>
                 <span class="nav-badge-pill">{{ $upcomingMeetings->count() }}</span>
@@ -1625,7 +1617,7 @@
         <div class="sidebar-accordion collapsed" id="sec-settings">
             <div class="sidebar-accordion-header" onclick="toggleSidebarSection('sec-settings')" data-tooltip="{{ __('Settings & Profile') }}">
                 <span style="display: flex; align-items: center; gap: 8px;">
-                    <span class="nav-icon-tile">⚙️</span>
+                    <span class="material-symbols-rounded text-[18px] text-[var(--nx-accent)]">settings</span>
                     <span>{{ __('Settings & Profile') }}</span>
                 </span>
                 <span class="sidebar-accordion-chevron">▼</span>
@@ -1633,14 +1625,14 @@
             <div class="sidebar-accordion-content">
                 <button class="nav-tab-btn" id="nav-btn-profile" onclick="switchAdminTab('profile')" data-tooltip="{{ __('My User Profile') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="nav-icon-tile">👤</span>
+                        <span class="material-symbols-rounded text-[18px]">person</span>
                         <span>{{ __('My User Profile') }}</span>
                     </span>
                 </button>
                 @if($membership->hasPermission('billing.manage'))
                 <button class="nav-tab-btn" id="nav-btn-billing" onclick="switchAdminTab('billing')" data-tooltip="{{ __('Billing & Subscription') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="nav-icon-tile">💎</span>
+                        <span class="material-symbols-rounded text-[18px]">credit_card</span>
                         <span>{{ __('Billing & Subscription') }}</span>
                     </span>
                 </button>
@@ -1648,7 +1640,7 @@
                 @if($membership->hasPermission('organizations.manage'))
                 <button class="nav-tab-btn" id="nav-btn-settings" onclick="switchAdminTab('settings')" data-tooltip="{{ __('Workspace Settings') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="nav-icon-tile">⚙️</span>
+                        <span class="material-symbols-rounded text-[18px]">tune</span>
                         <span>{{ __('Workspace Settings') }}</span>
                     </span>
                 </button>
@@ -1659,48 +1651,21 @@
         @if($user->isSuperAdmin())
         <div style="margin-top: 8px;">
             <a href="{{ route('superadmin.dashboard') }}" class="nav-tab-btn" data-tooltip="{{ __('Super Admin Portal') }}" style="background: rgba(36, 92, 58, 0.1); color: var(--brand-forest); border: 1px solid rgba(36, 92, 58, 0.25); text-decoration: none;">
-                <span class="nav-icon-tile" style="background: transparent; border: none; box-shadow: none;">⚡</span>
+                <span class="material-symbols-rounded text-[18px]">bolt</span>
                 <strong>{{ __('Super Admin Portal') }}</strong>
             </a>
         </div>
         @endif
 
-        <!-- Go Premium Card (Only for Free Plan) -->
-        @php
-            $isFreePlan = !$organization->plan || (float)$organization->plan->price == 0 || strtolower($organization->plan->slug ?? '') === 'free';
-        @endphp
-        @if($isFreePlan)
-        <div class="go-premium-card" style="margin-top: 14px;">
-            <div class="go-premium-crown">👑</div>
-            <div style="font-size: 13px; font-weight: 900; color: #8A6414; margin-bottom: 2px;">{{ __('Go Premium') }}</div>
-            <div style="font-size: 11px; color: #9A7B32; margin-bottom: 10px; line-height: 1.3;">{{ __('Unlock more features and awesome perks!') }}</div>
-            <button onclick="switchAdminTab('billing')" class="tactile-btn" style="width: 100%; justify-content: center; background: linear-gradient(180deg, #D6A23A 0%, #B4831B 100%); color: #FFFDF6; border: 1px solid #996D12; font-size: 12px; padding: 8px 12px; box-shadow: 0 4px 10px rgba(180, 131, 27, 0.25);">
-                {{ __('Upgrade Now') }}
-            </button>
-        </div>
-        @endif
-
-        <!-- Language & Utility Strip -->
-        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border-color); display: flex; gap: 8px; align-items: center;">
-            @if(app()->getLocale() === 'ar')
-                <a href="{{ route('lang.switch', 'en') }}" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 7px; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-primary); text-decoration: none; font-size: 11px; font-weight: 800;">🌐 English</a>
-            @else
-                <a href="{{ route('lang.switch', 'ar') }}" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 7px; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-primary); text-decoration: none; font-size: 11px; font-weight: 800;">🌐 العربية</a>
-            @endif
-            <button onclick="toggleThemeMode()" style="padding: 7px 10px; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-primary); cursor: pointer; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center;" title="{{ __('Toggle Dark / Light Mode') }}">
-                <span class="theme-toggle-icon-label">🌙</span>
-            </button>
-        </div>
-
         <!-- User Profile Card (Footer) -->
-        <div class="sidebar-user" style="margin-top: 10px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: var(--radius-md); background: var(--bg-surface-subtle); border: 1px solid var(--border-color);" onclick="switchAdminTab('profile')" title="{{ __('View and Edit Profile') }}">
+        <div class="sidebar-user" style="margin-top: auto; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: var(--radius-md); background: var(--bg-surface-subtle); border: 1px solid var(--border-color);" onclick="switchAdminTab('profile')" title="{{ __('View and Edit Profile') }}">
             @if($user->avatar_url)
                 <img id="sidebar-user-avatar" src="{{ $user->avatar_url }}" alt="{{ $user->name }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1px solid var(--border-color);">
             @else
                 <div class="sidebar-avatar" style="width: 36px; height: 36px; border-radius: 50%; background: var(--accent-gradient); color: #FFFDF6; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900;">{{ strtoupper(substr($user->name, 0, 2)) }}</div>
             @endif
             <div style="flex: 1; min-width: 0;">
-                <div style="font-size: 12px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary);">
+                <div style="font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary);">
                     {{ $user->name }}
                     @if($user->nickname)
                         <span style="font-size: 10px; color: var(--brand-forest); font-weight: 600;">({{ '@' . $user->nickname }})</span>
@@ -1710,7 +1675,9 @@
             </div>
             <form method="POST" action="{{ route('logout') }}" style="display:inline;" onclick="event.stopPropagation();">
                 @csrf
-                <button type="submit" style="background: none; border: none; color: #D96B5F; cursor: pointer; font-size: 15px;" title="{{ __('Logout') }}">🚪</button>
+                <button type="submit" style="background: none; border: none; color: var(--text-muted); cursor: pointer; display: flex; align-items: center;" title="{{ __('Logout') }}">
+                    <span class="material-symbols-rounded text-[18px]">logout</span>
+                </button>
             </form>
         </div>
     </aside>
@@ -1719,80 +1686,81 @@
     <main class="main-content">
 
         @if(session('superadmin_impersonator_id'))
-        <div style="background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%); color: #ffffff; padding: 12px 22px; border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; box-shadow: 0 8px 24px rgba(37,99,235,0.28); border: 1px solid rgba(255,255,255,0.25); font-weight: 800; font-size: 13px; flex-wrap: wrap; gap: 12px;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 22px;">⚡</span>
-                <span>{{ __('You are currently logged in as company:') }} <strong style="text-decoration: underline;">{{ session('superadmin_impersonated_org_name') }}</strong> ({{ Auth::user()->name }})</span>
+        <div class="relative overflow-hidden rounded-[var(--nx-radius-lg)] border border-[var(--nx-gold-400)] bg-[var(--nx-palm-900)] text-[var(--nx-sand-100)] p-3.5 sm:p-4 mb-5 shadow-[var(--nx-shadow-md)] flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center gap-2.5 text-[13px] font-medium">
+                <span class="material-symbols-rounded text-[20px] text-[var(--nx-gold-400)]">admin_panel_settings</span>
+                <span>{{ __('You are currently logged in as company:') }} <strong class="text-[var(--nx-gold-400)] underline underline-offset-2">{{ session('superadmin_impersonated_org_name') }}</strong> ({{ Auth::user()->name }})</span>
             </div>
-            <form method="POST" action="{{ route('impersonate.leave') }}" style="margin: 0; display: inline-flex;">
+            <form method="POST" action="{{ route('impersonate.leave') }}" class="m-0 inline-flex">
                 @csrf
-                <button type="submit" class="tactile-btn" style="background: #ffffff; color: #1E3A8A; border: none; padding: 8px 20px; border-radius: 9999px; font-weight: 900; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.18);">
-                    <span>🛡️</span>
+                <x-btn type="submit" variant="nav-cta" size="sm" icon="arrow_back">
                     <span>{{ __('Return to Super Admin (الرجوع للوحة التحكم)') }}</span>
-                </button>
+                </x-btn>
             </form>
         </div>
         @endif
 
         @if(session('org_impersonator_id'))
-        <div style="background: linear-gradient(135deg, #065F46 0%, #059669 100%); color: #ffffff; padding: 12px 22px; border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; box-shadow: 0 8px 24px rgba(5,150,105,0.28); border: 1px solid rgba(255,255,255,0.25); font-weight: 800; font-size: 13px; flex-wrap: wrap; gap: 12px;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="font-size: 22px;">👤</span>
-                <span>{{ __('You are currently logged in as team member:') }} <strong style="text-decoration: underline;">{{ Auth::user()->name }}</strong> ({{ Auth::user()->email }})</span>
+        <div class="relative overflow-hidden rounded-[var(--nx-radius-lg)] border border-[var(--nx-palm-300)] bg-[var(--nx-palm-700)] text-[var(--nx-sand-100)] p-3.5 sm:p-4 mb-5 shadow-[var(--nx-shadow-md)] flex items-center justify-between flex-wrap gap-3">
+            <div class="flex items-center gap-2.5 text-[13px] font-medium">
+                <span class="material-symbols-rounded text-[20px] text-[var(--nx-palm-300)]">switch_account</span>
+                <span>{{ __('You are currently logged in as team member:') }} <strong class="text-[var(--nx-sand-200)] underline underline-offset-2">{{ Auth::user()->name }}</strong> ({{ Auth::user()->email }})</span>
             </div>
-            <form method="POST" action="{{ route('organization.members.impersonate.leave') }}" style="margin: 0; display: inline-flex;">
+            <form method="POST" action="{{ route('organization.members.impersonate.leave') }}" class="m-0 inline-flex">
                 @csrf
-                <button type="submit" class="tactile-btn" style="background: #ffffff; color: #065F46; border: none; padding: 8px 20px; border-radius: 9999px; font-weight: 900; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.18);">
-                    <span>↩️</span>
+                <x-btn type="submit" variant="nav-cta" size="sm" icon="logout">
                     <span>{{ __('Leave Impersonation (العودة لحساب المسؤول)') }}</span>
-                </button>
+                </x-btn>
             </form>
         </div>
         @endif
 
-        <!-- Top App Bar Navigation Header -->
-        <div class="top-app-header">
-            <div style="display: flex; align-items: center; gap: 14px;">
-                <button class="mobile-menu-btn" onclick="toggleDashboardSidebar()">☰</button>
-                <div class="header-title-area">
-                    <h1 id="page-primary-title">{{ __('Dashboard') }}</h1>
-                    <p id="page-primary-subtitle">{{ __('Welcome to your virtual workspace') }}</p>
+        <!-- Top App Bar Navigation Header (Figma App Bar Component) -->
+        <div class="flex items-center justify-between mb-6 gap-4 flex-wrap">
+            <div class="flex items-center gap-3.5">
+                <button class="mobile-menu-btn" onclick="toggleDashboardSidebar()">
+                    <span class="material-symbols-rounded text-[22px]">menu</span>
+                </button>
+                <div class="flex flex-col">
+                    <h1 id="page-primary-title" class="text-[22px] font-semibold text-[var(--nx-text-primary)] leading-tight font-['IBM_Plex_Sans_Arabic',sans-serif]">
+                        {{ __('Dashboard') }}
+                    </h1>
+                    <p id="page-primary-subtitle" class="text-[12px] text-[var(--nx-text-muted)] font-normal mt-0.5">
+                        {{ __('Welcome to your virtual workspace') }}
+                    </p>
                 </div>
             </div>
 
-            <!-- Soft Elevated Search Bar -->
-            <div class="header-search-bar">
-                <span class="header-search-icon">🔍</span>
-                <input type="text" class="header-search-input" placeholder="{{ __('Search people, rooms, files...') }}" id="globalSearchInput" onkeyup="handleGlobalSearch(this.value)">
+            <!-- Soft Search Bar -->
+            <div class="flex-1 max-w-[380px] relative flex items-center">
+                <span class="material-symbols-rounded absolute inset-inline-start-3.5 text-[18px] text-[var(--nx-text-muted)] pointer-events-none">search</span>
+                <input type="text" class="w-full bg-[var(--nx-bg-surface)] border border-[var(--nx-border-subtle)] rounded-full py-2.5 px-4 ps-10 text-[13px] font-normal text-[var(--nx-text-primary)] placeholder-[var(--nx-text-muted)] focus:border-[var(--nx-palm-900)] focus:outline-none transition-colors" placeholder="{{ __('Search people, rooms, files...') }}" id="globalSearchInput" onkeyup="handleGlobalSearch(this.value)">
             </div>
 
-            <!-- Header Action Controls -->
-            <div class="header-actions-group">
-                <a href="javascript:void(0)" onclick="openInviteModal()" class="header-icon-btn" title="{{ __('Invite People') }}">
-                    <span>👥</span>
-                </a>
-                <!-- Notification Center Bell & Live Dropdown -->
-                <div class="notification-dropdown-wrapper" id="notifWrapper">
-                    <a href="javascript:void(0)" onclick="toggleNotificationDropdown()" class="header-icon-btn notification-bell-btn" id="notifBellBtn" title="{{ __('Notifications') }}">
-                        <span>🔔</span>
-                        <span class="notification-badge-pulse" id="notifBadge" style="display: none;">0</span>
-                    </a>
+            <!-- Header Actions Group -->
+            <div class="flex items-center gap-2.5">
+                <x-icon-btn icon="group_add" onclick="openInviteModal()" title="{{ __('Invite People') }}" size="md" variant="subtle" />
+
+                <!-- Notification Center Bell & Dropdown -->
+                <div class="relative inline-block" id="notifWrapper">
+                    <x-icon-btn icon="notifications" onclick="toggleNotificationDropdown()" id="notifBellBtn" title="{{ __('Notifications') }}" size="md" variant="subtle" />
+                    <span class="notification-badge-pulse" id="notifBadge" style="display: none;">0</span>
 
                     <!-- Dropdown Panel -->
                     <div class="notification-dropdown-panel" id="notifDropdown">
                         <!-- Dropdown Header -->
                         <div style="padding: 14px 18px; background: var(--bg-surface-subtle); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="font-size: 16px;">🔔</span>
+                                <span class="material-symbols-rounded text-[18px] text-[var(--nx-accent)]">notifications</span>
                                 <strong style="font-size: 13px; color: var(--text-primary);">{{ __('Notifications') }}</strong>
                                 <span id="notifHeaderCount" class="badge-status badge-active" style="font-size: 10px; padding: 2px 8px; display: none;">0 new</span>
                             </div>
                             <div style="display: flex; gap: 8px; align-items: center;">
-                                <button type="button" onclick="markAllNotificationsAsRead()" style="background: none; border: none; font-size: 11px; font-weight: 800; color: var(--brand-forest); cursor: pointer;" title="{{ __('Mark all as read') }}">
-                                    ✓ {{ __('Mark read') }}
+                                <button type="button" onclick="markAllNotificationsAsRead()" style="background: none; border: none; font-size: 11px; font-weight: 700; color: var(--brand-forest); cursor: pointer;" title="{{ __('Mark all as read') }}">
+                                    {{ __('Mark read') }}
                                 </button>
-                                <button type="button" onclick="clearAllNotificationsFromServer()" style="background: none; border: none; font-size: 11px; font-weight: 800; color: var(--text-muted); cursor: pointer;" title="{{ __('Clear all') }}">
-                                    🗑️
+                                <button type="button" onclick="clearAllNotificationsFromServer()" style="background: none; border: none; font-size: 11px; font-weight: 700; color: var(--text-muted); cursor: pointer;" title="{{ __('Clear all') }}">
+                                    <span class="material-symbols-rounded text-[16px]">delete_sweep</span>
                                 </button>
                             </div>
                         </div>
@@ -1800,48 +1768,49 @@
                         <!-- Filter Tabs -->
                         <div style="padding: 8px 12px; border-bottom: 1px solid var(--border-color); display: flex; gap: 6px; background: var(--bg-surface);">
                             <button type="button" class="notif-tab-btn active" onclick="filterNotifTab('all', this)">{{ __('All') }}</button>
-                            <button type="button" class="notif-tab-btn" onclick="filterNotifTab('task', this)">📋 {{ __('Tasks') }}</button>
-                            <button type="button" class="notif-tab-btn" onclick="filterNotifTab('meeting', this)">📅 {{ __('Meetings') }}</button>
-                            <button type="button" class="notif-tab-btn" onclick="filterNotifTab('spatial', this)">🚪 {{ __('Office') }}</button>
+                            <button type="button" class="notif-tab-btn" onclick="filterNotifTab('task', this)">{{ __('Tasks') }}</button>
+                            <button type="button" class="notif-tab-btn" onclick="filterNotifTab('meeting', this)">{{ __('Meetings') }}</button>
+                            <button type="button" class="notif-tab-btn" onclick="filterNotifTab('spatial', this)">{{ __('Office') }}</button>
                         </div>
 
                         <!-- Notifications Scrollable Feed -->
                         <div id="notifListContainer" style="max-height: 380px; overflow-y: auto; display: flex; flex-direction: column;">
                             <div id="notifEmptyState" style="padding: 36px 18px; text-align: center; color: var(--text-muted);">
-                                <div style="font-size: 32px; margin-bottom: 8px;">🎉</div>
+                                <span class="material-symbols-rounded text-[32px] text-[var(--nx-text-muted)] block mb-2">celebration</span>
                                 <strong style="display: block; font-size: 13px; color: var(--text-primary); margin-bottom: 4px;">{{ __('All caught up!') }}</strong>
                                 <span style="font-size: 12px;">{{ __('No new notifications right now.') }}</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <button onclick="toggleThemeMode()" class="header-icon-btn" title="{{ __('Toggle Dark / Light Mode') }}">
-                    <span class="theme-toggle-icon-label">🌙</span>
-                </button>
 
-                <!-- Language Switcher (Directly next to user profile) -->
+                <x-icon-btn icon="dark_mode" onclick="toggleThemeMode()" title="{{ __('Toggle Dark / Light Mode') }}" size="md" variant="subtle" />
+
+                <!-- Language Switcher -->
                 @if(app()->getLocale() === 'ar')
-                    <a href="{{ route('lang.switch', 'en') }}" class="header-icon-btn" style="width: auto; padding: 0 12px; gap: 6px; text-decoration: none; font-size: 12px; font-weight: 800;" title="{{ __('Switch to English') }}">
-                        <span>🌐</span>
-                        <span>English</span>
+                    <a href="{{ route('lang.switch', 'en') }}" class="inline-flex items-center gap-1 px-3 py-2 rounded-[var(--nx-radius-md)] bg-[var(--nx-bg-surface)] border border-[var(--nx-border-subtle)] text-[12px] font-semibold text-[var(--nx-text-primary)] hover:border-[var(--nx-palm-900)] transition-colors" title="{{ __('Switch to English') }}">
+                        <span class="material-symbols-rounded text-[16px] text-[var(--nx-accent)]">language</span>
+                        <span>EN</span>
                     </a>
                 @else
-                    <a href="{{ route('lang.switch', 'ar') }}" class="header-icon-btn" style="width: auto; padding: 0 12px; gap: 6px; text-decoration: none; font-size: 12px; font-weight: 800;" title="{{ __('التبديل إلى العربية') }}">
-                        <span>🌐</span>
-                        <span>العربية</span>
+                    <a href="{{ route('lang.switch', 'ar') }}" class="inline-flex items-center gap-1 px-3 py-2 rounded-[var(--nx-radius-md)] bg-[var(--nx-bg-surface)] border border-[var(--nx-border-subtle)] text-[12px] font-semibold text-[var(--nx-text-primary)] hover:border-[var(--nx-palm-900)] transition-colors" title="{{ __('التبديل إلى العربية') }}">
+                        <span class="material-symbols-rounded text-[16px] text-[var(--nx-accent)]">language</span>
+                        <span>عربي</span>
                     </a>
                 @endif
 
-                <!-- User Profile Capsule / Avatar -->
-                <div onclick="switchAdminTab('profile')" style="cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 4px 10px; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-full); box-shadow: var(--shadow-soft-3d); transition: all 0.2s ease;" title="{{ __('View and Edit Profile') }}" onmouseover="this.style.borderColor='var(--brand-forest)'" onmouseout="this.style.borderColor='var(--border-color)'">
-                    @if($user->avatar_url)
-                        <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
-                    @else
-                        <div style="width: 30px; height: 30px; border-radius: 50%; background: var(--accent-gradient); color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900;">
-                            {{ strtoupper(substr($user->name, 0, 2)) }}
-                        </div>
-                    @endif
-                    <span style="font-size: 12px; font-weight: 800; color: var(--text-primary); padding-inline-end: 4px;">{{ explode(' ', $user->name)[0] }}</span>
+                <!-- User Profile Capsule (App Bar spec) -->
+                <div onclick="switchAdminTab('profile')" class="cursor-pointer flex items-center gap-2 py-1 px-2.5 rounded-full bg-[var(--nx-bg-surface)] border border-[var(--nx-border-subtle)] shadow-[var(--nx-shadow-sm)] hover:border-[var(--nx-palm-900)] transition-all" title="{{ __('View Profile') }}">
+                    <div class="w-7 h-7 rounded-full overflow-hidden bg-[var(--nx-sand-200)] flex items-center justify-center text-[var(--nx-palm-900)] font-bold text-[11px] shrink-0">
+                        @if($user->avatar_url)
+                            <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="w-full h-full object-cover">
+                        @else
+                            <span>{{ strtoupper(substr($user->name, 0, 2)) }}</span>
+                        @endif
+                    </div>
+                    <span class="text-[12px] font-medium text-[var(--nx-text-primary)] pe-1.5 hidden sm:inline">
+                        {{ explode(' ', $user->name)[0] }}
+                    </span>
                 </div>
             </div>
         </div>
