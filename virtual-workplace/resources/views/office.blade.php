@@ -6,8 +6,14 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $organization->name }} — {{ __('Virtual Interactive Office') }}</title>
 
-    <!-- UlaSpace Design Tokens & Fonts -->
+    <!-- Google Fonts & Material Symbols -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+
+    <!-- UlaSpace Design Tokens & Office Stylesheet -->
     <link rel="stylesheet" href="{{ asset('css/ulaspace-tokens.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/ulaspace-office.css') }}">
     <link rel="stylesheet" href="{{ asset('css/modern-design-system.css') }}">
 
     <style>
@@ -811,20 +817,22 @@
 </head>
 <body>
 
-    <!-- ── Top Floating Overlay Bar ── -->
-    <div class="top-bar-overlay">
-        <div class="glass-pill">
+    <!-- ── Top Floating Overlay Bar (UlaSpace Figma Floor Map Spec) ── -->
+    <header class="nx-map-toolbar">
+        <div class="nx-toolbar-group">
             @if(empty($user->is_guest))
-            <a href="{{ route('dashboard') }}" class="action-link-btn" title="{{ __('Back to Dashboard (الخروج إلى لوحة التحكم)') }}">
-                <span>🏠</span> <span>{{ __('Dashboard') }}</span>
+            <a href="{{ route('dashboard') }}" class="nx-toolbar-btn" title="{{ __('Back to Dashboard (الخروج إلى لوحة التحكم)') }}">
+                <span class="material-symbols-rounded" style="font-size: 18px;">dashboard</span>
+                <span>{{ __('Dashboard') }}</span>
             </a>
             @endif
 
             @if(session('superadmin_impersonator_id'))
             <form method="POST" action="{{ route('impersonate.leave') }}" style="margin: 0; display: inline-flex;">
                 @csrf
-                <button type="submit" class="action-link-btn" style="background: rgba(37, 99, 235, 0.25); color: #93C5FD; border: 1px solid rgba(147, 197, 253, 0.45); font-weight: 800;" title="{{ __('Return to Super Admin (الرجوع للوحة التحكم)') }}">
-                    <span>🛡️</span> <span>{{ __('Super Admin') }}</span>
+                <button type="submit" class="nx-toolbar-btn btn-accent" title="{{ __('Return to Super Admin (الرجوع للوحة التحكم)') }}">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">shield</span>
+                    <span>{{ __('Super Admin') }}</span>
                 </button>
             </form>
             @endif
@@ -832,10 +840,10 @@
             <!-- Office / Branch Switcher (Internal Team Members Only) -->
             @if(isset($userAllowedOffices) && $userAllowedOffices->count() > 1 && empty($user->is_guest))
             <div style="position: relative; display: inline-block;">
-                <button type="button" onclick="toggleOfficeDropdown(event)" class="action-link-btn" style="background: rgba(36, 92, 58, 0.35); color: #86EFAC; border: 1px solid rgba(134, 239, 172, 0.45); font-weight: 800; display: flex; align-items: center; gap: 6px;" title="{{ __('Switch Office Branch (تغيير الفرع)') }}">
-                    <span>🏢</span>
+                <button type="button" onclick="toggleOfficeDropdown(event)" class="nx-toolbar-btn" style="color: var(--nx-map-gold); border-color: rgba(211, 165, 83, 0.35); font-weight: 600;" title="{{ __('Switch Office Branch (تغيير الفرع)') }}">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">domain</span>
                     <span>{{ $floor->name }}</span>
-                    <span style="font-size: 8px;">▼</span>
+                    <span class="material-symbols-rounded" style="font-size: 16px;">arrow_drop_down</span>
                 </button>
                 <div id="office-switcher-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); inset-inline-start: 0; min-width: 250px; background: rgba(18, 28, 22, 0.96); backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; box-shadow: 0 16px 36px rgba(0,0,0,0.6); padding: 6px; z-index: 100000;">
                     <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 4px;">
@@ -848,7 +856,7 @@
                     @endphp
                     <a href="{{ route('office', ['office' => $off->id]) }}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: {{ $off->id === $floor->id ? '#86EFAC' : '#E2E8F0' }}; background: {{ $off->id === $floor->id ? 'rgba(36, 92, 58, 0.45)' : 'transparent' }}; font-weight: 700; font-size: 12px; transition: background 0.15s ease;">
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <span>🏢</span>
+                            <span class="material-symbols-rounded" style="font-size: 16px;">apartment</span>
                             <span>{{ $off->name }}</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 6px;">
@@ -866,20 +874,20 @@
             </div>
             @endif
 
-            <div class="org-badge">
-                <div class="status-dot"></div>
+            <div class="nx-brand-capsule">
+                <span class="nx-presence-dot"></span>
                 @if(!empty($organization->logo_url))
-                    <img src="{{ $organization->logo_url }}" alt="{{ $organization->name }}" class="org-logo-img">
+                    <img src="{{ $organization->logo_url }}" alt="{{ $organization->name }}" style="height: 18px; width: auto; object-fit: contain;">
                 @elseif(!empty($organization->settings?->logo_url))
-                    <img src="{{ $organization->settings->logo_url }}" alt="{{ $organization->name }}" class="org-logo-img">
+                    <img src="{{ $organization->settings->logo_url }}" alt="{{ $organization->name }}" style="height: 18px; width: auto; object-fit: contain;">
                 @else
-                    <span>🏢</span>
+                    <span class="material-symbols-rounded" style="color: var(--nx-map-gold); font-size: 18px;">apartment</span>
                 @endif
                 <span>{{ $organization->name }}</span>
             </div>
 
             @if(!empty($user->is_guest))
-                <span class="guest-badge" style="font-weight: 800;">
+                <span class="nx-toolbar-btn btn-accent" style="font-weight: 700;">
                     🛡️ GUEST ACCESS ({{ $user->name }})
                 </span>
             @endif
@@ -893,61 +901,73 @@
             </div>
         @endif
 
-        <div class="glass-pill" id="room-status-pill" style="display: none;">
-            <span id="current-room-name" style="font-weight: 800; font-size: 12px; color: #34D399;">🏢 {{ __('غرفة الاجتماعات') }}</span>
+        <!-- Active Room Label Scrim Capsule -->
+        <div class="nx-map-room-label" id="room-status-pill" style="display: none;">
+            <span id="current-room-name" style="font-weight: 600; font-size: 12px; color: #86EFAC; display: flex; align-items: center; gap: 6px;">
+                <span class="material-symbols-rounded" style="font-size: 18px;">meeting_room</span>
+                <span>{{ __('غرفة الاجتماعات') }}</span>
+            </span>
             
-            <button onclick="openRoomFilesModal()" id="btn-room-files" class="action-link-btn" style="padding: 4px 8px; font-size: 11px;">
-                <span>📁</span> <span>{{ __('ملفات الغرفة') }}</span>
+            <button onclick="openRoomFilesModal()" id="btn-room-files" class="nx-toolbar-btn" style="height: 28px; padding: 2px 10px; font-size: 11px;">
+                <span class="material-symbols-rounded" style="font-size: 15px;">folder_open</span>
+                <span>{{ __('ملفات الغرفة') }}</span>
             </button>
 
             @if(empty($user->is_guest))
-            <button onclick="toggleRoomDoorLock()" id="btn-lock-room" class="action-link-btn" style="padding: 4px 8px; font-size: 11px;">
-                <span id="lock-icon">🔓</span> <span id="lock-text">{{ __('قفل الباب') }}</span>
+            <button onclick="toggleRoomDoorLock()" id="btn-lock-room" class="nx-toolbar-btn" style="height: 28px; padding: 2px 10px; font-size: 11px;">
+                <span id="lock-icon" class="material-symbols-rounded" style="font-size: 15px;">lock_open</span>
+                <span id="lock-text">{{ __('قفل الباب') }}</span>
             </button>
             @endif
         </div>
 
-        <div class="glass-pill">
+        <div class="nx-toolbar-group">
             <!-- Live Office Attendance Timer -->
             @if(empty($user->is_guest))
-            <div id="office-attendance-timer-pill" class="action-link-btn" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(52, 211, 153, 0.4); color: #6EE7B7; font-weight: 800; cursor: pointer;" onclick="openMyTaskDrawer()" title="{{ __('Your active time in the virtual office today (ساعات تواجدك بالعمل اليوم)') }}">
-                <span class="live-dot" style="width: 7px; height: 7px;"></span>
-                <span>⏱️</span>
-                <span id="office-attendance-clock" style="font-family: monospace; letter-spacing: 0.5px; font-size: 12px;">00:00:00</span>
+            <div id="office-attendance-timer-pill" class="nx-toolbar-btn" style="background: rgba(60, 107, 76, 0.25); border-color: rgba(60, 107, 76, 0.5); color: #86EFAC; font-weight: 600; cursor: pointer;" onclick="openMyTaskDrawer()" title="{{ __('Your active time in the virtual office today (ساعات تواجدك بالعمل اليوم)') }}">
+                <span class="nx-presence-dot"></span>
+                <span class="material-symbols-rounded" style="font-size: 16px;">schedule</span>
+                <span id="office-attendance-clock" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">00:00:00</span>
             </div>
             @endif
 
-            <button onclick="openOccupantsModal()" class="action-link-btn" id="btn-occupants-pill" title="{{ __('المتواجدون في المكتب') }}">
-                <span class="live-dot" style="width: 7px; height: 7px;"></span>
-                <span>👥</span> <span id="occupants-counter">1 {{ __('متصل الآن') }}</span>
+            <button onclick="openOccupantsModal()" class="nx-presence-capsule" id="btn-occupants-pill" title="{{ __('المتواجدون في المكتب') }}" style="cursor: pointer; border: 1px solid rgba(60, 107, 76, 0.4);">
+                <span class="nx-presence-dot"></span>
+                <span class="material-symbols-rounded" style="font-size: 16px;">group</span>
+                <span id="occupants-counter">1 {{ __('متصل الآن') }}</span>
             </button>
 
-            <button onclick="openDiagnosticsModal()" class="action-link-btn" id="btn-webrtc-quality-pill" title="{{ __('جودة الاتصال بالسيرفر') }}">
-                <span id="webrtc-quality-dot" style="width: 7px; height: 7px; border-radius: 50%; background: #10B981; display: inline-block;"></span>
+            <button onclick="openDiagnosticsModal()" class="nx-toolbar-btn" id="btn-webrtc-quality-pill" title="{{ __('جودة الاتصال بالسيرفر') }}">
+                <span id="webrtc-quality-dot" class="nx-presence-dot" style="background: #10B981; box-shadow: 0 0 8px #10B981;"></span>
                 <span id="webrtc-quality-text">{{ __('ممتاز') }}</span>
             </button>
 
-            <button onclick="toggleChatDrawer()" class="action-link-btn" title="{{ __('المحادثة والمستندات') }}">
-                <span>💬</span> <span>{{ __('المحادثة') }}</span>
+            <button onclick="toggleChatDrawer()" class="nx-toolbar-btn" title="{{ __('المحادثة والمستندات') }}">
+                <span class="material-symbols-rounded" style="font-size: 18px;">chat</span>
+                <span>{{ __('المحادثة') }}</span>
             </button>
 
-            <button onclick="toggleAppTheme()" class="action-link-btn" title="{{ __('تغيير مظهر الشاشة') }}">
-                <span id="theme-icon">☀️</span>
+            <button onclick="toggleAppTheme()" class="nx-toolbar-btn" style="padding: 6px 10px;" title="{{ __('تغيير مظهر الشاشة') }}">
+                <span id="theme-icon" class="material-symbols-rounded" style="font-size: 18px;">light_mode</span>
             </button>
 
             @if(app()->getLocale() === 'ar')
-                <a href="{{ route('lang.switch', 'en') }}" class="action-link-btn" title="English">🌐 EN</a>
+                <a href="{{ route('lang.switch', 'en') }}" class="nx-toolbar-btn" style="padding: 6px 10px;" title="English">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">language</span> EN
+                </a>
             @else
-                <a href="{{ route('lang.switch', 'ar') }}" class="action-link-btn" title="العربية">🌐 عربي</a>
+                <a href="{{ route('lang.switch', 'ar') }}" class="nx-toolbar-btn" style="padding: 6px 10px;" title="العربية">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">language</span> عربي
+                </a>
             @endif
 
             @if(!empty($user) && in_array($user->role ?? 'member', ['superadmin', 'company_admin', 'manager']))
-                <a href="{{ route('editor') }}" class="action-link-btn" style="color: var(--brand-primary); font-weight: 800;">
-                    <span>🛠️</span> {{ __('محرر الخريطة') }}
+                <a href="{{ route('editor') }}" class="nx-toolbar-btn btn-accent" style="font-weight: 600;">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">draw</span> {{ __('محرر الخريطة') }}
                 </a>
             @endif
         </div>
-    </div>
+    </header>
 
     <!-- ── Interactive Canvas Viewport ── -->
     <div class="canvas-container" id="canvas-container">
@@ -1002,58 +1022,66 @@
         </div>
     </div>
 
-    <!-- ── Bottom Floating Dock ── -->
-    <div class="bottom-dock">
-        <button class="dock-btn muted" id="btn-mic" onclick="toggleMicrophone()">
-            <span id="mic-icon">🔇</span>
+    <!-- ── Bottom Meeting Control Bar (UlaSpace Figma Spec) ── -->
+    <nav class="nx-meeting-dock" aria-label="Meeting Controls">
+        <button class="nx-dock-btn muted" id="btn-mic" onclick="toggleMicrophone()" title="{{ __('Microphone (كتم/تشغيل المايك)') }}">
+            <span id="mic-icon" class="material-symbols-rounded">mic_off</span>
             <span id="mic-text">{{ __('كتم المايك') }}</span>
         </button>
-        <button class="dock-btn muted" id="btn-cam" onclick="toggleCamera()">
-            <span id="cam-icon">📷</span>
+        <button class="nx-dock-btn muted" id="btn-cam" onclick="toggleCamera()" title="{{ __('Camera (إيقاف/تشغيل الكاميرا)') }}">
+            <span id="cam-icon" class="material-symbols-rounded">videocam_off</span>
             <span id="cam-text">{{ __('إيقاف الكاميرا') }}</span>
         </button>
-        <button class="dock-btn" id="btn-screen" onclick="toggleScreenShare()">
-            <span id="screen-icon">🖥️</span>
+        <button class="nx-dock-btn" id="btn-screen" onclick="toggleScreenShare()" title="{{ __('Screen Share (مشاركة الشاشة)') }}">
+            <span id="screen-icon" class="material-symbols-rounded">screen_share</span>
             <span id="screen-text">{{ __('مشاركة الشاشة') }}</span>
         </button>
 
-        <div class="dock-divider"></div>
+        <div class="nx-dock-divider"></div>
 
-        <button class="dock-btn" onclick="openMyTaskDrawer()" title="{{ __('قائمة مهامي وتتبع الوقت') }}">
-            <span>📝</span>
+        <button class="nx-dock-btn" onclick="openMyTaskDrawer()" title="{{ __('قائمة مهامي وتتبع الوقت') }}">
+            <span class="material-symbols-rounded">task_alt</span>
             <span>{{ __('مهامي') }}</span>
         </button>
-        <button class="dock-btn" onclick="openGuestInviteModal()">
-            <span>⚡</span>
+        <button class="nx-dock-btn" onclick="openGuestInviteModal()" title="{{ __('دعوة ضيف خارجي للمكتب') }}">
+            <span class="material-symbols-rounded">person_add</span>
             <span>{{ __('دعوة ضيف') }}</span>
         </button>
-        <button class="dock-btn" id="btn-react-dock" onclick="toggleReactionMenu(event)" title="{{ __('التفاعلات السريعة والفقاعات') }}">
-            <span>😀</span>
+        <button class="nx-dock-btn" id="btn-react-dock" onclick="toggleReactionMenu(event)" title="{{ __('التفاعلات السريعة والفقاعات') }}">
+            <span class="material-symbols-rounded">add_reaction</span>
             <span>{{ __('تفاعل') }}</span>
         </button>
-        <button class="dock-btn" onclick="openWhiteboardModal()">
-            <span>📋</span>
+        <button class="nx-dock-btn" onclick="openWhiteboardModal()" title="{{ __('السبورة الرقمية التعاونية') }}">
+            <span class="material-symbols-rounded">draw</span>
             <span>{{ __('السبورة') }}</span>
         </button>
-        <button class="dock-btn" id="btn-record" onclick="toggleRecording()">
-            <span id="rec-icon">⏺️</span>
+        <button class="nx-dock-btn" id="btn-record" onclick="toggleRecording()" title="{{ __('تسجيل الجلسة') }}">
+            <span id="rec-icon" class="material-symbols-rounded">radio_button_checked</span>
             <span id="rec-text">{{ __('تسجيل') }}</span>
         </button>
 
-        <div class="dock-divider"></div>
+        <div class="nx-dock-divider"></div>
 
-        <button class="dock-btn" id="btn-more-dock" onclick="toggleMoreMenu(event)" title="{{ __('المزيد من الأدوات والإعدادات') }}">
-            <span style="font-size: 16px; font-weight: 900; letter-spacing: 2px;">•••</span>
+        <button class="nx-dock-btn" id="btn-more-dock" onclick="toggleMoreMenu(event)" title="{{ __('المزيد من الأدوات والإعدادات') }}">
+            <span class="material-symbols-rounded">more_horiz</span>
             <span>{{ __('المزيد') }}</span>
         </button>
 
         <!-- Floating Live Task Timer Pill In Dock -->
-        <div id="floating-task-timer-pill" class="dock-timer-pill" onclick="openMyTaskDrawer()" title="{{ __('انقر لفتح وإدارة المهمة') }}">
-            <span>⏱️</span>
-            <span id="dock-timer-task-name" style="max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ __('Task') }}</span>
-            <span id="dock-timer-clock" style="font-family: monospace; letter-spacing: 0.5px; background: rgba(0,0,0,0.25); padding: 2px 6px; border-radius: 6px;">00:00:00</span>
+        <div id="floating-task-timer-pill" class="nx-toolbar-btn" style="display: none; background: rgba(211, 165, 83, 0.2); border-color: var(--nx-map-gold); color: var(--nx-map-gold); height: 48px; padding: 4px 12px; cursor: pointer; border-radius: 12px; flex-direction: column; justify-content: center; gap: 2px;" onclick="openMyTaskDrawer()" title="{{ __('انقر لفتح وإدارة المهمة') }}">
+            <div style="display: flex; align-items: center; gap: 4px;">
+                <span class="material-symbols-rounded" style="font-size: 16px;">timer</span>
+                <span id="dock-timer-task-name" style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; font-weight: 700;">{{ __('Task') }}</span>
+            </div>
+            <span id="dock-timer-clock" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; background: rgba(0,0,0,0.35); padding: 1px 6px; border-radius: 4px;">00:00:00</span>
         </div>
-    </div>
+
+        <!-- Leave / Exit Office Button (Terracotta / Red Pill on far end) -->
+        <a href="{{ route('dashboard') }}" class="nx-dock-btn nx-dock-btn-leave" title="{{ __('مغادرة المكتب والعودة للوحة التحكم') }}">
+            <span class="material-symbols-rounded">logout</span>
+            <span>{{ __('مغادرة') }}</span>
+        </a>
+    </nav>
 
     <!-- ── Floating More Tools & Settings Popover Menu ── -->
     <div id="floating-more-popover" style="display: none; position: absolute; bottom: 85px; left: 65%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.96); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.18); border-radius: 18px; padding: 8px; flex-direction: column; gap: 4px; box-shadow: 0 16px 36px rgba(0,0,0,0.6); z-index: 100000; min-width: 220px;">
@@ -2153,7 +2181,7 @@
                 if (statusPill) statusPill.style.display = 'flex';
                 if (roomNameEl) roomNameEl.textContent = `🏢 ${r.name}`;
                 const isLocked = !!roomDoorStates.get(r.id);
-                if (lockIcon) lockIcon.textContent = isLocked ? '🔒' : '🔓';
+                if (lockIcon) lockIcon.textContent = isLocked ? 'lock' : 'lock_open';
                 if (lockText) lockText.textContent = isLocked ? '{{ __("Unlock Door") }}' : '{{ __("Lock Door") }}';
 
                 if (localAvatar.currentRoomId !== r.id) {
@@ -3765,7 +3793,7 @@
             const btn = document.getElementById('btn-mic');
             btn.classList.toggle('muted', !micActive);
             btn.classList.toggle('active', micActive);
-            document.getElementById('mic-icon').textContent = micActive ? '🎙️' : '🔇';
+            document.getElementById('mic-icon').textContent = micActive ? 'mic' : 'mic_off';
             document.getElementById('mic-text').textContent = micActive ? '{{ __("المايك يعمل") }}' : '{{ __("كتم المايك") }}';
         }
 
@@ -3850,7 +3878,7 @@
             const btn = document.getElementById('btn-cam');
             btn.classList.toggle('muted', !camActive);
             btn.classList.toggle('active', camActive);
-            document.getElementById('cam-icon').textContent = camActive ? '📹' : '📷';
+            document.getElementById('cam-icon').textContent = camActive ? 'videocam' : 'videocam_off';
             document.getElementById('cam-text').textContent = camActive ? '{{ __("الكاميرا تعمل") }}' : '{{ __("إيقاف الكاميرا") }}';
         }
 
@@ -3870,6 +3898,7 @@
                     const btn = document.getElementById('btn-screen');
                     const text = document.getElementById('screen-text');
                     btn.classList.add('active');
+                    document.getElementById('screen-icon').textContent = 'stop_screen_share';
                     text.textContent = '{{ __("إيقاف المشاركة") }}';
                     showToast('🖥️ {{ __("تم بدء مشاركة الشاشة") }}');
                     if (ws && ws.readyState === WebSocket.OPEN) {
@@ -3886,6 +3915,7 @@
                     const btn = document.getElementById('btn-screen');
                     const text = document.getElementById('screen-text');
                     btn.classList.remove('active');
+                    document.getElementById('screen-icon').textContent = 'screen_share';
                     text.textContent = '{{ __("مشاركة الشاشة") }}';
                     showToast('⏹️ {{ __("تم إيقاف مشاركة الشاشة") }}');
                     if (ws && ws.readyState === WebSocket.OPEN) {
@@ -3906,6 +3936,7 @@
                 screenActive = false;
                 const btn = document.getElementById('btn-screen');
                 btn.classList.remove('active');
+                document.getElementById('screen-icon').textContent = 'screen_share';
                 document.getElementById('screen-text').textContent = '{{ __("مشاركة الشاشة") }}';
                 if (e.name !== 'NotAllowedError') {
                     showToast(`❌ {{ __("خطأ في مشاركة الشاشة:") }} ${e.message || e.name}`);
@@ -3944,7 +3975,7 @@
                 isRecording = true;
                 recordStartTime = Date.now();
                 document.getElementById('btn-record').classList.add('active');
-                document.getElementById('rec-icon').textContent = '⏹️';
+                document.getElementById('rec-icon').textContent = 'stop_circle';
                 document.getElementById('rec-text').textContent = '{{ __("Stop") }}';
                 showToast('⏺️ {{ __("Recording started...") }}');
             } catch(e) {
@@ -3958,7 +3989,7 @@
                 mediaRecorder.stop();
                 isRecording = false;
                 document.getElementById('btn-record').classList.remove('active');
-                document.getElementById('rec-icon').textContent = '⏺️';
+                document.getElementById('rec-icon').textContent = 'radio_button_checked';
                 document.getElementById('rec-text').textContent = '{{ __("Record") }}';
                 showToast('⏳ {{ __("Processing recording...") }}');
             }
