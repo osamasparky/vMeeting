@@ -635,3 +635,105 @@ body {
 .nx-viewport-ctrl-btn span.material-symbols-rounded {
     font-size: 20px;
 }
+
+/* ── UlaSpace System Card Notifications (Toasts) ── */
+.nx-toast-container {
+    position: fixed;
+    top: 76px;
+    inset-inline-end: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100000;
+    pointer-events: none;
+    max-width: 360px;
+    width: calc(100vw - 48px);
+}
+
+.nx-toast-card {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: rgba(14, 25, 19, 0.96);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--nx-map-border-strong);
+    border-radius: 14px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.60);
+    color: var(--nx-map-text);
+    animation: nxToastSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transition: all 0.25s ease;
+}
+
+.nx-toast-card.nx-toast-fadeout {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+}
+
+.nx-toast-icon-wrap {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: rgba(60, 107, 76, 0.28);
+    border: 1px solid rgba(60, 107, 76, 0.50);
+    color: #86EFAC;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.nx-toast-card.nx-toast-warning .nx-toast-icon-wrap {
+    background: rgba(211, 165, 83, 0.25);
+    border-color: rgba(211, 165, 83, 0.50);
+    color: var(--nx-map-gold);
+}
+
+.nx-toast-card.nx-toast-error .nx-toast-icon-wrap {
+    background: rgba(217, 107, 95, 0.25);
+    border-color: rgba(217, 107, 95, 0.50);
+    color: #F87171;
+}
+
+.nx-toast-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.nx-toast-msg {
+    font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--nx-map-text);
+    word-break: break-word;
+}
+
+.nx-toast-close {
+    background: transparent;
+    border: none;
+    color: var(--nx-map-muted);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    transition: color 0.15s;
+    flex-shrink: 0;
+}
+.nx-toast-close:hover {
+    color: #FFFFFF;
+}
+
+@keyframes nxToastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-12px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}

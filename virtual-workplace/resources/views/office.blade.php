@@ -1000,6 +1000,9 @@
                 </button>
             </div>
         </header>
+ 
+    <!-- ── System Card Toast Notifications Container ── -->
+    <div id="nx-toast-container" class="nx-toast-container" aria-live="polite"></div>
 
     <!-- ── Interactive Canvas Viewport ── -->
     <div class="canvas-container" id="canvas-container">
@@ -1264,11 +1267,11 @@
             width = canvas.width = container.clientWidth || window.innerWidth;
             height = canvas.height = container.clientHeight || window.innerHeight;
 
-            const availW = Math.max(100, width - 24);
-            const availH = Math.max(100, height - 24);
+            const availW = Math.max(100, width);
+            const availH = Math.max(100, height);
             const scaleX = availW / MAP_WIDTH_PX;
             const scaleY = availH / MAP_HEIGHT_PX;
-            zoomLevel = Math.min(1.0, Math.min(scaleX, scaleY));
+            zoomLevel = Math.max(scaleX, scaleY);
 
             cameraOffset.x = (width - MAP_WIDTH_PX * zoomLevel) / 2;
             cameraOffset.y = (height - MAP_HEIGHT_PX * zoomLevel) / 2;
@@ -3018,46 +3021,46 @@
                 }
             }
 
+            // 4. Live Camera Video OR User Profile Picture / Gradient Monogram (Clean Circular Avatar)
             const isCamOn = isSelf ? (camActive && !!localMediaStream) : (av.camActive && !!av.videoEl && canSeeLiveCam);
             const videoEl = isSelf ? (document.getElementById('local-video-elem') || localAvatar.videoEl) : av.videoEl;
 
             ctx.save();
             ctx.beginPath();
-            if (ctx.roundRect) ctx.roundRect(x - radius, y - radius, cardSize, cardSize, 11);
-            else ctx.rect(x - radius, y - radius, cardSize, cardSize);
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
             ctx.clip();
 
             if (isCamOn && videoEl && (videoEl.readyState >= 2 || videoEl.videoWidth > 0)) {
-                // Draw Live Video Stream directly inside the Canvas Profile Square!
+                // Draw Live Video Stream inside Circle
                 try {
-                    ctx.drawImage(videoEl, x - radius, y - radius, cardSize, cardSize);
+                    ctx.drawImage(videoEl, x - radius, y - radius, radius * 2, radius * 2);
                 } catch(e) {
                     if (av.avatarImg && av.avatarImg.complete && av.avatarImg.naturalWidth > 0) {
-                        ctx.drawImage(av.avatarImg, x - radius, y - radius, cardSize, cardSize);
+                        ctx.drawImage(av.avatarImg, x - radius, y - radius, radius * 2, radius * 2);
                     }
                 }
             } else if (av.avatarImg && av.avatarImg.complete && av.avatarImg.naturalWidth > 0) {
-                // Draw User Profile Picture
-                ctx.drawImage(av.avatarImg, x - radius, y - radius, cardSize, cardSize);
+                // Draw User Profile Picture inside Circle
+                ctx.drawImage(av.avatarImg, x - radius, y - radius, radius * 2, radius * 2);
             } else {
                 // Draw Modern Gradient Monogram with User's Initials
                 const bgGrad = ctx.createLinearGradient(x - radius, y - radius, x + radius, y + radius);
                 if (isSelf) {
-                    bgGrad.addColorStop(0, '#10B981');
-                    bgGrad.addColorStop(1, '#047857');
+                    bgGrad.addColorStop(0, '#3C6B4C');
+                    bgGrad.addColorStop(1, '#1E412F');
                 } else {
-                    bgGrad.addColorStop(0, '#3B82F6');
-                    bgGrad.addColorStop(1, '#1D4ED8');
+                    bgGrad.addColorStop(0, '#2563EB');
+                    bgGrad.addColorStop(1, '#1E40AF');
                 }
                 ctx.fillStyle = bgGrad;
-                ctx.fillRect(x - radius, y - radius, cardSize, cardSize);
+                ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
 
                 // Initials
                 const nameParts = (av.name || 'User').trim().split(' ');
                 const initials = nameParts.length >= 2 
                     ? (nameParts[0][0] + nameParts[1][0]).toUpperCase()
                     : (nameParts[0].substring(0, 2)).toUpperCase();
-                ctx.font = '900 12px Cairo, Inter, sans-serif';
+                ctx.font = 'bold 11px "IBM Plex Sans Arabic", "IBM Plex Sans", sans-serif';
                 ctx.fillStyle = '#FFFFFF';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -3065,69 +3068,71 @@
             }
             ctx.restore();
 
-            // 5. Card Border Frame
-            ctx.strokeStyle = isSelf ? '#10B981' : (isCamOn ? '#3B82F6' : 'rgba(255, 255, 255, 0.4)');
-            ctx.lineWidth = isSelf ? 2 : 1.5;
+            // 5. Circular Avatar Border Ring
+            ctx.strokeStyle = isSelf ? '#86EFAC' : (isCamOn ? '#60A5FA' : 'rgba(237, 230, 217, 0.50)');
+            ctx.lineWidth = isSelf ? 2.5 : 1.8;
             ctx.beginPath();
-            if (ctx.roundRect) ctx.roundRect(x - radius, y - radius, cardSize, cardSize, 11);
-            else ctx.rect(x - radius, y - radius, cardSize, cardSize);
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
             ctx.stroke();
 
             // 6. Status Indicators (Top-right Mic & Bottom-right Cam)
             const isMicOn = isSelf ? micActive : av.micActive;
             
             // Mic Badge
-            ctx.fillStyle = isMicOn ? '#10B981' : 'rgba(15, 23, 42, 0.85)';
+            ctx.fillStyle = isMicOn ? '#10B981' : 'rgba(15, 23, 42, 0.90)';
             ctx.beginPath();
-            ctx.arc(x + radius - 3, y - radius + 3, 6.5, 0, Math.PI * 2);
+            ctx.arc(x + radius - 2, y - radius + 3, 5.5, 0, Math.PI * 2);
             ctx.fill();
             ctx.strokeStyle = '#FFFFFF';
             ctx.lineWidth = 1;
             ctx.stroke();
-            ctx.font = '7px Cairo, Inter, sans-serif';
+            ctx.font = '6px sans-serif';
             ctx.fillStyle = '#FFFFFF';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(isMicOn ? '🎙️' : '🔇', x + radius - 3, y - radius + 3);
+            ctx.fillText(isMicOn ? '🎙️' : '🔇', x + radius - 2, y - radius + 3);
 
             // Cam Badge if live
             if (isCamOn) {
                 ctx.fillStyle = '#3B82F6';
                 ctx.beginPath();
-                ctx.arc(x + radius - 3, y + radius - 3, 6.5, 0, Math.PI * 2);
+                ctx.arc(x + radius - 2, y + radius - 3, 5.5, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.strokeStyle = '#FFFFFF';
                 ctx.lineWidth = 1;
                 ctx.stroke();
-                ctx.font = '7px Cairo, Inter, sans-serif';
+                ctx.font = '6px sans-serif';
                 ctx.fillStyle = '#FFFFFF';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('📷', x + radius - 3, y + radius - 3);
+                ctx.fillText('📷', x + radius - 2, y + radius - 3);
             }
 
-            // 7. Sleek User Name Pill (with Seated Desk indicator)
+            // 7. Small Compact Person Name Pill Under the Circular Avatar
             const isSitting = isSelf ? localAvatar.isSitting : av.isSitting;
             const displayName = isSelf 
-                ? (isSitting ? `🪑 ${av.name} ({{ __("At Desk") }})` : `${av.name} ({{ __("You") }})`)
+                ? (isSitting ? `🪑 ${av.name}` : `${av.name}`)
                 : (isSitting ? `🪑 ${av.name}` : av.name);
-            ctx.font = 'bold 9px Cairo, Inter, sans-serif';
-            const nameW = ctx.measureText(displayName).width + 12;
-            ctx.fillStyle = isSitting ? 'rgba(16, 185, 129, 0.95)' : 'rgba(15, 23, 42, 0.92)';
-            if (ctx.roundRect) ctx.roundRect(x - nameW / 2, y + radius + 5, nameW, 16, 5);
-            else ctx.rect(x - nameW / 2, y + radius + 5, nameW, 16);
+            ctx.font = '600 8.5px "IBM Plex Sans Arabic", "IBM Plex Sans", sans-serif';
+            const nameW = ctx.measureText(displayName).width + 10;
+            const badgeH = 14;
+            const badgeY = y + radius + 3;
+
+            ctx.fillStyle = isSitting ? 'rgba(60, 107, 76, 0.95)' : 'rgba(14, 25, 19, 0.92)';
+            if (ctx.roundRect) ctx.roundRect(x - nameW / 2, badgeY, nameW, badgeH, 4);
+            else ctx.rect(x - nameW / 2, badgeY, nameW, badgeH);
             ctx.fill();
 
-            ctx.strokeStyle = isSelf ? 'rgba(16, 185, 129, 0.6)' : 'rgba(255, 255, 255, 0.2)';
-            ctx.lineWidth = 1;
-            if (ctx.roundRect) ctx.roundRect(x - nameW / 2, y + radius + 5, nameW, 16, 5);
-            else ctx.rect(x - nameW / 2, y + radius + 5, nameW, 16);
+            ctx.strokeStyle = isSelf ? 'rgba(134, 239, 172, 0.6)' : 'rgba(237, 230, 217, 0.25)';
+            ctx.lineWidth = 0.8;
+            if (ctx.roundRect) ctx.roundRect(x - nameW / 2, badgeY, nameW, badgeH, 4);
+            else ctx.rect(x - nameW / 2, badgeY, nameW, badgeH);
             ctx.stroke();
 
-            ctx.fillStyle = isSitting ? '#FFFFFF' : (isSelf ? '#6EE7B7' : '#F8FAFC');
+            ctx.fillStyle = isSitting ? '#FFFFFF' : (isSelf ? '#86EFAC' : '#F9F4EE');
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(displayName, x, y + radius + 13);
+            ctx.fillText(displayName, x, badgeY + (badgeH / 2));
 
             // 8. In-World Floating Speech / Reaction Comic Bubble
             const bubble = speechBubbles.get(av.id);
@@ -5840,11 +5845,57 @@
             document.getElementById('theme-icon').textContent = next === 'dark' ? '☀️' : '🌙';
         }
 
-        function showToast(msg) {
-            const t = document.getElementById('toast-bubble');
-            t.textContent = msg;
-            t.style.display = 'block';
-            setTimeout(() => { t.style.display = 'none'; }, 3200);
+        function showToast(msg, customType = null) {
+            const container = document.getElementById('nx-toast-container');
+            if (!container) return;
+
+            const card = document.createElement('div');
+            let icon = 'info';
+            let type = customType || 'info';
+
+            const str = String(msg || '');
+            if (str.includes('🚫') || str.includes('❌') || str.includes('denied') || str.includes('خطأ')) {
+                icon = 'cancel'; type = 'error';
+            } else if (str.includes('✅') || str.includes('▶️') || str.includes('unlocked') || str.includes('بنجاح') || str.includes('granted')) {
+                icon = 'check_circle'; type = 'success';
+            } else if (str.includes('⚠️') || str.includes('🔒') || str.includes('locked') || str.includes('تحذير')) {
+                icon = 'warning'; type = 'warning';
+            } else if (str.includes('🚪') || str.includes('Door') || str.includes('Room')) {
+                icon = 'meeting_room';
+            } else if (str.includes('☕')) {
+                icon = 'coffee';
+            } else if (str.includes('🎙️') || str.includes('🔇') || str.includes('Microphone')) {
+                icon = 'mic';
+            } else if (str.includes('📹') || str.includes('📷') || str.includes('Camera')) {
+                icon = 'videocam';
+            } else if (str.includes('🖥️') || str.includes('Screen')) {
+                icon = 'screen_share';
+            } else if (str.includes('👋')) {
+                icon = 'waving_hand';
+            } else if (str.includes('🎯')) {
+                icon = 'center_focus_strong';
+            } else if (str.includes('🪑')) {
+                icon = 'chair';
+            } else if (str.includes('🔔')) {
+                icon = 'notifications_active';
+            }
+
+            card.className = `nx-toast-card nx-toast-${type}`;
+            card.innerHTML = `
+                <div class="nx-toast-icon-wrap">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">${icon}</span>
+                </div>
+                <div class="nx-toast-content">
+                    <div class="nx-toast-msg">${str}</div>
+                </div>
+                <button type="button" class="nx-toast-close" onclick="this.closest('.nx-toast-card').remove()" title="Close">✕</button>
+            `;
+
+            container.appendChild(card);
+            setTimeout(() => {
+                card.classList.add('nx-toast-fadeout');
+                setTimeout(() => { if (card.parentElement) card.remove(); }, 250);
+            }, 3500);
         }
 
         function toggleOfficeMainMenu(e) {
