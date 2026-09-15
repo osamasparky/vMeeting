@@ -6,153 +6,144 @@
     <title>{{ __('Guest Invitation') }} — {{ __('Virtual Workplace') }}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="{{ asset('css/ulaspace-tokens.css') }}">
     <style>
-        :root {
-            --bg-dark: #070913;
-            --bg-card: rgba(15, 23, 42, 0.88);
-            --border-card: rgba(255, 255, 255, 0.1);
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-            --accent-glow: rgba(59, 130, 246, 0.35);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --success: #10b981;
-            --danger: #ef4444;
-            --font-family: 'Cairo', 'Inter', sans-serif;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-family); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: var(--bg-dark);
-            color: var(--text-main);
+            background: var(--nx-bg-page, #0E1612);
+            color: var(--nx-text-primary, #E8F5E9);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-family: {{ app()->getLocale() === 'ar' ? "var(--nx-font-arabic, 'IBM Plex Sans Arabic', sans-serif)" : "var(--nx-font-sans, 'IBM Plex Sans', sans-serif)" }};
             background-image: 
-                radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.12) 0%, transparent 40%);
-            padding: 20px;
+                radial-gradient(circle at 20% 20%, rgba(79, 155, 95, 0.15) 0%, transparent 45%),
+                radial-gradient(circle at 80% 80%, rgba(36, 92, 58, 0.25) 0%, transparent 45%);
+            padding: var(--nx-spacing-5, 20px);
         }
 
         .lobby-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-card);
-            border-radius: 24px;
-            padding: 40px;
+            background: var(--nx-bg-surface, #15221B);
+            border: 1px solid var(--nx-border-subtle, rgba(255, 255, 255, 0.1));
+            border-radius: var(--nx-radius-2xl, 24px);
+            padding: var(--nx-spacing-10, 40px);
             width: 100%;
             max-width: 480px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            box-shadow: var(--nx-shadow-2xl, 0 25px 50px -12px rgba(0, 0, 0, 0.6));
             backdrop-filter: blur(20px);
             text-align: center;
         }
 
         .brand-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            border-radius: 16px;
+            width: 64px;
+            height: 64px;
+            background: var(--nx-accent-gradient, linear-gradient(135deg, #4F9B5F, #245C3A));
+            border-radius: var(--nx-radius-xl, 18px);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 28px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 25px var(--accent-glow);
+            color: white;
+            margin-bottom: var(--nx-spacing-5, 20px);
+            box-shadow: var(--nx-shadow-soft-3d);
         }
 
         .title {
-            font-size: 22px;
-            font-weight: 800;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
+            font-size: var(--nx-font-size-2xl, 24px);
+            font-weight: var(--nx-font-weight-black, 900);
+            margin-bottom: var(--nx-spacing-2, 8px);
+            color: var(--nx-text-primary, #E8F5E9);
         }
 
         .subtitle {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-bottom: 24px;
-            line-height: 1.5;
+            font-size: var(--nx-font-size-sm, 14px);
+            color: var(--nx-text-secondary, #A5D6A7);
+            margin-bottom: var(--nx-spacing-6, 24px);
+            line-height: 1.6;
         }
 
         .room-badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            background: rgba(59, 130, 246, 0.12);
-            border: 1px solid rgba(59, 130, 246, 0.3);
-            color: #93c5fd;
+            gap: var(--nx-spacing-2, 8px);
+            background: var(--nx-primary-surface, rgba(79, 155, 95, 0.15));
+            border: 1px solid var(--nx-border-subtle, rgba(79, 155, 95, 0.3));
+            color: var(--nx-primary-500, #4F9B5F);
             padding: 8px 16px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 24px;
+            border-radius: var(--nx-radius-full, 9999px);
+            font-size: var(--nx-font-size-xs, 12px);
+            font-weight: var(--nx-font-weight-bold, 700);
+            margin-bottom: var(--nx-spacing-6, 24px);
         }
 
         .form-group {
-            text-align: {{ app()->getLocale() === 'ar' ? 'right' : 'left' }};
-            margin-bottom: 20px;
+            text-align: start;
+            margin-bottom: var(--nx-spacing-5, 20px);
         }
 
         .form-label {
-            display: block;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: var(--nx-font-size-xs, 12px);
+            font-weight: var(--nx-font-weight-bold, 700);
+            color: var(--nx-text-secondary, #A5D6A7);
             margin-bottom: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.04em;
         }
 
         .form-input {
             width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-card);
-            border-radius: 12px;
+            background: var(--nx-bg-surface-subtle, rgba(255, 255, 255, 0.05));
+            border: 1px solid var(--nx-border-subtle, rgba(255, 255, 255, 0.1));
+            border-radius: var(--nx-radius-lg, 12px);
             padding: 14px 16px;
-            color: var(--text-main);
-            font-size: 15px;
+            color: var(--nx-text-primary, #E8F5E9);
+            font-size: var(--nx-font-size-sm, 14px);
             outline: none;
             transition: all 0.2s;
-            text-align: {{ app()->getLocale() === 'ar' ? 'right' : 'left' }};
+            box-shadow: var(--nx-shadow-inset-3d);
         }
 
         .form-input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 15px var(--accent-glow);
+            border-color: var(--nx-primary-500, #4F9B5F);
             background: rgba(255, 255, 255, 0.08);
         }
 
         .join-btn {
             width: 100%;
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            background: var(--nx-accent-gradient, linear-gradient(135deg, #4F9B5F, #245C3A));
             color: white;
             border: none;
-            border-radius: 14px;
-            padding: 15px;
-            font-size: 15px;
-            font-weight: 800;
+            border-radius: var(--nx-radius-lg, 12px);
+            padding: 14px;
+            font-size: var(--nx-font-size-sm, 14px);
+            font-weight: var(--nx-font-weight-bold, 700);
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: var(--nx-spacing-2, 8px);
             transition: all 0.2s;
-            box-shadow: 0 10px 25px var(--accent-glow);
+            box-shadow: var(--nx-shadow-soft-3d);
+            text-decoration: none;
         }
 
         .join-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 15px 30px var(--accent-glow);
+            box-shadow: var(--nx-shadow-md);
         }
 
         .error-card {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #fca5a5;
+            background: rgba(217, 107, 95, 0.15);
+            border: 1px solid rgba(217, 107, 95, 0.35);
+            color: #D96B5F;
             padding: 16px;
-            border-radius: 12px;
-            font-size: 13px;
+            border-radius: var(--nx-radius-lg, 12px);
+            font-size: var(--nx-font-size-xs, 12px);
             margin-bottom: 20px;
             line-height: 1.5;
         }
@@ -161,13 +152,16 @@
 <body>
 
     <div class="lobby-card">
-        <div class="brand-icon">🌐</div>
+        <div class="brand-icon">
+            <span class="material-symbols-rounded" style="font-size: 32px;">meeting_room</span>
+        </div>
 
         @if(!empty($error))
             <h1 class="title">{{ __('Invitation Issue') }}</h1>
             <div class="error-card">{{ $error }}</div>
-            <a href="{{ route('login') }}" class="join-btn" style="text-decoration: none;">
-                {{ __('Go to Homepage') }}
+            <a href="{{ route('login') }}" class="join-btn">
+                <span class="material-symbols-rounded" style="font-size: 18px;">home</span>
+                <span>{{ __('Go to Homepage') }}</span>
             </a>
         @else
             <h1 class="title">{{ $invitation->organization->name }}</h1>
@@ -176,19 +170,23 @@
             </p>
 
             <div class="room-badge">
-                <span>🏢</span>
+                <span class="material-symbols-rounded" style="font-size: 16px;">apartment</span>
                 <span>{{ __('Destination Room:') }} <strong>{{ $invitation->room->name }}</strong></span>
             </div>
 
             <form action="{{ route('guest.enter', $invitation->token) }}" method="POST">
                 @csrf
                 <div class="form-group">
-                    <label class="form-label">{{ __('Your Full Name (Display Name)') }}</label>
+                    <label class="form-label">
+                        <span class="material-symbols-rounded" style="font-size: 15px;">person</span>
+                        <span>{{ __('Your Full Name (Display Name)') }}</span>
+                    </label>
                     <input type="text" name="guest_name" class="form-input" value="{{ old('guest_name', $invitation->guest_name) }}" required placeholder="e.g. John Smith / Partner">
                 </div>
 
                 <button type="submit" class="join-btn">
-                    <span>🚀</span> {{ __('Enter Workplace as Guest') }}
+                    <span class="material-symbols-rounded" style="font-size: 18px;">login</span>
+                    <span>{{ __('Enter Workplace as Guest') }}</span>
                 </button>
             </form>
         @endif
@@ -196,4 +194,3 @@
 
 </body>
 </html>
-

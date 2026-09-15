@@ -4,98 +4,117 @@
             <!-- Page Header -->
             <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
                 <div>
-                    <h1 class="page-title" style="font-size: 22px; font-weight: 900; color: var(--text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
-                        <span>🚪</span> {{ __('Meeting Rooms & Spatial Office Distribution') }}
+                    <h1 class="page-title" style="font-size: 22px; font-weight: 800; color: var(--nx-text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-rounded" style="font-size: 24px; color: var(--nx-accent);">meeting_room</span>
+                        <span>{{ __('Meeting Rooms & Spatial Office Distribution') }}</span>
                     </h1>
-                    <p class="page-subtitle" style="font-size: 13px; color: var(--text-secondary);">
+                    <p class="page-subtitle" style="font-size: 13px; color: var(--nx-text-secondary);">
                         {{ __('Explore, inspect, and organize rooms across all company branches, maps, and spatial floorplans.') }}
                     </p>
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                    <a href="{{ route('office') }}" class="tactile-btn btn-primary" style="padding: 10px 18px; font-size: 13px; text-decoration: none;">
-                        <span>🚀</span> {{ __('Enter Virtual Office') }}
-                    </a>
-                    <a href="{{ route('editor') }}" class="tactile-btn" style="background: linear-gradient(135deg, #10B981, #059669); color: white; padding: 10px 18px; font-size: 13px; text-decoration: none; font-weight: 800; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);">
-                        <span>✨</span> {{ __('AI Office Generator') }}
-                    </a>
-                    <a href="{{ route('editor') }}" class="tactile-btn btn-secondary" style="padding: 10px 16px; font-size: 13px; text-decoration: none;">
-                        <span>🎨</span> {{ __('Floor Map Editor') }}
-                    </a>
+                    <x-btn variant="primary" size="md" href="{{ route('office') }}" icon="login">
+                        {{ __('Enter Virtual Office') }}
+                    </x-btn>
+                    <x-btn variant="secondary" size="md" href="{{ route('editor') }}" icon="auto_awesome">
+                        {{ __('AI Office Generator') }}
+                    </x-btn>
+                    <x-btn variant="outline" size="md" href="{{ route('editor') }}" icon="design_services">
+                        {{ __('Floor Map Editor') }}
+                    </x-btn>
                 </div>
             </div>
 
-            <!-- Top Metric Stats Cards (3D Soft Neumorphic KPI Grid) -->
+            <!-- Top Metric Stats Cards -->
             <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-bottom: 24px;">
                 <!-- Total Rooms -->
                 <div class="kpi-card" style="padding: 16px 18px;">
                     <div class="kpi-info">
                         <div class="kpi-title">{{ __('Total Configured Rooms') }}</div>
-                        <div class="kpi-value" style="color: var(--brand-forest);">{{ $rooms->count() }}</div>
-                        <div class="kpi-sub" style="font-size: 11px; color: var(--text-secondary);">
-                            <span>🏢</span> {{ __('Across all office branches') }}
+                        <div class="kpi-value" style="color: var(--nx-palm-900);">{{ $rooms->count() }}</div>
+                        <div class="kpi-sub" style="font-size: 11px; color: var(--nx-text-secondary); display: flex; align-items: center; gap: 4px;">
+                            <span class="material-symbols-rounded" style="font-size: 14px;">domain</span>
+                            <span>{{ __('Across all office branches') }}</span>
                         </div>
                     </div>
-                    <div class="icon-box-3d" style="width: 44px; height: 44px; font-size: 20px;">🚪</div>
+                    <div class="icon-box-3d" style="width: 44px; height: 44px; font-size: 20px;">
+                        <span class="material-symbols-rounded">meeting_room</span>
+                    </div>
                 </div>
 
                 <!-- Active Branches -->
                 <div class="kpi-card" style="padding: 16px 18px;">
                     <div class="kpi-info">
                         <div class="kpi-title">{{ __('Workplace Branches') }}</div>
-                        <div class="kpi-value" style="color: #3B82F6;">{{ $offices->count() }}</div>
-                        <div class="kpi-sub" style="font-size: 11px; color: var(--text-secondary);">
-                            <span>🏛️</span> {{ __('Physical & virtual locations') }}
+                        <div class="kpi-value" style="color: var(--nx-palm-700);">{{ $offices->count() }}</div>
+                        <div class="kpi-sub" style="font-size: 11px; color: var(--nx-text-secondary); display: flex; align-items: center; gap: 4px;">
+                            <span class="material-symbols-rounded" style="font-size: 14px;">corporate_fare</span>
+                            <span>{{ __('Physical & virtual locations') }}</span>
                         </div>
                     </div>
-                    <div class="icon-box-3d" style="width: 44px; height: 44px; font-size: 20px; background: linear-gradient(145deg, #3B82F6, #1D4ED8); border-color: #1E40AF;">🏢</div>
+                    <div class="icon-box-3d" style="width: 44px; height: 44px; font-size: 20px;">
+                        <span class="material-symbols-rounded">corporate_fare</span>
+                    </div>
                 </div>
 
                 <!-- Seating Capacity -->
                 <div class="kpi-card" style="padding: 16px 18px;">
                     <div class="kpi-info">
                         <div class="kpi-title">{{ __('Total Seating Capacity') }}</div>
-                        <div class="kpi-value" style="color: #10B981;">{{ $rooms->sum('capacity') }}</div>
-                        <div class="kpi-sub" style="font-size: 11px; color: var(--text-secondary);">
-                            <span>👥</span> {{ __('Simultaneous room seats') }}
+                        <div class="kpi-value" style="color: var(--nx-status-live);">{{ $rooms->sum('capacity') }}</div>
+                        <div class="kpi-sub" style="font-size: 11px; color: var(--nx-text-secondary); display: flex; align-items: center; gap: 4px;">
+                            <span class="material-symbols-rounded" style="font-size: 14px;">chair</span>
+                            <span>{{ __('Simultaneous room seats') }}</span>
                         </div>
                     </div>
-                    <div class="icon-box-3d" style="width: 44px; height: 44px; font-size: 20px; background: linear-gradient(145deg, #10B981, #047857); border-color: #065F46;">🪑</div>
+                    <div class="icon-box-3d" style="width: 44px; height: 44px; font-size: 20px;">
+                        <span class="material-symbols-rounded">chair</span>
+                    </div>
                 </div>
 
                 <!-- Public / Open Rooms -->
                 <div class="kpi-card" style="padding: 16px 18px;">
                     <div class="kpi-info">
                         <div class="kpi-title">{{ __('Open Access Rooms') }}</div>
-                        <div class="kpi-value" style="color: #4F9B5F;">{{ $rooms->where('access_mode', '!=', 'private')->count() }}</div>
-                        <div class="kpi-sub" style="font-size: 11px; color: #4F9B5F;">
-                            <span>🔓</span> {{ __('Public & walk-in spaces') }}
+                        <div class="kpi-value" style="color: var(--nx-status-live);">{{ $rooms->where('access_mode', '!=', 'private')->count() }}</div>
+                        <div class="kpi-sub" style="font-size: 11px; color: var(--nx-status-live); display: flex; align-items: center; gap: 4px;">
+                            <span class="material-symbols-rounded" style="font-size: 14px;">lock_open</span>
+                            <span>{{ __('Public & walk-in spaces') }}</span>
                         </div>
                     </div>
-                    <div class="icon-box-3d" style="width: 44px; height: 44px; font-size: 20px; background: linear-gradient(145deg, #4F9B5F, #2E6F3D); border-color: #245C3A;">🔓</div>
+                    <div class="icon-box-3d" style="width: 44px; height: 44px; font-size: 20px;">
+                        <span class="material-symbols-rounded">lock_open</span>
+                    </div>
                 </div>
 
                 <!-- Private / Locked Rooms -->
                 <div class="kpi-card" style="padding: 16px 18px;">
                     <div class="kpi-info">
                         <div class="kpi-title">{{ __('Private & Locked') }}</div>
-                        <div class="kpi-value" style="color: #D6A23A;">{{ $rooms->where('access_mode', 'private')->count() }}</div>
-                        <div class="kpi-sub" style="font-size: 11px; color: #D6A23A;">
-                            <span>🔒</span> {{ __('Knock-to-enter access') }}
+                        <div class="kpi-value" style="color: var(--nx-gold-600);">{{ $rooms->where('access_mode', 'private')->count() }}</div>
+                        <div class="kpi-sub" style="font-size: 11px; color: var(--nx-gold-600); display: flex; align-items: center; gap: 4px;">
+                            <span class="material-symbols-rounded" style="font-size: 14px;">lock</span>
+                            <span>{{ __('Knock-to-enter access') }}</span>
                         </div>
                     </div>
-                    <div class="icon-box-3d" style="width: 44px; height: 44px; font-size: 20px; background: linear-gradient(145deg, #D6A23A, #B45309); border-color: #92400E;">🔒</div>
+                    <div class="icon-box-3d" style="width: 44px; height: 44px; font-size: 20px;">
+                        <span class="material-symbols-rounded">lock</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Smart Office / Branch Navigation Tabs & Filter Ribbon -->
-            <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-xl); padding: 14px 18px; margin-bottom: 20px; box-shadow: var(--shadow-card);">
+            <div style="background: var(--nx-bg-surface); border: 1px solid var(--nx-border-subtle); border-radius: var(--nx-radius-xl); padding: 14px 18px; margin-bottom: 20px; box-shadow: var(--nx-shadow-sm);">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px;">
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 13px; font-weight: 800; color: var(--text-secondary);">🏢 {{ __('Filter by Office Branch:') }}</span>
+                        <span style="font-size: 13px; font-weight: 700; color: var(--nx-text-secondary); display: flex; align-items: center; gap: 6px;">
+                            <span class="material-symbols-rounded" style="font-size: 18px; color: var(--nx-accent);">domain</span>
+                            <span>{{ __('Filter by Office Branch:') }}</span>
+                        </span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 12px; color: var(--text-muted);">{{ __('Showing:') }}</span>
-                        <span id="rooms-visible-count-badge" class="nav-badge-pill" style="font-weight: 900; background: var(--bg-surface-subtle); color: var(--brand-forest);">
+                        <span style="font-size: 12px; color: var(--nx-text-muted);">{{ __('Showing:') }}</span>
+                        <span id="rooms-visible-count-badge" class="nav-badge-pill" style="font-weight: 700; background: var(--nx-sand-200); color: var(--nx-palm-900); font-family: 'IBM Plex Mono', monospace;">
                             {{ $rooms->count() }} {{ __('Rooms') }}
                         </span>
                     </div>
@@ -103,24 +122,26 @@
 
                 <!-- Branch Filter Pills -->
                 <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-                    <button type="button" onclick="filterRoomsByBranch('all')" id="branch-pill-all" class="tactile-btn branch-filter-pill active" style="padding: 7px 14px; font-size: 12px; border-radius: 20px; border: 1px solid var(--brand-forest); background: var(--brand-forest); color: white;">
-                        <span>🏢</span> {{ __('All Offices & Branches') }}
-                        <span class="nav-badge-pill" style="background: rgba(255, 255, 255, 0.25); color: white; border-color: transparent; margin-inline-start: 4px;">{{ $rooms->count() }}</span>
+                    <button type="button" onclick="filterRoomsByBranch('all')" id="branch-pill-all" class="tactile-btn branch-filter-pill active" style="padding: 7px 14px; font-size: 12px; border-radius: 20px; border: 1px solid var(--nx-palm-900); background: var(--nx-palm-900); color: white; display: inline-flex; align-items: center; gap: 6px;">
+                        <span class="material-symbols-rounded" style="font-size: 15px;">domain</span>
+                        <span>{{ __('All Offices & Branches') }}</span>
+                        <span class="nav-badge-pill" style="background: rgba(255, 255, 255, 0.25); color: white; border-color: transparent; margin-inline-start: 4px; font-family: 'IBM Plex Mono', monospace;">{{ $rooms->count() }}</span>
                     </button>
 
                     @foreach($offices as $off)
                         @php
                             $offRoomCount = $off->rooms->count();
                         @endphp
-                        <button type="button" onclick="filterRoomsByBranch('{{ $off->id }}')" id="branch-pill-{{ $off->id }}" class="tactile-btn branch-filter-pill" style="padding: 7px 14px; font-size: 12px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--bg-surface-subtle); color: var(--text-primary);">
-                            <span>🏛️</span> {{ $off->name }}
+                        <button type="button" onclick="filterRoomsByBranch('{{ $off->id }}')" id="branch-pill-{{ $off->id }}" class="tactile-btn branch-filter-pill" style="padding: 7px 14px; font-size: 12px; border-radius: 20px; border: 1px solid var(--nx-border-subtle); background: var(--nx-bg-surface); color: var(--nx-text-primary); display: inline-flex; align-items: center; gap: 6px;">
+                            <span class="material-symbols-rounded" style="font-size: 15px; color: var(--nx-accent);">corporate_fare</span>
+                            <span>{{ $off->name }}</span>
                             @if($off->city_location)
                                 <span style="font-size: 10px; opacity: 0.75;">({{ $off->city_location }})</span>
                             @endif
                             @if($off->is_default)
-                                <span title="{{ __('Primary Office') }}" style="color: #D6A23A;">⭐</span>
+                                <span class="material-symbols-rounded" title="{{ __('Primary Office') }}" style="font-size: 14px; color: var(--nx-gold-400);">star</span>
                             @endif
-                            <span class="nav-badge-pill" style="margin-inline-start: 4px;">{{ $offRoomCount }}</span>
+                            <span class="nav-badge-pill" style="margin-inline-start: 4px; font-family: 'IBM Plex Mono', monospace;">{{ $offRoomCount }}</span>
                         </button>
                     @endforeach
                 </div>
@@ -130,29 +151,31 @@
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 24px;">
                 <!-- Search Input -->
                 <div style="flex: 1; max-width: 440px; min-width: 260px; position: relative;">
-                    <span style="position: absolute; inset-inline-start: 14px; top: 50%; transform: translateY(-50%); font-size: 14px; color: var(--text-muted); pointer-events: none;">🔍</span>
-                    <input type="text" id="rooms-search-input" oninput="searchAndFilterRooms()" placeholder="{{ __('Search room name, office, type, or map...') }}" style="width: 100%; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-full); padding: 10px 16px; padding-inline-start: 38px; color: var(--text-primary); font-size: 13px; font-weight: 600; outline: none; box-shadow: var(--shadow-inset-3d);">
+                    <span class="material-symbols-rounded" style="position: absolute; inset-inline-start: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--nx-text-muted); pointer-events: none;">search</span>
+                    <input type="text" id="rooms-search-input" oninput="searchAndFilterRooms()" placeholder="{{ __('Search room name, office, type, or map...') }}" style="width: 100%; background: var(--nx-bg-surface); border: 1px solid var(--nx-border-subtle); border-radius: 9999px; padding: 10px 16px; padding-inline-start: 40px; color: var(--nx-text-primary); font-size: 13px; font-weight: 500; outline: none; box-shadow: var(--nx-shadow-sm);">
                 </div>
 
                 <!-- Type Selector & View Toggle Buttons -->
                 <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                     <!-- Room Type Selector -->
-                    <select id="rooms-type-filter" onchange="searchAndFilterRooms()" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 9px 14px; color: var(--text-primary); font-size: 12px; font-weight: 700; outline: none; box-shadow: var(--shadow-soft-3d);">
-                        <option value="all">🏷️ {{ __('All Room Types') }}</option>
-                        <option value="office">💼 {{ __('Private Offices') }}</option>
-                        <option value="meeting">👥 {{ __('Conference & Meeting') }}</option>
-                        <option value="lounge">☕ {{ __('Lounge & Breakout') }}</option>
-                        <option value="auditorium">🎭 {{ __('Auditorium / Stage') }}</option>
-                        <option value="brainstorming">🧠 {{ __('Brainstorming') }}</option>
+                    <select id="rooms-type-filter" onchange="searchAndFilterRooms()" style="background: var(--nx-bg-surface); border: 1px solid var(--nx-border-subtle); border-radius: var(--nx-radius-md); padding: 9px 14px; color: var(--nx-text-primary); font-size: 12px; font-weight: 600; outline: none; box-shadow: var(--nx-shadow-sm);">
+                        <option value="all">{{ __('All Room Types') }}</option>
+                        <option value="office">{{ __('Private Offices') }}</option>
+                        <option value="meeting">{{ __('Conference & Meeting') }}</option>
+                        <option value="lounge">{{ __('Lounge & Breakout') }}</option>
+                        <option value="auditorium">{{ __('Auditorium / Stage') }}</option>
+                        <option value="brainstorming">{{ __('Brainstorming') }}</option>
                     </select>
 
                     <!-- View Switcher (Cards vs Table) -->
-                    <div style="display: flex; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 3px; box-shadow: var(--shadow-soft-3d);">
-                        <button type="button" onclick="switchRoomsViewMode('cards')" id="rooms-view-cards-btn" class="tactile-btn" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; background: var(--brand-forest); color: white; border: none;" title="{{ __('Visual Spatial Cards Grid') }}">
-                            <span>🎴</span> {{ __('Cards Grid') }}
+                    <div style="display: flex; background: var(--nx-bg-surface); border: 1px solid var(--nx-border-subtle); border-radius: var(--nx-radius-md); padding: 3px; box-shadow: var(--nx-shadow-sm);">
+                        <button type="button" onclick="switchRoomsViewMode('cards')" id="rooms-view-cards-btn" class="tactile-btn" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; background: var(--nx-palm-900); color: white; border: none; display: inline-flex; align-items: center; gap: 4px;" title="{{ __('Visual Spatial Cards Grid') }}">
+                            <span class="material-symbols-rounded" style="font-size: 15px;">view_module</span>
+                            <span>{{ __('Cards Grid') }}</span>
                         </button>
-                        <button type="button" onclick="switchRoomsViewMode('table')" id="rooms-view-table-btn" class="tactile-btn" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; background: transparent; color: var(--text-secondary); border: none; box-shadow: none;" title="{{ __('Detailed Data Table') }}">
-                            <span>📋</span> {{ __('Data Table') }}
+                        <button type="button" onclick="switchRoomsViewMode('table')" id="rooms-view-table-btn" class="tactile-btn" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; background: transparent; color: var(--nx-text-secondary); border: none; box-shadow: none; display: inline-flex; align-items: center; gap: 4px;" title="{{ __('Detailed Data Table') }}">
+                            <span class="material-symbols-rounded" style="font-size: 15px;">table_rows</span>
+                            <span>{{ __('Data Table') }}</span>
                         </button>
                     </div>
                 </div>
@@ -166,37 +189,46 @@
                         $publishedMap = $off->activeMap ?: $off->maps->first();
                     @endphp
 
-                    <div class="office-branch-section" id="office-branch-section-{{ $off->id }}" data-office-id="{{ $off->id }}" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow-card); transition: all 0.25s ease;">
+                    <div class="office-branch-section" id="office-branch-section-{{ $off->id }}" data-office-id="{{ $off->id }}" style="background: var(--nx-bg-surface); border: 1px solid var(--nx-border-subtle); border-radius: var(--nx-radius-xl); overflow: hidden; box-shadow: var(--nx-shadow-sm); transition: all 0.25s ease;">
                         
                         <!-- Office Branch Distinct Header Banner -->
-                        <div style="padding: 18px 24px; background: var(--bg-surface-subtle); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                        <div style="padding: 18px 24px; background: var(--nx-sand-200); border-bottom: 1px solid var(--nx-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
                             <div style="display: flex; align-items: center; gap: 14px; min-width: 0;">
-                                <div class="icon-box-3d" style="width: 46px; height: 46px; border-radius: 14px; font-size: 22px; flex-shrink: 0; background: linear-gradient(145deg, #245C3A 0%, #153B23 100%);">
-                                    🏛️
+                                <div class="icon-box-3d" style="width: 46px; height: 46px; border-radius: 14px; font-size: 22px; flex-shrink: 0; background: var(--nx-palm-900);">
+                                    <span class="material-symbols-rounded" style="color: white; font-size: 24px;">corporate_fare</span>
                                 </div>
                                 <div>
                                     <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px;">
-                                        <h2 style="font-size: 17px; font-weight: 900; color: var(--text-primary); margin: 0;">
+                                        <h2 style="font-size: 17px; font-weight: 800; color: var(--nx-text-primary); margin: 0;">
                                             {{ $off->name }}
                                         </h2>
                                         @if($off->city_location)
-                                            <span class="nav-badge-pill" style="font-size: 11px; background: rgba(59, 130, 246, 0.12); color: #3B82F6; border-color: rgba(59, 130, 246, 0.3);">
-                                                📍 {{ $off->city_location }}
+                                            <span class="nav-badge-pill" style="font-size: 11px; display: inline-flex; align-items: center; gap: 3px;">
+                                                <span class="material-symbols-rounded" style="font-size: 13px;">location_on</span>
+                                                <span>{{ $off->city_location }}</span>
                                             </span>
                                         @endif
                                         @if($off->is_default)
-                                            <span class="nav-badge-pill" style="font-size: 11px; background: rgba(214, 162, 58, 0.15); color: #D6A23A; border-color: rgba(214, 162, 58, 0.35);">
-                                                ⭐ {{ __('Primary Headquarters') }}
+                                            <span class="nav-badge-pill" style="font-size: 11px; background: rgba(211, 165, 83, 0.15); color: var(--nx-gold-600); border-color: rgba(211, 165, 83, 0.35); display: inline-flex; align-items: center; gap: 3px;">
+                                                <span class="material-symbols-rounded" style="font-size: 13px; color: var(--nx-gold-400);">star</span>
+                                                <span>{{ __('Primary Headquarters') }}</span>
                                             </span>
                                         @endif
-                                        <span class="nav-badge-pill" style="font-size: 11px;">
-                                            🚪 {{ $branchRooms->count() }} {{ __('Rooms Configured') }}
+                                        <span class="nav-badge-pill" style="font-size: 11px; display: inline-flex; align-items: center; gap: 4px;">
+                                            <span class="material-symbols-rounded" style="font-size: 13px;">meeting_room</span>
+                                            <span>{{ $branchRooms->count() }} {{ __('Rooms Configured') }}</span>
                                         </span>
                                     </div>
-                                    <div style="font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                                        <span>🗺️ {{ __('Active Map Blueprint:') }} <strong style="color: var(--text-primary);">{{ $publishedMap?->name ?? __('Standard Layout') }}</strong></span>
+                                    <div style="font-size: 12px; color: var(--nx-text-muted); display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                                        <span style="display: inline-flex; align-items: center; gap: 4px;">
+                                            <span class="material-symbols-rounded" style="font-size: 14px;">map</span>
+                                            <span>{{ __('Active Map Blueprint:') }} <strong style="color: var(--nx-text-primary);">{{ $publishedMap?->name ?? __('Standard Layout') }}</strong></span>
+                                        </span>
                                         @if($publishedMap)
-                                            <span>📐 {{ $publishedMap->width }}x{{ $publishedMap->height }} tiles ({{ $publishedMap->tile_size }}px)</span>
+                                            <span style="display: inline-flex; align-items: center; gap: 4px; font-family: 'IBM Plex Mono', monospace;">
+                                                <span class="material-symbols-rounded" style="font-size: 14px;">square_foot</span>
+                                                <span>{{ $publishedMap->width }}x{{ $publishedMap->height }} tiles ({{ $publishedMap->tile_size }}px)</span>
+                                            </span>
                                         @endif
                                     </div>
                                 </div>
@@ -204,12 +236,12 @@
 
                             <!-- Branch Fast Actions -->
                             <div style="display: flex; gap: 8px; align-items: center;">
-                                <a href="{{ route('office', ['office_id' => $off->id]) }}" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px; text-decoration: none;">
-                                    <span>🚀</span> {{ __('Enter This Office') }}
-                                </a>
-                                <a href="{{ route('editor') }}" class="tactile-btn btn-secondary" style="padding: 8px 14px; font-size: 12px; text-decoration: none;">
-                                    <span>🎨</span> {{ __('Edit Blueprint') }}
-                                </a>
+                                <x-btn variant="primary" size="sm" href="{{ route('office', ['office_id' => $off->id]) }}" icon="login">
+                                    {{ __('Enter This Office') }}
+                                </x-btn>
+                                <x-btn variant="secondary" size="sm" href="{{ route('editor') }}" icon="design_services">
+                                    {{ __('Edit Blueprint') }}
+                                </x-btn>
                             </div>
                         </div>
 
@@ -219,7 +251,7 @@
                                 <div class="rooms-grid-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
                                     @foreach($branchRooms as $r)
                                         @php
-                                            $roomColor = $r->color ?: '#245C3A';
+                                            $roomColor = $r->color ?: '#142B24';
                                             $bounds = $r->bounds ?? ['x' => 0, 'y' => 0, 'width' => 10, 'height' => 10];
                                             $bx = $bounds['x'] ?? 0;
                                             $by = $bounds['y'] ?? 0;
@@ -228,24 +260,24 @@
 
                                             // Icon & Type determination
                                             $rType = strtolower($r->type ?? 'meeting');
-                                            $typeIcon = '👥';
+                                            $typeIcon = 'group';
                                             $typeLabel = __('Conference / Meeting');
                                             if (str_contains($rType, 'office') || str_contains(strtolower($r->name), 'مكتب')) {
-                                                $typeIcon = '💼';
+                                                $typeIcon = 'work';
                                                 $typeLabel = __('Private Office');
                                             } elseif (str_contains($rType, 'lounge') || str_contains(strtolower($r->name), 'استراحة')) {
-                                                $typeIcon = '☕';
+                                                $typeIcon = 'local_cafe';
                                                 $typeLabel = __('Lounge & Breakout');
                                             } elseif (str_contains($rType, 'auditorium') || str_contains(strtolower($r->name), 'مسرح') || str_contains(strtolower($r->name), 'قاعة')) {
-                                                $typeIcon = '🎭';
+                                                $typeIcon = 'theater_comedy';
                                                 $typeLabel = __('Auditorium / Hall');
                                             } elseif (str_contains($rType, 'brainstorm') || str_contains(strtolower($r->name), 'عصف')) {
-                                                $typeIcon = '🧠';
+                                                $typeIcon = 'psychology';
                                                 $typeLabel = __('Ideation Space');
                                             }
                                         @endphp
 
-                                        <div class="room-spatial-card" data-room-id="{{ $r->id }}" data-room-name="{{ strtolower($r->name) }}" data-office-name="{{ strtolower($off->name) }}" data-room-type="{{ $rType }}" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px; position: relative; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow-soft-3d);">
+                                        <div class="room-spatial-card" data-room-id="{{ $r->id }}" data-room-name="{{ strtolower($r->name) }}" data-office-name="{{ strtolower($off->name) }}" data-room-type="{{ $rType }}" style="background: var(--nx-bg-surface); border: 1px solid var(--nx-border-subtle); border-radius: var(--nx-radius-lg); padding: 18px; position: relative; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--nx-shadow-sm);">
                                             
                                             <!-- Color Accent Top Strip -->
                                             <div style="position: absolute; top: 0; inset-inline-start: 18px; inset-inline-end: 18px; height: 3px; border-radius: 0 0 4px 4px; background: {{ $roomColor }}; opacity: 0.85;"></div>
@@ -254,44 +286,58 @@
                                                 <!-- Card Top Row: Room Type Badge & Door Lock Status -->
                                                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; margin-top: 4px;">
                                                     <div style="display: flex; align-items: center; gap: 8px;">
-                                                        <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(36, 92, 58, 0.12); border: 1px solid rgba(36, 92, 58, 0.25); display: flex; align-items: center; justify-content: center; font-size: 18px;">
-                                                            {{ $typeIcon }}
+                                                        <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(20, 43, 36, 0.08); border: 1px solid var(--nx-border-subtle); display: flex; align-items: center; justify-content: center; color: var(--nx-accent);">
+                                                            <span class="material-symbols-rounded" style="font-size: 20px;">{{ $typeIcon }}</span>
                                                         </div>
                                                         <div>
-                                                            <h3 style="font-size: 15px; font-weight: 900; color: var(--text-primary); margin: 0; line-height: 1.2;">
+                                                            <h3 style="font-size: 15px; font-weight: 700; color: var(--nx-text-primary); margin: 0; line-height: 1.2;">
                                                                 {{ $r->name }}
                                                             </h3>
-                                                            <span style="font-size: 11px; color: var(--text-muted); font-weight: 600;">{{ $typeLabel }}</span>
+                                                            <span style="font-size: 11px; color: var(--nx-text-muted); font-weight: 500;">{{ $typeLabel }}</span>
                                                         </div>
                                                     </div>
 
                                                     <!-- Door Status Pill -->
-                                                    <span class="nav-badge-pill" style="font-size: 10px; {{ $r->access_mode === 'private' ? 'background: rgba(214, 162, 58, 0.15); color: #D6A23A; border-color: rgba(214, 162, 58, 0.3);' : 'background: rgba(79, 155, 95, 0.15); color: #4F9B5F; border-color: rgba(79, 155, 95, 0.3);' }}">
-                                                        {{ $r->access_mode === 'private' ? '🔒 ' . __('Locked / Private') : '🔓 ' . __('Open') }}
-                                                    </span>
+                                                    @if($r->access_mode === 'private')
+                                                        <x-badge variant="scheduled" icon="lock">{{ __('Locked / Private') }}</x-badge>
+                                                    @else
+                                                        <x-badge variant="live" icon="lock_open">{{ __('Open') }}</x-badge>
+                                                    @endif
                                                 </div>
 
                                                 <!-- Room Spatial Details Specs (Attribution to Office & Map) -->
-                                                <div style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
+                                                <div style="background: var(--nx-sand-100); border: 1px solid var(--nx-border-subtle); border-radius: 12px; padding: 12px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px; font-size: 12px;">
                                                     <!-- Office Location Attribution -->
                                                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                                                        <span style="color: var(--text-muted); font-size: 11px;">🏛️ {{ __('Office Branch:') }}</span>
-                                                        <strong style="color: var(--brand-forest); font-weight: 800;">{{ $off->name }}</strong>
+                                                        <span style="color: var(--nx-text-muted); font-size: 11px; display: flex; align-items: center; gap: 4px;">
+                                                            <span class="material-symbols-rounded" style="font-size: 13px;">corporate_fare</span>
+                                                            <span>{{ __('Office Branch:') }}</span>
+                                                        </span>
+                                                        <strong style="color: var(--nx-palm-900); font-weight: 700;">{{ $off->name }}</strong>
                                                     </div>
                                                     <!-- Map Blueprint Name -->
                                                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                                                        <span style="color: var(--text-muted); font-size: 11px;">🗺️ {{ __('Map Floorplan:') }}</span>
-                                                        <span style="color: var(--text-primary); font-weight: 700; font-size: 11px;">{{ $r->map?->name ?? $publishedMap?->name ?? __('Main Floor') }}</span>
+                                                        <span style="color: var(--nx-text-muted); font-size: 11px; display: flex; align-items: center; gap: 4px;">
+                                                            <span class="material-symbols-rounded" style="font-size: 13px;">map</span>
+                                                            <span>{{ __('Map Floorplan:') }}</span>
+                                                        </span>
+                                                        <span style="color: var(--nx-text-primary); font-weight: 600; font-size: 11px;">{{ $r->map?->name ?? $publishedMap?->name ?? __('Main Floor') }}</span>
                                                     </div>
                                                     <!-- Capacity -->
                                                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                                                        <span style="color: var(--text-muted); font-size: 11px;">👥 {{ __('Capacity:') }}</span>
-                                                        <span style="font-weight: 800; color: var(--text-primary); font-family: monospace;">{{ $r->capacity }} {{ __('Seats') }}</span>
+                                                        <span style="color: var(--nx-text-muted); font-size: 11px; display: flex; align-items: center; gap: 4px;">
+                                                            <span class="material-symbols-rounded" style="font-size: 13px;">chair</span>
+                                                            <span>{{ __('Capacity:') }}</span>
+                                                        </span>
+                                                        <span style="font-weight: 700; color: var(--nx-text-primary); font-family: 'IBM Plex Mono', monospace;">{{ $r->capacity }} {{ __('Seats') }}</span>
                                                     </div>
                                                     <!-- Spatial Bounds & Location -->
                                                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                                                        <span style="color: var(--text-muted); font-size: 11px;">📍 {{ __('Floor Coordinates:') }}</span>
-                                                        <code style="background: var(--bg-surface-subtle); padding: 2px 6px; border-radius: 4px; font-size: 10px; color: var(--text-secondary); border: 1px solid var(--border-color);">
+                                                        <span style="color: var(--nx-text-muted); font-size: 11px; display: flex; align-items: center; gap: 4px;">
+                                                            <span class="material-symbols-rounded" style="font-size: 13px;">location_on</span>
+                                                            <span>{{ __('Floor Coordinates:') }}</span>
+                                                        </span>
+                                                        <code style="background: var(--nx-sand-200); padding: 2px 6px; border-radius: 4px; font-size: 10px; color: var(--nx-text-secondary); border: 1px solid var(--nx-border-subtle); font-family: 'IBM Plex Mono', monospace;">
                                                             X:{{ $bx }}, Y:{{ $by }} ({{ $bw }}x{{ $bh }})
                                                         </code>
                                                     </div>
@@ -299,15 +345,16 @@
                                             </div>
 
                                             <!-- Card Quick Actions Footer -->
-                                            <div style="display: flex; gap: 6px; align-items: center; border-top: 1px dashed var(--border-color); padding-top: 12px;">
-                                                <a href="{{ route('office', ['office_id' => $off->id, 'room_id' => $r->id]) }}" class="tactile-btn btn-primary" style="flex: 1; padding: 7px 10px; font-size: 11px; text-decoration: none; justify-content: center;">
-                                                    <span>🚀</span> {{ __('Enter Room') }}
-                                                </a>
-                                                <button type="button" onclick="openRoomGuestModal('{{ $r->id }}', '{{ addslashes($r->name) }}')" class="tactile-btn btn-secondary" style="padding: 7px 10px; font-size: 11px;" title="{{ __('Generate Guest Link for this room') }}">
-                                                    <span>🔗</span> {{ __('Guest Link') }}
+                                            <div style="display: flex; gap: 6px; align-items: center; border-top: 1px dashed var(--nx-border-subtle); padding-top: 12px;">
+                                                <x-btn variant="primary" size="sm" href="{{ route('office', ['office_id' => $off->id, 'room_id' => $r->id]) }}" icon="login" style="flex: 1; justify-content: center;">
+                                                    {{ __('Enter Room') }}
+                                                </x-btn>
+                                                <button type="button" onclick="openRoomGuestModal('{{ $r->id }}', '{{ addslashes($r->name) }}')" class="nx-btn nx-btn-secondary nx-btn-sm" style="padding: 7px 10px; font-size: 11px;" title="{{ __('Generate Guest Link for this room') }}">
+                                                    <span class="material-symbols-rounded" style="font-size: 14px;">link</span>
+                                                    <span>{{ __('Guest Link') }}</span>
                                                 </button>
-                                                <a href="{{ route('editor') }}" class="tactile-btn btn-secondary" style="padding: 7px 10px; font-size: 11px; text-decoration: none;" title="{{ __('Edit in Map Editor') }}">
-                                                    <span>🎨</span>
+                                                <a href="{{ route('editor') }}" class="nx-btn nx-btn-outline nx-btn-sm" style="padding: 7px 10px; font-size: 11px;" title="{{ __('Edit in Map Editor') }}">
+                                                    <span class="material-symbols-rounded" style="font-size: 14px;">design_services</span>
                                                 </a>
                                             </div>
 
@@ -315,13 +362,13 @@
                                     @endforeach
                                 </div>
                             @else
-                                <div style="text-align: center; padding: 36px 20px; color: var(--text-muted); background: var(--bg-surface-subtle); border: 1px dashed var(--border-color); border-radius: 14px;">
-                                    <div style="font-size: 32px; margin-bottom: 8px;">📂</div>
-                                    <h4 style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">{{ __('No rooms created in this office branch yet.') }}</h4>
-                                    <p style="font-size: 12px; margin-bottom: 14px;">{{ __('Use the Floor Map Editor or AI generator to design rooms for') }} {{ $off->name }}.</p>
-                                    <a href="{{ route('editor') }}" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px; text-decoration: none;">
-                                        <span>🎨</span> {{ __('Design Rooms in Editor') }}
-                                    </a>
+                                <div style="text-align: center; padding: 48px 20px; color: var(--nx-text-muted); background: var(--nx-bg-surface); border: 1px dashed var(--nx-border-subtle); border-radius: var(--nx-radius-lg);">
+                                    <span class="material-symbols-rounded" style="font-size: 36px; color: var(--nx-sand-400); display: block; margin-bottom: 8px;">meeting_room</span>
+                                    <h4 style="font-size: 14px; font-weight: 700; color: var(--nx-text-primary); margin-bottom: 4px;">{{ __('No rooms created in this office branch yet.') }}</h4>
+                                    <p style="font-size: 12px; margin-bottom: 14px; color: var(--nx-text-secondary);">{{ __('Use the Floor Map Editor or AI generator to design rooms for') }} {{ $off->name }}.</p>
+                                    <x-btn variant="primary" size="sm" href="{{ route('editor') }}" icon="design_services">
+                                        {{ __('Design Rooms in Editor') }}
+                                    </x-btn>
                                 </div>
                             @endif
                         </div>
@@ -356,42 +403,53 @@
                                                 <tr class="room-table-row" data-room-id="{{ $r->id }}" data-room-name="{{ strtolower($r->name) }}" data-office-name="{{ strtolower($off->name) }}" data-room-type="{{ $rType }}">
                                                     <td>
                                                         <div style="display: flex; align-items: center; gap: 8px;">
-                                                            <div style="width: 10px; height: 10px; border-radius: 50%; background: {{ $r->color ?: '#245C3A' }}; flex-shrink: 0;"></div>
-                                                            <strong style="color: var(--text-primary); font-size: 13px;">🚪 {{ $r->name }}</strong>
+                                                            <div style="width: 10px; height: 10px; border-radius: 50%; background: {{ $r->color ?: '#142B24' }}; flex-shrink: 0;"></div>
+                                                            <strong style="color: var(--nx-text-primary); font-size: 13px; display: inline-flex; align-items: center; gap: 4px;">
+                                                                <span class="material-symbols-rounded" style="font-size: 15px;">meeting_room</span>
+                                                                <span>{{ $r->name }}</span>
+                                                            </strong>
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <strong style="color: var(--brand-forest);">🏛️ {{ $off->name }}</strong>
+                                                        <strong style="color: var(--nx-palm-900); display: inline-flex; align-items: center; gap: 4px;">
+                                                            <span class="material-symbols-rounded" style="font-size: 14px;">corporate_fare</span>
+                                                            <span>{{ $off->name }}</span>
+                                                        </strong>
                                                         @if($off->city_location)
-                                                            <span style="font-size: 11px; color: var(--text-muted);">({{ $off->city_location }})</span>
+                                                            <span style="font-size: 11px; color: var(--nx-text-muted);">({{ $off->city_location }})</span>
                                                         @endif
                                                     </td>
                                                     <td>
-                                                        <span style="font-size: 12px; color: var(--text-secondary);">🗺️ {{ $r->map?->name ?? $publishedMap?->name ?? __('Default Blueprint') }}</span>
+                                                        <span style="font-size: 12px; color: var(--nx-text-secondary); display: inline-flex; align-items: center; gap: 4px;">
+                                                            <span class="material-symbols-rounded" style="font-size: 14px;">map</span>
+                                                            <span>{{ $r->map?->name ?? $publishedMap?->name ?? __('Default Blueprint') }}</span>
+                                                        </span>
                                                     </td>
                                                     <td>
                                                         <span class="nav-badge-pill" style="text-transform: capitalize;">{{ $r->type ?: 'Meeting' }}</span>
                                                     </td>
                                                     <td>
-                                                        <span style="font-weight: 700; font-family: monospace;">{{ $r->capacity }} {{ __('Seats') }}</span>
+                                                        <span style="font-weight: 700; font-family: 'IBM Plex Mono', monospace;">{{ $r->capacity }} {{ __('Seats') }}</span>
                                                     </td>
                                                     <td>
-                                                        <code style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); padding: 3px 8px; border-radius: 6px; font-size: 11px; color: var(--text-secondary);">
+                                                        <code style="background: var(--nx-sand-200); border: 1px solid var(--nx-border-subtle); padding: 3px 8px; border-radius: 6px; font-size: 11px; color: var(--nx-text-secondary); font-family: 'IBM Plex Mono', monospace;">
                                                             X:{{ $bx }}, Y:{{ $by }} ({{ $bw }}x{{ $bh }})
                                                         </code>
                                                     </td>
                                                     <td>
-                                                        <span class="nav-badge-pill" style="{{ $r->access_mode === 'private' ? 'background: rgba(214, 162, 58, 0.15); color: #D6A23A;' : 'background: rgba(79, 155, 95, 0.15); color: #4F9B5F;' }}">
-                                                            {{ $r->access_mode === 'private' ? '🔒 ' . __('Locked') : '🔓 ' . __('Open') }}
-                                                        </span>
+                                                        @if($r->access_mode === 'private')
+                                                            <x-badge variant="scheduled" icon="lock">{{ __('Locked') }}</x-badge>
+                                                        @else
+                                                            <x-badge variant="live" icon="lock_open">{{ __('Open') }}</x-badge>
+                                                        @endif
                                                     </td>
                                                     <td>
                                                         <div style="display: flex; gap: 6px; justify-content: center; align-items: center;">
-                                                            <a href="{{ route('office', ['office_id' => $off->id, 'room_id' => $r->id]) }}" class="tactile-btn btn-primary" style="padding: 6px 12px; font-size: 11px; text-decoration: none;">
-                                                                🚀 {{ __('Enter') }}
-                                                            </a>
-                                                            <button type="button" onclick="openRoomGuestModal('{{ $r->id }}', '{{ addslashes($r->name) }}')" class="tactile-btn btn-secondary" style="padding: 6px 10px; font-size: 11px;" title="{{ __('Generate Guest Link') }}">
-                                                                🔗
+                                                            <x-btn variant="primary" size="sm" href="{{ route('office', ['office_id' => $off->id, 'room_id' => $r->id]) }}" icon="login">
+                                                                {{ __('Enter') }}
+                                                            </x-btn>
+                                                            <button type="button" onclick="openRoomGuestModal('{{ $r->id }}', '{{ addslashes($r->name) }}')" class="nx-btn nx-btn-secondary nx-btn-sm" style="padding: 6px 10px; font-size: 11px;" title="{{ __('Generate Guest Link') }}">
+                                                                <span class="material-symbols-rounded" style="font-size: 14px;">link</span>
                                                             </button>
                                                         </div>
                                                     </td>
@@ -408,15 +466,15 @@
             </div>
 
             <!-- Global No Results Empty State (when search returns 0 matches) -->
-            <div id="rooms-no-results-hint" style="display: none; text-align: center; padding: 60px 20px; background: var(--bg-surface); border: 1px dashed var(--border-color); border-radius: var(--radius-xl); margin-top: 20px;">
-                <div style="font-size: 40px; margin-bottom: 12px;">🔍</div>
-                <h3 style="font-size: 16px; font-weight: 900; color: var(--text-primary); margin-bottom: 6px;">{{ __('No matching workplace rooms found') }}</h3>
-                <p style="font-size: 13px; color: var(--text-secondary); max-width: 400px; margin: 0 auto 16px auto;">
+            <div id="rooms-no-results-hint" style="display: none; text-align: center; padding: 60px 20px; background: var(--nx-bg-surface); border: 1px dashed var(--nx-border-subtle); border-radius: var(--nx-radius-xl); margin-top: 20px;">
+                <span class="material-symbols-rounded" style="font-size: 40px; color: var(--nx-sand-400); display: block; margin-bottom: 12px;">search_off</span>
+                <h3 style="font-size: 16px; font-weight: 800; color: var(--nx-text-primary); margin-bottom: 6px;">{{ __('No matching workplace rooms found') }}</h3>
+                <p style="font-size: 13px; color: var(--nx-text-secondary); max-width: 400px; margin: 0 auto 16px auto;">
                     {{ __('Try adjusting your branch filter, clearing the search query, or selecting another room category.') }}
                 </p>
-                <button type="button" onclick="resetRoomsFilters()" class="tactile-btn btn-primary" style="padding: 9px 18px; font-size: 12px;">
-                    🔄 {{ __('Reset Filters') }}
-                </button>
+                <x-btn variant="primary" size="sm" onclick="resetRoomsFilters()" icon="restart_alt">
+                    {{ __('Reset Filters') }}
+                </x-btn>
             </div>
 
         </div>

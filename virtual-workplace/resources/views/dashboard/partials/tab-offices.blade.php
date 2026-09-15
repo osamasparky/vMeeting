@@ -1,104 +1,119 @@
-        <div id="tab-offices" class="tab-view">
-            <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
-                <div>
-                    <h1 class="page-title" style="font-size: 22px; font-weight: 900; color: var(--text-primary); margin-bottom: 4px;">🏢 {{ __('Offices & Virtual Branches') }}</h1>
-                    <p class="page-subtitle" style="font-size: 13px; color: var(--text-secondary);">{{ __('Manage multiple branches (e.g. Cairo Branch, Riyadh HQ, Dubai Hub), their blueprints, and member access permissions.') }}</p>
-                </div>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    @if(!$organization->hasReachedOfficeLimit())
-                    <button onclick="openNewOfficeModal()" class="tactile-btn btn-primary" style="padding: 10px 18px; font-size: 13px;">
-                        <span>➕</span> {{ __('Add Office Branch') }}
-                    </button>
-                    @else
-                    <button onclick="switchAdminTab('billing')" class="tactile-btn" style="padding: 10px 18px; font-size: 13px; background: linear-gradient(180deg, #D6A23A 0%, #B4831B 100%); color: white; border: 1px solid #996D12;">
-                        <span>👑</span> {{ __('Upgrade Plan for More Offices') }}
-                    </button>
-                    @endif
-                </div>
+<div id="tab-offices" class="tab-view">
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--nx-spacing-6); flex-wrap: wrap; gap: var(--nx-spacing-4);">
+        <div>
+            <h1 class="page-title" style="font-size: var(--nx-font-size-2xl); font-weight: var(--nx-font-weight-black); color: var(--nx-text-primary); margin-bottom: var(--nx-spacing-1); display: flex; align-items: center; gap: var(--nx-spacing-2);">
+                <span class="material-symbols-rounded" style="font-size: 28px; color: var(--nx-primary-500);">apartment</span>
+                <span>{{ __('Offices & Virtual Branches') }}</span>
+            </h1>
+            <p class="page-subtitle" style="font-size: var(--nx-font-size-sm); color: var(--nx-text-secondary);">{{ __('Manage multiple branches (e.g. Cairo Branch, Riyadh HQ, Dubai Hub), their blueprints, and member access permissions.') }}</p>
+        </div>
+        <div style="display: flex; gap: var(--nx-spacing-3); align-items: center;">
+            @if(!$organization->hasReachedOfficeLimit())
+            <button onclick="openNewOfficeModal()" class="tactile-btn btn-primary" style="padding: 10px 18px; font-size: var(--nx-font-size-sm); display: inline-flex; align-items: center; gap: var(--nx-spacing-2);">
+                <span class="material-symbols-rounded" style="font-size: 18px;">add</span>
+                <span>{{ __('Add Office Branch') }}</span>
+            </button>
+            @else
+            <button onclick="switchAdminTab('billing')" class="tactile-btn" style="padding: 10px 18px; font-size: var(--nx-font-size-sm); background: linear-gradient(180deg, #D6A23A 0%, #B4831B 100%); color: white; border: 1px solid #996D12; display: inline-flex; align-items: center; gap: var(--nx-spacing-2);">
+                <span class="material-symbols-rounded" style="font-size: 18px;">workspace_premium</span>
+                <span>{{ __('Upgrade Plan for More Offices') }}</span>
+            </button>
+            @endif
+        </div>
+    </div>
+
+    <!-- Quota Indicator Banner -->
+    <div style="background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: var(--nx-radius-lg); padding: var(--nx-spacing-4) var(--nx-spacing-5); display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--nx-spacing-6); flex-wrap: wrap; gap: var(--nx-spacing-3); box-shadow: var(--nx-shadow-sm);">
+        <div style="display: flex; align-items: center; gap: var(--nx-spacing-3);">
+            <div style="width: 36px; height: 36px; border-radius: var(--nx-radius-md); background: var(--nx-primary-surface); color: var(--nx-primary-500); display: flex; align-items: center; justify-content: center;">
+                <span class="material-symbols-rounded" style="font-size: 20px;">diamond</span>
             </div>
-
-            <!-- Quota Indicator Banner -->
-            <div style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 20px;">💎</span>
-                    <div>
-                        <strong style="color: var(--text-primary); font-size: 13px;">{{ __('Offices Quota:') }} {{ $offices->count() }} / {{ $organization->plan?->isUnlimitedOffices() ? __('Unlimited') : ($organization->plan?->max_offices ?? 1) }}</strong>
-                        <div style="font-size: 11px; color: var(--text-secondary);">{{ __('Your organization is subscribed to :plan plan.', ['plan' => $organization->plan?->name ?? 'Default']) }}</div>
-                    </div>
-                </div>
-                <span class="badge-status" style="background: rgba(36, 92, 58, 0.12); color: var(--brand-forest); font-weight: 800; font-size: 12px;">
-                    {{ $offices->count() }} {{ __('Active Branches') }}
-                </span>
-            </div>
-
-            <!-- Offices Grid -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px;">
-                @forelse($offices as $off)
-                <div class="card" style="border-radius: var(--radius-xl); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--border-color); box-shadow: var(--shadow-card); transition: all 0.25s ease;">
-                    <div>
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <div style="width: 44px; height: 44px; border-radius: 14px; background: var(--accent-gradient); color: white; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: var(--shadow-soft-3d);">
-                                    🏢
-                                </div>
-                                <div>
-                                    <h3 style="font-size: 16px; font-weight: 900; color: var(--text-primary); margin: 0 0 2px 0;">{{ $off->name }}</h3>
-                                    <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">
-                                        📍 {{ $off->city_location ?: __('Primary Location') }}
-                                    </span>
-                                </div>
-                            </div>
-                            @if($off->is_default)
-                                <span class="badge-status" style="background: rgba(79, 155, 95, 0.15); color: #2E6B40; font-size: 11px; font-weight: 900;">
-                                    ⭐ {{ __('Main HQ') }}
-                                </span>
-                            @endif
-                        </div>
-
-                        @if($off->description)
-                            <p style="font-size: 12px; color: var(--text-secondary); margin: 0 0 16px 0; line-height: 1.5;">
-                                {{ $off->description }}
-                            </p>
-                        @endif
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; padding: 12px; background: var(--bg-surface-subtle); border-radius: 12px; border: 1px solid var(--border-color);">
-                            <div>
-                                <span style="font-size: 11px; color: var(--text-muted);">{{ __('Configured Rooms') }}</span>
-                                <div style="font-size: 15px; font-weight: 900; color: var(--text-primary); margin-top: 2px;">
-                                    🚪 {{ $off->rooms->count() }}
-                                </div>
-                            </div>
-                            <div>
-                                <span style="font-size: 11px; color: var(--text-muted);">{{ __('Assigned Staff') }}</span>
-                                <div style="font-size: 15px; font-weight: 900; color: var(--brand-forest); margin-top: 2px;">
-                                    👥 {{ $off->members->count() > 0 ? $off->members->count() : __('All') }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap; pt-2; border-top: 1px solid var(--border-color); padding-top: 14px;">
-                        <a href="{{ route('office', ['office' => $off->id]) }}" class="tactile-btn btn-primary" style="flex: 1; justify-content: center; padding: 8px 12px; font-size: 12px; text-decoration: none;">
-                            <span>🚀</span> {{ __('Enter Office') }}
-                        </a>
-                        <button onclick="openEditOfficeModal('{{ $off->id }}', '{{ addslashes($off->name) }}', '{{ addslashes($off->city_location ?? '') }}', '{{ addslashes($off->description ?? '') }}', {{ $off->is_default ? 'true' : 'false' }})" class="tactile-btn" style="padding: 8px 12px; font-size: 12px; background: var(--bg-surface-subtle);" title="{{ __('Edit Branch Details') }}">
-                            <span>✏️</span>
-                        </button>
-                        @if($offices->count() > 1)
-                        <form method="POST" action="{{ route('offices.delete', $off->id) }}" onsubmit="return confirm('{{ __('Are you sure you want to permanently delete this office branch and its blueprint?') }}');" style="margin: 0;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="tactile-btn" style="padding: 8px 12px; font-size: 12px; background: rgba(217, 107, 95, 0.12); color: #D96B5F; border-color: rgba(217, 107, 95, 0.3);" title="{{ __('Delete Branch') }}">
-                                <span>🗑️</span>
-                            </button>
-                        </form>
-                        @endif
-                    </div>
-                </div>
-                @empty
-                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
-                    <p>{{ __('No office branches configured yet.') }}</p>
-                </div>
-                @endforelse
+            <div>
+                <strong style="color: var(--nx-text-primary); font-size: var(--nx-font-size-sm); font-family: var(--nx-font-mono);">{{ __('Offices Quota:') }} {{ $offices->count() }} / {{ $organization->plan?->isUnlimitedOffices() ? __('Unlimited') : ($organization->plan?->max_offices ?? 1) }}</strong>
+                <div style="font-size: var(--nx-font-size-xs); color: var(--nx-text-secondary);">{{ __('Your organization is subscribed to :plan plan.', ['plan' => $organization->plan?->name ?? 'Default']) }}</div>
             </div>
         </div>
+        <span class="badge-status" style="background: var(--nx-primary-surface); color: var(--nx-primary-500); font-weight: var(--nx-font-weight-bold); font-size: var(--nx-font-size-xs); padding: 4px 12px; border-radius: var(--nx-radius-full); font-family: var(--nx-font-mono);">
+            {{ $offices->count() }} {{ __('Active Branches') }}
+        </span>
+    </div>
+
+    <!-- Offices Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--nx-spacing-5);">
+        @forelse($offices as $off)
+        <div class="card" style="border-radius: var(--nx-radius-xl); padding: var(--nx-spacing-5); display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--nx-border-subtle); box-shadow: var(--nx-shadow-card); background: var(--nx-bg-surface); transition: all 0.25s ease;">
+            <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--nx-spacing-4);">
+                    <div style="display: flex; align-items: center; gap: var(--nx-spacing-3);">
+                        <div style="width: 44px; height: 44px; border-radius: var(--nx-radius-lg); background: var(--nx-accent-gradient); color: white; display: flex; align-items: center; justify-content: center; box-shadow: var(--nx-shadow-soft-3d);">
+                            <span class="material-symbols-rounded" style="font-size: 24px;">apartment</span>
+                        </div>
+                        <div>
+                            <h3 style="font-size: var(--nx-font-size-md); font-weight: var(--nx-font-weight-black); color: var(--nx-text-primary); margin: 0 0 2px 0;">{{ $off->name }}</h3>
+                            <span style="font-size: var(--nx-font-size-xs); color: var(--nx-text-muted); font-weight: var(--nx-font-weight-semibold); display: flex; align-items: center; gap: 2px;">
+                                <span class="material-symbols-rounded" style="font-size: 14px;">location_on</span>
+                                <span>{{ $off->city_location ?: __('Primary Location') }}</span>
+                            </span>
+                        </div>
+                    </div>
+                    @if($off->is_default)
+                        <span class="badge-status" style="background: rgba(79, 155, 95, 0.15); color: #2E6B40; font-size: 11px; font-weight: var(--nx-font-weight-bold); display: inline-flex; align-items: center; gap: 2px; padding: 3px 8px; border-radius: var(--nx-radius-full);">
+                            <span class="material-symbols-rounded" style="font-size: 13px;">star</span>
+                            <span>{{ __('Main HQ') }}</span>
+                        </span>
+                    @endif
+                </div>
+
+                @if($off->description)
+                    <p style="font-size: var(--nx-font-size-xs); color: var(--nx-text-secondary); margin: 0 0 var(--nx-spacing-4) 0; line-height: 1.5;">
+                        {{ $off->description }}
+                    </p>
+                @endif
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--nx-spacing-3); margin-bottom: var(--nx-spacing-4); padding: var(--nx-spacing-3); background: var(--nx-bg-surface-subtle); border-radius: var(--nx-radius-md); border: 1px solid var(--nx-border-subtle);">
+                    <div>
+                        <span style="font-size: var(--nx-font-size-xs); color: var(--nx-text-muted);">{{ __('Configured Rooms') }}</span>
+                        <div style="font-size: var(--nx-font-size-md); font-weight: var(--nx-font-weight-black); color: var(--nx-text-primary); margin-top: 2px; display: flex; align-items: center; gap: 4px; font-family: var(--nx-font-mono);">
+                            <span class="material-symbols-rounded" style="font-size: 16px; color: var(--nx-primary-500);">meeting_room</span>
+                            <span>{{ $off->rooms->count() }}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <span style="font-size: var(--nx-font-size-xs); color: var(--nx-text-muted);">{{ __('Assigned Staff') }}</span>
+                        <div style="font-size: var(--nx-font-size-md); font-weight: var(--nx-font-weight-black); color: var(--nx-primary-500); margin-top: 2px; display: flex; align-items: center; gap: 4px; font-family: var(--nx-font-mono);">
+                            <span class="material-symbols-rounded" style="font-size: 16px;">group</span>
+                            <span>{{ $off->members->count() > 0 ? $off->members->count() : __('All') }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: var(--nx-spacing-2); flex-wrap: wrap; border-top: 1px solid var(--nx-border-subtle); padding-top: var(--nx-spacing-3);">
+                <a href="{{ route('office', ['office' => $off->id]) }}" class="tactile-btn btn-primary" style="flex: 1; justify-content: center; padding: 8px 12px; font-size: var(--nx-font-size-xs); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                    <span class="material-symbols-rounded" style="font-size: 16px;">login</span>
+                    <span>{{ __('Enter Office') }}</span>
+                </a>
+                <button onclick="openEditOfficeModal('{{ $off->id }}', '{{ addslashes($off->name) }}', '{{ addslashes($off->city_location ?? '') }}', '{{ addslashes($off->description ?? '') }}', {{ $off->is_default ? 'true' : 'false' }})" class="tactile-btn btn-secondary" style="padding: 8px 12px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center;" title="{{ __('Edit Branch Details') }}">
+                    <span class="material-symbols-rounded" style="font-size: 16px;">edit</span>
+                </button>
+                @if($offices->count() > 1)
+                <form method="POST" action="{{ route('offices.delete', $off->id) }}" onsubmit="return confirm('{{ __('Are you sure you want to permanently delete this office branch and its blueprint?') }}');" style="margin: 0;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="tactile-btn" style="padding: 8px 12px; font-size: 12px; background: rgba(217, 107, 95, 0.12); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.25); display: inline-flex; align-items: center; justify-content: center; border-radius: var(--nx-radius-md);" title="{{ __('Delete Branch') }}">
+                        <span class="material-symbols-rounded" style="font-size: 16px;">delete</span>
+                    </button>
+                </form>
+                @endif
+            </div>
+        </div>
+        @empty
+        <div style="grid-column: 1 / -1; text-align: center; padding: var(--nx-spacing-10); color: var(--nx-text-muted); background: var(--nx-bg-surface); border: 1px dashed var(--nx-border-subtle); border-radius: var(--nx-radius-xl);">
+            <div style="font-size: 32px; margin-bottom: var(--nx-spacing-2); color: var(--nx-text-muted); display: flex; justify-content: center;">
+                <span class="material-symbols-rounded" style="font-size: 40px;">domain_disabled</span>
+            </div>
+            <p style="margin: 0; font-size: var(--nx-font-size-sm);">{{ __('No office branches configured yet.') }}</p>
+        </div>
+        @endforelse
+    </div>
+</div>

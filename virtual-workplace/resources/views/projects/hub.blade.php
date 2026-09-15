@@ -6,114 +6,125 @@
     <title>{{ $project->name }} ({{ $project->code }}) — {{ __('Project Hub') }} | {{ $organization->name }}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <!-- Google Fonts: Cairo (Arabic) & Inter (English) -->
+    <!-- Typography: IBM Plex Sans Arabic & IBM Plex Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Centralized Luxury Design System -->
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+    <!-- Centralized UlaSpace Design System Tokens -->
+    <link rel="stylesheet" href="{{ asset('css/ulaspace-tokens.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/ulaspace-dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/modern-design-system.css') }}">
 
     <style>
         :root {
-            /* 🌿 Virtual Workplace — Authentic Warm Ivory & Forest Green Palette */
-            --bg-primary: #F5F3E8;          /* Warm Ivory Background Canvas */
-            --bg-canvas: #F5F3E8;
-            --bg-body: #F5F3E8;
-            --bg-secondary: #FFFDF6;        /* Creamy Elevated Surfaces */
-            --bg-surface: #FFFDF6;
-            --bg-surface-subtle: #E8EFE2;   /* Soft Sage Inset Surface */
-            --bg-card: #FFFDF6;
-            --bg-elevated: #E8EFE2;
-            --bg-surface-elevated: #FFFFFF;
+            /* 🌿 UlaSpace Design Tokens Mapping */
+            --bg-primary: var(--nx-bg-page);
+            --bg-canvas: var(--nx-bg-page);
+            --bg-body: var(--nx-bg-page);
+            --bg-secondary: var(--nx-bg-surface);
+            --bg-surface: var(--nx-bg-surface);
+            --bg-surface-subtle: var(--nx-sand-200);
+            --bg-card: var(--nx-bg-card);
+            --bg-elevated: var(--nx-bg-surface-elevated);
+            --bg-surface-elevated: var(--nx-bg-surface-elevated);
             
-            --sidebar-bg: #1B3524;          /* Deep Forest Sidebar */
-            --sidebar-text: #E8EFE9;
-            --sidebar-text-muted: #A3BDA8;
-            --sidebar-hover: rgba(255, 255, 255, 0.08);
-            --sidebar-active: #245C3A;
-            --sidebar-border: rgba(255, 255, 255, 0.12);
+            --sidebar-bg: var(--nx-bg-surface);
+            --sidebar-text: var(--nx-text-primary);
+            --sidebar-text-muted: var(--nx-text-muted);
+            --sidebar-hover: var(--nx-bg-surface-hover);
+            --sidebar-active: var(--nx-palm-900);
+            --sidebar-border: var(--nx-border-subtle);
 
-            --border-color: #D5DED0;        /* Soft Organic Border */
-            --border-subtle: #E2E8DC;
-            --border-focus: #245C3A;
+            --border-color: var(--nx-border-subtle);
+            --border-subtle: var(--nx-border-subtle);
+            --border-focus: var(--nx-palm-900);
 
-            --text-primary: #26352A;        /* Deep Forest Charcoal */
-            --text-secondary: #4A5B4E;      /* Calm Sage Slate */
-            --text-muted: #637567;          /* Subtle Gray-Green */
-            --text-dim: #8B9B8F;
+            --text-primary: var(--nx-text-primary);
+            --text-secondary: var(--nx-text-secondary);
+            --text-muted: var(--nx-text-muted);
+            --text-dim: var(--nx-sand-500);
 
             /* Core Brand Green & Accents */
-            --brand-forest: #245C3A;        /* Primary Forest Green */
-            --brand-workspace: #3F7D4F;     /* Mid Workspace Green */
-            --brand-sage: #4F9B5F;          /* Sage Accent */
-            --brand-leaf: #4F9B5F;
+            --brand-forest: var(--nx-palm-900);
+            --brand-workspace: var(--nx-palm-700);
+            --brand-sage: var(--nx-palm-500);
+            --brand-leaf: var(--nx-palm-300);
             --brand-soft-sage: #BFD4B8;
-            --brand-gold: #D6A23A;          /* Warm Gold */
-            --accent-gold: #D6A23A;
-            --status-warning: #D6A23A;
-            --status-danger: #D96B5F;        /* Soft Coral / Crimson */
-            --status-success: #4F9B5F;
-            --status-info: #6E9E9A;
+            --brand-gold: var(--nx-gold-400);
+            --accent-gold: var(--nx-gold-400);
+            --status-warning: var(--nx-status-scheduled);
+            --status-danger: var(--nx-status-attention);
+            --status-success: var(--nx-status-live);
+            --status-info: var(--nx-palm-900);
 
-            --accent-gradient: linear-gradient(135deg, #1C4D30 0%, #245C3A 50%, #3F7D4F 100%);
-            --accent-gradient-gold: linear-gradient(135deg, #D6A23A 0%, #B88523 100%);
+            --accent-gradient: linear-gradient(135deg, var(--nx-palm-900) 0%, var(--nx-palm-700) 100%);
+            --accent-gradient-gold: linear-gradient(135deg, var(--nx-gold-400) 0%, var(--nx-gold-600) 100%);
 
-            /* 3D Soft Neumorphic Shadows & Spatial Depth */
-            --shadow-soft-3d: 5px 5px 12px rgba(32, 64, 42, 0.07), -4px -4px 10px rgba(255, 255, 255, 0.95);
-            --shadow-card: 0 14px 34px rgba(32, 64, 42, 0.08), 0 3px 8px rgba(32, 64, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95);
-            --shadow-elevated: 0 20px 44px rgba(32, 64, 42, 0.14), 0 6px 14px rgba(32, 64, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 1);
-            --shadow-inset-3d: inset 2px 2px 6px rgba(32, 64, 42, 0.07), inset -2px -2px 6px rgba(255, 255, 255, 0.95);
+            /* 3D Shadows & Elevation */
+            --shadow-soft-3d: var(--nx-shadow-sm);
+            --shadow-card: var(--nx-shadow-sm);
+            --shadow-elevated: var(--nx-shadow-md);
+            --shadow-inset-3d: inset 0 1px 2px rgba(27, 50, 35, 0.05);
 
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 22px;
-            --radius-full: 9999px;
+            --radius-sm: var(--nx-radius-sm);
+            --radius-md: var(--nx-radius-md);
+            --radius-lg: var(--nx-radius-lg);
+            --radius-xl: var(--nx-radius-xl);
+            --radius-full: var(--nx-radius-pill);
             
-            --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: all var(--nx-duration-base) var(--nx-ease-standard);
+            --font-family: var(--nx-font-family);
+        }
+
+        [dir="rtl"], [lang="ar"] {
+            --font-family: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        [dir="ltr"], [lang="en"] {
+            --font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         /* 🌙 Dark Spatial Workspace Mode */
         [data-theme="dark"], body.dark-mode {
-            --bg-primary: #07100C;          /* Deep Green-Black Canvas */
-            --bg-canvas: #07100C;
-            --bg-body: #07100C;
-            --bg-secondary: #0B1510;        /* Secondary Dark Surface / Sidebar */
-            --bg-surface: #101C15;          /* Primary Surface Cards */
-            --bg-surface-subtle: #0C1711;   /* Inset Subsurfaces */
-            --bg-card: #101C15;
-            --bg-elevated: #15241B;
-            --bg-surface-elevated: #1A2E22;
+            --bg-primary: var(--nx-palm-950);
+            --bg-canvas: var(--nx-palm-950);
+            --bg-body: var(--nx-palm-950);
+            --bg-secondary: var(--nx-palm-900);
+            --bg-surface: var(--nx-palm-900);
+            --bg-surface-subtle: #17221F;
+            --bg-card: var(--nx-palm-900);
+            --bg-elevated: var(--nx-palm-700);
+            --bg-surface-elevated: var(--nx-palm-700);
 
-            --sidebar-bg: #09130E;
-            --sidebar-text: #E8EFE9;
-            --sidebar-text-muted: #7E9C84;
-            --sidebar-hover: rgba(255, 255, 255, 0.06);
-            --sidebar-active: #224E33;
-            --sidebar-border: rgba(255, 255, 255, 0.08);
+            --sidebar-bg: var(--nx-palm-900);
+            --sidebar-text: var(--nx-sand-100);
+            --sidebar-text-muted: var(--nx-sand-400);
+            --sidebar-hover: #1e382f;
+            --sidebar-active: var(--nx-palm-700);
+            --sidebar-border: var(--nx-border-subtle);
 
-            --border-color: #213B2C;
-            --border-subtle: #1A3124;
-            --border-focus: #4F9B5F;
+            --border-color: var(--nx-border-subtle);
+            --border-subtle: var(--nx-border-subtle);
+            --border-focus: var(--nx-accent);
 
-            --text-primary: #F5FBF6;
-            --text-secondary: #C0D6C5;
-            --text-muted: #88A690;
-            --text-dim: #5F7D67;
+            --text-primary: var(--nx-sand-100);
+            --text-secondary: var(--nx-sand-400);
+            --text-muted: #a4b5ad;
+            --text-dim: #63756d;
 
-            --brand-forest: #4F9B5F;
-            --brand-workspace: #5CB87A;
-            --brand-sage: #5CB87A;
-            --brand-leaf: #6CC989;
-            --brand-gold: #E5B54F;
-            --status-danger: #E27B70;
-            --status-warning: #E5B54F;
-            --status-success: #5CB87A;
+            --brand-forest: var(--nx-palm-300);
+            --brand-workspace: var(--nx-palm-300);
+            --brand-sage: var(--nx-palm-300);
+            --brand-leaf: var(--nx-palm-300);
+            --brand-gold: var(--nx-gold-400);
+            --status-danger: var(--nx-status-attention);
+            --status-warning: var(--nx-status-scheduled);
+            --status-success: var(--nx-status-live);
 
-            --accent-gradient: linear-gradient(135deg, #183824 0%, #224E33 50%, #2E6B46 100%);
-
-            --shadow-soft-3d: 0 4px 16px rgba(0, 0, 0, 0.45);
-            --shadow-card: 0 8px 26px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.35);
-            --shadow-elevated: 0 18px 42px rgba(0, 0, 0, 0.65), 0 4px 16px rgba(0, 0, 0, 0.45);
+            --accent-gradient: linear-gradient(135deg, var(--nx-palm-900) 0%, var(--nx-palm-700) 100%);
+            --shadow-soft-3d: var(--nx-shadow-sm);
+            --shadow-card: var(--nx-shadow-sm);
+            --shadow-elevated: var(--nx-shadow-md);
             --shadow-inset-3d: inset 0 2px 6px rgba(0, 0, 0, 0.55);
         }
 
@@ -124,7 +135,7 @@
         }
 
         body {
-            font-family: 'Cairo', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: var(--font-family);
             background-color: var(--bg-body);
             color: var(--text-primary);
             min-height: 100vh;
