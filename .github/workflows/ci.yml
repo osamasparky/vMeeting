@@ -41,6 +41,18 @@ jobs:
           cp .env.example .env
           php artisan key:generate
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: virtual-workplace/package-lock.json
+
+      - name: Install NPM Dependencies & Build Assets
+        run: |
+          npm ci || npm install
+          npm run build
+
       - name: Run Laravel Pint Code Style Check
         run: ./vendor/bin/pint --test
 
