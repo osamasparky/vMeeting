@@ -3390,7 +3390,7 @@
                 ctx.stroke();
 
                 // Localized Room Name
-                ctx.fillStyle = isLocked ? '#FCA5A5' : '#86EFAC';
+                ctx.fillStyle = '#FFFFFF';
                 ctx.font = '600 9px ' + (CURRENT_LOCALE === 'ar' ? '"IBM Plex Sans Arabic", sans-serif' : '"IBM Plex Sans", sans-serif');
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
