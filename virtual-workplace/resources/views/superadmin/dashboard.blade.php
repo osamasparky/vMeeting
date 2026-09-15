@@ -7,19 +7,22 @@
 <!-- Header Welcome & Live Health Status -->
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
     <div>
-        <h2 style="font-size: 22px; font-weight: 900; color: var(--text-primary); margin-bottom: 4px;">
-            ⚡ {{ __('Platform Overview & SaaS Metrics') }}
+        <h2 style="font-size: 22px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+            <span class="material-symbols-rounded" style="color: var(--nx-palm-500, #1E412F); font-size: 26px;">analytics</span>
+            <span>{{ __('Platform Overview & SaaS Metrics') }}</span>
         </h2>
         <p style="font-size: 13px; color: var(--text-secondary);">
             {{ __('Real-time multi-tenant health, subscription revenues, and spatial collaboration indicators.') }}
         </p>
     </div>
     <div style="display: flex; align-items: center; gap: 10px;">
-        <span class="badge-status badge-active" style="padding: 6px 14px; font-size: 12px;">
-            🟢 {{ __('System Normal & All Nodes Live') }}
+        <span class="badge-status badge-active" style="padding: 6px 14px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
+            <span class="material-symbols-rounded" style="font-size: 16px; color: var(--status-success);">check_circle</span>
+            <span>{{ __('System Normal & All Nodes Live') }}</span>
         </span>
-        <a href="{{ route('superadmin.companies') }}" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px;">
-            🏢 {{ __('Manage Companies') }}
+        <a href="{{ route('superadmin.companies') }}" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
+            <span class="material-symbols-rounded" style="font-size: 16px;">domain</span>
+            <span>{{ __('Manage Companies') }}</span>
         </a>
     </div>
 </div>
@@ -28,19 +31,27 @@
 <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; margin-bottom: 20px;">
     <!-- Total Companies -->
     <div class="kpi-card" style="border-radius: var(--radius-xl); padding: 22px; position: relative; overflow: hidden;">
-        <div class="kpi-icon" style="background: rgba(36, 92, 58, 0.12); color: var(--brand-forest); font-size: 24px;">🏢</div>
+        <div class="kpi-icon" style="background: rgba(30, 65, 47, 0.12); color: var(--brand-forest); font-size: 22px; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-rounded">domain</span>
+        </div>
         <div class="kpi-info" style="flex: 1;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3>{{ __('Total Companies') }}</h3>
-                <span class="nav-badge-pill" style="font-size: 10px; color: var(--brand-forest);">
+                <span class="nav-badge-pill" style="font-size: 10px; color: var(--brand-forest); font-family: var(--font-mono);">
                     +{{ $stats['new_companies_month'] }} {{ __('this mo') }}
                 </span>
             </div>
-            <div class="kpi-value" style="margin: 4px 0;">{{ $stats['total_companies'] }}</div>
+            <div class="kpi-value" style="margin: 4px 0; font-family: var(--font-mono);">{{ $stats['total_companies'] }}</div>
             <div style="font-size: 11px; color: var(--text-muted); display: flex; gap: 8px;">
-                <span style="color: var(--brand-forest); font-weight: 700;">✅ {{ $stats['active_companies'] }} {{ __('Active') }}</span>
+                <span style="color: var(--status-success); font-weight: 700; display: inline-flex; align-items: center; gap: 3px;">
+                    <span class="material-symbols-rounded" style="font-size: 14px;">check_circle</span>
+                    <span>{{ $stats['active_companies'] }} {{ __('Active') }}</span>
+                </span>
                 @if($stats['suspended_companies'] > 0)
-                    <span style="color: #D96B5F; font-weight: 700;">🛑 {{ $stats['suspended_companies'] }} {{ __('Suspended') }}</span>
+                    <span style="color: var(--status-danger); font-weight: 700; display: inline-flex; align-items: center; gap: 3px;">
+                        <span class="material-symbols-rounded" style="font-size: 14px;">block</span>
+                        <span>{{ $stats['suspended_companies'] }} {{ __('Suspended') }}</span>
+                    </span>
                 @endif
             </div>
         </div>
@@ -48,53 +59,59 @@
 
     <!-- Total Users -->
     <div class="kpi-card" style="border-radius: var(--radius-xl); padding: 22px; position: relative; overflow: hidden;">
-        <div class="kpi-icon" style="background: rgba(79, 155, 95, 0.12); color: var(--brand-emerald); font-size: 24px;">👥</div>
+        <div class="kpi-icon" style="background: rgba(60, 107, 76, 0.12); color: var(--brand-emerald); font-size: 22px; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-rounded">group</span>
+        </div>
         <div class="kpi-info" style="flex: 1;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3>{{ __('Total Users') }}</h3>
-                <span class="nav-badge-pill" style="font-size: 10px; color: var(--brand-forest);">
+                <span class="nav-badge-pill" style="font-size: 10px; color: var(--brand-forest); font-family: var(--font-mono);">
                     +{{ $stats['new_users_month'] }} {{ __('new') }}
                 </span>
             </div>
-            <div class="kpi-value" style="margin: 4px 0;">{{ $stats['total_users'] }}</div>
+            <div class="kpi-value" style="margin: 4px 0; font-family: var(--font-mono);">{{ $stats['total_users'] }}</div>
             <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">
-                {{ $stats['total_companies'] > 0 ? round($stats['total_users'] / $stats['total_companies'], 1) : 0 }} {{ __('avg users / tenant') }}
+                <span style="font-family: var(--font-mono);">{{ $stats['total_companies'] > 0 ? round($stats['total_users'] / $stats['total_companies'], 1) : 0 }}</span> {{ __('avg users / tenant') }}
             </div>
         </div>
     </div>
 
     <!-- Active Subscriptions -->
     <div class="kpi-card" style="border-radius: var(--radius-xl); padding: 22px; position: relative; overflow: hidden;">
-        <div class="kpi-icon" style="background: rgba(214, 162, 58, 0.12); color: #D6A23A; font-size: 24px;">💎</div>
+        <div class="kpi-icon" style="background: rgba(211, 165, 83, 0.15); color: #D3A553; font-size: 22px; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-rounded">workspace_premium</span>
+        </div>
         <div class="kpi-info" style="flex: 1;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3>{{ __('Paid Subscriptions') }}</h3>
-                <span class="nav-badge-pill" style="font-size: 10px; color: #D6A23A;">
+                <span class="nav-badge-pill" style="font-size: 10px; color: #D3A553; font-family: var(--font-mono);">
                     {{ $stats['conversion_rate'] }}% {{ __('Paid') }}
                 </span>
             </div>
-            <div class="kpi-value" style="margin: 4px 0;">{{ $stats['active_subscriptions'] }}</div>
+            <div class="kpi-value" style="margin: 4px 0; font-family: var(--font-mono);">{{ $stats['active_subscriptions'] }}</div>
             <div style="font-size: 11px; color: var(--text-muted); font-weight: 700;">
-                {{ $stats['total_companies'] - $stats['active_subscriptions'] }} {{ __('Free / Starter tier') }}
+                <span style="font-family: var(--font-mono);">{{ $stats['total_companies'] - $stats['active_subscriptions'] }}</span> {{ __('Free / Starter tier') }}
             </div>
         </div>
     </div>
 
     <!-- Monthly Recurring Revenue (MRR) -->
     <div class="kpi-card" style="border-radius: var(--radius-xl); padding: 22px; position: relative; overflow: hidden; border-inline-start: 4px solid var(--brand-forest);">
-        <div class="kpi-icon" style="background: rgba(36, 92, 58, 0.15); color: var(--brand-forest); font-size: 24px;">💵</div>
+        <div class="kpi-icon" style="background: rgba(30, 65, 47, 0.15); color: var(--brand-forest); font-size: 22px; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-rounded">payments</span>
+        </div>
         <div class="kpi-info" style="flex: 1;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3>{{ __('Estimated MRR') }}</h3>
-                <span class="nav-badge-pill" style="font-size: 10px; color: var(--brand-forest);">
+                <span class="nav-badge-pill" style="font-size: 10px; color: var(--brand-forest); font-family: var(--font-mono);">
                     ${{ number_format($stats['estimated_arr'], 0) }} {{ __('ARR') }}
                 </span>
             </div>
-            <div class="kpi-value" style="margin: 4px 0; color: var(--brand-forest);">
+            <div class="kpi-value" style="margin: 4px 0; color: var(--brand-forest); font-family: var(--font-mono);">
                 ${{ number_format($stats['estimated_mrr'], 2) }}
             </div>
             <div style="font-size: 11px; color: var(--text-secondary); font-weight: 700;">
-                ≈ {{ number_format($stats['estimated_mrr_sar'], 2) }} SAR / {{ __('month') }}
+                ≈ <span style="font-family: var(--font-mono);">{{ number_format($stats['estimated_mrr_sar'], 2) }}</span> SAR / {{ __('month') }}
             </div>
         </div>
     </div>
@@ -103,34 +120,42 @@
 <!-- Secondary Platform Activity & Spatial Health KPI Grid (Tier 2 KPI) -->
 <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 28px;">
     <div class="kpi-card" style="padding: 16px 18px; border-radius: var(--radius-lg);">
-        <div class="kpi-icon" style="width: 40px; height: 40px; font-size: 18px;">🚪</div>
+        <div class="kpi-icon" style="width: 40px; height: 40px; font-size: 18px; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-rounded">door_front</span>
+        </div>
         <div class="kpi-info">
-            <h3 style="font-size: 10px;">{{ __('Meeting Rooms') }}</h3>
-            <div class="kpi-value" style="font-size: 19px;">{{ $stats['total_rooms'] }}</div>
+            <h3 style="font-size: 11px;">{{ __('Meeting Rooms') }}</h3>
+            <div class="kpi-value" style="font-size: 19px; font-family: var(--font-mono);">{{ $stats['total_rooms'] }}</div>
         </div>
     </div>
 
     <div class="kpi-card" style="padding: 16px 18px; border-radius: var(--radius-lg);">
-        <div class="kpi-icon" style="width: 40px; height: 40px; font-size: 18px;">📁</div>
+        <div class="kpi-icon" style="width: 40px; height: 40px; font-size: 18px; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-rounded">folder</span>
+        </div>
         <div class="kpi-info">
-            <h3 style="font-size: 10px;">{{ __('Total Projects') }}</h3>
-            <div class="kpi-value" style="font-size: 19px;">{{ $stats['total_projects'] }}</div>
+            <h3 style="font-size: 11px;">{{ __('Total Projects') }}</h3>
+            <div class="kpi-value" style="font-size: 19px; font-family: var(--font-mono);">{{ $stats['total_projects'] }}</div>
         </div>
     </div>
 
     <div class="kpi-card" style="padding: 16px 18px; border-radius: var(--radius-lg);">
-        <div class="kpi-icon" style="width: 40px; height: 40px; font-size: 18px;">⏱️</div>
+        <div class="kpi-icon" style="width: 40px; height: 40px; font-size: 18px; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-rounded">schedule</span>
+        </div>
         <div class="kpi-info">
-            <h3 style="font-size: 10px;">{{ __('Logged Hours') }}</h3>
-            <div class="kpi-value" style="font-size: 19px;">{{ $stats['total_logged_hours'] }}h</div>
+            <h3 style="font-size: 11px;">{{ __('Logged Hours') }}</h3>
+            <div class="kpi-value" style="font-size: 19px; font-family: var(--font-mono);">{{ $stats['total_logged_hours'] }}h</div>
         </div>
     </div>
 
     <div class="kpi-card" style="padding: 16px 18px; border-radius: var(--radius-lg);">
-        <div class="kpi-icon" style="width: 40px; height: 40px; font-size: 18px;">🛡️</div>
+        <div class="kpi-icon" style="width: 40px; height: 40px; font-size: 18px; display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-rounded">security</span>
+        </div>
         <div class="kpi-info">
-            <h3 style="font-size: 10px;">{{ __('Audit Events') }}</h3>
-            <div class="kpi-value" style="font-size: 19px;">{{ $stats['total_audit_events'] }}</div>
+            <h3 style="font-size: 11px;">{{ __('Audit Events') }}</h3>
+            <div class="kpi-value" style="font-size: 19px; font-family: var(--font-mono);">{{ $stats['total_audit_events'] }}</div>
         </div>
     </div>
 </div>
@@ -141,11 +166,11 @@
     <div class="panel-card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
         <div>
             <div class="panel-header" style="margin-bottom: 16px; padding-bottom: 12px;">
-                <div class="panel-title">
-                    <span>💎</span>
+                <div class="panel-title" style="display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-rounded" style="color: #D3A553;">workspace_premium</span>
                     <span>{{ __('Plan Tiers Distribution') }}</span>
                 </div>
-                <a href="{{ route('superadmin.plans') }}" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 11px;">
+                <a href="{{ route('superadmin.plans') }}" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 11px; text-decoration: none;">
                     {{ __('Manage Plans') }}
                 </a>
             </div>
@@ -157,12 +182,13 @@
                 @endphp
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 13px;">
-                        <span style="font-weight: 800; color: var(--text-primary);">
-                            💎 {{ $plan->name }} (${{ number_format($plan->price, 0) }}/mo)
+                        <span style="font-weight: 700; color: var(--text-primary); display: inline-flex; align-items: center; gap: 6px;">
+                            <span class="material-symbols-rounded" style="font-size: 16px; color: var(--nx-palm-500, #1E412F);">verified</span>
+                            <span>{{ $plan->name }} (<span style="font-family: var(--font-mono);">${{ number_format($plan->price, 0) }}/mo</span>)</span>
                         </span>
                         <div style="display: flex; align-items: center; gap: 6px;">
-                            <span style="font-weight: 900; color: var(--brand-forest);">{{ $plan->organizations_count }}</span>
-                            <span style="font-size: 11px; color: var(--text-muted);">({{ $percentage }}%)</span>
+                            <span style="font-weight: 800; color: var(--brand-forest); font-family: var(--font-mono);">{{ $plan->organizations_count }}</span>
+                            <span style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">({{ $percentage }}%)</span>
                         </div>
                     </div>
                     <div style="width: 100%; height: 8px; background: var(--bg-surface-subtle); border-radius: 9999px; overflow: hidden; border: 1px solid var(--border-color);">
@@ -174,16 +200,16 @@
         </div>
 
         <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 12px;">
-            <span style="color: var(--text-secondary); font-weight: 700;">{{ __('Total Active Tenants') }}:</span>
-            <strong style="color: var(--brand-forest); font-size: 14px;">{{ $stats['total_companies'] }} {{ __('Organizations') }}</strong>
+            <span style="color: var(--text-secondary); font-weight: 600;">{{ __('Total Active Tenants') }}:</span>
+            <strong style="color: var(--brand-forest); font-size: 14px; font-family: var(--font-mono);">{{ $stats['total_companies'] }} {{ __('Organizations') }}</strong>
         </div>
     </div>
 
     <!-- Live Platform Activity Logs -->
     <div class="panel-card" style="margin-bottom: 0;">
         <div class="panel-header" style="margin-bottom: 16px; padding-bottom: 12px;">
-            <div class="panel-title">
-                <span>🛡️</span>
+            <div class="panel-title" style="display: flex; align-items: center; gap: 8px;">
+                <span class="material-symbols-rounded" style="color: var(--brand-forest);">security</span>
                 <span>{{ __('Live Security & Audit Trail') }}</span>
             </div>
             <span class="nav-badge-pill" style="font-size: 10px;">{{ __('Latest Events') }}</span>
@@ -193,11 +219,11 @@
             @forelse($recentAuditLogs as $log)
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-surface-subtle); border-radius: var(--radius-md); border: 1px solid var(--border-color); font-size: 12px;">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="font-size: 16px;">⚡</span>
+                    <span class="material-symbols-rounded" style="font-size: 18px; color: var(--brand-forest);">bolt</span>
                     <div>
-                        <div style="font-weight: 800; color: var(--text-primary);">
+                        <div style="font-weight: 700; color: var(--text-primary);">
                             {{ $log->actor?->name ?? 'System' }}
-                            <span style="font-weight: 600; color: var(--text-muted); font-size: 11px;">
+                            <span style="font-weight: 500; color: var(--text-muted); font-size: 11px;">
                                 ({{ $log->action }})
                             </span>
                         </div>
@@ -206,7 +232,7 @@
                         </div>
                     </div>
                 </div>
-                <div style="font-size: 10px; color: var(--text-dim); font-weight: 700; font-family: monospace;">
+                <div style="font-size: 10px; color: var(--text-dim); font-weight: 600; font-family: var(--font-mono);">
                     {{ $log->created_at?->diffForHumans() }}
                 </div>
             </div>
@@ -221,15 +247,15 @@
 
 <!-- Pending Subscription Approvals Alert Panel -->
 @if(isset($pendingSubscriptionRequests) && $pendingSubscriptionRequests->count() > 0)
-<div class="panel-card" style="border: 2px solid #D6A23A; background: var(--bg-surface); margin-bottom: 28px;">
-    <div class="panel-header" style="border-bottom: 1px solid rgba(214, 162, 58, 0.3); padding-bottom: 14px; margin-bottom: 16px;">
-        <div class="panel-title" style="color: #996D12;">
-            <span>⏳</span>
+<div class="panel-card" style="border: 2px solid #D3A553; background: var(--bg-surface); margin-bottom: 28px;">
+    <div class="panel-header" style="border-bottom: 1px solid rgba(211, 165, 83, 0.3); padding-bottom: 14px; margin-bottom: 16px;">
+        <div class="panel-title" style="color: #D3A553; display: flex; align-items: center; gap: 8px;">
+            <span class="material-symbols-rounded">hourglass_top</span>
             <span>{{ __('Pending Subscription Approvals') }} ({{ $stats['pending_subscriptions_count'] ?? $pendingSubscriptionRequests->count() }})</span>
         </div>
-        <a href="{{ route('superadmin.subscriptions', ['status' => 'pending']) }}" class="tactile-btn" style="font-size: 12px; padding: 6px 14px; background: #D6A23A; color: white; border: 1px solid #B4831B; text-decoration: none;">
+        <a href="{{ route('superadmin.subscriptions', ['status' => 'pending']) }}" class="tactile-btn" style="font-size: 12px; padding: 6px 14px; background: #D3A553; color: white; border: 1px solid #B4831B; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
             <span>{{ __('Review All Requests') }}</span>
-            <span>→</span>
+            <span class="material-symbols-rounded" style="font-size: 14px;">arrow_forward</span>
         </a>
     </div>
 
@@ -250,34 +276,48 @@
                 @foreach($pendingSubscriptionRequests as $pReq)
                 <tr>
                     <td>
-                        <strong style="color: var(--text-primary);">🏢 {{ $pReq->organization?->name ?? 'Company' }}</strong>
-                        <div style="font-size: 11px; color: var(--text-muted);">👤 {{ $pReq->sender_name }}</div>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <span class="material-symbols-rounded" style="font-size: 16px; color: var(--text-secondary);">domain</span>
+                            <strong style="color: var(--text-primary);">{{ $pReq->organization?->name ?? 'Company' }}</strong>
+                        </div>
+                        <div style="font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; margin-top: 2px;">
+                            <span class="material-symbols-rounded" style="font-size: 13px;">person</span>
+                            <span>{{ $pReq->sender_name }}</span>
+                        </div>
                     </td>
                     <td>
-                        <span class="badge-status badge-plan">💎 {{ $pReq->plan?->name ?? 'Plan' }}</span>
+                        <span class="badge-status badge-plan" style="display: inline-flex; align-items: center; gap: 4px;">
+                            <span class="material-symbols-rounded" style="font-size: 14px;">workspace_premium</span>
+                            <span>{{ $pReq->plan?->name ?? 'Plan' }}</span>
+                        </span>
                     </td>
                     <td>
-                        <strong>{{ number_format($pReq->amount, 2) }} {{ $pReq->currency }}</strong>
+                        <strong style="font-family: var(--font-mono);">{{ number_format($pReq->amount, 2) }} {{ $pReq->currency }}</strong>
                     </td>
                     <td>
-                        <div>🏦 {{ $pReq->bank_name }}</div>
-                        <div style="font-family: monospace; font-size: 11px; color: var(--brand-forest); font-weight: 800;">#{{ $pReq->transfer_reference }}</div>
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <span class="material-symbols-rounded" style="font-size: 14px; color: var(--text-secondary);">account_balance</span>
+                            <span>{{ $pReq->bank_name }}</span>
+                        </div>
+                        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--brand-forest); font-weight: 700;">#{{ $pReq->transfer_reference }}</div>
                     </td>
                     <td>
                         @if($pReq->receipt_path)
-                            <a href="{{ route('superadmin.subscriptions.receipt', $pReq->id) }}" target="_blank" class="tactile-btn" style="padding: 4px 10px; font-size: 11px; text-decoration: none;">
-                                📄 {{ __('View Receipt') }}
+                            <a href="{{ route('superadmin.subscriptions.receipt', $pReq->id) }}" target="_blank" class="tactile-btn" style="padding: 4px 10px; font-size: 11px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                                <span class="material-symbols-rounded" style="font-size: 14px;">receipt_long</span>
+                                <span>{{ __('View Receipt') }}</span>
                             </a>
                         @else
                             <span style="color: var(--text-muted); font-size: 11px;">—</span>
                         @endif
                     </td>
-                    <td style="font-size: 11px; color: var(--text-muted);">
+                    <td style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">
                         {{ $pReq->created_at->diffForHumans() }}
                     </td>
                     <td>
-                        <a href="{{ route('superadmin.subscriptions') }}" class="tactile-btn btn-primary" style="padding: 6px 12px; font-size: 11px; text-decoration: none;">
-                            ⚡ {{ __('Review & Approve') }}
+                        <a href="{{ route('superadmin.subscriptions') }}" class="tactile-btn btn-primary" style="padding: 6px 12px; font-size: 11px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                            <span class="material-symbols-rounded" style="font-size: 14px;">task_alt</span>
+                            <span>{{ __('Review & Approve') }}</span>
                         </a>
                     </td>
                 </tr>
@@ -291,13 +331,13 @@
 <!-- Recent Companies & Tenant Directory -->
 <div class="panel-card">
     <div class="panel-header">
-        <div class="panel-title">
-            <span>🏢</span>
+        <div class="panel-title" style="display: flex; align-items: center; gap: 8px;">
+            <span class="material-symbols-rounded" style="color: var(--brand-forest);">domain</span>
             <span>{{ __('Recent Registered Organizations') }}</span>
         </div>
-        <a href="{{ route('superadmin.companies') }}" class="tactile-btn btn-primary" style="font-size: 12px; padding: 8px 16px;">
+        <a href="{{ route('superadmin.companies') }}" class="tactile-btn btn-primary" style="font-size: 12px; padding: 8px 16px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
             <span>{{ __('View All Companies') }}</span>
-            <span>→</span>
+            <span class="material-symbols-rounded" style="font-size: 16px;">arrow_forward</span>
         </a>
     </div>
 
@@ -326,35 +366,43 @@
                 <tr>
                     <td>
                         <strong style="color: var(--text-primary); font-size: 14px;">{{ $comp->name }}</strong>
-                        <div style="font-size: 11px; color: var(--text-muted); font-family: monospace;">{{ $comp->slug }}</div>
+                        <div style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">{{ $comp->slug }}</div>
                     </td>
                     <td>
-                        <div style="font-weight: 800; color: var(--text-primary);">{{ $owner?->name ?? 'Administrator' }}</div>
+                        <div style="font-weight: 700; color: var(--text-primary);">{{ $owner?->name ?? 'Administrator' }}</div>
                         <div style="font-size: 11px; color: var(--text-muted);">{{ $owner?->email }}</div>
                     </td>
                     <td>
-                        <span class="badge-status badge-plan">
-                            💎 {{ $comp->plan?->name ?? 'Free' }} (${{ number_format($comp->plan?->price ?? 0, 2) }}/mo)
+                        <span class="badge-status badge-plan" style="display: inline-flex; align-items: center; gap: 4px;">
+                            <span class="material-symbols-rounded" style="font-size: 14px;">workspace_premium</span>
+                            <span>{{ $comp->plan?->name ?? 'Free' }} (<span style="font-family: var(--font-mono);">${{ number_format($comp->plan?->price ?? 0, 2) }}/mo</span>)</span>
                         </span>
                     </td>
                     <td>
-                        <div style="font-weight: 800; color: {{ !$isUnlimited && $memberCount >= $seatLimit ? '#D96B5F' : 'var(--brand-forest)' }};">
+                        <div style="font-weight: 700; font-family: var(--font-mono); color: {{ !$isUnlimited && $memberCount >= $seatLimit ? 'var(--status-danger)' : 'var(--brand-forest)' }};">
                             {{ $memberCount }} / {{ $isUnlimited ? '∞' : $seatLimit }} {{ __('Seats') }}
                         </div>
                     </td>
                     <td>
-                        <span style="font-weight: 800; color: var(--text-secondary);">{{ $comp->rooms->count() }} {{ __('Rooms') }}</span>
+                        <span style="font-weight: 700; color: var(--text-secondary); font-family: var(--font-mono);">{{ $comp->rooms->count() }} {{ __('Rooms') }}</span>
                     </td>
                     <td>
                         @if($isSuspended)
-                            <span class="badge-status badge-suspended">🛑 {{ __('Suspended') }}</span>
+                            <span class="badge-status badge-suspended" style="display: inline-flex; align-items: center; gap: 4px;">
+                                <span class="material-symbols-rounded" style="font-size: 14px;">block</span>
+                                <span>{{ __('Suspended') }}</span>
+                            </span>
                         @else
-                            <span class="badge-status badge-active">✅ {{ __('Active') }}</span>
+                            <span class="badge-status badge-active" style="display: inline-flex; align-items: center; gap: 4px;">
+                                <span class="material-symbols-rounded" style="font-size: 14px;">check_circle</span>
+                                <span>{{ __('Active') }}</span>
+                            </span>
                         @endif
                     </td>
                     <td>
-                        <a href="{{ route('superadmin.companies') }}" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 11px;">
-                            ⚙️ {{ __('Manage') }}
+                        <a href="{{ route('superadmin.companies') }}" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 11px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                            <span class="material-symbols-rounded" style="font-size: 14px;">settings</span>
+                            <span>{{ __('Manage') }}</span>
                         </a>
                     </td>
                 </tr>
