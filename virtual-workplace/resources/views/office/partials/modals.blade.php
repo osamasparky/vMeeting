@@ -57,7 +57,7 @@
     <div id="diagnostics-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 600px;">
             <div class="modal-header">
-                <div class="modal-title"><span>🩺</span> {{ __('WebRTC & Media Diagnostics (فحص جودة الاتصال)') }}</div>
+                <div class="modal-title"><span>🩺</span> {{ __('WebRTC & Media Diagnostics') }}</div>
                 <button onclick="closeDiagnosticsModal()" style="background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button>
             </div>
 
@@ -70,7 +70,7 @@
                 <div id="diag-overall-box" style="padding: 12px 16px; border-radius: 12px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(52, 211, 153, 0.3); display: flex; justify-content: space-between; align-items: center;">
                     <div>
                         <div style="font-size: 10px; font-weight: 800; color: var(--brand-primary); text-transform: uppercase;">{{ __('Overall Connection Quality') }}</div>
-                        <div id="diag-overall-text" style="font-size: 16px; font-weight: 900; color: #6EE7B7;">Excellent (ممتاز)</div>
+                        <div id="diag-overall-text" style="font-size: 16px; font-weight: 900; color: #6EE7B7;">{{ __('Excellent') }}</div>
                     </div>
                     <span id="diag-overall-badge" style="font-size: 24px;">🟢</span>
                 </div>
@@ -125,10 +125,10 @@
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <button id="spotlight-ring-btn" onclick="ringSpotlightUser()" class="action-link-btn" style="background: rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.4); color: #FCD34D; font-size: 11px; padding: 4px 10px;">
-                        <span>🔔</span> {{ __('Ring (تنبيه بالرنين)') }}
+                        <span>🔔</span> {{ __('Ring') }}
                     </button>
                     <button id="spotlight-wave-btn" onclick="sendWaveToSpotlightUser()" class="action-link-btn" style="background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.4); color: #93C5FD; font-size: 11px; padding: 4px 10px;">
-                        <span>👋</span> {{ __('Wave (استئذان)') }}
+                        <span>👋</span> {{ __('Wave') }}
                     </button>
                     <button onclick="closeUserSpotlight()" style="background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button>
                 </div>
@@ -175,7 +175,7 @@
     <div id="camera-gallery-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 1100px; height: 85vh;">
             <div class="modal-header">
-                <div class="modal-title"><span>🎥</span> {{ __('Office Live Cameras Gallery (شبكة الكاميرات المباشرة)') }}</div>
+                <div class="modal-title"><span>🎥</span> {{ __('Office Live Cameras Gallery') }}</div>
                 <button onclick="closeCameraGalleryModal()" style="background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button>
             </div>
             <div id="camera-gallery-grid" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; padding: 6px;">
@@ -210,7 +210,7 @@
                 <input type="text" id="guest-link-input" readonly class="styled-input" style="font-family: monospace; font-size: 11px;">
                 <div style="display: flex; gap: 8px;">
                     <button onclick="copyGuestLink()" class="action-link-btn" style="flex: 1; justify-content: center;">📋 {{ __('Copy Link') }}</button>
-                    <button onclick="openGuestInNewWindow()" class="action-link-btn" style="flex: 1; background: var(--brand-accent); color: white; justify-content: center;">🚀 {{ __('Open Guest (اختبار)') }}</button>
+                    <button onclick="openGuestInNewWindow()" class="action-link-btn" style="flex: 1; background: var(--brand-accent); color: white; justify-content: center;">🚀 {{ __('Open Guest') }}</button>
                 </div>
             </div>
         </div>
@@ -220,7 +220,7 @@
     <div id="occupants-modal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <div class="modal-title"><span>👥</span> {{ __('Active People in Office (المتواجدون حالياً)') }}</div>
+                <div class="modal-title"><span>👥</span> {{ __('Active People in Office') }}</div>
                 <button onclick="closeOccupantsModal()" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
             </div>
             <div id="occupants-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 380px; overflow-y: auto;">
@@ -299,7 +299,7 @@
                     <div style="padding: 12px 14px; background: #FFFFFF; border-bottom: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
                         <div style="display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 12px; color: #1E293B;">
                             <span>📌</span>
-                            <span>{{ __('Sticky Notes (الملاحظات)') }}</span>
+                            <span>{{ __('Sticky Notes') }}</span>
                         </div>
                         <button type="button" onclick="toggleWbStickyForm()" class="tactile-btn" style="background: #10B981; color: white; padding: 4px 8px; font-size: 11px; font-weight: 800; border-radius: 6px;">
                             + {{ __('Add') }}
@@ -378,7 +378,7 @@
     <div class="task-drawer" id="my-task-drawer">
         <div style="padding: 16px; background: var(--bg-surface); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
             <div style="font-size: 14px; font-weight: 900; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
-                <span>📝</span> <span>{{ __('My Tasks & Time Tracker (مهامي وتتبع الوقت)') }}</span>
+                <span>📝</span> <span>{{ __('My Tasks & Time Tracker') }}</span>
             </div>
             <button onclick="closeMyTaskDrawer()" style="background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">✕</button>
         </div>
@@ -388,7 +388,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                 <span style="font-size: 10px; font-weight: 800; color: var(--brand-primary); text-transform: uppercase; display: flex; align-items: center; gap: 4px;">
                     <span class="live-dot" style="width: 6px; height: 6px;"></span>
-                    {{ __('Active Task Timer (المهمة الجارية)') }}
+                    {{ __('Active Task Timer') }}
                 </span>
                 <span id="office-timer-clock" style="font-family: monospace; font-size: 15px; font-weight: 900; color: #34D399; letter-spacing: 1px;">00:00:00</span>
             </div>
@@ -396,7 +396,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span id="office-timer-project" style="font-size: 11px; font-weight: 700; color: var(--text-secondary);"></span>
                 <button onclick="stopActiveOfficeTask()" class="tactile-btn" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #F87171; padding: 4px 12px; font-size: 11px;">
-                    ⏹️ {{ __('Stop Task (إيقاف)') }}
+                    ⏹️ {{ __('Stop Task') }}
                 </button>
             </div>
         </div>
@@ -419,7 +419,7 @@
         <div class="modal-card" style="max-width: 440px; text-align: center; padding: 28px 24px; border: 2px solid rgba(214, 162, 58, 0.5); box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 30px rgba(214, 162, 58, 0.25);">
             <div style="font-size: 44px; margin-bottom: 10px;">⏰</div>
             <h3 style="font-size: 17px; font-weight: 900; color: #F59E0B; margin-bottom: 8px;">
-                {{ __('Are you still online? (تأكيد التواجد والنشاط)') }}
+                {{ __('Are you still online?') }}
             </h3>
             <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
                 {{ __('We noticed you have been inactive for a while. Please confirm you are still working so your office attendance time continues calculating.') }}
@@ -437,7 +437,7 @@
             </div>
 
             <button type="button" onclick="confirmUserPresence()" class="tactile-btn btn-primary" style="width: 100%; padding: 12px 24px; font-size: 14px; justify-content: center; background: #10B981; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);">
-                🟢 {{ __("Yes, I'm Online (نعم، أنا متواجد)") }}
+                🟢 {{ __("Yes, I'm Online") }}
             </button>
         </div>
     </div>
@@ -447,14 +447,14 @@
         <div class="modal-card" style="max-width: 480px; text-align: center; padding: 32px 24px; border: 1px solid rgba(52, 211, 153, 0.3);">
             <div style="font-size: 52px; margin-bottom: 12px;">⏸️</div>
             <h3 style="font-size: 18px; font-weight: 900; color: var(--text-primary); margin-bottom: 10px;">
-                {{ __('Office Time Tracking Paused (تم إيقاف احتساب وقت الحضور)') }}
+                {{ __('Office Time Tracking Paused') }}
             </h3>
             <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px;">
                 {{ __('Your office session calculation was paused due to inactivity. Click below whenever you are ready to resume attendance.') }}
             </p>
 
             <button type="button" onclick="resumeUserPresenceFromPaused()" class="tactile-btn btn-primary" style="width: 100%; padding: 13px 24px; font-size: 14px; justify-content: center; background: #10B981;">
-                ▶️ {{ __('Resume Presence (استئناف التواجد والحضور)') }}
+                ▶️ {{ __('Resume Presence') }}
             </button>
         </div>
     </div>
@@ -464,17 +464,17 @@
         <div class="modal-card" style="max-width: 440px; text-align: center; padding: 26px 22px; border: 2px solid #F59E0B; box-shadow: 0 20px 60px rgba(0,0,0,0.85), 0 0 40px rgba(245, 158, 11, 0.4); animation: pulseRing 1.2s infinite ease-in-out;">
             <div style="font-size: 54px; margin-bottom: 8px;">🔔</div>
             <h3 id="incoming-ring-title" style="font-size: 18px; font-weight: 900; color: #FCD34D; margin-bottom: 6px;">
-                {{ __('Incoming Ring Call (تنبيه صوتي عاجل)') }}
+                {{ __('Incoming Ring Call') }}
             </h3>
             <p id="incoming-ring-desc" style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;">
                 {{ __('A colleague is ringing you for immediate attention.') }}
             </p>
             <div style="display: flex; gap: 10px;">
                 <button type="button" onclick="acceptIncomingRing()" class="action-link-btn" style="flex: 1; justify-content: center; background: #10B981; color: white; padding: 12px; font-size: 14px; font-weight: 800;">
-                    📞 {{ __('Answer & Focus (رد وتوجه)') }}
+                    📞 {{ __('Answer & Focus') }}
                 </button>
                 <button type="button" onclick="dismissIncomingRing()" class="action-link-btn" style="flex: 1; justify-content: center; background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #F87171; padding: 12px; font-size: 14px; font-weight: 800;">
-                    ✕ {{ __('Dismiss (تجاهل)') }}
+                    ✕ {{ __('Dismiss') }}
                 </button>
             </div>
         </div>
@@ -493,7 +493,7 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px dashed rgba(120, 53, 15, 0.3); padding-bottom: 8px;">
                 <div style="display: flex; align-items: center; gap: 6px; font-weight: 900; font-size: 14px;">
                     <span style="font-size: 20px;">📌</span>
-                    <span id="sticky-modal-title">{{ __('Workplace Sticky Note (ملاحظة المكتب)') }}</span>
+                    <span id="sticky-modal-title">{{ __('Workplace Sticky Note') }}</span>
                 </div>
                 <button type="button" onclick="closeStickyNoteModal()" style="background: none; border: none; font-size: 20px; color: #78350F; cursor: pointer; line-height: 1;">✕</button>
             </div>
@@ -501,7 +501,7 @@
             </div>
             <div style="display: flex; justify-content: flex-end; margin-top: 14px;">
                 <button type="button" onclick="closeStickyNoteModal()" style="background: #D97706; color: white; border: none; border-radius: 8px; padding: 6px 16px; font-size: 12px; font-weight: 800; cursor: pointer;">
-                    ✓ {{ __('Close (إغلاق)') }}
+                    ✓ {{ __('Close') }}
                 </button>
             </div>
         </div>
@@ -525,13 +525,13 @@
         <div class="modal-card" style="max-width: 460px; text-align: center; padding: 28px 24px; border: 1px solid rgba(59, 130, 246, 0.4);">
             <div style="font-size: 48px; margin-bottom: 10px;">🔗</div>
             <h3 id="custom-link-modal-title" style="font-size: 17px; font-weight: 900; color: #93C5FD; margin-bottom: 8px;">
-                {{ __('Open Interactive Portal (فتح الرابط التفاعلي)') }}
+                {{ __('Open Interactive Portal') }}
             </h3>
             <p id="custom-link-modal-url" style="font-size: 13px; color: var(--text-muted); margin-bottom: 22px; word-break: break-all; background: rgba(15, 23, 42, 0.6); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); font-family: monospace;">
             </p>
             <div style="display: flex; gap: 10px;">
                 <a id="custom-link-modal-btn" href="#" target="_blank" rel="noopener noreferrer" class="action-link-btn" style="flex: 1; justify-content: center; background: #3B82F6; color: white; padding: 12px; font-size: 13px; font-weight: 800; text-decoration: none;">
-                    🚀 {{ __('Visit Link (زيارة الرابط)') }}
+                    🚀 {{ __('Visit Link') }}
                 </a>
                 <button type="button" onclick="closeCustomLinkModal()" class="action-link-btn" style="background: rgba(255,255,255,0.1); color: var(--text-muted); padding: 12px 18px; font-size: 13px; font-weight: 800;">
                     ✕ {{ __('Cancel') }}

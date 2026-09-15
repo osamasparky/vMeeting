@@ -52,7 +52,7 @@
                 @csrf
                 <button type="submit" class="tactile-btn" style="background: linear-gradient(135deg, #2563EB, #1D4ED8); color: white; border: none; padding: 10px 18px; font-size: 13px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(37,99,235,0.35);" title="{{ __('Log in to this company dashboard directly as administrator') }}">
                     <span>⚡</span>
-                    <span>{{ __('Login as Company (تسجيل دخول بالشركة)') }}</span>
+                    <span>{{ __'Login as Company') }}</span>
                 </button>
             </form>
 

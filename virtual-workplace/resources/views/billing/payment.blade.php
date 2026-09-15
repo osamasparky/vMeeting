@@ -78,7 +78,7 @@
                 <h2 style="font-size: 24px; font-weight: 900; color: var(--text-primary); margin-bottom: 8px;">💎 {{ $plan->name }} {{ __('Plan') }}</h2>
                 <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color);">
                     <span style="font-size: 32px; font-weight: 900; color: var(--brand-forest);">
-                        {{ number_format($priceSAR, 2) }} <span style="font-size: 15px; font-weight: 800; color: var(--text-secondary);">SAR (ر.س)</span>
+                        {{ number_format($priceSAR, 2) }} <span style="font-size: 15px; font-weight: 800; color: var(--text-secondary);">{{ __('SAR') }}</span>
                     </span>
                     <span style="font-size: 13px; font-weight: 700; color: var(--text-muted);">
                         (${{ number_format($priceUSD, 2) }} USD / {{ __('month') }})
@@ -174,7 +174,7 @@
                 @if(!empty($paymentSettings['instapay_handle']) || !empty($paymentSettings['stc_pay_phone']) || !empty($paymentSettings['vodafone_cash_phone']))
                     <div style="margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--border-color);">
                         <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
-                            <span>📱</span> {{ __('Instant Payment & Digital Wallets (الدفع الفوري والمحافظ)') }}
+                            <span>📱</span> {{ __'Instant Payment & Digital Wallets') }}
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
                             @if(!empty($paymentSettings['instapay_handle']))
@@ -329,7 +329,7 @@
                                 required
                             >
                             <select name="currency" class="form-input" style="width: 90px; font-weight: 800;">
-                                <option value="SAR" selected>SAR (ر.س)</option>
+                                <option value="SAR" selected>SAR</option>
                                 <option value="USD">USD ($)</option>
                             </select>
                         </div>

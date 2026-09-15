@@ -178,18 +178,21 @@
 
         /* ── Canvas Viewport ── */
         .canvas-container {
-            position: absolute;
-            inset: 0;
-            width: 100vw;
-            height: 100vh;
-            background: radial-gradient(circle at center, #0B1C13 0%, #050B08 100%);
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: var(--nx-map-dark-bg);
             overflow: hidden;
             z-index: 1;
         }
         #office-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
             display: block;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
             cursor: crosshair;
         }
 
@@ -828,7 +831,7 @@
             <div class="nx-toolbar-group">
                 <!-- Main App Burger Menu Dropdown -->
                 <div style="position: relative; display: inline-block;">
-                    <button type="button" onclick="toggleOfficeMainMenu(event)" class="nx-toolbar-btn" style="padding: 6px 10px;" title="{{ __('Menu (القائمة الرئيسية)') }}">
+                    <button type="button" onclick="toggleOfficeMainMenu(event)" class="nx-toolbar-btn" style="padding: 6px 10px;" title="{{ __('Menu') }}">
                         <span class="material-symbols-rounded" style="font-size: 20px;">menu</span>
                     </button>
                     
@@ -850,7 +853,7 @@
                         @if(empty($user->is_guest))
                         <a href="{{ route('dashboard') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #F9F4EE; font-size: 12px; font-weight: 600; transition: background 0.15s ease;">
                             <span class="material-symbols-rounded" style="font-size: 18px; color: var(--nx-map-gold);">dashboard</span>
-                            <span>{{ __('Dashboard (لوحة التحكم)') }}</span>
+                            <span>{{ __('Dashboard') }}</span>
                         </a>
                         @endif
 
@@ -859,7 +862,7 @@
                             @csrf
                             <button type="submit" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #93C5FD; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                                 <span class="material-symbols-rounded" style="font-size: 18px;">shield</span>
-                                <span>{{ __('Return to Super Admin (الرجوع للمشرف العام)') }}</span>
+                                <span>{{ __('Return to Super Admin') }}</span>
                             </button>
                         </form>
                         @endif
@@ -867,40 +870,40 @@
                         @if(!empty($user) && in_array($user->role ?? 'member', ['superadmin', 'company_admin', 'manager', 'admin']))
                         <label class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; color: #F59E0B; font-size: 12px; font-weight: 600; cursor: pointer; margin: 0;">
                             <span class="material-symbols-rounded" style="font-size: 18px; color: #F59E0B;">upload_file</span>
-                            <span>{{ __('Upload Floor Image (رفع صورة الأرضية)') }}</span>
+                            <span>{{ __('Upload Floor Image') }}</span>
                             <input type="file" accept="image/*" style="display:none;" onchange="uploadOfficeFloorImage(this); closeOfficeMainMenu();">
                         </label>
 
                         <a href="{{ route('editor') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #86EFAC; font-size: 12px; font-weight: 600;">
                             <span class="material-symbols-rounded" style="font-size: 18px;">draw</span>
-                            <span>{{ __('Map Editor (محرر الخريطة)') }}</span>
+                            <span>{{ __('Map Editor') }}</span>
                         </a>
                         @endif
 
                         <button type="button" onclick="openDiagnosticsModal(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #F9F4EE; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                             <span class="material-symbols-rounded" style="font-size: 18px;">network_check</span>
-                            <span>{{ __('Diagnostics (فحص جودة الاتصال)') }}</span>
+                            <span>{{ __('Diagnostics') }}</span>
                         </button>
 
                         <button type="button" onclick="toggleChatDrawer(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #F9F4EE; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                             <span class="material-symbols-rounded" style="font-size: 18px;">chat</span>
-                            <span>{{ __('Chat & Notes (المحادثة والملاحظات)') }}</span>
+                            <span>{{ __('Chat & Notes') }}</span>
                         </button>
 
                         <button type="button" onclick="toggleAppTheme(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #F9F4EE; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                             <span class="material-symbols-rounded" style="font-size: 18px;">light_mode</span>
-                            <span>{{ __('Toggle Theme (المظهر الداكن/الفاتح)') }}</span>
+                            <span>{{ __('Toggle Theme') }}</span>
                         </button>
 
                         @if(app()->getLocale() === 'ar')
                             <a href="{{ route('lang.switch', 'en') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #F9F4EE; font-size: 12px; font-weight: 600;">
                                 <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
-                                <span>English (EN)</span>
+                                <span>English</span>
                             </a>
                         @else
                             <a href="{{ route('lang.switch', 'ar') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #F9F4EE; font-size: 12px; font-weight: 600;">
                                 <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
-                                <span>العربية (AR)</span>
+                                <span>العربية</span>
                             </a>
                         @endif
                     </div>
@@ -922,14 +925,14 @@
                 <!-- Branch / Floor Switcher Button -->
                 @if(isset($userAllowedOffices) && $userAllowedOffices->count() > 1 && empty($user->is_guest))
                 <div style="position: relative; display: inline-block;">
-                    <button type="button" onclick="toggleOfficeDropdown(event)" class="nx-toolbar-btn" style="color: var(--nx-map-gold); border-color: rgba(211, 165, 83, 0.35); font-weight: 600;" title="{{ __('Switch Office Branch (تغيير الفرع)') }}">
+                    <button type="button" onclick="toggleOfficeDropdown(event)" class="nx-toolbar-btn" style="color: var(--nx-map-gold); border-color: rgba(211, 165, 83, 0.35); font-weight: 600;" title="{{ __('Switch Office Branch') }}">
                         <span class="material-symbols-rounded" style="font-size: 18px;">domain</span>
                         <span>{{ $floor->name }}</span>
                         <span class="material-symbols-rounded" style="font-size: 16px;">arrow_drop_down</span>
                     </button>
                     <div id="office-switcher-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); inset-inline-start: 0; min-width: 250px; background: rgba(14, 25, 19, 0.98); backdrop-filter: blur(18px); border: 1px solid rgba(237, 230, 217, 0.20); border-radius: 14px; box-shadow: 0 16px 36px rgba(0,0,0,0.65); padding: 6px; z-index: 100000;">
                         <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 4px;">
-                            🏢 {{ __('Office Branches (فروع الشركة)') }}
+                            🏢 {{ __('Office Branches') }}
                         </div>
                         @foreach($userAllowedOffices as $off)
                         @php
@@ -958,7 +961,7 @@
 
                 @if(!empty($user->is_guest))
                     <span class="nx-toolbar-btn btn-accent" style="font-weight: 700;">
-                        🛡️ GUEST ACCESS ({{ $user->name }})
+                        🛡️ {{ __('Guest Access') }} ({{ $user->name }})
                     </span>
                 @endif
             </div>
@@ -967,18 +970,18 @@
             <div class="nx-map-room-label" id="room-status-pill" style="display: none;">
                 <span id="current-room-name" style="font-weight: 600; font-size: 12px; color: #86EFAC; display: flex; align-items: center; gap: 6px;">
                     <span class="material-symbols-rounded" style="font-size: 18px;">meeting_room</span>
-                    <span>{{ __('غرفة الاجتماعات') }}</span>
+                    <span>{{ __('Meeting Room') }}</span>
                 </span>
                 
                 <button onclick="openRoomFilesModal()" id="btn-room-files" class="nx-toolbar-btn" style="height: 28px; padding: 2px 10px; font-size: 11px;">
                     <span class="material-symbols-rounded" style="font-size: 15px;">folder_open</span>
-                    <span>{{ __('ملفات الغرفة') }}</span>
+                    <span>{{ __('Room Files') }}</span>
                 </button>
 
                 @if(empty($user->is_guest))
                 <button onclick="toggleRoomDoorLock()" id="btn-lock-room" class="nx-toolbar-btn" style="height: 28px; padding: 2px 10px; font-size: 11px;">
                     <span id="lock-icon" class="material-symbols-rounded" style="font-size: 15px;">lock_open</span>
-                    <span id="lock-text">{{ __('قفل الباب') }}</span>
+                    <span id="lock-text">{{ __('Lock Door') }}</span>
                 </button>
                 @endif
             </div>
@@ -987,22 +990,22 @@
             <div class="nx-toolbar-group">
                 <!-- Live Office Attendance Timer -->
                 @if(empty($user->is_guest))
-                <div id="office-attendance-timer-pill" class="nx-toolbar-btn" style="background: rgba(60, 107, 76, 0.25); border-color: rgba(60, 107, 76, 0.5); color: #86EFAC; font-weight: 600; cursor: pointer;" onclick="openMyTaskDrawer()" title="{{ __('Your active time in the virtual office today (ساعات تواجدك بالعمل اليوم)') }}">
+                <div id="office-attendance-timer-pill" class="nx-toolbar-btn" style="background: rgba(60, 107, 76, 0.25); border-color: rgba(60, 107, 76, 0.5); color: #86EFAC; font-weight: 600; cursor: pointer;" onclick="openMyTaskDrawer()" title="{{ __('Your active time in the virtual office today') }}">
                     <span class="nx-presence-dot"></span>
                     <span class="material-symbols-rounded" style="font-size: 16px;">schedule</span>
                     <span id="office-attendance-clock" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">00:00:00</span>
                 </div>
                 @endif
 
-                <button onclick="openOccupantsModal()" class="nx-presence-capsule" id="btn-occupants-pill" title="{{ __('المتواجدون في المكتب') }}" style="cursor: pointer; border: 1px solid rgba(60, 107, 76, 0.4);">
+                <button onclick="openOccupantsModal()" class="nx-presence-capsule" id="btn-occupants-pill" title="{{ __('Office Occupants') }}" style="cursor: pointer; border: 1px solid rgba(60, 107, 76, 0.4);">
                     <span class="nx-presence-dot"></span>
                     <span class="material-symbols-rounded" style="font-size: 16px;">group</span>
-                    <span id="occupants-counter">1 {{ __('متصل الآن') }}</span>
+                    <span id="occupants-counter">1 {{ __('Online') }}</span>
                 </button>
 
-                <button onclick="openGuestInviteModal()" class="nx-toolbar-btn btn-accent" title="{{ __('دعوة ضيف خارجي للمكتب') }}">
+                <button onclick="openGuestInviteModal()" class="nx-toolbar-btn btn-accent" title="{{ __('Invite Guest') }}">
                     <span class="material-symbols-rounded" style="font-size: 16px;">person_add</span>
-                    <span>{{ __('دعوة') }}</span>
+                    <span>{{ __('Invite') }}</span>
                 </button>
             </div>
         </header>
@@ -1017,16 +1020,16 @@
 
     <!-- ── Floating Canvas Viewport Zoom & Navigation Controls ── -->
     <div class="nx-floating-viewport-controls" aria-label="Map Zoom & Navigation Controls">
-        <button type="button" class="nx-viewport-ctrl-btn" onclick="zoomIn()" title="{{ __('Zoom In (تكبير الخريطة)') }}">
+        <button type="button" class="nx-viewport-ctrl-btn" onclick="zoomIn()" title="{{ __('Zoom In') }}">
             <span class="material-symbols-rounded">zoom_in</span>
         </button>
-        <button type="button" class="nx-viewport-ctrl-btn" onclick="fitMapToCanvas()" title="{{ __('Fit Map to Canvas (ملاءمة الخريطة مع الشاشة بالضبط)') }}">
+        <button type="button" class="nx-viewport-ctrl-btn" onclick="fitMapToCanvas()" title="{{ __('Fit Map to Canvas') }}">
             <span class="material-symbols-rounded">aspect_ratio</span>
         </button>
-        <button type="button" class="nx-viewport-ctrl-btn" onclick="locateMe()" title="{{ __('Locate Me & Focus on My Avatar (تحديد موقعي والتقريب علي)') }}">
+        <button type="button" class="nx-viewport-ctrl-btn" onclick="locateMe()" title="{{ __('Locate Me') }}">
             <span class="material-symbols-rounded" style="color: #34D399;">location_on</span>
         </button>
-        <button type="button" class="nx-viewport-ctrl-btn" onclick="zoomOut()" title="{{ __('Zoom Out (تصغير الخريطة)') }}">
+        <button type="button" class="nx-viewport-ctrl-btn" onclick="zoomOut()" title="{{ __('Zoom Out') }}">
             <span class="material-symbols-rounded">zoom_out</span>
         </button>
     </div>
@@ -1036,9 +1039,9 @@
         <div class="local-cam-header">
             <span style="font-size: 10px; font-weight: 800; color: #F8FAFC; display: flex; align-items: center; gap: 4px;">
                 <span class="live-dot" style="width: 6px; height: 6px;"></span>
-                📹 {{ $user->name ?? 'You' }} ({{ __('أنت') }})
+                📹 {{ $user->name ?? __('You') }}
             </span>
-            <button onclick="toggleCamera()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; line-height: 1;" title="{{ __('إيقاف الكاميرا') }}">✕</button>
+            <button onclick="toggleCamera()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; line-height: 1;" title="{{ __('Stop Camera') }}">✕</button>
         </div>
         <div class="local-cam-viewport">
             <video id="local-video-elem" autoplay playsinline muted></video>
@@ -1053,116 +1056,127 @@
     <!-- ── Sliding Chat & File Sharing Drawer ── -->
     <div class="chat-drawer" id="chat-drawer">
         <div class="chat-header">
-            <strong style="font-size: 13px; display: flex; align-items: center; gap: 6px;">💬 {{ __('محادثة المكتب والغرف') }}</strong>
+            <strong style="font-size: 13px; display: flex; align-items: center; gap: 6px;">💬 {{ __('Office & Room Chat') }}</strong>
             <div style="display: flex; align-items: center; gap: 6px;">
-                <button onclick="focusActiveScreenShare()" class="action-link-btn" id="btn-chat-focus-screen" style="display: none; padding: 3px 8px; font-size: 10px; color: #34D399; border-color: rgba(52, 211, 153, 0.4);" title="{{ __('عرض الشاشة المشاركة') }}">
-                    🖥️ {{ __('الشاشة') }}
+                <button onclick="focusActiveScreenShare()" class="action-link-btn" id="btn-chat-focus-screen" style="display: none; padding: 3px 8px; font-size: 10px; color: #34D399; border-color: rgba(52, 211, 153, 0.4);" title="{{ __('View Screen Share') }}">
+                    🖥️ {{ __('Screen') }}
                 </button>
                 <button onclick="toggleChatDrawer()" style="background:none; border:none; color:var(--text-muted); font-size:16px; cursor:pointer;">✕</button>
             </div>
         </div>
         <div class="chat-tabs">
-            <div class="chat-tab active" id="chat-tab-room" onclick="switchChatScope('room')">🏢 {{ __('شات الغرفة') }}</div>
-            <div class="chat-tab" id="chat-tab-global" onclick="switchChatScope('global')">🌐 {{ __('العام') }}</div>
+            <div class="chat-tab active" id="chat-tab-room" onclick="switchChatScope('room')">🏢 {{ __('Room Chat') }}</div>
+            <div class="chat-tab" id="chat-tab-global" onclick="switchChatScope('global')">🌐 {{ __('Global Chat') }}</div>
         </div>
         <div class="chat-messages" id="chat-messages-container">
             <div class="msg-bubble">
-                <div class="msg-meta"><span>🤖 {{ __('المساعد الذكي') }}</span> <span>{{ date('H:i') }}</span></div>
-                <span>{{ __('مرحبًا بك في المكتب الافتراضي! يمكنك استخدام الشات للتواصل ومشاركة الملفات والملاحظات مع فريقك.') }}</span>
+                <div class="msg-meta"><span>🤖 {{ __('Smart Assistant') }}</span> <span>{{ date('H:i') }}</span></div>
+                <span>{{ __('Welcome to your virtual workplace! Use chat to communicate and share notes with your team.') }}</span>
             </div>
         </div>
         <div class="chat-input-bar">
             <input type="file" id="chat-file-input" style="display:none;" onchange="handleChatFileUpload(this)">
-            <button onclick="document.getElementById('chat-file-input').click()" class="action-link-btn" style="padding: 6px 8px;" title="{{ __('إرفاق ملف') }}">📎</button>
-            <input type="text" id="chat-msg-input" placeholder="{{ __('اكتب رسالتك هنا...') }}" class="styled-input" style="padding: 8px 10px; font-size: 12px;" onkeydown="if(event.key==='Enter') sendChatMessage()">
+            <button onclick="document.getElementById('chat-file-input').click()" class="action-link-btn" style="padding: 6px 8px;" title="{{ __('Attach File') }}">📎</button>
+            <input type="text" id="chat-msg-input" placeholder="{{ __('Type your message here...') }}" class="styled-input" style="padding: 8px 10px; font-size: 12px;" onkeydown="if(event.key==='Enter') sendChatMessage()">
             <button onclick="sendChatMessage()" class="action-link-btn" style="background: var(--brand-primary); color: white; padding: 6px 12px;">➤</button>
         </div>
     </div>
 
-    <!-- ── Bottom Meeting Control Bar (UlaSpace Figma Spec) ── -->
+    <!-- ── Bottom Meeting Control Bar (All Tools Restored & Styled) ── -->
     <nav class="nx-meeting-dock" aria-label="Meeting Controls">
-        <button class="nx-dock-btn muted" id="btn-mic" onclick="toggleMicrophone()" title="{{ __('Microphone (كتم/تشغيل المايك)') }}">
-            <span id="mic-icon" class="material-symbols-rounded">mic_off</span>
-            <span id="mic-text">{{ __('كتم المايك') }}</span>
-        </button>
-        <button class="nx-dock-btn muted" id="btn-cam" onclick="toggleCamera()" title="{{ __('Camera (إيقاف/تشغيل الكاميرا)') }}">
-            <span id="cam-icon" class="material-symbols-rounded">videocam_off</span>
-            <span id="cam-text">{{ __('إيقاف الكاميرا') }}</span>
-        </button>
-        <button class="nx-dock-btn" id="btn-screen" onclick="toggleScreenShare()" title="{{ __('Screen Share (مشاركة الشاشة)') }}">
+        <button class="nx-dock-btn" id="btn-screen" onclick="toggleScreenShare()" title="{{ __('Screen Share') }}">
             <span id="screen-icon" class="material-symbols-rounded">screen_share</span>
-            <span id="screen-text">{{ __('مشاركة الشاشة') }}</span>
+            <span id="screen-text">{{ __('Share') }}</span>
         </button>
 
-        <div class="nx-dock-divider"></div>
+        <button class="nx-dock-btn muted" id="btn-cam" onclick="toggleCamera()" title="{{ __('Camera') }}">
+            <span id="cam-icon" class="material-symbols-rounded">videocam_off</span>
+            <span id="cam-text">{{ __('Camera') }}</span>
+        </button>
 
-        <button class="nx-dock-btn" onclick="openMyTaskDrawer()" title="{{ __('قائمة مهامي وتتبع الوقت') }}">
-            <span class="material-symbols-rounded">task_alt</span>
-            <span>{{ __('مهامي') }}</span>
+        <button class="nx-dock-btn muted" id="btn-mic" onclick="toggleMicrophone()" title="{{ __('Microphone') }}">
+            <span id="mic-icon" class="material-symbols-rounded">mic_off</span>
+            <span id="mic-text">{{ __('Microphone') }}</span>
         </button>
-        <button class="nx-dock-btn" onclick="openGuestInviteModal()" title="{{ __('دعوة ضيف خارجي للمكتب') }}">
-            <span class="material-symbols-rounded">person_add</span>
-            <span>{{ __('دعوة ضيف') }}</span>
+
+        <button class="nx-dock-btn" id="btn-chat-dock" onclick="toggleChatDrawer()" title="{{ __('Chat & Notes') }}">
+            <span class="material-symbols-rounded">chat</span>
+            <span>{{ __('Chat') }}</span>
         </button>
-        <button class="nx-dock-btn" id="btn-react-dock" onclick="toggleReactionMenu(event)" title="{{ __('التفاعلات السريعة والفقاعات') }}">
+
+        <button class="nx-dock-btn" id="btn-occupants-dock" onclick="openOccupantsModal()" title="{{ __('Participants') }}">
+            <span class="material-symbols-rounded">group</span>
+            <span>{{ __('Participants') }}</span>
+        </button>
+
+        <button class="nx-dock-btn" id="btn-react-dock" onclick="toggleReactionMenu(event)" title="{{ __('Reactions') }}">
             <span class="material-symbols-rounded">add_reaction</span>
-            <span>{{ __('تفاعل') }}</span>
-        </button>
-        <button class="nx-dock-btn" onclick="openWhiteboardModal()" title="{{ __('السبورة الرقمية التعاونية') }}">
-            <span class="material-symbols-rounded">draw</span>
-            <span>{{ __('السبورة') }}</span>
-        </button>
-        <button class="nx-dock-btn" id="btn-record" onclick="toggleRecording()" title="{{ __('تسجيل الجلسة') }}">
-            <span id="rec-icon" class="material-symbols-rounded">radio_button_checked</span>
-            <span id="rec-text">{{ __('تسجيل') }}</span>
+            <span>{{ __('Reactions') }}</span>
         </button>
 
         <div class="nx-dock-divider"></div>
 
-        <button class="nx-dock-btn" id="btn-more-dock" onclick="toggleMoreMenu(event)" title="{{ __('المزيد من الأدوات والإعدادات') }}">
+        <button class="nx-dock-btn" id="btn-tasks-dock" onclick="openMyTaskDrawer()" title="{{ __('My Tasks & Time Tracking') }}">
+            <span class="material-symbols-rounded">task_alt</span>
+            <span>{{ __('Tasks') }}</span>
+        </button>
+
+        <button class="nx-dock-btn" id="btn-whiteboard-dock" onclick="openWhiteboardModal()" title="{{ __('Collaborative Whiteboard') }}">
+            <span class="material-symbols-rounded">draw</span>
+            <span>{{ __('Whiteboard') }}</span>
+        </button>
+
+        <button class="nx-dock-btn" id="btn-record" onclick="toggleRecording()" title="{{ __('Record Session') }}">
+            <span id="rec-icon" class="material-symbols-rounded">radio_button_checked</span>
+            <span id="rec-text">{{ __('Record') }}</span>
+        </button>
+
+        <button class="nx-dock-btn" id="btn-more-dock" onclick="toggleMoreMenu(event)" title="{{ __('More Tools & Settings') }}">
             <span class="material-symbols-rounded">more_horiz</span>
-            <span>{{ __('المزيد') }}</span>
+            <span>{{ __('More') }}</span>
         </button>
 
         <!-- Floating Live Task Timer Pill In Dock -->
-        <div id="floating-task-timer-pill" class="nx-toolbar-btn" style="display: none; background: rgba(211, 165, 83, 0.2); border-color: var(--nx-map-gold); color: var(--nx-map-gold); height: 48px; padding: 4px 12px; cursor: pointer; border-radius: 12px; flex-direction: column; justify-content: center; gap: 2px;" onclick="openMyTaskDrawer()" title="{{ __('انقر لفتح وإدارة المهمة') }}">
+        <div id="floating-task-timer-pill" class="nx-toolbar-btn" style="display: none; background: rgba(211, 165, 83, 0.2); border-color: var(--nx-map-gold); color: var(--nx-map-gold); height: 46px; padding: 4px 10px; cursor: pointer; border-radius: 12px; flex-direction: column; justify-content: center; gap: 2px;" onclick="openMyTaskDrawer()" title="{{ __('Click to manage active task') }}">
             <div style="display: flex; align-items: center; gap: 4px;">
-                <span class="material-symbols-rounded" style="font-size: 16px;">timer</span>
-                <span id="dock-timer-task-name" style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; font-weight: 700;">{{ __('Task') }}</span>
+                <span class="material-symbols-rounded" style="font-size: 15px;">timer</span>
+                <span id="dock-timer-task-name" style="max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; font-weight: 700;">{{ __('Task') }}</span>
             </div>
-            <span id="dock-timer-clock" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; background: rgba(0,0,0,0.35); padding: 1px 6px; border-radius: 4px;">00:00:00</span>
+            <span id="dock-timer-clock" style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; background: rgba(0,0,0,0.35); padding: 1px 5px; border-radius: 4px;">00:00:00</span>
         </div>
 
-        <!-- Leave / Exit Office Button (Terracotta / Red Pill on far end) -->
-        <a href="{{ route('dashboard') }}" class="nx-dock-btn nx-dock-btn-leave" title="{{ __('مغادرة المكتب والعودة للوحة التحكم') }}">
-            <span class="material-symbols-rounded">logout</span>
-            <span>{{ __('مغادرة') }}</span>
+        <div class="nx-dock-divider"></div>
+
+        <!-- Leave / Exit Office Button (Terracotta / Orange Accent matching Figma) -->
+        <a href="{{ route('dashboard') }}" class="nx-dock-btn nx-dock-btn-leave" title="{{ __('Leave Office & Return to Dashboard') }}">
+            <span class="material-symbols-rounded">phone_disabled</span>
+            <span>{{ __('Leave') }}</span>
         </a>
     </nav>
 
     <!-- ── Floating More Tools & Settings Popover Menu ── -->
     <div id="floating-more-popover" style="display: none; position: absolute; bottom: 85px; left: 65%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.96); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.18); border-radius: 18px; padding: 8px; flex-direction: column; gap: 4px; box-shadow: 0 16px 36px rgba(0,0,0,0.6); z-index: 100000; min-width: 220px;">
         <button class="more-menu-item" onclick="toggleCameraGalleryModal(); closeMoreMenu();">
-            <span>🎥</span> <span>{{ __('شبكة الكاميرات المباشرة') }}</span>
+            <span>🎥</span> <span>{{ __('Live Camera Grid') }}</span>
         </button>
         <button class="more-menu-item" onclick="openRecordingsGallery(); closeMoreMenu();">
-            <span>📼</span> <span>{{ __('مكتبة التسجيلات') }}</span>
+            <span>📼</span> <span>{{ __('Recordings Library') }}</span>
         </button>
     </div>
 
     <!-- ── Floating In-World Contextual Prompts & Menus ── -->
     <div id="furniture-sit-prompt" style="display: none; position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); background: rgba(14, 25, 19, 0.94); backdrop-filter: blur(20px); border: 1px solid rgba(211, 165, 83, 0.45); border-radius: 24px; padding: 6px 18px; color: var(--nx-sand-100, #F9F4EE); font-size: 12px; font-weight: 700; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5); z-index: 9999; pointer-events: none; transition: opacity 0.2s ease;">
-        <span id="furniture-sit-prompt-text">🪑 {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> {{ __('to Sit at Desk (الجلوس)') }}</span>
+        <span id="furniture-sit-prompt-text">🪑 {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> {{ __('to Sit at Desk') }}</span>
     </div>
 
     <div id="floating-reaction-popover" style="display: none; position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.96); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.18); border-radius: 32px; padding: 6px 14px; align-items: center; gap: 8px; box-shadow: 0 16px 36px rgba(0,0,0,0.6); z-index: 100000;">
-        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('👋')" title="Wave (تحية)">👋</button>
-        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('👍')" title="Thumbs Up (موافق)">👍</button>
-        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('☕')" title="Coffee Break (استراحة)">☕</button>
-        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('💡')" title="Idea (فكرة)">💡</button>
-        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('👏')" title="Applause (تصفيق)">👏</button>
-        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('❓')" title="Question (سؤال)">❓</button>
-        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('🔥')" title="Great Work (رائع)">🔥</button>
+        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('👋')" title="{{ __('Wave') }}">👋</button>
+        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('👍')" title="{{ __('Thumbs Up') }}">👍</button>
+        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('☕')" title="{{ __('Coffee Break') }}">☕</button>
+        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('💡')" title="{{ __('Idea') }}">💡</button>
+        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('👏')" title="{{ __('Applause') }}">👏</button>
+        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('❓')" title="{{ __('Question') }}">❓</button>
+        <button class="reaction-emoji-btn" onclick="sendEmojiReaction('🔥')" title="{{ __('Great Work') }}">🔥</button>
     </div>
 
         </div>
@@ -1206,6 +1220,192 @@
         const rooms = (CONFIG.map && CONFIG.map.rooms) ? CONFIG.map.rooms : [];
         const roomDoorStates = new Map();
         let pendingKnock = null;
+
+        // Background Blueprint & Object Sorting Setup (Declared early for camera fitting)
+        const MAP_BG_URL = (CONFIG.map && CONFIG.map.layout_data && CONFIG.map.layout_data.background_image_url)
+            ? CONFIG.map.layout_data.background_image_url
+            : null;
+        const BLUEPRINT_IMAGE = new Image();
+        let blueprintLoaded = false;
+        if (MAP_BG_URL) {
+            BLUEPRINT_IMAGE.src = MAP_BG_URL;
+            BLUEPRINT_IMAGE.onload = () => {
+                blueprintLoaded = true;
+                if (BLUEPRINT_IMAGE.naturalWidth > 0 && BLUEPRINT_IMAGE.naturalHeight > 0) {
+                    MAP_WIDTH_PX = BLUEPRINT_IMAGE.naturalWidth;
+                    MAP_HEIGHT_PX = BLUEPRINT_IMAGE.naturalHeight;
+                }
+                if (typeof resizeCanvas === 'function') resizeCanvas();
+            };
+            BLUEPRINT_IMAGE.onerror = () => {
+                blueprintLoaded = false;
+                if (typeof resizeCanvas === 'function') resizeCanvas();
+            };
+            if (BLUEPRINT_IMAGE.complete && BLUEPRINT_IMAGE.naturalWidth > 0) {
+                blueprintLoaded = true;
+                MAP_WIDTH_PX = BLUEPRINT_IMAGE.naturalWidth;
+                MAP_HEIGHT_PX = BLUEPRINT_IMAGE.naturalHeight;
+            }
+        }
+
+        let sortedMapObjects = [];
+        function refreshSortedMapObjects() {
+            const raw = (CONFIG.map && CONFIG.map.objects) ? CONFIG.map.objects : [];
+            sortedMapObjects = [...raw].sort((a, b) => {
+                const elevA = typeof a.elevation === 'number' ? a.elevation : (a.interaction_config?.elevation || 1);
+                const elevB = typeof b.elevation === 'number' ? b.elevation : (b.interaction_config?.elevation || 1);
+                if (elevA !== elevB) return elevA - elevB;
+                const yA = (a.position ? a.position.y : (a.y || 0));
+                const yB = (b.position ? b.position.y : (b.y || 0));
+                return yA - yB;
+            });
+        }
+        refreshSortedMapObjects();
+
+        const CURRENT_LOCALE = @json(app()->getLocale());
+        const ROOM_NAME_MAP = {
+            'meeting room': 'غرفة اجتماعات',
+            'executive room': 'غرفة الإدارة',
+            'board room': 'قاعة المؤتمرات',
+            'boardroom': 'قاعة المؤتمرات',
+            'lounge': 'الاستراحة',
+            'break room': 'غرفة الاستراحة',
+            'open space': 'المساحة المفتوحة',
+            'focus room': 'غرفة التركيز',
+            'phone booth': 'كابينة الاتصال',
+            'office': 'مكتب',
+            'reception': 'الاستقبال',
+            'cafeteria': 'الكافيتريا',
+            'غرفة اجتماعات': 'Meeting Room',
+            'غرفة الاجتماعات': 'Meeting Room',
+            'قاعة الاجتماعات': 'Meeting Room',
+            'غرفة الإدارة': 'Executive Room',
+            'غرفة الادارة': 'Executive Room',
+            'قاعة المؤتمرات': 'Board Room',
+            'الاستراحة': 'Lounge',
+            'غرفة الاستراحة': 'Break Room',
+            'المساحة المفتوحة': 'Open Space',
+            'غرفة التركيز': 'Focus Room',
+            'كابينة الاتصال': 'Phone Booth',
+            'مكتب': 'Office',
+            'الاستقبال': 'Reception',
+            'الكافيتريا': 'Cafeteria'
+        };
+
+        function getLocalizedRoomName(roomOrName) {
+            if (!roomOrName) return CURRENT_LOCALE === 'ar' ? 'المساحة المفتوحة' : 'Open Space';
+            let raw = (typeof roomOrName === 'string') ? roomOrName : (roomOrName.name || '');
+            let enProp = (typeof roomOrName === 'object' && roomOrName.english_name) ? roomOrName.english_name.trim() : '';
+            let arProp = (typeof roomOrName === 'object' && roomOrName.arabic_name) ? roomOrName.arabic_name.trim() : '';
+
+            let parts = raw.split(' - ');
+            let arPart = parts[0] ? parts[0].trim() : '';
+            let enPart = parts.length > 1 ? parts[1].trim() : '';
+
+            if (CURRENT_LOCALE === 'ar') {
+                if (arProp) return arProp;
+                if (arPart && /[\u0600-\u06FF]/.test(arPart)) return arPart;
+                if (ROOM_NAME_MAP[raw.toLowerCase()]) return ROOM_NAME_MAP[raw.toLowerCase()];
+                if (ROOM_NAME_MAP[arPart.toLowerCase()]) return ROOM_NAME_MAP[arPart.toLowerCase()];
+                return arPart || raw;
+            } else {
+                if (enProp) return enProp;
+                if (enPart && !/[\u0600-\u06FF]/.test(enPart)) return enPart;
+                if (arPart && !/[\u0600-\u06FF]/.test(arPart)) return arPart;
+                if (ROOM_NAME_MAP[raw]) return ROOM_NAME_MAP[raw];
+                if (ROOM_NAME_MAP[arPart]) return ROOM_NAME_MAP[arPart];
+                if (ROOM_NAME_MAP[raw.toLowerCase()]) return ROOM_NAME_MAP[raw.toLowerCase()];
+                return enPart || enProp || raw;
+            }
+        }
+
+        const I18N_DICT = {
+            'Fit Map to Canvas': { ar: 'تمت ملاءمة كامل الخريطة مع الشاشة', en: 'Fit Map to Canvas' },
+            'Locating You': { ar: 'تم تحديد وتوسيط موقعك والتقريب عليك', en: 'Locating You & Centering View' },
+            'No active map ID found': { ar: 'لم يتم العثور على معرّف الخريطة', en: 'No active map ID found' },
+            'Uploading Floor Image...': { ar: 'جاري رفع صورة الأرضية...', en: 'Uploading Floor Image...' },
+            'Floor Image Updated': { ar: 'تم تحديث صورة الأرضية بنجاح', en: 'Floor Image Updated' },
+            'Upload failed': { ar: 'فشل رفع الملف', en: 'Upload failed' },
+            'Stood up': { ar: 'تم الوقوف', en: 'Stood up' },
+            'Enjoying fresh drink from': { ar: 'استمتع بمشروب طازج من', en: 'Enjoying fresh drink from' },
+            'Interactive Strategy Whiteboard': { ar: 'السبورة الاستراتيجية التفاعلية', en: 'Interactive Strategy Whiteboard' },
+            'Chime sound effect triggered on': { ar: 'تم تشغيل نغمة التنبيه عند', en: 'Chime sound effect triggered on' },
+            'Playing musical note on': { ar: 'عزف نغمة موسيقية عند', en: 'Playing musical note on' },
+            'Seated at Desk': { ar: 'تم الجلوس في المكتب', en: 'Seated at Desk' },
+            'Knocked on door... waiting for occupant response.': { ar: 'تم طرق الباب... بانتظار استجابة المتواجدين.', en: 'Knocked on door... waiting for occupant response.' },
+            'Only occupants inside this room can control its door. Double-click inside to enter.': { ar: 'لا يمكن التحكم بالباب إلا من داخل الغرفة. انقر مرتين للدخول.', en: 'Only occupants inside this room can control its door. Double-click inside to enter.' },
+            'Cannot lock an empty room. The door must remain open when empty.': { ar: 'لا يمكن قفل غرفة فارغة. يجب أن يبقى الباب مفتوحاً.', en: 'Cannot lock an empty room. The door must remain open when empty.' },
+            'Cannot lock an empty room. Enter the room first to lock it.': { ar: 'لا يمكن قفل غرفة فارغة. ادخل الغرفة أولاً.', en: 'Cannot lock an empty room. Enter the room first to lock it.' },
+            'door closed & locked': { ar: 'تم إغلاق وقفل الباب', en: 'door closed & locked' },
+            'door opened': { ar: 'تم فتح الباب', en: 'door opened' },
+            'Double-click to navigate into:': { ar: 'انقر مرتين للدخول إلى:', en: 'Double-click to navigate into:' },
+            'Guests are only permitted in their designated invited room.': { ar: 'يُسمح للضيوف بالدخول فقط إلى الغرفة المحددة لدعوتهم.', en: 'Guests are only permitted in their designated invited room.' },
+            'Restricted Room: You do not have permission to access': { ar: 'غرفة مقيدة: لا تملك صلاحية الوصول إلى', en: 'Restricted Room: You do not have permission to access' },
+            'Restricted Room: Access not permitted for': { ar: 'غرفة مقيدة: لا تملك صلاحية الوصول إلى', en: 'Restricted Room: Access not permitted for' },
+            'Room has reached full capacity': { ar: 'وصلت الغرفة إلى الحد الأقصى للسعة', en: 'Room has reached full capacity' },
+            'Opening link:': { ar: 'جاري فتح الرابط:', en: 'Opening link:' },
+            'Company Workplace': { ar: 'مساحة عمل الشركة', en: 'Company Workplace' },
+            'You must be inside a room to lock or unlock its door.': { ar: 'يجب أن تكون داخل الغرفة للتحكم بقفل الباب.', en: 'You must be inside a room to lock or unlock its door.' },
+            'Room locked': { ar: 'تم قفل الغرفة', en: 'Room locked' },
+            'Room unlocked': { ar: 'تم فتح الغرفة', en: 'Room unlocked' },
+            'Session replaced by another window': { ar: 'تم استبدال الجلسة بنافذة أخرى', en: 'Session replaced by another window' },
+            'joined the office': { ar: 'انضم إلى المكتب', en: 'joined the office' },
+            'left the office': { ar: 'غادر المكتب', en: 'left the office' },
+            'changed avatar character to': { ar: 'قام بتغيير الشخصية إلى', en: 'changed avatar character to' },
+            'Female': { ar: 'أنثى', en: 'Female' },
+            'Male': { ar: 'ذكر', en: 'Male' },
+            'Access granted by': { ar: 'تم السماح بالدخول من قبل', en: 'Access granted by' },
+            'Access denied by occupant.': { ar: 'تم رفض إذن الدخول من قبل المتواجدين.', en: 'Access denied by occupant.' },
+            'says HI to you!': { ar: 'يلقي التحية عليك!', en: 'says HI to you!' },
+            'is ringing you!': { ar: 'يرن عليك للتنبيه!', en: 'is ringing you!' },
+            'cleared the whiteboard.': { ar: 'قام بمسح السبورة.', en: 'cleared the whiteboard.' },
+            'started screen presentation': { ar: 'بدأ مشاركة الشاشة', en: 'started screen presentation' },
+            'Screen presentation stopped': { ar: 'تم إيقاف مشاركة الشاشة', en: 'Screen presentation stopped' },
+            'Screen share window enlarged to theater view!': { ar: 'تم تكبير عرض الشاشة المشاركة!', en: 'Screen share window enlarged to theater view!' },
+            'No active screen share at the moment.': { ar: 'لا توجد مشاركة شاشة نشطة حالياً.', en: 'No active screen share at the moment.' },
+            'Microphone active': { ar: 'تم تشغيل المايكروفون', en: 'Microphone active' },
+            'Microphone muted': { ar: 'تم كتم المايكروفون', en: 'Microphone muted' },
+            'Microphone error:': { ar: 'خطأ في المايكروفون:', en: 'Microphone error:' },
+            'Camera active': { ar: 'تم تشغيل الكاميرا بنجاح', en: 'Camera active' },
+            'Camera stopped': { ar: 'تم إيقاف الكاميرا', en: 'Camera stopped' },
+            'Camera error:': { ar: 'خطأ في الكاميرا:', en: 'Camera error:' },
+            'Screen sharing started': { ar: 'تم بدء مشاركة الشاشة بنجاح', en: 'Screen sharing started' },
+            'Screen sharing stopped': { ar: 'تم إيقاف مشاركة الشاشة', en: 'Screen sharing stopped' },
+            'Screen sharing error:': { ar: 'خطأ في مشاركة الشاشة:', en: 'Screen sharing error:' },
+            'Recording started': { ar: 'تم بدء تسجيل الجلسة', en: 'Recording started' },
+            'Recording stopped and saved': { ar: 'تم إيقاف التسجيل وحفظ الفيديو بنجاح', en: 'Recording stopped and saved' },
+            'Recording failed': { ar: 'فشل بدء التسجيل', en: 'Recording failed' },
+            'Press': { ar: 'اضغط', en: 'Press' },
+            'to sit at desk': { ar: 'للجلوس في المكتب', en: 'to sit at desk' },
+            'Open Space': { ar: 'المساحة المفتوحة', en: 'Open Space' },
+            'You': { ar: 'أنت', en: 'You' },
+            'You / Host': { ar: 'أنت / المضيف', en: 'You / Host' },
+            'Host': { ar: 'المضيف', en: 'Host' },
+            'Connecting...': { ar: 'جاري الاتصال...', en: 'Connecting...' },
+            'Reconnecting...': { ar: 'جاري إعادة الاتصال...', en: 'Reconnecting...' },
+            'Connected': { ar: 'متصل', en: 'Connected' },
+            'Disconnected': { ar: 'غير متصل', en: 'Disconnected' },
+            'Task timer started': { ar: 'تم بدء مؤقت المهمة', en: 'Task timer started' },
+            'Task timer paused': { ar: 'تم إيقاف مؤقت المهمة مؤقتاً', en: 'Task timer paused' },
+            'Task timer stopped': { ar: 'تم إنهاء وحفظ وقت المهمة', en: 'Task timer stopped' },
+            'Link copied to clipboard': { ar: 'تم نسخ الرابط إلى الحافظة', en: 'Link copied to clipboard' },
+            'Sent Hi wave to colleague!': { ar: 'تم إلقاء التحية على الزميل!', en: 'Sent Hi wave to colleague!' },
+            'Ringing colleague for immediate attention...': { ar: 'جاري تنبيه الزميل بالرنين المباشر...', en: 'Ringing colleague for immediate attention...' },
+            'to Grab Drink': { ar: 'لتناول مشروب', en: 'to Grab Drink' },
+            'to Open Whiteboard': { ar: 'لفتح السبورة', en: 'to Open Whiteboard' },
+            'to Watch Stream': { ar: 'لمشاهدة البث', en: 'to Watch Stream' },
+            'to Ring Bell': { ar: 'لتشغيل التنبيه', en: 'to Ring Bell' },
+            'to Play Music': { ar: 'لعزف مقطوعة موسيقية', en: 'to Play Music' },
+            'to Read Note': { ar: 'لقراءة الملاحظة', en: 'to Read Note' }
+        };
+
+        function __(key) {
+            const entry = I18N_DICT[key];
+            if (entry) {
+                return entry[CURRENT_LOCALE] || entry['en'] || key;
+            }
+            return key;
+        }
 
         // Local User Profile Image
         const userAvatarUrl = CONFIG.currentUser?.avatar_url || null;
@@ -1271,43 +1471,149 @@
         let wsReconnectAttempts = 0;
 
         // ── Resize, Zoom, Pan & Camera ──
-        let cameraFitMode = 'fit'; // 'fit' (exact map containment) | 'fill' (edge-to-edge cover)
+        function getFloorBounds() {
+            let minX = 0;
+            let minY = 0;
+            let maxX = MAP_WIDTH_PX;
+            let maxY = MAP_HEIGHT_PX;
 
-        function centerCamera(mode = cameraFitMode) {
+            if (rooms && rooms.length > 0) {
+                rooms.forEach(r => {
+                    if (!r.bounds) return;
+                    const rx = r.bounds.x * TILE_SIZE;
+                    const ry = r.bounds.y * TILE_SIZE;
+                    const rw = r.bounds.width * TILE_SIZE;
+                    const rh = r.bounds.height * TILE_SIZE;
+                    minX = Math.min(minX, rx);
+                    minY = Math.min(minY, ry);
+                    maxX = Math.max(maxX, rx + rw);
+                    maxY = Math.max(maxY, ry + rh);
+                });
+            }
+
+            if (sortedMapObjects && sortedMapObjects.length > 0) {
+                sortedMapObjects.forEach(obj => {
+                    const ox = (obj.position ? obj.position.x : (obj.y || 0)) * TILE_SIZE;
+                    const oy = (obj.position ? obj.position.y : (obj.y || 0)) * TILE_SIZE;
+                    const ow = (obj.width || 1) * TILE_SIZE;
+                    const oh = (obj.height || 1) * TILE_SIZE;
+                    minX = Math.min(minX, ox);
+                    minY = Math.min(minY, oy);
+                    maxX = Math.max(maxX, ox + ow);
+                    maxY = Math.max(maxY, oy + oh);
+                });
+            }
+
+            const width = Math.max(100, maxX - minX);
+            const height = Math.max(100, maxY - minY);
+
+            return {
+                minX: minX,
+                minY: minY,
+                maxX: maxX,
+                maxY: maxY,
+                width: width,
+                height: height,
+                centerX: minX + (width / 2),
+                centerY: minY + (height / 2)
+            };
+        }
+
+        function updateDebugOverlay(info) {
+            let el = document.getElementById('fit-map-debug-overlay');
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'fit-map-debug-overlay';
+                el.style.cssText = 'position:fixed;top:70px;inset-inline-start:16px;background:rgba(11,20,16,0.92);backdrop-filter:blur(16px);border:1px solid rgba(211,165,83,0.5);border-radius:12px;padding:10px 14px;color:#F9F4EE;font-family:IBM Plex Mono,monospace;font-size:11px;z-index:99999;pointer-events:none;line-height:1.5;box-shadow:0 12px 30px rgba(0,0,0,0.7);';
+                document.body.appendChild(el);
+            }
+            el.innerHTML = `
+                <div style="color:#D3A553;font-weight:700;margin-bottom:4px;border-bottom:1px solid rgba(211,165,83,0.3);padding-bottom:2px;">
+                    📐 FIT TO CANVAS RUNTIME INSPECTION
+                </div>
+                <div><b>Viewport / Canvas:</b> ${info['canvas.clientWidth']} × ${info['canvas.clientHeight']} (Rect: ${info['canvas.getBoundingClientRect().width']} × ${info['canvas.getBoundingClientRect().height']})</div>
+                <div><b>Container:</b> ${info['map wrapper (#canvas-container) width']} × ${info['map wrapper (#canvas-container) height']}</div>
+                <div><b>Floor:</b> ${info['floorBounds.width']} × ${info['floorBounds.height']} [(${info['floorBounds.minX']},${info['floorBounds.minY']}) to (${info['floorBounds.maxX']},${info['floorBounds.maxY']})]</div>
+                <div><b>Scale / Zoom:</b> ${Number(info['camera.zoomLevel']).toFixed(4)}</div>
+                <div><b>Camera Offset:</b> X: ${info['camera.offsetX']}, Y: ${info['camera.offsetY']}</div>
+                <div><b>DPR:</b> ${info['devicePixelRatio']}</div>
+            `;
+            setTimeout(() => { if (el) el.style.display = 'none'; }, 8000);
+            el.style.display = 'block';
+        }
+
+        function centerCamera() {
             if (!canvas || !container) return;
             width = canvas.width = container.clientWidth || window.innerWidth;
             height = canvas.height = container.clientHeight || window.innerHeight;
 
-            const scaleX = width / MAP_WIDTH_PX;
-            const scaleY = height / MAP_HEIGHT_PX;
+            const floor = getFloorBounds();
 
-            if (mode === 'fill') {
-                // Edge-to-Edge Fill: covers width & height with zero black bars
-                zoomLevel = Math.max(scaleX, scaleY);
-            } else {
-                // Exact Fit: fits the entire floor map (1200×708) precisely inside the canvas, centered, 0 cutoff
-                zoomLevel = Math.min(scaleX, scaleY);
-            }
+            // Symmetrical padding around complete floor boundary (32px)
+            const padding = 32;
+            const availableWidth = Math.max(100, width - (padding * 2));
+            const availableHeight = Math.max(100, height - (padding * 2));
 
-            cameraOffset.x = Math.round((width - MAP_WIDTH_PX * zoomLevel) / 2);
-            cameraOffset.y = Math.round((height - MAP_HEIGHT_PX * zoomLevel) / 2);
+            // Fit complete floor into viewport using Math.min
+            const scaleX = availableWidth / floor.width;
+            const scaleY = availableHeight / floor.height;
+            const fitScale = Math.min(scaleX, scaleY);
+
+            zoomLevel = Math.max(0.05, Math.min(3.5, fitScale));
+
+            // Perfectly center the complete floor in the viewport
+            cameraOffset.x = Math.round((width / 2) - (floor.centerX * zoomLevel));
+            cameraOffset.y = Math.round((height / 2) - (floor.centerY * zoomLevel));
         }
 
         function fitMapToCanvas() {
-            if (!canvas || !container) return;
-            width = canvas.width = container.clientWidth || window.innerWidth;
-            height = canvas.height = container.clientHeight || window.innerHeight;
-
-            const scaleX = width / MAP_WIDTH_PX;
-            const scaleY = height / MAP_HEIGHT_PX;
-
-            // Contain scale: map is fully visible from edge to edge without distortion or cutoffs
-            zoomLevel = Math.min(scaleX, scaleY);
-            cameraOffset.x = Math.round((width - MAP_WIDTH_PX * zoomLevel) / 2);
-            cameraOffset.y = Math.round((height - MAP_HEIGHT_PX * zoomLevel) / 2);
-
+            centerCamera();
             if (typeof draw === 'function') draw();
-            showToast('📐 {{ __("Fit Map to Canvas (تمت ملاءمة الخريطة مع الشاشة بالضبط)") }}');
+
+            const mainContainer = document.querySelector('.nx-office-viewport-container');
+            const screenContainer = document.querySelector('.nx-floor-map-screen');
+            const rect = canvas ? canvas.getBoundingClientRect() : { width: 0, height: 0 };
+            const floor = getFloorBounds();
+            const dpr = window.devicePixelRatio || 1;
+
+            const debugInfo = {
+                'window.innerWidth': window.innerWidth,
+                'document.documentElement.clientWidth': document.documentElement.clientWidth,
+                'main office container (.nx-floor-map-screen) width': screenContainer ? screenContainer.clientWidth : 'N/A',
+                'main office container (.nx-floor-map-screen) height': screenContainer ? screenContainer.clientHeight : 'N/A',
+                'viewport wrapper (.nx-office-viewport-container) width': mainContainer ? mainContainer.clientWidth : 'N/A',
+                'map wrapper (#canvas-container) width': container ? container.clientWidth : 'N/A',
+                'map wrapper (#canvas-container) height': container ? container.clientHeight : 'N/A',
+                'canvas.clientWidth': canvas ? canvas.clientWidth : 0,
+                'canvas.clientHeight': canvas ? canvas.clientHeight : 0,
+                'canvas.getBoundingClientRect().width': rect.width,
+                'canvas.getBoundingClientRect().height': rect.height,
+                'canvas.width': canvas ? canvas.width : 0,
+                'canvas.height': canvas ? canvas.height : 0,
+                'devicePixelRatio': dpr,
+                'floorBounds.minX': floor.minX,
+                'floorBounds.minY': floor.minY,
+                'floorBounds.maxX': floor.maxX,
+                'floorBounds.maxY': floor.maxY,
+                'floorBounds.width': floor.width,
+                'floorBounds.height': floor.height,
+                'floorBounds.centerX': floor.centerX,
+                'floorBounds.centerY': floor.centerY,
+                'camera.zoomLevel': zoomLevel,
+                'camera.offsetX': cameraOffset.x,
+                'camera.offsetY': cameraOffset.y
+            };
+
+            console.log('═══════════════ FIT MAP TO CANVAS RUNTIME METRICS ═══════════════');
+            console.table(debugInfo);
+            window.__FIT_MAP_DEBUG = debugInfo;
+
+            updateDebugOverlay(debugInfo);
+            showToast('📐 ' + __('Fit Map to Canvas'));
+        }
+
+        function fitFloorToCanvas() {
+            fitMapToCanvas();
         }
 
         function toggleFitMode() {
@@ -1359,7 +1665,7 @@
 
             requestAnimationFrame(animateLocate);
             locateBeaconEndTime = Date.now() + 3500;
-            showToast('📍 {{ __("Locating You (تم تحديد وتوسيط موقعك والتقريب عليك)") }}');
+            showToast('📍 ' + __('Locating You'));
         }
 
         function resetCameraView() {
@@ -1457,33 +1763,7 @@
             });
         }
 
-        // ── Preloaded Background & Realtime User Profile Avatars ──
-        const MAP_BG_URL = (CONFIG.map && CONFIG.map.layout_data && CONFIG.map.layout_data.background_image_url)
-            ? CONFIG.map.layout_data.background_image_url
-            : null;
-        const BLUEPRINT_IMAGE = new Image();
-        let blueprintLoaded = false;
-        if (MAP_BG_URL) {
-            BLUEPRINT_IMAGE.src = MAP_BG_URL;
-            BLUEPRINT_IMAGE.onload = () => {
-                blueprintLoaded = true;
-                if (BLUEPRINT_IMAGE.naturalWidth > 0 && BLUEPRINT_IMAGE.naturalHeight > 0) {
-                    MAP_WIDTH_PX = BLUEPRINT_IMAGE.naturalWidth;
-                    MAP_HEIGHT_PX = BLUEPRINT_IMAGE.naturalHeight;
-                }
-                resizeCanvas();
-            };
-            BLUEPRINT_IMAGE.onerror = () => {
-                blueprintLoaded = false;
-                resizeCanvas();
-            };
-            if (BLUEPRINT_IMAGE.complete && BLUEPRINT_IMAGE.naturalWidth > 0) {
-                blueprintLoaded = true;
-                MAP_WIDTH_PX = BLUEPRINT_IMAGE.naturalWidth;
-                MAP_HEIGHT_PX = BLUEPRINT_IMAGE.naturalHeight;
-                resizeCanvas();
-            }
-        }
+        // ── Upload Custom Floor Artwork ──
 
         async function uploadOfficeFloorImage(input) {
             if (!input.files || !input.files[0]) return;
@@ -1496,7 +1776,7 @@
                 return;
             }
 
-            showToast('⏳ {{ __("Uploading Floor Image (جاري رفع صورة الأرضية)...") }}');
+            showToast('⏳ ' + __('Uploading Floor Image...'));
             try {
                 const res = await fetch(`/editor/maps/${mapId}/background`, {
                     method: 'POST',
@@ -1518,14 +1798,14 @@
                         }
                         centerCamera('fill');
                         if (typeof draw === 'function') draw();
-                        showToast('✅ {{ __("Floor Image Updated (تم تحديث صورة الأرضية بنجاح)") }}');
+                        showToast('✅ ' + __('Floor Image Updated'));
                     };
                 } else {
-                    showToast('❌ ' + (data.message || 'Upload failed'));
+                    showToast('❌ ' + (data.message || __('Upload failed')));
                 }
             } catch (err) {
                 console.error(err);
-                showToast('❌ Upload failed');
+                showToast('❌ ' + __('Upload failed'));
             }
         }
 
@@ -1705,16 +1985,19 @@
             } catch(e) {}
         }
 
-        // ── Movement & Controls ──
-        const keys = {};
+        // ── Controls & Keyboard Interaction ──
+        const keys = { w: false, a: false, s: false, d: false, arrowup: false, arrowdown: false, arrowleft: false, arrowright: false };
         window.addEventListener('keydown', (e) => {
-            if (['input', 'textarea', 'select'].includes(document.activeElement.tagName.toLowerCase())) return;
+            const activeEl = document.activeElement;
+            if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable)) return;
+
             const k = e.key.toLowerCase();
-            if (['w', 'a', 's', 'd', 'arrowup', 'arrowleft', 'arrowdown', 'arrowright'].includes(k)) {
+            if (keys[k] !== undefined) {
                 keys[k] = true;
+                avatarWaypoints = []; // Interrupt automated walking when player uses arrow keys
             }
 
-            // 'E' Key to Sit / Interact with Furniture (Drinks, Whiteboard, Instruments, Bells, Seating)
+            // 'E' Key to Interact with Furniture / Objects / Sit
             if (k === 'e') {
                 if (localAvatar.isSitting) {
                     localAvatar.isSitting = false;
@@ -1722,24 +2005,24 @@
                     if (ws && ws.readyState === WebSocket.OPEN) {
                         ws.send(JSON.stringify({ type: 'user.sit', payload: { isSitting: false } }));
                     }
-                    showToast('🧍 {{ __("Stood up (نهوض)") }}');
+                    showToast('🧍 ' + __('Stood up'));
                 } else if (nearbyInteractive) {
                     const item = nearbyInteractive;
                     if (item.interaction_type === 'drink') {
                         playDoorSlideSound();
-                        showToast(`☕ {{ __("Enjoying fresh drink from") }} ${item.name}! Cheers! 🎉`);
+                        showToast(`☕ ${__("Enjoying fresh drink from")} ${item.name}! Cheers! 🎉`);
                         triggerSpeechReaction('☕', 'emoji');
                     } else if (item.interaction_type === 'whiteboard') {
                         const boardModal = document.getElementById('whiteboard-modal');
                         if (boardModal) boardModal.style.display = 'flex';
-                        else showToast(`📋 {{ __("Interactive Strategy Whiteboard") }}: ${item.name}`);
+                        else showToast(`📋 ${__("Interactive Strategy Whiteboard")}: ${item.name}`);
                     } else if (item.interaction_type === 'soundEffect') {
                         playDoorKnockSound();
-                        showToast(`🔔 {{ __("Chime sound effect triggered on") }} ${item.name}!`);
+                        showToast(`🔔 ${__("Chime sound effect triggered on")} ${item.name}!`);
                         triggerSpeechReaction('🎉', 'emoji');
                     } else if (item.interaction_type === 'instrument' || item.interaction_type === 'staticMusic') {
                         playDoorSlideSound();
-                        showToast(`🎹 {{ __("Playing musical note on") }} ${item.name}! 🎶`);
+                        showToast(`🎹 ${__("Playing musical note on")} ${item.name}! 🎶`);
                         triggerSpeechReaction('🎶', 'emoji');
                     } else if (nearbyChair) {
                         localAvatar.isSitting = true;
@@ -1758,7 +2041,7 @@
                                 }
                             }));
                         }
-                        showToast('🪑 {{ __("Seated at Desk / Table (جلوس في المكتب)") }}');
+                        showToast('🪑 ' + __('Seated at Desk'));
                     }
                 }
             }
@@ -1817,19 +2100,19 @@
                 if (found) {
                     promptEl.style.display = 'block';
                     if (found.interaction_type === 'drink') {
-                        promptEl.innerHTML = `<span>☕ {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> {{ __('to Grab Drink (تناول مشروب)') }}</span>`;
+                        promptEl.innerHTML = `<span>☕ ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> ${__('to Grab Drink')}</span>`;
                     } else if (found.interaction_type === 'whiteboard') {
-                        promptEl.innerHTML = `<span>📋 {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> {{ __('to Open Whiteboard (السبورة)') }}</span>`;
+                        promptEl.innerHTML = `<span>📋 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> ${__('to Open Whiteboard')}</span>`;
                     } else if (found.interaction_type === 'youtube') {
-                        promptEl.innerHTML = `<span>📺 {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> {{ __('to Watch Stream (الشاشة)') }}</span>`;
+                        promptEl.innerHTML = `<span>📺 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> ${__('to Watch Stream')}</span>`;
                     } else if (found.interaction_type === 'soundEffect') {
-                        promptEl.innerHTML = `<span>🔔 {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> {{ __('to Ring Bell (تشغيل المؤثر)') }}</span>`;
+                        promptEl.innerHTML = `<span>🔔 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> ${__('to Ring Bell')}</span>`;
                     } else if (found.interaction_type === 'instrument' || found.interaction_type === 'staticMusic') {
-                        promptEl.innerHTML = `<span>🎹 {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> {{ __('to Play Music (عزف موسيقي)') }}</span>`;
+                        promptEl.innerHTML = `<span>🎹 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> ${__('to Play Music')}</span>`;
                     } else if (found.interaction_type === 'stickyNote') {
-                        promptEl.innerHTML = `<span>📝 {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> {{ __('to Read Note (ملاحظة)') }}</span>`;
+                        promptEl.innerHTML = `<span>📝 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> ${__('to Read Note')}</span>`;
                     } else {
-                        promptEl.innerHTML = `<span>🪑 {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> {{ __('to Sit at Desk (الجلوس)') }}</span>`;
+                        promptEl.innerHTML = `<span>🪑 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> ${__('to Sit at Desk')}</span>`;
                     }
                 } else {
                     promptEl.style.display = 'none';
@@ -2027,11 +2310,11 @@
                     if (confirm(`🚪 ${room.name} {{ __("is locked. Would you like to knock?") }}`)) {
                         if (ws && ws.readyState === WebSocket.OPEN) {
                             ws.send(JSON.stringify({ type: 'room.knock', payload: { roomId: room.id, roomName: room.name } }));
-                            showToast('⏳ {{ __("Knocked on door... waiting for occupant response.") }}');
+                            showToast('⏳ ' + __('Knocked on door... waiting for occupant response.'));
                         }
                     }
                 } else {
-                    showToast(`💡 {{ __("Only occupants inside this room can control its door (لا يمكن التحكم بالباب إلا من داخل الغرفة). Double-click inside to enter.") }}`);
+                    showToast('💡 ' + __('Only occupants inside this room can control its door. Double-click inside to enter.'));
                 }
                 return;
             }
@@ -2041,7 +2324,7 @@
             const nextLocked = !isCurrentlyLocked;
 
             if (occupants === 0 && nextLocked) {
-                showToast('⚠️ {{ __("Cannot lock an empty room. The door must remain open when empty (لا يمكن قفل غرفة فارغة).") }}');
+                showToast('⚠️ ' + __('Cannot lock an empty room. The door must remain open when empty.'));
                 return;
             }
 
@@ -2054,10 +2337,10 @@
 
             if (nextLocked) {
                 playDoorKnockSound();
-                showToast(`🔒 ${room.name} {{ __("door closed & locked (تم إغلاق الباب)") }}`);
+                showToast(`🔒 ${room.name} ` + __('door closed & locked'));
             } else {
                 playDoorSlideSound();
-                showToast(`🔓 ${room.name} {{ __("door opened (تم فتح الباب)") }}`);
+                showToast(`🔓 ${room.name} ` + __('door opened'));
             }
 
             if (ws && ws.readyState === WebSocket.OPEN) {
@@ -2269,7 +2552,7 @@
             if (targetRoom && targetRoom !== myRoom) {
                 // Moving into another room REQUIRES Double-Click!
                 if (!isDblClick) {
-                    showToast(`💡 {{ __("Double-click to navigate into (انقر مرتين للدخول):") }} ${targetRoom.name}`);
+                    showToast(`💡 ${__('Double-click to navigate into:')} ${getLocalizedRoomName(targetRoom)}`);
                     return;
                 }
 
@@ -2279,16 +2562,17 @@
                         return;
                     }
                 } else if (CONFIG.allowedRoomIds && CONFIG.allowedRoomIds.length > 0 && !CONFIG.allowedRoomIds.includes(targetRoom.id)) {
-                    showToast(`🚫 {{ __("Restricted Room: You do not have permission to access ':name'.", ['name' => '']) }} ${targetRoom.name}`);
+                    showToast(`🚫 {{ __("Restricted Room: You do not have permission to access ':name'.", ['name' => '']) }} ${getLocalizedRoomName(targetRoom)}`);
                     return;
                 } else if (targetRoom.capacity && targetRoom.capacity > 0 && countRoomOccupants(targetRoom.id) >= targetRoom.capacity) {
-                    showToast(`⚠️ {{ __("Room ':name' has reached full capacity (:max max occupants).", ['name' => '', 'max' => '']) }} ${targetRoom.name} (${targetRoom.capacity})`);
+                    showToast(`⚠️ {{ __("Room ':name' has reached full capacity (:max max occupants).", ['name' => '', 'max' => '']) }} ${getLocalizedRoomName(targetRoom)} (${targetRoom.capacity})`);
                     return;
                 } else if (roomDoorStates.get(targetRoom.id)) {
                     playDoorKnockSound();
-                    if (confirm(`🚪 ${targetRoom.name} {{ __("is locked. Would you like to knock?") }}`)) {
+                    const locName = getLocalizedRoomName(targetRoom);
+                    if (confirm(`🚪 ${locName} {{ __("is locked. Would you like to knock?") }}`)) {
                         if (ws && ws.readyState === WebSocket.OPEN) {
-                            ws.send(JSON.stringify({ type: 'room.knock', payload: { roomId: targetRoom.id, roomName: targetRoom.name } }));
+                            ws.send(JSON.stringify({ type: 'room.knock', payload: { roomId: targetRoom.id, roomName: locName } }));
                             showToast('⏳ {{ __("Knocked on door... waiting for occupant response.") }}');
                         }
                     }
@@ -2461,7 +2745,7 @@
 
                 if (r) {
                     if (statusPill) statusPill.style.display = 'flex';
-                    if (roomNameEl) roomNameEl.textContent = `🏢 ${r.name}`;
+                    if (roomNameEl) roomNameEl.textContent = `🏢 ${getLocalizedRoomName(r)}`;
                     if (lockIcon) lockIcon.textContent = isLocked ? 'lock' : 'lock_open';
                     if (lockText) lockText.textContent = isLocked ? '{{ __("Unlock Door") }}' : '{{ __("Lock Door") }}';
 
@@ -2711,19 +2995,6 @@
             }
         }
 
-        let sortedMapObjects = [];
-        function refreshSortedMapObjects() {
-            const raw = (CONFIG.map && CONFIG.map.objects) ? CONFIG.map.objects : [];
-            sortedMapObjects = [...raw].sort((a, b) => {
-                const elevA = typeof a.elevation === 'number' ? a.elevation : (a.interaction_config?.elevation || 1);
-                const elevB = typeof b.elevation === 'number' ? b.elevation : (b.interaction_config?.elevation || 1);
-                if (elevA !== elevB) return elevA - elevB;
-                const yA = (a.position ? a.position.y : (a.y || 0));
-                const yB = (b.position ? b.position.y : (b.y || 0));
-                return yA - yB;
-            });
-        }
-        refreshSortedMapObjects();
 
         function draw() {
             if (container && container.clientWidth > 0 && container.clientHeight > 0) {
@@ -2744,30 +3015,43 @@
 
             const hasBlueprint = blueprintLoaded && BLUEPRINT_IMAGE && BLUEPRINT_IMAGE.complete && BLUEPRINT_IMAGE.naturalWidth > 0 && BLUEPRINT_IMAGE.src && !BLUEPRINT_IMAGE.src.endsWith('/');
 
-            // 1. Draw Blueprint Background
+            // 1. Draw Blueprint / Procedural Floor Background (Warm Sand Diagonal Stripes matching Figma)
             if (hasBlueprint) {
-                ctx.fillStyle = '#ECE8DB';
+                ctx.fillStyle = '#EDE6D9';
                 ctx.fillRect(0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
                 ctx.drawImage(BLUEPRINT_IMAGE, 0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
             } else {
-                ctx.fillStyle = '#0F1E16';
+                // Pre-rendered Warm Sand with subtle diagonal striped texture
+                if (!window._floorSandPattern) {
+                    const pCan = document.createElement('canvas');
+                    pCan.width = 32;
+                    pCan.height = 32;
+                    const pCtx = pCan.getContext('2d');
+                    pCtx.fillStyle = '#EDE6D9';
+                    pCtx.fillRect(0, 0, 32, 32);
+                    pCtx.strokeStyle = '#E1D8CA';
+                    pCtx.lineWidth = 4.5;
+                    pCtx.beginPath();
+                    pCtx.moveTo(-8, 8); pCtx.lineTo(8, -8);
+                    pCtx.moveTo(0, 32); pCtx.lineTo(32, 0);
+                    pCtx.moveTo(24, 40); pCtx.lineTo(40, 24);
+                    pCtx.stroke();
+                    window._floorSandPattern = ctx.createPattern(pCan, 'repeat');
+                }
+                ctx.fillStyle = window._floorSandPattern || '#EDE6D9';
                 ctx.fillRect(0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
-                // Grid lines fallback
-                ctx.strokeStyle = 'rgba(79, 155, 95, 0.15)';
-                ctx.lineWidth = 1;
-                for (let gx = 0; gx <= MAP_WIDTH_PX; gx += 32) {
-                    ctx.beginPath(); ctx.moveTo(gx, 0); ctx.lineTo(gx, MAP_HEIGHT_PX); ctx.stroke();
-                }
-                for (let gy = 0; gy <= MAP_HEIGHT_PX; gy += 32) {
-                    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(MAP_WIDTH_PX, gy); ctx.stroke();
-                }
+
+                // Subtle Outer Floor Border
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
             }
 
             // 1b. Draw Placed Furniture & Decor Objects Layer (Rendered with 3D Elevation Depth Sorting)
             if (!window._officeObjImgCache) window._officeObjImgCache = new Map();
 
             sortedMapObjects.forEach(obj => {
-                const ox = (obj.position ? obj.position.x : (obj.x || 0)) * TILE_SIZE;
+                const ox = (obj.position ? obj.position.x : (obj.y || 0)) * TILE_SIZE;
                 const oy = (obj.position ? obj.position.y : (obj.y || 0)) * TILE_SIZE;
                 const objW = (obj.width || (obj.size ? obj.size.width : 1)) * TILE_SIZE;
                 const objH = (obj.height || (obj.size ? obj.size.height : 1)) * TILE_SIZE;
@@ -2778,10 +3062,7 @@
                     }
                 }
 
-                // If map has blueprint artwork, seeded untextured placeholder collision items should not be painted as blue blocks
-                if (hasBlueprint && !imgUrl) {
-                    return;
-                }
+                if (hasBlueprint && !imgUrl) return;
 
                 ctx.save();
                 ctx.translate(ox + objW / 2, oy + objH / 2);
@@ -2818,7 +3099,81 @@
                 ctx.restore();
             });
 
-            // 2. Draw Solid Architectural Room Walls, Door Openings & Animated Doors
+            // ── Architectural Solid Wall Segment Drawing Function ──
+            function renderSolidWallBlock(x1, y1, x2, y2, thickness, isLocked) {
+                const isHoriz = (y1 === y2);
+                const l = Math.min(x1, x2);
+                const r = Math.max(x1, x2);
+                const t = Math.min(y1, y2);
+                const b = Math.max(y1, y2);
+                if (r - l <= 0 && b - t <= 0) return;
+
+                ctx.save();
+                // 1. Drop shadow onto floor
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.25)';
+                ctx.shadowBlur = 5;
+                ctx.shadowOffsetX = 1;
+                ctx.shadowOffsetY = 2;
+
+                let wx, wy, ww, wh;
+                if (isHoriz) {
+                    wx = l;
+                    wy = y1 - thickness / 2;
+                    ww = r - l;
+                    wh = thickness;
+                } else {
+                    wx = x1 - thickness / 2;
+                    wy = t;
+                    ww = thickness;
+                    wh = b - t;
+                }
+
+                // 2. Solid Drywall / Architectural Wall Core
+                ctx.fillStyle = isLocked ? '#5F1414' : '#14231B';
+                ctx.fillRect(wx, wy, ww, wh);
+
+                // Turn off shadow for highlights
+                ctx.shadowColor = 'transparent';
+
+                // 3. Top Bevel Cap Highlight
+                ctx.fillStyle = isLocked ? '#991B1B' : '#2A4034';
+                if (isHoriz) {
+                    ctx.fillRect(wx + 1, wy + 1, ww - 2, Math.max(2, thickness * 0.38));
+                } else {
+                    ctx.fillRect(wx + 1, wy + 1, Math.max(2, thickness * 0.38), wh - 2);
+                }
+
+                // 4. Subtle Architectural Edge Stroke
+                ctx.strokeStyle = isLocked ? 'rgba(239, 68, 68, 0.75)' : 'rgba(237, 230, 217, 0.22)';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(wx + 0.5, wy + 0.5, ww - 1, wh - 1);
+                ctx.restore();
+            }
+
+            function renderSolidCornerPost(cx, cy, thickness, isLocked) {
+                ctx.save();
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.30)';
+                ctx.shadowBlur = 4;
+                ctx.shadowOffsetX = 1;
+                ctx.shadowOffsetY = 2;
+
+                const halfT = thickness / 2;
+                ctx.fillStyle = isLocked ? '#5F1414' : '#14231B';
+                ctx.fillRect(cx - halfT, cy - halfT, thickness, thickness);
+
+                ctx.shadowColor = 'transparent';
+                ctx.fillStyle = isLocked ? '#B91C1C' : '#334F40';
+                ctx.fillRect(cx - halfT + 1, cy - halfT + 1, thickness - 2, thickness - 2);
+
+                ctx.strokeStyle = isLocked ? '#EF4444' : 'rgba(237, 230, 217, 0.35)';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(cx - halfT + 0.5, cy - halfT + 0.5, thickness - 1, thickness - 1);
+                ctx.restore();
+            }
+
+            // 2. Draw Solid Architectural Room Walls, Door Openings & Animated Realistic Doors
+            const WALL_THICKNESS = 10;
+
             rooms.forEach(r => {
                 if (!r.bounds) return;
                 const rx = r.bounds.x * TILE_SIZE;
@@ -2830,62 +3185,60 @@
                 const doorState = doorAnimationStates.get(r.id) || { openProgress: 0 };
                 const openProg = isLocked ? 0 : (doorState.openProgress || 0);
 
-                // A. Room Interior Subtle Floor Glow Tint
-                ctx.fillStyle = isLocked ? 'rgba(239, 68, 68, 0.04)' : 'rgba(79, 155, 95, 0.05)';
-                ctx.fillRect(rx, ry, rw, rh);
+                // A. Room Floor Wash (100% Transparent to preserve natural floorplan artwork)
 
-                // B. Solid Physical Perimeter Walls (3D Beveled Architectural Outline)
-                ctx.save();
-                ctx.lineWidth = hasBlueprint ? 2 : 3.5;
-                ctx.strokeStyle = isLocked ? 'rgba(239, 68, 68, 0.85)' : (hasBlueprint ? 'rgba(45, 106, 79, 0.70)' : 'rgba(30, 58, 45, 0.95)');
-                ctx.fillStyle = isLocked ? '#7F1D1D' : '#14281E';
-
-                // Draw Top Wall
+                // B. Real Solid 3D Architectural Perimeter Walls
+                // Top Wall
                 if (door && door.wallSide === 'top') {
                     const doorLeft = door.x - (door.width / 2);
                     const doorRight = door.x + (door.width / 2);
-                    ctx.beginPath(); ctx.moveTo(rx, ry); ctx.lineTo(doorLeft, ry); ctx.stroke();
-                    ctx.beginPath(); ctx.moveTo(doorRight, ry); ctx.lineTo(rx + rw, ry); ctx.stroke();
+                    renderSolidWallBlock(rx, ry, doorLeft, ry, WALL_THICKNESS, isLocked);
+                    renderSolidWallBlock(doorRight, ry, rx + rw, ry, WALL_THICKNESS, isLocked);
                 } else {
-                    ctx.beginPath(); ctx.moveTo(rx, ry); ctx.lineTo(rx + rw, ry); ctx.stroke();
+                    renderSolidWallBlock(rx, ry, rx + rw, ry, WALL_THICKNESS, isLocked);
                 }
 
-                // Draw Left Wall
+                // Left Wall
                 if (door && door.wallSide === 'left') {
                     const doorTop = door.y - (door.width / 2);
                     const doorBottom = door.y + (door.width / 2);
-                    ctx.beginPath(); ctx.moveTo(rx, ry); ctx.lineTo(rx, doorTop); ctx.stroke();
-                    ctx.beginPath(); ctx.moveTo(rx, doorBottom); ctx.lineTo(rx, ry + rh); ctx.stroke();
+                    renderSolidWallBlock(rx, ry, rx, doorTop, WALL_THICKNESS, isLocked);
+                    renderSolidWallBlock(rx, doorBottom, rx, ry + rh, WALL_THICKNESS, isLocked);
                 } else {
-                    ctx.beginPath(); ctx.moveTo(rx, ry); ctx.lineTo(rx, ry + rh); ctx.stroke();
+                    renderSolidWallBlock(rx, ry, rx, ry + rh, WALL_THICKNESS, isLocked);
                 }
 
-                // Draw Right Wall
+                // Right Wall
                 if (door && door.wallSide === 'right') {
                     const doorTop = door.y - (door.width / 2);
                     const doorBottom = door.y + (door.width / 2);
-                    ctx.beginPath(); ctx.moveTo(rx + rw, ry); ctx.lineTo(rx + rw, doorTop); ctx.stroke();
-                    ctx.beginPath(); ctx.moveTo(rx + rw, doorBottom); ctx.lineTo(rx + rw, ry + rh); ctx.stroke();
+                    renderSolidWallBlock(rx + rw, ry, rx + rw, doorTop, WALL_THICKNESS, isLocked);
+                    renderSolidWallBlock(rx + rw, doorBottom, rx + rw, ry + rh, WALL_THICKNESS, isLocked);
                 } else {
-                    ctx.beginPath(); ctx.moveTo(rx + rw, ry); ctx.lineTo(rx + rw, ry + rh); ctx.stroke();
+                    renderSolidWallBlock(rx + rw, ry, rx + rw, ry + rh, WALL_THICKNESS, isLocked);
                 }
 
-                // Draw Bottom Wall
+                // Bottom Wall
                 if (door && door.wallSide === 'bottom') {
                     const doorLeft = door.x - (door.width / 2);
                     const doorRight = door.x + (door.width / 2);
-                    ctx.beginPath(); ctx.moveTo(rx, ry + rh); ctx.lineTo(doorLeft, ry + rh); ctx.stroke();
-                    ctx.beginPath(); ctx.moveTo(doorRight, ry + rh); ctx.lineTo(rx + rw, ry + rh); ctx.stroke();
+                    renderSolidWallBlock(rx, ry + rh, doorLeft, ry + rh, WALL_THICKNESS, isLocked);
+                    renderSolidWallBlock(doorRight, ry + rh, rx + rw, ry + rh, WALL_THICKNESS, isLocked);
                 } else {
-                    ctx.beginPath(); ctx.moveTo(rx, ry + rh); ctx.lineTo(rx + rw, ry + rh); ctx.stroke();
+                    renderSolidWallBlock(rx, ry + rh, rx + rw, ry + rh, WALL_THICKNESS, isLocked);
                 }
 
-                // Draw Door Portal & Animated Swinging Door Leaf
+                // Corner Structural Posts
+                renderSolidCornerPost(rx, ry, WALL_THICKNESS, isLocked);
+                renderSolidCornerPost(rx + rw, ry, WALL_THICKNESS, isLocked);
+                renderSolidCornerPost(rx + rw, ry + rh, WALL_THICKNESS, isLocked);
+                renderSolidCornerPost(rx, ry + rh, WALL_THICKNESS, isLocked);
+
+                // C. Real Architectural Doors
                 if (door) {
                     ctx.save();
                     ctx.translate(door.x, door.y);
 
-                    // Orientation angle: 0 for bottom, PI for top, PI/2 for right, -PI/2 for left
                     let wallAngle = 0;
                     if (door.wallSide === 'top') wallAngle = Math.PI;
                     else if (door.wallSide === 'right') wallAngle = Math.PI / 2;
@@ -2894,142 +3247,163 @@
                     ctx.rotate(wallAngle);
 
                     const halfW = door.width / 2;
+                    const doorThick = 6;
 
-                    // High Visibility Door Threshold Mat / Floor Marker
-                    ctx.fillStyle = isLocked ? 'rgba(239, 68, 68, 0.25)' : 'rgba(16, 185, 129, 0.22)';
-                    ctx.fillRect(-halfW - 4, -4, door.width + 8, 8);
-                    ctx.strokeStyle = isLocked ? '#EF4444' : '#10B981';
-                    ctx.lineWidth = 1.5;
-                    ctx.strokeRect(-halfW - 4, -4, door.width + 8, 8);
+                    // 1. Floor Threshold Plate (Warm Brass transition strip)
+                    ctx.fillStyle = isLocked ? 'rgba(239, 68, 68, 0.30)' : 'rgba(211, 165, 83, 0.32)';
+                    ctx.fillRect(-halfW - 2, -5, door.width + 4, 10);
+                    ctx.strokeStyle = isLocked ? '#EF4444' : '#D3A553';
+                    ctx.lineWidth = 1.2;
+                    ctx.strokeRect(-halfW - 2, -5, door.width + 4, 10);
 
-                    // Door Posts (Sturdy Architectural Pillars)
-                    ctx.fillStyle = '#064E3B';
-                    ctx.fillRect(-halfW - 5, -6, 6, 12);
-                    ctx.fillRect(halfW - 1, -6, 6, 12);
+                    // 2. Door Frame Jamb Posts (Architectural Frame)
+                    const jambW = 6;
+                    const jambD = 12;
+                    // Left Post
+                    ctx.fillStyle = isLocked ? '#7F1D1D' : '#0B1C13';
+                    ctx.fillRect(-halfW - jambW, -jambD / 2, jambW, jambD);
+                    ctx.fillStyle = isLocked ? '#DC2626' : '#D3A553';
+                    ctx.fillRect(-halfW - jambW, -jambD / 2 - 2, jambW, 3);
+                    ctx.strokeStyle = 'rgba(237, 230, 217, 0.3)';
+                    ctx.strokeRect(-halfW - jambW, -jambD / 2, jambW, jambD);
 
-                    // Door Post Gold Accent Caps
-                    ctx.fillStyle = '#F59E0B';
-                    ctx.fillRect(-halfW - 5, -8, 6, 3);
-                    ctx.fillRect(halfW - 1, -8, 6, 3);
+                    // Right Post
+                    ctx.fillStyle = isLocked ? '#7F1D1D' : '#0B1C13';
+                    ctx.fillRect(halfW, -jambD / 2, jambW, jambD);
+                    ctx.fillStyle = isLocked ? '#DC2626' : '#D3A553';
+                    ctx.fillRect(halfW, -jambD / 2 - 2, jambW, 3);
+                    ctx.strokeRect(halfW, -jambD / 2, jambW, jambD);
 
-                    // Animated Door Leaf (Rotates / Swings inward when opening)
+                    // 3. Dashed Door Swing Arc
                     ctx.save();
-                    ctx.translate(-halfW, 0);
-                    const swingAngle = openProg * (Math.PI * 0.45); // Swing 80 degrees inward (-Y is inside)
-                    ctx.rotate(-swingAngle);
-
-                    // Thick Solid Door Leaf Body (Wood/Glass Composite with Gold Trim)
-                    ctx.fillStyle = isLocked ? '#DC2626' : (openProg > 0.5 ? 'rgba(16, 185, 129, 0.85)' : '#059669');
-                    ctx.strokeStyle = isLocked ? '#FCA5A5' : '#6EE7B7';
-                    ctx.lineWidth = 2;
-                    if (ctx.roundRect) ctx.roundRect(0, -4, door.width * 0.95, 8, 3);
-                    else ctx.rect(0, -4, door.width * 0.95, 8);
-                    ctx.fill();
-                    ctx.stroke();
-
-                    // Door Handle (Gleaming Metallic)
-                    ctx.fillStyle = '#FBBF24';
+                    ctx.strokeStyle = isLocked ? 'rgba(239, 68, 68, 0.45)' : 'rgba(60, 107, 76, 0.45)';
+                    ctx.lineWidth = 1.5;
+                    ctx.setLineDash([3, 3]);
                     ctx.beginPath();
-                    ctx.arc(door.width * 0.78, 0, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.strokeStyle = '#78350F';
-                    ctx.lineWidth = 1;
+                    ctx.arc(-halfW, 0, door.width * 0.94, -Math.PI * 0.48, 0, false);
                     ctx.stroke();
                     ctx.restore();
 
-                    // Animated Door Arc Trace Indicator
-                    if (openProg > 0.05 && openProg < 0.95) {
-                        ctx.strokeStyle = 'rgba(16, 185, 129, 0.5)';
-                        ctx.lineWidth = 1.5;
-                        ctx.setLineDash([3, 3]);
-                        ctx.beginPath();
-                        ctx.arc(-halfW, 0, door.width * 0.95, -Math.PI * 0.45, 0);
-                        ctx.stroke();
-                        ctx.setLineDash([]);
-                    }
+                    // 4. Animated 3D Door Leaf
+                    ctx.save();
+                    ctx.translate(-halfW, 0);
+                    const swingAngle = openProg * (Math.PI * 0.48);
+                    ctx.rotate(-swingAngle);
 
-                    ctx.restore(); // Restore local transform
+                    ctx.shadowColor = 'rgba(0,0,0,0.35)';
+                    ctx.shadowBlur = 5;
+                    ctx.shadowOffsetX = 1;
+                    ctx.shadowOffsetY = 2;
 
-                    // Door Status Label Pill ("OPEN" / "LOCKED / CLICK TO OPEN") in world coordinates
-                    const statusText = isLocked ? '🔒 CLOSED' : (openProg > 0.4 ? '🚪 OPEN' : '🚪 UNLOCKED');
-                    ctx.font = 'bold 8px Cairo, Inter, sans-serif';
-                    ctx.fillStyle = isLocked ? '#EF4444' : '#10B981';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
+                    const leafW = door.width * 0.94;
+                    ctx.fillStyle = isLocked ? '#991B1B' : (openProg > 0.4 ? '#245C3A' : '#1A3828');
+                    if (ctx.roundRect) ctx.roundRect(0, -doorThick / 2, leafW, doorThick, 2);
+                    else ctx.rect(0, -doorThick / 2, leafW, doorThick);
+                    ctx.fill();
 
-                    let labelX = door.x;
-                    let labelY = door.y + 14;
-                    if (door.wallSide === 'top') labelY = door.y - 14;
-                    else if (door.wallSide === 'left') { labelX = door.x - 20; labelY = door.y; }
-                    else if (door.wallSide === 'right') { labelX = door.x + 20; labelY = door.y; }
+                    ctx.shadowColor = 'transparent';
+                    ctx.strokeStyle = isLocked ? '#FCA5A5' : (openProg > 0.4 ? '#86EFAC' : '#D3A553');
+                    ctx.lineWidth = 1.2;
+                    if (ctx.roundRect) ctx.roundRect(0, -doorThick / 2, leafW, doorThick, 2);
+                    else ctx.rect(0, -doorThick / 2, leafW, doorThick);
+                    ctx.stroke();
 
-                    ctx.fillText(statusText, labelX, labelY);
+                    // Inset Glass Tint
+                    ctx.fillStyle = isLocked ? 'rgba(255,255,255,0.1)' : 'rgba(167, 243, 208, 0.25)';
+                    ctx.fillRect(leafW * 0.2, -doorThick / 2 + 1, leafW * 0.5, doorThick - 2);
+
+                    // Metallic Knob
+                    ctx.fillStyle = '#FBBF24';
+                    ctx.beginPath();
+                    ctx.arc(leafW * 0.82, 0, 2.5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#78350F';
+                    ctx.lineWidth = 0.8;
+                    ctx.stroke();
+
+                    ctx.restore();
+                    ctx.restore();
                 }
-                ctx.restore();
 
-                // C. Floating Sleek Glass Room Header Scrim Capsule Badge (Figma Room Component)
-                const rawName = r.name || '';
-                const parts = rawName.split(' - ');
-                const arName = (parts[0] || rawName).trim();
-                const enName = parts.length > 1 ? parts[1].trim() : (r.english_name || '');
-                const occupantsCount = countRoomOccupants(r.id);
+                // D. Figma Design Room Card (Smaller pill placed at top-left corner with green rounded background)
+                const displayName = getLocalizedRoomName(r);
 
                 ctx.save();
-                ctx.font = '600 11px "IBM Plex Sans Arabic", sans-serif';
-                const arWidth = ctx.measureText(arName).width;
-                ctx.font = '400 9px "IBM Plex Sans", sans-serif';
-                const enWidth = enName ? ctx.measureText(enName).width : 0;
-                const badgeW = Math.min(rw - 4, Math.max(arWidth, enWidth, 60) + 20);
-                const badgeH = (enName && rh > 50) ? 34 : 22;
-                const badgeX = rx + (rw / 2) - (badgeW / 2);
-                const badgeY = ry + 8;
+                ctx.font = '600 9px ' + (CURRENT_LOCALE === 'ar' ? '"IBM Plex Sans Arabic", sans-serif' : '"IBM Plex Sans", sans-serif');
+                const nameMetrics = ctx.measureText(displayName);
+                
+                const cardPadX = 8;
+                const cardW = Math.min(rw - 16, nameMetrics.width + (cardPadX * 2));
+                const cardH = 18;
+                const cardRadius = 6;
+                const cardX = rx + 14;
+                const cardY = ry + 14;
 
-                // Scrim Glass Capsule Background
-                ctx.fillStyle = isLocked ? 'rgba(127, 29, 29, 0.90)' : 'rgba(20, 43, 36, 0.88)';
-                ctx.strokeStyle = isLocked ? 'rgba(239, 68, 68, 0.50)' : 'rgba(237, 230, 217, 0.24)';
-                ctx.lineWidth = 1;
-                if (ctx.roundRect) ctx.roundRect(badgeX, badgeY, badgeW, badgeH, 10);
-                else ctx.rect(badgeX, badgeY, badgeW, badgeH);
+                // Subtle Card Drop Shadow
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+                ctx.shadowBlur = 6;
+                ctx.shadowOffsetY = 2;
+
+                // Green rounded background
+                ctx.fillStyle = isLocked ? 'rgba(127, 29, 29, 0.92)' : 'rgba(20, 55, 38, 0.90)';
+                if (ctx.roundRect) ctx.roundRect(cardX, cardY, cardW, cardH, cardRadius);
+                else ctx.rect(cardX, cardY, cardW, cardH);
                 ctx.fill();
+
+                ctx.shadowColor = 'transparent';
+                ctx.strokeStyle = isLocked ? 'rgba(239, 68, 68, 0.50)' : 'rgba(52, 211, 153, 0.40)';
+                ctx.lineWidth = 1;
+                if (ctx.roundRect) ctx.roundRect(cardX, cardY, cardW, cardH, cardRadius);
+                else ctx.rect(cardX, cardY, cardW, cardH);
                 ctx.stroke();
 
-                // Arabic Headline
-                ctx.fillStyle = isLocked ? '#FCA5A5' : '#F9F4EE';
-                ctx.font = '600 11px "IBM Plex Sans Arabic", sans-serif';
+                // Localized Room Name
+                ctx.fillStyle = isLocked ? '#FCA5A5' : '#86EFAC';
+                ctx.font = '600 9px ' + (CURRENT_LOCALE === 'ar' ? '"IBM Plex Sans Arabic", sans-serif' : '"IBM Plex Sans", sans-serif');
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText((isLocked ? '🔒 ' : '') + arName, rx + (rw / 2), badgeY + (enName ? 11 : 11));
-
-                // English Companion
-                if (enName) {
-                    ctx.fillStyle = isLocked ? '#FECACA' : '#D3A553';
-                    ctx.font = '400 9px "IBM Plex Sans", sans-serif';
-                    ctx.fillText(enName, rx + (rw / 2), badgeY + 24);
-                }
+                ctx.fillText((isLocked ? '🔒 ' : '') + displayName, cardX + (cardW / 2), cardY + (cardH / 2) + 0.5);
                 ctx.restore();
             });
 
-            // 3. Rectangular Acoustic Sound Isolation Aura for Active Room
+            // 3. Active Room calculation for status badge
             const activeRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
-            if (activeRoom && activeRoom.bounds) {
-                const rx = activeRoom.bounds.x * TILE_SIZE;
-                const ry = activeRoom.bounds.y * TILE_SIZE;
-                const rw = activeRoom.bounds.width * TILE_SIZE;
-                const rh = activeRoom.bounds.height * TILE_SIZE;
 
-                ctx.fillStyle = 'rgba(79, 155, 95, 0.14)';
-                if (ctx.roundRect) ctx.roundRect(rx - 4, ry - 4, rw + 8, rh + 8, 8);
-                else ctx.rect(rx - 4, ry - 4, rw + 8, rh + 8);
-                ctx.fill();
+            // 3b. Active Room Occupants Floating Status Badge (Figma Spec matching Screenshot)
+            const roomOccupantsCount = activeRoom ? countRoomOccupants(activeRoom.id) : (remoteAvatars.size + 1);
+            const totalRoomCapacity = activeRoom ? (activeRoom.capacity || 8) : 8;
+            const currentRoomTitle = activeRoom ? getLocalizedRoomName(activeRoom) : (CURRENT_LOCALE === 'ar' ? 'المساحة المفتوحة' : 'Open Space');
+            
+            ctx.save();
+            const statusBadgeText = `● ${currentRoomTitle} · ${roomOccupantsCount} ${CURRENT_LOCALE === 'ar' ? 'من' : 'of'} ${totalRoomCapacity}`;
+            ctx.font = '600 11px ' + (CURRENT_LOCALE === 'ar' ? '"IBM Plex Sans Arabic", sans-serif' : '"IBM Plex Sans", sans-serif');
+            const sMetrics = ctx.measureText(statusBadgeText);
+            const sW = sMetrics.width + 24;
+            const sH = 26;
+            const sX = MAP_WIDTH_PX - sW - 20;
+            const sY = MAP_HEIGHT_PX - sH - 20;
 
-                ctx.strokeStyle = 'rgba(79, 155, 95, 0.75)';
-                ctx.lineWidth = 2;
-                ctx.setLineDash([6, 6]);
-                if (ctx.roundRect) ctx.roundRect(rx - 2, ry - 2, rw + 4, rh + 4, 6);
-                else ctx.rect(rx - 2, ry - 2, rw + 4, rh + 4);
-                ctx.stroke();
-                ctx.setLineDash([]);
-            }
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+            ctx.shadowBlur = 8;
+            ctx.shadowOffsetY = 3;
+
+            ctx.fillStyle = 'rgba(20, 36, 28, 0.90)';
+            if (ctx.roundRect) ctx.roundRect(sX, sY, sW, sH, 13);
+            else ctx.rect(sX, sY, sW, sH);
+            ctx.fill();
+
+            ctx.shadowColor = 'transparent';
+            ctx.strokeStyle = 'rgba(237, 230, 217, 0.18)';
+            ctx.lineWidth = 1;
+            if (ctx.roundRect) ctx.roundRect(sX, sY, sW, sH, 13);
+            else ctx.rect(sX, sY, sW, sH);
+            ctx.stroke();
+
+            ctx.fillStyle = '#86EFAC';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(statusBadgeText, sX + sW / 2, sY + sH / 2);
+            ctx.restore();
 
             // 4. Draw Remote Avatars (Clean 2.5D Figure without white circle)
             remoteAvatars.forEach(av => drawAvatar(av, false));
@@ -3688,7 +4062,7 @@
                         else if (data.type === 'user.wave' && data.payload) {
                             if (data.payload.targetUserId === localAvatar.id) {
                                 playWaveSound();
-                                showToast(`👋 ${data.payload.senderName || 'A Colleague'} {{ __("says HI to you! (يلقي التحية عليك)") }}`);
+                                showToast(`👋 ${data.payload.senderName || 'A Colleague'} ${__('says HI to you!')}`);
                                 spawnSpeechBubble(data.payload.senderUserId, data.payload.senderName, `👋 ${data.payload.senderName || 'Colleague'} says HI!`, '👋');
                             }
                         }
@@ -3701,11 +4075,11 @@
                                 spawnSpeechBubble(data.payload.senderUserId, data.payload.senderName, `🔔 Ringing!`, '🔔');
                                 const titleEl = document.getElementById('incoming-ring-title');
                                 const descEl = document.getElementById('incoming-ring-desc');
-                                if (titleEl) titleEl.textContent = `🔔 ${data.payload.senderName || 'A Colleague'} {{ __("is ringing you!") }}`;
-                                if (descEl) descEl.textContent = `{{ __("Immediate attention requested by") }} ${data.payload.senderName}.`;
+                                if (titleEl) titleEl.textContent = `🔔 ${data.payload.senderName || 'A Colleague'} ${__('is ringing you!')}`;
+                                if (descEl) descEl.textContent = `${__('Immediate attention requested by')} ${data.payload.senderName}.`;
                                 const ringModal = document.getElementById('incoming-ring-modal');
                                 if (ringModal) ringModal.style.display = 'flex';
-                                showToast(`🔔 ${data.payload.senderName} {{ __("is ringing you! (رنين تنبيه مباشر)") }}`);
+                                showToast(`🔔 ${data.payload.senderName} ${__('is ringing you!')}`);
                             }
                         }
 
@@ -3935,12 +4309,12 @@
                                     <span class="user-title">🖥️ ${presenterName} ({{ __('Screen Share') }})</span>
                                 </div>
                                 <div class="video-card-actions">
-                                    <button class="v-btn" id="vbtn-sm-${userId}" onclick="resizeVideoCard('${userId}', 'small')" title="{{ __('Small View (عرض صغير)') }}">📱</button>
-                                    <button class="v-btn active" id="vbtn-med-${userId}" onclick="resizeVideoCard('${userId}', 'medium')" title="{{ __('Medium View (عرض متوسط)') }}">💻</button>
-                                    <button class="v-btn" id="vbtn-lg-${userId}" onclick="resizeVideoCard('${userId}', 'large')" title="{{ __('Theater / Large (عرض كبير)') }}">📺</button>
-                                    <button class="v-btn" onclick="toggleFullscreenVideo('${userId}')" title="{{ __('Full Screen (شاشة كاملة)') }}">⛶</button>
+                                    <button class="v-btn" id="vbtn-sm-${userId}" onclick="resizeVideoCard('${userId}', 'small')" title="{{ __('Small View') }}">📱</button>
+                                    <button class="v-btn active" id="vbtn-med-${userId}" onclick="resizeVideoCard('${userId}', 'medium')" title="{{ __('Medium View') }}">💻</button>
+                                    <button class="v-btn" id="vbtn-lg-${userId}" onclick="resizeVideoCard('${userId}', 'large')" title="{{ __('Theater / Large') }}">📺</button>
+                                    <button class="v-btn" onclick="toggleFullscreenVideo('${userId}')" title="{{ __('Full Screen') }}">⛶</button>
                                     <button class="v-btn" onclick="togglePipVideo('${userId}')" title="{{ __('Picture in Picture') }}">🗖</button>
-                                    <button class="v-btn" onclick="toggleCollapseVideo('${userId}')" title="{{ __('Minimize (تصغير)') }}">➖</button>
+                                    <button class="v-btn" onclick="toggleCollapseVideo('${userId}')" title="{{ __('Minimize') }}">➖</button>
                                 </div>
                             </div>
                             <div class="video-wrapper"></div>
@@ -4507,7 +4881,7 @@
                 }));
                 playWaveSound();
                 spawnSpeechBubble(localAvatar.id, localAvatar.name, `👋 Hi!`, '👋');
-                showToast('👋 {{ __("Sent Hi wave to colleague! (تم إلقاء التحية)") }}');
+                showToast('👋 ' + __('Sent Hi wave to colleague!'));
             }
         }
 
@@ -4521,7 +4895,7 @@
                 }));
                 playRingSound();
                 spawnSpeechBubble(localAvatar.id, localAvatar.name, `🔔 Ringing...`, '🔔');
-                showToast('🔔 {{ __("Ringing colleague for immediate attention... (تم إرسال الرنين)") }}');
+                showToast('🔔 ' + __('Ringing colleague for immediate attention...'));
             }
         }
 
@@ -5599,7 +5973,7 @@
                 return `
                     <div class="msg-bubble ${isSelf ? 'self' : ''}">
                         <div class="msg-meta">
-                            <span>${isSelf ? '{{ __("You (أنت)") }}' : escapeHtml(m.senderName)}</span>
+                            <span>${isSelf ? '{{ __("You") }}' : escapeHtml(m.senderName)}</span>
                             <span>${m.time || ''}</span>
                         </div>
                         <span style="word-break: break-word;">${escapeHtml(m.body || m.text || '')}</span>

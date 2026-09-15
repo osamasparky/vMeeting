@@ -1,7 +1,7 @@
 @extends('superadmin.layout')
 
 @section('title', __('Global Feature Flags'))
-@section('page_title', __('System — Global Feature Flags (إدارة ميزات المنصة)'))
+@section('page_title', __'System — Global Feature Flags'))
 
 @section('content')
 <div style="display: flex; flex-direction: column; gap: 24px;">

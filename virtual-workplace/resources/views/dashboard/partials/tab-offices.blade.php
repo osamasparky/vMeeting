@@ -1,13 +1,13 @@
         <div id="tab-offices" class="tab-view">
             <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
                 <div>
-                    <h1 class="page-title" style="font-size: 22px; font-weight: 900; color: var(--text-primary); margin-bottom: 4px;">🏢 {{ __('Offices & Virtual Branches (الفروع ومكاتب العمل)') }}</h1>
+                    <h1 class="page-title" style="font-size: 22px; font-weight: 900; color: var(--text-primary); margin-bottom: 4px;">🏢 {{ __('Offices & Virtual Branches') }}</h1>
                     <p class="page-subtitle" style="font-size: 13px; color: var(--text-secondary);">{{ __('Manage multiple branches (e.g. Cairo Branch, Riyadh HQ, Dubai Hub), their blueprints, and member access permissions.') }}</p>
                 </div>
                 <div style="display: flex; gap: 10px; align-items: center;">
                     @if(!$organization->hasReachedOfficeLimit())
                     <button onclick="openNewOfficeModal()" class="tactile-btn btn-primary" style="padding: 10px 18px; font-size: 13px;">
-                        <span>➕</span> {{ __('Add Office Branch (إضافة فرع جديد)') }}
+                        <span>➕</span> {{ __('Add Office Branch') }}
                     </button>
                     @else
                     <button onclick="switchAdminTab('billing')" class="tactile-btn" style="padding: 10px 18px; font-size: 13px; background: linear-gradient(180deg, #D6A23A 0%, #B4831B 100%); color: white; border: 1px solid #996D12;">
@@ -22,7 +22,7 @@
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <span style="font-size: 20px;">💎</span>
                     <div>
-                        <strong style="color: var(--text-primary); font-size: 13px;">{{ __('Offices Quota:') }} {{ $offices->count() }} / {{ $organization->plan?->isUnlimitedOffices() ? __('Unlimited (غير محدود)') : ($organization->plan?->max_offices ?? 1) }}</strong>
+                        <strong style="color: var(--text-primary); font-size: 13px;">{{ __('Offices Quota:') }} {{ $offices->count() }} / {{ $organization->plan?->isUnlimitedOffices() ? __('Unlimited') : ($organization->plan?->max_offices ?? 1) }}</strong>
                         <div style="font-size: 11px; color: var(--text-secondary);">{{ __('Your organization is subscribed to :plan plan.', ['plan' => $organization->plan?->name ?? 'Default']) }}</div>
                     </div>
                 </div>
@@ -50,7 +50,7 @@
                             </div>
                             @if($off->is_default)
                                 <span class="badge-status" style="background: rgba(79, 155, 95, 0.15); color: #2E6B40; font-size: 11px; font-weight: 900;">
-                                    ⭐ {{ __('Main HQ (الرئيسي)') }}
+                                    ⭐ {{ __('Main HQ') }}
                                 </span>
                             @endif
                         </div>
@@ -71,7 +71,7 @@
                             <div>
                                 <span style="font-size: 11px; color: var(--text-muted);">{{ __('Assigned Staff') }}</span>
                                 <div style="font-size: 15px; font-weight: 900; color: var(--brand-forest); margin-top: 2px;">
-                                    👥 {{ $off->members->count() > 0 ? $off->members->count() : __('All (الكل)') }}
+                                    👥 {{ $off->members->count() > 0 ? $off->members->count() : __('All') }}
                                 </div>
                             </div>
                         </div>

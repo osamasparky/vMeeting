@@ -1,7 +1,7 @@
 @extends('superadmin.layout')
 
 @section('title', __('3D & Media Asset Manager'))
-@section('page_title', __('Website CMS — 3D & Media Assets (مدير ملفات الـ 3D والوسائط)'))
+@section('page_title', __('Website CMS — 3D & Media Assets'))
 
 @section('content')
 <div style="display: flex; flex-direction: column; gap: 24px;">
@@ -34,7 +34,7 @@
         <div class="panel-header" style="margin-bottom: 20px;">
             <div class="panel-title">
                 <span>📤</span>
-                <span>{{ __('Upload New Media or 3D GLB/GLTF Model (رفع ملف أو نموذج جديد)') }}</span>
+                <span>{{ __'Upload New Media or 3D GLB/GLTF Model') }}</span>
             </div>
             <p class="panel-subtitle">{{ __('Supported formats: GLB, GLTF, MP4, WebM, PNG, JPG, WebP, SVG, Lottie (Max 50MB)') }}</p>
         </div>
@@ -97,7 +97,7 @@
         <div class="panel-header" style="margin-bottom: 20px;">
             <div class="panel-title">
                 <span>📚</span>
-                <span>{{ __('Active Media & 3D Library (مكتبة الوسائط الحالية)') }}</span>
+                <span>{{ __'Active Media & 3D Library') }}</span>
             </div>
         </div>
 

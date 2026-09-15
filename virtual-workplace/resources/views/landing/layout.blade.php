@@ -283,7 +283,7 @@
                         <span>{{ __('Log In') }}</span>
                     </a>
                     <x-btn href="{{ route('register') }}" variant="nav-cta" size="sm">
-                        <span>{{ __('Book a Demo (احجز عرضاً)') }}</span>
+                        <span>{{ __'Book a Demo') }}</span>
                     </x-btn>
                 @endauth
 
@@ -318,7 +318,7 @@
             </div>
 
             <div class="nx-footer-col">
-                <h4>{{ __('Product (المنتج)') }}</h4>
+                <h4>{{ __'Product') }}</h4>
                 <ul class="nx-footer-links">
                     <li><a href="#spaces">{{ __('Spatial 2D/3D Office') }}</a></li>
                     <li><a href="#meetings">{{ __('Proximity Audio & Video') }}</a></li>
@@ -328,7 +328,7 @@
             </div>
 
             <div class="nx-footer-col">
-                <h4>{{ __('Company (الشركة)') }}</h4>
+                <h4>{{ __'Company') }}</h4>
                 <ul class="nx-footer-links">
                     <li><a href="{{ route('register') }}">{{ __('Get Started Free') }}</a></li>
                     <li><a href="{{ route('login') }}">{{ __('Sign In to Workplace') }}</a></li>

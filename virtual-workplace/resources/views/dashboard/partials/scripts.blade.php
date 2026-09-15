@@ -211,42 +211,43 @@
                 }
             }
 
-            const titles = {
-                'overview': '{{ __('Dashboard') }}',
-                'chat': '{{ __('Team Chat & Direct Messages') }}',
-                'rooms': '{{ __('Rooms & Doors') }}',
-                'members': '{{ __('People & Roles') }}',
-                'meetings': '{{ __('Scheduled Meetings & Live Sessions') }}',
-                'guests': '{{ __('Meetings & Guest Links') }}',
-                'all-tasks': '{{ __('Tasks Manager') }}',
-                'my-tasks': '{{ __('My Tasks') }}',
-                'projects': '{{ __('Files & Projects') }}',
-                'timesheets': '{{ __('Analytics & Timesheets') }}',
-                'workload': '{{ __('Team Workload') }}',
-                'departments': '{{ __('Departments & Teams') }}',
-                'audit': '{{ __('Audit Logs') }}',
-                'billing': '{{ __('Billing & Subscription') }}',
-                'settings': '{{ __('Workspace Settings') }}',
-                'profile': '{{ __('My User Profile') }}'
-            };
-            const subtitles = {
-                'overview': '{{ __('Welcome to your virtual workspace') }}',
-                'chat': '{{ __('Realtime company communication, direct colleague messaging, and team channels') }}',
-                'rooms': '{{ __('Collaborative 2D & 3D space management') }}',
-                'members': '{{ __('Team roster, departments, and permissions') }}',
-                'meetings': '{{ __('Scheduled video rooms, attendee sync, and sound alerts') }}',
-                'guests': '{{ __('Instant access links without authentication') }}',
-                'all-tasks': '{{ __('Track sprints, milestones, and deliverables') }}',
-                'my-tasks': '{{ __('Personal checklist and scheduled duties') }}',
-                'projects': '{{ __('Shared assets and file repositories') }}',
-                'timesheets': '{{ __('Presence trends and productivity tracking') }}',
-                'workload': '{{ __('Capacity planning and resource distribution') }}',
-                'departments': '{{ __('Organizational structure and hierarchy') }}',
-                'audit': '{{ __('Realtime activity logs and security history') }}',
-                'billing': '{{ __('Manage subscription tier and payment plans') }}',
-                'settings': '{{ __('Workspace configuration and branding') }}',
-                'profile': '{{ __('Personal details, hobbies, and security') }}'
-            };
+            const titles = {!! json_encode([
+                'overview' => __('Dashboard'),
+                'chat' => __('Team Chat & Direct Messages'),
+                'rooms' => __('Rooms & Doors'),
+                'members' => __('People & Roles'),
+                'meetings' => __('Scheduled Meetings & Live Sessions'),
+                'guests' => __('Meetings & Guest Links'),
+                'all-tasks' => __('Tasks Manager'),
+                'my-tasks' => __('My Tasks'),
+                'projects' => __('Files & Projects'),
+                'timesheets' => __('Analytics & Timesheets'),
+                'workload' => __('Team Workload'),
+                'departments' => __('Departments & Teams'),
+                'audit' => __('Audit Logs'),
+                'billing' => __('Billing & Subscription'),
+                'settings' => __('Workspace Settings'),
+                'profile' => __('My User Profile'),
+            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!};
+
+            const subtitles = {!! json_encode([
+                'overview' => __('Welcome to your virtual workspace'),
+                'chat' => __('Realtime company communication, direct colleague messaging, and team channels'),
+                'rooms' => __('Collaborative 2D & 3D space management'),
+                'members' => __('Team roster, departments, and permissions'),
+                'meetings' => __('Scheduled video rooms, attendee sync, and sound alerts'),
+                'guests' => __('Instant access links without authentication'),
+                'all-tasks' => __('Track sprints, milestones, and deliverables'),
+                'my-tasks' => __('Personal checklist and scheduled duties'),
+                'projects' => __('Shared assets and file repositories'),
+                'timesheets' => __('Presence trends and productivity tracking'),
+                'workload' => __('Capacity planning and resource distribution'),
+                'departments' => __('Organizational structure and hierarchy'),
+                'audit' => __('Realtime activity logs and security history'),
+                'billing' => __('Manage subscription tier and payment plans'),
+                'settings' => __('Workspace configuration and branding'),
+                'profile' => __('Personal details, hobbies, and security'),
+            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!};
 
             const headerTitle = document.getElementById('page-primary-title');
             const headerSub = document.getElementById('page-primary-subtitle');

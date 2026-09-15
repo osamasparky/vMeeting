@@ -959,18 +959,18 @@
                 <form method="POST" action="{{ route('organization.members.store') }}" style="display: flex; flex-direction: column; gap: 14px;">
                     @csrf
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Full Name (الاسم بالكامل)') }} *</label>
-                        <input type="text" name="name" required placeholder="e.g. Ahmed Ali" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Full Name') }} *</label>
+                        <input type="text" name="name" required placeholder="e.g. Sarah Jenkins" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                     </div>
 
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Email Address (البريد الإلكتروني)') }} *</label>
-                        <input type="email" name="email" required placeholder="colleague@company.com" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Email Address') }} *</label>
+                        <input type="email" name="email" required placeholder="sarah@company.com" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <div>
-                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Access Role (الدور والصلاحية)') }} *</label>
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Access Role') }} *</label>
                             <select name="role_id" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                                 @foreach($roles as $role)
                                     <option value="{{ $role->id }}">{{ $role->name }}</option>
@@ -978,14 +978,14 @@
                             </select>
                         </div>
                         <div>
-                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Initial Password (كلمة المرور)') }}</label>
-                            <input type="password" name="password" minlength="8" placeholder="Default: Password@1234" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Initial Password') }}</label>
+                            <input type="password" name="password" placeholder="Default: 12345678" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <div>
-                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Department (القسم)') }}</label>
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Department') }}</label>
                             <select name="department_id" onchange="filterTeamsForInvite(this.value)" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                                 <option value="">— {{ __('No Department') }} —</option>
                                 @foreach($departments as $d)
@@ -994,7 +994,7 @@
                             </select>
                         </div>
                         <div>
-                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Sub-Team (الفريق الفرعي)') }}</label>
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Sub-Team') }}</label>
                             <select name="team_id" id="invite-team-select" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                                 <option value="">— {{ __('No Team') }} —</option>
                             </select>
@@ -1003,20 +1003,20 @@
 
                     <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 12px;">
                         <div>
-                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Job Title (المسمى الوظيفي)') }}</label>
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Job Title') }}</label>
                             <input type="text" name="job_title" placeholder="e.g. Senior Software Architect" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         </div>
                         <div>
-                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Status (الحالة)') }}</label>
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Status') }}</label>
                             <select name="status" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
-                                <option value="active">🟢 {{ __('Active (نشط)') }}</option>
-                                <option value="invited">✉️ {{ __('Invited (مدعو)') }}</option>
+                                <option value="active">🟢 {{ __('Active') }}</option>
+                                <option value="invited">✉️ {{ __('Invited') }}</option>
                             </select>
                         </div>
                     </div>
 
                     <button type="submit" class="header-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px; justify-content: center;">
-                        <span>👤</span> {{ __('Create / Add Team Member (إضافة المستخدم)') }}
+                        <span>👤</span> {{ __('Add Team Member') }}
                     </button>
                 </form>
             </div>
@@ -1038,28 +1038,37 @@
                     <input type="text" name="name" id="department-name-input" required placeholder="e.g. Engineering & IT, Marketing, Sales" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
                 <button type="submit" class="header-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px; justify-content: center;">
-                    💾 {{ __('Save Department') }}
+                    💾 <span id="department-form-btn-text">{{ __('Create Department') }}</span>
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- Modal: Team Create -->
+    <!-- Modal: Team Create / Edit -->
     <div id="team-modal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <h3 class="modal-title" id="team-modal-title">👥 {{ __('Add Sub-Team') }}</h3>
+                <h3 class="modal-title" id="team-modal-title">👥 {{ __('New Sub-Team') }}</h3>
                 <button onclick="closeTeamModal()" class="modal-close">✕</button>
             </div>
-            <form method="POST" action="{{ route('teams.store') }}" style="display: flex; flex-direction: column; gap: 14px;">
+            <form id="team-form" method="POST" action="{{ route('teams.store') }}" style="display: flex; flex-direction: column; gap: 14px;">
                 @csrf
-                <input type="hidden" name="department_id" id="team-department-id">
+                <div id="team-method-field"></div>
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Team Name') }}</label>
-                    <input type="text" name="name" required placeholder="e.g. Frontend Team, Enterprise Sales, UI/UX Design" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Sub-Team Name') }}</label>
+                    <input type="text" name="name" id="team-name-input" required placeholder="e.g. Frontend Team, QA Core, DevOps" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                </div>
+                <div>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Parent Department') }}</label>
+                    <select name="department_id" id="team-department-select" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <option value="">— {{ __('Select Department') }} —</option>
+                        @foreach($departments as $d)
+                            <option value="{{ $d->id }}">{{ $d->name }}</option>
+                        @endforeach
+                    </select>
                 </div>
                 <button type="submit" class="header-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px; justify-content: center;">
-                    💾 {{ __('Add Team') }}
+                    💾 <span id="team-form-btn-text">{{ __('Create Team') }}</span>
                 </button>
             </form>
         </div>
@@ -1121,9 +1130,9 @@
 
     <!-- Modal: Edit Complete Member Information -->
     <div id="edit-member-modal" class="modal-overlay">
-        <div class="modal-card" style="max-width: 520px;">
+        <div class="modal-card" style="max-width: 520px; max-height: 90vh; overflow-y: auto;">
             <div class="modal-header">
-                <h3 class="modal-title">✏️ {{ __('Edit Team Member (تعديل بيانات المستخدم)') }}</h3>
+                <h3 class="modal-title">✏️ {{ __('Edit Team Member') }}</h3>
                 <button onclick="closeEditMemberModal()" class="modal-close">✕</button>
             </div>
             <form id="edit-member-form" method="POST" action="" style="display: flex; flex-direction: column; gap: 14px;">
@@ -1132,18 +1141,18 @@
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Full Name (الاسم)') }} *</label>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Full Name') }} *</label>
                         <input type="text" name="name" id="edit-member-name-input" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                     </div>
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Email Address (البريد الإلكتروني)') }} *</label>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Email Address') }} *</label>
                         <input type="email" name="email" id="edit-member-email-input" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                     </div>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Department (القسم)') }}</label>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Department') }}</label>
                         <select name="department_id" id="edit-member-dept-select" onchange="filterTeamsForEditMember(this.value)" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             <option value="">— {{ __('No Department') }} —</option>
                             @foreach($departments as $d)
@@ -1152,7 +1161,7 @@
                         </select>
                     </div>
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Sub-Team (الفريق الفرعي)') }}</label>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Sub-Team') }}</label>
                         <select name="team_id" id="edit-member-team-select" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             <option value="">— {{ __('No Team') }} —</option>
                         </select>
@@ -1160,13 +1169,13 @@
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Job Title (المسمى الوظيفي)') }}</label>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Job Title') }}</label>
                     <input type="text" name="job_title" id="edit-member-job-title" placeholder="e.g. Senior Project Manager, Software Engineer" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Access Role (الدور / الصلاحية)') }} *</label>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Access Role') }} *</label>
                         <select name="role_id" id="edit-member-role-select" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             @foreach($roles as $role)
                                 <option value="{{ $role->id }}">{{ $role->name }}</option>
@@ -1174,11 +1183,11 @@
                         </select>
                     </div>
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Account Status (حالة الحساب)') }} *</label>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Account Status') }} *</label>
                         <select name="status" id="edit-member-status-select" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
-                            <option value="active">🟢 {{ __('Active (نشط)') }}</option>
-                            <option value="suspended">🔴 {{ __('Suspended (معلق)') }}</option>
-                            <option value="invited">✉️ {{ __('Invited (مدعو)') }}</option>
+                            <option value="active">🟢 {{ __('Active') }}</option>
+                            <option value="suspended">🔴 {{ __('Suspended') }}</option>
+                            <option value="invited">✉️ {{ __('Invited') }}</option>
                         </select>
                     </div>
                 </div>
@@ -1186,7 +1195,7 @@
                 <!-- Granular Office Access Permissions -->
                 <div style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px;">
                     <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">
-                        🏢 {{ __('Allowed Offices / الفروع المصرح بدخولها') }}
+                        🏢 {{ __('Allowed Offices') }}
                     </label>
                     <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">
                         {{ __('Select which branches this member can enter (Leave all unchecked for full company access).') }}
@@ -1204,7 +1213,7 @@
                 <!-- Granular Room Access Permissions -->
                 <div style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px;">
                     <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">
-                        🚪 {{ __('Allowed Rooms / الغرف المصرح بدخولها') }}
+                        🚪 {{ __('Allowed Rooms') }}
                     </label>
                     <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">
                         {{ __('Select specific private/conference rooms this user is allowed to access.') }}
@@ -1231,7 +1240,7 @@
                 </div>
 
                 <button type="submit" class="header-btn btn-primary" style="margin-top: 8px; padding: 12px; font-size: 14px; justify-content: center;">
-                    💾 {{ __('Save Member Changes (حفظ التعديلات والصلاحيات)') }}
+                    💾 {{ __('Save Member Changes') }}
                 </button>
             </form>
         </div>
@@ -1241,35 +1250,35 @@
     <div id="new-office-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 480px;">
             <div class="modal-header">
-                <h3 class="modal-title">🏢 {{ __('Add New Office Branch (إضافة فرع جديد)') }}</h3>
+                <h3 class="modal-title">🏢 {{ __('Add New Office Branch') }}</h3>
                 <button onclick="closeNewOfficeModal()" class="modal-close">✕</button>
             </div>
             <form method="POST" action="{{ route('offices.store') }}" style="display: flex; flex-direction: column; gap: 14px;">
                 @csrf
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Office Branch Name (اسم الفرع / المكتب)') }} *</label>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Office Branch Name') }} *</label>
                     <input type="text" name="name" required placeholder="e.g. Cairo Branch, Riyadh HQ, Dubai Innovation Hub" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('City / Location (المدينة / الدولة)') }}</label>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('City / Location') }}</label>
                     <input type="text" name="city_location" placeholder="e.g. Cairo, Egypt or Riyadh, KSA" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Description (الوصف)') }}</label>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Description') }}</label>
                     <textarea name="description" rows="3" placeholder="Brief description of this branch and its teams..." style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;"></textarea>
                 </div>
 
                 <div>
                     <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--text-primary); cursor: pointer;">
                         <input type="checkbox" name="is_default" value="1">
-                        <span>⭐ {{ __('Set as Primary / Default Office (تعيين كمقر رئيسي)') }}</span>
+                        <span>⭐ {{ __('Set as Primary / Default Office') }}</span>
                     </label>
                 </div>
 
                 <button type="submit" class="header-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px; justify-content: center;">
-                    🏢 {{ __('Create Office Branch (إنشاء الفرع)') }}
+                    🏢 {{ __('Create Office Branch') }}
                 </button>
             </form>
         </div>
@@ -1279,7 +1288,7 @@
     <div id="edit-office-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 480px;">
             <div class="modal-header">
-                <h3 class="modal-title">✏️ {{ __('Edit Office Branch (تعديل بيانات الفرع)') }}</h3>
+                <h3 class="modal-title">✏️ {{ __('Edit Office Branch') }}</h3>
                 <button onclick="closeEditOfficeModal()" class="modal-close">✕</button>
             </div>
             <form id="edit-office-form" method="POST" action="" style="display: flex; flex-direction: column; gap: 14px;">
@@ -1318,31 +1327,31 @@
     <div id="change-member-password-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 440px;">
             <div class="modal-header">
-                <h3 class="modal-title">🔑 {{ __('Reset Member Password (تغيير كلمة المرور)') }}</h3>
+                <h3 class="modal-title">🔑 {{ __('Reset Member Password') }}</h3>
                 <button onclick="closeChangeMemberPasswordModal()" class="modal-close">✕</button>
             </div>
             <form id="change-member-password-form" method="POST" action="" style="display: flex; flex-direction: column; gap: 14px;">
                 @csrf
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('User Name (المستخدم)') }}</label>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('User Name') }}</label>
                     <div id="change-password-user-name" style="font-size: 14px; font-weight: 800; color: var(--brand-forest); background: var(--bg-elevated); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color);">
                         User Name
                     </div>
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('New Password (كلمة المرور الجديدة)') }} *</label>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('New Password') }} *</label>
                     <input type="password" name="password" required minlength="8" placeholder="••••••••" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                     <span style="font-size: 11px; color: var(--text-muted); margin-top: 2px; display: block;">{{ __('Minimum 8 characters') }}</span>
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Confirm New Password (تأكيد كلمة المرور)') }} *</label>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Confirm New Password') }} *</label>
                     <input type="password" name="password_confirmation" required minlength="8" placeholder="••••••••" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; color: var(--text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
 
                 <button type="submit" class="header-btn btn-primary" style="margin-top: 8px; padding: 12px; font-size: 14px; justify-content: center; background: linear-gradient(135deg, #D6A23A 0%, #B88628 100%);">
-                    🔑 {{ __('Update Password (تعيين كلمة المرور)') }}
+                    🔑 {{ __('Update Password') }}
                 </button>
             </form>
         </div>

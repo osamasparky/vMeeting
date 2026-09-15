@@ -1,7 +1,7 @@
 @extends('superadmin.layout')
 
 @section('title', __('System Health & Status'))
-@section('page_title', __('System — Infrastructure & Health Status (حالة النظام والخدمات)'))
+@section('page_title', __'System — Infrastructure & Health Status'))
 
 @section('content')
 <div style="display: flex; flex-direction: column; gap: 24px;">

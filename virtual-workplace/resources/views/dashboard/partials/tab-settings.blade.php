@@ -1,6 +1,6 @@
 <div id="tab-settings" class="tab-view">
             <div class="page-header" style="margin-bottom: 20px;">
-                <h1 class="page-title" style="font-size: 22px; font-weight: 900; color: var(--text-primary); margin-bottom: 4px;">⚙️ {{ __('Workspace Settings (إعدادات مساحة العمل)') }}</h1>
+                <h1 class="page-title" style="font-size: 22px; font-weight: 900; color: var(--text-primary); margin-bottom: 4px;">⚙️ {{ __('Workspace Settings') }}</h1>
                 <p class="page-subtitle" style="font-size: 13px; color: var(--text-secondary);">{{ __('Configure organization branding, custom SMTP mail servers, and AI office blueprint engine.') }}</p>
             </div>
 
@@ -24,19 +24,19 @@
             <div class="org-settings-tabs-nav" style="display: flex; gap: 8px; margin-bottom: 20px; background: var(--bg-surface); padding: 6px; border-radius: var(--radius-xl); border: 1px solid var(--border-color); box-shadow: var(--shadow-card); width: fit-content; max-width: 100%; overflow-x: auto; scrollbar-width: none;">
                 <button type="button" class="org-subtab-btn active" onclick="switchOrgSettingsTab('general', this)" id="org-subtab-btn-general">
                     <span>🏢</span>
-                    <span>{{ __('General & Branding (الهوية والبيانات)') }}</span>
+                    <span>{{ __('General & Branding') }}</span>
                 </button>
                 <button type="button" class="org-subtab-btn" onclick="switchOrgSettingsTab('smtp', this)" id="org-subtab-btn-smtp">
                     <span>✉️</span>
-                    <span>{{ __('SMTP Mail Server (خادم البريد)') }}</span>
+                    <span>{{ __('SMTP Mail Server') }}</span>
                 </button>
                 <button type="button" class="org-subtab-btn" onclick="switchOrgSettingsTab('ai', this)" id="org-subtab-btn-ai">
                     <span>🤖</span>
-                    <span>{{ __('AI Blueprint Engine (الذكاء الاصطناعي)') }}</span>
+                    <span>{{ __('AI Blueprint Engine') }}</span>
                 </button>
                 <button type="button" class="org-subtab-btn" onclick="switchOrgSettingsTab('attendance', this)" id="org-subtab-btn-attendance">
                     <span>⏱️</span>
-                    <span>{{ __('Attendance & Inactivity Policy (سياسة الحضور والتواجد)') }}</span>
+                    <span>{{ __('Attendance & Inactivity Policy') }}</span>
                 </button>
             </div>
 
@@ -49,7 +49,7 @@
                         <div style="margin-bottom: 20px;">
                             <h3 style="font-size: 16px; font-weight: 900; color: var(--text-primary); margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
                                 <span>🏢</span>
-                                <span>{{ __('Workspace Identity & General Info (هوية وبيانات مساحة العمل)') }}</span>
+                                <span>{{ __('Workspace Identity & General Info') }}</span>
                             </h3>
                             <p style="font-size: 12px; color: var(--text-muted); margin: 0;">
                                 {{ __('Manage your company name, logo icon, URL slug, and default timezone.') }}
@@ -122,7 +122,7 @@
 
                         <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
                             <button type="submit" class="tactile-btn btn-primary" style="padding: 11px 26px; font-size: 13px;">
-                                💾 {{ __('Save Changes (حفظ التعديلات)') }}
+                                💾 {{ __('Save Changes') }}
                             </button>
                         </div>
                     </div>
@@ -134,7 +134,7 @@
                         <div style="margin-bottom: 20px;">
                             <h3 style="font-size: 16px; font-weight: 900; color: var(--text-primary); margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
                                 <span>✉️</span>
-                                <span>{{ __('Outgoing SMTP Email Server (خادم البريد المخصص)') }}</span>
+                                <span>{{ __('Outgoing SMTP Email Server') }}</span>
                             </h3>
                             <p style="font-size: 12px; color: var(--text-muted); margin: 0;">
                                 {{ __('Configure your dedicated SMTP mail provider to send meeting invites, reminders, and alerts under your company name.') }}
@@ -211,7 +211,7 @@
 
                         <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
                             <button type="submit" class="tactile-btn btn-primary" style="padding: 11px 26px; font-size: 13px;">
-                                💾 {{ __('Save SMTP Changes (حفظ إعدادات البريد)') }}
+                                💾 {{ __('Save SMTP Changes') }}
                             </button>
                         </div>
                     </div>
@@ -223,7 +223,7 @@
                         <div style="margin-bottom: 20px;">
                             <h3 style="font-size: 16px; font-weight: 900; color: var(--text-primary); margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
                                 <span>🤖</span>
-                                <span>{{ __('OpenAI & AI Floorplan Generator (محرك الذكاء الاصطناعي)') }}</span>
+                                <span>{{ __('OpenAI & AI Floorplan Generator') }}</span>
                             </h3>
                             <p style="font-size: 12px; color: var(--text-muted); margin: 0;">
                                 {{ __('Add your company OpenAI API key to generate bespoke 2D architectural office blueprints directly from the editor without platform rate limits.') }}
@@ -234,7 +234,7 @@
                         <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 14px 16px; margin-bottom: 18px; font-size: 12px; line-height: 1.5; color: var(--text-primary);">
                             <div style="font-weight: 800; color: #10B981; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
                                 <span>💡</span>
-                                <span>{{ __('Token & Cost Optimization Enabled (توفير فائق للتكلفة والتوكنز)') }}</span>
+                                <span>{{ __('Token & Cost Optimization Enabled') }}</span>
                             </div>
                             <span style="color: var(--text-secondary); font-size: 11px;">
                                 {{ __('Prompts are ultra-compressed to ~60 tokens. Choosing GPT Image 1 Mini or DALL-E 2 with 1024x1024 reduces your cost to approx $0.015 - $0.02 per generated floorplan.') }}
@@ -295,7 +295,7 @@
 
                         <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
                             <button type="submit" class="tactile-btn btn-primary" style="padding: 11px 26px; font-size: 13px;">
-                                💾 {{ __('Save AI Settings (حفظ إعدادات الذكاء الاصطناعي)') }}
+                                💾 {{ __('Save AI Settings') }}
                             </button>
                         </div>
                     </div>
@@ -307,7 +307,7 @@
                         <div style="margin-bottom: 20px;">
                             <h3 style="font-size: 16px; font-weight: 900; color: var(--text-primary); margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
                                 <span>⏱️</span>
-                                <span>{{ __('Attendance & Smart Inactivity Policy (سياسة الحضور الذكي والتوقف)') }}</span>
+                                <span>{{ __('Attendance & Smart Inactivity Policy') }}</span>
                             </h3>
                             <p style="font-size: 12px; color: var(--text-muted); margin: 0;">
                                 {{ __('Configure automated virtual office presence recording, task execution rules, and smart idle prompts.') }}
@@ -358,7 +358,7 @@
                             <div style="background: rgba(79, 155, 95, 0.08); border: 1px solid rgba(79, 155, 95, 0.25); border-radius: 12px; padding: 14px 16px; font-size: 12px; line-height: 1.5; color: var(--text-primary);">
                                 <div style="font-weight: 800; color: #4F9B5F; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
                                     <span>🛡️</span>
-                                    <span>{{ __('Smart Active Task Protection (حماية المهام النشطة)') }}</span>
+                                    <span>{{ __('Smart Active Task Protection') }}</span>
                                 </div>
                                 <span style="color: var(--text-secondary); font-size: 11px;">
                                     {{ __('When a member has an active running task in the office, idle prompts are automatically bypassed so deep work is never interrupted.') }}
@@ -368,7 +368,7 @@
 
                         <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
                             <button type="submit" class="tactile-btn btn-primary" style="padding: 11px 26px; font-size: 13px;">
-                                💾 {{ __('Save Attendance Policy (حفظ سياسة الحضور)') }}
+                                💾 {{ __('Save Attendance Policy') }}
                             </button>
                         </div>
                     </div>

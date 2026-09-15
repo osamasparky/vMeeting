@@ -104,7 +104,7 @@
                 <!-- Branch Filter Pills -->
                 <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
                     <button type="button" onclick="filterRoomsByBranch('all')" id="branch-pill-all" class="tactile-btn branch-filter-pill active" style="padding: 7px 14px; font-size: 12px; border-radius: 20px; border: 1px solid var(--brand-forest); background: var(--brand-forest); color: white;">
-                        <span>🏢</span> {{ __('All Offices & Branches (كل المكاتب والفروع)') }}
+                        <span>🏢</span> {{ __('All Offices & Branches') }}
                         <span class="nav-badge-pill" style="background: rgba(255, 255, 255, 0.25); color: white; border-color: transparent; margin-inline-start: 4px;">{{ $rooms->count() }}</span>
                     </button>
 
@@ -138,12 +138,12 @@
                 <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                     <!-- Room Type Selector -->
                     <select id="rooms-type-filter" onchange="searchAndFilterRooms()" style="background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 9px 14px; color: var(--text-primary); font-size: 12px; font-weight: 700; outline: none; box-shadow: var(--shadow-soft-3d);">
-                        <option value="all">🏷️ {{ __('All Room Types (كل الأنواع)') }}</option>
-                        <option value="office">💼 {{ __('Private Offices (مكاتب خاصة)') }}</option>
-                        <option value="meeting">👥 {{ __('Conference & Meeting (قاعات اجتماعات)') }}</option>
-                        <option value="lounge">☕ {{ __('Lounge & Breakout (استراحات)') }}</option>
-                        <option value="auditorium">🎭 {{ __('Auditorium / Stage (مسارح)') }}</option>
-                        <option value="brainstorming">🧠 {{ __('Brainstorming (عصف ذهني)') }}</option>
+                        <option value="all">🏷️ {{ __('All Room Types') }}</option>
+                        <option value="office">💼 {{ __('Private Offices') }}</option>
+                        <option value="meeting">👥 {{ __('Conference & Meeting') }}</option>
+                        <option value="lounge">☕ {{ __('Lounge & Breakout') }}</option>
+                        <option value="auditorium">🎭 {{ __('Auditorium / Stage') }}</option>
+                        <option value="brainstorming">🧠 {{ __('Brainstorming') }}</option>
                     </select>
 
                     <!-- View Switcher (Cards vs Table) -->
@@ -186,7 +186,7 @@
                                         @endif
                                         @if($off->is_default)
                                             <span class="nav-badge-pill" style="font-size: 11px; background: rgba(214, 162, 58, 0.15); color: #D6A23A; border-color: rgba(214, 162, 58, 0.35);">
-                                                ⭐ {{ __('Primary Headquarters (المقر الرئيسي)') }}
+                                                ⭐ {{ __('Primary Headquarters') }}
                                             </span>
                                         @endif
                                         <span class="nav-badge-pill" style="font-size: 11px;">
@@ -205,7 +205,7 @@
                             <!-- Branch Fast Actions -->
                             <div style="display: flex; gap: 8px; align-items: center;">
                                 <a href="{{ route('office', ['office_id' => $off->id]) }}" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px; text-decoration: none;">
-                                    <span>🚀</span> {{ __('Enter This Office (دخول الفرع)') }}
+                                    <span>🚀</span> {{ __('Enter This Office') }}
                                 </a>
                                 <a href="{{ route('editor') }}" class="tactile-btn btn-secondary" style="padding: 8px 14px; font-size: 12px; text-decoration: none;">
                                     <span>🎨</span> {{ __('Edit Blueprint') }}
@@ -286,7 +286,7 @@
                                                     <!-- Capacity -->
                                                     <div style="display: flex; justify-content: space-between; align-items: center;">
                                                         <span style="color: var(--text-muted); font-size: 11px;">👥 {{ __('Capacity:') }}</span>
-                                                        <span style="font-weight: 800; color: var(--text-primary); font-family: monospace;">{{ $r->capacity }} {{ __('Seats (مقاعد)') }}</span>
+                                                        <span style="font-weight: 800; color: var(--text-primary); font-family: monospace;">{{ $r->capacity }} {{ __('Seats') }}</span>
                                                     </div>
                                                     <!-- Spatial Bounds & Location -->
                                                     <div style="display: flex; justify-content: space-between; align-items: center;">

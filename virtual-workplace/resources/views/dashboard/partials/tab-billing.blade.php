@@ -84,7 +84,7 @@
                         </div>
                         <div>
                             <h3 style="font-size: 16px; font-weight: 900; color: #D96B5F; margin: 0 0 4px 0;">
-                                {{ __('Plan Limit Exceeded') }} ({{ __('تجاوزت الحد المسموح للباقة') }})
+                                {{ __('Plan Limit Exceeded') }}
                             </h3>
                             <p style="font-size: 13px; color: var(--text-secondary); margin: 0;">
                                 @if($isRoomsExceeded)
@@ -98,7 +98,7 @@
                         </div>
                     </div>
                     <a href="#available-plans-section" class="tactile-btn" style="background: #D96B5F; color: white; border: none; padding: 10px 20px; font-size: 13px; font-weight: 800; text-decoration: none; display: flex; align-items: center; gap: 6px;">
-                        <span>🚀</span> {{ __('Upgrade Plan Now (ترقية الباقة)') }}
+                        <span>🚀</span> {{ __('Upgrade Plan Now') }}
                     </a>
                 </div>
             </div>
@@ -119,7 +119,7 @@
                         <h2 style="font-size: 26px; font-weight: 900; color: var(--text-primary); margin: 4px 0;">💎 {{ $currentPlan->name ?? __('Free Tier') }}</h2>
                         <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 6px;">
                             <span style="font-size: 24px; font-weight: 900; color: var(--brand-forest);">
-                                {{ number_format($priceSAR, 2) }} <span style="font-size: 14px; font-weight: 700; color: var(--text-secondary);">{{ __('SAR (ر.س)') }}</span>
+                                {{ number_format($priceSAR, 2) }} <span style="font-size: 14px; font-weight: 700; color: var(--text-secondary);">{{ __('SAR') }}</span>
                             </span>
                             <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">
                                 (${{ number_format($priceUSD, 2) }} USD / {{ __('month') }})

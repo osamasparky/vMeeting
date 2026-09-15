@@ -35,7 +35,7 @@
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <span style="font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase;">👤 {{ __('Member / View') }}:</span>
                         <select id="ts-filter-user" onchange="handleTimesheetUserChange(this.value)" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 6px 12px; color: var(--text-primary); font-size: 12px; font-weight: 700; outline: none;">
-                            <option value="all">👥 {{ __('All Employees (Company Overview)') }} ({{ __('جميع موظفي الشركة') }})</option>
+                            <option value="all">👥 {{ __('All Employees (Company Overview)') }}</option>
                             <option value="{{ $user->id }}" selected>{{ __('My Timesheet') }} ({{ $user->name }})</option>
                             @foreach($members as $m)
                                 @if($m->user_id !== $user->id && $m->user)
@@ -62,7 +62,7 @@
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(79, 155, 95, 0.15); color: #4F9B5F; display: flex; align-items: center; justify-content: center; font-size: 16px;">🌐</div>
                         <div>
-                            <h3 style="font-size: 15px; font-weight: 900; color: var(--text-primary); margin: 0;">{{ __('Team Live Presence & Daily Attendance Across All Offices') }} ({{ __('حالة التواجد لجميع الموظفين ومجموع ساعات اليوم') }})</h3>
+                            <h3 style="font-size: 15px; font-weight: 900; color: var(--text-primary); margin: 0;">{{ __('Team Live Presence & Daily Attendance Across All Offices') }}</h3>
                             <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">{{ __('Realtime online / offline status across all company branches, today total tracked time, and detailed session inspector.') }}</p>
                         </div>
                     </div>
@@ -176,7 +176,7 @@
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(79, 155, 95, 0.15); color: #4F9B5F; display: flex; align-items: center; justify-content: center; font-size: 16px;">📋</div>
                         <div>
-                            <h3 style="font-size: 16px; font-weight: 900; color: var(--text-primary); margin: 0;">{{ __('Section 1: Project & Task Work Details') }} ({{ __('ساعات إنجاز المهام والمشاريع') }})</h3>
+                            <h3 style="font-size: 16px; font-weight: 900; color: var(--text-primary); margin: 0;">{{ __('Project & Task Work Details') }}</h3>
                             <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">{{ __('Detailed breakdown of all work orders, milestones, and task sessions completed on this date.') }}</p>
                         </div>
                     </div>
@@ -214,7 +214,7 @@
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <div style="width: 32px; height: 32px; border-radius: 8px; background: rgba(36, 92, 58, 0.15); color: var(--brand-forest); display: flex; align-items: center; justify-content: center; font-size: 16px;">🏢</div>
                         <div>
-                            <h3 style="font-size: 16px; font-weight: 900; color: var(--text-primary); margin: 0;">{{ __('Section 2: Virtual Office Attendance & Presence Log') }} ({{ __('سجلات التواجد وساعات العمل في المكتب') }})</h3>
+                            <h3 style="font-size: 16px; font-weight: 900; color: var(--text-primary); margin: 0;">{{ __('Virtual Office Attendance & Presence Log') }}</h3>
                             <p style="font-size: 11px; color: var(--text-secondary); margin: 2px 0 0 0;">{{ __('Recorded 3D office presence sessions, check-ins, idle pauses, and branch room presence.') }}</p>
                         </div>
                     </div>

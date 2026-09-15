@@ -1,7 +1,7 @@
 @extends('superadmin.layout')
 
 @section('title', __('Theme & Branding Studio'))
-@section('page_title', __('Website CMS — Theme & Branding Studio (استوديو الهوية والثيمات)'))
+@section('page_title', __'Website CMS — Theme & Branding Studio'))
 
 @section('content')
 <div style="display: flex; flex-direction: column; gap: 24px;">
@@ -40,7 +40,7 @@
                     <div class="panel-header" style="margin-bottom: 20px;">
                         <div class="panel-title">
                             <span>🌈</span>
-                            <span>{{ __('Primary Color Palette & Spatial Tokens (ألوان المنصة المكانية)') }}</span>
+                            <span>{{ __'Primary Color Palette & Spatial Tokens') }}</span>
                         </div>
                     </div>
 
@@ -112,7 +112,7 @@
                     <div class="panel-header" style="margin-bottom: 20px;">
                         <div class="panel-title">
                             <span>📐</span>
-                            <span>{{ __('Typography & Corner Geometry (الخطوط والأبعاد)') }}</span>
+                            <span>{{ __'Typography & Corner Geometry') }}</span>
                         </div>
                     </div>
 
@@ -152,7 +152,7 @@
                     <div class="panel-header" style="margin-bottom: 20px;">
                         <div class="panel-title">
                             <span>🧭</span>
-                            <span>{{ __('Main Navigation Menu Links (روابط ونصوص القائمة الرئيسية)') }}</span>
+                            <span>{{ __'Main Navigation Menu Links') }}</span>
                         </div>
                         <p class="panel-subtitle">{{ __('Customize top navigation links in Arabic and English.') }}</p>
                     </div>

@@ -1550,7 +1550,7 @@
                 </button>
                 @endif
                 @if($membership->hasPermission('maps.manage') || $membership->role?->slug === 'company_admin')
-                <button class="nav-tab-btn" id="nav-btn-offices" onclick="switchAdminTab('offices')" data-tooltip="{{ __('Offices & Branches (الفروع والمكاتب)') }}">
+                <button class="nav-tab-btn" id="nav-btn-offices" onclick="switchAdminTab('offices')" data-tooltip="{{ __('Offices & Branches') }}">
                     <span style="display: flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-rounded text-[18px]">domain</span>
                         <span>{{ __('Offices & Branches') }}</span>
@@ -1695,7 +1695,7 @@
             <form method="POST" action="{{ route('impersonate.leave') }}" class="m-0 inline-flex">
                 @csrf
                 <x-btn type="submit" variant="nav-cta" size="sm" icon="arrow_back">
-                    <span>{{ __('Return to Super Admin (الرجوع للوحة التحكم)') }}</span>
+                    <span>{{ __('Return to Super Admin') }}</span>
                 </x-btn>
             </form>
         </div>
@@ -1710,7 +1710,7 @@
             <form method="POST" action="{{ route('organization.members.impersonate.leave') }}" class="m-0 inline-flex">
                 @csrf
                 <x-btn type="submit" variant="nav-cta" size="sm" icon="logout">
-                    <span>{{ __('Leave Impersonation (العودة لحساب المسؤول)') }}</span>
+                    <span>{{ __('Leave Impersonation') }}</span>
                 </x-btn>
             </form>
         </div>

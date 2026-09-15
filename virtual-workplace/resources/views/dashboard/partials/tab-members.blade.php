@@ -90,22 +90,22 @@
                                             @if($m->user_id !== $user->id)
                                                 <form method="POST" action="{{ route('organization.members.impersonate', $m->id) }}" style="display: inline;" onsubmit="return confirm('{{ __('Are you sure you want to log in as :name?', ['name' => addslashes($m->user->name)]) }}');">
                                                     @csrf
-                                                    <button type="submit" class="tactile-btn" style="background: rgba(59, 130, 246, 0.15); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3); padding: 5px 10px; font-size: 11px; font-weight: 800;" title="{{ __('Log in as this member (تسجيل الدخول كعضو)') }}">
+                                                    <button type="submit" class="tactile-btn" style="background: rgba(59, 130, 246, 0.15); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3); padding: 5px 10px; font-size: 11px; font-weight: 800;" title="{{ __('Log in as this member') }}">
                                                         <span>👤</span> {{ __('Login As') }}
                                                     </button>
                                                 </form>
                                             @endif
-                                            <button onclick="openEditMemberModal('{{ $m->id }}', '{{ addslashes($m->user->name) }}', '{{ addslashes($m->user->email) }}', '{{ $profile?->department_id }}', '{{ $profile?->team_id }}', '{{ $m->role_id }}', '{{ addslashes($profile?->job_title ?? '') }}', '{{ $m->status }}')" class="tactile-btn btn-secondary" style="padding: 5px 10px; font-size: 11px; font-weight: 800;" title="{{ __('Edit Member Data (تعديل البيانات)') }}">
+                                            <button onclick="openEditMemberModal('{{ $m->id }}', '{{ addslashes($m->user->name) }}', '{{ addslashes($m->user->email) }}', '{{ $profile?->department_id }}', '{{ $profile?->team_id }}', '{{ $m->role_id }}', '{{ addslashes($profile?->job_title ?? '') }}', '{{ $m->status }}')" class="tactile-btn btn-secondary" style="padding: 5px 10px; font-size: 11px; font-weight: 800;" title="{{ __('Edit Member') }}">
                                                 <span>✏️</span> {{ __('Edit') }}
                                             </button>
-                                            <button onclick="openChangeMemberPasswordModal('{{ $m->id }}', '{{ addslashes($m->user->name) }}')" class="tactile-btn" style="background: rgba(214, 162, 58, 0.15); color: #D6A23A; border: 1px solid rgba(214, 162, 58, 0.3); padding: 5px 10px; font-size: 11px; font-weight: 800;" title="{{ __('Change Password (تغيير كلمة المرور)') }}">
+                                            <button onclick="openChangeMemberPasswordModal('{{ $m->id }}', '{{ addslashes($m->user->name) }}')" class="tactile-btn" style="background: rgba(214, 162, 58, 0.15); color: #D6A23A; border: 1px solid rgba(214, 162, 58, 0.3); padding: 5px 10px; font-size: 11px; font-weight: 800;" title="{{ __('Change Password') }}">
                                                 <span>🔑</span> {{ __('Password') }}
                                             </button>
                                             @if($m->user_id !== $user->id)
                                                 <form method="POST" action="{{ route('organization.members.delete', $m->id) }}" onsubmit="return confirm('{{ __('Are you sure you want to remove this member from your company?') }}');" style="display: inline;">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.3); padding: 5px 8px; font-size: 11px;" title="{{ __('Remove Member (حذف)') }}">
+                                                    <button type="submit" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.3); padding: 5px 8px; font-size: 11px;" title="{{ __('Remove Member') }}">
                                                         🗑️
                                                     </button>
                                                 </form>

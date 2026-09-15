@@ -915,7 +915,7 @@
             </a>
             <a href="{{ route('superadmin.translations') }}" class="nav-item {{ request()->routeIs('superadmin.translations*') ? 'active' : '' }}" data-tooltip="{{ __('Translations') }}">
                 <span class="nav-item-icon">🌐</span>
-                <span>{{ __('Translations (الترجمات)') }}</span>
+                <span>{{ __'Translations') }}</span>
             </a>
 
             <div class="nav-category-title">{{ __('Session') }}</div>

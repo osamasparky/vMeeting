@@ -17,9 +17,6 @@
             
             <p class="nx-hero-tagline">
                 {{ __('Your workspace is ready. Let\'s make today productive!') }}
-                <span style="display: block; font-size: 12px; color: var(--nx-text-mute); margin-top: 2px;">
-                    ” كل فكرة عظيمة تبدأ بمحادثة “
-                </span>
             </p>
 
             <!-- Action CTAs -->
@@ -85,8 +82,7 @@
         <div class="nx-stat-card">
             <div class="nx-stat-top">
                 <div>
-                    <span class="nx-stat-title">المتواجدون الآن</span>
-                    <span class="nx-stat-subtitle">Active Presence</span>
+                    <span class="nx-stat-title">{{ __('Active Presence') }}</span>
                 </div>
                 <div class="nx-stat-icon-wrap emerald">
                     <span class="material-symbols-rounded" style="font-size: 19px;">group</span>
@@ -96,7 +92,7 @@
                 <div class="nx-stat-number {{ $activeMembersCount == 0 ? 'is-zero' : '' }}">
                     {{ $activeMembersCount }}
                 </div>
-                <div class="nx-stat-caption">من فريقك متصل حالياً</div>
+                <div class="nx-stat-caption">{{ __('from your team online now') }}</div>
             </div>
         </div>
 
@@ -104,8 +100,7 @@
         <div class="nx-stat-card">
             <div class="nx-stat-top">
                 <div>
-                    <span class="nx-stat-title">اجتماعات اليوم</span>
-                    <span class="nx-stat-subtitle">Today's Sessions</span>
+                    <span class="nx-stat-title">{{ __('Today\'s Meetings') }}</span>
                 </div>
                 <div class="nx-stat-icon-wrap gold">
                     <span class="material-symbols-rounded" style="font-size: 19px;">calendar_month</span>
@@ -115,7 +110,7 @@
                 <div class="nx-stat-number {{ $todayMeetings->count() == 0 ? 'is-zero' : '' }}">
                     {{ $todayMeetings->count() }}
                 </div>
-                <div class="nx-stat-caption">مواعيد مجدولة لليوم</div>
+                <div class="nx-stat-caption">{{ __('scheduled for today') }}</div>
             </div>
         </div>
 
@@ -123,8 +118,7 @@
         <div class="nx-stat-card">
             <div class="nx-stat-top">
                 <div>
-                    <span class="nx-stat-title">مكاتب نشطة</span>
-                    <span class="nx-stat-subtitle">Active Workspaces</span>
+                    <span class="nx-stat-title">{{ __('Active Workspaces') }}</span>
                 </div>
                 <div class="nx-stat-icon-wrap sage">
                     <span class="material-symbols-rounded" style="font-size: 19px;">meeting_room</span>
@@ -134,7 +128,7 @@
                 <div class="nx-stat-number {{ $openRooms == 0 ? 'is-zero' : '' }}">
                     {{ $openRooms }}
                 </div>
-                <div class="nx-stat-caption">قاعات مفتوحة للعمل</div>
+                <div class="nx-stat-caption">{{ __('open for work') }}</div>
             </div>
         </div>
 
@@ -142,8 +136,7 @@
         <div class="nx-stat-card">
             <div class="nx-stat-top">
                 <div>
-                    <span class="nx-stat-title">الدعوات الجديدة</span>
-                    <span class="nx-stat-subtitle">Pending Invites</span>
+                    <span class="nx-stat-title">{{ __('Pending Invitations') }}</span>
                 </div>
                 <div class="nx-stat-icon-wrap muted">
                     <span class="material-symbols-rounded" style="font-size: 19px;">mail</span>
@@ -153,7 +146,7 @@
                 <div class="nx-stat-number {{ $pendingGuests == 0 ? 'is-zero' : '' }}">
                     {{ $pendingGuests }}
                 </div>
-                <div class="nx-stat-caption">بانتظار الانضمام</div>
+                <div class="nx-stat-caption">{{ __('awaiting join') }}</div>
             </div>
         </div>
     </div>
@@ -164,39 +157,35 @@
         <!-- Panel 1: Quick Actions -->
         <div class="nx-panel-card">
             <div class="nx-panel-header">
-                <h3 class="nx-panel-title">{{ __('Quick Actions (إجراءات سريعة)') }}</h3>
+                <h3 class="nx-panel-title">{{ __('Quick Actions') }}</h3>
             </div>
 
             <div class="nx-quick-grid">
                 <button type="button" class="nx-quick-tile" onclick="openScheduleMeetingModal('general')">
                     <span class="material-symbols-rounded nx-quick-tile-icon">calendar_add_on</span>
                     <div>
-                        <span class="nx-quick-tile-title">جدولة اجتماع</span>
-                        <span class="nx-quick-tile-subtitle">Schedule</span>
+                        <span class="nx-quick-tile-title">{{ __('Schedule Meeting') }}</span>
                     </div>
                 </button>
 
                 <button type="button" class="nx-quick-tile" onclick="openInviteModal()">
                     <span class="material-symbols-rounded nx-quick-tile-icon">person_add</span>
                     <div>
-                        <span class="nx-quick-tile-title">دعوة عضو</span>
-                        <span class="nx-quick-tile-subtitle">Invite</span>
+                        <span class="nx-quick-tile-title">{{ __('Invite Member') }}</span>
                     </div>
                 </button>
 
                 <button type="button" class="nx-quick-tile" onclick="switchAdminTab('rooms')">
                     <span class="material-symbols-rounded nx-quick-tile-icon">meeting_room</span>
                     <div>
-                        <span class="nx-quick-tile-title">إدارة القاعات</span>
-                        <span class="nx-quick-tile-subtitle">Rooms</span>
+                        <span class="nx-quick-tile-title">{{ __('Manage Rooms') }}</span>
                     </div>
                 </button>
 
                 <button type="button" class="nx-quick-tile" onclick="openCreateTaskModal()">
                     <span class="material-symbols-rounded nx-quick-tile-icon">add_task</span>
                     <div>
-                        <span class="nx-quick-tile-title">مهمة جديدة</span>
-                        <span class="nx-quick-tile-subtitle">Task</span>
+                        <span class="nx-quick-tile-title">{{ __('New Task') }}</span>
                     </div>
                 </button>
             </div>
@@ -206,13 +195,13 @@
         <div class="nx-panel-card">
             <div class="nx-panel-header">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <h3 class="nx-panel-title">{{ __('Today\'s Scheduled Meetings (اجتماعات اليوم)') }}</h3>
+                    <h3 class="nx-panel-title">{{ __('Today\'s Scheduled Meetings') }}</h3>
                     <span style="font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 9999px; background: #E7F3EC; color: #3C6B4C;">
                         {{ $todayMeetings->count() }}
                     </span>
                 </div>
                 <button type="button" onclick="switchAdminTab('meetings')" style="background: none; border: none; font-size: 12px; font-weight: 600; color: #D3A553; cursor: pointer;">
-                    {{ __('View All (عرض الكل)') }} →
+                    {{ __('View All') }} →
                 </button>
             </div>
 
@@ -221,19 +210,19 @@
                     <div class="nx-meeting-row">
                         <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
                             <span class="nx-meeting-time">
-                                {{ $meeting->scheduled_at ? $meeting->scheduled_at->format('h:i A') : 'الآن' }}
+                                {{ $meeting->scheduled_at ? $meeting->scheduled_at->format('h:i A') : __('Now') }}
                             </span>
                             <div style="display: flex; flex-direction: column; min-width: 0;">
                                 <span style="font-size: 13px; font-weight: 500; color: #142B24; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                     {{ $meeting->title }}
                                 </span>
                                 <span style="font-size: 11px; color: #5A6B63;">
-                                    {{ $meeting->room->name ?? ($meeting->project->name ?? 'قاعة عامة') }}
+                                    {{ $meeting->room->name ?? ($meeting->project->name ?? __('General Room')) }}
                                 </span>
                             </div>
                         </div>
 
-                        <div class="nx-meeting-status-badge {{ $meeting->status === 'live' ? 'live' : 'scheduled' }}" title="{{ $meeting->status === 'live' ? 'مباشر الآن' : 'مجدول' }}">
+                        <div class="nx-meeting-status-badge {{ $meeting->status === 'live' ? 'live' : 'scheduled' }}" title="{{ $meeting->status === 'live' ? __('Live Now') : __('Scheduled') }}">
                             <span class="material-symbols-rounded" style="font-size: 16px;">
                                 {{ $meeting->status === 'live' ? 'videocam' : 'schedule' }}
                             </span>
@@ -265,7 +254,7 @@
         @endphp
         <div class="nx-panel-card">
             <div class="nx-panel-header">
-                <h3 class="nx-panel-title">{{ __('Workspace (مساحة العمل)') }}</h3>
+                <h3 class="nx-panel-title">{{ __('Workspace Utilization') }}</h3>
             </div>
 
             <div class="nx-donut-wrap">
@@ -274,7 +263,7 @@
                     :percent="$occupancyPercent" 
                     size="default" 
                     label="{{ $occupancyPercent }}%" 
-                    caption="قيد الاستخدام"
+                    caption="{{ __('In Use') }}"
                     accentColor="#142B24"
                     trackColor="#F4EDE1"
                 />
@@ -284,7 +273,7 @@
                     <div class="nx-legend-item">
                         <span style="display: flex; align-items: center;">
                             <span class="nx-legend-dot" style="background: #3C6B4C;"></span>
-                            <span>غرف مفتوحة</span>
+                            <span>{{ __('Open Rooms') }}</span>
                         </span>
                         <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: #142B24;">{{ $openRooms }}</span>
                     </div>
@@ -292,7 +281,7 @@
                     <div class="nx-legend-item">
                         <span style="display: flex; align-items: center;">
                             <span class="nx-legend-dot" style="background: #D3A553;"></span>
-                            <span>غرف مغلقة</span>
+                            <span>{{ __('Locked Rooms') }}</span>
                         </span>
                         <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: #142B24;">{{ $closedRooms }}</span>
                     </div>
@@ -300,7 +289,7 @@
                     <div class="nx-legend-item">
                         <span style="display: flex; align-items: center;">
                             <span class="nx-legend-dot" style="background: #E8DECC;"></span>
-                            <span>معدل الشغور</span>
+                            <span>{{ __('Vacancy Rate') }}</span>
                         </span>
                         <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 500; color: #8E9D95;">{{ 100 - $occupancyPercent }}%</span>
                     </div>
@@ -315,15 +304,12 @@
             <span class="material-symbols-rounded" style="font-size: 22px; color: #D3A553;">format_quote</span>
             <div style="display: flex; flex-direction: column;">
                 <span style="font-size: 13px; font-weight: 500; color: #142B24;">
-                    ” مساحات أفضل تصنع فرقاً أعظم “
-                </span>
-                <span style="font-size: 11px; color: #8E9D95;">
-                    Better spaces carve greater teams.
+                    {{ __('Better spaces carve greater teams.') }}
                 </span>
             </div>
         </div>
         <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: #8E9D95;">
-            <span>UlaSpace Workplace</span>
+            <span>{{ __('UlaSpace Workplace') }}</span>
             <span>·</span>
             <span>ALULA</span>
         </div>

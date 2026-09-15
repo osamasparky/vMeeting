@@ -198,17 +198,17 @@
                     <div class="flex items-center gap-4 flex-wrap mt-8">
                         @auth
                             <x-btn href="{{ route('office') }}" variant="nav-cta" size="lg" icon="apartment">
-                                <span>{{ __('Enter Workplace Floor (دخول المقر الافتراضي)') }}</span>
+                                <span>{{ __'Enter Workplace Floor') }}</span>
                             </x-btn>
                             <x-btn href="{{ route('dashboard') }}" variant="outline" size="lg" class="text-white border-white/20 hover:border-white/40">
                                 <span>{{ __('Dashboard') }}</span>
                             </x-btn>
                         @else
                             <x-btn href="{{ route('register') }}" variant="nav-cta" size="lg">
-                                <span>{{ __('Book a Demo (احجز عرضاً الآن)') }}</span>
+                                <span>{{ __'Book a Demo') }}</span>
                             </x-btn>
                             <x-btn href="{{ route('login') }}" variant="outline" size="lg" class="text-white border-white/20 hover:border-white/40">
-                                <span>{{ __('Sign In (تسجيل الدخول)') }}</span>
+                                <span>{{ __'Sign In') }}</span>
                             </x-btn>
                         @endauth
                     </div>

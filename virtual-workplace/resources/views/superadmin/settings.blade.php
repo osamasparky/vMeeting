@@ -1,7 +1,7 @@
 @extends('superadmin.layout')
 
 @section('title', __('System Settings & Payment Configuration'))
-@section('page_title', __('System Settings (إعدادات النظام والخدمات)'))
+@section('page_title', __'System Settings'))
 
 @section('content')
 <div style="display: flex; flex-direction: column; gap: 20px;">
@@ -10,19 +10,19 @@
     <div class="settings-tabs-nav" style="display: flex; gap: 8px; background: var(--bg-surface); padding: 8px; border-radius: var(--radius-xl); border: 1px solid var(--border-color); box-shadow: var(--shadow-card); overflow-x: auto; scrollbar-width: none;">
         <button type="button" class="sa-tab-btn active" onclick="switchSuperTab('general', this)" id="sa-tab-btn-general">
             <span>🌐</span>
-            <span>{{ __('Global Platform & SaaS (المنصة العامة)') }}</span>
+            <span>{{ __'Global Platform & SaaS') }}</span>
         </button>
         <button type="button" class="sa-tab-btn" onclick="switchSuperTab('payment', this)" id="sa-tab-btn-payment">
             <span>💳</span>
-            <span>{{ __('Payment & Bank Accounts (طرق الدفع والبنوك)') }}</span>
+            <span>{{ __'Payment & Bank Accounts') }}</span>
         </button>
         <button type="button" class="sa-tab-btn" onclick="switchSuperTab('blueprint', this)" id="sa-tab-btn-blueprint">
             <span>📐</span>
-            <span>{{ __('Default Global Blueprint (المخطط الافتراضي)') }}</span>
+            <span>{{ __'Default Global Blueprint') }}</span>
         </button>
         <button type="button" class="sa-tab-btn" onclick="switchSuperTab('ai', this)" id="sa-tab-btn-ai">
             <span>🤖</span>
-            <span>{{ __('AI Engine & OpenAI (الذكاء الاصطناعي)') }}</span>
+            <span>{{ __'AI Engine & OpenAI') }}</span>
         </button>
     </div>
 
@@ -35,7 +35,7 @@
                 <div class="panel-header" style="margin-bottom: 24px;">
                     <div class="panel-title">
                         <span>🌐</span>
-                        <span>{{ __('Global SaaS Configuration (إعدادات المنصة العامة)') }}</span>
+                        <span>{{ __'Global SaaS Configuration') }}</span>
                     </div>
                     <p class="panel-subtitle">{{ __('Configure core platform parameters, default registration tier, and real-time connectivity.') }}</p>
                 </div>
@@ -109,7 +109,7 @@
                 <div class="panel-header" style="margin-bottom: 24px;">
                     <div class="panel-title">
                         <span>💳</span>
-                        <span>{{ __('Checkout & Payment Gateways Settings (بيانات وإعدادات الدفع)') }}</span>
+                        <span>{{ __'Checkout & Payment Gateways Settings') }}</span>
                     </div>
                     <p class="panel-subtitle">{{ __('Configure payment methods, official bank accounts, Instapay / Wallets, currency rates, and terms displayed to users on the checkout page.') }}</p>
                 </div>
@@ -117,19 +117,19 @@
                 <!-- Currency & Rates -->
                 <div style="margin-bottom: 24px;">
                     <h4 style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px;">
-                        💱 {{ __('Currency Rates & Taxes (أسعار الصرف والضرائب)') }}
+                        💱 {{ __('Currency Rates & Taxes') }}
                     </h4>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
                         <div>
-                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">1 USD ➔ SAR (ر.س)</label>
+                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">1 USD ➔ {{ __('SAR') }}</label>
                             <input type="number" step="0.01" name="usd_to_sar_rate" value="{{ $paymentSettings['usd_to_sar_rate'] ?? 3.75 }}" required class="form-input" style="width: 100%; font-weight: 700;">
                         </div>
                         <div>
-                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">1 USD ➔ EGP (ج.م)</label>
+                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">1 USD ➔ {{ __('EGP') }}</label>
                             <input type="number" step="0.01" name="usd_to_egp_rate" value="{{ $paymentSettings['usd_to_egp_rate'] ?? 48.5 }}" required class="form-input" style="width: 100%; font-weight: 700;">
                         </div>
                         <div>
-                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">1 USD ➔ AED (د.إ)</label>
+                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">1 USD ➔ {{ __('AED') }}</label>
                             <input type="number" step="0.01" name="usd_to_aed_rate" value="{{ $paymentSettings['usd_to_aed_rate'] ?? 3.67 }}" required class="form-input" style="width: 100%; font-weight: 700;">
                         </div>
                         <div>
@@ -137,7 +137,7 @@
                             <input type="number" step="0.1" name="tax_percentage" value="{{ $paymentSettings['tax_percentage'] ?? 15 }}" class="form-input" style="width: 100%; font-weight: 700;">
                         </div>
                         <div>
-                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Tax Number / الرقم الضريبي') }}</label>
+                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Tax Number') }}</label>
                             <input type="text" name="tax_number" value="{{ $paymentSettings['tax_number'] ?? '' }}" placeholder="300012345600003" class="form-input" style="width: 100%; font-family: monospace;">
                         </div>
                     </div>
@@ -146,7 +146,7 @@
                 <!-- Instant Wallets & Digital Payment -->
                 <div style="margin-bottom: 24px; padding-top: 16px; border-top: 1px solid var(--border-color);">
                     <h4 style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px;">
-                        📱 {{ __('Instant Payment & Digital Wallets (إنستاباي والمحافظ الرقمية)') }}
+                        📱 {{ __('Instant Payment & Digital Wallets') }}
                     </h4>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
                         <div>
@@ -172,10 +172,10 @@
                 <div style="margin-bottom: 24px; padding-top: 16px; border-top: 1px solid var(--border-color);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
                         <h4 style="font-size: 14px; font-weight: 800; color: var(--text-primary);">
-                            🏦 {{ __('Official Bank Accounts for Wire Transfer (الحسابات البنكية الرسمية)') }}
+                            🏦 {{ __('Official Bank Accounts for Wire Transfer') }}
                         </h4>
                         <button type="button" onclick="addBankAccountRow()" class="tactile-btn btn-secondary" style="padding: 6px 14px; font-size: 12px;">
-                            <span>+</span> {{ __('Add Bank Account (إضافة حساب بنكي)') }}
+                            <span>+</span> {{ __('Add Bank Account') }}
                         </button>
                     </div>
 
@@ -194,7 +194,7 @@
                                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
                                     <div>
                                         <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Bank Name') }} *</label>
-                                        <input type="text" name="bank_name[]" value="{{ $b['bank_name'] ?? '' }}" required placeholder="e.g. Al Rajhi Bank (مصرف الراجحي)" class="form-input" style="width: 100%;">
+                                        <input type="text" name="bank_name[]" value="{{ $b['bank_name'] ?? '' }}" required placeholder="e.g. Al Rajhi Bank" class="form-input" style="width: 100%;">
                                     </div>
                                     <div>
                                         <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Beneficiary Name (Arabic)') }}</label>
@@ -233,15 +233,15 @@
                 <!-- Checkout Instructions & Terms -->
                 <div style="padding-top: 16px; border-top: 1px solid var(--border-color);">
                     <h4 style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px;">
-                        📜 {{ __('Checkout Instructions & Policy (تعليمات وشروط صفحة الدفع)') }}
+                        📜 {{ __'Checkout Instructions & Policy') }}
                     </h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                         <div>
-                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Instructions in Arabic (التعليمات بالعربية)') }}</label>
+                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __'Instructions in Arabic') }}</label>
                             <textarea name="checkout_terms_ar" rows="3" dir="rtl" class="form-input" style="width: 100%; font-family: 'Cairo', sans-serif;">{{ $paymentSettings['checkout_terms_ar'] ?? '' }}</textarea>
                         </div>
                         <div>
-                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Instructions in English (التعليمات بالإنجليزية)') }}</label>
+                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __'Instructions in English') }}</label>
                             <textarea name="checkout_terms_en" rows="3" dir="ltr" class="form-input" style="width: 100%; font-family: 'Inter', sans-serif;">{{ $paymentSettings['checkout_terms_en'] ?? '' }}</textarea>
                         </div>
                     </div>
@@ -249,7 +249,7 @@
 
                 <div style="margin-top: 24px; display: flex; justify-content: flex-end;">
                     <button type="submit" class="tactile-btn btn-primary" style="padding: 12px 32px; font-size: 13px;">
-                        💾 {{ __('Save Payment & Checkout Settings (حفظ إعدادات الدفع)') }}
+                        💾 {{ __'Save Payment & Checkout Settings') }}
                     </button>
                 </div>
             </div>
@@ -264,7 +264,7 @@
                 <div class="panel-header" style="margin-bottom: 20px;">
                     <div class="panel-title">
                         <span>📐</span>
-                        <span>{{ __('Global System Default Office Blueprint (المخطط الافتراضي للنظام)') }}</span>
+                        <span>{{ __'Global System Default Office Blueprint') }}</span>
                     </div>
                     <p class="panel-subtitle">
                         {{ __('Upload the platform-wide default 3D isometric architectural floorplan. All newly registered organizations and default workspaces will automatically inherit this blueprint design. Company admins can then customize and edit their specific rooms.') }}
@@ -305,7 +305,7 @@
                 <div class="panel-header" style="margin-bottom: 20px;">
                     <div class="panel-title">
                         <span>🤖</span>
-                        <span>{{ __('OpenAI & AI Office Generator Settings (إعدادات الذكاء الاصطناعي)') }}</span>
+                        <span>{{ __'OpenAI & AI Office Generator Settings') }}</span>
                     </div>
                     <p class="panel-subtitle">
                         {{ __('Configure ChatGPT & OpenAI (DALL-E 3) API credentials to empower company admins to generate bespoke, 3D isometric architectural floorplans and isolated room maps directly from the Edit Office page.') }}
@@ -316,13 +316,13 @@
                     <div style="grid-column: 1 / -1;">
                         <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; font-weight: 800; color: var(--text-primary);">
                             <input type="checkbox" name="is_enabled" value="1" {{ !empty($aiSettings['is_enabled']) || !empty($aiSettings['api_key']) ? 'checked' : '' }} style="width: 18px; height: 18px; accent-color: var(--brand-forest);">
-                            <span>✨ {{ __('Enable AI Office & Floorplan Generator Platform-wide (تفعيل ميزة توليد المكاتب بالذكاء الاصطناعي)') }}</span>
+                            <span>✨ {{ __('Enable AI Office & Floorplan Generator Platform-wide') }}</span>
                         </label>
                     </div>
 
                     <div style="grid-column: 1 / -1;">
                         <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
-                            🔑 {{ __('OpenAI API Secret Key (مفتاح API الخاص بـ OpenAI)') }} *
+                            🔑 {{ __('OpenAI API Secret Key') }} *
                         </label>
                         <div style="display: flex; gap: 10px;">
                             <input type="password" id="openai-api-key-input" name="api_key" value="{{ $aiSettings['api_key'] ?? '' }}" placeholder="sk-proj-..." class="form-input" style="flex: 1; font-family: monospace; font-size: 13px;">
@@ -330,7 +330,7 @@
                                 <span id="api-eye-icon">👁️</span>
                             </button>
                             <button type="button" onclick="testOpenAiConnection()" id="btn-test-ai" class="tactile-btn" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 0 16px; font-size: 12px; white-space: nowrap;">
-                                ⚡ {{ __('Test Connection (اختبار الاتصال)') }}
+                                ⚡ {{ __('Test Connection') }}
                             </button>
                         </div>
                         <div id="ai-test-feedback" style="display: none; margin-top: 8px; font-size: 12px; font-weight: 700; border-radius: 8px; padding: 8px 12px;"></div>
@@ -338,7 +338,7 @@
 
                     <div>
                         <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
-                            🖼️ {{ __('Image Generation Model (نموذج توليد الصور)') }}
+                            🖼️ {{ __'Image Generation Model') }}
                         </label>
                         <select name="model" class="form-input" style="width: 100%;">
                             <option value="gpt-image-1" {{ ($aiSettings['model'] ?? 'gpt-image-1') === 'gpt-image-1' ? 'selected' : '' }}>
@@ -358,7 +358,7 @@
 
                     <div>
                         <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
-                            📐 {{ __('Floorplan Image Aspect Ratio & Size (أبعاد المخطط)') }}
+                            📐 {{ __'Floorplan Image Aspect Ratio & Size') }}
                         </label>
                         <select name="image_size" class="form-input" style="width: 100%;">
                             <option value="1024x1024" {{ ($aiSettings['image_size'] ?? '1024x1024') === '1024x1024' ? 'selected' : '' }}>
@@ -372,7 +372,7 @@
 
                     <div>
                         <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
-                            💎 {{ __('Image Render Quality (جودة المعالجة)') }}
+                            💎 {{ __'Image Render Quality') }}
                         </label>
                         <select name="quality" class="form-input" style="width: 100%;">
                             <option value="standard" {{ ($aiSettings['quality'] ?? 'standard') === 'standard' ? 'selected' : '' }}>
@@ -386,7 +386,7 @@
 
                     <div style="grid-column: 1 / -1;">
                         <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
-                            📝 {{ __('System Prompt Prefix & Directives (تعليمات التوليد المعماري)') }}
+                            📝 {{ __'System Prompt Prefix & Directives') }}
                         </label>
                         <textarea name="prompt_prefix" rows="3" class="form-input" style="width: 100%; font-size: 12px;">{{ $aiSettings['prompt_prefix'] ?? "A clean, photorealistic direct top-down 2D architectural floor plan blueprint of a modern virtual workplace office (straight 90-degree overhead bird's-eye plan view with cutaway interior walls)." }}</textarea>
                     </div>
@@ -394,7 +394,7 @@
 
                 <div style="margin-top: 24px; display: flex; justify-content: flex-end;">
                     <button type="submit" class="tactile-btn btn-primary" style="padding: 12px 32px; font-size: 13px;">
-                        💾 {{ __('Save AI Generator Settings (حفظ إعدادات الذكاء الاصطناعي)') }}
+                        💾 {{ __'Save AI Generator Settings') }}
                     </button>
                 </div>
             </div>
@@ -514,7 +514,7 @@
             feedback.style.border = '1px solid rgba(217, 107, 95, 0.3)';
             feedback.innerHTML = '⚠️ Network error testing connection: ' + e.message;
         } finally {
-            btn.innerHTML = '⚡ {{ __("Test Connection (اختبار الاتصال)") }}';
+            btn.innerHTML = '⚡ {{ __"Test Connection") }}';
         }
     }
 

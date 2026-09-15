@@ -748,7 +748,7 @@
                 <div class="nx-toolbar-group">
                     <!-- Main Burger Dropdown -->
                     <div style="position: relative; display: inline-block;">
-                        <button type="button" onclick="toggleEditorMainMenu(event)" class="nx-toolbar-btn" style="padding: 6px 10px;" title="{{ __('Menu (القائمة الرئيسية)') }}">
+                        <button type="button" onclick="toggleEditorMainMenu(event)" class="nx-toolbar-btn" style="padding: 6px 10px;" title="{{ __('Menu') }}">
                             <span class="material-symbols-rounded" style="font-size: 20px;">menu</span>
                         </button>
                         
@@ -769,12 +769,12 @@
                             <!-- Actions -->
                             <a href="{{ route('dashboard') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #F9F4EE; font-size: 12px; font-weight: 600;">
                                 <span class="material-symbols-rounded" style="font-size: 18px; color: var(--nx-map-gold);">dashboard</span>
-                                <span>{{ __('Dashboard (لوحة التحكم)') }}</span>
+                                <span>{{ __'Dashboard') }}</span>
                             </a>
 
                             <a href="{{ route('office', ['office' => $floor->id]) }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #86EFAC; font-size: 12px; font-weight: 600;">
                                 <span class="material-symbols-rounded" style="font-size: 18px;">meeting_room</span>
-                                <span>{{ __('Enter Live Office (دخول المكتب)') }}</span>
+                                <span>{{ __'Enter Live Office') }}</span>
                             </a>
 
                             @if(session('superadmin_impersonator_id'))
@@ -782,7 +782,7 @@
                                 @csrf
                                 <button type="submit" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #93C5FD; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                                     <span class="material-symbols-rounded" style="font-size: 18px;">shield</span>
-                                    <span>{{ __('Return to Super Admin (الرجوع للمشرف العام)') }}</span>
+                                    <span>{{ __'Return to Super Admin') }}</span>
                                 </button>
                             </form>
                             @endif
@@ -791,7 +791,7 @@
 
                             <button type="button" onclick="toggleAppTheme(); closeEditorMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #F9F4EE; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                                 <span class="material-symbols-rounded" style="font-size: 18px;">light_mode</span>
-                                <span>{{ __('Toggle Theme (المظهر)') }}</span>
+                                <span>{{ __'Toggle Theme') }}</span>
                             </button>
 
                             @if(app()->getLocale() === 'ar')
@@ -821,14 +821,14 @@
 
                     <!-- Branch Switcher -->
                     <div style="position: relative; display: inline-block;">
-                        <button type="button" onclick="toggleBranchDropdown(event)" class="nx-toolbar-btn" style="color: var(--nx-map-gold); border-color: rgba(211, 165, 83, 0.35); font-weight: 600;" title="{{ __('Switch Office Branch (تغيير الفرع للتعديل)') }}">
+                        <button type="button" onclick="toggleBranchDropdown(event)" class="nx-toolbar-btn" style="color: var(--nx-map-gold); border-color: rgba(211, 165, 83, 0.35); font-weight: 600;" title="{{ __'Switch Office Branch') }}">
                             <span class="material-symbols-rounded" style="font-size: 18px;">domain</span>
                             <span style="max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $floor->name }}</span>
                             <span class="material-symbols-rounded" style="font-size: 16px;">arrow_drop_down</span>
                         </button>
                         <div id="branch-select-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); inset-inline-start: 0; min-width: 250px; background: rgba(14, 25, 19, 0.98); backdrop-filter: blur(18px); border: 1px solid rgba(237, 230, 217, 0.20); border-radius: 14px; box-shadow: 0 16px 36px rgba(0,0,0,0.65); padding: 6px; z-index: 100000;">
                             <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 4px;">
-                                🏢 {{ __('Select Office Branch (اختر الفرع للتعديل)') }}
+                                🏢 {{ __'Select Office Branch') }}
                             </div>
                             @foreach($floors as $f)
                             <a href="{{ route('editor', ['office' => $f->id]) }}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: {{ $f->id === $floor->id ? '#86EFAC' : '#E2E8F0' }}; background: {{ $f->id === $floor->id ? 'rgba(36, 92, 58, 0.45)' : 'transparent' }}; font-weight: 700; font-size: 12px; transition: background 0.15s ease;">
@@ -925,7 +925,8 @@
                 <button class="view-btn" onclick="zoomIn()" title="{{ __('Zoom In') }}">➕</button>
                 <button class="view-btn" onclick="zoomOut()" title="{{ __('Zoom Out') }}">➖</button>
                 <button class="view-btn" onclick="resetView()" title="{{ __('Reset View (100%)') }}">🏠</button>
-                <button class="view-btn" onclick="toggleGrid()" title="{{ __('Toggle Grid') }}">🔲</button>
+                <button class="view-btn" onclick="toggleGrid()" title="{{ __'Toggle Grid') }}">🔲</button>
+                <button class="view-btn" id="btn-grid-snap" onclick="cycleGridSnap()" style="font-size: 10px; font-weight: 800; font-family: 'IBM Plex Mono', monospace; width: auto; padding: 0 8px;" title="{{ __'Grid Snap Precision') }}">🎯 4px</button>
             </div>
         </div>
 
@@ -1215,24 +1216,24 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="prop-label">{{ __('Layer & Elevation (الطبقة والارتفاع)') }}</label>
+                                <label class="prop-label">{{ __'Layer & Elevation') }}</label>
                                 <select class="prop-input" id="prop-elevation" onchange="updateSelectedProp('elevation', parseInt(this.value))">
-                                    <option value="0">🧶 {{ __('Ground / Rug (أرضية / سجاد)') }}</option>
-                                    <option value="1">🪑 {{ __('Default Furniture (أثاث عادي)') }}</option>
-                                    <option value="2">💼 {{ __('Desk / Table Surface (سطح مكتب)') }}</option>
-                                    <option value="3">🌿 {{ __('Tall Plant / Partition (حاجز / نبتة طويلة)') }}</option>
-                                    <option value="5">💡 {{ __('Ceiling / Overhead (إضاءة وسقف)') }}</option>
+                                    <option value="0">🧶 {{ __'Ground / Rug') }}</option>
+                                    <option value="1">🪑 {{ __'Default Furniture') }}</option>
+                                    <option value="2">💼 {{ __'Desk / Table Surface') }}</option>
+                                    <option value="3">🌿 {{ __'Tall Plant / Partition') }}</option>
+                                    <option value="5">💡 {{ __'Ceiling / Overhead') }}</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="prop-label">{{ __('Interaction (نوع التفاعل)') }}</label>
+                                <label class="prop-label">{{ __'Interaction') }}</label>
                                 <div id="prop-interaction-badge" style="font-size: 11px; font-weight: 700; color: var(--brand-primary); padding: 4px 8px; background: rgba(16,185,129,0.1); border-radius: 6px; display: inline-block;">NONE</div>
                             </div>
 
                             <!-- 🏢 1. Company Logo / Branding Inspector Box -->
                             <div id="inspector-branding-box" style="display: none; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(52, 211, 153, 0.25); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 12px; font-weight: 800; color: #34D399;">🏢 {{ __('Company Logo (شعار الشركة)') }}</span>
+                                    <span style="font-size: 12px; font-weight: 800; color: #34D399;">🏢 {{ __'Company Logo') }}</span>
                                     <span class="furn-type-badge" style="background: rgba(16, 185, 129, 0.2); color: #6EE7B7;">Logo</span>
                                 </div>
                                 <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
@@ -1258,15 +1259,15 @@
                             <!-- 📝 2. Sticky Note Inspector Box -->
                             <div id="inspector-stickynote-box" style="display: none; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 12px; font-weight: 800; color: #FBBF24;">📝 {{ __('Sticky Note (ملاحظة لاصقة)') }}</span>
+                                    <span style="font-size: 12px; font-weight: 800; color: #FBBF24;">📝 {{ __'Sticky Note') }}</span>
                                     <span class="furn-type-badge" style="background: rgba(245, 158, 11, 0.2); color: #FCD34D;">Note</span>
                                 </div>
                                 <div>
-                                    <label class="prop-label">{{ __('Note Text (نص الملاحظة التفاعلية)') }}</label>
+                                    <label class="prop-label">{{ __'Note Text') }}</label>
                                     <textarea class="prop-input" id="prop-stickynote-text" rows="3" placeholder="{{ __('Write your note or announcement here...') }}" oninput="updateSelectedStickyText(this.value)" style="resize: vertical; min-height: 65px;"></textarea>
                                 </div>
                                 <div>
-                                    <label class="prop-label">{{ __('Color Theme (لون الملاحظة)') }}</label>
+                                    <label class="prop-label">{{ __'Color Theme') }}</label>
                                     <div style="display: flex; gap: 6px;">
                                         <button type="button" class="rot-btn" style="flex: 1; background: rgba(245, 158, 11, 0.2); border-color: #F59E0B; color: #FCD34D;" onclick="setStickyColor('yellow')" title="Yellow">🟡</button>
                                         <button type="button" class="rot-btn" style="flex: 1; background: rgba(234, 88, 12, 0.2); border-color: #EA580C; color: #FDBA74;" onclick="setStickyColor('orange')" title="Orange">🟠</button>
@@ -1280,19 +1281,19 @@
                             <!-- 🔗 3. Custom Link Inspector Box -->
                             <div id="inspector-link-box" style="display: none; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 12px; font-weight: 800; color: #60A5FA;">🔗 {{ __('Interactive Web Link (رابط مخصص)') }}</span>
+                                    <span style="font-size: 12px; font-weight: 800; color: #60A5FA;">🔗 {{ __'Interactive Web Link') }}</span>
                                     <span class="furn-type-badge" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD;">URL</span>
                                 </div>
                                 <div>
-                                    <label class="prop-label">{{ __('Target URL (رابط الموقع أو المستند)') }}</label>
+                                    <label class="prop-label">{{ __'Target URL') }}</label>
                                     <input type="url" class="prop-input" id="prop-link-url" placeholder="https://example.com/doc" oninput="updateSelectedLinkProp('url', this.value)">
                                 </div>
                                 <div>
-                                    <label class="prop-label">{{ __('Link Title / Label (عنوان الرابط)') }}</label>
+                                    <label class="prop-label">{{ __'Link Title / Label') }}</label>
                                     <input type="text" class="prop-input" id="prop-link-title" placeholder="{{ __('e.g. Project Notion Board') }}" oninput="updateSelectedLinkProp('title', this.value)">
                                 </div>
                                 <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
-                                    <span style="font-size: 11px; color: var(--text-secondary);">{{ __('Open in New Browser Tab (فتح بنافذة جديدة)') }}</span>
+                                    <span style="font-size: 11px; color: var(--text-secondary);">{{ __'Open in New Browser Tab') }}</span>
                                     <input type="checkbox" id="prop-link-newtab" checked onchange="updateSelectedLinkProp('openInNewTab', this.checked)" style="accent-color: var(--brand-primary); cursor: pointer; width: 16px; height: 16px;">
                                 </div>
                             </div>
@@ -1300,17 +1301,17 @@
                             <!-- 🖼️ 4. Custom Image Inspector Box -->
                             <div id="inspector-customimage-box" style="display: none; background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 12px; font-weight: 800; color: #C084FC;">🖼️ {{ __('Custom Image / Banner (صورة مخصصة)') }}</span>
+                                    <span style="font-size: 12px; font-weight: 800; color: #C084FC;">🖼️ {{ __'Custom Image / Banner') }}</span>
                                     <span class="furn-type-badge" style="background: rgba(139, 92, 246, 0.2); color: #D8B4FE;">Image</span>
                                 </div>
                                 <div>
-                                    <label class="prop-label">{{ __('Image URL (رابط الصورة)') }}</label>
+                                    <label class="prop-label">{{ __'Image URL') }}</label>
                                     <input type="url" class="prop-input" id="prop-customimage-url" placeholder="https://.../banner.png" oninput="updateSelectedCustomImageUrl(this.value)">
                                 </div>
                                 <div>
                                     <input type="file" id="customimage-upload-input" accept="image/*" style="display: none;" onchange="uploadObjectImageDirectly(this, 'custom_image')">
                                     <button type="button" class="tool-btn" onclick="document.getElementById('customimage-upload-input').click()" style="width: 100%; justify-content: center; padding: 7px; font-size: 11px;">
-                                        📤 {{ __('Upload Image File (رفع صورة من جهازك)') }}
+                                        📤 {{ __'Upload Image File') }}
                                     </button>
                                 </div>
                             </div>
@@ -1320,42 +1321,42 @@
                         <div id="inspector-room-fields" class="prop-section" style="display: none;">
                             <strong style="font-size: 13px; color: var(--text-main);">🏢 {{ __('Room Properties & Audio') }}</strong>
                             <div>
-                                <label class="prop-label">{{ __('Room Name (اسم الغرفة)') }}</label>
+                                <label class="prop-label">{{ __'Room Name') }}</label>
                                 <input type="text" class="prop-input" id="prop-room-name" placeholder="{{ __('e.g. Conference Room A') }}" oninput="updateRoomProp('name', this.value)">
                             </div>
                             <div>
-                                <label class="prop-label">{{ __('Room Type (نوع الغرفة)') }}</label>
+                                <label class="prop-label">{{ __'Room Type') }}</label>
                                 <select class="prop-input" id="prop-room-type" onchange="updateRoomProp('type', this.value)">
-                                    <option value="meeting">👥 {{ __('Meeting Room (قاعة اجتماعات)') }}</option>
-                                    <option value="private">🔒 {{ __('Private Office (مكتب خاص)') }}</option>
-                                    <option value="focus">🎯 {{ __('Focus Pod (كابينة تركيز)') }}</option>
-                                    <option value="breakout">☕ {{ __('Breakout Lounge (استراحة)') }}</option>
-                                    <option value="reception">🛎️ {{ __('Reception Lobby (استقبال)') }}</option>
+                                    <option value="meeting">👥 {{ __'Meeting Room') }}</option>
+                                    <option value="private">🔒 {{ __'Private Office') }}</option>
+                                    <option value="focus">🎯 {{ __'Focus Pod') }}</option>
+                                    <option value="breakout">☕ {{ __'Breakout Lounge') }}</option>
+                                    <option value="reception">🛎️ {{ __'Reception Lobby') }}</option>
                                 </select>
                             </div>
                             
                             <!-- Acoustic Isolation Box -->
                             <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 12px; font-weight: 800; color: #34D399;">🎙️ {{ __('Acoustic Isolation (العزل الصوتي)') }}</span>
+                                    <span style="font-size: 12px; font-weight: 800; color: #34D399;">🎙️ {{ __'Acoustic Isolation') }}</span>
                                     <input type="checkbox" id="prop-room-isolation" onchange="updateRoomProp('audio_isolation', this.checked)" style="width: 18px; height: 18px; accent-color: var(--brand-primary); cursor: pointer;">
                                 </div>
                                 <span style="font-size: 11px; color: var(--text-muted);" id="prop-room-bounds-label"></span>
                             </div>
 
                             <div>
-                                <label class="prop-label">{{ __('Door Placement (موقع باب الغرفة)') }}</label>
+                                <label class="prop-label">{{ __'Door Placement') }}</label>
                                 <select class="prop-input" id="prop-room-door-side" onchange="updateRoomProp('doorSide', this.value)">
-                                    <option value="auto">🌟 {{ __('Auto Corridor (تلقائي نحو الممر المفتوح)') }}</option>
-                                    <option value="bottom">⬇️ {{ __('Bottom Wall (الجدار السفلي)') }}</option>
-                                    <option value="top">⬆️ {{ __('Top Wall (الجدار العلوي)') }}</option>
-                                    <option value="left">⬅️ {{ __('Left Wall (الجدار الأيسر)') }}</option>
-                                    <option value="right">➡️ {{ __('Right Wall (الجدار الأيمن)') }}</option>
+                                    <option value="auto">🌟 {{ __'Auto Corridor') }}</option>
+                                    <option value="bottom">⬇️ {{ __'Bottom Wall') }}</option>
+                                    <option value="top">⬆️ {{ __'Top Wall') }}</option>
+                                    <option value="left">⬅️ {{ __'Left Wall') }}</option>
+                                    <option value="right">➡️ {{ __'Right Wall') }}</option>
                                 </select>
                             </div>
 
                             <div>
-                                <label class="prop-label">{{ __('Door Position on Wall (موضع الباب على الجدار)') }}</label>
+                                <label class="prop-label">{{ __'Door Position on Wall') }}</label>
                                 <div style="display: flex; align-items: center; gap: 8px;">
                                     <input type="range" class="prop-input" id="prop-room-door-offset" min="15" max="85" value="50" step="5" oninput="updateRoomProp('doorOffset', this.value / 100); document.getElementById('door-offset-val').textContent = this.value + '%';">
                                     <span id="door-offset-val" style="font-size: 11px; font-weight: 800; color: var(--brand-primary); min-width: 32px;">50%</span>
@@ -1363,12 +1364,12 @@
                             </div>
 
                             <div>
-                                <label class="prop-label">{{ __('Capacity (السعة)') }}</label>
+                                <label class="prop-label">{{ __'Capacity') }}</label>
                                 <input type="number" class="prop-input" id="prop-room-capacity" min="1" max="200" oninput="updateRoomProp('capacity', this.value)">
                             </div>
 
                             <button class="act-btn act-btn-emerald" onclick="saveSelectedRoom()" style="margin-top: 6px; justify-content: center;">
-                                💾 {{ __('Save Room Settings (حفظ التعديلات)') }}
+                                💾 {{ __'Save Room Settings') }}
                             </button>
                         </div>
 
@@ -1388,20 +1389,20 @@
                 <div id="drawer-view-floors" style="display: none; flex-direction: column; gap: 12px;">
                     <!-- Quick Action Tools Bar (Moved from Burger Menu) -->
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 6px; background: rgba(0,0,0,0.35); border: 1px solid var(--border-panel); border-radius: 12px;">
-                        <label class="tool-btn" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; margin: 0; background: rgba(255,255,255,0.05);" title="{{ __('Upload Custom Floorplan (رفع مخطط مخصص)') }}">
+                        <label class="tool-btn" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; margin: 0; background: rgba(255,255,255,0.05);" title="{{ __'Upload Custom Floorplan') }}">
                             <span class="material-symbols-rounded" style="font-size: 20px; color: #F59E0B;">upload_file</span>
                             <span style="font-weight: 700;">{{ __('Upload') }}</span>
                             <span style="font-size: 9px; opacity: 0.8; font-family: 'IBM Plex Sans Arabic', sans-serif;">رفع مخصص</span>
                             <input type="file" accept="image/*" style="display:none;" onchange="handleCustomFloorUpload(this)">
                         </label>
 
-                        <button type="button" class="tool-btn" onclick="deleteFloorplan()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; color: #F87171; background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3);" title="{{ __('Reset to Default Floorplan (استعادة المخطط الافتراضي)') }}">
+                        <button type="button" class="tool-btn" onclick="deleteFloorplan()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; color: #F87171; background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3);" title="{{ __'Reset to Default Floorplan') }}">
                             <span class="material-symbols-rounded" style="font-size: 20px; color: #F87171;">restart_alt</span>
                             <span style="font-weight: 700;">{{ __('Reset') }}</span>
                             <span style="font-size: 9px; opacity: 0.8; font-family: 'IBM Plex Sans Arabic', sans-serif;">استعادة</span>
                         </button>
 
-                        <button type="button" class="tool-btn" onclick="clearWorkspace()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; color: #FBBF24; background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3);" title="{{ __('Clear All Placed Furniture (تفريغ الأثاث)') }}">
+                        <button type="button" class="tool-btn" onclick="clearWorkspace()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; color: #FBBF24; background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3);" title="{{ __'Clear All Placed Furniture') }}">
                             <span class="material-symbols-rounded" style="font-size: 20px; color: #FBBF24;">cleaning_services</span>
                             <span style="font-weight: 700;">{{ __('Clear') }}</span>
                             <span style="font-size: 9px; opacity: 0.8; font-family: 'IBM Plex Sans Arabic', sans-serif;">تفريغ الأثاث</span>
@@ -1423,7 +1424,7 @@
 
                     <div style="padding-top: 8px; border-top: 1px solid var(--border-panel); display: flex; justify-content: space-between; align-items: center;">
                         <button type="button" class="tool-btn" onclick="clearCurrentFloorBackground()" style="color: #F87171; border-color: rgba(239,68,68,0.3); font-size: 11px; width: 100%; justify-content: center;">
-                            🗑️ {{ __('Remove Floor Background (إزالة صورة الأرضية)') }}
+                            🗑️ {{ __'Remove Floor Background') }}
                         </button>
                     </div>
                 </div>
@@ -1622,7 +1623,7 @@
         }
 
         async function applyFloorBackground(floorUrl, width = 1200, height = 708) {
-            showToast('⏳ {{ __("Applying Floor Style (جاري تطبيق نمط الأرضية)...") }}');
+            showToast('⏳ {{ __("Applying Floor Style...") }}');
             try {
                 const res = await fetch(`/editor/maps/${MAP_ID}/background`, {
                     method: 'POST',
@@ -1652,7 +1653,7 @@
                     
                     fitAndCenterView();
                     renderFloorsCatalog();
-                    showToast('✅ {{ __("Floor Style Applied Successfully (تم تطبيق نمط الأرضية بنجاح)") }}');
+                    showToast('✅ {{ __("Floor Style Applied Successfully") }}');
                 } else {
                     showToast('❌ ' + (data.message || 'Failed to apply floor style'));
                 }
@@ -1668,7 +1669,7 @@
             const formData = new FormData();
             formData.append('image', file);
 
-            showToast('⏳ {{ __("Uploading Custom Floor Image (جاري رفع صورة الأرضية)...") }}');
+            showToast('⏳ {{ __("Uploading Custom Floor Image...") }}');
             try {
                 const res = await fetch(`/editor/maps/${MAP_ID}/background`, {
                     method: 'POST',
@@ -1693,7 +1694,7 @@
                         }
                         fitAndCenterView();
                         renderFloorsCatalog();
-                        showToast('✅ {{ __("Floor Background Uploaded & Applied (تم تطبيق الأرضية بنجاح)") }}');
+                        showToast('✅ {{ __"Floor Background Uploaded & Applied") }}');
                     };
                 } else {
                     showToast('❌ ' + (data.message || 'Upload failed'));
@@ -1705,7 +1706,7 @@
         }
 
         async function clearCurrentFloorBackground() {
-            if (!confirm('{{ __("Are you sure you want to remove the floor background? (هل أنت متأكد من رغبتك في إزالة صورة الأرضية؟)") }}')) return;
+            if (!confirm('{{ __"Are you sure you want to remove the floor background?") }}')) return;
             try {
                 const res = await fetch(`/editor/maps/${MAP_ID}/background`, {
                     method: 'DELETE',
@@ -1728,7 +1729,7 @@
                     fitAndCenterView();
                     renderFloorsCatalog();
                     draw();
-                    showToast('✅ {{ __("Background removed (تمت إزالة صورة الأرضية)") }}');
+                    showToast('✅ {{ __"Background removed") }}');
                 }
             } catch (err) {
                 console.error(err);
@@ -1841,8 +1842,36 @@
             if (window.event && window.event.currentTarget) window.event.currentTarget.classList.add('active');
         }
 
-        function zoomIn() { zoomLevel = Math.min(2.5, zoomLevel + 0.15); draw(); }
-        function zoomOut() { zoomLevel = Math.max(0.4, zoomLevel - 0.15); draw(); }
+        let gridSnapStep = 0.25; // 4px micro precision
+        let gridSnapLabel = '4px';
+
+        function cycleGridSnap() {
+            if (gridSnapStep === 0.25) {
+                gridSnapStep = 0.5;
+                gridSnapLabel = '8px';
+            } else if (gridSnapStep === 0.5) {
+                gridSnapStep = 1.0;
+                gridSnapLabel = '16px';
+            } else if (gridSnapStep === 1.0) {
+                gridSnapStep = 0.0625;
+                gridSnapLabel = 'Free';
+            } else {
+                gridSnapStep = 0.25;
+                gridSnapLabel = '4px';
+            }
+            const btn = document.getElementById('btn-grid-snap');
+            if (btn) btn.textContent = `🎯 ${gridSnapLabel}`;
+            showToast(`🎯 {{ __("Grid Snap Precision:") }} ${gridSnapLabel}`);
+            draw();
+        }
+
+        function snapCoordinate(val, step = gridSnapStep) {
+            if (step <= 0) return val;
+            return Math.round(val / step) * step;
+        }
+
+        function zoomIn() { zoomLevel = Math.min(3.5, zoomLevel + 0.15); draw(); }
+        function zoomOut() { zoomLevel = Math.max(0.25, zoomLevel - 0.15); draw(); }
         function resetView() { fitAndCenterView(); draw(); }
         function toggleGrid() { showGrid = !showGrid; draw(); }
 
@@ -1852,7 +1881,7 @@
         canvas.addEventListener('wheel', (e) => {
             e.preventDefault();
             const zoomDelta = e.deltaY < 0 ? 0.12 : -0.12;
-            const newZoom = Math.max(0.35, Math.min(3.0, zoomLevel + zoomDelta));
+            const newZoom = Math.max(0.25, Math.min(3.5, zoomLevel + zoomDelta));
             if (newZoom !== zoomLevel) {
                 const rect = canvas.getBoundingClientRect();
                 const mouseX = e.clientX - rect.left;
@@ -1877,18 +1906,22 @@
             const mouseX = (e.clientX - rect.left - panOffset.x) / zoomLevel;
             const mouseY = (e.clientY - rect.top - panOffset.y) / zoomLevel;
 
-            const tileX = Math.floor(mouseX / TILE_SIZE);
-            const tileY = Math.floor(mouseY / TILE_SIZE);
+            const rawTileX = mouseX / TILE_SIZE;
+            const rawTileY = mouseY / TILE_SIZE;
+            const tileX = Math.floor(rawTileX);
+            const tileY = Math.floor(rawTileY);
 
             if (currentTool === 'select') {
                 let clicked = null;
-                // Objects first
+                // Objects first (support sub-tile hit testing)
                 for (let i = objects.length - 1; i >= 0; i--) {
                     const obj = objects[i];
+                    const ox = (obj.position ? obj.position.x : 0);
+                    const oy = (obj.position ? obj.position.y : 0);
                     const ow = obj.width || (obj.size ? obj.size.width : 1);
                     const oh = obj.height || (obj.size ? obj.size.height : 1);
-                    if (tileX >= obj.position.x && tileX < obj.position.x + ow &&
-                        tileY >= obj.position.y && tileY < obj.position.y + oh) {
+                    if (rawTileX >= ox && rawTileX < ox + ow &&
+                        rawTileY >= oy && rawTileY < oy + oh) {
                         clicked = { type: 'object', item: obj };
                         break;
                     }
@@ -1898,8 +1931,8 @@
                     for (let i = rooms.length - 1; i >= 0; i--) {
                         const r = rooms[i];
                         if (!r.bounds) continue;
-                        if (tileX >= r.bounds.x && tileX < r.bounds.x + r.bounds.width &&
-                            tileY >= r.bounds.y && tileY < r.bounds.y + r.bounds.height) {
+                        if (rawTileX >= r.bounds.x && rawTileX < r.bounds.x + r.bounds.width &&
+                            rawTileY >= r.bounds.y && rawTileY < r.bounds.y + r.bounds.height) {
                             clicked = { type: 'room', item: r };
                             break;
                         }
@@ -1909,12 +1942,12 @@
                 selectedItem = clicked;
                 if (selectedItem) {
                     isDragging = true;
-                    dragStartTileX = tileX;
-                    dragStartTileY = tileY;
+                    dragStartTileX = rawTileX;
+                    dragStartTileY = rawTileY;
 
                     if (selectedItem.type === 'object') {
-                        dragOrigX = selectedItem.item.position.x;
-                        dragOrigY = selectedItem.item.position.y;
+                        dragOrigX = (selectedItem.item.position ? selectedItem.item.position.x : 0);
+                        dragOrigY = (selectedItem.item.position ? selectedItem.item.position.y : 0);
                         roomContainedObjects = [];
                     } else if (selectedItem.type === 'room') {
                         dragOrigX = selectedItem.item.bounds.x;
@@ -1979,14 +2012,21 @@
                     };
                 }
 
+                const maxTilesX = MAP_WIDTH_PX / TILE_SIZE;
+                const maxTilesY = MAP_HEIGHT_PX / TILE_SIZE;
+                const placeW = currentObjectCustom?.width || 1;
+                const placeH = currentObjectCustom?.height || 1;
+                const placeX = Math.max(0, Math.min(maxTilesX - placeW, snapCoordinate(rawTileX, gridSnapStep)));
+                const placeY = Math.max(0, Math.min(maxTilesY - placeH, snapCoordinate(rawTileY, gridSnapStep)));
+
                 const newObj = {
                     type: currentObjectType,
                     name: currentObjectCustom?.name || `${currentObjectType.replace(/_/g, ' ')} #${objects.length + 1}`,
-                    position: { x: tileX, y: tileY, rotation: 0 },
+                    position: { x: placeX, y: placeY, rotation: 0 },
                     color: currentObjectColor,
                     image_url: objImgUrl,
-                    width: currentObjectCustom?.width || 1,
-                    height: currentObjectCustom?.height || 1,
+                    width: placeW,
+                    height: placeH,
                     collision: currentObjectCustom ? currentObjectCustom.collision : true,
                     elevation: currentObjectCustom?.elevation || 1,
                     interaction_type: iType,
@@ -2014,25 +2054,27 @@
             const mouseX = (e.clientX - rect.left - panOffset.x) / zoomLevel;
             const mouseY = (e.clientY - rect.top - panOffset.y) / zoomLevel;
 
-            const tileX = Math.floor(mouseX / TILE_SIZE);
-            const tileY = Math.floor(mouseY / TILE_SIZE);
+            const rawTileX = mouseX / TILE_SIZE;
+            const rawTileY = mouseY / TILE_SIZE;
+            const tileX = Math.floor(rawTileX);
+            const tileY = Math.floor(rawTileY);
 
             if (isDragging && selectedItem) {
-                const maxTilesX = Math.floor(MAP_WIDTH_PX / TILE_SIZE);
-                const maxTilesY = Math.floor(MAP_HEIGHT_PX / TILE_SIZE);
-                const dx = tileX - dragStartTileX;
-                const dy = tileY - dragStartTileY;
+                const maxTilesX = MAP_WIDTH_PX / TILE_SIZE;
+                const maxTilesY = MAP_HEIGHT_PX / TILE_SIZE;
+                const dx = rawTileX - dragStartTileX;
+                const dy = rawTileY - dragStartTileY;
 
                 if (selectedItem.type === 'object') {
                     const objW = selectedItem.item.width || (selectedItem.item.size ? selectedItem.item.size.width : 1);
                     const objH = selectedItem.item.height || (selectedItem.item.size ? selectedItem.item.size.height : 1);
-                    selectedItem.item.position.x = Math.max(0, Math.min(maxTilesX - objW, dragOrigX + dx));
-                    selectedItem.item.position.y = Math.max(0, Math.min(maxTilesY - objH, dragOrigY + dy));
+                    selectedItem.item.position.x = Math.max(0, Math.min(maxTilesX - objW, snapCoordinate(dragOrigX + dx, gridSnapStep)));
+                    selectedItem.item.position.y = Math.max(0, Math.min(maxTilesY - objH, snapCoordinate(dragOrigY + dy, gridSnapStep)));
                 } else if (selectedItem.type === 'room') {
                     const rw = selectedItem.item.bounds.width || 1;
                     const rh = selectedItem.item.bounds.height || 1;
-                    const newRoomX = Math.max(0, Math.min(maxTilesX - rw, dragOrigX + dx));
-                    const newRoomY = Math.max(0, Math.min(maxTilesY - rh, dragOrigY + dy));
+                    const newRoomX = Math.max(0, Math.min(maxTilesX - rw, Math.round(dragOrigX + dx)));
+                    const newRoomY = Math.max(0, Math.min(maxTilesY - rh, Math.round(dragOrigY + dy)));
                     selectedItem.item.bounds.x = newRoomX;
                     selectedItem.item.bounds.y = newRoomY;
 
@@ -2171,21 +2213,37 @@
             } else {
                 ctx.fillStyle = '#0F1E16';
                 ctx.fillRect(0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
-
-                if (showGrid) {
-                    ctx.strokeStyle = 'rgba(79, 155, 95, 0.08)';
-                    ctx.lineWidth = 1;
-                    for (let x = 0; x <= MAP_WIDTH_PX; x += TILE_SIZE) {
-                        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, MAP_HEIGHT_PX); ctx.stroke();
-                    }
-                    for (let y = 0; y <= MAP_HEIGHT_PX; y += TILE_SIZE) {
-                        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(MAP_WIDTH_PX, y); ctx.stroke();
-                    }
-                }
-                ctx.strokeStyle = '#2D5C3E';
-                ctx.lineWidth = 2.5;
-                ctx.strokeRect(0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
             }
+
+            // Grid Overlay (Fine micro-grid for precision object control)
+            if (showGrid) {
+                // Micro 4px sub-grid lines
+                ctx.strokeStyle = hasBlueprint ? 'rgba(0, 0, 0, 0.04)' : 'rgba(79, 155, 95, 0.05)';
+                ctx.lineWidth = 0.5;
+                const microStep = (gridSnapStep === 0.125 || gridSnapStep === 0.25) ? 4 : 8;
+                for (let x = 0; x <= MAP_WIDTH_PX; x += microStep) {
+                    if (x % TILE_SIZE === 0) continue;
+                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, MAP_HEIGHT_PX); ctx.stroke();
+                }
+                for (let y = 0; y <= MAP_HEIGHT_PX; y += microStep) {
+                    if (y % TILE_SIZE === 0) continue;
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(MAP_WIDTH_PX, y); ctx.stroke();
+                }
+
+                // Major 16px tile grid lines
+                ctx.strokeStyle = hasBlueprint ? 'rgba(45, 92, 62, 0.16)' : 'rgba(79, 155, 95, 0.16)';
+                ctx.lineWidth = 1;
+                for (let x = 0; x <= MAP_WIDTH_PX; x += TILE_SIZE) {
+                    ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, MAP_HEIGHT_PX); ctx.stroke();
+                }
+                for (let y = 0; y <= MAP_HEIGHT_PX; y += TILE_SIZE) {
+                    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(MAP_WIDTH_PX, y); ctx.stroke();
+                }
+            }
+
+            ctx.strokeStyle = '#2D5C3E';
+            ctx.lineWidth = 2.5;
+            ctx.strokeRect(0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
 
             // 2. Draw Unselected Rooms Dynamically (Sleek Glass Pills)
             rooms.forEach((r) => {
@@ -2978,7 +3036,7 @@
         }
 
         async function deleteFloorplan() {
-            if (!confirm('{{ __("Are you sure you want to reset the floorplan to default 1200×708? (هل أنت متأكد من استعادة المخطط الافتراضي؟)") }}')) return;
+            if (!confirm('{{ __"Are you sure you want to reset the floorplan to default 1200×708?") }}')) return;
             showToast('🗑️ {{ __("Resetting floorplan...") }}');
             try {
                 const res = await fetch(`/editor/maps/${MAP_ID}/background`, {
@@ -3353,7 +3411,7 @@
                         </div>
                         <div style="width: 1px; height: 26px; background: var(--border-card);"></div>
                         <div style="text-align: center;">
-                            <span style="font-size: 10px; color: var(--text-dim); display: block;">🖥️ {{ __('Total Workstations / Desks (إجمالي المكاتب)') }}</span>
+                            <span style="font-size: 10px; color: var(--text-dim); display: block;">🖥️ {{ __'Total Workstations / Desks') }}</span>
                             <span id="ai-quota-seats-val" style="font-size: 14px; font-weight: 900; color: #3B82F6;">0 / ∞</span>
                         </div>
                     </div>
@@ -3362,7 +3420,7 @@
                 <!-- 1. Architectural Style Selection -->
                 <div>
                     <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-main); margin-bottom: 10px;">
-                        🎨 {{ __('1. Choose Office Architectural Style (نمط المكتب المعماري)') }}
+                        🎨 {{ __'1. Choose Office Architectural Style') }}
                     </label>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
                         @foreach($aiStyles as $key => $style)
@@ -3382,7 +3440,7 @@
                 <!-- 2. Room Breakdown & Desks Steppers -->
                 <div>
                     <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-main); margin-bottom: 10px;">
-                        🏢 {{ __('2. Customize Room Quantities & Desk Counts (تخصيص الغرف والمكاتب)') }}
+                        🏢 {{ __'2. Customize Room Quantities & Desk Counts') }}
                     </label>
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px;">
@@ -3491,7 +3549,7 @@
                         {{ __('Cancel') }}
                     </button>
                     <button type="button" onclick="generateAiOfficeOnCanvas()" id="btn-ai-submit-generate" class="tactile-btn btn-primary" style="padding: 12px 28px; font-size: 14px; font-weight: 900; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);">
-                        <span>✨</span> {{ __('Generate Office with AI (توليد الخريطة بالذكاء الاصطناعي)') }}
+                        <span>✨</span> {{ __'Generate Office with AI') }}
                     </button>
                 </div>
             </div>
