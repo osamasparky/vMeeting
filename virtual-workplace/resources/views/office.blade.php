@@ -3325,7 +3325,7 @@
                     ctx.restore();
                 }
 
-                // D. Figma Design Room Card (Smaller pill placed at top-left corner with green rounded background)
+                // D. Figma Design Room Card (Smaller pill placed at the corner opposite the door on the other side)
                 const displayName = getLocalizedRoomName(r);
 
                 ctx.save();
@@ -3336,8 +3336,36 @@
                 const cardW = Math.min(rw - 16, nameMetrics.width + (cardPadX * 2));
                 const cardH = 18;
                 const cardRadius = 6;
-                const cardX = rx + 14;
-                const cardY = ry + 14;
+                const margin = 12;
+
+                // 4 Candidate corners: Top-Left, Top-Right, Bottom-Left, Bottom-Right
+                const corners = [
+                    { x: rx + margin, y: ry + margin },
+                    { x: rx + rw - cardW - margin, y: ry + margin },
+                    { x: rx + margin, y: ry + rh - cardH - margin },
+                    { x: rx + rw - cardW - margin, y: ry + rh - cardH - margin }
+                ];
+
+                let chosenCorner = corners[0]; // default top-left
+
+                if (door && typeof door.x === 'number' && typeof door.y === 'number') {
+                    // Pick the corner with the maximum distance from the door (opposite corner on the other side)
+                    let maxDistSq = -1;
+                    for (const corner of corners) {
+                        const cornerCenterX = corner.x + (cardW / 2);
+                        const cornerCenterY = corner.y + (cardH / 2);
+                        const dx = cornerCenterX - door.x;
+                        const dy = cornerCenterY - door.y;
+                        const distSq = (dx * dx) + (dy * dy);
+                        if (distSq > maxDistSq) {
+                            maxDistSq = distSq;
+                            chosenCorner = corner;
+                        }
+                    }
+                }
+
+                const cardX = chosenCorner.x;
+                const cardY = chosenCorner.y;
 
                 // Subtle Card Drop Shadow
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
