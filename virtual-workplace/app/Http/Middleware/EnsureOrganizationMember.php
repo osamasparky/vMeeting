@@ -18,17 +18,17 @@ class EnsureOrganizationMember
     {
         $organization = $request->route('organization');
 
-        if (!$organization instanceof Organization) {
+        if (! $organization instanceof Organization) {
             $organization = Organization::where('id', $organization)
                 ->orWhere('slug', $organization)
                 ->first();
         }
 
-        if (!$organization) {
+        if (! $organization) {
             return response()->json(['message' => 'Organization not found.'], 404);
         }
 
-        if (!$organization->isActive()) {
+        if (! $organization->isActive()) {
             return response()->json(['message' => 'Organization is not active.'], 403);
         }
 
@@ -39,7 +39,7 @@ class EnsureOrganizationMember
             ->where('status', 'active')
             ->first();
 
-        if (!$membership) {
+        if (! $membership) {
             return response()->json(['message' => 'You are not a member of this organization.'], 403);
         }
 

@@ -15,7 +15,7 @@ return new class extends Migration
         // 1. Alter meetings.status column from enum to varchar(32) so it accepts 'scheduled', 'cancelled', 'active', 'ended', 'pending'
         try {
             DB::statement("ALTER TABLE `meetings` MODIFY COLUMN `status` VARCHAR(32) NOT NULL DEFAULT 'active'");
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // Fallback for sqlite / non-mysql
             if (Schema::hasColumn('meetings', 'status')) {
                 Schema::table('meetings', function (Blueprint $table) {
@@ -25,7 +25,7 @@ return new class extends Migration
         }
 
         // 2. Create project_files table
-        if (!Schema::hasTable('project_files')) {
+        if (! Schema::hasTable('project_files')) {
             Schema::create('project_files', function (Blueprint $table) {
                 $table->uuid('id')->primary();
                 $table->foreignUuid('organization_id')->constrained('organizations')->cascadeOnDelete();
@@ -45,16 +45,16 @@ return new class extends Migration
 
         // 3. Add approval columns to tasks table
         Schema::table('tasks', function (Blueprint $table) {
-            if (!Schema::hasColumn('tasks', 'approval_status')) {
+            if (! Schema::hasColumn('tasks', 'approval_status')) {
                 $table->string('approval_status', 32)->default('none')->after('status');
             }
-            if (!Schema::hasColumn('tasks', 'approved_by')) {
+            if (! Schema::hasColumn('tasks', 'approved_by')) {
                 $table->foreignUuid('approved_by')->nullable()->after('approval_status')->constrained('users')->nullOnDelete();
             }
-            if (!Schema::hasColumn('tasks', 'approved_at')) {
+            if (! Schema::hasColumn('tasks', 'approved_at')) {
                 $table->timestamp('approved_at')->nullable()->after('approved_by');
             }
-            if (!Schema::hasColumn('tasks', 'rejection_reason')) {
+            if (! Schema::hasColumn('tasks', 'rejection_reason')) {
                 $table->text('rejection_reason')->nullable()->after('approved_at');
             }
         });

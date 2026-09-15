@@ -13,7 +13,7 @@ return new class extends Migration
             $table->integer('recurrence_interval')->default(1)->after('recurrence_rule');
             $table->date('recurrence_ends_at')->nullable()->after('recurrence_interval');
             $table->timestamp('last_recurred_at')->nullable()->after('recurrence_ends_at');
-            
+
             $table->index(['recurrence_rule', 'status']);
         });
     }

@@ -3,7 +3,8 @@
 namespace Tests\Feature;
 
 use App\Domains\Identity\Models\User;
-use App\Domains\Tenancy\Models\OrganizationMember;
+use Database\Seeders\PlansSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,8 +15,8 @@ class AuthTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\PlansSeeder::class);
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(PlansSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
     }
 
     public function test_user_can_register_and_create_organization(): void

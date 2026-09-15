@@ -10,19 +10,19 @@
     <div class="settings-tabs-nav" style="display: flex; gap: 8px; background: var(--bg-surface); padding: 8px; border-radius: var(--radius-xl); border: 1px solid var(--border-color); box-shadow: var(--shadow-card); overflow-x: auto; scrollbar-width: none;">
         <button type="button" class="sa-tab-btn active" onclick="switchSuperTab('general', this)" id="sa-tab-btn-general">
             <span>🌐</span>
-            <span>{{ __'Global Platform & SaaS') }}</span>
+            <span>{{ __('Global Platform & SaaS') }}</span>
         </button>
         <button type="button" class="sa-tab-btn" onclick="switchSuperTab('payment', this)" id="sa-tab-btn-payment">
             <span>💳</span>
-            <span>{{ __'Payment & Bank Accounts') }}</span>
+            <span>{{ __('Payment & Bank Accounts') }}</span>
         </button>
         <button type="button" class="sa-tab-btn" onclick="switchSuperTab('blueprint', this)" id="sa-tab-btn-blueprint">
             <span>📐</span>
-            <span>{{ __'Default Global Blueprint') }}</span>
+            <span>{{ __('Default Global Blueprint') }}</span>
         </button>
         <button type="button" class="sa-tab-btn" onclick="switchSuperTab('ai', this)" id="sa-tab-btn-ai">
             <span>🤖</span>
-            <span>{{ __'AI Engine & OpenAI') }}</span>
+            <span>{{ __('AI Engine & OpenAI') }}</span>
         </button>
     </div>
 
@@ -35,7 +35,7 @@
                 <div class="panel-header" style="margin-bottom: 24px;">
                     <div class="panel-title">
                         <span>🌐</span>
-                        <span>{{ __'Global SaaS Configuration') }}</span>
+                        <span>{{ __('Global SaaS Configuration') }}</span>
                     </div>
                     <p class="panel-subtitle">{{ __('Configure core platform parameters, default registration tier, and real-time connectivity.') }}</p>
                 </div>
@@ -109,7 +109,7 @@
                 <div class="panel-header" style="margin-bottom: 24px;">
                     <div class="panel-title">
                         <span>💳</span>
-                        <span>{{ __'Checkout & Payment Gateways Settings') }}</span>
+                        <span>{{ __('Checkout & Payment Gateways Settings') }}</span>
                     </div>
                     <p class="panel-subtitle">{{ __('Configure payment methods, official bank accounts, Instapay / Wallets, currency rates, and terms displayed to users on the checkout page.') }}</p>
                 </div>
@@ -233,15 +233,15 @@
                 <!-- Checkout Instructions & Terms -->
                 <div style="padding-top: 16px; border-top: 1px solid var(--border-color);">
                     <h4 style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin-bottom: 12px;">
-                        📜 {{ __'Checkout Instructions & Policy') }}
+                        📜 {{ __('Checkout Instructions & Policy') }}
                     </h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                         <div>
-                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __'Instructions in Arabic') }}</label>
+                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Instructions in Arabic') }}</label>
                             <textarea name="checkout_terms_ar" rows="3" dir="rtl" class="form-input" style="width: 100%; font-family: 'Cairo', sans-serif;">{{ $paymentSettings['checkout_terms_ar'] ?? '' }}</textarea>
                         </div>
                         <div>
-                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __'Instructions in English') }}</label>
+                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">{{ __('Instructions in English') }}</label>
                             <textarea name="checkout_terms_en" rows="3" dir="ltr" class="form-input" style="width: 100%; font-family: 'Inter', sans-serif;">{{ $paymentSettings['checkout_terms_en'] ?? '' }}</textarea>
                         </div>
                     </div>
@@ -249,7 +249,7 @@
 
                 <div style="margin-top: 24px; display: flex; justify-content: flex-end;">
                     <button type="submit" class="tactile-btn btn-primary" style="padding: 12px 32px; font-size: 13px;">
-                        💾 {{ __'Save Payment & Checkout Settings') }}
+                        💾 {{ __('Save Payment & Checkout Settings') }}
                     </button>
                 </div>
             </div>
@@ -264,7 +264,7 @@
                 <div class="panel-header" style="margin-bottom: 20px;">
                     <div class="panel-title">
                         <span>📐</span>
-                        <span>{{ __'Global System Default Office Blueprint') }}</span>
+                        <span>{{ __('Global System Default Office Blueprint') }}</span>
                     </div>
                     <p class="panel-subtitle">
                         {{ __('Upload the platform-wide default 3D isometric architectural floorplan. All newly registered organizations and default workspaces will automatically inherit this blueprint design. Company admins can then customize and edit their specific rooms.') }}
@@ -305,7 +305,7 @@
                 <div class="panel-header" style="margin-bottom: 20px;">
                     <div class="panel-title">
                         <span>🤖</span>
-                        <span>{{ __'OpenAI & AI Office Generator Settings') }}</span>
+                        <span>{{ __('OpenAI & AI Office Generator Settings') }}</span>
                     </div>
                     <p class="panel-subtitle">
                         {{ __('Configure ChatGPT & OpenAI (DALL-E 3) API credentials to empower company admins to generate bespoke, 3D isometric architectural floorplans and isolated room maps directly from the Edit Office page.') }}
@@ -338,7 +338,7 @@
 
                     <div>
                         <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
-                            🖼️ {{ __'Image Generation Model') }}
+                            🖼️ {{ __('Image Generation Model') }}
                         </label>
                         <select name="model" class="form-input" style="width: 100%;">
                             <option value="gpt-image-1" {{ ($aiSettings['model'] ?? 'gpt-image-1') === 'gpt-image-1' ? 'selected' : '' }}>
@@ -358,7 +358,7 @@
 
                     <div>
                         <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
-                            📐 {{ __'Floorplan Image Aspect Ratio & Size') }}
+                            📐 {{ __('Floorplan Image Aspect Ratio & Size') }}
                         </label>
                         <select name="image_size" class="form-input" style="width: 100%;">
                             <option value="1024x1024" {{ ($aiSettings['image_size'] ?? '1024x1024') === '1024x1024' ? 'selected' : '' }}>
@@ -372,7 +372,7 @@
 
                     <div>
                         <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
-                            💎 {{ __'Image Render Quality') }}
+                            💎 {{ __('Image Render Quality') }}
                         </label>
                         <select name="quality" class="form-input" style="width: 100%;">
                             <option value="standard" {{ ($aiSettings['quality'] ?? 'standard') === 'standard' ? 'selected' : '' }}>
@@ -386,7 +386,7 @@
 
                     <div style="grid-column: 1 / -1;">
                         <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">
-                            📝 {{ __'System Prompt Prefix & Directives') }}
+                            📝 {{ __('System Prompt Prefix & Directives') }}
                         </label>
                         <textarea name="prompt_prefix" rows="3" class="form-input" style="width: 100%; font-size: 12px;">{{ $aiSettings['prompt_prefix'] ?? "A clean, photorealistic direct top-down 2D architectural floor plan blueprint of a modern virtual workplace office (straight 90-degree overhead bird's-eye plan view with cutaway interior walls)." }}</textarea>
                     </div>
@@ -394,7 +394,7 @@
 
                 <div style="margin-top: 24px; display: flex; justify-content: flex-end;">
                     <button type="submit" class="tactile-btn btn-primary" style="padding: 12px 32px; font-size: 13px;">
-                        💾 {{ __'Save AI Generator Settings') }}
+                        💾 {{ __('Save AI Generator Settings') }}
                     </button>
                 </div>
             </div>
@@ -514,7 +514,7 @@
             feedback.style.border = '1px solid rgba(217, 107, 95, 0.3)';
             feedback.innerHTML = '⚠️ Network error testing connection: ' + e.message;
         } finally {
-            btn.innerHTML = '⚡ {{ __"Test Connection") }}';
+            btn.innerHTML = '⚡ {{ __("Test Connection") }}';
         }
     }
 

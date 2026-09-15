@@ -3,31 +3,39 @@
 namespace App\Http\Controllers\Web;
 
 use App\Domains\Administration\Models\AuditLog;
-use App\Domains\Tenancy\Models\OrganizationMember;
+use App\Domains\Identity\Models\User;
 use App\Domains\Identity\Services\RealtimeTokenService;
 use App\Domains\Notifications\Services\NotificationService;
+use App\Domains\People\Models\Department;
+use App\Domains\People\Models\Team;
 use App\Domains\Tenancy\Models\Organization;
+use App\Domains\Tenancy\Models\OrganizationMember;
+use App\Domains\Tenancy\Models\OrganizationSetting;
+use App\Domains\Workspace\Actions\PublishMapAction;
 use App\Domains\Workspace\Models\Floor;
+use App\Domains\Workspace\Models\FurnitureCategory;
 use App\Domains\Workspace\Models\FurnitureItem;
 use App\Domains\Workspace\Models\Map;
+use App\Domains\Workspace\Models\MapObject;
 use App\Domains\Workspace\Models\Room;
+use App\Domains\Workspace\Models\RoomFile;
 use App\Domains\Workspace\Services\AiMapGeneratorService;
 use App\Http\Controllers\Controller;
-use App\Services\FileUploadService;
 use Database\Seeders\BlueprintOfficeSeeder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class OfficeController extends Controller
 {
     /**
      * Show the interactive Virtual Office floor with multi-branch switcher and room access guard.
      */
-    public function office(\App\Domains\Identity\Services\RealtimeTokenService $tokenService)
+    public function office(RealtimeTokenService $tokenService)
     {
         $user = Auth::user();
 
@@ -36,7 +44,7 @@ class OfficeController extends Controller
             ->with(['organization.plan', 'role.permissions', 'offices', 'rooms'])
             ->first();
 
-        if (!$membership) {
+        if (! $membership) {
             return redirect()->route('login')->with('error', 'No active organization found.');
         }
 
@@ -58,10 +66,10 @@ class OfficeController extends Controller
 
         if ($requestedOfficeId) {
             $floor = $organization->floors()->find($requestedOfficeId);
-            if (!$floor) {
+            if (! $floor) {
                 return redirect()->route('office')->with('error', __('Requested office branch not found.'));
             }
-            if (!$membership->hasOfficeAccess($floor->id)) {
+            if (! $membership->hasOfficeAccess($floor->id)) {
                 return redirect()->route('dashboard')->with('error', __('You do not have access permission to enter this office branch (ليس لديك صلاحية لدخول هذا الفرع).'));
             }
         } else {
@@ -72,18 +80,18 @@ class OfficeController extends Controller
                 : ($userAllowedOffices->firstWhere('is_default', true) ?: $userAllowedOffices->first() ?: $organization->floors()->first());
         }
 
-        if (!$floor) {
+        if (! $floor) {
             return redirect()->route('dashboard')->with('error', __('No active office available.'));
         }
 
         $map = $organization->maps()->where('floor_id', $floor->id)->where('status', 'published')->latest('published_at')->first()
             ?? $organization->maps()->where('floor_id', $floor->id)->latest()->first();
 
-        if (!$map) {
+        if (! $map) {
             // Auto generate initial map for this office
             $map = $organization->maps()->create([
                 'floor_id' => $floor->id,
-                'name' => $floor->name . ' Blueprint',
+                'name' => $floor->name.' Blueprint',
                 'status' => 'published',
                 'version' => 1,
                 'width' => 32,
@@ -117,11 +125,11 @@ class OfficeController extends Controller
         $wsUrl = env('REALTIME_WS_URL', env('VITE_REALTIME_WS_URL', 'ws://127.0.0.1:8080'));
 
         $furnitureItems = Cache::remember('furniture_catalog_active', 86400, function () {
-            return \App\Domains\Workspace\Models\FurnitureItem::where('is_active', true)->get();
+            return FurnitureItem::where('is_active', true)->get();
         });
 
-        $attendancePolicy = optional($organization->settings)->getAttendancePolicy() 
-            ?? \App\Domains\Tenancy\Models\OrganizationSetting::getAttendancePolicy();
+        $attendancePolicy = optional($organization->settings)->getAttendancePolicy()
+            ?? OrganizationSetting::getAttendancePolicy();
 
         return view('office', compact('user', 'organization', 'membership', 'floor', 'map', 'allOffices', 'userAllowedOffices', 'userAllowedRoomIds', 'realtimeToken', 'wsUrl', 'furnitureItems', 'attendancePolicy'));
     }
@@ -129,13 +137,15 @@ class OfficeController extends Controller
     /**
      * Generate an AI-powered Office Blueprint & Spatial Rooms layout.
      */
-    public function generateAiOffice(Request $request, \App\Domains\Workspace\Services\AiMapGeneratorService $aiMapService)
+    public function generateAiOffice(Request $request, AiMapGeneratorService $aiMapService)
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->with(['organization.plan', 'role.permissions'])->first();
-        if (!$membership) abort(403);
+        if (! $membership) {
+            abort(403);
+        }
 
-        if (!$membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin' && !$user->isSuperAdmin()) {
+        if (! $membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin' && ! $user->isSuperAdmin()) {
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json(['success' => false, 'message' => __('Unauthorized: only organization admins can generate workplace blueprints.')], 403);
             }
@@ -159,7 +169,7 @@ class OfficeController extends Controller
         try {
             $result = $aiMapService->generate($organization, $validated, $user);
 
-            \App\Domains\Administration\Models\AuditLog::create([
+            AuditLog::create([
                 'organization_id' => $organization->id,
                 'actor_id' => $user->id,
                 'action' => 'map.ai_generated',
@@ -186,17 +196,19 @@ class OfficeController extends Controller
 
             return redirect()->route('editor', ['office' => $result['floor']->id])
                 ->with('success', $result['message']);
-        } catch (\Illuminate\Validation\ValidationException $ve) {
+        } catch (ValidationException $ve) {
             $errors = $ve->errors();
             $firstErr = reset($errors)[0] ?? __('Validation error.');
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json(['success' => false, 'message' => $firstErr], 422);
             }
+
             return back()->with('error', $firstErr);
         } catch (\Throwable $e) {
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
             }
+
             return back()->with('error', $e->getMessage());
         }
     }
@@ -208,9 +220,11 @@ class OfficeController extends Controller
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->with(['organization.plan', 'role.permissions'])->first();
-        if (!$membership) abort(403);
+        if (! $membership) {
+            abort(403);
+        }
 
-        if (!$membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin') {
+        if (! $membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin') {
             abort(403, 'Unauthorized: only organization admins can create offices.');
         }
 
@@ -218,7 +232,7 @@ class OfficeController extends Controller
 
         if ($organization->hasReachedOfficeLimit()) {
             return back()->with('error', __('Office limit reached for your current plan (:limit offices max). Please upgrade your subscription.', [
-                'limit' => $organization->plan?->max_offices ?? 1
+                'limit' => $organization->plan?->max_offices ?? 1,
             ]));
         }
 
@@ -229,7 +243,7 @@ class OfficeController extends Controller
             'is_default' => ['nullable', 'boolean'],
         ]);
 
-        if (!empty($validated['is_default'])) {
+        if (! empty($validated['is_default'])) {
             $organization->floors()->update(['is_default' => false]);
         }
 
@@ -237,14 +251,14 @@ class OfficeController extends Controller
             'name' => $validated['name'],
             'city_location' => $validated['city_location'] ?? null,
             'description' => $validated['description'] ?? null,
-            'is_default' => !empty($validated['is_default']),
+            'is_default' => ! empty($validated['is_default']),
             'order' => $organization->floors()->count() + 1,
         ]);
 
         // Create default published map
         $map = $organization->maps()->create([
             'floor_id' => $floor->id,
-            'name' => $floor->name . ' Blueprint',
+            'name' => $floor->name.' Blueprint',
             'status' => 'published',
             'version' => 1,
             'width' => 75,
@@ -259,7 +273,7 @@ class OfficeController extends Controller
             'published_at' => now(),
         ]);
 
-        \App\Domains\Administration\Models\AuditLog::create([
+        AuditLog::create([
             'organization_id' => $organization->id,
             'actor_id' => $user->id,
             'action' => 'office.created',
@@ -276,13 +290,15 @@ class OfficeController extends Controller
     /**
      * Update Office branch details.
      */
-    public function updateOffice(Request $request, \App\Domains\Workspace\Models\Floor $floor)
+    public function updateOffice(Request $request, Floor $floor)
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->with(['organization', 'role.permissions'])->first();
-        if (!$membership || $floor->organization_id !== $membership->organization_id) abort(403);
+        if (! $membership || $floor->organization_id !== $membership->organization_id) {
+            abort(403);
+        }
 
-        if (!$membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin') {
+        if (! $membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin') {
             abort(403, 'Unauthorized');
         }
 
@@ -293,7 +309,7 @@ class OfficeController extends Controller
             'is_default' => ['nullable', 'boolean'],
         ]);
 
-        if (!empty($validated['is_default'])) {
+        if (! empty($validated['is_default'])) {
             $membership->organization->floors()->where('id', '!=', $floor->id)->update(['is_default' => false]);
         }
 
@@ -301,7 +317,7 @@ class OfficeController extends Controller
             'name' => $validated['name'],
             'city_location' => $validated['city_location'] ?? null,
             'description' => $validated['description'] ?? null,
-            'is_default' => !empty($validated['is_default']),
+            'is_default' => ! empty($validated['is_default']),
         ]);
 
         return back()->with('success', __("Office ':name' updated successfully.", ['name' => $floor->name]));
@@ -310,13 +326,15 @@ class OfficeController extends Controller
     /**
      * Delete an Office branch.
      */
-    public function deleteOffice(\App\Domains\Workspace\Models\Floor $floor)
+    public function deleteOffice(Floor $floor)
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->with(['organization', 'role.permissions'])->first();
-        if (!$membership || $floor->organization_id !== $membership->organization_id) abort(403);
+        if (! $membership || $floor->organization_id !== $membership->organization_id) {
+            abort(403);
+        }
 
-        if (!$membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin') {
+        if (! $membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin') {
             abort(403, 'Unauthorized');
         }
 
@@ -344,7 +362,7 @@ class OfficeController extends Controller
             ->with(['organization.plan'])
             ->first();
 
-        if (!$membership) {
+        if (! $membership) {
             return redirect()->route('login')->with('error', 'No active organization found.');
         }
 
@@ -352,7 +370,7 @@ class OfficeController extends Controller
             $membership->update(['status' => 'active']);
         }
 
-        if (!$membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin') {
+        if (! $membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin') {
             return redirect()->route('dashboard')->with('error', __('Unauthorized: You do not have permission to access the Floor Map Editor.'));
         }
 
@@ -366,9 +384,9 @@ class OfficeController extends Controller
             $floor = $organization->defaultOffice() ?? $organization->floors()->first();
         }
 
-        if (!$floor) {
+        if (! $floor) {
             $floor = $organization->floors()->create([
-                'name' => $organization->name . ' HQ',
+                'name' => $organization->name.' HQ',
                 'is_default' => true,
                 'order' => 1,
             ]);
@@ -377,10 +395,10 @@ class OfficeController extends Controller
         $map = $organization->maps()->where('floor_id', $floor->id)->where('status', 'published')->latest('published_at')->first()
             ?? $organization->maps()->where('floor_id', $floor->id)->latest()->first();
 
-        if (!$map) {
+        if (! $map) {
             $map = $organization->maps()->create([
                 'floor_id' => $floor->id,
-                'name' => $floor->name . ' Blueprint',
+                'name' => $floor->name.' Blueprint',
                 'status' => 'published',
                 'version' => 1,
                 'width' => 75,
@@ -400,17 +418,17 @@ class OfficeController extends Controller
         $floors = $organization->floors()->orderBy('is_default', 'desc')->orderBy('name', 'asc')->get();
 
         $furnitureCategories = Cache::remember('furniture_categories_with_items', 86400, function () {
-            return \App\Domains\Workspace\Models\FurnitureCategory::with('items')
+            return FurnitureCategory::with('items')
                 ->orderBy('order', 'asc')
                 ->get();
         });
 
         $furnitureItems = Cache::remember('furniture_catalog_active', 86400, function () {
-            return \App\Domains\Workspace\Models\FurnitureItem::where('is_active', true)->get();
+            return FurnitureItem::where('is_active', true)->get();
         });
 
         $plan = $organization->plan;
-        $aiStyles = (new \App\Domains\Workspace\Services\AiMapGeneratorService())->getStyles();
+        $aiStyles = (new AiMapGeneratorService)->getStyles();
 
         return view('editor', compact('user', 'organization', 'floor', 'floors', 'map', 'furnitureCategories', 'furnitureItems', 'plan', 'aiStyles'));
     }
@@ -418,21 +436,21 @@ class OfficeController extends Controller
     /**
      * Upload custom floorplan background image via web session.
      */
-    public function uploadMapBackground(Request $request, \App\Domains\Workspace\Models\Map $map)
+    public function uploadMapBackground(Request $request, Map $map)
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)
             ->where('organization_id', $map->organization_id)
             ->first();
 
-        if (!$membership) {
+        if (! $membership) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
 
         $file = $request->file('image') ?? $request->file('background');
         $catalogFloorUrl = $request->input('floor_url') ?? $request->input('image_url');
 
-        if (!$file && !$catalogFloorUrl) {
+        if (! $file && ! $catalogFloorUrl) {
             return response()->json(['message' => 'No image file or catalog floor URL provided.'], 422);
         }
 
@@ -451,18 +469,18 @@ class OfficeController extends Controller
                 'background' => ['nullable', 'file', 'image', 'mimes:jpeg,png,jpg,webp', 'max:51200'],
             ]);
 
-            $filename = 'floorplan_' . $map->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-            
+            $filename = 'floorplan_'.$map->id.'_'.time().'.'.$file->getClientOriginalExtension();
+
             $destDir = public_path('images/maps');
-            if (!file_exists($destDir)) {
+            if (! file_exists($destDir)) {
                 mkdir($destDir, 0755, true);
             }
             $file->move($destDir, $filename);
-            $url = '/images/maps/' . $filename;
+            $url = '/images/maps/'.$filename;
 
             $layoutData['background_image_url'] = $url;
 
-            $imageSize = @getimagesize(public_path('images/maps/' . $filename));
+            $imageSize = @getimagesize(public_path('images/maps/'.$filename));
             $layoutData['background_width'] = $imageSize ? $imageSize[0] : 1200;
             $layoutData['background_height'] = $imageSize ? $imageSize[1] : 708;
         }
@@ -490,7 +508,7 @@ class OfficeController extends Controller
     public function uploadObjectImage(Request $request)
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'Unauthorized.'], 401);
         }
 
@@ -499,13 +517,13 @@ class OfficeController extends Controller
         ]);
 
         $file = $request->file('image');
-        $filename = 'custom_obj_' . Str::uuid() . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $filename = 'custom_obj_'.Str::uuid().'_'.time().'.'.$file->getClientOriginalExtension();
         $destDir = public_path('images/custom_objects');
-        if (!file_exists($destDir)) {
+        if (! file_exists($destDir)) {
             mkdir($destDir, 0755, true);
         }
         $file->move($destDir, $filename);
-        $url = '/images/custom_objects/' . $filename;
+        $url = '/images/custom_objects/'.$filename;
 
         return response()->json([
             'success' => true,
@@ -517,14 +535,14 @@ class OfficeController extends Controller
     /**
      * Remove custom floorplan and revert to system default.
      */
-    public function deleteMapBackground(Request $request, \App\Domains\Workspace\Models\Map $map)
+    public function deleteMapBackground(Request $request, Map $map)
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)
             ->where('organization_id', $map->organization_id)
             ->first();
 
-        if (!$membership) {
+        if (! $membership) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
 
@@ -551,19 +569,19 @@ class OfficeController extends Controller
     /**
      * Completely clear all furniture objects and reset floorplan for a fresh canvas.
      */
-    public function clearEditorMap(Request $request, \App\Domains\Workspace\Models\Map $map)
+    public function clearEditorMap(Request $request, Map $map)
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)
             ->where('organization_id', $map->organization_id)
             ->first();
 
-        if (!$membership && !$user->isSuperAdmin()) {
+        if (! $membership && ! $user->isSuperAdmin()) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
 
         // Delete all furniture objects
-        \App\Domains\Workspace\Models\MapObject::where('map_id', $map->id)->delete();
+        MapObject::where('map_id', $map->id)->delete();
 
         // Clear custom background image
         $layoutData = $map->layout_data ?? [];
@@ -589,14 +607,14 @@ class OfficeController extends Controller
     /**
      * Save draft map objects and layout data via web session.
      */
-    public function saveEditorMap(Request $request, \App\Domains\Workspace\Models\Map $map)
+    public function saveEditorMap(Request $request, Map $map)
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)
             ->where('organization_id', $map->organization_id)
             ->first();
 
-        if (!$membership && !$user->isSuperAdmin()) {
+        if (! $membership && ! $user->isSuperAdmin()) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
 
@@ -607,7 +625,7 @@ class OfficeController extends Controller
             'objects' => 'nullable|array',
         ]);
 
-        if (!empty($validated['name'])) {
+        if (! empty($validated['name'])) {
             $map->name = $validated['name'];
         }
         if (isset($validated['layout_data'])) {
@@ -623,17 +641,17 @@ class OfficeController extends Controller
             $maxRooms = ($org && $org->plan && $org->plan->room_limit > 0) ? $org->plan->room_limit : 0;
             if ($maxRooms > 0 && count($validated['rooms']) > $maxRooms) {
                 return response()->json([
-                    'message' => __("Your subscription plan allows a maximum of :limit rooms. Please upgrade your subscription plan to save :count rooms.", [
+                    'message' => __('Your subscription plan allows a maximum of :limit rooms. Please upgrade your subscription plan to save :count rooms.', [
                         'limit' => $maxRooms,
                         'count' => count($validated['rooms']),
-                    ])
+                    ]),
                 ], 403);
             }
 
-            \App\Domains\Workspace\Models\Room::where('map_id', $map->id)->delete();
+            Room::where('map_id', $map->id)->delete();
             foreach ($validated['rooms'] as $r) {
-                \App\Domains\Workspace\Models\Room::create([
-                    'id' => (!empty($r['id']) && strlen($r['id']) === 36 && str_contains($r['id'], '-')) ? $r['id'] : (string) \Illuminate\Support\Str::uuid(),
+                Room::create([
+                    'id' => (! empty($r['id']) && strlen($r['id']) === 36 && str_contains($r['id'], '-')) ? $r['id'] : (string) Str::uuid(),
                     'organization_id' => $map->organization_id,
                     'map_id' => $map->id,
                     'name' => $r['name'] ?? 'Meeting Room',
@@ -648,21 +666,21 @@ class OfficeController extends Controller
         }
 
         if (isset($validated['objects'])) {
-            \App\Domains\Workspace\Models\MapObject::where('map_id', $map->id)->delete();
+            MapObject::where('map_id', $map->id)->delete();
             foreach ($validated['objects'] as $obj) {
                 $imgUrl = $obj['image_url'] ?? ($obj['interaction_config']['image_url'] ?? null);
-                if (!$imgUrl && !empty($obj['type'])) {
-                    if ($obj['type'] === 'branding' && !empty($map->organization?->logo_url)) {
+                if (! $imgUrl && ! empty($obj['type'])) {
+                    if ($obj['type'] === 'branding' && ! empty($map->organization?->logo_url)) {
                         $imgUrl = $map->organization->logo_url;
                     } else {
-                        $catItem = \App\Domains\Workspace\Models\FurnitureItem::where('slug', $obj['type'])->first();
-                        if ($catItem && !empty($catItem->image_url)) {
+                        $catItem = FurnitureItem::where('slug', $obj['type'])->first();
+                        if ($catItem && ! empty($catItem->image_url)) {
                             $imgUrl = $catItem->image_url;
                         }
                     }
                 }
 
-                \App\Domains\Workspace\Models\MapObject::create([
+                MapObject::create([
                     'map_id' => $map->id,
                     'organization_id' => $map->organization_id,
                     'type' => $obj['type'] ?? 'desk',
@@ -681,7 +699,7 @@ class OfficeController extends Controller
                             'height' => $obj['height'] ?? null,
                             'elevation' => $obj['elevation'] ?? 1,
                             'interaction_type' => $obj['interaction_type'] ?? 'none',
-                        ], fn($v) => !is_null($v))
+                        ], fn ($v) => ! is_null($v))
                     ),
                 ]);
             }
@@ -696,14 +714,14 @@ class OfficeController extends Controller
     /**
      * Publish map via web session.
      */
-    public function publishEditorMap(Request $request, \App\Domains\Workspace\Models\Map $map, \App\Domains\Workspace\Actions\PublishMapAction $action)
+    public function publishEditorMap(Request $request, Map $map, PublishMapAction $action)
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)
             ->where('organization_id', $map->organization_id)
             ->first();
 
-        if (!$membership && !$user->isSuperAdmin()) {
+        if (! $membership && ! $user->isSuperAdmin()) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
 
@@ -726,15 +744,16 @@ class OfficeController extends Controller
             ->where('organization_id', $orgId)
             ->first();
 
-        if (!$membership && !$user->isSuperAdmin()) {
+        if (! $membership && ! $user->isSuperAdmin()) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
 
-        $org = $membership ? $membership->organization : \App\Domains\Tenancy\Models\Organization::find($orgId);
+        $org = $membership ? $membership->organization : Organization::find($orgId);
         if ($org && $org->hasReachedRoomLimit()) {
             $limit = $org->plan ? $org->plan->room_limit : 3;
+
             return response()->json([
-                'message' => __("You have reached the maximum room limit (:limit) for your subscription plan. Please upgrade your plan to create more rooms.", ['limit' => $limit])
+                'message' => __('You have reached the maximum room limit (:limit) for your subscription plan. Please upgrade your plan to create more rooms.', ['limit' => $limit]),
             ], 403);
         }
 
@@ -750,7 +769,7 @@ class OfficeController extends Controller
             'metadata' => 'nullable|array',
         ]);
 
-        $room = \App\Domains\Workspace\Models\Room::create($validated);
+        $room = Room::create($validated);
 
         return response()->json([
             'message' => 'Room created successfully.',
@@ -764,23 +783,24 @@ class OfficeController extends Controller
     public function updateEditorRoom(Request $request, $room)
     {
         $user = Auth::user();
-        $roomModel = $room instanceof \App\Domains\Workspace\Models\Room ? $room : \App\Domains\Workspace\Models\Room::find($room);
+        $roomModel = $room instanceof Room ? $room : Room::find($room);
 
-        if (!$roomModel) {
+        if (! $roomModel) {
             $orgId = $request->input('organization_id') ?: ($user->organizations()->first()?->id);
             $membership = OrganizationMember::where('user_id', $user->id)
                 ->where('organization_id', $orgId)
                 ->first();
 
-            if (!$membership && !$user->isSuperAdmin()) {
+            if (! $membership && ! $user->isSuperAdmin()) {
                 return response()->json(['message' => 'Unauthorized access.'], 403);
             }
 
-            $org = $membership ? $membership->organization : \App\Domains\Tenancy\Models\Organization::find($orgId);
+            $org = $membership ? $membership->organization : Organization::find($orgId);
             if ($org && $org->hasReachedRoomLimit()) {
                 $limit = $org->plan ? $org->plan->room_limit : 3;
+
                 return response()->json([
-                    'message' => __("You have reached the maximum room limit (:limit) for your subscription plan. Please upgrade your plan to create more rooms.", ['limit' => $limit])
+                    'message' => __('You have reached the maximum room limit (:limit) for your subscription plan. Please upgrade your plan to create more rooms.', ['limit' => $limit]),
                 ], 403);
             }
 
@@ -796,7 +816,7 @@ class OfficeController extends Controller
                 'metadata' => 'nullable|array',
             ]);
 
-            $roomModel = \App\Domains\Workspace\Models\Room::create($validated);
+            $roomModel = Room::create($validated);
 
             return response()->json([
                 'message' => 'Room created successfully.',
@@ -808,7 +828,7 @@ class OfficeController extends Controller
             ->where('organization_id', $roomModel->organization_id)
             ->first();
 
-        if (!$membership && !$user->isSuperAdmin()) {
+        if (! $membership && ! $user->isSuperAdmin()) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
 
@@ -819,7 +839,7 @@ class OfficeController extends Controller
             'capacity',
             'color',
             'bounds',
-            'metadata'
+            'metadata',
         ]);
 
         if (isset($data['capacity'])) {
@@ -837,62 +857,62 @@ class OfficeController extends Controller
     /**
      * Delete room via web session.
      */
-    public function deleteEditorRoom(Request $request, \App\Domains\Workspace\Models\Room $room)
+    public function deleteEditorRoom(Request $request, Room $room)
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)
             ->where('organization_id', $room->organization_id)
             ->first();
 
-        if (!$membership && !$user->isSuperAdmin()) {
+        if (! $membership && ! $user->isSuperAdmin()) {
             return response()->json(['message' => 'Unauthorized access: insufficient permissions.'], 403);
         }
 
         $room->delete();
 
         return response()->json([
-            'message' => 'Room deleted successfully.'
+            'message' => 'Room deleted successfully.',
         ]);
     }
 
     /**
      * Helper to guarantee default floor, map, and Nanobanaba isometric blueprint layout exist.
      */
-    private function ensureDefaultWorkspace(\App\Domains\Tenancy\Models\Organization $organization): void
+    private function ensureDefaultWorkspace(Organization $organization): void
     {
         if ($organization->floors()->count() === 0) {
-            $seeder = new \Database\Seeders\BlueprintOfficeSeeder();
+            $seeder = new BlueprintOfficeSeeder;
             $seeder->seedOrganizationOffice($organization);
         }
 
         if ($organization->departments()->count() === 0) {
-            $eng = \App\Domains\People\Models\Department::create([
+            $eng = Department::create([
                 'organization_id' => $organization->id,
                 'name' => 'Engineering & Technology',
             ]);
-            \App\Domains\People\Models\Team::create(['organization_id' => $organization->id, 'department_id' => $eng->id, 'name' => 'Frontend Team']);
-            \App\Domains\People\Models\Team::create(['organization_id' => $organization->id, 'department_id' => $eng->id, 'name' => 'Backend & Cloud']);
+            Team::create(['organization_id' => $organization->id, 'department_id' => $eng->id, 'name' => 'Frontend Team']);
+            Team::create(['organization_id' => $organization->id, 'department_id' => $eng->id, 'name' => 'Backend & Cloud']);
 
-            $sales = \App\Domains\People\Models\Department::create([
+            $sales = Department::create([
                 'organization_id' => $organization->id,
                 'name' => 'Sales & Business Growth',
             ]);
-            \App\Domains\People\Models\Team::create(['organization_id' => $organization->id, 'department_id' => $sales->id, 'name' => 'Enterprise Sales']);
+            Team::create(['organization_id' => $organization->id, 'department_id' => $sales->id, 'name' => 'Enterprise Sales']);
 
-            $design = \App\Domains\People\Models\Department::create([
+            $design = Department::create([
                 'organization_id' => $organization->id,
                 'name' => 'Product & Design',
             ]);
-            \App\Domains\People\Models\Team::create(['organization_id' => $organization->id, 'department_id' => $design->id, 'name' => 'UI / UX Design']);
+            Team::create(['organization_id' => $organization->id, 'department_id' => $design->id, 'name' => 'UI / UX Design']);
         }
     }
 
     /**
      * List all persistent documents and files for a specific room.
      */
-    public function listRoomFiles(\App\Domains\Tenancy\Models\Organization $organization, \App\Domains\Workspace\Models\Room $room)
+    public function listRoomFiles(Organization $organization, Room $room)
     {
-        $files = \App\Domains\Workspace\Models\RoomFile::where('organization_id', $organization->id)
+        $files = RoomFile::where('organization_id', $organization->id)
             ->where('room_id', $room->id)
             ->orderBy('created_at', 'desc')
             ->get();
@@ -905,7 +925,7 @@ class OfficeController extends Controller
     /**
      * Upload a persistent document or file to a specific room.
      */
-    public function uploadRoomFile(Request $request, \App\Domains\Tenancy\Models\Organization $organization, \App\Domains\Workspace\Models\Room $room)
+    public function uploadRoomFile(Request $request, Organization $organization, Room $room)
     {
         $request->validate([
             'file' => 'required|file|max:51200', // max 50MB
@@ -915,13 +935,13 @@ class OfficeController extends Controller
         $originalName = $uploadedFile->getClientOriginalName();
         $mime = $uploadedFile->getMimeType();
         $size = $uploadedFile->getSize();
-        $filename = 'room_file_' . \Illuminate\Support\Str::uuid() . '.' . ($uploadedFile->getClientOriginalExtension() ?: 'bin');
+        $filename = 'room_file_'.Str::uuid().'.'.($uploadedFile->getClientOriginalExtension() ?: 'bin');
         $path = $uploadedFile->storeAs("public/room_files/{$organization->id}/{$room->id}", $filename);
-        $url = \Illuminate\Support\Facades\Storage::url($path);
+        $url = Storage::url($path);
 
         $user = Auth::user();
 
-        $roomFile = \App\Domains\Workspace\Models\RoomFile::create([
+        $roomFile = RoomFile::create([
             'organization_id' => $organization->id,
             'room_id' => $room->id,
             'uploaded_by_user_id' => $user?->id,
@@ -942,13 +962,13 @@ class OfficeController extends Controller
     /**
      * Delete a persistent file from a room.
      */
-    public function deleteRoomFile(\App\Domains\Tenancy\Models\Organization $organization, \App\Domains\Workspace\Models\Room $room, \App\Domains\Workspace\Models\RoomFile $file)
+    public function deleteRoomFile(Organization $organization, Room $room, RoomFile $file)
     {
         if ($file->organization_id !== $organization->id || $file->room_id !== $room->id) {
             return response()->json(['message' => 'Unauthorized.'], 403);
         }
 
-        \Illuminate\Support\Facades\Storage::delete($file->file_path);
+        Storage::delete($file->file_path);
         $file->delete();
 
         return response()->json([
@@ -960,60 +980,60 @@ class OfficeController extends Controller
      * Send a direct wave notification to another team member.
      */
     public function sendDirectWave(Request $request)
-     {
-         $user = Auth::user();
-         $validated = $request->validate([
-             'target_user_id' => 'required|exists:users,id',
-             'room_name' => 'nullable|string|max:100',
-         ]);
+    {
+        $user = Auth::user();
+        $validated = $request->validate([
+            'target_user_id' => 'required|exists:users,id',
+            'room_name' => 'nullable|string|max:100',
+        ]);
 
-         if ($validated['target_user_id'] === $user->id) {
-             return response()->json(['message' => 'Cannot wave to yourself'], 422);
-         }
+        if ($validated['target_user_id'] === $user->id) {
+            return response()->json(['message' => 'Cannot wave to yourself'], 422);
+        }
 
-         $notification = \App\Domains\Notifications\Services\NotificationService::notifyWave(
-             $validated['target_user_id'],
-             $user,
-             $validated['room_name'] ?? null
-         );
+        $notification = NotificationService::notifyWave(
+            $validated['target_user_id'],
+            $user,
+            $validated['room_name'] ?? null
+        );
 
-         return response()->json([
-             'success' => true,
-             'message' => __('Wave sent successfully!'),
-         ]);
-     }
+        return response()->json([
+            'success' => true,
+            'message' => __('Wave sent successfully!'),
+        ]);
+    }
 
-     /**
-      * Send a door knock notification for a private room.
-      */
-     public function sendDoorKnock(Request $request)
-     {
-         $user = Auth::user();
-         $validated = $request->validate([
-             'room_id' => 'required|exists:rooms,id',
-         ]);
+    /**
+     * Send a door knock notification for a private room.
+     */
+    public function sendDoorKnock(Request $request)
+    {
+        $user = Auth::user();
+        $validated = $request->validate([
+            'room_id' => 'required|exists:rooms,id',
+        ]);
 
-         $room = \App\Domains\Workspace\Models\Room::find($validated['room_id']);
-         if (!$room) {
-             return response()->json(['message' => 'Room not found'], 404);
-         }
+        $room = Room::find($validated['room_id']);
+        if (! $room) {
+            return response()->json(['message' => 'Room not found'], 404);
+        }
 
-         // Find occupants or organization admins
-         $occupants = \App\Domains\Identity\Models\User::where('current_room_id', $room->id)->get();
-         if ($occupants->isEmpty()) {
-             // Notify room or organization members
-             $occupants = $room->organization ? $room->organization->users()->limit(3)->get() : collect([$user]);
-         }
+        // Find occupants or organization admins
+        $occupants = User::where('current_room_id', $room->id)->get();
+        if ($occupants->isEmpty()) {
+            // Notify room or organization members
+            $occupants = $room->organization ? $room->organization->users()->limit(3)->get() : collect([$user]);
+        }
 
-         foreach ($occupants as $occupant) {
-             if ($occupant->id !== $user->id) {
-                 \App\Domains\Notifications\Services\NotificationService::notifyDoorKnock($room, $occupant, $user);
-             }
-         }
+        foreach ($occupants as $occupant) {
+            if ($occupant->id !== $user->id) {
+                NotificationService::notifyDoorKnock($room, $occupant, $user);
+            }
+        }
 
-         return response()->json([
-             'success' => true,
-             'message' => __('Knock sent to room occupants!'),
-         ]);
-     }
+        return response()->json([
+            'success' => true,
+            'message' => __('Knock sent to room occupants!'),
+        ]);
+    }
 }

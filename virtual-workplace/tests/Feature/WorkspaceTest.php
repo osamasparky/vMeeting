@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Domains\Administration\Models\Role;
 use App\Domains\Identity\Models\User;
 use App\Domains\Tenancy\Actions\CreateOrganizationAction;
 use App\Domains\Tenancy\Models\Organization;
@@ -10,6 +9,8 @@ use App\Domains\Workspace\Models\Floor;
 use App\Domains\Workspace\Models\Map;
 use App\Domains\Workspace\Models\Room;
 use App\Domains\Workspace\Models\Zone;
+use Database\Seeders\PlansSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -19,14 +20,15 @@ class WorkspaceTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
+
     protected Organization $organization;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\PlansSeeder::class);
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(PlansSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->user = User::factory()->create([
             'email' => 'admin@workspace.test',
@@ -175,4 +177,3 @@ class WorkspaceTest extends TestCase
             ->assertSee('Acme Corp');
     }
 }
-

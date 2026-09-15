@@ -34,7 +34,7 @@
         <div class="panel-header" style="margin-bottom: 20px;">
             <div class="panel-title">
                 <span>📤</span>
-                <span>{{ __'Upload New Media or 3D GLB/GLTF Model') }}</span>
+                <span>{{ __('Upload New Media or 3D GLB/GLTF Model') }}</span>
             </div>
             <p class="panel-subtitle">{{ __('Supported formats: GLB, GLTF, MP4, WebM, PNG, JPG, WebP, SVG, Lottie (Max 50MB)') }}</p>
         </div>
@@ -97,7 +97,7 @@
         <div class="panel-header" style="margin-bottom: 20px;">
             <div class="panel-title">
                 <span>📚</span>
-                <span>{{ __'Active Media & 3D Library') }}</span>
+                <span>{{ __('Active Media & 3D Library') }}</span>
             </div>
         </div>
 

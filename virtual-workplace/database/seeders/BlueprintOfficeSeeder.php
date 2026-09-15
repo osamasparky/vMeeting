@@ -34,7 +34,7 @@ class BlueprintOfficeSeeder extends Seeder
 
         // 2. Ensure Floor
         $floor = Floor::where('organization_id', $organization->id)->first();
-        if (!$floor) {
+        if (! $floor) {
             $floor = Floor::create([
                 'organization_id' => $organization->id,
                 'name' => 'الدور الرئيسي - Main Office Floor',
@@ -51,11 +51,11 @@ class BlueprintOfficeSeeder extends Seeder
             'boardroom_sign' => 'BOARD ROOM - 10 Seats',
         ];
 
-        if (!isset($layoutData['background_image_url'])) {
+        if (! isset($layoutData['background_image_url'])) {
             $layoutData['background_image_url'] = $template->background_image_url ?: '/images/office_floorplan.jpg';
         }
 
-        if (!$map) {
+        if (! $map) {
             $map = Map::create([
                 'organization_id' => $organization->id,
                 'floor_id' => $floor->id,

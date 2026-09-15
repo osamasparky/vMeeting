@@ -12,16 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('furniture_items', function (Blueprint $table) {
-            if (!Schema::hasColumn('furniture_items', 'interaction_type')) {
+            if (! Schema::hasColumn('furniture_items', 'interaction_type')) {
                 $table->string('interaction_type', 64)->default('none')->after('colors');
             }
-            if (!Schema::hasColumn('furniture_items', 'interaction_config')) {
+            if (! Schema::hasColumn('furniture_items', 'interaction_config')) {
                 $table->json('interaction_config')->nullable()->after('interaction_type');
             }
-            if (!Schema::hasColumn('furniture_items', 'elevation')) {
+            if (! Schema::hasColumn('furniture_items', 'elevation')) {
                 $table->integer('elevation')->default(1)->after('interaction_config');
             }
-            if (!Schema::hasColumn('furniture_items', 'thumbnail_url')) {
+            if (! Schema::hasColumn('furniture_items', 'thumbnail_url')) {
                 $table->string('thumbnail_url')->nullable()->after('image_url');
             }
         });

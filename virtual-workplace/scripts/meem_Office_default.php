@@ -1,14 +1,15 @@
 <?php
+
 require 'vendor/autoload.php';
 $app = require_once 'bootstrap/app.php';
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$app->make(Kernel::class)->bootstrap();
 
+use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Workspace\Models\Map;
+use App\Domains\Workspace\Models\MapObject;
 use App\Domains\Workspace\Models\Room;
 use App\Domains\Workspace\Models\Zone;
-use App\Domains\Workspace\Models\MapObject;
-use App\Domains\Workspace\Models\FurnitureItem;
-use App\Domains\Tenancy\Models\Organization;
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Cache;
 
 $orgs = Organization::all();
@@ -21,7 +22,7 @@ foreach ($orgs as $org) {
 
     // Get or create published map (32 x 32 tiles)
     $map = $org->maps()->where('floor_id', $floor->id)->first();
-    if (!$map) {
+    if (! $map) {
         $map = Map::create([
             'organization_id' => $org->id,
             'floor_id' => $floor->id,
@@ -52,7 +53,7 @@ foreach ($orgs as $org) {
     // ══════════════════════════════════════════════════════════════
     // 1. CREATE ROOMS (Multi-Zone Meem Office Layout)
     // ══════════════════════════════════════════════════════════════
-    
+
     // Room 1: Private Office A (Top Left: x=1, y=1, w=5, h=7)
     $roomPrivateA = Room::create([
         'organization_id' => $org->id,
@@ -183,7 +184,7 @@ foreach ($orgs as $org) {
             'position' => ['x' => 2, 'y' => 2, 'rotation' => 0],
             'size' => ['width' => 3, 'height' => 2],
             'collision' => true,
-            'interaction_config' => ['image_url' => '/assets/furniture/desks/desk_employee_modern_01.png']
+            'interaction_config' => ['image_url' => '/assets/furniture/desks/desk_employee_modern_01.png'],
         ],
         [
             'type' => 'TEC-OFF-EQP-002',
@@ -191,7 +192,7 @@ foreach ($orgs as $org) {
             'position' => ['x' => 2, 'y' => 2, 'rotation' => 0],
             'size' => ['width' => 1, 'height' => 1],
             'collision' => false,
-            'interaction_config' => ['image_url' => '/assets/technology/tech_laptop_02.png']
+            'interaction_config' => ['image_url' => '/assets/technology/tech_laptop_02.png'],
         ],
         [
             'type' => 'FUR-CHR-OFF-001',
@@ -199,7 +200,7 @@ foreach ($orgs as $org) {
             'position' => ['x' => 3, 'y' => 4, 'rotation' => 0],
             'size' => ['width' => 1, 'height' => 1],
             'collision' => false,
-            'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png']
+            'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png'],
         ],
         [
             'type' => 'FUR-STOR-OFF-001',
@@ -207,7 +208,7 @@ foreach ($orgs as $org) {
             'position' => ['x' => 5, 'y' => 1, 'rotation' => 0],
             'size' => ['width' => 1, 'height' => 2],
             'collision' => true,
-            'interaction_config' => ['image_url' => '/assets/furniture/storage/storage_cabinet_01.png']
+            'interaction_config' => ['image_url' => '/assets/furniture/storage/storage_cabinet_01.png'],
         ],
 
         // ── TOP LEFT-CENTER: Private Office 2 (x:6, y:1, w:5, h:7) ──
@@ -217,7 +218,7 @@ foreach ($orgs as $org) {
             'position' => ['x' => 7, 'y' => 2, 'rotation' => 0],
             'size' => ['width' => 3, 'height' => 2],
             'collision' => true,
-            'interaction_config' => ['image_url' => '/assets/furniture/desks/desk_employee_modern_02.png']
+            'interaction_config' => ['image_url' => '/assets/furniture/desks/desk_employee_modern_02.png'],
         ],
         [
             'type' => 'TEC-OFF-EQP-001',
@@ -225,7 +226,7 @@ foreach ($orgs as $org) {
             'position' => ['x' => 8, 'y' => 2, 'rotation' => 0],
             'size' => ['width' => 1, 'height' => 1],
             'collision' => false,
-            'interaction_config' => ['image_url' => '/assets/technology/tech_dual_monitor_01.png']
+            'interaction_config' => ['image_url' => '/assets/technology/tech_dual_monitor_01.png'],
         ],
         [
             'type' => 'FUR-CHR-OFF-002',
@@ -233,7 +234,7 @@ foreach ($orgs as $org) {
             'position' => ['x' => 8, 'y' => 4, 'rotation' => 0],
             'size' => ['width' => 1, 'height' => 1],
             'collision' => false,
-            'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_02.png']
+            'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_02.png'],
         ],
         [
             'type' => 'DEC-PLANT-IND-001',
@@ -241,7 +242,7 @@ foreach ($orgs as $org) {
             'position' => ['x' => 10, 'y' => 2, 'rotation' => 0],
             'size' => ['width' => 1, 'height' => 1],
             'collision' => true,
-            'interaction_config' => ['image_url' => '/assets/decor/plants/plant_indoor_01.png']
+            'interaction_config' => ['image_url' => '/assets/decor/plants/plant_indoor_01.png'],
         ],
 
         // ── TOP CENTER: Glass Meeting Pod (x:12, y:1, w:7, h:9) ──
@@ -251,7 +252,7 @@ foreach ($orgs as $org) {
             'position' => ['x' => 14, 'y' => 4, 'rotation' => 0],
             'size' => ['width' => 3, 'height' => 3],
             'collision' => true,
-            'interaction_config' => ['image_url' => '/assets/furniture/tables/table_side_01.png']
+            'interaction_config' => ['image_url' => '/assets/furniture/tables/table_side_01.png'],
         ],
         [
             'type' => 'FUR-CHR-OFF-003',
@@ -259,7 +260,7 @@ foreach ($orgs as $org) {
             'position' => ['x' => 15, 'y' => 2, 'rotation' => 180],
             'size' => ['width' => 1, 'height' => 1],
             'collision' => false,
-            'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_03.png']
+            'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_03.png'],
         ],
         [
             'type' => 'FUR-CHR-OFF-003',
@@ -267,7 +268,7 @@ foreach ($orgs as $org) {
             'position' => ['x' => 15, 'y' => 7, 'rotation' => 0],
             'size' => ['width' => 1, 'height' => 1],
             'collision' => false,
-            'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_03.png']
+            'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_03.png'],
         ],
         [
             'type' => 'FUR-CHR-OFF-003',
@@ -275,7 +276,7 @@ foreach ($orgs as $org) {
             'position' => ['x' => 13, 'y' => 4, 'rotation' => 90],
             'size' => ['width' => 1, 'height' => 1],
             'collision' => false,
-            'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_03.png']
+            'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_03.png'],
         ],
         [
             'type' => 'FUR-CHR-OFF-003',
@@ -283,7 +284,7 @@ foreach ($orgs as $org) {
             'position' => ['x' => 17, 'y' => 4, 'rotation' => 270],
             'size' => ['width' => 1, 'height' => 1],
             'collision' => false,
-            'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_03.png']
+            'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_03.png'],
         ],
         [
             'type' => 'DEC-PLANT-IND-002',
@@ -291,7 +292,7 @@ foreach ($orgs as $org) {
             'position' => ['x' => 17, 'y' => 2, 'rotation' => 0],
             'size' => ['width' => 1, 'height' => 1],
             'collision' => true,
-            'interaction_config' => ['image_url' => '/assets/decor/plants/plant_indoor_02.png']
+            'interaction_config' => ['image_url' => '/assets/decor/plants/plant_indoor_02.png'],
         ],
 
         // ── TOP RIGHT: Presentation Stage & Auditorium (x:20, y:1, w:11, h:19) ──
@@ -301,7 +302,7 @@ foreach ($orgs as $org) {
             'position' => ['x' => 22, 'y' => 3, 'rotation' => 0],
             'size' => ['width' => 7, 'height' => 4],
             'collision' => true,
-            'interaction_config' => ['image_url' => '/assets/furniture/desks/desk_manager_executive_01.png']
+            'interaction_config' => ['image_url' => '/assets/furniture/desks/desk_manager_executive_01.png'],
         ],
         [
             'type' => 'BRD-MTG-WBD-001',
@@ -309,7 +310,7 @@ foreach ($orgs as $org) {
             'position' => ['x' => 23, 'y' => 2, 'rotation' => 0],
             'size' => ['width' => 4, 'height' => 1],
             'collision' => true,
-            'interaction_config' => ['image_url' => '/assets/meeting/board_office_01.png']
+            'interaction_config' => ['image_url' => '/assets/meeting/board_office_01.png'],
         ],
         [
             'type' => 'DEC-PLANT-IND-003',
@@ -317,7 +318,7 @@ foreach ($orgs as $org) {
             'position' => ['x' => 29, 'y' => 2, 'rotation' => 0],
             'size' => ['width' => 1, 'height' => 1],
             'collision' => true,
-            'interaction_config' => ['image_url' => '/assets/decor/plants/plant_indoor_03.png']
+            'interaction_config' => ['image_url' => '/assets/decor/plants/plant_indoor_03.png'],
         ],
     ];
 
@@ -333,7 +334,7 @@ foreach ($orgs as $org) {
                 'position' => ['x' => $cx, 'y' => $cy, 'rotation' => 180],
                 'size' => ['width' => 1, 'height' => 1],
                 'collision' => false,
-                'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_04.png']
+                'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_04.png'],
             ];
             $chairIndex++;
         }
@@ -346,7 +347,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 3, 'y' => 11, 'rotation' => 0],
         'size' => ['width' => 6, 'height' => 3],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/meeting/table_meeting_02.png']
+        'interaction_config' => ['image_url' => '/assets/meeting/table_meeting_02.png'],
     ];
     $objects[] = [
         'type' => 'FUR-CHR-OFF-001',
@@ -354,7 +355,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 4, 'y' => 10, 'rotation' => 180],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => false,
-        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png'],
     ];
     $objects[] = [
         'type' => 'FUR-CHR-OFF-001',
@@ -362,7 +363,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 7, 'y' => 10, 'rotation' => 180],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => false,
-        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png'],
     ];
     $objects[] = [
         'type' => 'FUR-CHR-OFF-001',
@@ -370,7 +371,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 4, 'y' => 14, 'rotation' => 0],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => false,
-        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png'],
     ];
     $objects[] = [
         'type' => 'FUR-CHR-OFF-001',
@@ -378,7 +379,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 7, 'y' => 14, 'rotation' => 0],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => false,
-        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png'],
     ];
     $objects[] = [
         'type' => 'DEC-PLANT-IND-004',
@@ -386,7 +387,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 1, 'y' => 10, 'rotation' => 0],
         'size' => ['width' => 1, 'height' => 5],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/decor/plants/plant_indoor_04.png']
+        'interaction_config' => ['image_url' => '/assets/decor/plants/plant_indoor_04.png'],
     ];
 
     // ── MIDDLE CENTER: Central Lounge & Huddle (x:12, y:11, w:7, h:11) ──
@@ -396,7 +397,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 13, 'y' => 11, 'rotation' => 0],
         'size' => ['width' => 2, 'height' => 2],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/furniture/lounge/lounge_01.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/lounge/lounge_01.png'],
     ];
     $objects[] = [
         'type' => 'FUR-TBL-COF-002',
@@ -404,7 +405,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 15, 'y' => 11, 'rotation' => 0],
         'size' => ['width' => 2, 'height' => 2],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/furniture/tables/table_side_02.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/tables/table_side_02.png'],
     ];
     $objects[] = [
         'type' => 'FUR-LOUNG-SOF-002',
@@ -412,7 +413,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 13, 'y' => 15, 'rotation' => 180],
         'size' => ['width' => 2, 'height' => 2],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/furniture/lounge/lounge_02.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/lounge/lounge_02.png'],
     ];
 
     // ── MIDDLE LOWER: Huddle Room (x:6, y:17, w:5, h:6) ──
@@ -422,7 +423,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 6, 'y' => 17, 'rotation' => 0],
         'size' => ['width' => 3, 'height' => 1],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/meeting/board_office_02.png']
+        'interaction_config' => ['image_url' => '/assets/meeting/board_office_02.png'],
     ];
     $objects[] = [
         'type' => 'FUR-TBL-COF-001',
@@ -430,7 +431,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 7, 'y' => 19, 'rotation' => 0],
         'size' => ['width' => 2, 'height' => 2],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/furniture/tables/table_side_01.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/tables/table_side_01.png'],
     ];
     $objects[] = [
         'type' => 'FUR-CHR-OFF-001',
@@ -438,7 +439,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 6, 'y' => 20, 'rotation' => 90],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => false,
-        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png'],
     ];
     $objects[] = [
         'type' => 'FUR-CHR-OFF-001',
@@ -446,7 +447,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 9, 'y' => 20, 'rotation' => 270],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => false,
-        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png'],
     ];
 
     // ── BOTTOM LEFT: Reception Lounge (x:1, y:23, w:11, h:8) ──
@@ -456,7 +457,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 3, 'y' => 24, 'rotation' => 0],
         'size' => ['width' => 5, 'height' => 2],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/furniture/lounge/lounge_03.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/lounge/lounge_03.png'],
     ];
     $objects[] = [
         'type' => 'FUR-TBL-COF-003',
@@ -464,7 +465,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 4, 'y' => 27, 'rotation' => 0],
         'size' => ['width' => 3, 'height' => 2],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/furniture/tables/table_side_03.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/tables/table_side_03.png'],
     ];
     $objects[] = [
         'type' => 'FUR-CHR-OFF-005',
@@ -472,7 +473,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 2, 'y' => 27, 'rotation' => 90],
         'size' => ['width' => 1, 'height' => 2],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_05.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_05.png'],
     ];
     $objects[] = [
         'type' => 'FUR-CHR-OFF-005',
@@ -480,7 +481,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 8, 'y' => 27, 'rotation' => 270],
         'size' => ['width' => 1, 'height' => 2],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_05.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_05.png'],
     ];
     $objects[] = [
         'type' => 'BRK-KIT-EQP-001',
@@ -488,7 +489,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 10, 'y' => 24, 'rotation' => 0],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/breakroom/breakroom_01.png']
+        'interaction_config' => ['image_url' => '/assets/breakroom/breakroom_01.png'],
     ];
     $objects[] = [
         'type' => 'DEC-PLANT-IND-001',
@@ -496,7 +497,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 1, 'y' => 24, 'rotation' => 0],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/decor/plants/plant_indoor_01.png']
+        'interaction_config' => ['image_url' => '/assets/decor/plants/plant_indoor_01.png'],
     ];
 
     // ── BOTTOM RIGHT: Executive Boardroom (x:20, y:21, w:11, h:10) ──
@@ -506,7 +507,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 23, 'y' => 24, 'rotation' => 0],
         'size' => ['width' => 5, 'height' => 3],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/meeting/table_meeting_01.png']
+        'interaction_config' => ['image_url' => '/assets/meeting/table_meeting_01.png'],
     ];
     $objects[] = [
         'type' => 'FUR-CHR-OFF-002',
@@ -514,7 +515,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 24, 'y' => 23, 'rotation' => 180],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => false,
-        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_02.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_02.png'],
     ];
     $objects[] = [
         'type' => 'FUR-CHR-OFF-002',
@@ -522,7 +523,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 26, 'y' => 23, 'rotation' => 180],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => false,
-        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_02.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_02.png'],
     ];
     $objects[] = [
         'type' => 'FUR-CHR-OFF-002',
@@ -530,7 +531,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 24, 'y' => 27, 'rotation' => 0],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => false,
-        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_02.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_02.png'],
     ];
     $objects[] = [
         'type' => 'FUR-CHR-OFF-002',
@@ -538,7 +539,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 26, 'y' => 27, 'rotation' => 0],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => false,
-        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_02.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_02.png'],
     ];
     $objects[] = [
         'type' => 'FUR-CHR-OFF-002',
@@ -546,7 +547,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 22, 'y' => 25, 'rotation' => 90],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => false,
-        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_02.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_02.png'],
     ];
     $objects[] = [
         'type' => 'FUR-CHR-OFF-002',
@@ -554,7 +555,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 28, 'y' => 25, 'rotation' => 270],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => false,
-        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_02.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_02.png'],
     ];
     $objects[] = [
         'type' => 'DEC-PLANT-IND-003',
@@ -562,7 +563,7 @@ foreach ($orgs as $org) {
         'position' => ['x' => 29, 'y' => 22, 'rotation' => 0],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/decor/plants/plant_indoor_03.png']
+        'interaction_config' => ['image_url' => '/assets/decor/plants/plant_indoor_03.png'],
     ];
 
     foreach ($objects as $obj) {
@@ -574,11 +575,11 @@ foreach ($orgs as $org) {
             'position' => $obj['position'],
             'size' => $obj['size'],
             'collision' => $obj['collision'],
-            'interaction_config' => $obj['interaction_config']
+            'interaction_config' => $obj['interaction_config'],
         ]);
     }
 
-    echo "Successfully built Meem Master Office (مكتب ميم الافتراضي) for Org: {$org->name} with " . count($objects) . " 3D objects and 8 rooms!\n";
+    echo "Successfully built Meem Master Office (مكتب ميم الافتراضي) for Org: {$org->name} with ".count($objects)." 3D objects and 8 rooms!\n";
 }
 
 Cache::flush();

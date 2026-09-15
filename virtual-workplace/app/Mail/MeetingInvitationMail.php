@@ -15,7 +15,9 @@ class MeetingInvitationMail extends Mailable
     use Queueable, SerializesModels;
 
     public Meeting $meeting;
+
     public User $recipient;
+
     public string $joinUrl;
 
     /**
@@ -34,7 +36,8 @@ class MeetingInvitationMail extends Mailable
     public function envelope(): Envelope
     {
         $projectName = $this->meeting->project?->name ?? null;
-        $prefix = $projectName ? "[{$projectName}] " : "";
+        $prefix = $projectName ? "[{$projectName}] " : '';
+
         return new Envelope(
             subject: "📅 {$prefix}Meeting Scheduled: {$this->meeting->title}",
         );

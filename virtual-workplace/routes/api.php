@@ -1,10 +1,26 @@
 <?php
 
+use App\Domains\Administration\Controllers\AdminController;
+use App\Domains\Chat\Controllers\ChatController;
+use App\Domains\Collaboration\Controllers\RecordingController;
+use App\Domains\Guests\Controllers\GuestController;
 use App\Domains\Identity\Controllers\AuthController;
-use App\Domains\Tenancy\Controllers\OrganizationController;
+use App\Domains\Identity\Services\RealtimeTokenService;
+use App\Domains\Meetings\Controllers\MeetingController;
+use App\Domains\People\Controllers\AttendanceApiController;
 use App\Domains\People\Controllers\PeopleController;
 use App\Domains\People\Controllers\ProfileController;
-use App\Domains\Administration\Controllers\AdminController;
+use App\Domains\Projects\Controllers\ProjectController;
+use App\Domains\Projects\Controllers\TaskController;
+use App\Domains\Projects\Controllers\TimesheetController;
+use App\Domains\Projects\Controllers\TimeTrackingController;
+use App\Domains\Tenancy\Controllers\BillingApiController;
+use App\Domains\Tenancy\Controllers\OrganizationController;
+use App\Domains\Tenancy\Models\Organization;
+use App\Domains\Tenancy\Models\Plan;
+use App\Domains\Workspace\Controllers\SpatialInteractionsApiController;
+use App\Domains\Workspace\Controllers\WorkspaceController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -57,13 +73,12 @@ Route::prefix('v1')->group(function () {
                     ->middleware('permission:organizations.manage');
 
                 // Realtime WebSocket Auth Token
-                Route::post('/realtime-token', function (\App\Domains\Tenancy\Models\Organization $organization, \App\Domains\Identity\Services\RealtimeTokenService $service) {
+                Route::post('/realtime-token', function (Organization $organization, RealtimeTokenService $service) {
                     return response()->json([
-                        'token' => $service->generateToken(\Illuminate\Support\Facades\Auth::user(), $organization),
+                        'token' => $service->generateToken(Auth::user(), $organization),
                         'ws_url' => env('REALTIME_WS_URL', 'ws://127.0.0.1:8080'),
                     ]);
                 });
-
 
                 // Settings
                 Route::get('/settings', [OrganizationController::class, 'showSettings']);
@@ -100,233 +115,232 @@ Route::prefix('v1')->group(function () {
                     ->middleware('permission:audit.view');
 
                 // Workspace: Floors
-                Route::get('/floors', [\App\Domains\Workspace\Controllers\WorkspaceController::class, 'listFloors']);
-                Route::post('/floors', [\App\Domains\Workspace\Controllers\WorkspaceController::class, 'createFloor'])
+                Route::get('/floors', [WorkspaceController::class, 'listFloors']);
+                Route::post('/floors', [WorkspaceController::class, 'createFloor'])
                     ->middleware('permission:organizations.manage');
 
                 // Workspace: Maps
-                Route::get('/maps', [\App\Domains\Workspace\Controllers\WorkspaceController::class, 'listMaps']);
-                Route::post('/maps', [\App\Domains\Workspace\Controllers\WorkspaceController::class, 'createMap'])
+                Route::get('/maps', [WorkspaceController::class, 'listMaps']);
+                Route::post('/maps', [WorkspaceController::class, 'createMap'])
                     ->middleware('permission:organizations.manage');
-                Route::get('/maps/{map}', [\App\Domains\Workspace\Controllers\WorkspaceController::class, 'showMap']);
-                Route::patch('/maps/{map}', [\App\Domains\Workspace\Controllers\WorkspaceController::class, 'updateMap'])
+                Route::get('/maps/{map}', [WorkspaceController::class, 'showMap']);
+                Route::patch('/maps/{map}', [WorkspaceController::class, 'updateMap'])
                     ->middleware('permission:organizations.manage');
-                Route::post('/maps/{map}/publish', [\App\Domains\Workspace\Controllers\WorkspaceController::class, 'publishMap'])
+                Route::post('/maps/{map}/publish', [WorkspaceController::class, 'publishMap'])
                     ->middleware('permission:organizations.manage');
-                Route::post('/maps/{map}/background', [\App\Domains\Workspace\Controllers\WorkspaceController::class, 'uploadBackground'])
+                Route::post('/maps/{map}/background', [WorkspaceController::class, 'uploadBackground'])
                     ->middleware('permission:organizations.manage');
-                Route::get('/maps/{map}/versions', [\App\Domains\Workspace\Controllers\WorkspaceController::class, 'getMapVersions']);
+                Route::get('/maps/{map}/versions', [WorkspaceController::class, 'getMapVersions']);
 
                 // Workspace: Rooms & Zones & Objects
-                Route::post('/rooms', [\App\Domains\Workspace\Controllers\WorkspaceController::class, 'createRoom'])
+                Route::post('/rooms', [WorkspaceController::class, 'createRoom'])
                     ->middleware('permission:organizations.manage');
-                Route::patch('/rooms/{room}', [\App\Domains\Workspace\Controllers\WorkspaceController::class, 'updateRoom'])
+                Route::patch('/rooms/{room}', [WorkspaceController::class, 'updateRoom'])
                     ->middleware('permission:organizations.manage');
-                Route::delete('/rooms/{room}', [\App\Domains\Workspace\Controllers\WorkspaceController::class, 'deleteRoom'])
-                    ->middleware('permission:organizations.manage');
-
-                Route::post('/zones', [\App\Domains\Workspace\Controllers\WorkspaceController::class, 'createZone'])
-                    ->middleware('permission:organizations.manage');
-                Route::delete('/zones/{zone}', [\App\Domains\Workspace\Controllers\WorkspaceController::class, 'deleteZone'])
+                Route::delete('/rooms/{room}', [WorkspaceController::class, 'deleteRoom'])
                     ->middleware('permission:organizations.manage');
 
-                Route::post('/maps/{map}/objects/sync', [\App\Domains\Workspace\Controllers\WorkspaceController::class, 'syncObjects'])
+                Route::post('/zones', [WorkspaceController::class, 'createZone'])
+                    ->middleware('permission:organizations.manage');
+                Route::delete('/zones/{zone}', [WorkspaceController::class, 'deleteZone'])
+                    ->middleware('permission:organizations.manage');
+
+                Route::post('/maps/{map}/objects/sync', [WorkspaceController::class, 'syncObjects'])
                     ->middleware('permission:organizations.manage');
 
                 // ── Chat Domain ──
-                Route::get('/channels', [\App\Domains\Chat\Controllers\ChatController::class, 'listChannels']);
-                Route::get('/users/{targetUser}/dm', [\App\Domains\Chat\Controllers\ChatController::class, 'getOrCreateDm']);
-                Route::get('/channels/{channel}/messages', [\App\Domains\Chat\Controllers\ChatController::class, 'listMessages']);
-                Route::post('/channels/{channel}/messages', [\App\Domains\Chat\Controllers\ChatController::class, 'sendMessage']);
+                Route::get('/channels', [ChatController::class, 'listChannels']);
+                Route::get('/users/{targetUser}/dm', [ChatController::class, 'getOrCreateDm']);
+                Route::get('/channels/{channel}/messages', [ChatController::class, 'listMessages']);
+                Route::post('/channels/{channel}/messages', [ChatController::class, 'sendMessage']);
 
                 // ── Meetings & LiveKit Domain ──
-                Route::get('/meetings', [\App\Domains\Meetings\Controllers\MeetingController::class, 'listMeetings']);
-                Route::post('/meetings', [\App\Domains\Meetings\Controllers\MeetingController::class, 'createMeeting']);
-                Route::post('/meetings/{meeting}/end', [\App\Domains\Meetings\Controllers\MeetingController::class, 'endMeeting']);
-                Route::post('/rooms/{room}/livekit-token', [\App\Domains\Meetings\Controllers\MeetingController::class, 'getLiveKitToken']);
+                Route::get('/meetings', [MeetingController::class, 'listMeetings']);
+                Route::post('/meetings', [MeetingController::class, 'createMeeting']);
+                Route::post('/meetings/{meeting}/end', [MeetingController::class, 'endMeeting']);
+                Route::post('/rooms/{room}/livekit-token', [MeetingController::class, 'getLiveKitToken']);
 
                 // ── Guest Invitations Domain ──
-                Route::post('/rooms/{room}/guest-invitations', [\App\Domains\Guests\Controllers\GuestController::class, 'createInvitation']);
+                Route::post('/rooms/{room}/guest-invitations', [GuestController::class, 'createInvitation']);
 
                 // ── Session & Meeting Recordings Gallery ──
-                Route::get('/recordings', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'index']);
-                Route::post('/recordings', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'store']);
-                Route::delete('/recordings/{recording}', [\App\Domains\Collaboration\Controllers\RecordingController::class, 'destroy']);
+                Route::get('/recordings', [RecordingController::class, 'index']);
+                Route::post('/recordings', [RecordingController::class, 'store']);
+                Route::delete('/recordings/{recording}', [RecordingController::class, 'destroy']);
 
                 // ── Projects Domain ──
-                Route::get('/projects', [\App\Domains\Projects\Controllers\ProjectController::class, 'index'])
+                Route::get('/projects', [ProjectController::class, 'index'])
                     ->middleware('permission:projects.view');
-                Route::post('/projects', [\App\Domains\Projects\Controllers\ProjectController::class, 'store'])
+                Route::post('/projects', [ProjectController::class, 'store'])
                     ->middleware('permission:projects.create');
-                Route::get('/projects/{project}', [\App\Domains\Projects\Controllers\ProjectController::class, 'show'])
+                Route::get('/projects/{project}', [ProjectController::class, 'show'])
                     ->middleware('permission:projects.view');
-                Route::patch('/projects/{project}', [\App\Domains\Projects\Controllers\ProjectController::class, 'update'])
+                Route::patch('/projects/{project}', [ProjectController::class, 'update'])
                     ->middleware('permission:projects.edit');
-                Route::delete('/projects/{project}', [\App\Domains\Projects\Controllers\ProjectController::class, 'destroy'])
+                Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])
                     ->middleware('permission:projects.delete');
 
                 // ClickUp Multi-Views & Advance Modules
-                Route::get('/projects/{project}/gantt', [\App\Domains\Projects\Controllers\ProjectController::class, 'gantt'])
+                Route::get('/projects/{project}/gantt', [ProjectController::class, 'gantt'])
                     ->middleware('permission:projects.view');
-                Route::get('/projects/{project}/workload', [\App\Domains\Projects\Controllers\ProjectController::class, 'workload'])
+                Route::get('/projects/{project}/workload', [ProjectController::class, 'workload'])
                     ->middleware('permission:projects.view');
 
                 // ClickUp Custom Fields
-                Route::get('/projects/{project}/custom-fields', [\App\Domains\Projects\Controllers\ProjectController::class, 'customFields'])
+                Route::get('/projects/{project}/custom-fields', [ProjectController::class, 'customFields'])
                     ->middleware('permission:projects.view');
-                Route::post('/projects/{project}/custom-fields', [\App\Domains\Projects\Controllers\ProjectController::class, 'storeCustomField'])
+                Route::post('/projects/{project}/custom-fields', [ProjectController::class, 'storeCustomField'])
                     ->middleware('permission:projects.edit');
 
                 // ClickUp Docs / Wiki
-                Route::get('/projects/{project}/docs', [\App\Domains\Projects\Controllers\ProjectController::class, 'documents'])
+                Route::get('/projects/{project}/docs', [ProjectController::class, 'documents'])
                     ->middleware('permission:projects.view');
-                Route::post('/projects/{project}/docs', [\App\Domains\Projects\Controllers\ProjectController::class, 'storeDocument'])
+                Route::post('/projects/{project}/docs', [ProjectController::class, 'storeDocument'])
                     ->middleware('permission:projects.edit');
-                Route::put('/projects/{project}/docs/{document}', [\App\Domains\Projects\Controllers\ProjectController::class, 'updateDocument'])
+                Route::put('/projects/{project}/docs/{document}', [ProjectController::class, 'updateDocument'])
                     ->middleware('permission:projects.edit');
-                Route::delete('/projects/{project}/docs/{document}', [\App\Domains\Projects\Controllers\ProjectController::class, 'destroyDocument'])
+                Route::delete('/projects/{project}/docs/{document}', [ProjectController::class, 'destroyDocument'])
                     ->middleware('permission:projects.delete');
 
                 // ClickUp Goals & Targets
-                Route::get('/projects/{project}/goals', [\App\Domains\Projects\Controllers\ProjectController::class, 'goals'])
+                Route::get('/projects/{project}/goals', [ProjectController::class, 'goals'])
                     ->middleware('permission:projects.view');
-                Route::post('/projects/{project}/goals', [\App\Domains\Projects\Controllers\ProjectController::class, 'storeGoal'])
+                Route::post('/projects/{project}/goals', [ProjectController::class, 'storeGoal'])
                     ->middleware('permission:projects.edit');
-                Route::post('/projects/{project}/goals/{goal}/targets', [\App\Domains\Projects\Controllers\ProjectController::class, 'storeGoalTarget'])
+                Route::post('/projects/{project}/goals/{goal}/targets', [ProjectController::class, 'storeGoalTarget'])
                     ->middleware('permission:projects.edit');
-                Route::patch('/projects/{project}/goals/{goal}/targets/{target}', [\App\Domains\Projects\Controllers\ProjectController::class, 'updateGoalTarget'])
+                Route::patch('/projects/{project}/goals/{goal}/targets/{target}', [ProjectController::class, 'updateGoalTarget'])
                     ->middleware('permission:projects.edit');
 
                 // ClickUp Sprints
-                Route::get('/projects/{project}/sprints', [\App\Domains\Projects\Controllers\ProjectController::class, 'sprints'])
+                Route::get('/projects/{project}/sprints', [ProjectController::class, 'sprints'])
                     ->middleware('permission:projects.view');
-                Route::post('/projects/{project}/sprints', [\App\Domains\Projects\Controllers\ProjectController::class, 'storeSprint'])
+                Route::post('/projects/{project}/sprints', [ProjectController::class, 'storeSprint'])
                     ->middleware('permission:projects.edit');
 
                 // Milestones & Roadmap
-                Route::get('/projects/{project}/milestones', [\App\Domains\Projects\Controllers\ProjectController::class, 'milestones'])
+                Route::get('/projects/{project}/milestones', [ProjectController::class, 'milestones'])
                     ->middleware('permission:projects.view');
-                Route::post('/projects/{project}/milestones', [\App\Domains\Projects\Controllers\ProjectController::class, 'storeMilestone'])
+                Route::post('/projects/{project}/milestones', [ProjectController::class, 'storeMilestone'])
                     ->middleware('permission:projects.edit');
-                Route::patch('/projects/{project}/milestones/{milestone}', [\App\Domains\Projects\Controllers\ProjectController::class, 'updateMilestone'])
+                Route::patch('/projects/{project}/milestones/{milestone}', [ProjectController::class, 'updateMilestone'])
                     ->middleware('permission:projects.edit');
-                Route::delete('/projects/{project}/milestones/{milestone}', [\App\Domains\Projects\Controllers\ProjectController::class, 'destroyMilestone'])
+                Route::delete('/projects/{project}/milestones/{milestone}', [ProjectController::class, 'destroyMilestone'])
                     ->middleware('permission:projects.edit');
 
                 // ── Tasks Domain ──
-                Route::get('/tasks', [\App\Domains\Projects\Controllers\TaskController::class, 'index'])
+                Route::get('/tasks', [TaskController::class, 'index'])
                     ->middleware('permission:tasks.view');
-                Route::get('/tasks/my-tasks', [\App\Domains\Projects\Controllers\TaskController::class, 'myTasks'])
+                Route::get('/tasks/my-tasks', [TaskController::class, 'myTasks'])
                     ->middleware('permission:tasks.view');
-                Route::post('/tasks', [\App\Domains\Projects\Controllers\TaskController::class, 'store'])
+                Route::post('/tasks', [TaskController::class, 'store'])
                     ->middleware('permission:tasks.create');
-                Route::get('/tasks/{task}', [\App\Domains\Projects\Controllers\TaskController::class, 'show'])
+                Route::get('/tasks/{task}', [TaskController::class, 'show'])
                     ->middleware('permission:tasks.view');
-                Route::get('/tasks/{task}/activity', [\App\Domains\Projects\Controllers\TaskController::class, 'activity'])
+                Route::get('/tasks/{task}/activity', [TaskController::class, 'activity'])
                     ->middleware('permission:tasks.view');
-                Route::patch('/tasks/{task}', [\App\Domains\Projects\Controllers\TaskController::class, 'update'])
+                Route::patch('/tasks/{task}', [TaskController::class, 'update'])
                     ->middleware('permission:tasks.edit');
-                Route::patch('/tasks/{task}/status', [\App\Domains\Projects\Controllers\TaskController::class, 'updateStatus'])
+                Route::patch('/tasks/{task}/status', [TaskController::class, 'updateStatus'])
                     ->middleware('permission:tasks.edit');
-                Route::patch('/tasks/{task}/assign', [\App\Domains\Projects\Controllers\TaskController::class, 'assign'])
+                Route::patch('/tasks/{task}/assign', [TaskController::class, 'assign'])
                     ->middleware('permission:tasks.assign');
-                Route::patch('/tasks/{task}/milestone', [\App\Domains\Projects\Controllers\TaskController::class, 'setMilestone'])
+                Route::patch('/tasks/{task}/milestone', [TaskController::class, 'setMilestone'])
                     ->middleware('permission:tasks.edit');
-                Route::post('/tasks/bulk', [\App\Domains\Projects\Controllers\TaskController::class, 'bulkUpdate'])
+                Route::post('/tasks/bulk', [TaskController::class, 'bulkUpdate'])
                     ->middleware('permission:tasks.edit');
-                Route::delete('/tasks/{task}', [\App\Domains\Projects\Controllers\TaskController::class, 'destroy'])
+                Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])
                     ->middleware('permission:tasks.delete');
-                Route::post('/tasks/{task}/checklist', [\App\Domains\Projects\Controllers\TaskController::class, 'addChecklistItem'])
+                Route::post('/tasks/{task}/checklist', [TaskController::class, 'addChecklistItem'])
                     ->middleware('permission:tasks.edit');
-                Route::patch('/tasks/{task}/checklist/{item}', [\App\Domains\Projects\Controllers\TaskController::class, 'toggleChecklistItem'])
+                Route::patch('/tasks/{task}/checklist/{item}', [TaskController::class, 'toggleChecklistItem'])
                     ->middleware('permission:tasks.edit');
-                Route::post('/tasks/{task}/comments', [\App\Domains\Projects\Controllers\TaskController::class, 'addComment'])
+                Route::post('/tasks/{task}/comments', [TaskController::class, 'addComment'])
                     ->middleware('permission:tasks.view');
-                Route::post('/tasks/{task}/dependencies', [\App\Domains\Projects\Controllers\TaskController::class, 'addDependency'])
+                Route::post('/tasks/{task}/dependencies', [TaskController::class, 'addDependency'])
                     ->middleware('permission:tasks.edit');
-                Route::post('/tasks/{task}/duplicate', [\App\Domains\Projects\Controllers\TaskController::class, 'duplicate'])
+                Route::post('/tasks/{task}/duplicate', [TaskController::class, 'duplicate'])
                     ->middleware('permission:tasks.create');
-                Route::post('/tasks/{task}/move', [\App\Domains\Projects\Controllers\TaskController::class, 'move'])
+                Route::post('/tasks/{task}/move', [TaskController::class, 'move'])
                     ->middleware('permission:tasks.edit');
-                Route::post('/tasks/{task}/custom-fields', [\App\Domains\Projects\Controllers\TaskController::class, 'setCustomFieldValue'])
+                Route::post('/tasks/{task}/custom-fields', [TaskController::class, 'setCustomFieldValue'])
                     ->middleware('permission:tasks.edit');
-                Route::patch('/tasks/{task}/sprint', [\App\Domains\Projects\Controllers\TaskController::class, 'setSprint'])
+                Route::patch('/tasks/{task}/sprint', [TaskController::class, 'setSprint'])
                     ->middleware('permission:tasks.edit');
 
                 // ── Time Tracking & Live Timers ──
-                Route::get('/time/active-timer', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'getActiveTimer'])
+                Route::get('/time/active-timer', [TimeTrackingController::class, 'getActiveTimer'])
                     ->middleware('permission:time.view');
-                Route::post('/time/timer/start', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'startTimer'])
+                Route::post('/time/timer/start', [TimeTrackingController::class, 'startTimer'])
                     ->middleware('permission:time.create');
-                Route::post('/time/timer/stop', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'stopTimer'])
+                Route::post('/time/timer/stop', [TimeTrackingController::class, 'stopTimer'])
                     ->middleware('permission:time.create');
-                Route::post('/time/entries/manual', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'logManual'])
+                Route::post('/time/entries/manual', [TimeTrackingController::class, 'logManual'])
                     ->middleware('permission:time.create');
-                Route::get('/time/entries', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'index'])
+                Route::get('/time/entries', [TimeTrackingController::class, 'index'])
                     ->middleware('permission:time.view');
-                Route::patch('/time/entries/{timeEntry}', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'update'])
+                Route::patch('/time/entries/{timeEntry}', [TimeTrackingController::class, 'update'])
                     ->middleware('permission:time.edit');
-                Route::delete('/time/entries/{timeEntry}', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'destroy'])
+                Route::delete('/time/entries/{timeEntry}', [TimeTrackingController::class, 'destroy'])
                     ->middleware('permission:time.delete');
 
                 // ── Time Entries Route Aliases ──
-                Route::post('/time-entries/timer/start', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'startTimer']);
-                Route::post('/time-entries/timer/stop', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'stopTimer']);
-                Route::post('/time-entries/manual', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'logManual']);
-                Route::get('/time-entries', [\App\Domains\Projects\Controllers\TimeTrackingController::class, 'index']);
+                Route::post('/time-entries/timer/start', [TimeTrackingController::class, 'startTimer']);
+                Route::post('/time-entries/timer/stop', [TimeTrackingController::class, 'stopTimer']);
+                Route::post('/time-entries/manual', [TimeTrackingController::class, 'logManual']);
+                Route::get('/time-entries', [TimeTrackingController::class, 'index']);
 
                 // ── Timesheets Domain ──
-                Route::get('/timesheets', [\App\Domains\Projects\Controllers\TimesheetController::class, 'index'])
+                Route::get('/timesheets', [TimesheetController::class, 'index'])
                     ->middleware('permission:timesheets.view');
-                Route::get('/timesheets/my-current', [\App\Domains\Projects\Controllers\TimesheetController::class, 'myCurrent'])
+                Route::get('/timesheets/my-current', [TimesheetController::class, 'myCurrent'])
                     ->middleware('permission:timesheets.view');
-                Route::get('/timesheets/{timesheet}', [\App\Domains\Projects\Controllers\TimesheetController::class, 'show'])
+                Route::get('/timesheets/{timesheet}', [TimesheetController::class, 'show'])
                     ->middleware('permission:timesheets.view');
-                Route::post('/timesheets/submit', [\App\Domains\Projects\Controllers\TimesheetController::class, 'submit'])
+                Route::post('/timesheets/submit', [TimesheetController::class, 'submit'])
                     ->middleware('permission:timesheets.submit');
-                Route::post('/timesheets/{timesheet}/approve', [\App\Domains\Projects\Controllers\TimesheetController::class, 'approve'])
+                Route::post('/timesheets/{timesheet}/approve', [TimesheetController::class, 'approve'])
                     ->middleware('permission:timesheets.approve');
-                Route::post('/timesheets/{timesheet}/reject', [\App\Domains\Projects\Controllers\TimesheetController::class, 'reject'])
+                Route::post('/timesheets/{timesheet}/reject', [TimesheetController::class, 'reject'])
                     ->middleware('permission:timesheets.approve');
 
                 // ── Attendance & Clock In/Out Domain ──
-                Route::get('/attendance/summary', [\App\Domains\People\Controllers\AttendanceApiController::class, 'summary']);
-                Route::post('/attendance/clock-in', [\App\Domains\People\Controllers\AttendanceApiController::class, 'clockIn']);
-                Route::post('/attendance/clock-out', [\App\Domains\People\Controllers\AttendanceApiController::class, 'clockOut']);
-                Route::get('/attendance/logs', [\App\Domains\People\Controllers\AttendanceApiController::class, 'logs']);
+                Route::get('/attendance/summary', [AttendanceApiController::class, 'summary']);
+                Route::post('/attendance/clock-in', [AttendanceApiController::class, 'clockIn']);
+                Route::post('/attendance/clock-out', [AttendanceApiController::class, 'clockOut']);
+                Route::get('/attendance/logs', [AttendanceApiController::class, 'logs']);
 
                 // ── Billing & Regional Subscriptions Domain ──
-                Route::get('/billing/plans', [\App\Domains\Tenancy\Controllers\BillingApiController::class, 'plans']);
-                Route::get('/billing/subscription', [\App\Domains\Tenancy\Controllers\BillingApiController::class, 'subscription']);
-                Route::post('/billing/checkout', [\App\Domains\Tenancy\Controllers\BillingApiController::class, 'checkout']);
+                Route::get('/billing/plans', [BillingApiController::class, 'plans']);
+                Route::get('/billing/subscription', [BillingApiController::class, 'subscription']);
+                Route::post('/billing/checkout', [BillingApiController::class, 'checkout']);
 
                 // ── Spatial Interactions & Knock / Wave / Ring Domain ──
-                Route::post('/interactions/knock', [\App\Domains\Workspace\Controllers\SpatialInteractionsApiController::class, 'knock']);
-                Route::post('/interactions/wave', [\App\Domains\Workspace\Controllers\SpatialInteractionsApiController::class, 'wave']);
-                Route::post('/interactions/ring', [\App\Domains\Workspace\Controllers\SpatialInteractionsApiController::class, 'ring']);
+                Route::post('/interactions/knock', [SpatialInteractionsApiController::class, 'knock']);
+                Route::post('/interactions/wave', [SpatialInteractionsApiController::class, 'wave']);
+                Route::post('/interactions/ring', [SpatialInteractionsApiController::class, 'ring']);
 
                 // ── WebRTC & LiveKit Meetings Domain ──
-                Route::get('/meetings', [\App\Domains\Meetings\Controllers\MeetingController::class, 'listMeetings']);
-                Route::post('/meetings', [\App\Domains\Meetings\Controllers\MeetingController::class, 'createMeeting']);
-                Route::post('/meetings/{meeting}/end', [\App\Domains\Meetings\Controllers\MeetingController::class, 'endMeeting']);
-                Route::post('/meetings/{meeting}/token', [\App\Domains\Meetings\Controllers\MeetingController::class, 'getMeetingToken']);
-                Route::post('/rooms/{room}/livekit-token', [\App\Domains\Meetings\Controllers\MeetingController::class, 'getLiveKitToken']);
-                Route::get('/webrtc/diagnostics-config', [\App\Domains\Meetings\Controllers\MeetingController::class, 'getDiagnosticsConfig']);
+                Route::get('/meetings', [MeetingController::class, 'listMeetings']);
+                Route::post('/meetings', [MeetingController::class, 'createMeeting']);
+                Route::post('/meetings/{meeting}/end', [MeetingController::class, 'endMeeting']);
+                Route::post('/meetings/{meeting}/token', [MeetingController::class, 'getMeetingToken']);
+                Route::post('/rooms/{room}/livekit-token', [MeetingController::class, 'getLiveKitToken']);
+                Route::get('/webrtc/diagnostics-config', [MeetingController::class, 'getDiagnosticsConfig']);
             });
 
         // ── In-App Notifications (authenticated) ──
-        Route::get('/notifications', [\App\Domains\Workspace\Controllers\SpatialInteractionsApiController::class, 'notifications']);
-        Route::post('/notifications/{id}/read', [\App\Domains\Workspace\Controllers\SpatialInteractionsApiController::class, 'markAsRead']);
+        Route::get('/notifications', [SpatialInteractionsApiController::class, 'notifications']);
+        Route::post('/notifications/{id}/read', [SpatialInteractionsApiController::class, 'markAsRead']);
 
         // ── Plans (public listing) ──
         Route::get('/plans', function () {
             return response()->json([
-                'plans' => \App\Domains\Tenancy\Models\Plan::where('is_active', true)->get(),
+                'plans' => Plan::where('is_active', true)->get(),
             ]);
         });
     });
 
     // ── Public Guest Verification ──
-    Route::get('/guest-invitations/{token}', [\App\Domains\Guests\Controllers\GuestController::class, 'verifyToken']);
+    Route::get('/guest-invitations/{token}', [GuestController::class, 'verifyToken']);
 });
-

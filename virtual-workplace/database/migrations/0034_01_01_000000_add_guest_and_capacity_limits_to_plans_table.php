@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('plans', function (Blueprint $table) {
-            if (!Schema::hasColumn('plans', 'max_guest_invitations')) {
+            if (! Schema::hasColumn('plans', 'max_guest_invitations')) {
                 $table->integer('max_guest_invitations')->default(5)->after('room_limit');
             }
-            if (!Schema::hasColumn('plans', 'max_room_capacity')) {
+            if (! Schema::hasColumn('plans', 'max_room_capacity')) {
                 $table->integer('max_room_capacity')->default(10)->after('max_guest_invitations');
             }
         });

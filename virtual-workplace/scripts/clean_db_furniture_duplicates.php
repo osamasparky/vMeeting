@@ -1,13 +1,14 @@
 <?php
+
 require 'vendor/autoload.php';
 $app = require_once 'bootstrap/app.php';
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$app->make(Kernel::class)->bootstrap();
 
-use App\Domains\Workspace\Models\FurnitureItem;
 use App\Domains\Workspace\Models\FurnitureCategory;
-use App\Domains\Workspace\Models\MapObject;
-use Illuminate\Support\Facades\File;
+use App\Domains\Workspace\Models\FurnitureItem;
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
 
 $catalogPath = database_path('data/furniture_catalog.json');
 $catalog = json_decode(File::get($catalogPath), true);

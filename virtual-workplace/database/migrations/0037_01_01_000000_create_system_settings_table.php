@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('system_settings')) {
+        if (! Schema::hasTable('system_settings')) {
             Schema::create('system_settings', function (Blueprint $table) {
                 $table->string('key')->primary();
                 $table->longText('value')->nullable();

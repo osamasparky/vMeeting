@@ -10,7 +10,7 @@
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 16px;">
     <div>
         <h2 style="font-size: 20px; font-weight: 900; color: var(--text-primary); margin: 0 0 4px 0;">
-            🏢 {{ __'Subscription Plan Office Blueprints') }}
+            🏢 {{ __('Subscription Plan Office Blueprints') }}
         </h2>
         <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
             {{ __('Configure and design dedicated default office floorplans and rooms for each subscription plan tier.') }}
@@ -63,7 +63,7 @@
                     <span>🖱️</span> <span>{{ __('Select & Move') }}</span>
                 </button>
                 <button type="button" id="tool-btn-draw" onclick="setDrawTool('draw')" class="tactile-btn" style="padding: 6px 14px; font-size: 12px; border: none; background: transparent; color: var(--text-secondary);">
-                    <span>✏️</span> <span>{{ __'Draw Room') }}</span>
+                    <span>✏️</span> <span>{{ __('Draw Room') }}</span>
                 </button>
             </div>
 
@@ -136,7 +136,7 @@
                 <!-- 1. Room Name (Rename) -->
                 <div>
                     <label style="display: block; font-size: 11px; font-weight: 800; color: var(--brand-forest); margin-bottom: 6px;">
-                        🏷️ {{ __'Room Name') }}
+                        🏷️ {{ __('Room Name') }}
                     </label>
                     <input type="text" id="insp-name" oninput="updateSelectedRoomProp('name', this.value)" placeholder="e.g. Executive Board Room" style="width: 100%; background: var(--bg-surface-subtle); border: 2px solid var(--brand-forest); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); font-size: 13px; font-weight: 800; outline: none; box-shadow: var(--shadow-inset-3d);">
                 </div>
@@ -179,7 +179,7 @@
                 <div style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px;">
                     <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 11px; font-weight: 700; color: var(--text-primary);">
                         <input type="checkbox" id="insp-isolation" onchange="updateSelectedRoomIsolation(this.checked)" style="width: 16px; height: 16px;">
-                        <span>🎙️ {{ __'Acoustic Sound Isolation') }}</span>
+                        <span>🎙️ {{ __('Acoustic Sound Isolation') }}</span>
                     </label>
                 </div>
 
@@ -208,7 +208,7 @@
 
                 <!-- 6. Delete Room Button -->
                 <button type="button" onclick="deleteCurrentSelectedRoom()" class="tactile-btn" style="width: 100%; justify-content: center; background: rgba(217, 107, 95, 0.15); border-color: rgba(217, 107, 95, 0.35); color: #D96B5F; font-size: 12px; padding: 8px;">
-                    🗑️ {{ __'Delete this Room') }}
+                    🗑️ {{ __('Delete this Room') }}
                 </button>
             </div>
         </div>
@@ -256,7 +256,7 @@
             <span>{{ __('All Preconfigured Default Rooms Roster') }}</span>
         </div>
         <button type="button" onclick="setDrawTool('draw')" class="tactile-btn btn-primary" style="font-size: 12px; padding: 6px 14px;">
-            ✏️ {{ __'Draw Another Room') }}
+            ✏️ {{ __('Draw Another Room') }}
         </button>
     </div>
 
@@ -300,7 +300,7 @@
             <!-- Sync Scope Selection -->
             <div style="margin-bottom: 16px;">
                 <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
-                    🎯 {{ __'Target Organizations') }}
+                    🎯 {{ __('Target Organizations') }}
                 </label>
                 <div style="display: flex; flex-direction: column; gap: 8px;">
                     <label style="display: flex; align-items: center; gap: 10px; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); padding: 10px 14px; border-radius: 12px; cursor: pointer;">
@@ -321,7 +321,7 @@
             <div style="background: rgba(214, 162, 58, 0.1); border: 1px solid rgba(214, 162, 58, 0.3); border-radius: 12px; padding: 14px; margin-bottom: 20px;">
                 <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 12px; font-weight: 700; color: var(--text-primary);">
                     <input type="checkbox" name="overwrite_rooms" value="1" checked style="margin-top: 2px;">
-                    <span>⚠️ {{ __'Overwrite and apply these exact rooms & boundaries') }}</span>
+                    <span>⚠️ {{ __('Overwrite and apply these exact rooms & boundaries') }}</span>
                 </label>
             </div>
 

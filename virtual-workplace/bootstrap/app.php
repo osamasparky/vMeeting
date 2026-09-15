@@ -1,5 +1,10 @@
 <?php
 
+use App\Http\Middleware\EnsureOrganizationMember;
+use App\Http\Middleware\EnsurePermission;
+use App\Http\Middleware\SecurityHeadersMiddleware;
+use App\Http\Middleware\SetLocaleMiddleware;
+use App\Http\Middleware\SuperAdminMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,18 +18,18 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
-            \App\Http\Middleware\SetLocaleMiddleware::class,
-            \App\Http\Middleware\SecurityHeadersMiddleware::class,
+            SetLocaleMiddleware::class,
+            SecurityHeadersMiddleware::class,
         ]);
 
         $middleware->api(append: [
-            \App\Http\Middleware\SecurityHeadersMiddleware::class,
+            SecurityHeadersMiddleware::class,
         ]);
 
         $middleware->alias([
-            'org.member' => \App\Http\Middleware\EnsureOrganizationMember::class,
-            'permission' => \App\Http\Middleware\EnsurePermission::class,
-            'superadmin' => \App\Http\Middleware\SuperAdminMiddleware::class,
+            'org.member' => EnsureOrganizationMember::class,
+            'permission' => EnsurePermission::class,
+            'superadmin' => SuperAdminMiddleware::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [

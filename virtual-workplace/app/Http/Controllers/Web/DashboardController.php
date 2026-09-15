@@ -2,13 +2,22 @@
 
 namespace App\Http\Controllers\Web;
 
-use App\Domains\Tenancy\Models\OrganizationMember;
+use App\Domains\Administration\Models\AuditLog;
+use App\Domains\Administration\Models\Role;
+use App\Domains\Guests\Models\GuestInvitation;
 use App\Domains\Identity\Models\User;
 use App\Domains\Meetings\Models\Meeting;
 use App\Domains\Notifications\Models\WorkplaceNotification;
 use App\Domains\Notifications\Services\NotificationService;
+use App\Domains\People\Models\Department;
+use App\Domains\People\Models\Team;
+use App\Domains\People\Models\UserProfile;
+use App\Domains\Projects\Models\ActiveTimer;
 use App\Domains\Projects\Models\Project;
 use App\Domains\Tenancy\Models\Organization;
+use App\Domains\Tenancy\Models\OrganizationMember;
+use App\Domains\Tenancy\Models\OrganizationSetting;
+use App\Domains\Tenancy\Models\Plan;
 use App\Http\Controllers\Controller;
 use App\Mail\MeetingInvitationMail;
 use Carbon\Carbon;
@@ -18,6 +27,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class DashboardController extends Controller
@@ -31,7 +41,7 @@ class DashboardController extends Controller
             $hasMembership = OrganizationMember::where('user_id', $user->id)
                 ->whereIn('status', ['active', 'invited'])
                 ->exists();
-            if (!$hasMembership) {
+            if (! $hasMembership) {
                 return redirect()->route('superadmin.dashboard');
             }
         }
@@ -42,7 +52,7 @@ class DashboardController extends Controller
             ->with(['organization.plan', 'organization.subscription', 'role'])
             ->first();
 
-        if (!$membership) {
+        if (! $membership) {
             return redirect()->route('login')->with('error', 'No active organization found.');
         }
 
@@ -55,21 +65,21 @@ class DashboardController extends Controller
 
         $rooms = $organization->rooms()->with(['floor', 'map.floor'])->get();
         $offices = $organization->offices()->with(['rooms', 'maps.rooms', 'activeMap.rooms'])->get();
-        $roles = \App\Domains\Administration\Models\Role::where('slug', '!=', 'super_admin')
-            ->where(function($q) use ($organization) {
+        $roles = Role::where('slug', '!=', 'super_admin')
+            ->where(function ($q) use ($organization) {
                 $q->where('organization_id', $organization->id)->orWhereNull('organization_id');
             })->get();
         $members = $organization->members()
-            ->whereHas('user', function($q) {
+            ->whereHas('user', function ($q) {
                 $q->where('is_super_admin', false);
             })
             ->with(['user.profiles', 'role', 'offices', 'rooms'])
             ->get();
         $departments = $organization->departments()->withCount('teams')->get();
         $teams = $organization->teams()->with('department')->get();
-        $auditLogs = \App\Domains\Administration\Models\AuditLog::where('organization_id', $organization->id)->latest()->take(20)->get();
-        $guestInvitations = \App\Domains\Guests\Models\GuestInvitation::where('organization_id', $organization->id)->with('room')->latest()->take(20)->get();
-        $allPlans = \App\Domains\Tenancy\Models\Plan::where('is_active', true)->orderBy('price', 'asc')->get();
+        $auditLogs = AuditLog::where('organization_id', $organization->id)->latest()->take(20)->get();
+        $guestInvitations = GuestInvitation::where('organization_id', $organization->id)->with('room')->latest()->take(20)->get();
+        $allPlans = Plan::where('is_active', true)->orderBy('price', 'asc')->get();
 
         $activeMembersCount = $members->where('status', 'active')->count();
         $invitedMembersCount = $members->where('status', 'invited')->count();
@@ -101,7 +111,7 @@ class DashboardController extends Controller
                 $collaborationHours = round($todayMeetingsCount * 1.5, 1);
             }
 
-            $inUseRoomsCount = $rooms->filter(function($r) {
+            $inUseRoomsCount = $rooms->filter(function ($r) {
                 return ($r->members_count ?? 0) > 0 || ($r->active_call ?? false);
             })->count();
             $occupancyRate = $totalRooms > 0 ? round(($inUseRoomsCount / $totalRooms) * 100) : 0;
@@ -112,7 +122,7 @@ class DashboardController extends Controller
 
             $presenceRate = $totalMembers > 0 ? round(($activeMembersCount / max(1, $totalMembers)) * 100) : 100;
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning('DashboardController dynamic stats calculation: ' . $e->getMessage());
+            Log::warning('DashboardController dynamic stats calculation: '.$e->getMessage());
         }
 
         $stats = [
@@ -137,11 +147,11 @@ class DashboardController extends Controller
         $projects = $organization->projects()->with(['owner', 'manager', 'department'])->withCount('tasks')->latest()->get();
         $tasks = $organization->tasks()->with(['project', 'assignee', 'reporter', 'phase', 'milestone'])->orderBy('order')->latest()->get();
         $myTasks = $tasks->where('assignee_id', $user->id)->values();
-        $activeTimer = \App\Domains\Projects\Models\ActiveTimer::where('user_id', $user->id)->with(['project', 'task'])->first();
+        $activeTimer = ActiveTimer::where('user_id', $user->id)->with(['project', 'task'])->first();
         $recentTimeEntries = $organization->timeEntries()->where('user_id', $user->id)->with(['project', 'task'])->latest()->take(30)->get();
         $allTimesheets = $organization->timesheets()->with(['user', 'reviewer'])->latest()->take(15)->get();
         $currentMember = $members->firstWhere('user_id', $user->id);
-        $myProfile = $currentMember?->user?->profiles?->first() ?? new \App\Domains\People\Models\UserProfile([
+        $myProfile = $currentMember?->user?->profiles?->first() ?? new UserProfile([
             'user_id' => $user->id,
             'organization_id' => $organization->id,
         ]);
@@ -159,12 +169,13 @@ class DashboardController extends Controller
         })->sortBy(function ($m) {
             $statusWeight = $m->status === 'active' ? 0 : ($m->status === 'pending' ? 1 : 2);
             $timeWeight = $m->scheduled_at ? $m->scheduled_at->timestamp : 0;
+
             return sprintf('%d-%012d', $statusWeight, $timeWeight);
         })->take(10)->values();
 
         $smtpSettings = $organization->settings?->smtp_settings ?? [];
         $openAiSettings = $organization->settings?->openai_settings ?? [];
-        $attendancePolicy = $organization->settings?->getAttendancePolicy() ?? \App\Domains\Tenancy\Models\OrganizationSetting::getAttendancePolicy();
+        $attendancePolicy = $organization->settings?->getAttendancePolicy() ?? OrganizationSetting::getAttendancePolicy();
 
         $upcomingMeetingsJson = $upcomingMeetings->map(function ($m) {
             return [
@@ -182,13 +193,17 @@ class DashboardController extends Controller
         $projectMembersMap = [];
         foreach ($projects as $p) {
             $pMembers = collect();
-            if ($p->owner) $pMembers->push($p->owner);
-            if ($p->manager) $pMembers->push($p->manager);
+            if ($p->owner) {
+                $pMembers->push($p->owner);
+            }
+            if ($p->manager) {
+                $pMembers->push($p->manager);
+            }
             $pTasks = $tasksByProject->get($p->id, collect());
             $pTaskUserIds = $pTasks->whereNotNull('assignee_id')->pluck('assignee_id')->unique();
             $pTaskUsers = $members->whereIn('user_id', $pTaskUserIds)->pluck('user');
             $pMembers = $pMembers->concat($pTaskUsers)->filter()->unique('id');
-            $projectMembersMap[$p->id] = $pMembers->map(fn($pm) => [
+            $projectMembersMap[$p->id] = $pMembers->map(fn ($pm) => [
                 'id' => $pm->id,
                 'name' => $pm->name,
                 'email' => $pm->email,
@@ -209,12 +224,13 @@ class DashboardController extends Controller
     /**
      * Upgrade / switch company subscription plan from dashboard.
      */
-
     public function storeScheduledMeeting(Request $request)
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->first();
-        if (!$membership) abort(403);
+        if (! $membership) {
+            abort(403);
+        }
         $organization = $membership->organization;
 
         $validated = $request->validate([
@@ -230,15 +246,15 @@ class DashboardController extends Controller
         ]);
 
         $project = null;
-        if ($validated['scope'] === 'project' && !empty($validated['project_id'])) {
+        if ($validated['scope'] === 'project' && ! empty($validated['project_id'])) {
             $project = $organization->projects()->findOrFail($validated['project_id']);
         }
 
         $room = null;
-        if (!empty($validated['room_id'])) {
+        if (! empty($validated['room_id'])) {
             $room = $organization->rooms()->find($validated['room_id']);
         }
-        if (!$room) {
+        if (! $room) {
             $room = $organization->rooms()->first();
         }
 
@@ -253,8 +269,8 @@ class DashboardController extends Controller
             'scope' => $validated['scope'],
             'status' => 'scheduled',
             'scheduled_at' => Carbon::parse($validated['scheduled_at']),
-            'duration_minutes' => (int)($validated['duration_minutes'] ?? 30),
-            'livekit_room_name' => "meeting_{$organization->id}_" . uniqid(),
+            'duration_minutes' => (int) ($validated['duration_minutes'] ?? 30),
+            'livekit_room_name' => "meeting_{$organization->id}_".uniqid(),
             'settings' => [
                 'allow_screen_share' => true,
                 'allow_chat' => true,
@@ -272,12 +288,16 @@ class DashboardController extends Controller
         $recipients = collect();
 
         if ($validated['scope'] === 'project' && $project) {
-            if ($project->owner_id && $project->owner) $recipients->push($project->owner);
-            if ($project->manager_id && $project->manager) $recipients->push($project->manager);
+            if ($project->owner_id && $project->owner) {
+                $recipients->push($project->owner);
+            }
+            if ($project->manager_id && $project->manager) {
+                $recipients->push($project->manager);
+            }
             $taskAssigneeIds = $project->tasks()->whereNotNull('assignee_id')->pluck('assignee_id')->unique();
             $taskUsers = User::whereIn('id', $taskAssigneeIds)->get();
             $recipients = $recipients->concat($taskUsers)->unique('id');
-        } elseif (!empty($validated['attendee_ids'])) {
+        } elseif (! empty($validated['attendee_ids'])) {
             $recipients = User::whereIn('id', $validated['attendee_ids'])->get();
         }
 
@@ -291,7 +311,7 @@ class DashboardController extends Controller
                 ]);
 
                 // Send live in-app & database notification
-                \App\Domains\Notifications\Services\NotificationService::notifyMeetingScheduled($meeting, $recipient, $user);
+                NotificationService::notifyMeetingScheduled($meeting, $recipient, $user);
             }
         }
 
@@ -301,21 +321,21 @@ class DashboardController extends Controller
         $sentCount = 0;
 
         foreach ($recipients as $recipient) {
-            if (!empty($recipient->email)) {
+            if (! empty($recipient->email)) {
                 try {
                     Mail::to($recipient->email)->send(
                         new MeetingInvitationMail($meeting, $recipient, $joinUrl)
                     );
                     $sentCount++;
                 } catch (\Throwable $e) {
-                    Log::warning("Could not send meeting invitation email to {$recipient->email}: " . $e->getMessage());
+                    Log::warning("Could not send meeting invitation email to {$recipient->email}: ".$e->getMessage());
                 }
             }
         }
 
         $tabRedirect = $validated['scope'] === 'project' ? 'projects' : 'meetings';
-        $emailMsg = $sentCount > 0 ? " (" . __(':count invitations emailed', ['count' => $sentCount]) . ")" : "";
-        $successMsg = __('Meeting ":title" scheduled successfully!', ['title' => $meeting->title]) . $emailMsg;
+        $emailMsg = $sentCount > 0 ? ' ('.__(':count invitations emailed', ['count' => $sentCount]).')' : '';
+        $successMsg = __('Meeting ":title" scheduled successfully!', ['title' => $meeting->title]).$emailMsg;
 
         if ($request->wantsJson() || $request->ajax()) {
             return response()->json([
@@ -336,7 +356,7 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->first();
-        if (!$membership || $meeting->organization_id !== $membership->organization_id) {
+        if (! $membership || $meeting->organization_id !== $membership->organization_id) {
             abort(403);
         }
 
@@ -345,8 +365,7 @@ class DashboardController extends Controller
         return back()->with('success', __('Meeting ":title" has been cancelled.', ['title' => $meeting->title]));
     }
 
-
-    public function uploadChatAttachment(Request $request, \App\Domains\Tenancy\Models\Organization $organization)
+    public function uploadChatAttachment(Request $request, Organization $organization)
     {
         $request->validate([
             'file' => 'required|file|max:20480', // max 20MB
@@ -356,9 +375,9 @@ class DashboardController extends Controller
         $originalName = $uploadedFile->getClientOriginalName();
         $mime = $uploadedFile->getMimeType();
         $size = $uploadedFile->getSize();
-        $filename = 'chat_' . \Illuminate\Support\Str::uuid() . '.' . ($uploadedFile->getClientOriginalExtension() ?: 'bin');
+        $filename = 'chat_'.Str::uuid().'.'.($uploadedFile->getClientOriginalExtension() ?: 'bin');
         $path = $uploadedFile->storeAs("public/chat_files/{$organization->id}", $filename);
-        $url = \Illuminate\Support\Facades\Storage::url($path);
+        $url = Storage::url($path);
 
         return response()->json([
             'name' => $originalName,
@@ -371,93 +390,93 @@ class DashboardController extends Controller
     /**
      * Fetch user profile, live working timer and task list for office spotlight / inspector.
      */
+    public function getUserNotifications(Request $request)
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return response()->json(['unread_count' => 0, 'notifications' => []]);
+        }
 
-     public function getUserNotifications(Request $request)
-     {
-         $user = Auth::user();
-         if (!$user) {
-             return response()->json(['unread_count' => 0, 'notifications' => []]);
-         }
+        $unreadCount = WorkplaceNotification::forUser($user->id)->unread()->count();
+        $notifications = WorkplaceNotification::forUser($user->id)
+            ->orderByDesc('created_at')
+            ->limit(35)
+            ->get()
+            ->map(function ($n) {
+                return [
+                    'id' => $n->id,
+                    'type' => $n->type,
+                    'title' => $n->title,
+                    'body' => $n->body,
+                    'icon' => $n->icon ?: '🔔',
+                    'action_url' => $n->action_url,
+                    'is_read' => (bool) $n->is_read,
+                    'data' => $n->data,
+                    'created_at_human' => $n->created_at ? $n->created_at->diffForHumans() : '',
+                    'created_at' => $n->created_at ? $n->created_at->toISOString() : '',
+                ];
+            });
 
-         $unreadCount = \App\Domains\Notifications\Models\WorkplaceNotification::forUser($user->id)->unread()->count();
-         $notifications = \App\Domains\Notifications\Models\WorkplaceNotification::forUser($user->id)
-             ->orderByDesc('created_at')
-             ->limit(35)
-             ->get()
-             ->map(function ($n) {
-                 return [
-                     'id' => $n->id,
-                     'type' => $n->type,
-                     'title' => $n->title,
-                     'body' => $n->body,
-                     'icon' => $n->icon ?: '🔔',
-                     'action_url' => $n->action_url,
-                     'is_read' => (bool) $n->is_read,
-                     'data' => $n->data,
-                     'created_at_human' => $n->created_at ? $n->created_at->diffForHumans() : '',
-                     'created_at' => $n->created_at ? $n->created_at->toISOString() : '',
-                 ];
-             });
+        return response()->json([
+            'unread_count' => $unreadCount,
+            'notifications' => $notifications,
+        ]);
+    }
 
-         return response()->json([
-             'unread_count' => $unreadCount,
-             'notifications' => $notifications,
-         ]);
-     }
+    /**
+     * Mark a specific notification as read.
+     */
+    public function markNotificationRead(Request $request, string $id)
+    {
+        $user = Auth::user();
+        $notification = WorkplaceNotification::forUser($user->id)->where('id', $id)->first();
 
-     /**
-      * Mark a specific notification as read.
-      */
-     public function markNotificationRead(Request $request, string $id)
-     {
-         $user = Auth::user();
-         $notification = \App\Domains\Notifications\Models\WorkplaceNotification::forUser($user->id)->where('id', $id)->first();
+        if ($notification) {
+            $notification->markAsRead();
+        }
 
-         if ($notification) {
-             $notification->markAsRead();
-         }
+        $unreadCount = WorkplaceNotification::forUser($user->id)->unread()->count();
 
-         $unreadCount = \App\Domains\Notifications\Models\WorkplaceNotification::forUser($user->id)->unread()->count();
+        return response()->json([
+            'success' => true,
+            'unread_count' => $unreadCount,
+        ]);
+    }
 
-         return response()->json([
-             'success' => true,
-             'unread_count' => $unreadCount,
-         ]);
-     }
+    /**
+     * Mark all notifications as read for current user.
+     */
+    public function markAllNotificationsRead(Request $request)
+    {
+        $user = Auth::user();
+        WorkplaceNotification::forUser($user->id)
+            ->unread()
+            ->update([
+                'is_read' => true,
+                'read_at' => now(),
+            ]);
 
-     /**
-      * Mark all notifications as read for current user.
-      */
-     public function markAllNotificationsRead(Request $request)
-     {
-         $user = Auth::user();
-         \App\Domains\Notifications\Models\WorkplaceNotification::forUser($user->id)
-             ->unread()
-             ->update([
-                 'is_read' => true,
-                 'read_at' => now(),
-             ]);
+        return response()->json([
+            'success' => true,
+            'unread_count' => 0,
+        ]);
+    }
 
-         return response()->json([
-             'success' => true,
-             'unread_count' => 0,
-         ]);
-     }
+    /**
+     * Clear / delete all notifications for current user.
+     */
+    public function clearAllNotifications(Request $request)
+    {
+        $user = Auth::user();
+        WorkplaceNotification::forUser($user->id)->delete();
 
-     /**
-      * Clear / delete all notifications for current user.
-      */
-     public function clearAllNotifications(Request $request)
-     {
-         $user = Auth::user();
-         \App\Domains\Notifications\Models\WorkplaceNotification::forUser($user->id)->delete();
+        return response()->json([
+            'success' => true,
+            'unread_count' => 0,
+            'notifications' => [],
+        ]);
+    }
 
-         return response()->json([
-             'success' => true,
-             'unread_count' => 0,
-             'notifications' => [],
-         ]);
-     }
     /**
      * Apply organization-level SMTP settings to current runtime configuration.
      */
@@ -481,29 +500,29 @@ class DashboardController extends Controller
     private function ensureDefaultWorkspace(Organization $organization): void
     {
         if ($organization->floors()->count() === 0) {
-            $seeder = new BlueprintOfficeSeeder();
+            $seeder = new BlueprintOfficeSeeder;
             $seeder->seedOrganizationOffice($organization);
         }
 
         if ($organization->departments()->count() === 0) {
-            $eng = \App\Domains\People\Models\Department::create([
+            $eng = Department::create([
                 'organization_id' => $organization->id,
                 'name' => 'Engineering & Technology',
             ]);
-            \App\Domains\People\Models\Team::create(['organization_id' => $organization->id, 'department_id' => $eng->id, 'name' => 'Frontend Team']);
-            \App\Domains\People\Models\Team::create(['organization_id' => $organization->id, 'department_id' => $eng->id, 'name' => 'Backend & Cloud']);
+            Team::create(['organization_id' => $organization->id, 'department_id' => $eng->id, 'name' => 'Frontend Team']);
+            Team::create(['organization_id' => $organization->id, 'department_id' => $eng->id, 'name' => 'Backend & Cloud']);
 
-            $sales = \App\Domains\People\Models\Department::create([
+            $sales = Department::create([
                 'organization_id' => $organization->id,
                 'name' => 'Sales & Business Growth',
             ]);
-            \App\Domains\People\Models\Team::create(['organization_id' => $organization->id, 'department_id' => $sales->id, 'name' => 'Enterprise Sales']);
+            Team::create(['organization_id' => $organization->id, 'department_id' => $sales->id, 'name' => 'Enterprise Sales']);
 
-            $design = \App\Domains\People\Models\Department::create([
+            $design = Department::create([
                 'organization_id' => $organization->id,
                 'name' => 'Product & Design',
             ]);
-            \App\Domains\People\Models\Team::create(['organization_id' => $organization->id, 'department_id' => $design->id, 'name' => 'UI / UX Design']);
+            Team::create(['organization_id' => $organization->id, 'department_id' => $design->id, 'name' => 'UI / UX Design']);
         }
     }
 }

@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Domains\Identity\Models\User;
 use App\Domains\Identity\Services\RealtimeTokenService;
 use App\Domains\Tenancy\Actions\CreateOrganizationAction;
+use Database\Seeders\PlansSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -15,8 +17,8 @@ class SecurityAndRateLimitTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\PlansSeeder::class);
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(PlansSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
     }
 
     public function test_global_security_headers_are_present_in_responses(): void
@@ -31,7 +33,7 @@ class SecurityAndRateLimitTest extends TestCase
         $csp = $response->headers->get('Content-Security-Policy');
         $this->assertStringContainsString("default-src 'self'", $csp);
         $this->assertStringContainsString("script-src 'self' 'unsafe-inline'", $csp);
-        $this->assertStringContainsString("report-uri /csp-violation-report", $csp);
+        $this->assertStringContainsString('report-uri /csp-violation-report', $csp);
     }
 
     public function test_csp_violation_report_endpoint_accepts_reports(): void

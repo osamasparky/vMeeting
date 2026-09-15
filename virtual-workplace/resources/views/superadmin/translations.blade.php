@@ -19,7 +19,7 @@
             </div>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <button type="button" onclick="openAddPhraseModal()" class="tactile-btn btn-primary" style="padding: 10px 18px; font-size: 13px;">
-                    <span>+</span> {{ __'Add New Phrase') }}
+                    <span>+</span> {{ __('Add New Phrase') }}
                 </button>
             </div>
         </div>
@@ -61,7 +61,7 @@
                     📝 {{ __('Bilingual Translation Table (Arabic ⇄ English)') }}
                 </div>
                 <button type="submit" class="tactile-btn btn-primary" style="padding: 9px 24px; font-size: 13px;">
-                    💾 {{ __'Save All Changes') }}
+                    💾 {{ __('Save All Changes') }}
                 </button>
             </div>
 
@@ -70,8 +70,8 @@
                     <thead>
                         <tr style="background: var(--bg-surface); border-bottom: 2px solid var(--border-color); color: var(--text-muted); font-size: 11px; font-weight: 800; text-transform: uppercase;">
                             <th style="padding: 14px 20px; width: 30%;">🔑 {{ __('Original Key / Identifier') }}</th>
-                            <th style="padding: 14px 20px; width: 32%;">🇸🇦 {{ __'Arabic Translation') }}</th>
-                            <th style="padding: 14px 20px; width: 32%;">🇬🇧 {{ __'English Translation') }}</th>
+                            <th style="padding: 14px 20px; width: 32%;">🇸🇦 {{ __('Arabic Translation') }}</th>
+                            <th style="padding: 14px 20px; width: 32%;">🇬🇧 {{ __('English Translation') }}</th>
                             <th style="padding: 14px 20px; width: 6%; text-align: center;">⚡</th>
                         </tr>
                     </thead>
@@ -141,7 +141,7 @@
                 </div>
 
                 <button type="submit" class="tactile-btn btn-primary" style="padding: 10px 28px; font-size: 13px;">
-                    💾 {{ __'Save All Changes') }}
+                    💾 {{ __('Save All Changes') }}
                 </button>
             </div>
         </div>
@@ -176,7 +176,7 @@
 
             <div>
                 <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 6px;">
-                    🇸🇦 {{ __'Arabic Translation') }} *
+                    🇸🇦 {{ __('Arabic Translation') }} *
                 </label>
                 <textarea
                     name="ar"

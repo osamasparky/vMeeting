@@ -3,26 +3,25 @@
 namespace App\Http\Controllers\Web;
 
 use App\Domains\Administration\Models\AuditLog;
-use App\Domains\Tenancy\Models\OrganizationMember;
+use App\Domains\Administration\Models\SystemSetting;
 use App\Domains\Identity\Models\Role;
 use App\Domains\Identity\Models\User;
 use App\Domains\People\Models\Department;
 use App\Domains\People\Models\Team;
 use App\Domains\People\Models\UserProfile;
+use App\Domains\People\Requests\AssignMemberDepartmentRequest;
 use App\Domains\People\Requests\StoreDepartmentRequest;
-use App\Domains\People\Requests\UpdateDepartmentRequest;
 use App\Domains\People\Requests\StoreTeamRequest;
-use App\Domains\People\Requests\UpdateTeamRequest;
-use App\Domains\People\Requests\StoreMemberRequest;
-use App\Domains\People\Requests\UpdateMemberRequest;
+use App\Domains\Projects\Models\ActiveTimer;
+use App\Domains\Projects\Models\Task;
+use App\Domains\Projects\Models\TimeEntry;
 use App\Domains\Tenancy\Models\Organization;
+use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Domains\Tenancy\Models\Plan;
-use App\Domains\Tenancy\Models\SubscriptionPaymentRequest;
 use App\Http\Controllers\Controller;
-use App\Mail\MeetingInvitationMail;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
@@ -38,11 +37,11 @@ class OrganizationSettingsController extends Controller
             ->with(['organization', 'role.permissions'])
             ->first();
 
-        if (!$membership) {
+        if (! $membership) {
             return redirect()->route('login');
         }
 
-        if (!$membership->hasPermission('organizations.manage') && $membership->role?->slug !== 'company_admin') {
+        if (! $membership->hasPermission('organizations.manage') && $membership->role?->slug !== 'company_admin') {
             abort(403, 'Unauthorized: only organization admins can modify subscription plans.');
         }
 
@@ -53,7 +52,7 @@ class OrganizationSettingsController extends Controller
         $organization = $membership->organization;
         $newPlan = Plan::findOrFail($validated['plan_id']);
 
-        if ((float)$newPlan->price > 0) {
+        if ((float) $newPlan->price > 0) {
             return redirect()->route('subscription.payment', ['plan' => $newPlan->id]);
         }
 
@@ -73,11 +72,11 @@ class OrganizationSettingsController extends Controller
             ->with(['organization.plan', 'role.permissions'])
             ->first();
 
-        if (!$membership) {
+        if (! $membership) {
             return redirect()->route('login');
         }
 
-        if (!$membership->hasPermission('organizations.manage') && $membership->role?->slug !== 'company_admin') {
+        if (! $membership->hasPermission('organizations.manage') && $membership->role?->slug !== 'company_admin') {
             abort(403, 'Unauthorized: only organization admins can manage subscription payments.');
         }
 
@@ -85,7 +84,7 @@ class OrganizationSettingsController extends Controller
         $pendingRequest = $organization->pendingSubscriptionRequest()->where('plan_id', $plan->id)->first()
             ?: $organization->pendingSubscriptionRequest()->with('plan')->first();
 
-        $priceUSD = (float)$plan->price;
+        $priceUSD = (float) $plan->price;
 
         $defaultBankAccounts = [
             [
@@ -110,7 +109,7 @@ class OrganizationSettingsController extends Controller
             ],
         ];
 
-        $paymentSettings = \App\Domains\Administration\Models\SystemSetting::get('payment_settings', [
+        $paymentSettings = SystemSetting::get('payment_settings', [
             'usd_to_sar_rate' => 3.75,
             'usd_to_egp_rate' => 48.5,
             'usd_to_aed_rate' => 3.67,
@@ -129,15 +128,15 @@ class OrganizationSettingsController extends Controller
             'enable_wallets' => true,
         ]);
 
-        $sarRate = (float)($paymentSettings['usd_to_sar_rate'] ?? 3.75);
+        $sarRate = (float) ($paymentSettings['usd_to_sar_rate'] ?? 3.75);
         $priceSAR = round($priceUSD * $sarRate, 2);
 
-        $bankAccounts = !empty($paymentSettings['bank_accounts']) ? $paymentSettings['bank_accounts'] : $defaultBankAccounts;
+        $bankAccounts = ! empty($paymentSettings['bank_accounts']) ? $paymentSettings['bank_accounts'] : $defaultBankAccounts;
 
         $cleanSlug = preg_replace('/[^a-zA-Z0-9]/', '', $organization->slug ?: 'ORG');
-        $referenceCode = 'PAY-' . strtoupper(substr($cleanSlug, 0, 4))
-            . '-' . strtoupper(substr($plan->slug, 0, 4))
-            . '-' . strtoupper(Str::random(4));
+        $referenceCode = 'PAY-'.strtoupper(substr($cleanSlug, 0, 4))
+            .'-'.strtoupper(substr($plan->slug, 0, 4))
+            .'-'.strtoupper(Str::random(4));
 
         return view('billing.payment', compact(
             'user', 'membership', 'organization', 'plan', 'pendingRequest',
@@ -156,11 +155,11 @@ class OrganizationSettingsController extends Controller
             ->with(['organization', 'role.permissions'])
             ->first();
 
-        if (!$membership) {
+        if (! $membership) {
             return redirect()->route('login');
         }
 
-        if (!$membership->hasPermission('organizations.manage') && $membership->role?->slug !== 'company_admin') {
+        if (! $membership->hasPermission('organizations.manage') && $membership->role?->slug !== 'company_admin') {
             abort(403, 'Unauthorized: only organization admins can manage subscription payments.');
         }
 
@@ -230,7 +229,7 @@ class OrganizationSettingsController extends Controller
             ->with(['organization', 'role.permissions'])
             ->first();
 
-        if (!$membership || $membership->organization_id !== $subscriptionRequest->organization_id) {
+        if (! $membership || $membership->organization_id !== $subscriptionRequest->organization_id) {
             abort(403, 'Unauthorized.');
         }
 
@@ -245,7 +244,6 @@ class OrganizationSettingsController extends Controller
     }
 
     /**
-
     public function storeDepartment(\App\Domains\People\Requests\StoreDepartmentRequest $request)
     {
         $user = Auth::user();
@@ -269,70 +267,78 @@ class OrganizationSettingsController extends Controller
     /**
      * Update Department.
      */
-    public function updateDepartment(\App\Domains\People\Requests\StoreDepartmentRequest $request, \App\Domains\People\Models\Department $department)
+    public function updateDepartment(StoreDepartmentRequest $request, Department $department)
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
-        if (!$membership) abort(403);
+        if (! $membership) {
+            abort(403);
+        }
 
         if ($department->organization_id !== $membership->organization_id) {
             abort(403, 'Unauthorized department access.');
         }
 
-        if (!$membership->hasPermission('departments.manage') && $membership->role?->slug !== 'company_admin') {
+        if (! $membership->hasPermission('departments.manage') && $membership->role?->slug !== 'company_admin') {
             abort(403, 'Unauthorized: insufficient permissions.');
         }
 
         $validated = $request->validated();
 
         $department->update(['name' => $validated['name']]);
+
         return back()->with('success', 'Department updated successfully.');
     }
 
     /**
      * Delete Department.
      */
-    public function deleteDepartment(\App\Domains\People\Models\Department $department)
+    public function deleteDepartment(Department $department)
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
-        if (!$membership) abort(403);
+        if (! $membership) {
+            abort(403);
+        }
 
         if ($department->organization_id !== $membership->organization_id) {
             abort(403, 'Unauthorized department access.');
         }
 
-        if (!$membership->hasPermission('departments.manage') && $membership->role?->slug !== 'company_admin') {
+        if (! $membership->hasPermission('departments.manage') && $membership->role?->slug !== 'company_admin') {
             abort(403, 'Unauthorized: insufficient permissions.');
         }
 
         $department->teams()->delete();
         $department->delete();
+
         return back()->with('success', 'Department deleted successfully.');
     }
 
     /**
      * Store new Team in Department.
      */
-    public function storeTeam(\App\Domains\People\Requests\StoreTeamRequest $request)
+    public function storeTeam(StoreTeamRequest $request)
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
-        if (!$membership) abort(403);
+        if (! $membership) {
+            abort(403);
+        }
 
-        if (!$membership->hasPermission('teams.manage') && $membership->role?->slug !== 'company_admin') {
+        if (! $membership->hasPermission('teams.manage') && $membership->role?->slug !== 'company_admin') {
             abort(403, 'Unauthorized: insufficient permissions to manage teams.');
         }
 
         $validated = $request->validated();
 
         // Verify target department belongs to user's organization
-        $department = \App\Domains\People\Models\Department::findOrFail($validated['department_id']);
+        $department = Department::findOrFail($validated['department_id']);
         if ($department->organization_id !== $membership->organization_id) {
             abort(403, 'Unauthorized department access.');
         }
 
-        \App\Domains\People\Models\Team::create([
+        Team::create([
             'organization_id' => $membership->organization_id,
             'department_id' => $department->id,
             'name' => $validated['name'],
@@ -344,32 +350,37 @@ class OrganizationSettingsController extends Controller
     /**
      * Delete Team.
      */
-    public function deleteTeam(\App\Domains\People\Models\Team $team)
+    public function deleteTeam(Team $team)
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
-        if (!$membership) abort(403);
+        if (! $membership) {
+            abort(403);
+        }
 
         if ($team->organization_id !== $membership->organization_id) {
             abort(403, 'Unauthorized team access.');
         }
 
-        if (!$membership->hasPermission('teams.manage') && $membership->role?->slug !== 'company_admin') {
+        if (! $membership->hasPermission('teams.manage') && $membership->role?->slug !== 'company_admin') {
             abort(403, 'Unauthorized: insufficient permissions.');
         }
 
         $team->delete();
+
         return back()->with('success', 'Team deleted successfully.');
     }
 
     /**
      * Assign member to department, team, role, and job title.
      */
-    public function assignMemberDepartment(\App\Domains\People\Requests\AssignMemberDepartmentRequest $request, OrganizationMember $member)
+    public function assignMemberDepartment(AssignMemberDepartmentRequest $request, OrganizationMember $member)
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
-        if (!$membership) abort(403);
+        if (! $membership) {
+            abort(403);
+        }
 
         // Strict tenant boundary verification
         if ($member->organization_id !== $membership->organization_id) {
@@ -377,32 +388,32 @@ class OrganizationSettingsController extends Controller
         }
 
         // Administrative permission required to change members/roles
-        if (!$membership->hasPermission('members.manage') && $membership->role?->slug !== 'company_admin') {
+        if (! $membership->hasPermission('members.manage') && $membership->role?->slug !== 'company_admin') {
             abort(403, 'Unauthorized: insufficient permissions to manage members.');
         }
 
         $validated = $request->validated();
 
         // Verify department belongs to this organization
-        if (!empty($validated['department_id'])) {
-            $dept = \App\Domains\People\Models\Department::findOrFail($validated['department_id']);
+        if (! empty($validated['department_id'])) {
+            $dept = Department::findOrFail($validated['department_id']);
             if ($dept->organization_id !== $membership->organization_id) {
                 abort(403, 'Invalid department selection.');
             }
         }
 
         // Verify team belongs to this organization
-        if (!empty($validated['team_id'])) {
-            $team = \App\Domains\People\Models\Team::findOrFail($validated['team_id']);
+        if (! empty($validated['team_id'])) {
+            $team = Team::findOrFail($validated['team_id']);
             if ($team->organization_id !== $membership->organization_id) {
                 abort(403, 'Invalid team selection.');
             }
         }
 
         // Verify role is global or belongs to this organization
-        if (!empty($validated['role_id'])) {
+        if (! empty($validated['role_id'])) {
             $role = \App\Domains\Administration\Models\Role::findOrFail($validated['role_id']);
-            if ($role->slug === 'super_admin' && !$user->isSuperAdmin()) {
+            if ($role->slug === 'super_admin' && ! $user->isSuperAdmin()) {
                 abort(403, 'Unauthorized: only the System Owner (Super Admin) can assign or create a Super Admin.');
             }
             if ($role->organization_id && $role->organization_id !== $membership->organization_id) {
@@ -411,7 +422,7 @@ class OrganizationSettingsController extends Controller
             $member->update(['role_id' => $role->id]);
         }
 
-        $profile = \App\Domains\People\Models\UserProfile::firstOrNew([
+        $profile = UserProfile::firstOrNew([
             'user_id' => $member->user_id,
             'organization_id' => $member->organization_id,
         ]);
@@ -433,16 +444,19 @@ class OrganizationSettingsController extends Controller
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
-        if (!$membership) abort(403);
+        if (! $membership) {
+            abort(403);
+        }
 
-        if (!$membership->hasPermission('members.manage') && $membership->role?->slug !== 'company_admin') {
+        if (! $membership->hasPermission('members.manage') && $membership->role?->slug !== 'company_admin') {
             abort(403, 'Unauthorized: insufficient permissions to manage members.');
         }
 
         // Strict Plan Seat Limit Enforcement
         if ($membership->organization->hasReachedSeatLimit()) {
             $limit = $membership->organization->plan->seat_limit ?? 5;
-            return back()->with('error', __("You have reached the maximum team member capacity (:limit seats) for your subscription plan. Please upgrade your plan to add more team members.", ['limit' => $limit]));
+
+            return back()->with('error', __('You have reached the maximum team member capacity (:limit seats) for your subscription plan. Please upgrade your plan to add more team members.', ['limit' => $limit]));
         }
 
         $validated = $request->validate([
@@ -461,39 +475,39 @@ class OrganizationSettingsController extends Controller
         ]);
 
         $targetRole = \App\Domains\Administration\Models\Role::findOrFail($validated['role_id']);
-        if ($targetRole->slug === 'super_admin' && !$user->isSuperAdmin()) {
+        if ($targetRole->slug === 'super_admin' && ! $user->isSuperAdmin()) {
             abort(403, 'Unauthorized: only the System Owner (Super Admin) can assign or create a Super Admin.');
         }
 
-        if (!empty($validated['department_id'])) {
-            $dept = \App\Domains\People\Models\Department::findOrFail($validated['department_id']);
+        if (! empty($validated['department_id'])) {
+            $dept = Department::findOrFail($validated['department_id']);
             if ($dept->organization_id !== $membership->organization_id) {
                 abort(403, 'Invalid department selection.');
             }
         }
 
-        if (!empty($validated['team_id'])) {
-            $team = \App\Domains\People\Models\Team::findOrFail($validated['team_id']);
+        if (! empty($validated['team_id'])) {
+            $team = Team::findOrFail($validated['team_id']);
             if ($team->organization_id !== $membership->organization_id) {
                 abort(403, 'Invalid team selection.');
             }
         }
 
         // Find or create User
-        $targetUser = \App\Domains\Identity\Models\User::where('email', $validated['email'])->first();
+        $targetUser = User::where('email', $validated['email'])->first();
         $plainPassword = $validated['password'] ?: 'Password@1234';
-        
-        if (!$targetUser) {
-            $targetUser = \App\Domains\Identity\Models\User::create([
+
+        if (! $targetUser) {
+            $targetUser = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
-                'password' => \Illuminate\Support\Facades\Hash::make($plainPassword),
+                'password' => Hash::make($plainPassword),
                 'email_verified_at' => now(),
             ]);
         } else {
             $targetUser->name = $validated['name'];
-            if (!empty($validated['password'])) {
-                $targetUser->password = \Illuminate\Support\Facades\Hash::make($validated['password']);
+            if (! empty($validated['password'])) {
+                $targetUser->password = Hash::make($validated['password']);
             }
             $targetUser->save();
         }
@@ -520,7 +534,7 @@ class OrganizationSettingsController extends Controller
         }
 
         // Create or update Profile
-        $profile = \App\Domains\People\Models\UserProfile::firstOrNew([
+        $profile = UserProfile::firstOrNew([
             'user_id' => $targetUser->id,
             'organization_id' => $membership->organization_id,
         ]);
@@ -529,7 +543,7 @@ class OrganizationSettingsController extends Controller
         $profile->job_title = $validated['job_title'] ?? null;
         $profile->save();
 
-        \App\Domains\Administration\Models\AuditLog::create([
+        AuditLog::create([
             'organization_id' => $membership->organization_id,
             'user_id' => $user->id,
             'action' => 'member.created',
@@ -555,19 +569,21 @@ class OrganizationSettingsController extends Controller
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
-        if (!$membership) abort(403);
+        if (! $membership) {
+            abort(403);
+        }
 
         if ($member->organization_id !== $membership->organization_id) {
             abort(403, 'Unauthorized member access.');
         }
 
-        if (!$membership->hasPermission('members.manage') && $membership->role?->slug !== 'company_admin') {
+        if (! $membership->hasPermission('members.manage') && $membership->role?->slug !== 'company_admin') {
             abort(403, 'Unauthorized: insufficient permissions to manage members.');
         }
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $member->user_id],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$member->user_id],
             'job_title' => ['nullable', 'string', 'max:255'],
             'department_id' => ['nullable', 'exists:departments,id'],
             'team_id' => ['nullable', 'exists:teams,id'],
@@ -580,19 +596,19 @@ class OrganizationSettingsController extends Controller
         ]);
 
         $targetRole = \App\Domains\Administration\Models\Role::findOrFail($validated['role_id']);
-        if ($targetRole->slug === 'super_admin' && !$user->isSuperAdmin()) {
+        if ($targetRole->slug === 'super_admin' && ! $user->isSuperAdmin()) {
             abort(403, 'Unauthorized: only the System Owner (Super Admin) can assign or create a Super Admin.');
         }
 
-        if (!empty($validated['department_id'])) {
-            $dept = \App\Domains\People\Models\Department::findOrFail($validated['department_id']);
+        if (! empty($validated['department_id'])) {
+            $dept = Department::findOrFail($validated['department_id']);
             if ($dept->organization_id !== $membership->organization_id) {
                 abort(403, 'Invalid department selection.');
             }
         }
 
-        if (!empty($validated['team_id'])) {
-            $team = \App\Domains\People\Models\Team::findOrFail($validated['team_id']);
+        if (! empty($validated['team_id'])) {
+            $team = Team::findOrFail($validated['team_id']);
             if ($team->organization_id !== $membership->organization_id) {
                 abort(403, 'Invalid team selection.');
             }
@@ -612,7 +628,7 @@ class OrganizationSettingsController extends Controller
         $member->offices()->sync($validated['allowed_offices'] ?? []);
         $member->rooms()->sync($validated['allowed_rooms'] ?? []);
 
-        $profile = \App\Domains\People\Models\UserProfile::firstOrNew([
+        $profile = UserProfile::firstOrNew([
             'user_id' => $member->user_id,
             'organization_id' => $member->organization_id,
         ]);
@@ -632,13 +648,15 @@ class OrganizationSettingsController extends Controller
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
-        if (!$membership) abort(403);
+        if (! $membership) {
+            abort(403);
+        }
 
         if ($member->organization_id !== $membership->organization_id) {
             abort(403, 'Unauthorized member access.');
         }
 
-        if (!$membership->hasPermission('members.manage') && $membership->role?->slug !== 'company_admin') {
+        if (! $membership->hasPermission('members.manage') && $membership->role?->slug !== 'company_admin') {
             abort(403, 'Unauthorized: insufficient permissions to manage members.');
         }
 
@@ -647,7 +665,7 @@ class OrganizationSettingsController extends Controller
         ]);
 
         $member->user->update([
-            'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
+            'password' => Hash::make($validated['password']),
         ]);
 
         return back()->with('success', __('Member password has been updated successfully.'));
@@ -660,13 +678,15 @@ class OrganizationSettingsController extends Controller
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
-        if (!$membership) abort(403);
+        if (! $membership) {
+            abort(403);
+        }
 
         if ($member->organization_id !== $membership->organization_id) {
             abort(403, 'Unauthorized member access.');
         }
 
-        if (!$membership->hasPermission('members.manage') && $membership->role?->slug !== 'company_admin') {
+        if (! $membership->hasPermission('members.manage') && $membership->role?->slug !== 'company_admin') {
             abort(403, 'Unauthorized: insufficient permissions to manage members.');
         }
 
@@ -684,27 +704,27 @@ class OrganizationSettingsController extends Controller
     /**
      * Fetch full Team Member Profile Details (Bio, Skills, Contact, Assigned Tasks, Work Time Logs, Allowed Offices & Rooms).
      */
-    public function getMemberProfileDetails(OrganizationMember $member): \Illuminate\Http\JsonResponse
+    public function getMemberProfileDetails(OrganizationMember $member): JsonResponse
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)
             ->whereIn('status', ['active', 'invited'])
             ->first();
 
-        if (!$membership || $member->organization_id !== $membership->organization_id) {
+        if (! $membership || $member->organization_id !== $membership->organization_id) {
             return response()->json(['message' => 'Unauthorized member access.'], 403);
         }
 
         $targetUser = $member->user;
-        $profile = \App\Domains\People\Models\UserProfile::where('user_id', $targetUser->id)
+        $profile = UserProfile::where('user_id', $targetUser->id)
             ->where('organization_id', $member->organization_id)
             ->first();
 
-        $dept = $profile && $profile->department_id ? \App\Domains\People\Models\Department::find($profile->department_id) : null;
-        $team = $profile && $profile->team_id ? \App\Domains\People\Models\Team::find($profile->team_id) : null;
+        $dept = $profile && $profile->department_id ? Department::find($profile->department_id) : null;
+        $team = $profile && $profile->team_id ? Team::find($profile->team_id) : null;
 
         // Fetch tasks assigned to this member in this organization
-        $tasks = \App\Domains\Projects\Models\Task::where('organization_id', $member->organization_id)
+        $tasks = Task::where('organization_id', $member->organization_id)
             ->where('assignee_id', $targetUser->id)
             ->with(['project:id,name,code', 'checklistItems'])
             ->orderBy('due_date')
@@ -727,15 +747,15 @@ class OrganizationSettingsController extends Controller
                     ] : null,
                     'due_date' => $t->due_date ? $t->due_date->format('M d, Y') : null,
                     'is_overdue' => $t->due_date && $t->due_date->isPast() && $t->status !== 'done',
-                    'estimated_hours' => (float)($t->estimated_hours ?? 0),
-                    'actual_hours' => (float)($t->actual_hours ?? 0),
+                    'estimated_hours' => (float) ($t->estimated_hours ?? 0),
+                    'actual_hours' => (float) ($t->actual_hours ?? 0),
                     'checklist_count' => $totalChecklist,
                     'checklist_done' => $doneChecklist,
                 ];
             });
 
         // Fetch time entries logged by this member in this organization
-        $timeEntries = \App\Domains\Projects\Models\TimeEntry::where('organization_id', $member->organization_id)
+        $timeEntries = TimeEntry::where('organization_id', $member->organization_id)
             ->where('user_id', $targetUser->id)
             ->with(['project:id,name,code', 'task:id,task_number,title'])
             ->latest('started_at')
@@ -748,17 +768,17 @@ class OrganizationSettingsController extends Controller
                     'duration_formatted' => $te->formattedDuration(),
                     'description' => $te->description ?? 'General Work Session',
                     'project_name' => $te->project?->name ?? 'General',
-                    'task_title' => $te->task ? ('#' . $te->task->task_number . ' ' . $te->task->title) : '—',
-                    'is_billable' => (bool)$te->is_billable,
+                    'task_title' => $te->task ? ('#'.$te->task->task_number.' '.$te->task->title) : '—',
+                    'is_billable' => (bool) $te->is_billable,
                 ];
             });
 
-        $totalDurationSeconds = \App\Domains\Projects\Models\TimeEntry::where('organization_id', $member->organization_id)
+        $totalDurationSeconds = TimeEntry::where('organization_id', $member->organization_id)
             ->where('user_id', $targetUser->id)
             ->sum('duration_seconds');
         $totalHoursLogged = round($totalDurationSeconds / 3600, 1);
 
-        $activeTimer = \App\Domains\Projects\Models\ActiveTimer::where('user_id', $targetUser->id)
+        $activeTimer = ActiveTimer::where('user_id', $targetUser->id)
             ->with(['project:id,name,code', 'task:id,task_number,title'])
             ->first();
 
@@ -791,7 +811,7 @@ class OrganizationSettingsController extends Controller
                 'skills' => $profile?->skills ? array_filter(array_map('trim', explode(',', $profile->skills))) : [],
                 'hobbies' => $profile?->hobbies ? array_filter(array_map('trim', explode(',', $profile->hobbies))) : [],
                 'notes' => $profile?->notes,
-                'social_links' => (array)($profile?->social_links ?? []),
+                'social_links' => (array) ($profile?->social_links ?? []),
             ],
             'stats' => [
                 'total_tasks' => $tasks->count(),
@@ -803,7 +823,7 @@ class OrganizationSettingsController extends Controller
                     'id' => $activeTimer->id,
                     'started_at' => $activeTimer->started_at->toIso8601String(),
                     'project_name' => $activeTimer->project?->name,
-                    'task_title' => $activeTimer->task ? ('#' . $activeTimer->task->task_number . ' ' . $activeTimer->task->title) : null,
+                    'task_title' => $activeTimer->task ? ('#'.$activeTimer->task->task_number.' '.$activeTimer->task->title) : null,
                 ] : null,
             ],
             'tasks' => $tasks,
@@ -821,13 +841,15 @@ class OrganizationSettingsController extends Controller
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
-        if (!$membership) abort(403);
+        if (! $membership) {
+            abort(403);
+        }
 
-        if (!$membership->hasPermission('audit.view') && !$membership->hasPermission('organizations.manage') && $membership->role?->slug !== 'company_admin') {
+        if (! $membership->hasPermission('audit.view') && ! $membership->hasPermission('organizations.manage') && $membership->role?->slug !== 'company_admin') {
             abort(403, 'Unauthorized: insufficient permissions.');
         }
 
-        \App\Domains\Administration\Models\AuditLog::where('organization_id', $membership->organization_id)->delete();
+        AuditLog::where('organization_id', $membership->organization_id)->delete();
 
         return back()->with('success', __('All audit logs have been cleared successfully.'));
     }
@@ -839,9 +861,11 @@ class OrganizationSettingsController extends Controller
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions', 'organization')->first();
-        if (!$membership) abort(403);
+        if (! $membership) {
+            abort(403);
+        }
 
-        if (!$membership->hasPermission('organizations.manage') && $membership->role?->slug !== 'company_admin') {
+        if (! $membership->hasPermission('organizations.manage') && $membership->role?->slug !== 'company_admin') {
             abort(403, 'Unauthorized: insufficient permissions.');
         }
 
@@ -865,9 +889,9 @@ class OrganizationSettingsController extends Controller
 
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
-            $filename = 'org_logo_' . $organization->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $filename = 'org_logo_'.$organization->id.'_'.time().'.'.$file->getClientOriginalExtension();
             $path = $file->storeAs('logos', $filename, 'public');
-            $organization->logo_url = '/storage/' . $path;
+            $organization->logo_url = '/storage/'.$path;
         }
 
         $organization->save();
@@ -892,7 +916,7 @@ class OrganizationSettingsController extends Controller
             'mail_from_address' => $request->input('mail_from_address'),
             'mail_from_name' => $request->input('mail_from_name'),
         ], function ($val) {
-            return !is_null($val);
+            return ! is_null($val);
         }));
 
         $orgSettings->smtp_settings = $newSmtp;
@@ -905,7 +929,7 @@ class OrganizationSettingsController extends Controller
             'model' => $request->input('openai_model', 'gpt-image-1-mini'),
             'image_size' => $request->input('openai_image_size', '1024x1024'),
             'quality' => $request->input('openai_quality', 'standard'),
-            'is_enabled' => $request->has('openai_is_enabled') || !empty($openAiApiKey),
+            'is_enabled' => $request->has('openai_is_enabled') || ! empty($openAiApiKey),
         ];
         $orgSettings->openai_settings = $newOpenAi;
 
@@ -913,8 +937,8 @@ class OrganizationSettingsController extends Controller
         $currentPolicies = $orgSettings->policies ?? [];
         $currentPolicies['attendance'] = [
             'auto_attendance_enabled' => $request->has('attendance_auto_enabled') || $request->input('attendance_auto_enabled', '1') === '1',
-            'idle_prompt_minutes' => max(1, (int)$request->input('attendance_idle_prompt_minutes', 15)),
-            'idle_response_grace_seconds' => max(30, (int)$request->input('attendance_idle_grace_seconds', 180)),
+            'idle_prompt_minutes' => max(1, (int) $request->input('attendance_idle_prompt_minutes', 15)),
+            'idle_response_grace_seconds' => max(30, (int) $request->input('attendance_idle_grace_seconds', 180)),
             'allow_in_office_task_tracking' => true,
         ];
         $orgSettings->policies = $currentPolicies;
@@ -931,9 +955,11 @@ class OrganizationSettingsController extends Controller
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->first();
-        if (!$membership) abort(403);
+        if (! $membership) {
+            abort(403);
+        }
 
-        if (!$membership->hasPermission('organizations.manage') && $membership->role?->slug !== 'company_admin' && !$user->isSuperAdmin()) {
+        if (! $membership->hasPermission('organizations.manage') && $membership->role?->slug !== 'company_admin' && ! $user->isSuperAdmin()) {
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json(['success' => false, 'message' => __('Unauthorized: insufficient permissions.')], 403);
             }
@@ -951,7 +977,7 @@ class OrganizationSettingsController extends Controller
         }
 
         try {
-            $response = \Illuminate\Support\Facades\Http::withToken($apiKey)
+            $response = Http::withToken($apiKey)
                 ->timeout(15)
                 ->get('https://api.openai.com/v1/models');
 
@@ -960,10 +986,11 @@ class OrganizationSettingsController extends Controller
             } else {
                 $err = $response->json();
                 $errMsg = $err['error']['message'] ?? $response->body();
-                return response()->json(['success' => false, 'message' => 'OpenAI Error: ' . $errMsg], 400);
+
+                return response()->json(['success' => false, 'message' => 'OpenAI Error: '.$errMsg], 400);
             }
         } catch (\Throwable $e) {
-            return response()->json(['success' => false, 'message' => 'Network error connecting to OpenAI: ' . $e->getMessage()], 500);
+            return response()->json(['success' => false, 'message' => 'Network error connecting to OpenAI: '.$e->getMessage()], 500);
         }
     }
 
@@ -973,12 +1000,12 @@ class OrganizationSettingsController extends Controller
     protected function applyOrganizationSmtp($organization): void
     {
         $smtp = $organization->settings?->smtp_settings;
-        if (!empty($smtp['mail_host'])) {
+        if (! empty($smtp['mail_host'])) {
             config([
                 'mail.default' => 'smtp',
                 'mail.mailers.smtp.host' => $smtp['mail_host'],
-                'mail.mailers.smtp.port' => (int)($smtp['mail_port'] ?? 587),
-                'mail.mailers.smtp.encryption' => !empty($smtp['mail_encryption']) && $smtp['mail_encryption'] !== 'none' ? $smtp['mail_encryption'] : null,
+                'mail.mailers.smtp.port' => (int) ($smtp['mail_port'] ?? 587),
+                'mail.mailers.smtp.encryption' => ! empty($smtp['mail_encryption']) && $smtp['mail_encryption'] !== 'none' ? $smtp['mail_encryption'] : null,
                 'mail.mailers.smtp.username' => $smtp['mail_username'] ?? null,
                 'mail.mailers.smtp.password' => $smtp['mail_password'] ?? null,
                 'mail.from.address' => $smtp['mail_from_address'] ?? config('mail.from.address'),
@@ -994,7 +1021,9 @@ class OrganizationSettingsController extends Controller
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->first();
-        if (!$membership) abort(403);
+        if (! $membership) {
+            abort(403);
+        }
         $organization = $membership->organization;
 
         $validated = $request->validate([
@@ -1010,8 +1039,8 @@ class OrganizationSettingsController extends Controller
         config([
             'mail.default' => 'smtp',
             'mail.mailers.smtp.host' => $validated['mail_host'],
-            'mail.mailers.smtp.port' => (int)$validated['mail_port'],
-            'mail.mailers.smtp.encryption' => !empty($validated['mail_encryption']) && $validated['mail_encryption'] !== 'none' ? $validated['mail_encryption'] : null,
+            'mail.mailers.smtp.port' => (int) $validated['mail_port'],
+            'mail.mailers.smtp.encryption' => ! empty($validated['mail_encryption']) && $validated['mail_encryption'] !== 'none' ? $validated['mail_encryption'] : null,
             'mail.mailers.smtp.username' => $validated['mail_username'] ?? null,
             'mail.mailers.smtp.password' => $validated['mail_password'] ?? null,
             'mail.from.address' => $validated['mail_from_address'],
@@ -1019,7 +1048,7 @@ class OrganizationSettingsController extends Controller
         ]);
 
         try {
-            Mail::raw("Hello {$user->name},\n\nThis is a test email confirming that your SMTP settings for {$organization->name} on vMeeting Virtual Workplace are configured and working properly!\n\nDelivered at: " . now(), function ($msg) use ($user, $validated, $organization) {
+            Mail::raw("Hello {$user->name},\n\nThis is a test email confirming that your SMTP settings for {$organization->name} on vMeeting Virtual Workplace are configured and working properly!\n\nDelivered at: ".now(), function ($msg) use ($user, $organization) {
                 $msg->to($user->email)
                     ->subject("✅ [SMTP Test] Successful connection on {$organization->name}");
             });
@@ -1031,7 +1060,7 @@ class OrganizationSettingsController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'message' => __('SMTP Connection Failed: ') . $e->getMessage(),
+                'message' => __('SMTP Connection Failed: ').$e->getMessage(),
             ], 422);
         }
     }

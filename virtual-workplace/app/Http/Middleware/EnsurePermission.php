@@ -16,11 +16,11 @@ class EnsurePermission
     {
         $membership = $request->get('current_membership');
 
-        if (!$membership) {
+        if (! $membership) {
             return response()->json(['message' => 'Organization context not set.'], 403);
         }
 
-        if (!$membership->hasPermission($permission)) {
+        if (! $membership->hasPermission($permission)) {
             return response()->json([
                 'message' => 'You do not have permission to perform this action.',
                 'required_permission' => $permission,

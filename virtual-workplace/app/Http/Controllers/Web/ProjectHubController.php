@@ -148,12 +148,12 @@ class ProjectHubController extends Controller
         $maxSafeYear = now()->year + 2;
 
         $ganttTasks = $tasks->map(function ($t) use ($project, $taskIds, $minSafeYear, $maxSafeYear) {
-            $start = $t->start_date 
-                ? $t->start_date->copy() 
+            $start = $t->start_date
+                ? $t->start_date->copy()
                 : ($t->due_date ? $t->due_date->copy()->subDays(max(1, (int) ceil(($t->estimated_hours ?? 8) / 8))) : ($project->created_at ? $project->created_at->copy() : now()->subDays(3)));
-            
-            $end = $t->due_date 
-                ? $t->due_date->copy() 
+
+            $end = $t->due_date
+                ? $t->due_date->copy()
                 : $start->copy()->addDays(max(2, (int) ceil(($t->estimated_hours ?? 8) / 8)));
 
             // Normalize outlier/faker dates (e.g. 1979 or year 2099)

@@ -13,9 +13,8 @@ class FileUploadService
     /**
      * Ensure a target directory exists with secure permissions (0755).
      *
-     * @param string $path Absolute or relative filesystem directory path
-     * @param int $permissions Default 0755 (never 0777)
-     * @return string
+     * @param  string  $path  Absolute or relative filesystem directory path
+     * @param  int  $permissions  Default 0755 (never 0777)
      */
     public static function ensureDirectory(string $path, int $permissions = 0755): string
     {
@@ -29,10 +28,9 @@ class FileUploadService
     /**
      * Securely store an uploaded file with sanitized name and validated extension.
      *
-     * @param UploadedFile $file
-     * @param string $disk Storage disk ('public', 'local', etc.)
-     * @param string $folder Relative destination folder (e.g. 'project_files/123')
-     * @param array $allowedExtensions Optional whitelist of allowed file extensions
+     * @param  string  $disk  Storage disk ('public', 'local', etc.)
+     * @param  string  $folder  Relative destination folder (e.g. 'project_files/123')
+     * @param  array  $allowedExtensions  Optional whitelist of allowed file extensions
      * @return array Metadata about the uploaded file
      */
     public static function store(
@@ -84,10 +82,6 @@ class FileUploadService
 
     /**
      * Safely delete a file from storage.
-     *
-     * @param string|null $path
-     * @param string $disk
-     * @return bool
      */
     public static function delete(?string $path, string $disk = 'public'): bool
     {

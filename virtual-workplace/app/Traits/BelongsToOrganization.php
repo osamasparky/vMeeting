@@ -3,8 +3,8 @@
 namespace App\Traits;
 
 use App\Domains\Tenancy\Models\Organization;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Trait BelongsToOrganization

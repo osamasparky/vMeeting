@@ -1,14 +1,16 @@
 <?php
+
 require 'vendor/autoload.php';
 $app = require_once 'bootstrap/app.php';
-$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+$app->make(Kernel::class)->bootstrap();
 
+use App\Domains\Workspace\Models\FurnitureItem;
 use App\Domains\Workspace\Models\Map;
 use App\Domains\Workspace\Models\MapObject;
-use App\Domains\Workspace\Models\FurnitureItem;
+use Illuminate\Contracts\Console\Kernel;
 
 $map = Map::with(['rooms', 'objects'])->first();
-if (!$map) {
+if (! $map) {
     echo "No map found.\n";
     exit(0);
 }
@@ -34,7 +36,7 @@ $newObjects = [
         'position' => ['x' => 4, 'y' => 11, 'rotation' => 0],
         'size' => ['width' => 4, 'height' => 2],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/meeting/table_meeting_01.png']
+        'interaction_config' => ['image_url' => '/assets/meeting/table_meeting_01.png'],
     ],
     [
         'type' => 'FUR-CHR-OFF-001',
@@ -42,7 +44,7 @@ $newObjects = [
         'position' => ['x' => 4, 'y' => 10, 'rotation' => 180],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => false,
-        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png'],
     ],
     [
         'type' => 'FUR-CHR-OFF-001',
@@ -50,7 +52,7 @@ $newObjects = [
         'position' => ['x' => 6, 'y' => 10, 'rotation' => 180],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => false,
-        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png'],
     ],
     [
         'type' => 'FUR-CHR-OFF-001',
@@ -58,7 +60,7 @@ $newObjects = [
         'position' => ['x' => 4, 'y' => 13, 'rotation' => 0],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => false,
-        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png'],
     ],
     [
         'type' => 'FUR-CHR-OFF-001',
@@ -66,7 +68,7 @@ $newObjects = [
         'position' => ['x' => 6, 'y' => 13, 'rotation' => 0],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => false,
-        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_01.png'],
     ],
     [
         'type' => 'DEC-PLANT-IND-001',
@@ -74,7 +76,7 @@ $newObjects = [
         'position' => ['x' => 2, 'y' => 14, 'rotation' => 0],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/decor/plants/plant_indoor_01.png']
+        'interaction_config' => ['image_url' => '/assets/decor/plants/plant_indoor_01.png'],
     ],
 
     // ── Reception Room (Top) ──
@@ -84,7 +86,7 @@ $newObjects = [
         'position' => ['x' => 12, 'y' => 5, 'rotation' => 0],
         'size' => ['width' => 4, 'height' => 1],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/furniture/reception/reception_counter_01.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/reception/reception_counter_01.png'],
     ],
     [
         'type' => 'FUR-LOUNG-SOF-001',
@@ -92,7 +94,7 @@ $newObjects = [
         'position' => ['x' => 9, 'y' => 6, 'rotation' => 90],
         'size' => ['width' => 2, 'height' => 1],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/furniture/lounge/lounge_01.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/lounge/lounge_01.png'],
     ],
 
     // ── Design Studio ──
@@ -102,7 +104,7 @@ $newObjects = [
         'position' => ['x' => 18, 'y' => 11, 'rotation' => 0],
         'size' => ['width' => 3, 'height' => 2],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/furniture/desks/desk_employee_modern_03.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/desks/desk_employee_modern_03.png'],
     ],
     [
         'type' => 'TEC-OFF-EQP-001',
@@ -110,7 +112,7 @@ $newObjects = [
         'position' => ['x' => 19, 'y' => 11, 'rotation' => 0],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => false,
-        'interaction_config' => ['image_url' => '/assets/technology/tech_dual_monitor_01.png']
+        'interaction_config' => ['image_url' => '/assets/technology/tech_dual_monitor_01.png'],
     ],
     [
         'type' => 'DEC-PLANT-IND-003',
@@ -118,7 +120,7 @@ $newObjects = [
         'position' => ['x' => 22, 'y' => 14, 'rotation' => 0],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/decor/plants/plant_indoor_03.png']
+        'interaction_config' => ['image_url' => '/assets/decor/plants/plant_indoor_03.png'],
     ],
 
     // ── Executive Office ──
@@ -128,7 +130,7 @@ $newObjects = [
         'position' => ['x' => 18, 'y' => 18, 'rotation' => 0],
         'size' => ['width' => 4, 'height' => 2],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/furniture/desks/desk_manager_executive_01.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/desks/desk_manager_executive_01.png'],
     ],
     [
         'type' => 'FUR-CHR-OFF-004',
@@ -136,7 +138,7 @@ $newObjects = [
         'position' => ['x' => 19, 'y' => 17, 'rotation' => 180],
         'size' => ['width' => 1, 'height' => 1],
         'collision' => false,
-        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_04.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/chairs/chair_office_04.png'],
     ],
     [
         'type' => 'FUR-STOR-OFF-001',
@@ -144,7 +146,7 @@ $newObjects = [
         'position' => ['x' => 16, 'y' => 17, 'rotation' => 90],
         'size' => ['width' => 1, 'height' => 3],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/furniture/storage/storage_cabinet_01.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/storage/storage_cabinet_01.png'],
     ],
 
     // ── Lower Lounge / Breakroom ──
@@ -154,7 +156,7 @@ $newObjects = [
         'position' => ['x' => 4, 'y' => 18, 'rotation' => 0],
         'size' => ['width' => 3, 'height' => 2],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/furniture/lounge/lounge_03.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/lounge/lounge_03.png'],
     ],
     [
         'type' => 'FUR-TBL-COF-001',
@@ -162,7 +164,7 @@ $newObjects = [
         'position' => ['x' => 5, 'y' => 20, 'rotation' => 0],
         'size' => ['width' => 2, 'height' => 1],
         'collision' => true,
-        'interaction_config' => ['image_url' => '/assets/furniture/tables/table_side_01.png']
+        'interaction_config' => ['image_url' => '/assets/furniture/tables/table_side_01.png'],
     ],
 ];
 
@@ -175,8 +177,8 @@ foreach ($newObjects as $obj) {
         'position' => $obj['position'],
         'size' => $obj['size'],
         'collision' => $obj['collision'],
-        'interaction_config' => $obj['interaction_config']
+        'interaction_config' => $obj['interaction_config'],
     ]);
 }
 
-echo "Successfully placed " . count($newObjects) . " clean 3D top-down objects on map!\n";
+echo 'Successfully placed '.count($newObjects)." clean 3D top-down objects on map!\n";

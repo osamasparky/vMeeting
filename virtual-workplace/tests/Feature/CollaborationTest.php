@@ -2,14 +2,19 @@
 
 namespace Tests\Feature;
 
-use App\Domains\Chat\Models\Channel;
+use App\Domains\Administration\Models\Role;
+use App\Domains\Guests\Models\GuestInvitation;
 use App\Domains\Identity\Models\User;
 use App\Domains\Tenancy\Actions\CreateOrganizationAction;
 use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Workspace\Models\Floor;
 use App\Domains\Workspace\Models\Map;
 use App\Domains\Workspace\Models\Room;
+use Database\Seeders\PlansSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -18,16 +23,19 @@ class CollaborationTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
+
     protected User $colleague;
+
     protected Organization $organization;
+
     protected Room $room;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\PlansSeeder::class);
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(PlansSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->user = User::factory()->create(['email' => 'founder@acme.test']);
         $this->colleague = User::factory()->create(['email' => 'engineer@acme.test']);
@@ -36,7 +44,7 @@ class CollaborationTest extends TestCase
         $this->organization = $createOrg->execute(['name' => 'Acme Collaboration'], $this->user);
 
         // Add colleague as active member
-        $memberRole = \App\Domains\Administration\Models\Role::where('name', 'Employee')->first();
+        $memberRole = Role::where('name', 'Employee')->first();
         $this->organization->members()->create([
             'user_id' => $this->colleague->id,
             'role_id' => $memberRole->id,
@@ -170,7 +178,7 @@ class CollaborationTest extends TestCase
             ->assertJsonStructure(['token', 'ws_url']);
 
         // 2. Create Guest Invitation
-        $invite = \App\Domains\Guests\Models\GuestInvitation::create([
+        $invite = GuestInvitation::create([
             'organization_id' => $this->organization->id,
             'room_id' => $this->room->id,
             'invited_by' => $this->user->id,
@@ -194,9 +202,9 @@ class CollaborationTest extends TestCase
     public function test_can_upload_and_list_session_recordings(): void
     {
         Sanctum::actingAs($this->user);
-        \Illuminate\Support\Facades\Storage::fake('public');
+        Storage::fake('public');
 
-        $fakeVideo = \Illuminate\Http\UploadedFile::fake()->create('session_test.webm', 1024, 'video/webm');
+        $fakeVideo = UploadedFile::fake()->create('session_test.webm', 1024, 'video/webm');
 
         // 1. Upload Recording
         $uploadResp = $this->postJson("/api/v1/organizations/{$this->organization->id}/recordings", [
@@ -271,4 +279,3 @@ class CollaborationTest extends TestCase
             ]);
     }
 }
-

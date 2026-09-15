@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Web;
 use App\Domains\Guests\Models\GuestInvitation;
 use App\Domains\Identity\Services\RealtimeTokenService;
 use App\Domains\Tenancy\Models\OrganizationMember;
+use App\Domains\Tenancy\Models\OrganizationSetting;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -116,8 +117,8 @@ class GuestAccessController extends Controller
             ]);
         }
 
-        $attendancePolicy = optional($organization->settings)->getAttendancePolicy() 
-            ?? \App\Domains\Tenancy\Models\OrganizationSetting::getAttendancePolicy();
+        $attendancePolicy = optional($organization->settings)->getAttendancePolicy()
+            ?? OrganizationSetting::getAttendancePolicy();
 
         return view('office', compact('user', 'invitation', 'organization', 'floor', 'map', 'room', 'allOffices', 'userAllowedOffices', 'userAllowedRoomIds', 'realtimeToken', 'wsUrl', 'initialSpawn', 'branchWarning', 'isDifferentBranch', 'orgDefaultFloor', 'attendancePolicy'));
     }

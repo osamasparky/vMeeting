@@ -6,11 +6,13 @@ use App\Domains\Identity\Models\User;
 use App\Domains\Meetings\Services\LiveKitTokenService;
 use App\Domains\People\Models\AttendanceSession;
 use App\Domains\People\Services\AttendanceService;
+use App\Domains\Tenancy\Actions\CreateOrganizationAction;
 use App\Domains\Tenancy\Models\Organization;
-use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Domains\Workspace\Models\Floor;
 use App\Domains\Workspace\Models\Map;
 use App\Domains\Workspace\Models\Room;
+use Database\Seeders\PlansSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -19,16 +21,18 @@ class AttendanceAndLiveKitSecurityTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
+
     protected Organization $organization;
+
     protected Room $room;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\PlansSeeder::class);
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(PlansSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
-        $action = app(\App\Domains\Tenancy\Actions\CreateOrganizationAction::class);
+        $action = app(CreateOrganizationAction::class);
 
         $this->user = User::factory()->create([
             'email' => 'member@example.com',

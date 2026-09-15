@@ -3,14 +3,13 @@
 namespace Tests\Feature\Projects;
 
 use App\Domains\Identity\Models\User;
-use App\Domains\Projects\Models\CustomFieldDefinition;
 use App\Domains\Projects\Models\Project;
-use App\Domains\Projects\Models\ProjectDocument;
-use App\Domains\Projects\Models\ProjectGoal;
-use App\Domains\Projects\Models\ProjectSprint;
 use App\Domains\Projects\Models\Task;
+use App\Domains\Tenancy\Actions\CreateOrganizationAction;
 use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Tenancy\Models\OrganizationMember;
+use Database\Seeders\PlansSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -19,18 +18,20 @@ class ClickUpAdvancedFeaturesTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
+
     protected Organization $org;
+
     protected Project $project;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\PlansSeeder::class);
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(PlansSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->user = User::factory()->create(['email' => 'clickup-admin@acme.com']);
-        $action = app(\App\Domains\Tenancy\Actions\CreateOrganizationAction::class);
+        $action = app(CreateOrganizationAction::class);
         $this->org = $action->execute(['name' => 'Acme ClickUp Org'], $this->user);
 
         $member = OrganizationMember::where('organization_id', $this->org->id)

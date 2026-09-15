@@ -12,12 +12,12 @@ class ProcessRecurringTaskAction
      */
     public function execute(Task $task): ?Task
     {
-        if (!$task->isRecurring()) {
+        if (! $task->isRecurring()) {
             return null;
         }
 
         $nextDueDate = $task->calculateNextDueDate();
-        if (!$nextDueDate) {
+        if (! $nextDueDate) {
             return null;
         }
 
@@ -33,37 +33,37 @@ class ProcessRecurringTaskAction
             $nextOrder = Task::where('project_id', $task->project_id)->max('order') + 1;
 
             $newTask = Task::create([
-                'organization_id'     => $task->organization_id,
-                'project_id'          => $task->project_id,
-                'phase_id'            => $task->phase_id,
-                'milestone_id'        => $task->milestone_id,
-                'parent_task_id'      => $task->parent_task_id,
-                'title'               => $task->title,
-                'description'         => $task->description,
-                'task_number'         => $nextNumber,
-                'task_type'           => $task->task_type,
-                'status'              => Task::STATUS_READY,
-                'priority'            => $task->priority,
-                'assignee_id'         => $task->assignee_id,
-                'reporter_id'         => $task->reporter_id,
-                'team_id'             => $task->team_id,
-                'start_date'          => $nextStartDate,
-                'due_date'            => $nextDueDate,
-                'estimated_hours'     => $task->estimated_hours,
-                'is_billable'         => $task->is_billable,
-                'order'               => $nextOrder,
-                'recurrence_rule'     => $task->recurrence_rule,
+                'organization_id' => $task->organization_id,
+                'project_id' => $task->project_id,
+                'phase_id' => $task->phase_id,
+                'milestone_id' => $task->milestone_id,
+                'parent_task_id' => $task->parent_task_id,
+                'title' => $task->title,
+                'description' => $task->description,
+                'task_number' => $nextNumber,
+                'task_type' => $task->task_type,
+                'status' => Task::STATUS_READY,
+                'priority' => $task->priority,
+                'assignee_id' => $task->assignee_id,
+                'reporter_id' => $task->reporter_id,
+                'team_id' => $task->team_id,
+                'start_date' => $nextStartDate,
+                'due_date' => $nextDueDate,
+                'estimated_hours' => $task->estimated_hours,
+                'is_billable' => $task->is_billable,
+                'order' => $nextOrder,
+                'recurrence_rule' => $task->recurrence_rule,
                 'recurrence_interval' => $task->recurrence_interval,
-                'recurrence_ends_at'  => $task->recurrence_ends_at,
+                'recurrence_ends_at' => $task->recurrence_ends_at,
             ]);
 
             // Duplicate checklist items uncompleted
             foreach ($task->checklistItems as $item) {
                 $newTask->checklistItems()->create([
                     'organization_id' => $task->organization_id,
-                    'title'           => $item->title,
-                    'is_completed'    => false,
-                    'order'           => $item->order ?? 0,
+                    'title' => $item->title,
+                    'is_completed' => false,
+                    'order' => $item->order ?? 0,
                 ]);
             }
 

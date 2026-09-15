@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Domains\CMS\Models\CmsMediaAsset;
 use App\Domains\CMS\Models\CmsPage;
 use App\Domains\CMS\Models\CmsSection;
 use App\Domains\CMS\Models\CmsThemeSetting;
 use App\Domains\CMS\Models\FeatureFlag;
-use App\Domains\CMS\Models\CmsMediaAsset;
 use Illuminate\Database\Seeder;
 
 class CmsDatabaseSeeder extends Seeder
@@ -184,8 +184,8 @@ class CmsDatabaseSeeder extends Seeder
                             'desc_ar' => 'كبائن فردية معزولة مع تفعيل وضع عدم الإزعاج لإنجاز المهام بتركيز.',
                             'icon' => '🎧',
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'section_type' => 'spatial_presence',
@@ -220,8 +220,8 @@ class CmsDatabaseSeeder extends Seeder
                             'desc_en' => 'Lock private rooms with one click. Team members knock on the door and request access before joining.',
                             'desc_ar' => 'قفل الغرف الخاصة وإمكانية طرق الباب لطلب الإذن من المتواجدين بالداخل قبل الانضمام.',
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'section_type' => 'meetings',
@@ -238,8 +238,8 @@ class CmsDatabaseSeeder extends Seeder
                         ['value' => '4K / 60fps', 'label_en' => 'Ultra HD Screen Sharing', 'label_ar' => 'مشاركة شاشة بدقة فائقة'],
                         ['value' => '< 50ms', 'label_en' => 'Ultra-Low Latency', 'label_ar' => 'استجابة صوتية ومرئية فورية'],
                         ['value' => '100%', 'label_en' => 'STUN / TURN Traversal', 'label_ar' => 'تخطي الجدران النارية واستقرار تام'],
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'section_type' => 'floorplan_editor',
@@ -257,8 +257,8 @@ class CmsDatabaseSeeder extends Seeder
                         'Draw custom polygon & rectangular sound isolation boxes',
                         'Set spawn points, desk tags, and room occupancy limits',
                         'Instant live map synchronization via WebSockets without page reload',
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'section_type' => 'ai_generator',
@@ -275,7 +275,7 @@ class CmsDatabaseSeeder extends Seeder
                     'prompt_example_ar' => 'مكتب شركة تقنية حديث لـ 25 موظفاً مع غرفتي اجتماعات، 4 كبائن تركيز، مساحة استراحة مفتوحة وركن قهوة.',
                     'cost_badge' => '~$0.015 per generated floorplan',
                     'cost_badge_ar' => 'تكلفة تقارب 0.015$ فقط لكل مخطط مولد',
-                ]
+                ],
             ],
             [
                 'section_type' => 'collaboration',
@@ -317,8 +317,8 @@ class CmsDatabaseSeeder extends Seeder
                             'desc_ar' => 'مستودع مركزي لمشاركة ملفات وأدلة وتصاميم المشروعات.',
                             'icon' => '📁',
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'section_type' => 'company_workspace',
@@ -335,8 +335,8 @@ class CmsDatabaseSeeder extends Seeder
                         ['title_en' => 'Custom Branding & Logo', 'title_ar' => 'الهوية والشعار الخاص', 'desc_en' => 'Your company logo and colors throughout the dashboard and office.', 'desc_ar' => 'ظهور شعار وهوية شركتك في كامل لوحة التحكم والمكتب.'],
                         ['title_en' => 'Dedicated SMTP Server', 'title_ar' => 'خادم بريد SMTP مخصص', 'desc_en' => 'Send meeting invites and alerts from your own company email domain.', 'desc_ar' => 'إرسال دعوات الاجتماعات والتنبيهات ببريد وهوية شركتك الخاصة.'],
                         ['title_en' => 'Role-Based Permissions (RBAC)', 'title_ar' => 'نظام الصلاحيات والأدوار', 'desc_en' => 'Granular permissions for Owners, Admins, Managers, and Members.', 'desc_ar' => 'تحكم دقيق بصلاحيات المالك، المشرف، المدير، والموظفين.'],
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'section_type' => 'pricing',
@@ -353,7 +353,7 @@ class CmsDatabaseSeeder extends Seeder
                     'default_currency' => 'SAR',
                     'billing_periods' => ['monthly', 'annual'],
                     'annual_discount_percentage' => 20,
-                ]
+                ],
             ],
             [
                 'section_type' => 'testimonials',
@@ -394,8 +394,8 @@ class CmsDatabaseSeeder extends Seeder
                             'avatar' => '👩‍💻',
                             'company' => 'ScaleUp MENA',
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'section_type' => 'faq',
@@ -433,8 +433,8 @@ class CmsDatabaseSeeder extends Seeder
                             'answer_en' => 'Yes! The built-in spatial editor lets you draw private sound isolation zones, assign desk labels, set door knock permissions, and upload custom office floorplans.',
                             'answer_ar' => 'بالتأكيد! يتيح لك المحرر المكاني رسم وتعديل مناطق العزل الصوتي وتحديد مقاعد الموظفين وقفل الغرف بكل سهولة.',
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'section_type' => 'cta',
@@ -452,8 +452,8 @@ class CmsDatabaseSeeder extends Seeder
                     'btn_link' => '/register',
                     'note_en' => '⚡ Instant setup • No credit card required • Free forever tier available',
                     'note_ar' => '⚡ تفعيل فوري • بدون بطاقة ائتمان • باقة مجانية متوفرة دائماً',
-                ]
-            ]
+                ],
+            ],
         ];
 
         foreach ($sections as $s) {

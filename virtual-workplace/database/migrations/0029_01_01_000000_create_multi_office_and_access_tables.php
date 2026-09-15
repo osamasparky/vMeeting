@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // 1. Add max_offices to plans table if not exists
-        if (!Schema::hasColumn('plans', 'max_offices')) {
+        if (! Schema::hasColumn('plans', 'max_offices')) {
             Schema::table('plans', function (Blueprint $table) {
                 $table->integer('max_offices')->default(1)->after('seat_limit');
             });
@@ -20,19 +20,19 @@ return new class extends Migration
 
         // 2. Add extra branch details to floors table
         Schema::table('floors', function (Blueprint $table) {
-            if (!Schema::hasColumn('floors', 'city_location')) {
+            if (! Schema::hasColumn('floors', 'city_location')) {
                 $table->string('city_location')->nullable()->after('name');
             }
-            if (!Schema::hasColumn('floors', 'description')) {
+            if (! Schema::hasColumn('floors', 'description')) {
                 $table->text('description')->nullable()->after('city_location');
             }
-            if (!Schema::hasColumn('floors', 'is_default')) {
+            if (! Schema::hasColumn('floors', 'is_default')) {
                 $table->boolean('is_default')->default(false)->after('description');
             }
         });
 
         // 3. Member Office Access (which branches a user can enter)
-        if (!Schema::hasTable('member_office_access')) {
+        if (! Schema::hasTable('member_office_access')) {
             Schema::create('member_office_access', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('organization_member_id')->constrained('organization_members')->onDelete('cascade');
@@ -45,7 +45,7 @@ return new class extends Migration
         }
 
         // 4. Member Room Access (which specific rooms a user can enter)
-        if (!Schema::hasTable('member_room_access')) {
+        if (! Schema::hasTable('member_room_access')) {
             Schema::create('member_room_access', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('organization_member_id')->constrained('organization_members')->onDelete('cascade');

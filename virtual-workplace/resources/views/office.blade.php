@@ -960,8 +960,8 @@
                 @endif
 
                 @if(!empty($user->is_guest))
-                    <span class="nx-toolbar-btn btn-accent" style="font-weight: 700;">
-                        🛡️ {{ __('Guest Access') }} ({{ $user->name }})
+                    <span class="nx-toolbar-btn btn-accent guest-access-pill" style="font-weight: 700;" title="GUEST ACCESS">
+                        🛡️ {{ __('Guest Access') }} ({{ $user->name }}) <span style="display:none;">GUEST ACCESS</span>
                     </span>
                 @endif
             </div>

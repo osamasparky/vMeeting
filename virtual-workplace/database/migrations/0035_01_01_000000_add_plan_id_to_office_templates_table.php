@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('office_templates', function (Blueprint $table) {
-            if (!Schema::hasColumn('office_templates', 'plan_id')) {
+            if (! Schema::hasColumn('office_templates', 'plan_id')) {
                 $table->foreignId('plan_id')->nullable()->after('slug')->constrained('plans')->nullOnDelete();
             }
-            if (!Schema::hasColumn('office_templates', 'plan_slug')) {
+            if (! Schema::hasColumn('office_templates', 'plan_slug')) {
                 $table->string('plan_slug')->nullable()->after('plan_id')->index();
             }
         });

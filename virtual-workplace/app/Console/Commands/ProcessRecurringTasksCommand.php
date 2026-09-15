@@ -9,6 +9,7 @@ use Illuminate\Console\Command;
 class ProcessRecurringTasksCommand extends Command
 {
     protected $signature = 'tasks:process-recurring';
+
     protected $description = 'Process and spawn overdue completed or scheduled recurring tasks';
 
     public function handle(ProcessRecurringTaskAction $action): int
@@ -30,6 +31,7 @@ class ProcessRecurringTasksCommand extends Command
         }
 
         $this->info("Successfully processed {$count} recurring task(s).");
+
         return self::SUCCESS;
     }
 }

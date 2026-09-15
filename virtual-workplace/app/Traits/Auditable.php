@@ -33,7 +33,7 @@ trait Auditable
     protected static function logAudit($model, string $action, array $metadata = []): void
     {
         // Skip if no authenticated user (e.g., during seeding)
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return;
         }
 

@@ -9,6 +9,8 @@ use App\Domains\Projects\Models\Task;
 use App\Domains\Tenancy\Actions\CreateOrganizationAction;
 use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Tenancy\Models\OrganizationMember;
+use Database\Seeders\PlansSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -18,17 +20,21 @@ class ProjectAndTaskApiTest extends TestCase
     use RefreshDatabase;
 
     protected User $adminA;
+
     protected User $employeeA;
+
     protected User $adminB;
+
     protected Organization $orgA;
+
     protected Organization $orgB;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\PlansSeeder::class);
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(PlansSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $action = app(CreateOrganizationAction::class);
 

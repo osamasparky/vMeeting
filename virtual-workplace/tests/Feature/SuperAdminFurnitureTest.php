@@ -4,10 +4,11 @@ namespace Tests\Feature;
 
 use App\Domains\Identity\Models\User;
 use App\Domains\Workspace\Models\FurnitureCategory;
-use App\Domains\Workspace\Models\FurnitureItem;
+use Database\Seeders\FurnitureSeeder;
+use Database\Seeders\PlansSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class SuperAdminFurnitureTest extends TestCase
@@ -15,14 +16,15 @@ class SuperAdminFurnitureTest extends TestCase
     use RefreshDatabase;
 
     protected User $superAdmin;
+
     protected User $regularUser;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\PlansSeeder::class);
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
-        $this->seed(\Database\Seeders\FurnitureSeeder::class);
+        $this->seed(PlansSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
+        $this->seed(FurnitureSeeder::class);
 
         $this->superAdmin = User::factory()->create([
             'email' => 'info@meemdtt.com',

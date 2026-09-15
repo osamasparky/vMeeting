@@ -7,6 +7,7 @@ use App\Domains\People\Models\Team;
 use App\Traits\Auditable;
 use App\Traits\BelongsToOrganization;
 use App\Traits\HasUuid;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -61,9 +62,13 @@ class Task extends Model
 
     // Recurrence rules
     public const RECURRENCE_DAILY = 'daily';
+
     public const RECURRENCE_WEEKLY = 'weekly';
+
     public const RECURRENCE_BIWEEKLY = 'biweekly';
+
     public const RECURRENCE_MONTHLY = 'monthly';
+
     public const RECURRENCE_QUARTERLY = 'quarterly';
 
     public const RECURRENCE_RULES = [
@@ -123,12 +128,12 @@ class Task extends Model
 
     public function isRecurring(): bool
     {
-        return !empty($this->recurrence_rule);
+        return ! empty($this->recurrence_rule);
     }
 
-    public function calculateNextDueDate(): ?\Carbon\Carbon
+    public function calculateNextDueDate(): ?Carbon
     {
-        if (!$this->isRecurring()) {
+        if (! $this->isRecurring()) {
             return null;
         }
 

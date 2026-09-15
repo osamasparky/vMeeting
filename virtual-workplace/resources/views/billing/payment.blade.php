@@ -174,7 +174,7 @@
                 @if(!empty($paymentSettings['instapay_handle']) || !empty($paymentSettings['stc_pay_phone']) || !empty($paymentSettings['vodafone_cash_phone']))
                     <div style="margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--border-color);">
                         <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
-                            <span>📱</span> {{ __'Instant Payment & Digital Wallets') }}
+                            <span>📱</span> {{ __('Instant Payment & Digital Wallets') }}
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
                             @if(!empty($paymentSettings['instapay_handle']))

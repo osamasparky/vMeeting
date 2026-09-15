@@ -3,11 +3,11 @@
 namespace Tests\Feature;
 
 use App\Domains\Administration\Jobs\RecordAuditLogJob;
-use App\Domains\Administration\Models\AuditLog;
 use App\Domains\Identity\Models\User;
 use App\Domains\Tenancy\Actions\CreateOrganizationAction;
+use Database\Seeders\PlansSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class AuditLogJobTest extends TestCase
@@ -17,8 +17,8 @@ class AuditLogJobTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\PlansSeeder::class);
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(PlansSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
     }
 
     public function test_audit_log_job_dispatches_and_records_entry(): void

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'is_super_admin')) {
+            if (! Schema::hasColumn('users', 'is_super_admin')) {
                 $table->boolean('is_super_admin')->default(false)->after('avatar_url');
             }
         });

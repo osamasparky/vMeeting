@@ -16,11 +16,11 @@ class SuperAdminMiddleware
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login');
         }
 
-        if (!$user->isSuperAdmin()) {
+        if (! $user->isSuperAdmin()) {
             return redirect()->route('dashboard')->with('error', 'Unauthorized access to Super Admin portal.');
         }
 

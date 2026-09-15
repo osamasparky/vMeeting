@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Web;
 
 use App\Domains\Administration\Models\AuditLog;
 use App\Domains\Identity\Models\User;
+use App\Domains\People\Models\AttendanceSession;
 use App\Domains\People\Services\AttendanceService;
 use App\Domains\Projects\Actions\StartTimerAction;
 use App\Domains\Projects\Actions\StopTimerAction;
@@ -333,7 +334,7 @@ class AttendanceController extends Controller
                 $activeTimerData = [
                     'id' => $activeTimer->id,
                     'project_name' => $activeTimer->project?->name ?? 'General Work',
-                    'task_title' => $activeTimer->task ? ('#' . $activeTimer->task->task_number . ' ' . $activeTimer->task->title) : 'Focused Work Session',
+                    'task_title' => $activeTimer->task ? ('#'.$activeTimer->task->task_number.' '.$activeTimer->task->title) : 'Focused Work Session',
                     'task_number' => $activeTimer->task?->task_number ?? '',
                     'started_at' => $activeTimer->started_at?->toIso8601String(),
                     'duration_seconds' => $activeTimer->elapsedSeconds(),
@@ -441,7 +442,7 @@ class AttendanceController extends Controller
             ->get();
 
         // 2. Active office sessions right now
-        $activeSessions = \App\Domains\People\Models\AttendanceSession::where('organization_id', $organization->id)
+        $activeSessions = AttendanceSession::where('organization_id', $organization->id)
             ->where('status', 'active')
             ->whereNull('ended_at')
             ->with(['room', 'room.floor', 'room.map'])
@@ -449,7 +450,7 @@ class AttendanceController extends Controller
             ->keyBy('user_id');
 
         // 3. All today's attendance sessions for sum
-        $todaySessions = \App\Domains\People\Models\AttendanceSession::where('organization_id', $organization->id)
+        $todaySessions = AttendanceSession::where('organization_id', $organization->id)
             ->whereBetween('started_at', [$startOfDay, $endOfDay])
             ->get()
             ->groupBy('user_id');
@@ -471,7 +472,9 @@ class AttendanceController extends Controller
 
         $roster = $members->map(function ($m) use ($activeSessions, $todaySessions, $todayTaskEntries, $activeTimers) {
             $u = $m->user;
-            if (!$u) return null;
+            if (! $u) {
+                return null;
+            }
 
             $activeSession = $activeSessions->get($u->id);
             $isOnline = (bool) $activeSession;
@@ -484,14 +487,16 @@ class AttendanceController extends Controller
                 if ($s->isActive()) {
                     return max($s->duration_seconds ?? 0, now()->diffInSeconds($s->started_at));
                 }
+
                 return $s->duration_seconds ?? 0;
             });
 
             // Calculate total task seconds today
             $totalTaskSec = $userTodayTasks->sum(function ($te) {
-                if (!$te->ended_at && $te->started_at) {
+                if (! $te->ended_at && $te->started_at) {
                     return max(0, now()->diffInSeconds($te->started_at));
                 }
+
                 return $te->duration_seconds ?? 0;
             });
 

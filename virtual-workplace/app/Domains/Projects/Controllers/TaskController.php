@@ -296,10 +296,10 @@ class TaskController extends Controller
     public function bulkUpdate(Request $request, Organization $organization): JsonResponse
     {
         $validated = $request->validate([
-            'task_ids'    => ['required', 'array', 'min:1', 'max:100'],
-            'task_ids.*'  => ['required', 'string'],
-            'action'      => ['required', 'string', 'in:update_status,assign,delete'],
-            'status'      => ['required_if:action,update_status', 'string', 'in:backlog,ready,in_progress,review,qa,done'],
+            'task_ids' => ['required', 'array', 'min:1', 'max:100'],
+            'task_ids.*' => ['required', 'string'],
+            'action' => ['required', 'string', 'in:update_status,assign,delete'],
+            'status' => ['required_if:action,update_status', 'string', 'in:backlog,ready,in_progress,review,qa,done'],
             'assignee_id' => ['required_if:action,assign', 'nullable', 'string'],
         ]);
 
@@ -334,7 +334,7 @@ class TaskController extends Controller
         }
 
         return response()->json([
-            'message'  => "Bulk {$action} applied to {$affected} task(s).",
+            'message' => "Bulk {$action} applied to {$affected} task(s).",
             'affected' => $affected,
         ]);
     }

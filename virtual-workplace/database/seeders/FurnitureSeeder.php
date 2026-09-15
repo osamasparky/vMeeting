@@ -126,7 +126,7 @@ class FurnitureSeeder extends Seeder
                     $meta = $categoryMeta[$catSlug] ?? [
                         'name' => ucwords(str_replace('_', ' ', $catSlug)),
                         'icon' => '🪑',
-                        'order' => 20
+                        'order' => 20,
                     ];
 
                     $category = FurnitureCategory::firstOrCreate(
@@ -136,7 +136,7 @@ class FurnitureSeeder extends Seeder
                     $category->update([
                         'name' => $meta['name'],
                         'icon' => $meta['icon'],
-                        'order' => $meta['order']
+                        'order' => $meta['order'],
                     ]);
 
                     FurnitureItem::updateOrCreate(
@@ -162,5 +162,3 @@ class FurnitureSeeder extends Seeder
         Cache::flush();
     }
 }
-
-

@@ -4,7 +4,6 @@ namespace Tests\Feature\Projects;
 
 use App\Domains\Administration\Models\Role;
 use App\Domains\Identity\Models\User;
-use App\Domains\Projects\Models\ActiveTimer;
 use App\Domains\Projects\Models\Project;
 use App\Domains\Projects\Models\Task;
 use App\Domains\Projects\Models\TimeEntry;
@@ -12,6 +11,8 @@ use App\Domains\Projects\Models\Timesheet;
 use App\Domains\Tenancy\Actions\CreateOrganizationAction;
 use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Tenancy\Models\OrganizationMember;
+use Database\Seeders\PlansSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -21,20 +22,27 @@ class TimeTrackingAndTimesheetApiTest extends TestCase
     use RefreshDatabase;
 
     protected User $adminA;
+
     protected User $employeeA;
+
     protected User $adminB;
+
     protected Organization $orgA;
+
     protected Organization $orgB;
+
     protected Project $projectA;
+
     protected Task $taskA1;
+
     protected Task $taskA2;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\PlansSeeder::class);
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(PlansSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $action = app(CreateOrganizationAction::class);
 

@@ -19,6 +19,8 @@ use App\Domains\Projects\Models\Timesheet;
 use App\Domains\Tenancy\Actions\CreateOrganizationAction;
 use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Tenancy\Models\OrganizationMember;
+use Database\Seeders\PlansSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -28,16 +30,19 @@ class Phase1FoundationTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
+
     protected User $user2;
+
     protected Organization $org;
+
     protected OrganizationMember $membership;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->seed(\Database\Seeders\PlansSeeder::class);
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(PlansSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $action = app(CreateOrganizationAction::class);
         $this->user = User::factory()->create(['email' => 'admin@virtualworkplace.test']);

@@ -3,11 +3,13 @@
 namespace Tests\Feature;
 
 use App\Domains\Identity\Models\User;
+use App\Domains\Projects\Models\Project;
+use App\Domains\Projects\Models\Task;
 use App\Domains\Tenancy\Actions\CreateOrganizationAction;
 use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Workspace\Models\Floor;
-use App\Domains\Workspace\Models\Map;
-use App\Domains\Workspace\Models\Room;
+use Database\Seeders\PlansSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -17,15 +19,18 @@ class TenantIsolationTest extends TestCase
     use RefreshDatabase;
 
     protected User $userA;
+
     protected User $userB;
+
     protected Organization $orgA;
+
     protected Organization $orgB;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->seed(\Database\Seeders\PlansSeeder::class);
-        $this->seed(\Database\Seeders\RolesAndPermissionsSeeder::class);
+        $this->seed(PlansSeeder::class);
+        $this->seed(RolesAndPermissionsSeeder::class);
 
         $action = app(CreateOrganizationAction::class);
 
@@ -69,14 +74,14 @@ class TenantIsolationTest extends TestCase
     {
         Sanctum::actingAs($this->userA);
 
-        $projectA = \App\Domains\Projects\Models\Project::create([
+        $projectA = Project::create([
             'organization_id' => $this->orgA->id,
             'owner_id' => $this->userA->id,
             'name' => 'Project A',
             'code' => 'PRJ-A',
             'status' => 'active',
         ]);
-        $taskA = \App\Domains\Projects\Models\Task::create([
+        $taskA = Task::create([
             'organization_id' => $this->orgA->id,
             'project_id' => $projectA->id,
             'reporter_id' => $this->userA->id,
@@ -84,14 +89,14 @@ class TenantIsolationTest extends TestCase
             'status' => 'in_progress',
         ]);
 
-        $projectB = \App\Domains\Projects\Models\Project::create([
+        $projectB = Project::create([
             'organization_id' => $this->orgB->id,
             'owner_id' => $this->userB->id,
             'name' => 'Project B',
             'code' => 'PRJ-B',
             'status' => 'active',
         ]);
-        $taskB = \App\Domains\Projects\Models\Task::create([
+        $taskB = Task::create([
             'organization_id' => $this->orgB->id,
             'project_id' => $projectB->id,
             'reporter_id' => $this->userB->id,
@@ -112,14 +117,14 @@ class TenantIsolationTest extends TestCase
     {
         $this->actingAs($this->userA);
 
-        $projectB = \App\Domains\Projects\Models\Project::create([
+        $projectB = Project::create([
             'organization_id' => $this->orgB->id,
             'owner_id' => $this->userB->id,
             'name' => 'Project B',
             'code' => 'PRJ-B',
             'status' => 'active',
         ]);
-        $taskB = \App\Domains\Projects\Models\Task::create([
+        $taskB = Task::create([
             'organization_id' => $this->orgB->id,
             'project_id' => $projectB->id,
             'reporter_id' => $this->userB->id,

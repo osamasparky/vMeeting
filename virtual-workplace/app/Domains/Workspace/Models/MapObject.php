@@ -44,18 +44,19 @@ class MapObject extends Model
 
     public function getImageUrlAttribute()
     {
-        if (!empty($this->attributes['image_url'])) {
+        if (! empty($this->attributes['image_url'])) {
             return $this->attributes['image_url'];
         }
-        if (!empty($this->interaction_config['image_url'])) {
+        if (! empty($this->interaction_config['image_url'])) {
             return $this->interaction_config['image_url'];
         }
-        if (!empty($this->type)) {
+        if (! empty($this->type)) {
             $catItem = FurnitureItem::where('slug', $this->type)->first();
-            if ($catItem && !empty($catItem->image_url)) {
+            if ($catItem && ! empty($catItem->image_url)) {
                 return $catItem->image_url;
             }
         }
+
         return null;
     }
 

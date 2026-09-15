@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Domains\Workspace\Models\FurnitureCategory;
 use App\Domains\Workspace\Models\FurnitureItem;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
@@ -16,14 +17,16 @@ class FullFurnitureCatalogSeeder extends Seeder
     public function run(): void
     {
         $jsonPath = database_path('seeders/furniture_catalog_data.json');
-        if (!File::exists($jsonPath)) {
+        if (! File::exists($jsonPath)) {
             $this->command->error("Furniture catalog data file not found at: {$jsonPath}");
+
             return;
         }
 
         $data = json_decode(File::get($jsonPath), true);
-        if (!$data || empty($data['categories']) || empty($data['items'])) {
-            $this->command->error("Invalid catalog data JSON.");
+        if (! $data || empty($data['categories']) || empty($data['items'])) {
+            $this->command->error('Invalid catalog data JSON.');
+
             return;
         }
 
@@ -48,7 +51,9 @@ class FullFurnitureCatalogSeeder extends Seeder
             foreach ($chunks as $chunk) {
                 foreach ($chunk as $item) {
                     $catId = $categoriesMap[$item['category_slug']] ?? null;
-                    if (!$catId) continue;
+                    if (! $catId) {
+                        continue;
+                    }
 
                     FurnitureItem::updateOrCreate(
                         ['slug' => $item['slug']],
@@ -73,8 +78,8 @@ class FullFurnitureCatalogSeeder extends Seeder
         });
 
         // Clear catalog caches
-        \Illuminate\Support\Facades\Cache::forget('furniture_categories_with_items');
-        \Illuminate\Support\Facades\Cache::forget('furniture_catalog_active');
+        Cache::forget('furniture_categories_with_items');
+        Cache::forget('furniture_catalog_active');
 
         $count = FurnitureItem::count();
         $catsCount = FurnitureCategory::count();

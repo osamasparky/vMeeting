@@ -769,12 +769,12 @@
                             <!-- Actions -->
                             <a href="{{ route('dashboard') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #F9F4EE; font-size: 12px; font-weight: 600;">
                                 <span class="material-symbols-rounded" style="font-size: 18px; color: var(--nx-map-gold);">dashboard</span>
-                                <span>{{ __'Dashboard') }}</span>
+                                <span>{{ __('Dashboard') }}</span>
                             </a>
 
                             <a href="{{ route('office', ['office' => $floor->id]) }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #86EFAC; font-size: 12px; font-weight: 600;">
                                 <span class="material-symbols-rounded" style="font-size: 18px;">meeting_room</span>
-                                <span>{{ __'Enter Live Office') }}</span>
+                                <span>{{ __('Enter Live Office') }}</span>
                             </a>
 
                             @if(session('superadmin_impersonator_id'))
@@ -782,7 +782,7 @@
                                 @csrf
                                 <button type="submit" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #93C5FD; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                                     <span class="material-symbols-rounded" style="font-size: 18px;">shield</span>
-                                    <span>{{ __'Return to Super Admin') }}</span>
+                                    <span>{{ __('Return to Super Admin') }}</span>
                                 </button>
                             </form>
                             @endif
@@ -791,7 +791,7 @@
 
                             <button type="button" onclick="toggleAppTheme(); closeEditorMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #F9F4EE; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                                 <span class="material-symbols-rounded" style="font-size: 18px;">light_mode</span>
-                                <span>{{ __'Toggle Theme') }}</span>
+                                <span>{{ __('Toggle Theme') }}</span>
                             </button>
 
                             @if(app()->getLocale() === 'ar')
@@ -821,14 +821,14 @@
 
                     <!-- Branch Switcher -->
                     <div style="position: relative; display: inline-block;">
-                        <button type="button" onclick="toggleBranchDropdown(event)" class="nx-toolbar-btn" style="color: var(--nx-map-gold); border-color: rgba(211, 165, 83, 0.35); font-weight: 600;" title="{{ __'Switch Office Branch') }}">
+                        <button type="button" onclick="toggleBranchDropdown(event)" class="nx-toolbar-btn" style="color: var(--nx-map-gold); border-color: rgba(211, 165, 83, 0.35); font-weight: 600;" title="{{ __('Switch Office Branch') }}">
                             <span class="material-symbols-rounded" style="font-size: 18px;">domain</span>
                             <span style="max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $floor->name }}</span>
                             <span class="material-symbols-rounded" style="font-size: 16px;">arrow_drop_down</span>
                         </button>
                         <div id="branch-select-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); inset-inline-start: 0; min-width: 250px; background: rgba(14, 25, 19, 0.98); backdrop-filter: blur(18px); border: 1px solid rgba(237, 230, 217, 0.20); border-radius: 14px; box-shadow: 0 16px 36px rgba(0,0,0,0.65); padding: 6px; z-index: 100000;">
                             <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 4px;">
-                                🏢 {{ __'Select Office Branch') }}
+                                🏢 {{ __('Select Office Branch') }}
                             </div>
                             @foreach($floors as $f)
                             <a href="{{ route('editor', ['office' => $f->id]) }}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: {{ $f->id === $floor->id ? '#86EFAC' : '#E2E8F0' }}; background: {{ $f->id === $floor->id ? 'rgba(36, 92, 58, 0.45)' : 'transparent' }}; font-weight: 700; font-size: 12px; transition: background 0.15s ease;">
@@ -925,8 +925,8 @@
                 <button class="view-btn" onclick="zoomIn()" title="{{ __('Zoom In') }}">➕</button>
                 <button class="view-btn" onclick="zoomOut()" title="{{ __('Zoom Out') }}">➖</button>
                 <button class="view-btn" onclick="resetView()" title="{{ __('Reset View (100%)') }}">🏠</button>
-                <button class="view-btn" onclick="toggleGrid()" title="{{ __'Toggle Grid') }}">🔲</button>
-                <button class="view-btn" id="btn-grid-snap" onclick="cycleGridSnap()" style="font-size: 10px; font-weight: 800; font-family: 'IBM Plex Mono', monospace; width: auto; padding: 0 8px;" title="{{ __'Grid Snap Precision') }}">🎯 4px</button>
+                <button class="view-btn" onclick="toggleGrid()" title="{{ __('Toggle Grid') }}">🔲</button>
+                <button class="view-btn" id="btn-grid-snap" onclick="cycleGridSnap()" style="font-size: 10px; font-weight: 800; font-family: 'IBM Plex Mono', monospace; width: auto; padding: 0 8px;" title="{{ __('Grid Snap Precision') }}">🎯 4px</button>
             </div>
         </div>
 
@@ -1216,24 +1216,24 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="prop-label">{{ __'Layer & Elevation') }}</label>
+                                <label class="prop-label">{{ __('Layer & Elevation') }}</label>
                                 <select class="prop-input" id="prop-elevation" onchange="updateSelectedProp('elevation', parseInt(this.value))">
-                                    <option value="0">🧶 {{ __'Ground / Rug') }}</option>
-                                    <option value="1">🪑 {{ __'Default Furniture') }}</option>
-                                    <option value="2">💼 {{ __'Desk / Table Surface') }}</option>
-                                    <option value="3">🌿 {{ __'Tall Plant / Partition') }}</option>
-                                    <option value="5">💡 {{ __'Ceiling / Overhead') }}</option>
+                                    <option value="0">🧶 {{ __('Ground / Rug') }}</option>
+                                    <option value="1">🪑 {{ __('Default Furniture') }}</option>
+                                    <option value="2">💼 {{ __('Desk / Table Surface') }}</option>
+                                    <option value="3">🌿 {{ __('Tall Plant / Partition') }}</option>
+                                    <option value="5">💡 {{ __('Ceiling / Overhead') }}</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="prop-label">{{ __'Interaction') }}</label>
+                                <label class="prop-label">{{ __('Interaction') }}</label>
                                 <div id="prop-interaction-badge" style="font-size: 11px; font-weight: 700; color: var(--brand-primary); padding: 4px 8px; background: rgba(16,185,129,0.1); border-radius: 6px; display: inline-block;">NONE</div>
                             </div>
 
                             <!-- 🏢 1. Company Logo / Branding Inspector Box -->
                             <div id="inspector-branding-box" style="display: none; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(52, 211, 153, 0.25); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 12px; font-weight: 800; color: #34D399;">🏢 {{ __'Company Logo') }}</span>
+                                    <span style="font-size: 12px; font-weight: 800; color: #34D399;">🏢 {{ __('Company Logo') }}</span>
                                     <span class="furn-type-badge" style="background: rgba(16, 185, 129, 0.2); color: #6EE7B7;">Logo</span>
                                 </div>
                                 <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
@@ -1259,15 +1259,15 @@
                             <!-- 📝 2. Sticky Note Inspector Box -->
                             <div id="inspector-stickynote-box" style="display: none; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 12px; font-weight: 800; color: #FBBF24;">📝 {{ __'Sticky Note') }}</span>
+                                    <span style="font-size: 12px; font-weight: 800; color: #FBBF24;">📝 {{ __('Sticky Note') }}</span>
                                     <span class="furn-type-badge" style="background: rgba(245, 158, 11, 0.2); color: #FCD34D;">Note</span>
                                 </div>
                                 <div>
-                                    <label class="prop-label">{{ __'Note Text') }}</label>
+                                    <label class="prop-label">{{ __('Note Text') }}</label>
                                     <textarea class="prop-input" id="prop-stickynote-text" rows="3" placeholder="{{ __('Write your note or announcement here...') }}" oninput="updateSelectedStickyText(this.value)" style="resize: vertical; min-height: 65px;"></textarea>
                                 </div>
                                 <div>
-                                    <label class="prop-label">{{ __'Color Theme') }}</label>
+                                    <label class="prop-label">{{ __('Color Theme') }}</label>
                                     <div style="display: flex; gap: 6px;">
                                         <button type="button" class="rot-btn" style="flex: 1; background: rgba(245, 158, 11, 0.2); border-color: #F59E0B; color: #FCD34D;" onclick="setStickyColor('yellow')" title="Yellow">🟡</button>
                                         <button type="button" class="rot-btn" style="flex: 1; background: rgba(234, 88, 12, 0.2); border-color: #EA580C; color: #FDBA74;" onclick="setStickyColor('orange')" title="Orange">🟠</button>
@@ -1281,19 +1281,19 @@
                             <!-- 🔗 3. Custom Link Inspector Box -->
                             <div id="inspector-link-box" style="display: none; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 12px; font-weight: 800; color: #60A5FA;">🔗 {{ __'Interactive Web Link') }}</span>
+                                    <span style="font-size: 12px; font-weight: 800; color: #60A5FA;">🔗 {{ __('Interactive Web Link') }}</span>
                                     <span class="furn-type-badge" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD;">URL</span>
                                 </div>
                                 <div>
-                                    <label class="prop-label">{{ __'Target URL') }}</label>
+                                    <label class="prop-label">{{ __('Target URL') }}</label>
                                     <input type="url" class="prop-input" id="prop-link-url" placeholder="https://example.com/doc" oninput="updateSelectedLinkProp('url', this.value)">
                                 </div>
                                 <div>
-                                    <label class="prop-label">{{ __'Link Title / Label') }}</label>
+                                    <label class="prop-label">{{ __('Link Title / Label') }}</label>
                                     <input type="text" class="prop-input" id="prop-link-title" placeholder="{{ __('e.g. Project Notion Board') }}" oninput="updateSelectedLinkProp('title', this.value)">
                                 </div>
                                 <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
-                                    <span style="font-size: 11px; color: var(--text-secondary);">{{ __'Open in New Browser Tab') }}</span>
+                                    <span style="font-size: 11px; color: var(--text-secondary);">{{ __('Open in New Browser Tab') }}</span>
                                     <input type="checkbox" id="prop-link-newtab" checked onchange="updateSelectedLinkProp('openInNewTab', this.checked)" style="accent-color: var(--brand-primary); cursor: pointer; width: 16px; height: 16px;">
                                 </div>
                             </div>
@@ -1301,17 +1301,17 @@
                             <!-- 🖼️ 4. Custom Image Inspector Box -->
                             <div id="inspector-customimage-box" style="display: none; background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 12px; font-weight: 800; color: #C084FC;">🖼️ {{ __'Custom Image / Banner') }}</span>
+                                    <span style="font-size: 12px; font-weight: 800; color: #C084FC;">🖼️ {{ __('Custom Image / Banner') }}</span>
                                     <span class="furn-type-badge" style="background: rgba(139, 92, 246, 0.2); color: #D8B4FE;">Image</span>
                                 </div>
                                 <div>
-                                    <label class="prop-label">{{ __'Image URL') }}</label>
+                                    <label class="prop-label">{{ __('Image URL') }}</label>
                                     <input type="url" class="prop-input" id="prop-customimage-url" placeholder="https://.../banner.png" oninput="updateSelectedCustomImageUrl(this.value)">
                                 </div>
                                 <div>
                                     <input type="file" id="customimage-upload-input" accept="image/*" style="display: none;" onchange="uploadObjectImageDirectly(this, 'custom_image')">
                                     <button type="button" class="tool-btn" onclick="document.getElementById('customimage-upload-input').click()" style="width: 100%; justify-content: center; padding: 7px; font-size: 11px;">
-                                        📤 {{ __'Upload Image File') }}
+                                        📤 {{ __('Upload Image File') }}
                                     </button>
                                 </div>
                             </div>
@@ -1321,42 +1321,42 @@
                         <div id="inspector-room-fields" class="prop-section" style="display: none;">
                             <strong style="font-size: 13px; color: var(--text-main);">🏢 {{ __('Room Properties & Audio') }}</strong>
                             <div>
-                                <label class="prop-label">{{ __'Room Name') }}</label>
+                                <label class="prop-label">{{ __('Room Name') }}</label>
                                 <input type="text" class="prop-input" id="prop-room-name" placeholder="{{ __('e.g. Conference Room A') }}" oninput="updateRoomProp('name', this.value)">
                             </div>
                             <div>
-                                <label class="prop-label">{{ __'Room Type') }}</label>
+                                <label class="prop-label">{{ __('Room Type') }}</label>
                                 <select class="prop-input" id="prop-room-type" onchange="updateRoomProp('type', this.value)">
-                                    <option value="meeting">👥 {{ __'Meeting Room') }}</option>
-                                    <option value="private">🔒 {{ __'Private Office') }}</option>
-                                    <option value="focus">🎯 {{ __'Focus Pod') }}</option>
-                                    <option value="breakout">☕ {{ __'Breakout Lounge') }}</option>
-                                    <option value="reception">🛎️ {{ __'Reception Lobby') }}</option>
+                                    <option value="meeting">👥 {{ __('Meeting Room') }}</option>
+                                    <option value="private">🔒 {{ __('Private Office') }}</option>
+                                    <option value="focus">🎯 {{ __('Focus Pod') }}</option>
+                                    <option value="breakout">☕ {{ __('Breakout Lounge') }}</option>
+                                    <option value="reception">🛎️ {{ __('Reception Lobby') }}</option>
                                 </select>
                             </div>
                             
                             <!-- Acoustic Isolation Box -->
                             <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 12px; font-weight: 800; color: #34D399;">🎙️ {{ __'Acoustic Isolation') }}</span>
+                                    <span style="font-size: 12px; font-weight: 800; color: #34D399;">🎙️ {{ __('Acoustic Isolation') }}</span>
                                     <input type="checkbox" id="prop-room-isolation" onchange="updateRoomProp('audio_isolation', this.checked)" style="width: 18px; height: 18px; accent-color: var(--brand-primary); cursor: pointer;">
                                 </div>
                                 <span style="font-size: 11px; color: var(--text-muted);" id="prop-room-bounds-label"></span>
                             </div>
 
                             <div>
-                                <label class="prop-label">{{ __'Door Placement') }}</label>
+                                <label class="prop-label">{{ __('Door Placement') }}</label>
                                 <select class="prop-input" id="prop-room-door-side" onchange="updateRoomProp('doorSide', this.value)">
-                                    <option value="auto">🌟 {{ __'Auto Corridor') }}</option>
-                                    <option value="bottom">⬇️ {{ __'Bottom Wall') }}</option>
-                                    <option value="top">⬆️ {{ __'Top Wall') }}</option>
-                                    <option value="left">⬅️ {{ __'Left Wall') }}</option>
-                                    <option value="right">➡️ {{ __'Right Wall') }}</option>
+                                    <option value="auto">🌟 {{ __('Auto Corridor') }}</option>
+                                    <option value="bottom">⬇️ {{ __('Bottom Wall') }}</option>
+                                    <option value="top">⬆️ {{ __('Top Wall') }}</option>
+                                    <option value="left">⬅️ {{ __('Left Wall') }}</option>
+                                    <option value="right">➡️ {{ __('Right Wall') }}</option>
                                 </select>
                             </div>
 
                             <div>
-                                <label class="prop-label">{{ __'Door Position on Wall') }}</label>
+                                <label class="prop-label">{{ __('Door Position on Wall') }}</label>
                                 <div style="display: flex; align-items: center; gap: 8px;">
                                     <input type="range" class="prop-input" id="prop-room-door-offset" min="15" max="85" value="50" step="5" oninput="updateRoomProp('doorOffset', this.value / 100); document.getElementById('door-offset-val').textContent = this.value + '%';">
                                     <span id="door-offset-val" style="font-size: 11px; font-weight: 800; color: var(--brand-primary); min-width: 32px;">50%</span>
@@ -1364,12 +1364,12 @@
                             </div>
 
                             <div>
-                                <label class="prop-label">{{ __'Capacity') }}</label>
+                                <label class="prop-label">{{ __('Capacity') }}</label>
                                 <input type="number" class="prop-input" id="prop-room-capacity" min="1" max="200" oninput="updateRoomProp('capacity', this.value)">
                             </div>
 
                             <button class="act-btn act-btn-emerald" onclick="saveSelectedRoom()" style="margin-top: 6px; justify-content: center;">
-                                💾 {{ __'Save Room Settings') }}
+                                💾 {{ __('Save Room Settings') }}
                             </button>
                         </div>
 
@@ -1389,20 +1389,20 @@
                 <div id="drawer-view-floors" style="display: none; flex-direction: column; gap: 12px;">
                     <!-- Quick Action Tools Bar (Moved from Burger Menu) -->
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 6px; background: rgba(0,0,0,0.35); border: 1px solid var(--border-panel); border-radius: 12px;">
-                        <label class="tool-btn" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; margin: 0; background: rgba(255,255,255,0.05);" title="{{ __'Upload Custom Floorplan') }}">
+                        <label class="tool-btn" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; margin: 0; background: rgba(255,255,255,0.05);" title="{{ __('Upload Custom Floorplan') }}">
                             <span class="material-symbols-rounded" style="font-size: 20px; color: #F59E0B;">upload_file</span>
                             <span style="font-weight: 700;">{{ __('Upload') }}</span>
                             <span style="font-size: 9px; opacity: 0.8; font-family: 'IBM Plex Sans Arabic', sans-serif;">رفع مخصص</span>
                             <input type="file" accept="image/*" style="display:none;" onchange="handleCustomFloorUpload(this)">
                         </label>
 
-                        <button type="button" class="tool-btn" onclick="deleteFloorplan()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; color: #F87171; background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3);" title="{{ __'Reset to Default Floorplan') }}">
+                        <button type="button" class="tool-btn" onclick="deleteFloorplan()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; color: #F87171; background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3);" title="{{ __('Reset to Default Floorplan') }}">
                             <span class="material-symbols-rounded" style="font-size: 20px; color: #F87171;">restart_alt</span>
                             <span style="font-weight: 700;">{{ __('Reset') }}</span>
                             <span style="font-size: 9px; opacity: 0.8; font-family: 'IBM Plex Sans Arabic', sans-serif;">استعادة</span>
                         </button>
 
-                        <button type="button" class="tool-btn" onclick="clearWorkspace()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; color: #FBBF24; background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3);" title="{{ __'Clear All Placed Furniture') }}">
+                        <button type="button" class="tool-btn" onclick="clearWorkspace()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; color: #FBBF24; background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3);" title="{{ __('Clear All Placed Furniture') }}">
                             <span class="material-symbols-rounded" style="font-size: 20px; color: #FBBF24;">cleaning_services</span>
                             <span style="font-weight: 700;">{{ __('Clear') }}</span>
                             <span style="font-size: 9px; opacity: 0.8; font-family: 'IBM Plex Sans Arabic', sans-serif;">تفريغ الأثاث</span>
@@ -1424,7 +1424,7 @@
 
                     <div style="padding-top: 8px; border-top: 1px solid var(--border-panel); display: flex; justify-content: space-between; align-items: center;">
                         <button type="button" class="tool-btn" onclick="clearCurrentFloorBackground()" style="color: #F87171; border-color: rgba(239,68,68,0.3); font-size: 11px; width: 100%; justify-content: center;">
-                            🗑️ {{ __'Remove Floor Background') }}
+                            🗑️ {{ __('Remove Floor Background') }}
                         </button>
                     </div>
                 </div>
@@ -1694,7 +1694,7 @@
                         }
                         fitAndCenterView();
                         renderFloorsCatalog();
-                        showToast('✅ {{ __"Floor Background Uploaded & Applied") }}');
+                        showToast('✅ {{ __("Floor Background Uploaded & Applied") }}');
                     };
                 } else {
                     showToast('❌ ' + (data.message || 'Upload failed'));
@@ -1706,7 +1706,7 @@
         }
 
         async function clearCurrentFloorBackground() {
-            if (!confirm('{{ __"Are you sure you want to remove the floor background?") }}')) return;
+            if (!confirm('{{ __("Are you sure you want to remove the floor background?") }}')) return;
             try {
                 const res = await fetch(`/editor/maps/${MAP_ID}/background`, {
                     method: 'DELETE',
@@ -1729,7 +1729,7 @@
                     fitAndCenterView();
                     renderFloorsCatalog();
                     draw();
-                    showToast('✅ {{ __"Background removed") }}');
+                    showToast('✅ {{ __("Background removed") }}');
                 }
             } catch (err) {
                 console.error(err);
@@ -3036,7 +3036,7 @@
         }
 
         async function deleteFloorplan() {
-            if (!confirm('{{ __"Are you sure you want to reset the floorplan to default 1200×708?") }}')) return;
+            if (!confirm('{{ __("Are you sure you want to reset the floorplan to default 1200×708?") }}')) return;
             showToast('🗑️ {{ __("Resetting floorplan...") }}');
             try {
                 const res = await fetch(`/editor/maps/${MAP_ID}/background`, {
@@ -3411,7 +3411,7 @@
                         </div>
                         <div style="width: 1px; height: 26px; background: var(--border-card);"></div>
                         <div style="text-align: center;">
-                            <span style="font-size: 10px; color: var(--text-dim); display: block;">🖥️ {{ __'Total Workstations / Desks') }}</span>
+                            <span style="font-size: 10px; color: var(--text-dim); display: block;">🖥️ {{ __('Total Workstations / Desks') }}</span>
                             <span id="ai-quota-seats-val" style="font-size: 14px; font-weight: 900; color: #3B82F6;">0 / ∞</span>
                         </div>
                     </div>
@@ -3420,7 +3420,7 @@
                 <!-- 1. Architectural Style Selection -->
                 <div>
                     <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-main); margin-bottom: 10px;">
-                        🎨 {{ __'1. Choose Office Architectural Style') }}
+                        🎨 {{ __('1. Choose Office Architectural Style') }}
                     </label>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
                         @foreach($aiStyles as $key => $style)
@@ -3440,7 +3440,7 @@
                 <!-- 2. Room Breakdown & Desks Steppers -->
                 <div>
                     <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-main); margin-bottom: 10px;">
-                        🏢 {{ __'2. Customize Room Quantities & Desk Counts') }}
+                        🏢 {{ __('2. Customize Room Quantities & Desk Counts') }}
                     </label>
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px;">
@@ -3549,7 +3549,7 @@
                         {{ __('Cancel') }}
                     </button>
                     <button type="button" onclick="generateAiOfficeOnCanvas()" id="btn-ai-submit-generate" class="tactile-btn btn-primary" style="padding: 12px 28px; font-size: 14px; font-weight: 900; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);">
-                        <span>✨</span> {{ __'Generate Office with AI') }}
+                        <span>✨</span> {{ __('Generate Office with AI') }}
                     </button>
                 </div>
             </div>

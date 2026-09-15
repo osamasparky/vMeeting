@@ -40,7 +40,7 @@
                     <div class="panel-header" style="margin-bottom: 20px;">
                         <div class="panel-title">
                             <span>🌈</span>
-                            <span>{{ __'Primary Color Palette & Spatial Tokens') }}</span>
+                            <span>{{ __('Primary Color Palette & Spatial Tokens') }}</span>
                         </div>
                     </div>
 
@@ -112,7 +112,7 @@
                     <div class="panel-header" style="margin-bottom: 20px;">
                         <div class="panel-title">
                             <span>📐</span>
-                            <span>{{ __'Typography & Corner Geometry') }}</span>
+                            <span>{{ __('Typography & Corner Geometry') }}</span>
                         </div>
                     </div>
 
@@ -152,7 +152,7 @@
                     <div class="panel-header" style="margin-bottom: 20px;">
                         <div class="panel-title">
                             <span>🧭</span>
-                            <span>{{ __'Main Navigation Menu Links') }}</span>
+                            <span>{{ __('Main Navigation Menu Links') }}</span>
                         </div>
                         <p class="panel-subtitle">{{ __('Customize top navigation links in Arabic and English.') }}</p>
                     </div>

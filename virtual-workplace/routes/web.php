@@ -12,6 +12,8 @@ use App\Http\Controllers\Web\GuestAccessController;
 use App\Http\Controllers\Web\OfficeController;
 use App\Http\Controllers\Web\OrganizationSettingsController;
 use App\Http\Controllers\Web\ProjectHubController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [LandingController::class, 'home'])->name('landing.home');
@@ -239,8 +241,8 @@ Route::prefix('superadmin')->middleware(['auth', 'superadmin'])->name('superadmi
 });
 
 // Content Security Policy (CSP) Violation Reporting Endpoint
-Route::post('/csp-violation-report', function (\Illuminate\Http\Request $request) {
-    \Illuminate\Support\Facades\Log::warning('CSP Violation Report', [
+Route::post('/csp-violation-report', function (Request $request) {
+    Log::warning('CSP Violation Report', [
         'ip' => $request->ip(),
         'user_agent' => $request->userAgent(),
         'payload' => $request->json()->all() ?: $request->all(),
@@ -248,4 +250,3 @@ Route::post('/csp-violation-report', function (\Illuminate\Http\Request $request
 
     return response()->noContent();
 })->name('csp.violation.report');
-
