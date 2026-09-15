@@ -2927,10 +2927,12 @@
 
                 if (!data.messages || !data.messages.length) {
                     container.innerHTML = `
-                        <div style="text-align: center; color: var(--text-muted); font-size: 13px; padding: 40px;">
-                            <div style="font-size: 28px; margin-bottom: 8px;">👋</div>
-                            <div style="font-weight: 700;">{{ __('No messages in this conversation yet.') }}</div>
-                            <div style="font-size: 11px; margin-top: 4px;">{{ __('Send a message below to start the discussion!') }}</div>
+                        <div style="text-align: center; color: var(--nx-text-muted); font-size: var(--nx-font-size-xs); padding: 40px;">
+                            <div style="margin-bottom: 8px; display: flex; justify-content: center;">
+                                <span class="material-symbols-rounded" style="font-size: 28px; color: var(--nx-primary-500);">waving_hand</span>
+                            </div>
+                            <div style="font-weight: var(--nx-font-weight-bold); color: var(--nx-text-primary); font-size: var(--nx-font-size-sm);">{{ __('No messages in this conversation yet.') }}</div>
+                            <div style="font-size: 11px; margin-top: 4px; color: var(--nx-text-secondary);">{{ __('Send a message below to start the discussion!') }}</div>
                         </div>
                     `;
                     return;
@@ -2943,19 +2945,19 @@
                     return `
                         <div style="display: flex; gap: 10px; align-items: flex-end; justify-content: ${isMine ? 'flex-end' : 'flex-start'};">
                             ${!isMine ? `
-                                <div style="width: 30px; height: 30px; border-radius: 8px; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: white; flex-shrink: 0; box-shadow: var(--shadow-soft-3d); overflow: hidden;">
+                                <div style="width: 30px; height: 30px; border-radius: var(--nx-radius-sm); background: var(--nx-accent-gradient); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: var(--nx-font-weight-bold); color: white; flex-shrink: 0; box-shadow: var(--nx-shadow-soft-3d); overflow: hidden; font-family: var(--nx-font-mono);">
                                     ${msg.sender.avatar_url ? `<img src="${msg.sender.avatar_url}" style="width:100%;height:100%;object-fit:cover;">` : initials}
                                 </div>
                             ` : ''}
 
                             <div style="max-width: 70%; display: flex; flex-direction: column; align-items: ${isMine ? 'flex-end' : 'flex-start'};">
-                                ${!isMine ? `<span style="font-size: 10px; font-weight: 800; color: var(--text-secondary); margin-bottom: 2px; margin-inline-start: 4px;">${escapeHtml(msg.sender.name)}</span>` : ''}
+                                ${!isMine ? `<span style="font-size: 10px; font-weight: var(--nx-font-weight-bold); color: var(--nx-text-secondary); margin-bottom: 2px; margin-inline-start: 4px;">${escapeHtml(msg.sender.name)}</span>` : ''}
                                 
-                                <div style="padding: 10px 14px; border-radius: ${isMine ? '14px 14px 2px 14px' : '14px 14px 14px 2px'}; background: ${isMine ? 'var(--accent-gradient)' : 'var(--bg-surface)'}; color: ${isMine ? '#FFFDF6' : 'var(--text-primary)'}; border: 1px solid ${isMine ? 'transparent' : 'var(--border-color)'}; box-shadow: var(--shadow-soft-3d); font-size: 13px; line-height: 1.5; word-break: break-word;">
-                                    ${escapeHtml(msg.body).replace(/\\n/g, '<br>')}
+                                <div style="padding: 10px 14px; border-radius: ${isMine ? '14px 14px 2px 14px' : '14px 14px 14px 2px'}; background: ${isMine ? 'var(--nx-accent-gradient)' : 'var(--nx-bg-surface)'}; color: ${isMine ? '#FFFDF6' : 'var(--nx-text-primary)'}; border: 1px solid ${isMine ? 'transparent' : 'var(--nx-border-subtle)'}; box-shadow: var(--nx-shadow-soft-3d); font-size: var(--nx-font-size-xs); line-height: 1.5; word-break: break-word;">
+                                    ${escapeHtml(msg.body).replace(/\n/g, '<br>')}
                                 </div>
                                 
-                                <span style="font-size: 9px; color: var(--text-muted); margin-top: 3px; margin-inline-start: 4px; margin-inline-end: 4px;">
+                                <span style="font-size: 9px; color: var(--nx-text-muted); margin-top: 3px; margin-inline-start: 4px; margin-inline-end: 4px; font-family: var(--nx-font-mono);">
                                     ${msg.created_at}
                                 </span>
                             </div>
