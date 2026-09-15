@@ -2724,5 +2724,16 @@
     "📅 Meeting Invitation: :meeting": "📅 Meeting Invitation: :meeting",
     "🔔 :name mentioned you in task": "🔔 :name mentioned you in task",
     "🔔 :name mentioned you in task ": "🔔 :name mentioned you in task",
-    "🚪 Knock on Door: :room": "🚪 Knock on Door: :room"
+    "🚪 Knock on Door: :room": "🚪 Knock on Door: :room",
+    "Screen Sharing": "Screen Sharing",
+    "Mute": "Mute",
+    "Unmute": "Unmute",
+    "Door Lock": "Door Lock",
+    "Door Locked": "Door Locked",
+    "Door Unlocked": "Door Unlocked",
+    "Noise Suppression": "Noise Suppression",
+    "Invite Guests": "Invite Guests",
+    "Connected users": "Connected users",
+    "online now": "online now",
+    "to Leave Desk": "to Leave Desk"
 }

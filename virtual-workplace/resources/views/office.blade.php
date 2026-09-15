@@ -960,8 +960,8 @@
                 @endif
 
                 @if(!empty($user->is_guest))
-                    <span class="nx-toolbar-btn btn-accent guest-access-pill" style="font-weight: 700;" title="GUEST ACCESS">
-                        🛡️ {{ __('Guest Access') }} ({{ $user->name }}) <span style="display:none;">GUEST ACCESS</span>
+                    <span class="nx-toolbar-btn btn-accent guest-access-pill" style="font-weight: 700;" title="{{ __('Guest Access') }}">
+                        🛡️ {{ __('Guest Access') }} ({{ $user->name }})
                     </span>
                 @endif
             </div>
@@ -1019,7 +1019,7 @@
     </div>
 
     <!-- ── Floating Canvas Viewport Zoom & Navigation Controls ── -->
-    <div class="nx-floating-viewport-controls" aria-label="Map Zoom & Navigation Controls">
+    <div class="nx-floating-viewport-controls" aria-label="{{ __('Map Zoom & Navigation Controls') }}">
         <button type="button" class="nx-viewport-ctrl-btn" onclick="zoomIn()" title="{{ __('Zoom In') }}">
             <span class="material-symbols-rounded">zoom_in</span>
         </button>
@@ -1083,7 +1083,7 @@
     </div>
 
     <!-- ── Bottom Meeting Control Bar (All Tools Restored & Styled) ── -->
-    <nav class="nx-meeting-dock" aria-label="Meeting Controls">
+    <nav class="nx-meeting-dock" aria-label="{{ __('Meeting Controls') }}">
         <button class="nx-dock-btn" id="btn-screen" onclick="toggleScreenShare()" title="{{ __('Screen Share') }}">
             <span id="screen-icon" class="material-symbols-rounded">screen_share</span>
             <span id="screen-text">{{ __('Share') }}</span>
@@ -1399,10 +1399,14 @@
             'to Read Note': { ar: 'لقراءة الملاحظة', en: 'to Read Note' }
         };
 
+        const LARAVEL_I18N = @json(file_exists(lang_path(app()->getLocale() . '.json')) ? json_decode(file_get_contents(lang_path(app()->getLocale() . '.json')), true) : []);
+
         function __(key) {
-            const entry = I18N_DICT[key];
-            if (entry) {
-                return entry[CURRENT_LOCALE] || entry['en'] || key;
+            if (I18N_DICT[key]) {
+                return I18N_DICT[key][CURRENT_LOCALE] || I18N_DICT[key]['en'] || key;
+            }
+            if (LARAVEL_I18N && LARAVEL_I18N[key]) {
+                return LARAVEL_I18N[key];
             }
             return key;
         }
@@ -2714,10 +2718,10 @@
             rooms.forEach(r => {
                 const occupants = countRoomOccupants(r.id);
                 if (occupants === 0) {
-                    // Empty rooms must always have their doors open & unlocked!
+                    // Empty rooms are unlocked and resting closed
                     roomDoorStates.set(r.id, false);
-                    let animState = doorAnimationStates.get(r.id) || { openProgress: 1.0, isAnimating: false };
-                    animState.openProgress = 1.0;
+                    let animState = doorAnimationStates.get(r.id) || { openProgress: 0.0, isAnimating: false };
+                    animState.openProgress = 0.0;
                     doorAnimationStates.set(r.id, animState);
 
                     if (ws && ws.readyState === WebSocket.OPEN) {
@@ -2905,22 +2909,19 @@
                 }
             }
 
-            // Update Door Proximity Animation & Auto Open for Empty Rooms
+            // Update Door Proximity Animation & Auto Open when approaching or inside
             rooms.forEach(r => {
                 const door = getRoomDoorPortal(r);
                 if (door) {
                     const isLocked = !!roomDoorStates.get(r.id);
-                    const occupants = countRoomOccupants(r.id);
                     let state = doorAnimationStates.get(r.id) || { openProgress: 0, isAnimating: false };
 
                     if (isLocked) {
-                        state.openProgress = 0.0;
-                    } else if (occupants === 0) {
-                        // Empty rooms are always open!
-                        state.openProgress = 1.0;
+                        state.openProgress = Math.max(0.0, state.openProgress - 0.1);
                     } else {
                         const distToDoor = Math.hypot(localAvatar.x - door.x, localAvatar.y - door.y);
-                        if (distToDoor < 45) {
+                        const isInsideThisRoom = (localRoom && localRoom.id === r.id);
+                        if (distToDoor < 45 || isInsideThisRoom) {
                             state.openProgress = Math.min(1.0, state.openProgress + 0.15);
                         } else if (!state.isAnimating) {
                             state.openProgress = Math.max(0.0, state.openProgress - 0.06);
@@ -3274,15 +3275,18 @@
                     ctx.fillRect(halfW, -jambD / 2 - 2, jambW, 3);
                     ctx.strokeRect(halfW, -jambD / 2, jambW, jambD);
 
-                    // 3. Dashed Door Swing Arc
-                    ctx.save();
-                    ctx.strokeStyle = isLocked ? 'rgba(239, 68, 68, 0.45)' : 'rgba(60, 107, 76, 0.45)';
-                    ctx.lineWidth = 1.5;
-                    ctx.setLineDash([3, 3]);
-                    ctx.beginPath();
-                    ctx.arc(-halfW, 0, door.width * 0.94, -Math.PI * 0.48, 0, false);
-                    ctx.stroke();
-                    ctx.restore();
+                    // 3. Subtle Architectural Door Swing Arc (Only visible when open / swinging)
+                    if (openProg > 0.05 && !isLocked) {
+                        ctx.save();
+                        ctx.strokeStyle = 'rgba(211, 165, 83, 0.28)';
+                        ctx.lineWidth = 0.75;
+                        ctx.setLineDash([2, 3]);
+                        ctx.beginPath();
+                        const currentArcAngle = Math.min(Math.PI * 0.48, openProg * (Math.PI * 0.48));
+                        ctx.arc(-halfW, 0, door.width * 0.94, -currentArcAngle, 0, false);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
 
                     // 4. Animated 3D Door Leaf
                     ctx.save();

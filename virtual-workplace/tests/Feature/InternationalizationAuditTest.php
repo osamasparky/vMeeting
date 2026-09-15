@@ -67,6 +67,50 @@ class InternationalizationAuditTest extends TestCase
     }
 
     /**
+     * Test that ar.json values are localized and do not contain untranslated core UI strings.
+     */
+    public function test_ar_json_contains_localized_arabic_values(): void
+    {
+        $arPath = base_path('lang/ar.json');
+        $arData = json_decode(File::get($arPath), true);
+
+        $coreKeysToCheck = [
+            'Participants' => 'المشاركون',
+            'Reactions' => 'التفاعلات',
+            'Leave' => 'مغادرة',
+            'Record' => 'تسجيل',
+            'Screen Sharing' => 'مشاركة الشاشة',
+            'Chat' => 'المحادثة',
+            'Mute' => 'كتم الصوت',
+            'Meeting Room' => 'غرفة اجتماعات',
+            'Collaborative Whiteboard' => 'السبورة التفاعلية',
+        ];
+
+        foreach ($coreKeysToCheck as $key => $expectedArabic) {
+            $this->assertArrayHasKey($key, $arData, "Key '{$key}' must exist in ar.json");
+            $this->assertEquals($expectedArabic, $arData[$key], "ar.json value for '{$key}' should be '{$expectedArabic}', found '{$arData[$key]}'");
+        }
+    }
+
+    /**
+     * Test that public rendered pages respect locale and set correct lang and dir attributes.
+     */
+    public function test_rendered_pages_have_correct_html_lang_and_dir_attributes(): void
+    {
+        // Arabic session
+        $responseAr = $this->withSession(['locale' => 'ar'])->get('/login');
+        $responseAr->assertStatus(200);
+        $responseAr->assertSee('lang="ar"', false);
+        $responseAr->assertSee('dir="rtl"', false);
+
+        // English session
+        $responseEn = $this->withSession(['locale' => 'en'])->get('/login');
+        $responseEn->assertStatus(200);
+        $responseEn->assertSee('lang="en"', false);
+        $responseEn->assertSee('dir="ltr"', false);
+    }
+
+    /**
      * Test that language switching endpoint sets session and cookie properly.
      */
     public function test_language_switching_sets_session_and_cookie(): void

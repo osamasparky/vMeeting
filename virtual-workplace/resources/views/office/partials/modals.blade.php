@@ -79,11 +79,11 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; padding: 10px;">
                         <div style="font-size: 10px; color: var(--text-muted); font-weight: 800;">📷 {{ __('Camera Access') }}</div>
-                        <div id="diag-cam-status" style="font-size: 13px; font-weight: 800; color: #10B981;">✓ Verified</div>
+                        <div id="diag-cam-status" style="font-size: 13px; font-weight: 800; color: #10B981;">✓ {{ __('Verified') }}</div>
                     </div>
                     <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; padding: 10px;">
                         <div style="font-size: 10px; color: var(--text-muted); font-weight: 800;">🎙️ {{ __('Microphone Access') }}</div>
-                        <div id="diag-mic-status" style="font-size: 13px; font-weight: 800; color: #10B981;">✓ Verified</div>
+                        <div id="diag-mic-status" style="font-size: 13px; font-weight: 800; color: #10B981;">✓ {{ __('Verified') }}</div>
                     </div>
                     <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; padding: 10px;">
                         <div style="font-size: 10px; color: var(--text-muted); font-weight: 800;">⚡ {{ __('Internet Ping (RTT)') }}</div>
@@ -91,7 +91,7 @@
                     </div>
                     <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; padding: 10px;">
                         <div style="font-size: 10px; color: var(--text-muted); font-weight: 800;">🌐 {{ __('STUN & TURN Relay') }}</div>
-                        <div id="diag-turn-status" style="font-size: 13px; font-weight: 800; color: #10B981;">✓ Active (Coturn)</div>
+                        <div id="diag-turn-status" style="font-size: 13px; font-weight: 800; color: #10B981;">✓ {{ __('Active (Coturn)') }}</div>
                     </div>
                 </div>
 
