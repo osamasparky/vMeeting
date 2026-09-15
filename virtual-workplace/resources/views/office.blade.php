@@ -2920,7 +2920,7 @@
                         state.openProgress = Math.max(0.0, state.openProgress - 0.1);
                     } else {
                         const distToDoor = Math.hypot(localAvatar.x - door.x, localAvatar.y - door.y);
-                        const isInsideThisRoom = (localRoom && localRoom.id === r.id);
+                        const isInsideThisRoom = (currentR && currentR.id === r.id);
                         if (distToDoor < 45 || isInsideThisRoom) {
                             state.openProgress = Math.min(1.0, state.openProgress + 0.15);
                         } else if (!state.isAnimating) {
