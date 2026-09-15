@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>{{ $organization->name }} — {{ __('Virtual Interactive Office') }}</title>
 
     <!-- Google Fonts & Material Symbols -->
@@ -3333,14 +3336,14 @@
                 const displayName = getLocalizedRoomName(r);
 
                 ctx.save();
-                ctx.font = '700 10px ' + (CURRENT_LOCALE === 'ar' ? '"IBM Plex Sans Arabic", sans-serif' : '"IBM Plex Sans", sans-serif');
+                ctx.font = '700 11px ' + (CURRENT_LOCALE === 'ar' ? '"IBM Plex Sans Arabic", sans-serif' : '"IBM Plex Sans", sans-serif');
                 const nameMetrics = ctx.measureText(displayName);
                 
-                const cardPadX = 10;
-                const cardW = Math.min(rw - 16, nameMetrics.width + (cardPadX * 2));
+                const cardPadX = 8;
+                const cardW = Math.max(60, Math.min(rw - 12, nameMetrics.width + (cardPadX * 2)));
                 const cardH = 20;
-                const cardRadius = 7;
-                const margin = 12;
+                const cardRadius = 6;
+                const margin = 8;
 
                 // 4 Candidate corners: Top-Left, Top-Right, Bottom-Left, Bottom-Right
                 const corners = [
@@ -3372,18 +3375,18 @@
                 const cardY = chosenCorner.y;
 
                 // Subtle Card Drop Shadow
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.50)';
                 ctx.shadowBlur = 6;
                 ctx.shadowOffsetY = 2;
 
-                // Dark elegant background matching Figma
-                ctx.fillStyle = isLocked ? 'rgba(127, 29, 29, 0.94)' : 'rgba(14, 38, 26, 0.92)';
+                // Dark high-contrast background matching Figma
+                ctx.fillStyle = isLocked ? 'rgba(127, 29, 29, 0.95)' : 'rgba(10, 24, 18, 0.94)';
                 if (ctx.roundRect) ctx.roundRect(cardX, cardY, cardW, cardH, cardRadius);
                 else ctx.rect(cardX, cardY, cardW, cardH);
                 ctx.fill();
 
                 ctx.shadowColor = 'transparent';
-                ctx.strokeStyle = isLocked ? 'rgba(239, 68, 68, 0.60)' : 'rgba(52, 211, 153, 0.50)';
+                ctx.strokeStyle = isLocked ? 'rgba(239, 68, 68, 0.80)' : 'rgba(211, 165, 83, 0.70)';
                 ctx.lineWidth = 1.2;
                 if (ctx.roundRect) ctx.roundRect(cardX, cardY, cardW, cardH, cardRadius);
                 else ctx.rect(cardX, cardY, cardW, cardH);
@@ -3391,7 +3394,7 @@
 
                 // Localized Room Name (100% Solid Crisp Pure White #FFFFFF)
                 ctx.fillStyle = '#FFFFFF';
-                ctx.font = '700 10px ' + (CURRENT_LOCALE === 'ar' ? '"IBM Plex Sans Arabic", sans-serif' : '"IBM Plex Sans", sans-serif');
+                ctx.font = '700 11px ' + (CURRENT_LOCALE === 'ar' ? '"IBM Plex Sans Arabic", sans-serif' : '"IBM Plex Sans", sans-serif');
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText((isLocked ? '🔒 ' : '') + displayName, cardX + (cardW / 2), cardY + (cardH / 2) + 0.5);
