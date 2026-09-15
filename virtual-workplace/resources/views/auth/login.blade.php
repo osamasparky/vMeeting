@@ -1,6 +1,6 @@
 @extends('layouts.auth')
 
-@section('title', __('Login') . ' — Virtual Workplace')
+@section('title', __('Login') . ' — UlaSpace')
 
 @section('content')
 <div style="position: absolute; top: 20px; inset-inline-end: 24px; z-index: 10;">
@@ -22,10 +22,13 @@
     <div class="auth-left">
         <div class="auth-card">
             <div class="auth-logo">
-                <div class="logo-icon">
-                    <span class="material-symbols-rounded">domain</span>
+                <div class="logo-icon" style="background: var(--nx-palm-900, #142B24); border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; box-shadow: var(--nx-shadow-sm); padding: 6px;">
+                    <img src="{{ asset('images/ulaspace-icon.png') }}" alt="UlaSpace" style="width: 26px; height: auto; object-fit: contain;">
                 </div>
-                <span class="logo-text">{{ __('Virtual Workplace') }}</span>
+                <div>
+                    <span class="logo-text" style="display: block; line-height: 1.1; font-weight: 800;">UlaSpace</span>
+                    <span style="font-size: 10px; font-weight: 700; color: var(--text-secondary); letter-spacing: 0.5px; text-transform: uppercase;">{{ __('Virtual Workplace') }}</span>
+                </div>
             </div>
 
             <h1 class="auth-title">{{ __('Welcome back') }}</h1>
@@ -115,8 +118,8 @@
     <!-- Right: Branding Panel -->
     <div class="auth-right">
         <div class="brand-panel">
-            <div class="brand-panel-icon">
-                <span class="material-symbols-rounded">corporate_fare</span>
+            <div style="margin-bottom: 28px;">
+                <img src="{{ asset('images/ulaspace-logo.png') }}" alt="UlaSpace" style="max-width: 260px; width: 100%; height: auto; margin: 0 auto; display: block;">
             </div>
             <h2 class="brand-title">{{ __('Your Virtual Office Awaits') }}</h2>
             <p class="brand-description">

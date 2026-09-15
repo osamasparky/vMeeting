@@ -3,42 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virtual Workplace — Next-Gen Spatial Office & Collaboration</title>
+    <title>{{ __('Virtual Workplace') }} — UlaSpace</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/ulaspace-tokens.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/modern-design-system.css') }}">
+
     <style>
         :root {
-            --bg-dark: #070913;
-            --bg-secondary: #0f172a;
-            --accent-gradient: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899);
-            --accent-green: #10b981;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-panel: rgba(255, 255, 255, 0.08);
+            --bg-page: var(--nx-bg-page, #0B1410);
+            --bg-surface: var(--nx-bg-surface, #142B24);
+            --bg-card: #142B24;
+            --text-primary: var(--nx-sand-100, #F9F4EE);
+            --text-secondary: var(--nx-sand-400, #E3D2BB);
+            --text-muted: var(--nx-text-muted, #A4B5AD);
+            --border-panel: rgba(237, 230, 217, 0.12);
+            --brand-primary: var(--nx-palm-300, #4EA66F);
+            --brand-accent: var(--nx-sand-300, #EADCC9);
+            --font-ar: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-en: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'IBM Plex Mono', monospace;
+            --font-family: var(--font-en);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        [dir="rtl"], [lang="ar"] {
+            --font-family: var(--font-ar);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-family); }
         body {
-            font-family: 'Cairo', 'Inter', sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-main);
+            background: var(--bg-page);
+            color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
             display: flex;
             flex-direction: column;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* ── Header Navigation ── */
         .navbar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 20px 48px;
+            padding: 20px 32px;
             max-width: 1400px;
             margin: 0 auto;
             width: 100%;
-            border-bottom: 1px solid var(--border-panel);
         }
 
         .brand {
@@ -46,26 +57,27 @@
             align-items: center;
             gap: 12px;
             text-decoration: none;
-            color: white;
+            color: inherit;
         }
 
         .brand-logo {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: var(--accent-gradient);
+            width: 42px;
+            height: 42px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-panel);
+            border-radius: var(--nx-radius-md, 12px);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            font-weight: 800;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+            padding: 6px;
+            box-shadow: var(--nx-shadow-sm);
         }
 
         .brand-name {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 800;
-            letter-spacing: -0.5px;
+            color: var(--text-primary);
+            letter-spacing: -0.2px;
         }
 
         .nav-links {
@@ -75,71 +87,27 @@
         }
 
         .btn-link {
-            color: var(--text-muted);
+            color: var(--text-secondary);
             text-decoration: none;
+            font-size: 14px;
             font-weight: 600;
-            font-size: 14px;
             padding: 8px 16px;
-            border-radius: 8px;
-            transition: all 0.2s;
+            border-radius: var(--nx-radius-md, 12px);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
-
         .btn-link:hover {
-            color: white;
-            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.06);
         }
 
-        .btn-primary {
-            background: var(--accent-gradient);
-            color: white;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 14px;
-            padding: 10px 22px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
-        }
-
-        .btn-green {
-            background: var(--accent-green);
-            color: black;
-            text-decoration: none;
-            font-weight: 800;
-            font-size: 14px;
-            padding: 10px 22px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
-            transition: transform 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-green:hover {
-            transform: translateY(-2px);
-        }
-
-        /* ── Hero Section ── */
         .hero {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 80px 24px 60px;
             max-width: 1000px;
-            margin: 0 auto;
-            position: relative;
+            margin: 60px auto 40px;
+            padding: 0 24px;
+            text-align: center;
         }
 
         .badge-pill {
@@ -147,95 +115,101 @@
             align-items: center;
             gap: 8px;
             padding: 6px 16px;
-            background: rgba(99, 102, 241, 0.12);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            border-radius: 30px;
-            font-size: 12px;
+            background: rgba(78, 166, 111, 0.12);
+            border: 1px solid rgba(78, 166, 111, 0.25);
+            border-radius: 9999px;
+            font-size: 13px;
             font-weight: 700;
-            color: #a5b4fc;
+            color: var(--brand-primary);
             margin-bottom: 24px;
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
         }
 
         .hero-title {
-            font-size: 54px;
+            font-size: clamp(32px, 5vw, 54px);
             font-weight: 900;
-            letter-spacing: -1.5px;
             line-height: 1.15;
             margin-bottom: 20px;
+            letter-spacing: -0.5px;
         }
 
         .gradient-text {
-            background: var(--accent-gradient);
+            background: linear-gradient(135deg, #4EA66F 0%, #D3A553 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .hero-desc {
             font-size: 18px;
-            color: var(--text-muted);
-            line-height: 1.6;
-            max-width: 680px;
-            margin-bottom: 36px;
+            line-height: 1.7;
+            color: var(--text-secondary);
+            max-width: 720px;
+            margin: 0 auto 36px;
+            font-weight: 400;
         }
 
         .hero-actions {
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 16px;
-            margin-bottom: 50px;
+            flex-wrap: wrap;
         }
 
-        /* ── Feature Cards ── */
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 20px;
-            width: 100%;
             max-width: 1200px;
-            margin: 0 auto 80px;
+            margin: 40px auto 80px;
             padding: 0 24px;
+            width: 100%;
         }
 
         .feature-card {
-            background: rgba(15, 23, 42, 0.85);
+            background: var(--bg-surface);
             border: 1px solid var(--border-panel);
-            border-radius: 16px;
+            border-radius: var(--nx-radius-xl, 16px);
             padding: 28px;
-            text-align: left;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
             transition: transform 0.2s, border-color 0.2s;
         }
-
         .feature-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-2px);
+            border-color: rgba(78, 166, 111, 0.4);
         }
 
         .feature-icon {
-            font-size: 32px;
-            margin-bottom: 14px;
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: var(--nx-radius-md, 12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--brand-primary);
+            margin-bottom: 16px;
         }
 
         .feature-title {
             font-size: 17px;
             font-weight: 700;
             margin-bottom: 8px;
+            color: var(--text-primary);
         }
 
         .feature-desc {
-            font-size: 13px;
-            color: var(--text-muted);
-            line-height: 1.5;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-secondary);
         }
 
         footer {
+            margin-top: auto;
             border-top: 1px solid var(--border-panel);
             padding: 24px;
             text-align: center;
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-muted);
+            font-family: var(--font-mono);
         }
     </style>
 </head>
@@ -244,18 +218,35 @@
     <!-- Navigation Header -->
     <header class="navbar">
         <a href="/" class="brand">
-            <div class="brand-logo">🏢</div>
-            <div class="brand-name">Virtual Workplace</div>
+            <div class="brand-logo">
+                <img src="{{ asset('images/ulaspace-icon.png') }}" alt="UlaSpace" style="width: 26px; height: auto; object-fit: contain;">
+            </div>
+            <div class="brand-name">UlaSpace</div>
         </a>
 
         <nav class="nav-links">
             @auth
-                <a href="{{ route('office') }}" class="btn-link">🗺️ Office Floor</a>
-                <a href="{{ route('editor') }}" class="btn-link">🎨 Designer</a>
-                <a href="{{ route('dashboard') }}" class="btn-primary">📊 Open Dashboard</a>
+                <a href="{{ route('office') }}" class="btn-link">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">map</span>
+                    <span>{{ __('Office Floor') }}</span>
+                </a>
+                <a href="{{ route('editor') }}" class="btn-link">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">design_services</span>
+                    <span>{{ __('Designer') }}</span>
+                </a>
+                <a href="{{ route('dashboard') }}" class="nx-btn nx-btn--primary">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">dashboard</span>
+                    <span>{{ __('Open Dashboard') }}</span>
+                </a>
             @else
-                <a href="{{ route('login') }}" class="btn-link" style="color: white; font-size: 15px;">🔑 Sign In</a>
-                <a href="{{ route('register') }}" class="btn-green">✨ Create Free Workspace</a>
+                <a href="{{ route('login') }}" class="btn-link">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">login</span>
+                    <span>{{ __('Sign In') }}</span>
+                </a>
+                <a href="{{ route('register') }}" class="nx-btn nx-btn--primary">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">rocket_launch</span>
+                    <span>{{ __('Create Workspace') }}</span>
+                </a>
             @endauth
         </nav>
     </header>
@@ -263,31 +254,36 @@
     <!-- Main Hero -->
     <section class="hero">
         <div class="badge-pill">
-            <span>✨</span> Next-Gen Spatial Virtual Office Engine
+            <span class="material-symbols-rounded" style="font-size: 16px;">auto_awesome</span>
+            <span>UlaSpace Spatial Office Platform</span>
         </div>
 
         <h1 class="hero-title">
-            Bring your remote team together in a <span class="gradient-text">Virtual Office</span>.
+            {{ __('Bring your remote team together in a') }} <span class="gradient-text">{{ __('Virtual Office') }}</span>.
         </h1>
 
         <p class="hero-desc">
-            Walk up and talk with spatial voice & video, close private meeting room doors, invite external guests with 1-click links, and design your custom office floor plan in real time.
+            {{ __('Step into a persistent, spatial workspace where your team connects naturally — just like a real office, but without walls.') }}
         </p>
 
         <div class="hero-actions">
             @auth
-                <a href="{{ route('office') }}" class="btn-primary" style="font-size: 16px; padding: 14px 28px;">
-                    <span>🚀</span> Enter Workplace Floor
+                <a href="{{ route('office') }}" class="nx-btn nx-btn--primary" style="padding: 14px 28px; font-size: 15px;">
+                    <span class="material-symbols-rounded" style="font-size: 20px;">meeting_room</span>
+                    <span>{{ __('Enter Workplace Floor') }}</span>
                 </a>
-                <a href="{{ route('dashboard') }}" class="btn-link" style="border: 1px solid var(--border-panel); padding: 14px 24px; font-size: 15px;">
-                    📊 Workspace Dashboard
+                <a href="{{ route('dashboard') }}" class="btn-link" style="border: 1px solid var(--border-panel); padding: 12px 24px;">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">dashboard</span>
+                    <span>{{ __('Workspace Dashboard') }}</span>
                 </a>
             @else
-                <a href="{{ route('register') }}" class="btn-green" style="font-size: 16px; padding: 14px 28px;">
-                    <span>⚡</span> Get Started Free
+                <a href="{{ route('register') }}" class="nx-btn nx-btn--primary" style="padding: 14px 28px; font-size: 15px;">
+                    <span class="material-symbols-rounded" style="font-size: 20px;">add_circle</span>
+                    <span>{{ __('Get Started Free') }}</span>
                 </a>
-                <a href="{{ route('login') }}" class="btn-primary" style="font-size: 16px; padding: 14px 28px;">
-                    <span>🔑</span> Sign In to Workplace
+                <a href="{{ route('login') }}" class="btn-link" style="border: 1px solid var(--border-panel); padding: 12px 24px;">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">login</span>
+                    <span>{{ __('Sign In to Workplace') }}</span>
                 </a>
             @endauth
         </div>
@@ -296,32 +292,40 @@
     <!-- Features -->
     <section class="features-grid">
         <div class="feature-card">
-            <div class="feature-icon">🎙️</div>
-            <h3 class="feature-title">Spatial Proximity Audio & Video</h3>
-            <p class="feature-desc">Natural communication that mimics real life. Hear colleagues get louder as you walk closer, with instant P2P WebRTC camera video.</p>
+            <div class="feature-icon">
+                <span class="material-symbols-rounded" style="font-size: 24px;">spatial_audio</span>
+            </div>
+            <h3 class="feature-title">{{ __('Spatial Proximity Audio & Video') }}</h3>
+            <p class="feature-desc">{{ __('Natural communication that mimics real life with instant WebRTC presence and spatial audio zones.') }}</p>
         </div>
 
         <div class="feature-card">
-            <div class="feature-icon">🚪</div>
-            <h3 class="feature-title">Interactive Room Doors & Ringing</h3>
-            <p class="feature-desc">Lock your private office or boardroom. Outside visitors can ring the doorbell, and occupants can allow entry with one click.</p>
+            <div class="feature-icon">
+                <span class="material-symbols-rounded" style="font-size: 24px;">door_front</span>
+            </div>
+            <h3 class="feature-title">{{ __('Interactive Room Doors & Ringing') }}</h3>
+            <p class="feature-desc">{{ __('Lock your private office or boardroom. Outside visitors can ring the doorbell with 1-click access.') }}</p>
         </div>
 
         <div class="feature-card">
-            <div class="feature-icon">🔗</div>
-            <h3 class="feature-title">Instant 1-Click Guest Invites</h3>
-            <p class="feature-desc">Invite candidates, partners, and clients with single-click links. No registration or software installation required.</p>
+            <div class="feature-icon">
+                <span class="material-symbols-rounded" style="font-size: 24px;">link</span>
+            </div>
+            <h3 class="feature-title">{{ __('Instant 1-Click Guest Invites') }}</h3>
+            <p class="feature-desc">{{ __('Invite candidates, partners, and clients with single-click links without requiring accounts.') }}</p>
         </div>
 
         <div class="feature-card">
-            <div class="feature-icon">🎨</div>
-            <h3 class="feature-title">Visual Map & Furniture Designer</h3>
-            <p class="feature-desc">Easily customize your office layout with executive desks, conference rooms, stages, sofas, whiteboard partitions, and amenities.</p>
+            <div class="feature-icon">
+                <span class="material-symbols-rounded" style="font-size: 24px;">architecture</span>
+            </div>
+            <h3 class="feature-title">{{ __('Visual Map & Furniture Designer') }}</h3>
+            <p class="feature-desc">{{ __('Easily customize your office layout with desks, conference rooms, stages, and whiteboard partitions.') }}</p>
         </div>
     </section>
 
     <footer>
-        © {{ date('Y') }} Virtual Workplace Platform. All rights reserved. Built with Realtime WebSockets & WebRTC P2P mesh technology.
+        © {{ date('Y') }} UlaSpace — Virtual Workplace Platform. All rights reserved.
     </footer>
 
 </body>

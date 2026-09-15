@@ -834,11 +834,11 @@
     <aside class="admin-sidebar" id="adminSidebar">
         <div class="admin-brand">
             <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
-                <div class="admin-brand-icon">
-                    <span class="material-symbols-rounded" style="font-size: 22px;">admin_panel_settings</span>
+                <div class="admin-brand-icon" style="background: var(--nx-palm-900, #142B24); border-radius: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; padding: 4px; box-shadow: var(--nx-shadow-sm);">
+                    <img src="{{ asset('images/ulaspace-icon.png') }}" alt="UlaSpace" style="width: 22px; height: auto; object-fit: contain;">
                 </div>
                 <div class="admin-brand-text">
-                    <h2>{{ __('Super Admin Portal') }}</h2>
+                    <h2>UlaSpace</h2>
                     <span class="admin-brand-badge">ROOT ACCESS</span>
                 </div>
             </div>

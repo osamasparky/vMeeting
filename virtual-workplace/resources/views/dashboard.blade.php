@@ -1423,7 +1423,9 @@
                 @if($organization->logo_url)
                     <img id="sidebar-tenant-logo" src="{{ $organization->logo_url }}" alt="{{ $organization->name }}" style="width: 38px; height: 38px; border-radius: 12px; object-fit: cover; box-shadow: var(--shadow-soft-3d); flex-shrink: 0;">
                 @else
-                    <div id="sidebar-tenant-logo-icon" class="sidebar-logo-icon">🏢</div>
+                    <div id="sidebar-tenant-logo-icon" class="sidebar-logo-icon" style="background: var(--nx-palm-900, #142B24); width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 5px; flex-shrink: 0; box-shadow: var(--nx-shadow-sm);">
+                        <img src="{{ asset('images/ulaspace-icon.png') }}" alt="UlaSpace" style="width: 24px; height: auto; object-fit: contain;">
+                    </div>
                 @endif
                 <div>
                     <div class="sidebar-logo-text" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $organization->name }}</div>

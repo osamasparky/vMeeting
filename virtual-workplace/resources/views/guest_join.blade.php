@@ -152,8 +152,8 @@
 <body>
 
     <div class="lobby-card">
-        <div class="brand-icon">
-            <span class="material-symbols-rounded" style="font-size: 32px;">meeting_room</span>
+        <div class="brand-icon" style="background: var(--nx-palm-900, #142B24); width: 64px; height: 64px; border-radius: var(--nx-radius-xl, 18px); display: inline-flex; align-items: center; justify-content: center; padding: 12px; margin-bottom: 20px; box-shadow: var(--nx-shadow-md);">
+            <img src="{{ asset('images/ulaspace-icon.png') }}" alt="UlaSpace" style="width: 36px; height: auto; object-fit: contain;">
         </div>
 
         @if(!empty($error))
