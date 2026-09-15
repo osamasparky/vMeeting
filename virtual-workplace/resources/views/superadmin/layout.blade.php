@@ -834,35 +834,37 @@
     <aside class="admin-sidebar" id="adminSidebar">
         <div class="admin-brand">
             <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
-                <div class="admin-brand-icon">⚡</div>
+                <div class="admin-brand-icon">
+                    <span class="material-symbols-rounded" style="font-size: 22px;">admin_panel_settings</span>
+                </div>
                 <div class="admin-brand-text">
                     <h2>{{ __('Super Admin Portal') }}</h2>
                     <span class="admin-brand-badge">ROOT ACCESS</span>
                 </div>
             </div>
-            <button onclick="toggleSuperAdminSidebarCollapse()" class="sidebar-collapse-btn" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); width: 28px; height: 28px; border-radius: 8px; font-size: 11px; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;" title="{{ __('Toggle Sidebar') }}">
-                <span id="superadmin-sidebar-arrow">{{ app()->getLocale() === 'ar' ? '◀' : '▶' }}</span>
+            <button onclick="toggleSuperAdminSidebarCollapse()" class="sidebar-collapse-btn" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); width: 28px; height: 28px; border-radius: 8px; font-size: 16px; cursor: pointer; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;" title="{{ __('Toggle Sidebar') }}">
+                <span class="material-symbols-rounded" id="superadmin-sidebar-arrow" style="font-size: 18px;">chevron_left</span>
             </button>
         </div>
 
         <nav class="admin-nav">
             <div class="nav-category-title">{{ __('Overview') }}</div>
             <a href="{{ route('superadmin.dashboard') }}" class="nav-item {{ request()->routeIs('superadmin.dashboard') ? 'active' : '' }}" data-tooltip="{{ __('Dashboard') }}">
-                <span class="nav-item-icon">📊</span>
+                <span class="nav-item-icon"><span class="material-symbols-rounded">dashboard</span></span>
                 <span>{{ __('Dashboard') }}</span>
             </a>
 
             <div class="nav-category-title">{{ __('SaaS Management') }}</div>
             <a href="{{ route('superadmin.companies') }}" class="nav-item {{ request()->routeIs('superadmin.companies') ? 'active' : '' }}" data-tooltip="{{ __('Companies') }}">
-                <span class="nav-item-icon">🏢</span>
+                <span class="nav-item-icon"><span class="material-symbols-rounded">domain</span></span>
                 <span>{{ __('Companies') }}</span>
             </a>
             <a href="{{ route('superadmin.plans') }}" class="nav-item {{ request()->routeIs('superadmin.plans') ? 'active' : '' }}" data-tooltip="{{ __('Subscription Plans') }}">
-                <span class="nav-item-icon">💎</span>
+                <span class="nav-item-icon"><span class="material-symbols-rounded">workspace_premium</span></span>
                 <span>{{ __('Subscription Plans') }}</span>
             </a>
             <a href="{{ route('superadmin.template') }}" class="nav-item {{ request()->routeIs('superadmin.template*') ? 'active' : '' }}" data-tooltip="{{ __('Default Office Template') }}">
-                <span class="nav-item-icon">📐</span>
+                <span class="nav-item-icon"><span class="material-symbols-rounded">architecture</span></span>
                 <span>{{ __('Default Office Blueprint') }}</span>
             </a>
             @php
@@ -870,68 +872,68 @@
             @endphp
             <a href="{{ route('superadmin.subscriptions') }}" class="nav-item {{ request()->routeIs('superadmin.subscriptions*') ? 'active' : '' }}" data-tooltip="{{ __('Subscription Requests') }}" style="display: flex; justify-content: space-between; align-items: center;">
                 <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
-                    <span class="nav-item-icon">💳</span>
+                    <span class="nav-item-icon"><span class="material-symbols-rounded">credit_card</span></span>
                     <span>{{ __('Subscription Requests') }}</span>
                 </div>
                 @if($sidebarPendingSubs > 0)
-                    <span style="background: #D6A23A; color: white; font-size: 10px; font-weight: 900; padding: 2px 7px; border-radius: 9999px;">{{ $sidebarPendingSubs }}</span>
+                    <span style="background: var(--nx-status-scheduled, #D3A553); color: white; font-size: 10px; font-weight: 900; padding: 2px 7px; border-radius: 9999px;">{{ $sidebarPendingSubs }}</span>
                 @endif
             </a>
             <a href="{{ route('superadmin.furniture') }}" class="nav-item {{ request()->routeIs('superadmin.furniture*') ? 'active' : '' }}" data-tooltip="{{ __('Furniture & Assets') }}">
-                <span class="nav-item-icon">🛋️</span>
+                <span class="nav-item-icon"><span class="material-symbols-rounded">chair</span></span>
                 <span>{{ __('Furniture & Assets') }}</span>
             </a>
 
             <div class="nav-category-title">{{ __('Website & CMS') }}</div>
             <a href="{{ route('superadmin.cms.pages') }}" class="nav-item {{ request()->routeIs('superadmin.cms.pages*') ? 'active' : '' }}" data-tooltip="{{ __('CMS Pages & Sections') }}">
-                <span class="nav-item-icon">🌐</span>
+                <span class="nav-item-icon"><span class="material-symbols-rounded">web</span></span>
                 <span>{{ __('Website CMS Pages') }}</span>
             </a>
             <a href="{{ route('superadmin.cms.assets') }}" class="nav-item {{ request()->routeIs('superadmin.cms.assets*') ? 'active' : '' }}" data-tooltip="{{ __('3D & Media Assets') }}">
-                <span class="nav-item-icon">📁</span>
+                <span class="nav-item-icon"><span class="material-symbols-rounded">folder_open</span></span>
                 <span>{{ __('3D & Media Assets') }}</span>
             </a>
             <a href="{{ route('superadmin.cms.theme') }}" class="nav-item {{ request()->routeIs('superadmin.cms.theme*') ? 'active' : '' }}" data-tooltip="{{ __('Theme & Branding Studio') }}">
-                <span class="nav-item-icon">🎨</span>
+                <span class="nav-item-icon"><span class="material-symbols-rounded">palette</span></span>
                 <span>{{ __('Theme & Branding') }}</span>
             </a>
             <a href="{{ route('superadmin.features') }}" class="nav-item {{ request()->routeIs('superadmin.features*') ? 'active' : '' }}" data-tooltip="{{ __('Feature Flags') }}">
-                <span class="nav-item-icon">🚩</span>
+                <span class="nav-item-icon"><span class="material-symbols-rounded">flag</span></span>
                 <span>{{ __('Feature Flags') }}</span>
             </a>
 
             <div class="nav-category-title">{{ __('Access & Security') }}</div>
             <a href="{{ route('superadmin.matrix') }}" class="nav-item {{ request()->routeIs('superadmin.matrix') ? 'active' : '' }}" data-tooltip="{{ __('Permission Matrix') }}">
-                <span class="nav-item-icon">🔐</span>
+                <span class="nav-item-icon"><span class="material-symbols-rounded">lock_person</span></span>
                 <span>{{ __('Permission Matrix') }}</span>
             </a>
             <a href="{{ route('superadmin.settings') }}" class="nav-item {{ request()->routeIs('superadmin.settings') ? 'active' : '' }}" data-tooltip="{{ __('System Settings') }}">
-                <span class="nav-item-icon">⚙️</span>
+                <span class="nav-item-icon"><span class="material-symbols-rounded">settings</span></span>
                 <span>{{ __('System Settings') }}</span>
             </a>
             <a href="{{ route('superadmin.health') }}" class="nav-item {{ request()->routeIs('superadmin.health*') ? 'active' : '' }}" data-tooltip="{{ __('System Health') }}">
-                <span class="nav-item-icon">⚡</span>
+                <span class="nav-item-icon"><span class="material-symbols-rounded">monitor_heart</span></span>
                 <span>{{ __('System Health') }}</span>
             </a>
             <a href="{{ route('superadmin.translations') }}" class="nav-item {{ request()->routeIs('superadmin.translations*') ? 'active' : '' }}" data-tooltip="{{ __('Translations') }}">
-                <span class="nav-item-icon">🌐</span>
+                <span class="nav-item-icon"><span class="material-symbols-rounded">translate</span></span>
                 <span>{{ __('Translations') }}</span>
             </a>
 
             <div class="nav-category-title">{{ __('Session') }}</div>
             <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0;">
                 @csrf
-                <button type="submit" class="nav-item" style="width: 100%; border: none; background: none; text-align: start; cursor: pointer; color: #D96B5F;" data-tooltip="{{ __('Logout') }}">
-                    <span class="nav-item-icon">🚪</span>
+                <button type="submit" class="nav-item" style="width: 100%; border: none; background: none; text-align: start; cursor: pointer; color: var(--nx-status-attention, #9A5827);" data-tooltip="{{ __('Logout') }}">
+                    <span class="nav-item-icon"><span class="material-symbols-rounded">logout</span></span>
                     <span>{{ __('Logout') }}</span>
                 </button>
             </form>
         </nav>
 
         <div class="admin-sidebar-footer">
-            <span>vMeeting SaaS 2.0</span>
-            <button onclick="toggleSuperAdminTheme()" class="theme-toggle-btn" style="padding: 4px 8px; font-size: 11px;">
-                <span id="superadmin-theme-icon">🌙</span>
+            <span style="font-family: var(--font-mono); font-size: 11px;">UlaSpace 2.0</span>
+            <button onclick="toggleSuperAdminTheme()" class="theme-toggle-btn" style="padding: 4px 8px; font-size: 16px; display: inline-flex; align-items: center; justify-content: center;">
+                <span class="material-symbols-rounded" id="superadmin-theme-icon" style="font-size: 16px;">dark_mode</span>
             </button>
         </div>
     </aside>
@@ -941,23 +943,31 @@
     <div class="admin-main">
         <header class="admin-header">
             <div class="admin-header-left">
-                <button class="menu-toggle-btn" onclick="toggleSidebar()">☰</button>
+                <button class="menu-toggle-btn" onclick="toggleSidebar()" aria-label="Toggle Navigation">
+                    <span class="material-symbols-rounded">menu</span>
+                </button>
                 <button onclick="toggleSuperAdminSidebarCollapse()" class="theme-toggle-btn" style="display: inline-flex; align-items: center; justify-content: center;" title="{{ __('Toggle Sidebar') }}">
-                    <span id="header-collapse-icon">◀</span>
+                    <span class="material-symbols-rounded" id="header-collapse-icon" style="font-size: 18px;">chevron_left</span>
                 </button>
                 <h1>@yield('page_title', __('Dashboard'))</h1>
             </div>
             <div class="admin-header-right">
                 <!-- Theme Toggle Button in Header -->
-                <button onclick="toggleSuperAdminTheme()" class="theme-toggle-btn">
-                    <span id="header-theme-icon">🌙</span>
+                <button onclick="toggleSuperAdminTheme()" class="theme-toggle-btn" aria-label="Toggle theme">
+                    <span class="material-symbols-rounded" id="header-theme-icon" style="font-size: 18px;">dark_mode</span>
                 </button>
 
                 <!-- Language Switcher -->
                 @if(app()->getLocale() === 'ar')
-                    <a href="{{ route('lang.switch', 'en') }}" class="lang-switch-btn">🌐 English</a>
+                    <a href="{{ route('lang.switch', 'en') }}" class="lang-switch-btn" style="display: inline-flex; align-items: center; gap: 6px;">
+                        <span class="material-symbols-rounded" style="font-size: 16px;">language</span>
+                        <span>English</span>
+                    </a>
                 @else
-                    <a href="{{ route('lang.switch', 'ar') }}" class="lang-switch-btn">🌐 العربية</a>
+                    <a href="{{ route('lang.switch', 'ar') }}" class="lang-switch-btn" style="display: inline-flex; align-items: center; gap: 6px;">
+                        <span class="material-symbols-rounded" style="font-size: 16px;">language</span>
+                        <span>العربية</span>
+                    </a>
                 @endif
 
                 <!-- User Profile Capsule -->
@@ -975,8 +985,8 @@
                 <!-- Super Admin Logout Header Button -->
                 <form method="POST" action="{{ route('logout') }}" style="display: inline; margin: 0;">
                     @csrf
-                    <button type="submit" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.35); padding: 7px 14px; font-size: 12px; font-weight: 800; cursor: pointer; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px;" title="{{ __('Logout') }}">
-                        <span>🚪</span>
+                    <button type="submit" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: var(--nx-status-attention, #9A5827); border: 1px solid rgba(217, 107, 95, 0.35); padding: 7px 14px; font-size: 12px; font-weight: 800; cursor: pointer; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px;" title="{{ __('Logout') }}">
+                        <span class="material-symbols-rounded" style="font-size: 16px;">logout</span>
                         <span>{{ __('Logout') }}</span>
                     </button>
                 </form>
@@ -985,15 +995,15 @@
 
         <main class="admin-body">
             @if(session('success'))
-                <div class="alert-box alert-success">
-                    <span>✅</span>
+                <div class="alert-box alert-success" style="display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-rounded">check_circle</span>
                     <span>{{ session('success') }}</span>
                 </div>
             @endif
 
             @if(session('error'))
-                <div class="alert-box alert-error">
-                    <span>⚠️</span>
+                <div class="alert-box alert-error" style="display: flex; align-items: center; gap: 8px;">
+                    <span class="material-symbols-rounded">warning</span>
                     <span>{{ session('error') }}</span>
                 </div>
             @endif
@@ -1019,9 +1029,14 @@
         function updateSidebarArrow(isCollapsed, isRtl) {
             const arrowEl = document.getElementById('superadmin-sidebar-arrow');
             const headerIcon = document.getElementById('header-collapse-icon');
-            const arrow = isCollapsed ? (isRtl ? '◀' : '▶') : (isRtl ? '▶' : '◀');
-            if (arrowEl) arrowEl.textContent = arrow;
-            if (headerIcon) headerIcon.textContent = arrow;
+            let iconName = 'chevron_left';
+            if (isCollapsed) {
+                iconName = isRtl ? 'chevron_left' : 'chevron_right';
+            } else {
+                iconName = isRtl ? 'chevron_right' : 'chevron_left';
+            }
+            if (arrowEl) arrowEl.textContent = iconName;
+            if (headerIcon) headerIcon.textContent = iconName;
         }
 
         function toggleSuperAdminTheme() {
@@ -1033,7 +1048,7 @@
         }
 
         function updateThemeIcons(theme) {
-            const icon = theme === 'dark' ? '🌙' : '☀️';
+            const icon = theme === 'dark' ? 'dark_mode' : 'light_mode';
             const el1 = document.getElementById('superadmin-theme-icon');
             const el2 = document.getElementById('header-theme-icon');
             if (el1) el1.textContent = icon;

@@ -5,18 +5,26 @@
 @section('content')
 <div style="position: absolute; top: 20px; inset-inline-end: 24px; z-index: 10;">
     @if(app()->getLocale() === 'ar')
-        <a href="{{ route('lang.switch', 'en') }}" class="lang-switch-btn" style="background: #ffffff; border: 1px solid var(--border-color); color: var(--brand-navy); padding: 7px 14px; border-radius: 8px; font-size: 13px; text-decoration: none; font-weight: 800; box-shadow: var(--shadow-input);">🌐 English</a>
+        <a href="{{ route('lang.switch', 'en') }}" class="lang-switch-btn">
+            <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
+            <span>English</span>
+        </a>
     @else
-        <a href="{{ route('lang.switch', 'ar') }}" class="lang-switch-btn" style="background: #ffffff; border: 1px solid var(--border-color); color: var(--brand-navy); padding: 7px 14px; border-radius: 8px; font-size: 13px; text-decoration: none; font-weight: 800; box-shadow: var(--shadow-input);">🌐 العربية</a>
+        <a href="{{ route('lang.switch', 'ar') }}" class="lang-switch-btn">
+            <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
+            <span>العربية</span>
+        </a>
     @endif
 </div>
 
 <div class="auth-wrapper">
     <!-- Left: Register Form -->
-    <div class="auth-left" style="max-width: 620px; margin: 0 auto; width: 100%;">
+    <div class="auth-left" style="max-width: 640px; margin: 0 auto; width: 100%;">
         <div class="auth-card" style="max-width: 580px;">
             <div class="auth-logo">
-                <div class="logo-icon">🏢</div>
+                <div class="logo-icon">
+                    <span class="material-symbols-rounded">domain</span>
+                </div>
                 <span class="logo-text">{{ __('Virtual Workplace') }}</span>
             </div>
 
@@ -25,8 +33,8 @@
 
             @if($errors->any())
                 <div class="alert alert-error">
-                    <span>⚠️</span>
-                    <ul style="list-style: none; padding: 0;">
+                    <span class="material-symbols-rounded">warning</span>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
                         @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
@@ -50,7 +58,9 @@
                             required
                             autocomplete="name"
                         >
-                        <span class="form-input-icon">👤</span>
+                        <span class="form-input-icon">
+                            <span class="material-symbols-rounded">person</span>
+                        </span>
                     </div>
                 </div>
 
@@ -67,7 +77,9 @@
                             required
                             autocomplete="email"
                         >
-                        <span class="form-input-icon">📧</span>
+                        <span class="form-input-icon">
+                            <span class="material-symbols-rounded">mail</span>
+                        </span>
                     </div>
                 </div>
 
@@ -85,8 +97,12 @@
                                 minlength="8"
                                 autocomplete="new-password"
                             >
-                            <span class="form-input-icon">🔒</span>
-                            <button type="button" class="password-toggle" onclick="togglePassword('password', this)">👁️</button>
+                            <span class="form-input-icon">
+                                <span class="material-symbols-rounded">lock</span>
+                            </span>
+                            <button type="button" class="password-toggle" onclick="togglePassword('password', this)" aria-label="Toggle password visibility">
+                                <span class="material-symbols-rounded">visibility</span>
+                            </button>
                         </div>
                     </div>
 
@@ -102,7 +118,9 @@
                                 required
                                 autocomplete="new-password"
                             >
-                            <span class="form-input-icon">🔒</span>
+                            <span class="form-input-icon">
+                                <span class="material-symbols-rounded">lock</span>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -119,7 +137,9 @@
                             value="{{ old('organization_name') }}"
                             required
                         >
-                        <span class="form-input-icon">🏛️</span>
+                        <span class="form-input-icon">
+                            <span class="material-symbols-rounded">corporate_fare</span>
+                        </span>
                     </div>
                 </div>
 
@@ -133,21 +153,25 @@
                         <div
                             class="plan-card-opt {{ $index === 0 ? 'selected' : '' }}"
                             onclick="selectPlan('{{ $plan->id }}', this)"
-                            style="border: 2px solid var(--border-color); background: #f8fafc; border-radius: 12px; padding: 12px; cursor: pointer; transition: all 0.2s;"
+                            style="border: 1.5px solid var(--border-color); background: var(--bg-input); border-radius: var(--nx-radius-md, 12px); padding: 12px; cursor: pointer; transition: all 0.2s;"
                         >
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                                <strong style="font-size: 13px; color: var(--brand-navy);">💎 {{ $plan->name }}</strong>
-                                <span style="font-size: 11px; font-weight: 800; color: var(--brand-green);">${{ number_format($plan->price, 0) }}/mo</span>
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <span class="material-symbols-rounded" style="font-size: 16px; color: var(--nx-palm-500, #1E412F);">verified</span>
+                                    <strong style="font-size: 13px; color: var(--text-primary);">{{ $plan->name }}</strong>
+                                </div>
+                                <span style="font-size: 12px; font-weight: 700; font-family: var(--font-mono); color: var(--status-success);">${{ number_format($plan->price, 0) }}/mo</span>
                             </div>
-                            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">
-                                👥 <strong>{{ $plan->seat_limit === 0 ? __('Unlimited') : $plan->seat_limit }}</strong> {{ __('Seats') }}
+                            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-secondary); font-weight: 500;">
+                                <span class="material-symbols-rounded" style="font-size: 14px;">group</span>
+                                <span><strong style="font-family: var(--font-mono);">{{ $plan->seat_limit === 0 ? __('Unlimited') : $plan->seat_limit }}</strong> {{ __('Seats') }}</span>
                             </div>
                         </div>
                         @endforeach
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-primary" id="registerBtn" style="margin-top: 8px;">
+                <button type="submit" class="nx-btn nx-btn--primary" id="registerBtn" style="width: 100%; justify-content: center; padding: 12px 20px; font-weight: 700; margin-top: 8px;">
                     <span class="btn-text">{{ __('Create Account') }}</span>
                     <div class="spinner"></div>
                 </button>
@@ -164,9 +188,9 @@
 @section('styles')
 <style>
     .plan-card-opt.selected {
-        border-color: var(--brand-teal) !important;
-        background: rgba(0, 180, 179, 0.08) !important;
-        box-shadow: 0 4px 12px rgba(0, 180, 179, 0.2);
+        border-color: var(--nx-palm-500, #1E412F) !important;
+        background: rgba(30, 65, 47, 0.06) !important;
+        box-shadow: 0 0 0 1px var(--nx-palm-500, #1E412F);
     }
 </style>
 @endsection
@@ -175,12 +199,13 @@
 <script nonce="{{ $cspNonce ?? '' }}">
     function togglePassword(inputId, btn) {
         const input = document.getElementById(inputId);
+        const icon = btn.querySelector('.material-symbols-rounded');
         if (input.type === 'password') {
             input.type = 'text';
-            btn.textContent = '🙈';
+            if (icon) icon.textContent = 'visibility_off';
         } else {
             input.type = 'password';
-            btn.textContent = '👁️';
+            if (icon) icon.textContent = 'visibility';
         }
     }
 
@@ -189,5 +214,11 @@
         document.querySelectorAll('.plan-card-opt').forEach(el => el.classList.remove('selected'));
         element.classList.add('selected');
     }
+
+    document.getElementById('registerForm').addEventListener('submit', function() {
+        const btn = document.getElementById('registerBtn');
+        btn.classList.add('btn-loading');
+        btn.disabled = true;
+    });
 </script>
 @endsection
