@@ -968,7 +968,7 @@
 
             <!-- 2. Center: Active Room Scrim Capsule (Room Name, Room Files, Door Lock) -->
             <div class="nx-map-room-label" id="room-status-pill" style="display: none;">
-                <span id="current-room-name" style="font-weight: 600; font-size: 12px; color: #86EFAC; display: flex; align-items: center; gap: 6px;">
+                <span id="current-room-name" style="font-weight: 600; font-size: 12px; color: #FFFFFF; display: flex; align-items: center; gap: 6px;">
                     <span class="material-symbols-rounded" style="font-size: 18px;">meeting_room</span>
                     <span>{{ __('Meeting Room') }}</span>
                 </span>
@@ -3431,7 +3431,7 @@
             else ctx.rect(sX, sY, sW, sH);
             ctx.stroke();
 
-            ctx.fillStyle = '#86EFAC';
+            ctx.fillStyle = '#FFFFFF';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(statusBadgeText, sX + sW / 2, sY + sH / 2);
