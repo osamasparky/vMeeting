@@ -2441,11 +2441,15 @@
                 const ry = r.bounds.y * TILE_SIZE;
                 const rw = r.bounds.width * TILE_SIZE;
                 const rh = r.bounds.height * TILE_SIZE;
+                const isLocked = !!roomDoorStates.get(r.id);
                 const door = getRoomDoorPortal(r);
-                const doorHalfW = door ? (door.width / 2) : 24;
+                const doorHalfW = door ? (door.width / 2) : 28;
+
+                // If room is locked, door is impassable solid wall!
+                const hasOpenDoor = (!isLocked && door);
 
                 // 1. Top wall
-                if (door && door.wallSide === 'top') {
+                if (hasOpenDoor && door.wallSide === 'top') {
                     if (door.x - doorHalfW > rx + 4) segments.push({ x1: rx, y1: ry, x2: door.x - doorHalfW, y2: ry, roomId: r.id });
                     if (door.x + doorHalfW < rx + rw - 4) segments.push({ x1: door.x + doorHalfW, y1: ry, x2: rx + rw, y2: ry, roomId: r.id });
                 } else {
@@ -2453,7 +2457,7 @@
                 }
 
                 // 2. Bottom wall
-                if (door && door.wallSide === 'bottom') {
+                if (hasOpenDoor && door.wallSide === 'bottom') {
                     if (door.x - doorHalfW > rx + 4) segments.push({ x1: rx, y1: ry + rh, x2: door.x - doorHalfW, y2: ry + rh, roomId: r.id });
                     if (door.x + doorHalfW < rx + rw - 4) segments.push({ x1: door.x + doorHalfW, y1: ry + rh, x2: rx + rw, y2: ry + rh, roomId: r.id });
                 } else {
@@ -2461,7 +2465,7 @@
                 }
 
                 // 3. Left wall
-                if (door && door.wallSide === 'left') {
+                if (hasOpenDoor && door.wallSide === 'left') {
                     if (door.y - doorHalfW > ry + 4) segments.push({ x1: rx, y1: ry, x2: rx, y2: door.y - doorHalfW, roomId: r.id });
                     if (door.y + doorHalfW < ry + rh - 4) segments.push({ x1: rx, y1: door.y + doorHalfW, x2: rx, y2: ry + rh, roomId: r.id });
                 } else {
@@ -2469,7 +2473,7 @@
                 }
 
                 // 4. Right wall
-                if (door && door.wallSide === 'right') {
+                if (hasOpenDoor && door.wallSide === 'right') {
                     if (door.y - doorHalfW > ry + 4) segments.push({ x1: rx + rw, y1: ry, x2: rx + rw, y2: door.y - doorHalfW, roomId: r.id });
                     if (door.y + doorHalfW < ry + rh - 4) segments.push({ x1: rx + rw, y1: door.y + doorHalfW, x2: rx + rw, y2: ry + rh, roomId: r.id });
                 } else {
@@ -2497,26 +2501,43 @@
                 const ry = r.bounds.y * TILE_SIZE;
                 const rw = r.bounds.width * TILE_SIZE;
                 const rh = r.bounds.height * TILE_SIZE;
-                const door = getRoomDoorPortal(r);
+                const isLocked = !!roomDoorStates.get(r.id);
+                const doors = getRoomDoors(r);
 
-                // If point is directly at the door opening, it's legal walkable passage
-                if (door && Math.hypot(x - door.x, y - door.y) <= 32) {
-                    continue;
+                // If room is open and point is within any valid door corridor, it's legal walkable passage
+                if (!isLocked && doors && doors.length > 0) {
+                    let inDoorOpening = false;
+                    for (const d of doors) {
+                        const doorMinX = Math.min(d.entryInsideX, d.exitOutsideX) - 24;
+                        const doorMaxX = Math.max(d.entryInsideX, d.exitOutsideX) + 24;
+                        const doorMinY = Math.min(d.entryInsideY, d.exitOutsideY) - 24;
+                        const doorMaxY = Math.max(d.entryInsideY, d.exitOutsideY) + 24;
+                        if (x >= doorMinX && x <= doorMaxX && y >= doorMinY && y <= doorMaxY) {
+                            inDoorOpening = true;
+                            break;
+                        }
+                        if (Math.hypot(x - d.x, y - d.y) <= 32) {
+                            inDoorOpening = true;
+                            break;
+                        }
+                    }
+                    if (inDoorOpening) continue;
                 }
 
                 if (x >= rx - margin && x <= rx + rw + margin && y >= ry - margin && y <= ry + rh + margin) {
-                    return true;
+                    return true; // Point falls inside forbidden room interior/perimeter
                 }
             }
             return false;
         }
 
         function isPathClear(p1, p2, allowedRoomId = null, radius = 12) {
+            if (!p1 || !p2) return false;
             if (checkCapsuleWallCollision(p1.x, p1.y, p2.x, p2.y, radius, allowedRoomId)) {
                 return false;
             }
             const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-            const steps = Math.max(2, Math.ceil(dist / 14));
+            const steps = Math.max(2, Math.ceil(dist / 12));
             for (let i = 1; i < steps; i++) {
                 const t = i / steps;
                 const sx = p1.x + t * (p2.x - p1.x);
@@ -2529,6 +2550,8 @@
         }
 
         function findAStarPath(start, goal, allowedRoomId = null) {
+            if (!start || !goal) return null;
+
             const cols = Math.ceil(MAP_WIDTH_PX / NAV_GRID_STEP);
             const rows = Math.ceil(MAP_HEIGHT_PX / NAV_GRID_STEP);
 
@@ -2553,10 +2576,9 @@
 
             let goalNode = null;
             let iterations = 0;
-            const maxIterations = 2500;
+            const maxIterations = 3500;
 
             while (openSet.length > 0 && iterations++ < maxIterations) {
-                // Find node with lowest f cost
                 let bestIdx = 0;
                 for (let i = 1; i < openSet.length; i++) {
                     if (openSet[i].f < openSet[bestIdx].f) bestIdx = i;
@@ -2572,6 +2594,9 @@
                     break;
                 }
 
+                const curPx = current.c * NAV_GRID_STEP + (NAV_GRID_STEP / 2);
+                const curPy = current.r * NAV_GRID_STEP + (NAV_GRID_STEP / 2);
+
                 for (const d of dirs) {
                     const nc = current.c + d.dc;
                     const nr = current.r + d.dr;
@@ -2583,19 +2608,26 @@
                     const npx = nc * NAV_GRID_STEP + (NAV_GRID_STEP / 2);
                     const npy = nr * NAV_GRID_STEP + (NAV_GRID_STEP / 2);
 
-                    // For diagonal moves, prevent cutting corners between walls
+                    // For diagonal moves, require both orthogonal neighbors to be unobstructed
                     if (d.dc !== 0 && d.dr !== 0) {
                         const cornerX1 = (current.c + d.dc) * NAV_GRID_STEP + (NAV_GRID_STEP / 2);
                         const cornerY1 = current.r * NAV_GRID_STEP + (NAV_GRID_STEP / 2);
                         const cornerX2 = current.c * NAV_GRID_STEP + (NAV_GRID_STEP / 2);
                         const cornerY2 = (current.r + d.dr) * NAV_GRID_STEP + (NAV_GRID_STEP / 2);
+
                         if (isPointInForbiddenRoomZone(cornerX1, cornerY1, allowedRoomId, 10) ||
-                            isPointInForbiddenRoomZone(cornerX2, cornerY2, allowedRoomId, 10)) {
+                            isPointInForbiddenRoomZone(cornerX2, cornerY2, allowedRoomId, 10) ||
+                            checkCapsuleWallCollision(curPx, curPy, cornerX1, cornerY1, 10, allowedRoomId) ||
+                            checkCapsuleWallCollision(curPx, curPy, cornerX2, cornerY2, 10, allowedRoomId)) {
                             continue;
                         }
                     }
 
+                    // Check destination node walkability
                     if (isPointInForbiddenRoomZone(npx, npy, allowedRoomId, 12)) continue;
+
+                    // Check continuous edge capsule collision
+                    if (checkCapsuleWallCollision(curPx, curPy, npx, npy, 10, allowedRoomId)) continue;
 
                     const ng = current.g + d.cost * NAV_GRID_STEP;
                     const h = Math.hypot(npx - goal.x, npy - goal.y);
@@ -2604,7 +2636,7 @@
             }
 
             if (!goalNode) {
-                return [goal];
+                return null; // Explicit failure: NEVER return [goal]
             }
 
             const path = [];
@@ -2622,7 +2654,8 @@
         }
 
         function simplifyPath(rawPath, allowedRoomId = null) {
-            if (!rawPath || rawPath.length <= 2) return rawPath || [];
+            if (!rawPath || !Array.isArray(rawPath) || rawPath.length === 0) return [];
+            if (rawPath.length <= 2) return [...rawPath];
             const smoothed = [rawPath[0]];
             let currentIdx = 0;
 
@@ -2657,12 +2690,36 @@
             return false;
         }
 
-        function buildNavigationRoute(startPos, destPos, srcRoom, dstRoom) {
-            const waypoints = [];
+        function validateCompleteRoute(route, srcRoomId = null, dstRoomId = null) {
+            if (!route || !Array.isArray(route) || route.length === 0) return false;
+            for (let i = 0; i < route.length - 1; i++) {
+                const p1 = route[i];
+                const p2 = route[i + 1];
+                const p1Room = getCurrentRoom(p1.x, p1.y);
+                const p2Room = getCurrentRoom(p2.x, p2.y);
+                const allowedRoom = (p1Room && p2Room && p1Room.id === p2Room.id) ? p1Room.id : (p1Room ? p1Room.id : (p2Room ? p2Room.id : null));
 
-            // Case 1: Same Room Movement (or both in open space with clear line of sight)
+                if (!isPathClear(p1, p2, allowedRoom, 10)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function buildNavigationRoute(startPos, destPos, srcRoom = null, dstRoom = null) {
+            if (!srcRoom) srcRoom = getCurrentRoom(startPos.x, startPos.y);
+            if (!dstRoom) dstRoom = getCurrentRoom(destPos.x, destPos.y);
+
+            // Guard: Destination or Source locked room check
+            if (dstRoom && roomDoorStates.get(dstRoom.id) && (!srcRoom || srcRoom.id !== dstRoom.id)) {
+                return null;
+            }
+            if (srcRoom && roomDoorStates.get(srcRoom.id) && (!dstRoom || dstRoom.id !== srcRoom.id)) {
+                return null;
+            }
+
+            // Case 1: Same Room Movement
             if (srcRoom && dstRoom && srcRoom.id === dstRoom.id) {
-                // Keep safe clearance from room walls
                 const rx = srcRoom.bounds.x * TILE_SIZE;
                 const ry = srcRoom.bounds.y * TILE_SIZE;
                 const rw = srcRoom.bounds.width * TILE_SIZE;
@@ -2670,120 +2727,162 @@
                 const margin = AVATAR_COLLISION_RADIUS + 2;
                 const clampedX = Math.max(rx + margin, Math.min(rx + rw - margin, destPos.x));
                 const clampedY = Math.max(ry + margin, Math.min(ry + rh - margin, destPos.y));
+                const clampedDest = { x: clampedX, y: clampedY };
 
-                if (isPathClear(startPos, { x: clampedX, y: clampedY }, srcRoom.id, 10)) {
-                    waypoints.push({ x: clampedX, y: clampedY, action: null });
-                } else {
-                    const raw = findAStarPath(startPos, { x: clampedX, y: clampedY }, srcRoom.id);
-                    const simplified = simplifyPath(raw, srcRoom.id);
-                    simplified.forEach(pt => waypoints.push({ x: pt.x, y: pt.y, action: null }));
+                if (isPathClear(startPos, clampedDest, srcRoom.id, 10)) {
+                    return [{ x: clampedX, y: clampedY, action: null }];
                 }
-                return waypoints;
+                const raw = findAStarPath(startPos, clampedDest, srcRoom.id);
+                if (!raw) return null;
+                const simplified = simplifyPath(raw, srcRoom.id);
+                const waypoints = simplified.map(pt => ({ x: pt.x, y: pt.y, action: null }));
+                return validateCompleteRoute(waypoints, srcRoom.id, srcRoom.id) ? waypoints : null;
             }
 
             // Case 2: Open Space to Open Space
             if (!srcRoom && !dstRoom) {
                 const clampedX = Math.max(16, Math.min(MAP_WIDTH_PX - 16, destPos.x));
                 const clampedY = Math.max(16, Math.min(MAP_HEIGHT_PX - 16, destPos.y));
+                const clampedDest = { x: clampedX, y: clampedY };
 
-                if (isPathClear(startPos, { x: clampedX, y: clampedY }, null, 14)) {
-                    waypoints.push({ x: clampedX, y: clampedY, action: null });
-                } else {
-                    const raw = findAStarPath(startPos, { x: clampedX, y: clampedY }, null);
-                    const simplified = simplifyPath(raw, null);
-                    simplified.forEach(pt => waypoints.push({ x: pt.x, y: pt.y, action: null }));
+                if (isPathClear(startPos, clampedDest, null, 12)) {
+                    return [{ x: clampedX, y: clampedY, action: null }];
                 }
-                return waypoints;
+                const raw = findAStarPath(startPos, clampedDest, null);
+                if (!raw) return null;
+                const simplified = simplifyPath(raw, null);
+                const waypoints = simplified.map(pt => ({ x: pt.x, y: pt.y, action: null }));
+                return validateCompleteRoute(waypoints, null, null) ? waypoints : null;
             }
 
-            // Case 3: Inside Room to Open Space (Evaluate all doors of source room for shortest path)
+            // Case 3: Inside Room to Open Space (Evaluate all source doors for shortest valid path)
             if (srcRoom && !dstRoom) {
                 const curDoors = getRoomDoors(srcRoom);
                 let bestRoute = null;
                 let bestDist = Infinity;
 
                 for (const curDoor of curDoors) {
-                    const openRaw = findAStarPath({ x: curDoor.exitOutsideX, y: curDoor.exitOutsideY }, destPos, null);
-                    const openSimplified = simplifyPath(openRaw, null);
-
-                    let totalDist = Math.hypot(startPos.x - curDoor.entryInsideX, startPos.y - curDoor.entryInsideY);
-                    for (let i = 0; i < openSimplified.length - 1; i++) {
-                        totalDist += Math.hypot(openSimplified[i+1].x - openSimplified[i].x, openSimplified[i+1].y - openSimplified[i].y);
+                    let insideLeg = [{ x: curDoor.entryInsideX, y: curDoor.entryInsideY }];
+                    if (!isPathClear(startPos, { x: curDoor.entryInsideX, y: curDoor.entryInsideY }, srcRoom.id, 10)) {
+                        const insideRaw = findAStarPath(startPos, { x: curDoor.entryInsideX, y: curDoor.entryInsideY }, srcRoom.id);
+                        if (!insideRaw) continue;
+                        insideLeg = simplifyPath(insideRaw, srcRoom.id).slice(1);
                     }
 
-                    if (totalDist < bestDist) {
-                        bestDist = totalDist;
-                        bestRoute = [
-                            {
-                                x: curDoor.entryInsideX,
-                                y: curDoor.entryInsideY,
-                                action: () => {
-                                    playDoorSlideSound();
-                                    triggerDoorAnimation(srcRoom.id);
-                                }
-                            },
-                            {
-                                x: curDoor.exitOutsideX,
-                                y: curDoor.exitOutsideY,
-                                action: null
-                            },
-                            ...openSimplified.slice(1).map(pt => ({ x: pt.x, y: pt.y, action: null }))
-                        ];
+                    let openLeg = [{ x: destPos.x, y: destPos.y }];
+                    if (!isPathClear({ x: curDoor.exitOutsideX, y: curDoor.exitOutsideY }, destPos, null, 12)) {
+                        const openRaw = findAStarPath({ x: curDoor.exitOutsideX, y: curDoor.exitOutsideY }, destPos, null);
+                        if (!openRaw) continue;
+                        openLeg = simplifyPath(openRaw, null).slice(1);
+                    }
+
+                    const candidate = [
+                        ...insideLeg.slice(0, -1).map(pt => ({ x: pt.x, y: pt.y, action: null })),
+                        {
+                            x: curDoor.entryInsideX,
+                            y: curDoor.entryInsideY,
+                            action: () => {
+                                playDoorSlideSound();
+                                triggerDoorAnimation(srcRoom.id);
+                            }
+                        },
+                        {
+                            x: curDoor.exitOutsideX,
+                            y: curDoor.exitOutsideY,
+                            action: null
+                        },
+                        ...openLeg.map(pt => ({ x: pt.x, y: pt.y, action: null }))
+                    ];
+
+                    if (!validateCompleteRoute(candidate, srcRoom.id, null)) continue;
+
+                    let dist = Math.hypot(startPos.x - candidate[0].x, startPos.y - candidate[0].y);
+                    for (let i = 0; i < candidate.length - 1; i++) {
+                        dist += Math.hypot(candidate[i+1].x - candidate[i].x, candidate[i+1].y - candidate[i].y);
+                    }
+                    if (dist < bestDist) {
+                        bestDist = dist;
+                        bestRoute = candidate;
                     }
                 }
-                return bestRoute || [];
+                return bestRoute;
             }
 
-            // Case 4: Open Space to Inside Room (Evaluate all doors of target room for shortest path)
+            // Case 4: Open Space to Inside Room (Evaluate all target doors for shortest valid path)
             if (!srcRoom && dstRoom) {
+                const rx = dstRoom.bounds.x * TILE_SIZE;
+                const ry = dstRoom.bounds.y * TILE_SIZE;
+                const rw = dstRoom.bounds.width * TILE_SIZE;
+                const rh = dstRoom.bounds.height * TILE_SIZE;
+                const margin = AVATAR_COLLISION_RADIUS + 2;
+                const clampedX = Math.max(rx + margin, Math.min(rx + rw - margin, destPos.x));
+                const clampedY = Math.max(ry + margin, Math.min(ry + rh - margin, destPos.y));
+                const clampedDest = { x: clampedX, y: clampedY };
+
                 const targetDoors = getRoomDoors(dstRoom);
                 let bestRoute = null;
                 let bestDist = Infinity;
 
                 for (const targetDoor of targetDoors) {
-                    const openRaw = findAStarPath(startPos, { x: targetDoor.exitOutsideX, y: targetDoor.exitOutsideY }, null);
-                    const openSimplified = simplifyPath(openRaw, null);
-
-                    const rx = dstRoom.bounds.x * TILE_SIZE;
-                    const ry = dstRoom.bounds.y * TILE_SIZE;
-                    const rw = dstRoom.bounds.width * TILE_SIZE;
-                    const rh = dstRoom.bounds.height * TILE_SIZE;
-                    const margin = AVATAR_COLLISION_RADIUS + 2;
-                    const clampedX = Math.max(rx + margin, Math.min(rx + rw - margin, destPos.x));
-                    const clampedY = Math.max(ry + margin, Math.min(ry + rh - margin, destPos.y));
-
-                    let totalDist = 0;
-                    for (let i = 0; i < openSimplified.length - 1; i++) {
-                        totalDist += Math.hypot(openSimplified[i+1].x - openSimplified[i].x, openSimplified[i+1].y - openSimplified[i].y);
+                    let openLeg = [];
+                    if (isPathClear(startPos, { x: targetDoor.exitOutsideX, y: targetDoor.exitOutsideY }, null, 12)) {
+                        openLeg = [{ x: targetDoor.exitOutsideX, y: targetDoor.exitOutsideY }];
+                    } else {
+                        const openRaw = findAStarPath(startPos, { x: targetDoor.exitOutsideX, y: targetDoor.exitOutsideY }, null);
+                        if (!openRaw) continue;
+                        openLeg = simplifyPath(openRaw, null).slice(1);
                     }
-                    totalDist += Math.hypot(targetDoor.entryInsideX - clampedX, targetDoor.entryInsideY - clampedY);
 
-                    if (totalDist < bestDist) {
-                        bestDist = totalDist;
-                        bestRoute = [
-                            ...openSimplified.map(pt => ({ x: pt.x, y: pt.y, action: null })),
-                            {
-                                x: targetDoor.exitOutsideX,
-                                y: targetDoor.exitOutsideY,
-                                action: () => {
-                                    playDoorSlideSound();
-                                    triggerDoorAnimation(dstRoom.id);
-                                }
-                            },
-                            {
-                                x: targetDoor.entryInsideX,
-                                y: targetDoor.entryInsideY,
-                                action: null
-                            },
-                            { x: clampedX, y: clampedY, action: null }
-                        ];
+                    let insideLeg = [{ x: clampedX, y: clampedY }];
+                    if (!isPathClear({ x: targetDoor.entryInsideX, y: targetDoor.entryInsideY }, clampedDest, dstRoom.id, 10)) {
+                        const insideRaw = findAStarPath({ x: targetDoor.entryInsideX, y: targetDoor.entryInsideY }, clampedDest, dstRoom.id);
+                        if (!insideRaw) continue;
+                        insideLeg = simplifyPath(insideRaw, dstRoom.id).slice(1);
+                    }
+
+                    const candidate = [
+                        ...openLeg.slice(0, -1).map(pt => ({ x: pt.x, y: pt.y, action: null })),
+                        {
+                            x: targetDoor.exitOutsideX,
+                            y: targetDoor.exitOutsideY,
+                            action: () => {
+                                playDoorSlideSound();
+                                triggerDoorAnimation(dstRoom.id);
+                            }
+                        },
+                        {
+                            x: targetDoor.entryInsideX,
+                            y: targetDoor.entryInsideY,
+                            action: null
+                        },
+                        ...insideLeg.map(pt => ({ x: pt.x, y: pt.y, action: null }))
+                    ];
+
+                    if (!validateCompleteRoute(candidate, null, dstRoom.id)) continue;
+
+                    let dist = Math.hypot(startPos.x - candidate[0].x, startPos.y - candidate[0].y);
+                    for (let i = 0; i < candidate.length - 1; i++) {
+                        dist += Math.hypot(candidate[i+1].x - candidate[i].x, candidate[i+1].y - candidate[i].y);
+                    }
+                    if (dist < bestDist) {
+                        bestDist = dist;
+                        bestRoute = candidate;
                     }
                 }
-                return bestRoute || [];
+                return bestRoute;
             }
 
-            // Case 5: Room A to Room B (Evaluate all door combinations for shortest path)
+            // Case 5: Room A to Room B (Evaluate all door combinations for shortest valid path)
             if (srcRoom && dstRoom && srcRoom.id !== dstRoom.id) {
+                const rx = dstRoom.bounds.x * TILE_SIZE;
+                const ry = dstRoom.bounds.y * TILE_SIZE;
+                const rw = dstRoom.bounds.width * TILE_SIZE;
+                const rh = dstRoom.bounds.height * TILE_SIZE;
+                const margin = AVATAR_COLLISION_RADIUS + 2;
+                const clampedX = Math.max(rx + margin, Math.min(rx + rw - margin, destPos.x));
+                const clampedY = Math.max(ry + margin, Math.min(ry + rh - margin, destPos.y));
+                const clampedDest = { x: clampedX, y: clampedY };
+
                 const srcDoors = getRoomDoors(srcRoom);
                 const dstDoors = getRoomDoors(dstRoom);
                 let bestRoute = null;
@@ -2791,66 +2890,81 @@
 
                 for (const sDoor of srcDoors) {
                     for (const dDoor of dstDoors) {
-                        const openRaw = findAStarPath(
-                            { x: sDoor.exitOutsideX, y: sDoor.exitOutsideY },
-                            { x: dDoor.exitOutsideX, y: dDoor.exitOutsideY },
-                            null
-                        );
-                        const openSimplified = simplifyPath(openRaw, null);
-
-                        const rx = dstRoom.bounds.x * TILE_SIZE;
-                        const ry = dstRoom.bounds.y * TILE_SIZE;
-                        const rw = dstRoom.bounds.width * TILE_SIZE;
-                        const rh = dstRoom.bounds.height * TILE_SIZE;
-                        const margin = AVATAR_COLLISION_RADIUS + 2;
-                        const clampedX = Math.max(rx + margin, Math.min(rx + rw - margin, destPos.x));
-                        const clampedY = Math.max(ry + margin, Math.min(ry + rh - margin, destPos.y));
-
-                        let totalDist = Math.hypot(startPos.x - sDoor.entryInsideX, startPos.y - sDoor.entryInsideY);
-                        for (let i = 0; i < openSimplified.length - 1; i++) {
-                            totalDist += Math.hypot(openSimplified[i+1].x - openSimplified[i].x, openSimplified[i+1].y - openSimplified[i].y);
+                        let srcInsideLeg = [];
+                        if (isPathClear(startPos, { x: sDoor.entryInsideX, y: sDoor.entryInsideY }, srcRoom.id, 10)) {
+                            srcInsideLeg = [{ x: sDoor.entryInsideX, y: sDoor.entryInsideY }];
+                        } else {
+                            const srcRaw = findAStarPath(startPos, { x: sDoor.entryInsideX, y: sDoor.entryInsideY }, srcRoom.id);
+                            if (!srcRaw) continue;
+                            srcInsideLeg = simplifyPath(srcRaw, srcRoom.id).slice(1);
                         }
-                        totalDist += Math.hypot(dDoor.entryInsideX - clampedX, dDoor.entryInsideY - clampedY);
 
-                        if (totalDist < bestDist) {
-                            bestDist = totalDist;
-                            bestRoute = [
-                                {
-                                    x: sDoor.entryInsideX,
-                                    y: sDoor.entryInsideY,
-                                    action: () => {
-                                        playDoorSlideSound();
-                                        triggerDoorAnimation(srcRoom.id);
-                                    }
-                                },
-                                {
-                                    x: sDoor.exitOutsideX,
-                                    y: sDoor.exitOutsideY,
-                                    action: null
-                                },
-                                ...openSimplified.slice(1).map(pt => ({ x: pt.x, y: pt.y, action: null })),
-                                {
-                                    x: dDoor.exitOutsideX,
-                                    y: dDoor.exitOutsideY,
-                                    action: () => {
-                                        playDoorSlideSound();
-                                        triggerDoorAnimation(dstRoom.id);
-                                    }
-                                },
-                                {
-                                    x: dDoor.entryInsideX,
-                                    y: dDoor.entryInsideY,
-                                    action: null
-                                },
-                                { x: clampedX, y: clampedY, action: null }
-                            ];
+                        let openLeg = [];
+                        if (isPathClear({ x: sDoor.exitOutsideX, y: sDoor.exitOutsideY }, { x: dDoor.exitOutsideX, y: dDoor.exitOutsideY }, null, 12)) {
+                            openLeg = [{ x: dDoor.exitOutsideX, y: dDoor.exitOutsideY }];
+                        } else {
+                            const openRaw = findAStarPath({ x: sDoor.exitOutsideX, y: sDoor.exitOutsideY }, { x: dDoor.exitOutsideX, y: dDoor.exitOutsideY }, null);
+                            if (!openRaw) continue;
+                            openLeg = simplifyPath(openRaw, null).slice(1);
+                        }
+
+                        let dstInsideLeg = [];
+                        if (isPathClear({ x: dDoor.entryInsideX, y: dDoor.entryInsideY }, clampedDest, dstRoom.id, 10)) {
+                            dstInsideLeg = [{ x: clampedX, y: clampedY }];
+                        } else {
+                            const dstRaw = findAStarPath({ x: dDoor.entryInsideX, y: dDoor.entryInsideY }, clampedDest, dstRoom.id);
+                            if (!dstRaw) continue;
+                            dstInsideLeg = simplifyPath(dstRaw, dstRoom.id).slice(1);
+                        }
+
+                        const candidate = [
+                            ...srcInsideLeg.slice(0, -1).map(pt => ({ x: pt.x, y: pt.y, action: null })),
+                            {
+                                x: sDoor.entryInsideX,
+                                y: sDoor.entryInsideY,
+                                action: () => {
+                                    playDoorSlideSound();
+                                    triggerDoorAnimation(srcRoom.id);
+                                }
+                            },
+                            {
+                                x: sDoor.exitOutsideX,
+                                y: sDoor.exitOutsideY,
+                                action: null
+                            },
+                            ...openLeg.slice(0, -1).map(pt => ({ x: pt.x, y: pt.y, action: null })),
+                            {
+                                x: dDoor.exitOutsideX,
+                                y: dDoor.exitOutsideY,
+                                action: () => {
+                                    playDoorSlideSound();
+                                    triggerDoorAnimation(dstRoom.id);
+                                }
+                            },
+                            {
+                                x: dDoor.entryInsideX,
+                                y: dDoor.entryInsideY,
+                                action: null
+                            },
+                            ...dstInsideLeg.map(pt => ({ x: pt.x, y: pt.y, action: null }))
+                        ];
+
+                        if (!validateCompleteRoute(candidate, srcRoom.id, dstRoom.id)) continue;
+
+                        let dist = Math.hypot(startPos.x - candidate[0].x, startPos.y - candidate[0].y);
+                        for (let i = 0; i < candidate.length - 1; i++) {
+                            dist += Math.hypot(candidate[i+1].x - candidate[i].x, candidate[i+1].y - candidate[i].y);
+                        }
+                        if (dist < bestDist) {
+                            bestDist = dist;
+                            bestRoute = candidate;
                         }
                     }
                 }
-                return bestRoute || [];
+                return bestRoute;
             }
 
-            return waypoints;
+            return null;
         }
 
         function navigateToRoomWithRoute(targetRoom, destX, destY) {
@@ -2867,6 +2981,8 @@
                 localAvatar.targetX = firstWp.x;
                 localAvatar.targetY = firstWp.y;
                 if (firstWp.action) firstWp.action();
+            } else {
+                showToast('⚠️ ' + __('No route available'));
             }
         }
 
@@ -3311,12 +3427,15 @@
                 // Check if allowed via door portal opening
                 const myDoor = currentR ? getRoomDoorPortal(currentR) : null;
                 const tgtDoor = targetR ? getRoomDoorPortal(targetR) : null;
-                const nearMyDoor = myDoor && Math.hypot(localAvatar.x - myDoor.x, localAvatar.y - myDoor.y) <= 32;
-                const nearTgtDoor = tgtDoor && Math.hypot(nextX - tgtDoor.x, nextY - tgtDoor.y) <= 32;
+                const nearMyDoor = myDoor && Math.hypot(localAvatar.x - myDoor.x, localAvatar.y - myDoor.y) <= 36;
+                const nearTgtDoor = tgtDoor && Math.hypot(nextX - tgtDoor.x, nextY - tgtDoor.y) <= 36;
 
                 if (!nearMyDoor && !nearTgtDoor) {
                     nextX = localAvatar.x;
                     nextY = localAvatar.y;
+                    localAvatar.targetX = localAvatar.x;
+                    localAvatar.targetY = localAvatar.y;
+                    avatarWaypoints = []; // Clear waypoints so avatar doesn't get stuck indefinitely
                 }
             }
 
@@ -3801,11 +3920,18 @@
                 ctx.stroke();
 
                 // Localized Room Name (100% Solid Crisp Pure White #FFFFFF)
+                ctx.save();
+                ctx.globalAlpha = 1.0;
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
                 ctx.fillStyle = '#FFFFFF';
                 ctx.font = '700 11px ' + (CURRENT_LOCALE === 'ar' ? '"IBM Plex Sans Arabic", sans-serif' : '"IBM Plex Sans", sans-serif');
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText((isLocked ? '🔒 ' : '') + displayName, cardX + (cardW / 2), cardY + (cardH / 2) + 0.5);
+                ctx.restore();
                 ctx.restore();
             });
 
@@ -3836,16 +3962,26 @@
             ctx.fill();
 
             ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
             ctx.strokeStyle = 'rgba(237, 230, 217, 0.18)';
             ctx.lineWidth = 1;
             if (ctx.roundRect) ctx.roundRect(sX, sY, sW, sH, 13);
             else ctx.rect(sX, sY, sW, sH);
             ctx.stroke();
 
+            ctx.save();
+            ctx.globalAlpha = 1.0;
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
             ctx.fillStyle = '#FFFFFF';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(statusBadgeText, sX + sW / 2, sY + sH / 2);
+            ctx.restore();
             ctx.restore();
 
             // 4. Draw Remote Avatars (Clean 2.5D Figure without white circle)
