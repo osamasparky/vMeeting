@@ -3333,13 +3333,13 @@
                 const displayName = getLocalizedRoomName(r);
 
                 ctx.save();
-                ctx.font = '600 9px ' + (CURRENT_LOCALE === 'ar' ? '"IBM Plex Sans Arabic", sans-serif' : '"IBM Plex Sans", sans-serif');
+                ctx.font = '700 10px ' + (CURRENT_LOCALE === 'ar' ? '"IBM Plex Sans Arabic", sans-serif' : '"IBM Plex Sans", sans-serif');
                 const nameMetrics = ctx.measureText(displayName);
                 
-                const cardPadX = 8;
+                const cardPadX = 10;
                 const cardW = Math.min(rw - 16, nameMetrics.width + (cardPadX * 2));
-                const cardH = 18;
-                const cardRadius = 6;
+                const cardH = 20;
+                const cardRadius = 7;
                 const margin = 12;
 
                 // 4 Candidate corners: Top-Left, Top-Right, Bottom-Left, Bottom-Right
@@ -3372,26 +3372,26 @@
                 const cardY = chosenCorner.y;
 
                 // Subtle Card Drop Shadow
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.35)';
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
                 ctx.shadowBlur = 6;
                 ctx.shadowOffsetY = 2;
 
-                // Green rounded background
-                ctx.fillStyle = isLocked ? 'rgba(127, 29, 29, 0.92)' : 'rgba(20, 55, 38, 0.90)';
+                // Dark elegant background matching Figma
+                ctx.fillStyle = isLocked ? 'rgba(127, 29, 29, 0.94)' : 'rgba(14, 38, 26, 0.92)';
                 if (ctx.roundRect) ctx.roundRect(cardX, cardY, cardW, cardH, cardRadius);
                 else ctx.rect(cardX, cardY, cardW, cardH);
                 ctx.fill();
 
                 ctx.shadowColor = 'transparent';
-                ctx.strokeStyle = isLocked ? 'rgba(239, 68, 68, 0.50)' : 'rgba(52, 211, 153, 0.40)';
-                ctx.lineWidth = 1;
+                ctx.strokeStyle = isLocked ? 'rgba(239, 68, 68, 0.60)' : 'rgba(52, 211, 153, 0.50)';
+                ctx.lineWidth = 1.2;
                 if (ctx.roundRect) ctx.roundRect(cardX, cardY, cardW, cardH, cardRadius);
                 else ctx.rect(cardX, cardY, cardW, cardH);
                 ctx.stroke();
 
-                // Localized Room Name
+                // Localized Room Name (100% Solid Crisp Pure White #FFFFFF)
                 ctx.fillStyle = '#FFFFFF';
-                ctx.font = '600 9px ' + (CURRENT_LOCALE === 'ar' ? '"IBM Plex Sans Arabic", sans-serif' : '"IBM Plex Sans", sans-serif');
+                ctx.font = '700 10px ' + (CURRENT_LOCALE === 'ar' ? '"IBM Plex Sans Arabic", sans-serif' : '"IBM Plex Sans", sans-serif');
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText((isLocked ? '🔒 ' : '') + displayName, cardX + (cardW / 2), cardY + (cardH / 2) + 0.5);
