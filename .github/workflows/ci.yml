@@ -40,11 +40,12 @@ jobs:
         run: |
           cp .env.example .env
           php artisan key:generate
+          touch database/database.sqlite
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: 'npm'
           cache-dependency-path: virtual-workplace/package-lock.json
 
@@ -58,3 +59,4 @@ jobs:
 
       - name: Execute Tests via PHPUnit
         run: php artisan test
+
