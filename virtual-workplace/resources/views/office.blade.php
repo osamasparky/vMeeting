@@ -1323,6 +1323,8 @@
         }
 
         const I18N_DICT = {
+            'No route available': { ar: 'لا يوجد مسار متاح للوصول إلى هذا الموقع', en: 'No route available to this location' },
+            'Moving to:': { ar: 'جاري الانتقال إلى:', en: 'Moving to:' },
             'Fit Map to Canvas': { ar: 'تمت ملاءمة كامل الخريطة مع الشاشة', en: 'Fit Map to Canvas' },
             'Locating You': { ar: 'تم تحديد وتوسيط موقعك والتقريب عليك', en: 'Locating You & Centering View' },
             'No active map ID found': { ar: 'لم يتم العثور على معرّف الخريطة', en: 'No active map ID found' },
@@ -2397,120 +2399,407 @@
             updateRoomPresence();
         }
 
-        function checkLineCrossesRoomWall(x1, y1, x2, y2, room) {
-            if (!room || !room.bounds) return false;
-            const rx = room.bounds.x * TILE_SIZE;
-            const ry = room.bounds.y * TILE_SIZE;
-            const rw = room.bounds.width * TILE_SIZE;
-            const rh = room.bounds.height * TILE_SIZE;
+        // ── Obstacle-Aware Navigation & Wall Collision Engine ──
+        const AVATAR_COLLISION_RADIUS = 16;
+        const NAV_GRID_STEP = 16;
 
-            const door = getRoomDoorPortal(room);
-            const doorMargin = (door.width / 2) + 8;
+        function distPointToSegment(px, py, x1, y1, x2, y2) {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const lenSq = dx * dx + dy * dy;
+            if (lenSq === 0) return Math.hypot(px - x1, py - y1);
+            let t = ((px - x1) * dx + (py - y1) * dy) / lenSq;
+            t = Math.max(0, Math.min(1, t));
+            const projX = x1 + t * dx;
+            const projY = y1 + t * dy;
+            return Math.hypot(px - projX, py - projY);
+        }
 
-            // Check if moving between inside and outside
-            const p1Inside = (x1 >= rx && x1 <= rx + rw && y1 >= ry && y1 <= ry + rh);
-            const p2Inside = (x2 >= rx && x2 <= rx + rw && y2 >= ry && y2 <= ry + rh);
+        function segmentsIntersect(x1, y1, x2, y2, x3, y3, x4, y4) {
+            function ccw(ax, ay, bx, by, cx, cy) {
+                return (cy - ay) * (bx - ax) > (by - ay) * (cx - ax);
+            }
+            return (ccw(x1, y1, x3, y3, x4, y4) !== ccw(x2, y2, x3, y3, x4, y4)) &&
+                   (ccw(x1, y1, x2, y2, x3, y3) !== ccw(x1, y1, x2, y2, x4, y4));
+        }
 
-            if (p1Inside !== p2Inside) {
-                // Crossing the boundary! Allowed ONLY if crossing through door portal
-                const midX = (x1 + x2) / 2;
-                const midY = (y1 + y2) / 2;
+        function distBetweenSegments(x1, y1, x2, y2, x3, y3, x4, y4) {
+            if (segmentsIntersect(x1, y1, x2, y2, x3, y3, x4, y4)) return 0;
+            return Math.min(
+                distPointToSegment(x1, y1, x3, y3, x4, y4),
+                distPointToSegment(x2, y2, x3, y3, x4, y4),
+                distPointToSegment(x3, y3, x1, y1, x2, y2),
+                distPointToSegment(x4, y4, x1, y1, x2, y2)
+            );
+        }
 
-                let isNearDoor = false;
-                if (door.wallSide === 'bottom' || door.wallSide === 'top') {
-                    isNearDoor = Math.abs(midX - door.x) <= doorMargin && Math.abs(midY - door.y) <= 28;
+        function getAllSolidWallSegments(ignoreRoomId = null) {
+            const segments = [];
+            for (const r of rooms) {
+                if (!r.bounds || (ignoreRoomId && r.id === ignoreRoomId)) continue;
+                const rx = r.bounds.x * TILE_SIZE;
+                const ry = r.bounds.y * TILE_SIZE;
+                const rw = r.bounds.width * TILE_SIZE;
+                const rh = r.bounds.height * TILE_SIZE;
+                const door = getRoomDoorPortal(r);
+                const doorHalfW = door ? (door.width / 2) : 24;
+
+                // 1. Top wall
+                if (door && door.wallSide === 'top') {
+                    if (door.x - doorHalfW > rx + 4) segments.push({ x1: rx, y1: ry, x2: door.x - doorHalfW, y2: ry, roomId: r.id });
+                    if (door.x + doorHalfW < rx + rw - 4) segments.push({ x1: door.x + doorHalfW, y1: ry, x2: rx + rw, y2: ry, roomId: r.id });
                 } else {
-                    isNearDoor = Math.abs(midY - door.y) <= doorMargin && Math.abs(midX - door.x) <= 28;
+                    segments.push({ x1: rx, y1: ry, x2: rx + rw, y2: ry, roomId: r.id });
                 }
 
-                if (!isNearDoor) {
-                    return true; // Blocked: tried to walk through wall!
+                // 2. Bottom wall
+                if (door && door.wallSide === 'bottom') {
+                    if (door.x - doorHalfW > rx + 4) segments.push({ x1: rx, y1: ry + rh, x2: door.x - doorHalfW, y2: ry + rh, roomId: r.id });
+                    if (door.x + doorHalfW < rx + rw - 4) segments.push({ x1: door.x + doorHalfW, y1: ry + rh, x2: rx + rw, y2: ry + rh, roomId: r.id });
+                } else {
+                    segments.push({ x1: rx, y1: ry + rh, x2: rx + rw, y2: ry + rh, roomId: r.id });
+                }
+
+                // 3. Left wall
+                if (door && door.wallSide === 'left') {
+                    if (door.y - doorHalfW > ry + 4) segments.push({ x1: rx, y1: ry, x2: rx, y2: door.y - doorHalfW, roomId: r.id });
+                    if (door.y + doorHalfW < ry + rh - 4) segments.push({ x1: rx, y1: door.y + doorHalfW, x2: rx, y2: ry + rh, roomId: r.id });
+                } else {
+                    segments.push({ x1: rx, y1: ry, x2: rx, y2: ry + rh, roomId: r.id });
+                }
+
+                // 4. Right wall
+                if (door && door.wallSide === 'right') {
+                    if (door.y - doorHalfW > ry + 4) segments.push({ x1: rx + rw, y1: ry, x2: rx + rw, y2: door.y - doorHalfW, roomId: r.id });
+                    if (door.y + doorHalfW < ry + rh - 4) segments.push({ x1: rx + rw, y1: door.y + doorHalfW, x2: rx + rw, y2: ry + rh, roomId: r.id });
+                } else {
+                    segments.push({ x1: rx + rw, y1: ry, x2: rx + rw, y2: ry + rh, roomId: r.id });
+                }
+            }
+            return segments;
+        }
+
+        function checkCapsuleWallCollision(x1, y1, x2, y2, radius = 12, ignoreRoomId = null) {
+            const walls = getAllSolidWallSegments(ignoreRoomId);
+            for (const w of walls) {
+                const dist = distBetweenSegments(x1, y1, x2, y2, w.x1, w.y1, w.x2, w.y2);
+                if (dist < radius) {
+                    return true; // Collision detected!
                 }
             }
             return false;
         }
 
-        function navigateToRoomWithRoute(targetRoom, finalX, finalY) {
-            if (!targetRoom || !targetRoom.bounds) {
-                localAvatar.targetX = finalX;
-                localAvatar.targetY = finalY;
-                return;
+        function isPointInForbiddenRoomZone(x, y, allowedRoomId = null, margin = 14) {
+            for (const r of rooms) {
+                if (!r.bounds || (allowedRoomId && r.id === allowedRoomId)) continue;
+                const rx = r.bounds.x * TILE_SIZE;
+                const ry = r.bounds.y * TILE_SIZE;
+                const rw = r.bounds.width * TILE_SIZE;
+                const rh = r.bounds.height * TILE_SIZE;
+                const door = getRoomDoorPortal(r);
+
+                // If point is directly at the door opening, it's legal walkable passage
+                if (door && Math.hypot(x - door.x, y - door.y) <= 32) {
+                    continue;
+                }
+
+                if (x >= rx - margin && x <= rx + rw + margin && y >= ry - margin && y <= ry + rh + margin) {
+                    return true;
+                }
             }
+            return false;
+        }
 
-            const currentRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
-            avatarWaypoints = []; // Reset any ongoing route
-
-            // If already inside the target room, just walk directly
-            if (currentRoom && currentRoom.id === targetRoom.id) {
-                localAvatar.targetX = finalX;
-                localAvatar.targetY = finalY;
-                return;
+        function isPathClear(p1, p2, allowedRoomId = null, radius = 12) {
+            if (checkCapsuleWallCollision(p1.x, p1.y, p2.x, p2.y, radius, allowedRoomId)) {
+                return false;
             }
+            const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+            const steps = Math.max(2, Math.ceil(dist / 14));
+            for (let i = 1; i < steps; i++) {
+                const t = i / steps;
+                const sx = p1.x + t * (p2.x - p1.x);
+                const sy = p1.y + t * (p2.y - p1.y);
+                if (isPointInForbiddenRoomZone(sx, sy, allowedRoomId, radius)) {
+                    return false;
+                }
+            }
+            return true;
+        }
 
-            const targetDoor = getRoomDoorPortal(targetRoom);
-            const hubX = MAP_WIDTH_PX / 2;
-            const hubY = 450; // Central corridor hub
+        function findAStarPath(start, goal, allowedRoomId = null) {
+            const cols = Math.ceil(MAP_WIDTH_PX / NAV_GRID_STEP);
+            const rows = Math.ceil(MAP_HEIGHT_PX / NAV_GRID_STEP);
 
-            // Step 1: If inside another room, must first walk out through current room's door
-            if (currentRoom) {
-                const curDoor = getRoomDoorPortal(currentRoom);
-                avatarWaypoints.push({
-                    x: curDoor.entryInsideX,
-                    y: curDoor.entryInsideY,
-                    action: () => {
-                        playDoorSlideSound();
-                        triggerDoorAnimation(currentRoom.id);
+            const startC = Math.max(0, Math.min(cols - 1, Math.floor(start.x / NAV_GRID_STEP)));
+            const startR = Math.max(0, Math.min(rows - 1, Math.floor(start.y / NAV_GRID_STEP)));
+            const goalC = Math.max(0, Math.min(cols - 1, Math.floor(goal.x / NAV_GRID_STEP)));
+            const goalR = Math.max(0, Math.min(rows - 1, Math.floor(goal.y / NAV_GRID_STEP)));
+
+            const openSet = [{ f: 0, g: 0, c: startC, r: startR, parent: null }];
+            const visited = new Map();
+
+            const dirs = [
+                { dc: 1, dr: 0, cost: 1.0 },
+                { dc: -1, dr: 0, cost: 1.0 },
+                { dc: 0, dr: 1, cost: 1.0 },
+                { dc: 0, dr: -1, cost: 1.0 },
+                { dc: 1, dr: 1, cost: 1.414 },
+                { dc: 1, dr: -1, cost: 1.414 },
+                { dc: -1, dr: 1, cost: 1.414 },
+                { dc: -1, dr: -1, cost: 1.414 }
+            ];
+
+            let goalNode = null;
+            let iterations = 0;
+            const maxIterations = 2500;
+
+            while (openSet.length > 0 && iterations++ < maxIterations) {
+                // Find node with lowest f cost
+                let bestIdx = 0;
+                for (let i = 1; i < openSet.length; i++) {
+                    if (openSet[i].f < openSet[bestIdx].f) bestIdx = i;
+                }
+                const current = openSet.splice(bestIdx, 1)[0];
+                const key = `${current.c},${current.r}`;
+
+                if (visited.has(key) && visited.get(key).g <= current.g) continue;
+                visited.set(key, current);
+
+                if (current.c === goalC && current.r === goalR) {
+                    goalNode = current;
+                    break;
+                }
+
+                for (const d of dirs) {
+                    const nc = current.c + d.dc;
+                    const nr = current.r + d.dr;
+                    if (nc < 0 || nc >= cols || nr < 0 || nr >= rows) continue;
+
+                    const nKey = `${nc},${nr}`;
+                    if (visited.has(nKey)) continue;
+
+                    const npx = nc * NAV_GRID_STEP + (NAV_GRID_STEP / 2);
+                    const npy = nr * NAV_GRID_STEP + (NAV_GRID_STEP / 2);
+
+                    // For diagonal moves, prevent cutting corners between walls
+                    if (d.dc !== 0 && d.dr !== 0) {
+                        const cornerX1 = (current.c + d.dc) * NAV_GRID_STEP + (NAV_GRID_STEP / 2);
+                        const cornerY1 = current.r * NAV_GRID_STEP + (NAV_GRID_STEP / 2);
+                        const cornerX2 = current.c * NAV_GRID_STEP + (NAV_GRID_STEP / 2);
+                        const cornerY2 = (current.r + d.dr) * NAV_GRID_STEP + (NAV_GRID_STEP / 2);
+                        if (isPointInForbiddenRoomZone(cornerX1, cornerY1, allowedRoomId, 10) ||
+                            isPointInForbiddenRoomZone(cornerX2, cornerY2, allowedRoomId, 10)) {
+                            continue;
+                        }
                     }
-                });
-                avatarWaypoints.push({
-                    x: curDoor.exitOutsideX,
-                    y: curDoor.exitOutsideY,
-                    action: null
-                });
 
-                // Step 1b: If moving across the building corridor, add intermediate corridor hub
-                const isCrossCorridor = (Math.abs(curDoor.exitOutsideX - targetDoor.exitOutsideX) > 220) || 
-                                       (Math.abs(curDoor.exitOutsideY - targetDoor.exitOutsideY) > 220);
-                if (isCrossCorridor) {
-                    avatarWaypoints.push({
-                        x: (curDoor.exitOutsideX + hubX) / 2,
-                        y: (curDoor.exitOutsideY + hubY) / 2,
+                    if (isPointInForbiddenRoomZone(npx, npy, allowedRoomId, 12)) continue;
+
+                    const ng = current.g + d.cost * NAV_GRID_STEP;
+                    const h = Math.hypot(npx - goal.x, npy - goal.y);
+                    openSet.push({ f: ng + h, g: ng, c: nc, r: nr, parent: current });
+                }
+            }
+
+            if (!goalNode) {
+                return [goal];
+            }
+
+            const path = [];
+            let curr = goalNode;
+            while (curr) {
+                path.push({
+                    x: curr.c * NAV_GRID_STEP + (NAV_GRID_STEP / 2),
+                    y: curr.r * NAV_GRID_STEP + (NAV_GRID_STEP / 2)
+                });
+                curr = curr.parent;
+            }
+            path.reverse();
+            path.push({ x: goal.x, y: goal.y });
+            return path;
+        }
+
+        function simplifyPath(rawPath, allowedRoomId = null) {
+            if (!rawPath || rawPath.length <= 2) return rawPath || [];
+            const smoothed = [rawPath[0]];
+            let currentIdx = 0;
+
+            while (currentIdx < rawPath.length - 1) {
+                let furthestIdx = currentIdx + 1;
+                for (let testIdx = rawPath.length - 1; testIdx > currentIdx + 1; testIdx--) {
+                    if (isPathClear(rawPath[currentIdx], rawPath[testIdx], allowedRoomId, 12)) {
+                        furthestIdx = testIdx;
+                        break;
+                    }
+                }
+                smoothed.push(rawPath[furthestIdx]);
+                currentIdx = furthestIdx;
+            }
+            return smoothed;
+        }
+
+        function buildNavigationRoute(startPos, destPos, srcRoom, dstRoom) {
+            const waypoints = [];
+
+            // Case 1: Same Room Movement (or both in open space with clear line of sight)
+            if (srcRoom && dstRoom && srcRoom.id === dstRoom.id) {
+                // Keep safe clearance from room walls
+                const rx = srcRoom.bounds.x * TILE_SIZE;
+                const ry = srcRoom.bounds.y * TILE_SIZE;
+                const rw = srcRoom.bounds.width * TILE_SIZE;
+                const rh = srcRoom.bounds.height * TILE_SIZE;
+                const margin = AVATAR_COLLISION_RADIUS + 2;
+                const clampedX = Math.max(rx + margin, Math.min(rx + rw - margin, destPos.x));
+                const clampedY = Math.max(ry + margin, Math.min(ry + rh - margin, destPos.y));
+
+                if (isPathClear(startPos, { x: clampedX, y: clampedY }, srcRoom.id, 10)) {
+                    waypoints.push({ x: clampedX, y: clampedY, action: null });
+                } else {
+                    const raw = findAStarPath(startPos, { x: clampedX, y: clampedY }, srcRoom.id);
+                    const simplified = simplifyPath(raw, srcRoom.id);
+                    simplified.forEach(pt => waypoints.push({ x: pt.x, y: pt.y, action: null }));
+                }
+                return waypoints;
+            }
+
+            // Case 2: Open Space to Open Space
+            if (!srcRoom && !dstRoom) {
+                const clampedX = Math.max(16, Math.min(MAP_WIDTH_PX - 16, destPos.x));
+                const clampedY = Math.max(16, Math.min(MAP_HEIGHT_PX - 16, destPos.y));
+
+                if (isPathClear(startPos, { x: clampedX, y: clampedY }, null, 14)) {
+                    waypoints.push({ x: clampedX, y: clampedY, action: null });
+                } else {
+                    const raw = findAStarPath(startPos, { x: clampedX, y: clampedY }, null);
+                    const simplified = simplifyPath(raw, null);
+                    simplified.forEach(pt => waypoints.push({ x: pt.x, y: pt.y, action: null }));
+                }
+                return waypoints;
+            }
+
+            // Case 3: Inside Room to Open Space
+            if (srcRoom && !dstRoom) {
+                const curDoor = getRoomDoorPortal(srcRoom);
+                if (curDoor) {
+                    waypoints.push({
+                        x: curDoor.entryInsideX,
+                        y: curDoor.entryInsideY,
+                        action: () => {
+                            playDoorSlideSound();
+                            triggerDoorAnimation(srcRoom.id);
+                        }
+                    });
+                    waypoints.push({
+                        x: curDoor.exitOutsideX,
+                        y: curDoor.exitOutsideY,
                         action: null
                     });
+
+                    // Route from exit portal to open space target
+                    const openRaw = findAStarPath({ x: curDoor.exitOutsideX, y: curDoor.exitOutsideY }, destPos, null);
+                    const openSimplified = simplifyPath(openRaw, null);
+                    // Skip first if duplicate
+                    openSimplified.slice(1).forEach(pt => waypoints.push({ x: pt.x, y: pt.y, action: null }));
                 }
+                return waypoints;
             }
 
-            // Step 2: Walk to outside door portal of target room
-            avatarWaypoints.push({
-                x: targetDoor.exitOutsideX,
-                y: targetDoor.exitOutsideY,
-                action: () => {
-                    playDoorSlideSound();
-                    triggerDoorAnimation(targetRoom.id);
+            // Case 4: Open Space to Inside Room
+            if (!srcRoom && dstRoom) {
+                const targetDoor = getRoomDoorPortal(dstRoom);
+                if (targetDoor) {
+                    const openRaw = findAStarPath(startPos, { x: targetDoor.exitOutsideX, y: targetDoor.exitOutsideY }, null);
+                    const openSimplified = simplifyPath(openRaw, null);
+                    openSimplified.forEach(pt => waypoints.push({ x: pt.x, y: pt.y, action: null }));
+
+                    waypoints.push({
+                        x: targetDoor.exitOutsideX,
+                        y: targetDoor.exitOutsideY,
+                        action: () => {
+                            playDoorSlideSound();
+                            triggerDoorAnimation(dstRoom.id);
+                        }
+                    });
+                    waypoints.push({
+                        x: targetDoor.entryInsideX,
+                        y: targetDoor.entryInsideY,
+                        action: null
+                    });
+
+                    // Destination point inside target room
+                    const rx = dstRoom.bounds.x * TILE_SIZE;
+                    const ry = dstRoom.bounds.y * TILE_SIZE;
+                    const rw = dstRoom.bounds.width * TILE_SIZE;
+                    const rh = dstRoom.bounds.height * TILE_SIZE;
+                    const margin = AVATAR_COLLISION_RADIUS + 2;
+                    const clampedX = Math.max(rx + margin, Math.min(rx + rw - margin, destPos.x));
+                    const clampedY = Math.max(ry + margin, Math.min(ry + rh - margin, destPos.y));
+
+                    waypoints.push({ x: clampedX, y: clampedY, action: null });
                 }
-            });
-
-            // Step 3: Enter through target room's door
-            avatarWaypoints.push({
-                x: targetDoor.entryInsideX,
-                y: targetDoor.entryInsideY,
-                action: null
-            });
-
-            // Step 4: Arrive at clicked destination point
-            avatarWaypoints.push({
-                x: finalX,
-                y: finalY,
-                action: null
-            });
-
-            // Start first waypoint immediately
-            if (avatarWaypoints.length > 0) {
-                const firstWp = avatarWaypoints.shift();
-                localAvatar.targetX = firstWp.x;
-                localAvatar.targetY = firstWp.y;
-                if (firstWp.action) firstWp.action();
+                return waypoints;
             }
+
+            // Case 5: Room A to Room B
+            if (srcRoom && dstRoom && srcRoom.id !== dstRoom.id) {
+                const curDoor = getRoomDoorPortal(srcRoom);
+                const targetDoor = getRoomDoorPortal(dstRoom);
+
+                if (curDoor && targetDoor) {
+                    waypoints.push({
+                        x: curDoor.entryInsideX,
+                        y: curDoor.entryInsideY,
+                        action: () => {
+                            playDoorSlideSound();
+                            triggerDoorAnimation(srcRoom.id);
+                        }
+                    });
+                    waypoints.push({
+                        x: curDoor.exitOutsideX,
+                        y: curDoor.exitOutsideY,
+                        action: null
+                    });
+
+                    // Open space corridor navigation between the two room doors
+                    const openRaw = findAStarPath(
+                        { x: curDoor.exitOutsideX, y: curDoor.exitOutsideY },
+                        { x: targetDoor.exitOutsideX, y: targetDoor.exitOutsideY },
+                        null
+                    );
+                    const openSimplified = simplifyPath(openRaw, null);
+                    openSimplified.slice(1).forEach(pt => waypoints.push({ x: pt.x, y: pt.y, action: null }));
+
+                    waypoints.push({
+                        x: targetDoor.exitOutsideX,
+                        y: targetDoor.exitOutsideY,
+                        action: () => {
+                            playDoorSlideSound();
+                            triggerDoorAnimation(dstRoom.id);
+                        }
+                    });
+                    waypoints.push({
+                        x: targetDoor.entryInsideX,
+                        y: targetDoor.entryInsideY,
+                        action: null
+                    });
+
+                    // Destination point inside target room
+                    const rx = dstRoom.bounds.x * TILE_SIZE;
+                    const ry = dstRoom.bounds.y * TILE_SIZE;
+                    const rw = dstRoom.bounds.width * TILE_SIZE;
+                    const rh = dstRoom.bounds.height * TILE_SIZE;
+                    const margin = AVATAR_COLLISION_RADIUS + 2;
+                    const clampedX = Math.max(rx + margin, Math.min(rx + rw - margin, destPos.x));
+                    const clampedY = Math.max(ry + margin, Math.min(ry + rh - margin, destPos.y));
+
+                    waypoints.push({ x: clampedX, y: clampedY, action: null });
+                }
+                return waypoints;
+            }
+
+            return waypoints;
         }
 
         function triggerDoorAnimation(roomId) {
@@ -2626,16 +2915,26 @@
                     }
                     return;
                 }
+            }
 
-                // Execute animated pathfinding through doors
-                navigateToRoomWithRoute(targetRoom, clickX, clickY);
+            // Calculate obstacle-aware collision-free route
+            const route = buildNavigationRoute(
+                { x: localAvatar.x, y: localAvatar.y },
+                { x: clickX, y: clickY },
+                myRoom,
+                targetRoom
+            );
+
+            if (!route || route.length === 0) {
+                showToast('⚠️ ' + __('No route available'));
                 return;
             }
 
-            // Single click inside same room or open corridor
-            avatarWaypoints = []; // Clear waypoints on manual direct click
-            localAvatar.targetX = Math.max(10, Math.min(MAP_WIDTH_PX - 10, clickX));
-            localAvatar.targetY = Math.max(10, Math.min(MAP_HEIGHT_PX - 10, clickY));
+            avatarWaypoints = [...route];
+            const firstWp = avatarWaypoints.shift();
+            localAvatar.targetX = firstWp.x;
+            localAvatar.targetY = firstWp.y;
+            if (firstWp.action) firstWp.action();
         });
 
         // ── Interactive Media & Objects Click Controller ──
@@ -2939,15 +3238,15 @@
                 }
             }
 
-            // 4. Solid Wall Physics: Block avatar from crossing room perimeter except through Door
-            if (currentR) {
-                if (checkLineCrossesRoomWall(localAvatar.x, localAvatar.y, nextX, nextY, currentR)) {
-                    nextX = localAvatar.x;
-                    nextY = localAvatar.y;
-                }
-            }
-            if (targetR && targetR !== currentR) {
-                if (checkLineCrossesRoomWall(localAvatar.x, localAvatar.y, nextX, nextY, targetR)) {
+            // 4. Solid Wall Physics: Block avatar from crossing solid room walls
+            if (checkCapsuleWallCollision(localAvatar.x, localAvatar.y, nextX, nextY, 10, null)) {
+                // Check if allowed via door portal opening
+                const myDoor = currentR ? getRoomDoorPortal(currentR) : null;
+                const tgtDoor = targetR ? getRoomDoorPortal(targetR) : null;
+                const nearMyDoor = myDoor && Math.hypot(localAvatar.x - myDoor.x, localAvatar.y - myDoor.y) <= 32;
+                const nearTgtDoor = tgtDoor && Math.hypot(nextX - tgtDoor.x, nextY - tgtDoor.y) <= 32;
+
+                if (!nearMyDoor && !nearTgtDoor) {
                     nextX = localAvatar.x;
                     nextY = localAvatar.y;
                 }
