@@ -1635,21 +1635,62 @@
             setZoomLevel(zoomLevel * 0.96);
         }
 
+        function getClampedCameraOffset(targetCenterX, targetCenterY, zoom) {
+            const floor = getFloorBounds();
+            const floorWidthOnScreen = floor.width * zoom;
+            const floorHeightOnScreen = floor.height * zoom;
+            
+            let offsetX, offsetY;
+            
+            // X axis clamping:
+            if (floorWidthOnScreen <= width) {
+                // If the entire floor fits horizontally, center the entire floor horizontally
+                offsetX = Math.round((width / 2) - (floor.centerX * zoom));
+            } else {
+                // If floor is wider than screen, center on target but keep within floor bounds
+                const desiredOffsetX = Math.round((width / 2) - (targetCenterX * zoom));
+                const minOffsetX = Math.round(width - (floor.maxX * zoom) - 24);
+                const maxOffsetX = Math.round(-floor.minX * zoom + 24);
+                offsetX = Math.max(minOffsetX, Math.min(maxOffsetX, desiredOffsetX));
+            }
+            
+            // Y axis clamping:
+            if (floorHeightOnScreen <= height) {
+                // If the entire floor fits vertically, center the entire floor vertically
+                offsetY = Math.round((height / 2) - (floor.centerY * zoom));
+            } else {
+                // If floor is taller than screen, center on target but keep within floor bounds
+                const desiredOffsetY = Math.round((height / 2) - (targetCenterY * zoom));
+                const minOffsetY = Math.round(height - (floor.maxY * zoom) - 24);
+                const maxOffsetY = Math.round(-floor.minY * zoom + 24);
+                offsetY = Math.max(minOffsetY, Math.min(maxOffsetY, desiredOffsetY));
+            }
+            
+            return { x: offsetX, y: offsetY };
+        }
+
         let locateBeaconEndTime = 0;
         function locateMe() {
             if (!localAvatar) return;
-            const targetX = localAvatar.x;
-            const targetY = localAvatar.y;
-            const targetZoom = 1.35; // Comfortable close-up view focusing on avatar
+
+            const floor = getFloorBounds();
+            const padding = 32;
+            const availableWidth = Math.max(100, width - (padding * 2));
+            const availableHeight = Math.max(100, height - (padding * 2));
+            const fitScale = Math.min(availableWidth / floor.width, availableHeight / floor.height);
+
+            // Gentle comfortable zoom focused on avatar
+            const targetZoom = Math.max(zoomLevel, Math.min(1.30, Math.max(fitScale * 1.15, 1.10)));
 
             const startX = cameraOffset.x;
             const startY = cameraOffset.y;
             const startZoom = zoomLevel;
 
-            const endX = Math.round((width / 2) - (targetX * targetZoom));
-            const endY = Math.round((height / 2) - (targetY * targetZoom));
+            const targetPos = getClampedCameraOffset(localAvatar.x, localAvatar.y, targetZoom);
+            const endX = targetPos.x;
+            const endY = targetPos.y;
 
-            const duration = 450; // ms smooth glide
+            const duration = 400; // ms smooth glide
             const startTime = performance.now();
 
             function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
@@ -1671,7 +1712,7 @@
             }
 
             requestAnimationFrame(animateLocate);
-            locateBeaconEndTime = Date.now() + 3500;
+            locateBeaconEndTime = Date.now() + 4500;
             showToast('📍 ' + __('Locating You'));
         }
 
