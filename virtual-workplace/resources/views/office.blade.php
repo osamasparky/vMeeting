@@ -2640,6 +2640,23 @@
             return smoothed;
         }
 
+        function getRoomDoors(r) {
+            if (!r || !r.bounds) return [];
+            if (Array.isArray(r.doors) && r.doors.length > 0) return r.doors;
+            if (Array.isArray(r.bounds.doors) && r.bounds.doors.length > 0) return r.bounds.doors;
+            const single = getRoomDoorPortal(r);
+            return single ? [single] : [];
+        }
+
+        function isNearRoomDoorPortal(room, x, y, maxDist = 36) {
+            if (!room) return false;
+            const doors = getRoomDoors(room);
+            for (const d of doors) {
+                if (Math.hypot(x - d.x, y - d.y) <= maxDist) return true;
+            }
+            return false;
+        }
+
         function buildNavigationRoute(startPos, destPos, srcRoom, dstRoom) {
             const waypoints = [];
 
@@ -2679,56 +2696,54 @@
                 return waypoints;
             }
 
-            // Case 3: Inside Room to Open Space
+            // Case 3: Inside Room to Open Space (Evaluate all doors of source room for shortest path)
             if (srcRoom && !dstRoom) {
-                const curDoor = getRoomDoorPortal(srcRoom);
-                if (curDoor) {
-                    waypoints.push({
-                        x: curDoor.entryInsideX,
-                        y: curDoor.entryInsideY,
-                        action: () => {
-                            playDoorSlideSound();
-                            triggerDoorAnimation(srcRoom.id);
-                        }
-                    });
-                    waypoints.push({
-                        x: curDoor.exitOutsideX,
-                        y: curDoor.exitOutsideY,
-                        action: null
-                    });
+                const curDoors = getRoomDoors(srcRoom);
+                let bestRoute = null;
+                let bestDist = Infinity;
 
-                    // Route from exit portal to open space target
+                for (const curDoor of curDoors) {
                     const openRaw = findAStarPath({ x: curDoor.exitOutsideX, y: curDoor.exitOutsideY }, destPos, null);
                     const openSimplified = simplifyPath(openRaw, null);
-                    // Skip first if duplicate
-                    openSimplified.slice(1).forEach(pt => waypoints.push({ x: pt.x, y: pt.y, action: null }));
+
+                    let totalDist = Math.hypot(startPos.x - curDoor.entryInsideX, startPos.y - curDoor.entryInsideY);
+                    for (let i = 0; i < openSimplified.length - 1; i++) {
+                        totalDist += Math.hypot(openSimplified[i+1].x - openSimplified[i].x, openSimplified[i+1].y - openSimplified[i].y);
+                    }
+
+                    if (totalDist < bestDist) {
+                        bestDist = totalDist;
+                        bestRoute = [
+                            {
+                                x: curDoor.entryInsideX,
+                                y: curDoor.entryInsideY,
+                                action: () => {
+                                    playDoorSlideSound();
+                                    triggerDoorAnimation(srcRoom.id);
+                                }
+                            },
+                            {
+                                x: curDoor.exitOutsideX,
+                                y: curDoor.exitOutsideY,
+                                action: null
+                            },
+                            ...openSimplified.slice(1).map(pt => ({ x: pt.x, y: pt.y, action: null }))
+                        ];
+                    }
                 }
-                return waypoints;
+                return bestRoute || [];
             }
 
-            // Case 4: Open Space to Inside Room
+            // Case 4: Open Space to Inside Room (Evaluate all doors of target room for shortest path)
             if (!srcRoom && dstRoom) {
-                const targetDoor = getRoomDoorPortal(dstRoom);
-                if (targetDoor) {
+                const targetDoors = getRoomDoors(dstRoom);
+                let bestRoute = null;
+                let bestDist = Infinity;
+
+                for (const targetDoor of targetDoors) {
                     const openRaw = findAStarPath(startPos, { x: targetDoor.exitOutsideX, y: targetDoor.exitOutsideY }, null);
                     const openSimplified = simplifyPath(openRaw, null);
-                    openSimplified.forEach(pt => waypoints.push({ x: pt.x, y: pt.y, action: null }));
 
-                    waypoints.push({
-                        x: targetDoor.exitOutsideX,
-                        y: targetDoor.exitOutsideY,
-                        action: () => {
-                            playDoorSlideSound();
-                            triggerDoorAnimation(dstRoom.id);
-                        }
-                    });
-                    waypoints.push({
-                        x: targetDoor.entryInsideX,
-                        y: targetDoor.entryInsideY,
-                        action: null
-                    });
-
-                    // Destination point inside target room
                     const rx = dstRoom.bounds.x * TILE_SIZE;
                     const ry = dstRoom.bounds.y * TILE_SIZE;
                     const rw = dstRoom.bounds.width * TILE_SIZE;
@@ -2737,69 +2752,122 @@
                     const clampedX = Math.max(rx + margin, Math.min(rx + rw - margin, destPos.x));
                     const clampedY = Math.max(ry + margin, Math.min(ry + rh - margin, destPos.y));
 
-                    waypoints.push({ x: clampedX, y: clampedY, action: null });
+                    let totalDist = 0;
+                    for (let i = 0; i < openSimplified.length - 1; i++) {
+                        totalDist += Math.hypot(openSimplified[i+1].x - openSimplified[i].x, openSimplified[i+1].y - openSimplified[i].y);
+                    }
+                    totalDist += Math.hypot(targetDoor.entryInsideX - clampedX, targetDoor.entryInsideY - clampedY);
+
+                    if (totalDist < bestDist) {
+                        bestDist = totalDist;
+                        bestRoute = [
+                            ...openSimplified.map(pt => ({ x: pt.x, y: pt.y, action: null })),
+                            {
+                                x: targetDoor.exitOutsideX,
+                                y: targetDoor.exitOutsideY,
+                                action: () => {
+                                    playDoorSlideSound();
+                                    triggerDoorAnimation(dstRoom.id);
+                                }
+                            },
+                            {
+                                x: targetDoor.entryInsideX,
+                                y: targetDoor.entryInsideY,
+                                action: null
+                            },
+                            { x: clampedX, y: clampedY, action: null }
+                        ];
+                    }
                 }
-                return waypoints;
+                return bestRoute || [];
             }
 
-            // Case 5: Room A to Room B
+            // Case 5: Room A to Room B (Evaluate all door combinations for shortest path)
             if (srcRoom && dstRoom && srcRoom.id !== dstRoom.id) {
-                const curDoor = getRoomDoorPortal(srcRoom);
-                const targetDoor = getRoomDoorPortal(dstRoom);
+                const srcDoors = getRoomDoors(srcRoom);
+                const dstDoors = getRoomDoors(dstRoom);
+                let bestRoute = null;
+                let bestDist = Infinity;
 
-                if (curDoor && targetDoor) {
-                    waypoints.push({
-                        x: curDoor.entryInsideX,
-                        y: curDoor.entryInsideY,
-                        action: () => {
-                            playDoorSlideSound();
-                            triggerDoorAnimation(srcRoom.id);
+                for (const sDoor of srcDoors) {
+                    for (const dDoor of dstDoors) {
+                        const openRaw = findAStarPath(
+                            { x: sDoor.exitOutsideX, y: sDoor.exitOutsideY },
+                            { x: dDoor.exitOutsideX, y: dDoor.exitOutsideY },
+                            null
+                        );
+                        const openSimplified = simplifyPath(openRaw, null);
+
+                        const rx = dstRoom.bounds.x * TILE_SIZE;
+                        const ry = dstRoom.bounds.y * TILE_SIZE;
+                        const rw = dstRoom.bounds.width * TILE_SIZE;
+                        const rh = dstRoom.bounds.height * TILE_SIZE;
+                        const margin = AVATAR_COLLISION_RADIUS + 2;
+                        const clampedX = Math.max(rx + margin, Math.min(rx + rw - margin, destPos.x));
+                        const clampedY = Math.max(ry + margin, Math.min(ry + rh - margin, destPos.y));
+
+                        let totalDist = Math.hypot(startPos.x - sDoor.entryInsideX, startPos.y - sDoor.entryInsideY);
+                        for (let i = 0; i < openSimplified.length - 1; i++) {
+                            totalDist += Math.hypot(openSimplified[i+1].x - openSimplified[i].x, openSimplified[i+1].y - openSimplified[i].y);
                         }
-                    });
-                    waypoints.push({
-                        x: curDoor.exitOutsideX,
-                        y: curDoor.exitOutsideY,
-                        action: null
-                    });
+                        totalDist += Math.hypot(dDoor.entryInsideX - clampedX, dDoor.entryInsideY - clampedY);
 
-                    // Open space corridor navigation between the two room doors
-                    const openRaw = findAStarPath(
-                        { x: curDoor.exitOutsideX, y: curDoor.exitOutsideY },
-                        { x: targetDoor.exitOutsideX, y: targetDoor.exitOutsideY },
-                        null
-                    );
-                    const openSimplified = simplifyPath(openRaw, null);
-                    openSimplified.slice(1).forEach(pt => waypoints.push({ x: pt.x, y: pt.y, action: null }));
-
-                    waypoints.push({
-                        x: targetDoor.exitOutsideX,
-                        y: targetDoor.exitOutsideY,
-                        action: () => {
-                            playDoorSlideSound();
-                            triggerDoorAnimation(dstRoom.id);
+                        if (totalDist < bestDist) {
+                            bestDist = totalDist;
+                            bestRoute = [
+                                {
+                                    x: sDoor.entryInsideX,
+                                    y: sDoor.entryInsideY,
+                                    action: () => {
+                                        playDoorSlideSound();
+                                        triggerDoorAnimation(srcRoom.id);
+                                    }
+                                },
+                                {
+                                    x: sDoor.exitOutsideX,
+                                    y: sDoor.exitOutsideY,
+                                    action: null
+                                },
+                                ...openSimplified.slice(1).map(pt => ({ x: pt.x, y: pt.y, action: null })),
+                                {
+                                    x: dDoor.exitOutsideX,
+                                    y: dDoor.exitOutsideY,
+                                    action: () => {
+                                        playDoorSlideSound();
+                                        triggerDoorAnimation(dstRoom.id);
+                                    }
+                                },
+                                {
+                                    x: dDoor.entryInsideX,
+                                    y: dDoor.entryInsideY,
+                                    action: null
+                                },
+                                { x: clampedX, y: clampedY, action: null }
+                            ];
                         }
-                    });
-                    waypoints.push({
-                        x: targetDoor.entryInsideX,
-                        y: targetDoor.entryInsideY,
-                        action: null
-                    });
-
-                    // Destination point inside target room
-                    const rx = dstRoom.bounds.x * TILE_SIZE;
-                    const ry = dstRoom.bounds.y * TILE_SIZE;
-                    const rw = dstRoom.bounds.width * TILE_SIZE;
-                    const rh = dstRoom.bounds.height * TILE_SIZE;
-                    const margin = AVATAR_COLLISION_RADIUS + 2;
-                    const clampedX = Math.max(rx + margin, Math.min(rx + rw - margin, destPos.x));
-                    const clampedY = Math.max(ry + margin, Math.min(ry + rh - margin, destPos.y));
-
-                    waypoints.push({ x: clampedX, y: clampedY, action: null });
+                    }
                 }
-                return waypoints;
+                return bestRoute || [];
             }
 
             return waypoints;
+        }
+
+        function navigateToRoomWithRoute(targetRoom, destX, destY) {
+            const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+            const route = buildNavigationRoute(
+                { x: localAvatar.x, y: localAvatar.y },
+                { x: destX, y: destY },
+                myRoom,
+                targetRoom
+            );
+            if (route && route.length > 0) {
+                avatarWaypoints = [...route];
+                const firstWp = avatarWaypoints.shift();
+                localAvatar.targetX = firstWp.x;
+                localAvatar.targetY = firstWp.y;
+                if (firstWp.action) firstWp.action();
+            }
         }
 
         function triggerDoorAnimation(roomId) {
@@ -5853,8 +5921,24 @@
         function teleportToUser(userId) {
             const av = remoteAvatars.get(userId);
             if (!av) return;
-            localAvatar.targetX = av.x + 30;
-            localAvatar.targetY = av.y;
+            const destRoom = getCurrentRoom(av.x, av.y);
+            const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+            const route = buildNavigationRoute(
+                { x: localAvatar.x, y: localAvatar.y },
+                { x: av.x + 30, y: av.y },
+                myRoom,
+                destRoom
+            );
+            if (route && route.length > 0) {
+                avatarWaypoints = [...route];
+                const firstWp = avatarWaypoints.shift();
+                localAvatar.targetX = firstWp.x;
+                localAvatar.targetY = firstWp.y;
+                if (firstWp.action) firstWp.action();
+            } else {
+                localAvatar.targetX = av.x + 30;
+                localAvatar.targetY = av.y;
+            }
             closeOccupantsModal();
             showToast(`🎯 {{ __('Moving to') }} ${av.name}...`);
         }
