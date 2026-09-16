@@ -4,35 +4,47 @@
 @section('page_title', __('Companies'))
 
 @section('content')
-<div class="panel-card">
-    <div class="panel-header">
-        <div class="panel-title">
-            <span>🏢</span>
+<div class="panel-card" style="background: var(--nx-bg-surface); border: 1px solid var(--nx-border-subtle); border-radius: var(--nx-radius-xl, 20px); box-shadow: var(--nx-shadow-sm); overflow: hidden;">
+    <div class="panel-header" style="padding: 20px 24px; border-bottom: 1px solid var(--nx-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <div class="panel-title" style="display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 800; color: var(--nx-text-primary);">
+            <span class="material-symbols-rounded" style="color: var(--nx-accent); font-size: 22px;">domain</span>
             <span>{{ __('Registered Companies') }}</span>
+            <span class="nav-badge-pill" style="font-size: 11px; padding: 2px 8px; background: rgba(20,43,36,0.06); color: var(--nx-palm-900); font-family: 'IBM Plex Mono', monospace;">{{ $companies->total() }}</span>
         </div>
-        <form method="GET" action="{{ route('superadmin.companies') }}" style="display: flex; gap: 8px;">
-            <input
-                type="text"
-                name="search"
-                value="{{ request('search') }}"
-                placeholder="{{ __('Search by name or slug...') }}"
-                style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px 14px; color: var(--text-primary); font-size: 13px; outline: none; width: 220px; box-shadow: var(--shadow-inset-3d); font-weight: 600;"
-            >
-            <button type="submit" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px;">🔍 {{ __('Search') }}</button>
+        <form method="GET" action="{{ route('superadmin.companies') }}" style="display: flex; gap: 8px; margin: 0;">
+            <div style="position: relative; display: flex; align-items: center;">
+                <span class="material-symbols-rounded" style="position: absolute; inset-inline-start: 12px; font-size: 16px; color: var(--nx-text-muted); pointer-events: none;">search</span>
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ request('search') }}"
+                    placeholder="{{ __('Search by name or slug...') }}"
+                    style="background: var(--nx-bg-surface-subtle, #F4EDE1); border: 1px solid var(--nx-border-subtle); border-radius: var(--nx-radius-full, 9999px); padding: 8px 14px; padding-inline-start: 36px; color: var(--nx-text-primary); font-size: 13px; outline: none; width: 240px; font-weight: 500;"
+                >
+            </div>
+            <button type="submit" class="tactile-btn btn-primary" style="padding: 8px 18px; font-size: 12px; border-radius: var(--nx-radius-full, 9999px); display: inline-flex; align-items: center; gap: 6px;">
+                <span class="material-symbols-rounded" style="font-size: 15px;">search</span>
+                <span>{{ __('Search') }}</span>
+            </button>
+            @if(request('search'))
+                <a href="{{ route('superadmin.companies') }}" class="tactile-btn btn-secondary" style="padding: 8px 12px; font-size: 12px; border-radius: var(--nx-radius-full, 9999px); display: inline-flex; align-items: center;" title="{{ __('Clear search') }}">
+                    <span class="material-symbols-rounded" style="font-size: 15px;">close</span>
+                </a>
+            @endif
         </form>
     </div>
 
-    <div class="data-table-container">
-        <table class="data-table">
+    <div class="data-table-container" style="overflow-x: auto;">
+        <table class="data-table" style="width: 100%; border-collapse: collapse; text-align: start;">
             <thead>
                 <tr>
-                    <th>{{ __('Company Name') }}</th>
-                    <th>{{ __('Owner') }}</th>
-                    <th>{{ __('Current Plan') }}</th>
-                    <th>{{ __('Seat Usage') }}</th>
-                    <th>{{ __('Rooms') }}</th>
-                    <th>{{ __('Status') }}</th>
-                    <th>{{ __('Actions') }}</th>
+                    <th style="padding: 12px 20px; font-size: 11px; font-weight: 700; color: var(--nx-text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--nx-border-subtle); text-align: start;">{{ __('Company Name') }}</th>
+                    <th style="padding: 12px 20px; font-size: 11px; font-weight: 700; color: var(--nx-text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--nx-border-subtle); text-align: start;">{{ __('Owner') }}</th>
+                    <th style="padding: 12px 20px; font-size: 11px; font-weight: 700; color: var(--nx-text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--nx-border-subtle); text-align: start;">{{ __('Current Plan') }}</th>
+                    <th style="padding: 12px 20px; font-size: 11px; font-weight: 700; color: var(--nx-text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--nx-border-subtle); text-align: start;">{{ __('Seat Usage') }}</th>
+                    <th style="padding: 12px 20px; font-size: 11px; font-weight: 700; color: var(--nx-text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--nx-border-subtle); text-align: start;">{{ __('Rooms') }}</th>
+                    <th style="padding: 12px 20px; font-size: 11px; font-weight: 700; color: var(--nx-text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--nx-border-subtle); text-align: start;">{{ __('Status') }}</th>
+                    <th style="padding: 12px 20px; font-size: 11px; font-weight: 700; color: var(--nx-text-muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--nx-border-subtle); text-align: start;">{{ __('Actions') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -44,72 +56,86 @@
                     $owner = $comp->members->first()?->user;
                     $isSuspended = $comp->status === 'suspended';
                 @endphp
-                <tr>
-                    <td>
+                <tr style="border-bottom: 1px solid var(--nx-border-subtle); transition: background 0.15s ease;">
+                    <td style="padding: 14px 20px;">
                         <a href="{{ route('superadmin.companies.show', $comp) }}" style="text-decoration: none; display: block;" title="{{ __('View Full Company Profile') }}">
-                            <strong style="color: var(--brand-primary); font-size: 14px; display: inline-flex; align-items: center; gap: 4px;">
-                                <span>🏢</span>
+                            <strong style="color: var(--nx-palm-900); font-size: 14px; display: inline-flex; align-items: center; gap: 8px;">
+                                <div style="width: 30px; height: 30px; border-radius: 8px; background: rgba(20,43,36,0.08); display: flex; align-items: center; justify-content: center; color: var(--nx-palm-900); font-size: 13px; font-weight: 700;">
+                                    {{ strtoupper(substr($comp->name, 0, 2)) }}
+                                </div>
                                 <span>{{ $comp->name }}</span>
                             </strong>
                         </a>
-                        <div style="font-size: 11px; color: var(--text-muted); font-family: monospace;">{{ $comp->slug }}</div>
+                        <div style="font-size: 11px; color: var(--nx-text-muted); font-family: 'IBM Plex Mono', monospace; margin-inline-start: 38px;">{{ $comp->slug }}</div>
                     </td>
-                    <td>
-                        <div style="font-weight: 800; color: var(--text-primary);">{{ $owner?->name ?? 'Administrator' }}</div>
-                        <div style="font-size: 11px; color: var(--text-muted);">{{ $owner?->email }}</div>
+                    <td style="padding: 14px 20px;">
+                        <div style="font-weight: 700; color: var(--nx-text-primary); font-size: 13px;">{{ $owner?->name ?? 'Administrator' }}</div>
+                        <div style="font-size: 11px; color: var(--nx-text-muted); font-family: 'IBM Plex Mono', monospace;">{{ $owner?->email }}</div>
                     </td>
-                    <td>
-                        <span class="badge-status badge-plan">
-                            💎 {{ $comp->plan?->name ?? 'Free' }}
+                    <td style="padding: 14px 20px;">
+                        <span class="badge-status badge-plan" style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 8px; border-radius: 6px; background: rgba(211,165,83,0.12); color: var(--nx-gold-600); font-weight: 700;">
+                            <span class="material-symbols-rounded" style="font-size: 14px;">diamond</span>
+                            <span>{{ $comp->plan?->name ?? 'Free' }}</span>
                         </span>
-                        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 2px; font-weight: 700;">
+                        <div style="font-size: 11px; color: var(--nx-text-secondary); margin-top: 2px; font-weight: 600; font-family: 'IBM Plex Mono', monospace;">
                             ${{ number_format($comp->plan?->price ?? 0, 2) }}/mo
                         </div>
                     </td>
-                    <td>
-                        <div style="font-weight: 800; color: {{ !$isUnlimited && $memberCount >= $seatLimit ? '#D96B5F' : 'var(--brand-forest)' }}; font-size: 13px;">
+                    <td style="padding: 14px 20px;">
+                        <div style="font-weight: 700; color: {{ !$isUnlimited && $memberCount >= $seatLimit ? 'var(--nx-status-attention)' : 'var(--nx-status-live)' }}; font-size: 13px; font-family: 'IBM Plex Mono', monospace;">
                             {{ $memberCount }} / {{ $isUnlimited ? '∞' : $seatLimit }}
                         </div>
-                        <div style="font-size: 10px; color: var(--text-muted);">{{ __('Seats used') }}</div>
+                        <div style="font-size: 10px; color: var(--nx-text-muted);">{{ __('Seats used') }}</div>
                     </td>
-                    <td>
-                        <span style="font-weight: 800; color: var(--text-secondary);">{{ $comp->rooms->count() }} {{ __('Rooms') }}</span>
+                    <td style="padding: 14px 20px;">
+                        <span style="font-weight: 700; color: var(--nx-text-secondary); font-size: 12px; font-family: 'IBM Plex Mono', monospace;">
+                            {{ $comp->rooms->count() }} {{ __('Rooms') }}
+                        </span>
                     </td>
-                    <td>
+                    <td style="padding: 14px 20px;">
                         @if($isSuspended)
-                            <span class="badge-status badge-suspended">🛑 {{ __('Suspended') }}</span>
+                            <span class="badge-status badge-suspended" style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 8px; border-radius: 6px; background: rgba(217,107,95,0.12); color: var(--nx-status-attention); font-weight: 700;">
+                                <span class="material-symbols-rounded" style="font-size: 13px;">block</span>
+                                <span>{{ __('Suspended') }}</span>
+                            </span>
                         @else
-                            <span class="badge-status badge-active">✅ {{ __('Active') }}</span>
+                            <span class="badge-status badge-active" style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 8px; border-radius: 6px; background: rgba(60,107,76,0.12); color: var(--nx-status-live); font-weight: 700;">
+                                <span class="material-symbols-rounded" style="font-size: 13px;">check_circle</span>
+                                <span>{{ __('Active') }}</span>
+                            </span>
                         @endif
                     </td>
-                    <td>
+                    <td style="padding: 14px 20px;">
                         <div style="display: flex; gap: 6px; align-items: center;">
                             <!-- Details Page Button -->
-                            <a href="{{ route('superadmin.companies.show', $comp) }}" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 11px; text-decoration: none;" title="{{ __('View Details') }}">
-                                🔍 {{ __('Details') }}
+                            <a href="{{ route('superadmin.companies.show', $comp) }}" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 11px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;" title="{{ __('View Details') }}">
+                                <span class="material-symbols-rounded" style="font-size: 14px;">visibility</span>
+                                <span>{{ __('Details') }}</span>
                             </a>
 
                             <!-- Impersonate Button -->
                             <form method="POST" action="{{ route('superadmin.companies.impersonate', $comp) }}" style="display: inline; margin: 0;">
                                 @csrf
-                                <button type="submit" class="tactile-btn" style="background: linear-gradient(135deg, #2563EB, #1D4ED8); color: white; border: none; padding: 6px 12px; font-size: 11px; font-weight: 800;" title="{{ __('Log in as this company owner') }}">
-                                    ⚡ {{ __('Login') }}
+                                <button type="submit" class="tactile-btn" style="background: var(--nx-palm-900); color: white; border: none; padding: 6px 12px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;" title="{{ __('Log in as this company owner') }}">
+                                    <span class="material-symbols-rounded" style="font-size: 14px;">bolt</span>
+                                    <span>{{ __('Login') }}</span>
                                 </button>
                             </form>
 
                             <button
                                 onclick="openChangePlanModal('{{ $comp->id }}', '{{ $comp->name }}', '{{ $comp->plan_id }}')"
                                 class="tactile-btn btn-secondary"
-                                style="padding: 6px 12px; font-size: 11px;"
+                                style="padding: 6px 10px; font-size: 11px; display: inline-flex; align-items: center; gap: 4px;"
                                 title="{{ __('Change Plan') }}"
                             >
-                                💎 {{ __('Plan') }}
+                                <span class="material-symbols-rounded" style="font-size: 14px;">diamond</span>
+                                <span>{{ __('Plan') }}</span>
                             </button>
 
                             <form method="POST" action="{{ route('superadmin.companies.toggle', $comp) }}" style="display: inline; margin: 0;">
                                 @csrf
-                                <button type="submit" class="tactile-btn" style="padding: 6px 12px; font-size: 11px; color: {{ $isSuspended ? 'var(--brand-forest)' : '#D96B5F' }};">
-                                    {{ $isSuspended ? '▶️' : '⏸️' }}
+                                <button type="submit" class="tactile-btn" style="padding: 6px 10px; font-size: 11px; color: {{ $isSuspended ? 'var(--nx-status-live)' : 'var(--nx-status-attention)' }};" title="{{ $isSuspended ? __('Activate Company') : __('Suspend Company') }}">
+                                    <span class="material-symbols-rounded" style="font-size: 15px;">{{ $isSuspended ? 'play_arrow' : 'pause' }}</span>
                                 </button>
                             </form>
                         </div>
@@ -117,7 +143,8 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                    <td colspan="7" style="text-align: center; color: var(--nx-text-muted); padding: 48px;">
+                        <span class="material-symbols-rounded" style="font-size: 36px; display: block; margin-bottom: 8px; opacity: 0.5;">domain_disabled</span>
                         {{ __('No organizations found matching search criteria.') }}
                     </td>
                 </tr>
@@ -126,29 +153,36 @@
         </table>
     </div>
 
-    <div style="margin-top: 20px;">
+    @if($companies->hasPages())
+    <div style="padding: 16px 24px; border-top: 1px solid var(--nx-border-subtle);">
         {{ $companies->links() }}
     </div>
+    @endif
 </div>
 
 <!-- Change Plan Modal -->
 <div id="changePlanModal" class="modal-overlay">
-    <div class="modal-card" style="border-radius: 24px; padding: 26px;">
+    <div class="modal-card" style="border-radius: var(--nx-radius-xl, 20px); padding: 26px; max-width: 480px; width: 100%;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3 style="font-size: 17px; font-weight: 900; color: var(--text-primary);" id="modalCompanyTitle">💎 {{ __('Change Subscription Plan') }}</h3>
-            <button onclick="closeChangePlanModal()" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-primary); font-weight: 800;">✕</button>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="material-symbols-rounded" style="color: var(--nx-accent); font-size: 22px;">diamond</span>
+                <h3 style="font-size: 16px; font-weight: 800; color: var(--nx-text-primary); margin: 0;" id="modalCompanyTitle">{{ __('Change Subscription Plan') }}</h3>
+            </div>
+            <button onclick="closeChangePlanModal()" style="background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--nx-text-primary);">
+                <span class="material-symbols-rounded" style="font-size: 16px;">close</span>
+            </button>
         </div>
 
         <form id="changePlanForm" method="POST" action="">
             @csrf
             <div style="margin-bottom: 22px;">
-                <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-secondary); margin-bottom: 8px;">
+                <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 8px;">
                     {{ __('Select New Subscription Tier (Seats)') }}
                 </label>
-                <select name="plan_id" id="modalPlanSelect" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; color: var(--text-primary); font-size: 13px; outline: none; font-weight: 700; box-shadow: var(--shadow-inset-3d);">
+                <select name="plan_id" id="modalPlanSelect" style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 12px; padding: 12px; color: var(--nx-text-primary); font-size: 13px; outline: none; font-weight: 600;">
                     @foreach($plans as $plan)
                         <option value="{{ $plan->id }}">
-                            💎 {{ $plan->name }} — {{ $plan->seat_limit === 0 ? 'Unlimited' : $plan->seat_limit }} Users (${{ number_format($plan->price, 2) }}/mo)
+                            {{ $plan->name }} — {{ $plan->seat_limit === 0 ? 'Unlimited' : $plan->seat_limit }} Users (${{ number_format($plan->price, 2) }}/mo)
                         </option>
                     @endforeach
                 </select>
@@ -156,8 +190,9 @@
 
             <div style="display: flex; justify-content: flex-end; gap: 10px;">
                 <button type="button" onclick="closeChangePlanModal()" class="tactile-btn btn-secondary">{{ __('Cancel') }}</button>
-                <button type="submit" class="tactile-btn btn-primary">
-                    💾 {{ __('Save Changes') }}
+                <button type="submit" class="tactile-btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
+                    <span class="material-symbols-rounded" style="font-size: 16px;">save</span>
+                    <span>{{ __('Save Changes') }}</span>
                 </button>
             </div>
         </form>
@@ -168,7 +203,7 @@
 @section('scripts')
 <script nonce="{{ $cspNonce ?? '' }}">
     function openChangePlanModal(orgId, orgName, currentPlanId) {
-        document.getElementById('modalCompanyTitle').textContent = `💎 Change Plan for ${orgName}`;
+        document.getElementById('modalCompanyTitle').textContent = `Change Plan — ${orgName}`;
         document.getElementById('changePlanForm').action = `/superadmin/companies/${orgId}/plan`;
         if (currentPlanId) {
             document.getElementById('modalPlanSelect').value = currentPlanId;
