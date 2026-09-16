@@ -28,6 +28,7 @@ use App\Domains\Workspace\Models\OfficeTemplate;
 use App\Domains\Workspace\Models\Room;
 use App\Domains\Workspace\Requests\StoreFurnitureCategoryRequest;
 use App\Domains\Workspace\Requests\StoreFurnitureItemRequest;
+use App\Domains\Workspace\Support\RoomBoundsGap;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
@@ -1401,6 +1402,8 @@ class SuperAdminController extends Controller
             'rooms.*.bounds.y' => ['required', 'integer', 'min:0'],
             'rooms.*.bounds.width' => ['required', 'integer', 'min:1'],
             'rooms.*.bounds.height' => ['required', 'integer', 'min:1'],
+            'rooms.*.bounds.doorSide' => ['nullable', 'string', 'in:auto,top,bottom,left,right'],
+            'rooms.*.bounds.doorOffset' => ['nullable', 'numeric', 'min:0.05', 'max:0.95'],
             'rooms.*.metadata' => ['nullable', 'array'],
         ]);
 
@@ -1412,16 +1415,33 @@ class SuperAdminController extends Controller
                 'access_mode' => $r['access_mode'] ?? 'public',
                 'capacity' => (int) ($r['capacity'] ?? 8),
                 'color' => $r['color'] ?? '#3F7D4F',
-                'bounds' => [
+                'bounds' => array_filter([
                     'x' => (int) ($r['bounds']['x'] ?? 0),
                     'y' => (int) ($r['bounds']['y'] ?? 0),
                     'width' => (int) ($r['bounds']['width'] ?? 10),
                     'height' => (int) ($r['bounds']['height'] ?? 8),
-                ],
+                    'doorSide' => $r['bounds']['doorSide'] ?? null,
+                    'doorOffset' => $r['bounds']['doorOffset'] ?? null,
+                ], fn ($v) => $v !== null),
                 'metadata' => [
                     'audio_isolation' => isset($r['metadata']['audio_isolation']) ? (bool) $r['metadata']['audio_isolation'] : true,
                 ],
             ];
+        }
+
+        $tilePx = RoomBoundsGap::CANONICAL_TILE_PX;
+        $violations = RoomBoundsGap::violatingPairs(array_map(fn ($r) => $r['bounds'], $roomsFormatted), $tilePx);
+        if (! empty($violations)) {
+            $names = array_map(fn ($r) => $r['name'], $roomsFormatted);
+            $pairs = array_map(fn ($v) => "{$names[$v[0]]} / {$names[$v[1]]}", array_slice($violations, 0, 5));
+
+            return response()->json([
+                'success' => false,
+                'message' => __('These rooms are too close together for the avatar to walk between (need at least :gap tiles of clearance): :pairs', [
+                    'gap' => RoomBoundsGap::minGapTiles($tilePx),
+                    'pairs' => implode(', ', $pairs),
+                ]),
+            ], 422);
         }
 
         $template->update([

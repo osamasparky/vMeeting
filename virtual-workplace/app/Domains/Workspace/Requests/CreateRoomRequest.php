@@ -2,10 +2,14 @@
 
 namespace App\Domains\Workspace\Requests;
 
+use App\Domains\Workspace\Requests\Concerns\ValidatesRoomSpacing;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRoomRequest extends FormRequest
 {
+    use ValidatesRoomSpacing;
+
     public function authorize(): bool
     {
         return true;
@@ -25,7 +29,16 @@ class CreateRoomRequest extends FormRequest
             'bounds.y' => ['required', 'numeric'],
             'bounds.width' => ['required', 'numeric', 'min:1'],
             'bounds.height' => ['required', 'numeric', 'min:1'],
+            'bounds.doorSide' => ['nullable', 'string', 'in:auto,top,bottom,left,right'],
+            'bounds.doorOffset' => ['nullable', 'numeric', 'min:0.05', 'max:0.95'],
             'metadata' => ['nullable', 'array'],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            $this->validateRoomSpacing($validator, $this->input('map_id'), null, $this->input('bounds'));
+        });
     }
 }

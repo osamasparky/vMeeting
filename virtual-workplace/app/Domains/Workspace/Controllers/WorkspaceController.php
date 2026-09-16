@@ -18,6 +18,7 @@ use App\Domains\Workspace\Requests\CreateRoomRequest;
 use App\Domains\Workspace\Requests\CreateZoneRequest;
 use App\Domains\Workspace\Requests\SyncMapObjectsRequest;
 use App\Domains\Workspace\Requests\UpdateMapRequest;
+use App\Domains\Workspace\Requests\UpdateRoomRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -192,21 +193,13 @@ class WorkspaceController extends Controller
         ], 201);
     }
 
-    public function updateRoom(Request $request, Organization $organization, Room $room): JsonResponse
+    public function updateRoom(UpdateRoomRequest $request, Organization $organization, Room $room): JsonResponse
     {
         if ($room->organization_id !== $organization->id) {
             return response()->json(['message' => 'Unauthorized room access.'], 403);
         }
 
-        $room->update($request->only([
-            'name',
-            'type',
-            'access_mode',
-            'capacity',
-            'color',
-            'bounds',
-            'metadata',
-        ]));
+        $room->update($request->validated());
 
         return response()->json([
             'message' => 'Room updated successfully.',

@@ -20,6 +20,7 @@ use App\Domains\Workspace\Models\MapObject;
 use App\Domains\Workspace\Models\Room;
 use App\Domains\Workspace\Models\RoomFile;
 use App\Domains\Workspace\Services\AiMapGeneratorService;
+use App\Domains\Workspace\Support\RoomBoundsGap;
 use App\Http\Controllers\Controller;
 use Database\Seeders\BlueprintOfficeSeeder;
 use Illuminate\Http\Request;
@@ -607,6 +608,36 @@ class OfficeController extends Controller
     /**
      * Save draft map objects and layout data via web session.
      */
+    /**
+     * Reject a room bounds placement that leaves less than
+     * RoomBoundsGap::MIN_ROOM_GAP_PX of walkable corridor to a sibling room
+     * on the same map — the avatar navigation engine can never route
+     * through a gap narrower than that. Returns a 422 JSON response to
+     * return from the caller, or null if the placement is fine.
+     */
+    private function checkRoomSpacingOrFail(array $bounds, string $mapId, ?string $ignoreRoomId = null)
+    {
+        $map = Map::find($mapId);
+        $tilePx = $map?->tile_size ?: RoomBoundsGap::CANONICAL_TILE_PX;
+
+        $siblings = Room::where('map_id', $mapId)
+            ->when($ignoreRoomId, fn ($q) => $q->where('id', '!=', $ignoreRoomId))
+            ->get(['id', 'name', 'bounds']);
+
+        foreach ($siblings as $sibling) {
+            if (! RoomBoundsGap::satisfiesMinGap($bounds, $sibling->bounds, $tilePx)) {
+                return response()->json([
+                    'message' => __('This room must be at least :gap tiles away from ":name" to leave a walkable corridor.', [
+                        'gap' => RoomBoundsGap::minGapTiles($tilePx),
+                        'name' => $sibling->name,
+                    ]),
+                ], 422);
+            }
+        }
+
+        return null;
+    }
+
     public function saveEditorMap(Request $request, Map $map)
     {
         $user = Auth::user();
@@ -646,6 +677,24 @@ class OfficeController extends Controller
                         'count' => count($validated['rooms']),
                     ]),
                 ], 403);
+            }
+
+            // This endpoint replaces the entire room set for the map, so
+            // check the submitted payload against itself rather than
+            // against what's currently in the database.
+            $tilePx = RoomBoundsGap::CANONICAL_TILE_PX;
+            $submittedBounds = array_map(fn ($r) => $r['bounds'] ?? ['x' => 1, 'y' => 1, 'width' => 8, 'height' => 6], $validated['rooms']);
+            $violations = RoomBoundsGap::violatingPairs($submittedBounds, $tilePx);
+            if (! empty($violations)) {
+                $names = array_map(fn ($r) => $r['name'] ?? __('Room'), $validated['rooms']);
+                $pairs = array_map(fn ($v) => "{$names[$v[0]]} / {$names[$v[1]]}", array_slice($violations, 0, 5));
+
+                return response()->json([
+                    'message' => __('These rooms are too close together for the avatar to walk between (need at least :gap tiles of clearance): :pairs', [
+                        'gap' => RoomBoundsGap::minGapTiles($tilePx),
+                        'pairs' => implode(', ', $pairs),
+                    ]),
+                ], 422);
             }
 
             Room::where('map_id', $map->id)->delete();
@@ -766,8 +815,18 @@ class OfficeController extends Controller
             'capacity' => 'nullable|integer|min:1|max:200',
             'color' => 'nullable|string|max:20',
             'bounds' => 'required|array',
+            'bounds.x' => 'required|numeric',
+            'bounds.y' => 'required|numeric',
+            'bounds.width' => 'required|numeric|min:1',
+            'bounds.height' => 'required|numeric|min:1',
+            'bounds.doorSide' => 'nullable|string|in:auto,top,bottom,left,right',
+            'bounds.doorOffset' => 'nullable|numeric|min:0.05|max:0.95',
             'metadata' => 'nullable|array',
         ]);
+
+        if ($fail = $this->checkRoomSpacingOrFail($validated['bounds'], $validated['map_id'])) {
+            return $fail;
+        }
 
         $room = Room::create($validated);
 
@@ -813,8 +872,18 @@ class OfficeController extends Controller
                 'capacity' => 'nullable|integer',
                 'color' => 'nullable|string',
                 'bounds' => 'required|array',
+                'bounds.x' => 'required|numeric',
+                'bounds.y' => 'required|numeric',
+                'bounds.width' => 'required|numeric|min:1',
+                'bounds.height' => 'required|numeric|min:1',
+                'bounds.doorSide' => 'nullable|string|in:auto,top,bottom,left,right',
+                'bounds.doorOffset' => 'nullable|numeric|min:0.05|max:0.95',
                 'metadata' => 'nullable|array',
             ]);
+
+            if ($fail = $this->checkRoomSpacingOrFail($validated['bounds'], $validated['map_id'])) {
+                return $fail;
+            }
 
             $roomModel = Room::create($validated);
 
@@ -844,6 +913,24 @@ class OfficeController extends Controller
 
         if (isset($data['capacity'])) {
             $data['capacity'] = (int) $data['capacity'];
+        }
+
+        if (isset($data['bounds'])) {
+            $boundsValidator = validator($data, [
+                'bounds.x' => 'required|numeric',
+                'bounds.y' => 'required|numeric',
+                'bounds.width' => 'required|numeric|min:1',
+                'bounds.height' => 'required|numeric|min:1',
+                'bounds.doorSide' => 'nullable|string|in:auto,top,bottom,left,right',
+                'bounds.doorOffset' => 'nullable|numeric|min:0.05|max:0.95',
+            ]);
+            if ($boundsValidator->fails()) {
+                return response()->json(['message' => $boundsValidator->errors()->first()], 422);
+            }
+
+            if ($fail = $this->checkRoomSpacingOrFail($data['bounds'], $roomModel->map_id, $roomModel->id)) {
+                return $fail;
+            }
         }
 
         $roomModel->update($data);

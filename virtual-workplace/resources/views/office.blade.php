@@ -2177,6 +2177,51 @@
         let lastCanvasClickPos = { x: 0, y: 0 };
         const roomDoorPortalsCache = new Map();
 
+        // Mirrors App\Domains\Workspace\Support\RoomBoundsGap::MIN_ROOM_GAP_PX.
+        // Floor is 36px from A* grid quantization (node centers at c*16+8,
+        // capsule band [12, G-12] needs the first usable node at offset 24);
+        // 48 is the next tile-aligned value, giving 12px slack.
+        const MIN_ROOM_GAP_PX = 48;
+
+        // Single formula for a door's geometry on a given wall side/offset,
+        // shared by the explicit-config path and the "auto" candidate search
+        // below so the two can never drift apart from each other or from
+        // editor.blade.php's door preview.
+        function buildPortalOnSide(side, off, rx, ry, rw, rh) {
+            let cx = 0, cy = 0, inX = 0, inY = 0, outX = 0, outY = 0;
+            if (side === 'bottom') {
+                cx = rx + (rw * off);
+                cy = ry + rh;
+                inX = cx; inY = cy - 26;
+                outX = cx; outY = cy + 32;
+            } else if (side === 'top') {
+                cx = rx + (rw * off);
+                cy = ry;
+                inX = cx; inY = cy + 26;
+                outX = cx; outY = cy - 32;
+            } else if (side === 'right') {
+                cx = rx + rw;
+                cy = ry + (rh * off);
+                inX = cx - 26; inY = cy;
+                outX = cx + 32; outY = cy;
+            } else if (side === 'left') {
+                cx = rx;
+                cy = ry + (rh * off);
+                inX = cx + 26; inY = cy;
+                outX = cx - 32; outY = cy;
+            }
+            return {
+                side: side,
+                offset: off,
+                x: cx,
+                y: cy,
+                entryInsideX: inX,
+                entryInsideY: inY,
+                exitOutsideX: outX,
+                exitOutsideY: outY,
+            };
+        }
+
         function getRoomDoorPortal(r) {
             if (!r || !r.bounds) return null;
             if (roomDoorPortalsCache.has(r.id)) {
@@ -2193,73 +2238,79 @@
             const explicitSide = r.bounds.doorSide || r.bounds.door_side || r.door_side || r.doorSide || null;
             const explicitOffset = (typeof r.bounds.doorOffset === 'number') ? r.bounds.doorOffset : null;
 
-            // Candidate wall sides and offset samples
-            const offsetSamples = (explicitOffset !== null) 
-                ? [explicitOffset] 
-                : [0.5, 0.75, 0.82, 0.25, 0.18, 0.65, 0.35];
+            // Explicit admin configuration wins outright — it is never
+            // relocated by the "avoid other rooms" heuristic below, and must
+            // match editor.blade.php's preview (doorSide + doorOffset,
+            // default bottom/0.5) exactly, or the editor lies about where
+            // the door actually is.
+            if (explicitSide && explicitSide !== 'auto') {
+                const cand = buildPortalOnSide(explicitSide.toLowerCase(), explicitOffset !== null ? explicitOffset : 0.5, rx, ry, rw, rh);
+                const portal = {
+                    x: cand.x,
+                    y: cand.y,
+                    width: doorWidth,
+                    height: 20,
+                    wallSide: cand.side,
+                    entryInsideX: cand.entryInsideX,
+                    entryInsideY: cand.entryInsideY,
+                    exitOutsideX: cand.exitOutsideX,
+                    exitOutsideY: cand.exitOutsideY
+                };
+                roomDoorPortalsCache.set(r.id, portal);
+                return portal;
+            }
+
+            // 2. No explicit config: search all 4 sides x 7 offset samples
+            const offsetSamples = [0.5, 0.75, 0.82, 0.25, 0.18, 0.65, 0.35];
+            const sides = ['bottom', 'top', 'right', 'left'];
 
             const candidates = [];
-            const sides = (explicitSide && explicitSide !== 'auto') 
-                ? [explicitSide.toLowerCase()] 
-                : ['bottom', 'top', 'right', 'left'];
-
             for (const side of sides) {
                 for (const off of offsetSamples) {
-                    let cx = 0, cy = 0, inX = 0, inY = 0, outX = 0, outY = 0;
-                    if (side === 'bottom') {
-                        cx = rx + (rw * off);
-                        cy = ry + rh;
-                        inX = cx; inY = cy - 26;
-                        outX = cx; outY = cy + 32;
-                    } else if (side === 'top') {
-                        cx = rx + (rw * off);
-                        cy = ry;
-                        inX = cx; inY = cy + 26;
-                        outX = cx; outY = cy - 32;
-                    } else if (side === 'right') {
-                        cx = rx + rw;
-                        cy = ry + (rh * off);
-                        inX = cx - 26; inY = cy;
-                        outX = cx + 32; outY = cy;
-                    } else if (side === 'left') {
-                        cx = rx;
-                        cy = ry + (rh * off);
-                        inX = cx + 26; inY = cy;
-                        outX = cx - 32; outY = cy;
-                    }
-
-                    candidates.push({
-                        side: side,
-                        offset: off,
-                        x: cx,
-                        y: cy,
-                        entryInsideX: inX,
-                        entryInsideY: inY,
-                        exitOutsideX: outX,
-                        exitOutsideY: outY,
-                    });
+                    candidates.push(buildPortalOnSide(side, off, rx, ry, rw, rh));
                 }
             }
 
-            // 2. Intelligent Placement Facing the Central Open Walkway & Avoiding Shared Walls
-            const mapCenter = { x: MAP_WIDTH_PX / 2, y: MAP_HEIGHT_PX / 2 };
+            // 3. Intelligent Placement Facing the Central Open Walkway & Avoiding Shared Walls
+            // Score against the office's own footprint center, not the raw
+            // background canvas center — the canvas (e.g. a 2194x1952
+            // decorative image) is typically far larger than the room
+            // cluster, so MAP_WIDTH_PX/2,MAP_HEIGHT_PX/2 can sit well
+            // outside the office entirely and bias doors to face away from
+            // the rest of the rooms instead of toward the shared corridor.
+            let officeCenterX = MAP_WIDTH_PX / 2;
+            let officeCenterY = MAP_HEIGHT_PX / 2;
+            let centerSumX = 0, centerSumY = 0, centerCount = 0;
+            for (const other of rooms) {
+                if (!other.bounds) continue;
+                centerSumX += (other.bounds.x + other.bounds.width / 2) * TILE_SIZE;
+                centerSumY += (other.bounds.y + other.bounds.height / 2) * TILE_SIZE;
+                centerCount++;
+            }
+            if (centerCount > 0) {
+                officeCenterX = centerSumX / centerCount;
+                officeCenterY = centerSumY / centerCount;
+            }
+            const mapCenter = { x: officeCenterX, y: officeCenterY };
             const outerMargin = 16; // Authoritative outer map canvas border margin
 
             let bestCandidate = null;
             let bestScore = -Infinity;
 
             for (const cand of candidates) {
-                // A. Disqualify outer exterior building walls touching outer map canvas border (unless explicitly chosen)
-                if (!explicitSide || explicitSide === 'auto') {
-                    if (cand.exitOutsideX < outerMargin || cand.exitOutsideX > MAP_WIDTH_PX - outerMargin ||
-                        cand.exitOutsideY < outerMargin || cand.exitOutsideY > MAP_HEIGHT_PX - outerMargin) {
-                        continue; // Skip: Outer exterior building wall facing outside margins!
-                    }
+                // A. Disqualify outer exterior building walls touching outer map canvas border
+                if (cand.exitOutsideX < outerMargin || cand.exitOutsideX > MAP_WIDTH_PX - outerMargin ||
+                    cand.exitOutsideY < outerMargin || cand.exitOutsideY > MAP_HEIGHT_PX - outerMargin) {
+                    continue; // Skip: Outer exterior building wall facing outside margins!
                 }
 
-                // B. Check overlap with other rooms (MUST NOT touch or enter any other room!)
-                let isInsideOtherRoom = false;
-                let minDistanceToOtherRooms = 99999;
+                // B. Require a REAL walkable corridor to every other room, not
+                // just "not touching". Uses the same AABB clearance formula as
+                // App\Domains\Workspace\Support\RoomBoundsGap::distanceBetween
+                // (max of the two axis separations, not hypot — a diagonal
+                // gap can't be walked through on the diagonal).
+                let hasInsufficientClearance = false;
+                let minClearanceToOtherRooms = 99999;
 
                 for (const other of rooms) {
                     if (other.id === r.id || !other.bounds) continue;
@@ -2268,36 +2319,28 @@
                     const orw = other.bounds.width * TILE_SIZE;
                     const orh = other.bounds.height * TILE_SIZE;
 
-                    // Test if exit outside point is inside or touching other room with 6px safety margin
-                    if (cand.exitOutsideX >= orx - 6 && cand.exitOutsideX <= orx + orw + 6 &&
-                        cand.exitOutsideY >= ory - 6 && cand.exitOutsideY <= ory + orh + 6) {
-                        isInsideOtherRoom = true;
-                        break;
-                    }
-
-                    // Test if door position itself on the wall falls on a shared wall segment
-                    if (cand.x >= orx - 4 && cand.x <= orx + orw + 4 &&
-                        cand.y >= ory - 4 && cand.y <= ory + orh + 4) {
-                        isInsideOtherRoom = true;
-                        break;
-                    }
-
-                    // Calculate clearance distance to other room's rectangle
                     const dx = Math.max(orx - cand.exitOutsideX, 0, cand.exitOutsideX - (orx + orw));
                     const dy = Math.max(ory - cand.exitOutsideY, 0, cand.exitOutsideY - (ory + orh));
-                    const dist = Math.hypot(dx, dy);
-                    if (dist < minDistanceToOtherRooms) {
-                        minDistanceToOtherRooms = dist;
+                    const clearance = Math.max(dx, dy);
+
+                    // The exit point only needs to own half the corridor;
+                    // the neighboring room supplies the other half.
+                    if (clearance < MIN_ROOM_GAP_PX / 2) {
+                        hasInsufficientClearance = true;
+                        break;
+                    }
+                    if (clearance < minClearanceToOtherRooms) {
+                        minClearanceToOtherRooms = clearance;
                     }
                 }
 
-                if (isInsideOtherRoom) {
-                    continue; // Discard: this position touches another room!
+                if (hasInsufficientClearance) {
+                    continue; // Discard: not enough room for the avatar to walk through here
                 }
 
                 // C. Score candidate: closer to Central Open Corridor + open clearance distance
                 const distToCenter = Math.hypot(cand.exitOutsideX - mapCenter.x, cand.exitOutsideY - mapCenter.y);
-                const score = (1200 - distToCenter) + (minDistanceToOtherRooms * 4) + (cand.offset === 0.5 ? 25 : 0);
+                const score = (1200 - distToCenter) + (minClearanceToOtherRooms * 4) + (cand.offset === 0.5 ? 25 : 0);
 
                 if (score > bestScore) {
                     bestScore = score;
@@ -2305,23 +2348,27 @@
                 }
             }
 
-            // Fallback (strictly prioritize candidates NOT inside other rooms)
+            // Fallback: a degraded door beats no door, but flag it so it's
+            // observable instead of silently shipping a bad placement.
+            let usedFallback = false;
             if (!bestCandidate) {
-                const nonOverlapping = candidates.filter(cand => {
+                usedFallback = true;
+                const withClearance = candidates.filter(cand => {
                     for (const other of rooms) {
                         if (other.id === r.id || !other.bounds) continue;
                         const orx = other.bounds.x * TILE_SIZE;
                         const ory = other.bounds.y * TILE_SIZE;
                         const orw = other.bounds.width * TILE_SIZE;
                         const orh = other.bounds.height * TILE_SIZE;
-                        if (cand.exitOutsideX >= orx - 4 && cand.exitOutsideX <= orx + orw + 4 &&
-                            cand.exitOutsideY >= ory - 4 && cand.exitOutsideY <= ory + orh + 4) {
+                        const dx = Math.max(orx - cand.exitOutsideX, 0, cand.exitOutsideX - (orx + orw));
+                        const dy = Math.max(ory - cand.exitOutsideY, 0, cand.exitOutsideY - (ory + orh));
+                        if (Math.max(dx, dy) < MIN_ROOM_GAP_PX / 2) {
                             return false;
                         }
                     }
                     return true;
                 });
-                const pool = nonOverlapping.length > 0 ? nonOverlapping : candidates;
+                const pool = withClearance.length > 0 ? withClearance : candidates;
                 pool.sort((a, b) => {
                     const da = Math.hypot(a.exitOutsideX - mapCenter.x, a.exitOutsideY - mapCenter.y);
                     const db = Math.hypot(b.exitOutsideX - mapCenter.x, b.exitOutsideY - mapCenter.y);
@@ -2341,6 +2388,11 @@
                 exitOutsideX: bestCandidate.exitOutsideX,
                 exitOutsideY: bestCandidate.exitOutsideY
             };
+
+            if (usedFallback) {
+                portal.degraded = true;
+                console.warn(`[office] Room "${r.name || r.id}" has no door position with a full walkable corridor; using degraded fallback placement.`);
+            }
 
             roomDoorPortalsCache.set(r.id, portal);
             return portal;
@@ -2645,7 +2697,12 @@
 
             let goalNode = null;
             let iterations = 0;
-            const maxIterations = 4000;
+            // Large real maps (e.g. a 2194x1952 background at 16px tiles)
+            // can need a genuinely long detour around a single big room; a
+            // budget too close to the grid size can exhaust before the
+            // search escapes that room's "shadow". 12000 comfortably covers
+            // routing around any one room on the maps this app ships today.
+            const maxIterations = 12000;
 
             while (openSet.length > 0 && iterations++ < maxIterations) {
                 let bestIdx = 0;
