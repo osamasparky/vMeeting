@@ -2,22 +2,22 @@
     <div id="new-project-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 540px; border-radius: 20px; padding: 24px;">
             <div class="modal-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                <h3 class="modal-title" style="font-size: 18px; font-weight: 900; color: var(--nx-text-primary);"><span class="material-symbols-rounded" style="font-size: 20px; color: var(--nx-primary-500);">folder</span> {{ __('Create New Project') }}</h3>
-                <button onclick="closeNewProjectModal()" class="modal-close" style="background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--nx-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
+                <h3 class="modal-title" style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-accent-default);">folder</span> {{ __('Create New Project') }}</h3>
+                <button onclick="closeNewProjectModal()" class="modal-close" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ula-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
             </div>
             <form id="new-project-form" onsubmit="createProjectSubmit(event)" style="display: flex; flex-direction: column; gap: 14px;">
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Project Name') }} *</label>
-                    <input type="text" name="name" required placeholder="e.g. Mobile App Redesign, Cloud Migration" style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--nx-shadow-inset-3d);">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Project Name') }} *</label>
+                    <input type="text" name="name" required placeholder="e.g. Mobile App Redesign, Cloud Migration" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--ula-shadow-xs);">
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Project Code') }}</label>
-                        <input type="text" name="code" placeholder="e.g. MOB-01" style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--nx-shadow-inset-3d);">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Project Code') }}</label>
+                        <input type="text" name="code" placeholder="e.g. MOB-01" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--ula-shadow-xs);">
                     </div>
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Priority') }}</label>
-                        <select name="priority" style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Priority') }}</label>
+                        <select name="priority" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             <option value="medium">{{ __('Medium') }}</option>
                             <option value="low">{{ __('Low') }}</option>
                             <option value="high">{{ __('High') }}</option>
@@ -27,8 +27,8 @@
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Project Manager') }}</label>
-                        <select name="manager_id" style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Project Manager') }}</label>
+                        <select name="manager_id" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             <option value="">— {{ __('Select Manager') }} —</option>
                             @foreach($members as $m)
                                 <option value="{{ $m->user_id }}">{{ $m->user->name }}</option>
@@ -36,8 +36,8 @@
                         </select>
                     </div>
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Department') }}</label>
-                        <select name="department_id" style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Department') }}</label>
+                        <select name="department_id" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             <option value="">— {{ __('No Department') }} —</option>
                             @foreach($departments as $d)
                                 <option value="{{ $d->id }}">{{ $d->name }}</option>
@@ -47,21 +47,21 @@
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Budget ($)') }}</label>
-                        <input type="number" step="0.01" name="budget_amount" placeholder="10000" style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--nx-shadow-inset-3d);">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Budget ($)') }}</label>
+                        <input type="number" step="0.01" name="budget_amount" placeholder="10000" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--ula-shadow-xs);">
                     </div>
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Planned Hours') }}</label>
-                        <input type="number" step="0.5" name="planned_hours" placeholder="160" style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--nx-shadow-inset-3d);">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Planned Hours') }}</label>
+                        <input type="number" step="0.5" name="planned_hours" placeholder="160" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--ula-shadow-xs);">
                     </div>
                 </div>
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Due Date') }}</label>
-                    <input type="date" name="due_date" style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--nx-shadow-inset-3d);">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Due Date') }}</label>
+                    <input type="date" name="due_date" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--ula-shadow-xs);">
                 </div>
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Description') }}</label>
-                    <textarea name="description" rows="2" placeholder="Brief project summary..." style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--nx-shadow-inset-3d);"></textarea>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Description') }}</label>
+                    <textarea name="description" rows="2" placeholder="Brief project summary..." style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--ula-shadow-xs);"></textarea>
                 </div>
                 <button type="submit" class="tactile-btn btn-primary" style="margin-top: 8px; padding: 12px; font-size: 14px; justify-content: center; width: 100%;">
                     🚀 {{ __('Create Project') }}
@@ -74,26 +74,26 @@
     <div id="new-task-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 540px; border-radius: 20px; padding: 24px;">
             <div class="modal-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                <h3 class="modal-title" style="font-size: 18px; font-weight: 900; color: var(--nx-text-primary);">✅ {{ __('Create New Task') }}</h3>
-                <button onclick="closeNewTaskModal()" class="modal-close" style="background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--nx-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
+                <h3 class="modal-title" style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);">✅ {{ __('Create New Task') }}</h3>
+                <button onclick="closeNewTaskModal()" class="modal-close" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ula-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
             </div>
             <form id="new-task-form" onsubmit="createTaskSubmit(event)" style="display: flex; flex-direction: column; gap: 14px;">
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Project') }} *</label>
-                    <select name="project_id" required style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Project') }} *</label>
+                    <select name="project_id" required style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         @foreach($projects as $p)
                             <option value="{{ $p->id }}">📁 {{ $p->name }} ({{ $p->code }})</option>
                         @endforeach
                     </select>
                 </div>
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Task Title') }} *</label>
-                    <input type="text" name="title" required placeholder="e.g. Implement authentication middleware" style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--nx-shadow-inset-3d);">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Task Title') }} *</label>
+                    <input type="text" name="title" required placeholder="e.g. Implement authentication middleware" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--ula-shadow-xs);">
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Assignee') }}</label>
-                        <select name="assignee_id" style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Assignee') }}</label>
+                        <select name="assignee_id" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             <option value="">— {{ __('Unassigned') }} —</option>
                             @foreach($members as $m)
                                 <option value="{{ $m->user_id }}">{{ $m->user->name }}</option>
@@ -101,8 +101,8 @@
                         </select>
                     </div>
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Priority') }}</label>
-                        <select name="priority" style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Priority') }}</label>
+                        <select name="priority" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             <option value="medium">{{ __('Medium') }}</option>
                             <option value="low">{{ __('Low') }}</option>
                             <option value="high">{{ __('High') }}</option>
@@ -112,12 +112,12 @@
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Estimated Hours') }}</label>
-                        <input type="number" step="0.5" name="estimated_hours" placeholder="4.0" style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--nx-shadow-inset-3d);">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Estimated Hours') }}</label>
+                        <input type="number" step="0.5" name="estimated_hours" placeholder="4.0" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--ula-shadow-xs);">
                     </div>
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Due Date') }}</label>
-                        <input type="date" name="due_date" style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--nx-shadow-inset-3d);">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Due Date') }}</label>
+                        <input type="date" name="due_date" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--ula-shadow-xs);">
                     </div>
                 </div>
                 <button type="submit" class="tactile-btn btn-primary" style="margin-top: 8px; padding: 12px; font-size: 14px; justify-content: center; width: 100%;">
@@ -131,8 +131,8 @@
     <div id="schedule-meeting-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 600px; border-radius: 20px; padding: 24px; max-height: 90vh; overflow-y: auto;">
             <div class="modal-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                <h3 class="modal-title" style="font-size: 18px; font-weight: 900; color: var(--nx-text-primary);">📅 {{ __('Schedule Meeting & Sync Attendees') }}</h3>
-                <button onclick="closeScheduleMeetingModal()" class="modal-close" style="background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--nx-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
+                <h3 class="modal-title" style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);">📅 {{ __('Schedule Meeting & Sync Attendees') }}</h3>
+                <button onclick="closeScheduleMeetingModal()" class="modal-close" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ula-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
             </div>
 
             <form id="schedule-meeting-form" onsubmit="scheduleMeetingSubmit(event)" method="POST" action="{{ route('meetings.schedule') }}" style="display: flex; flex-direction: column; gap: 14px;">
@@ -140,13 +140,13 @@
 
                 <!-- Meeting Scope Switcher -->
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Meeting Scope') }} *</label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: var(--nx-bg-surface-subtle); padding: 4px; border-radius: 12px; border: 1px solid var(--nx-border-subtle);">
-                        <label id="lbl-scope-general" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer; background: var(--nx-bg-surface); color: var(--nx-primary-500); box-shadow: var(--nx-shadow-soft-3d);">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Meeting Scope') }} *</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: var(--ula-surface-page-alt); padding: 4px; border-radius: 12px; border: 1px solid var(--ula-border-subtle);">
+                        <label id="lbl-scope-general" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer; background: var(--ula-surface-card); color: var(--ula-accent-default); box-shadow: var(--ula-shadow-xs);">
                             <input type="radio" name="scope" value="general" checked onchange="toggleMeetingScope('general')" style="display: none;">
                             <span>🌐 {{ __('General Meeting') }}</span>
                         </label>
-                        <label id="lbl-scope-project" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer; color: var(--nx-text-secondary);">
+                        <label id="lbl-scope-project" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer; color: var(--ula-text-secondary);">
                             <input type="radio" name="scope" value="project" onchange="toggleMeetingScope('project')" style="display: none;">
                             <span>📁 {{ __('Project Team Meeting') }}</span>
                         </label>
@@ -155,8 +155,8 @@
 
                 <!-- Project Selector (Shown when scope is project) -->
                 <div id="meeting-project-field" style="display: none;">
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Target Project') }} *</label>
-                    <select name="project_id" id="meeting-project-select" onchange="renderProjectAttendeesList(this.value)" style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Target Project') }} *</label>
+                    <select name="project_id" id="meeting-project-select" onchange="renderProjectAttendeesList(this.value)" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         <option value="">— {{ __('Select Project') }} —</option>
                         @foreach($projects as $p)
                             <option value="{{ $p->id }}">📁 {{ $p->name }} ({{ $p->code }})</option>
@@ -166,34 +166,34 @@
                     <!-- Project Team Members Checklist (Only Project-related Members) -->
                     <div id="project-attendees-selection-box" style="margin-top: 10px; display: none;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <label style="font-size: 12px; font-weight: 700; color: var(--nx-text-secondary);">
+                            <label style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">
                                 👥 {{ __('Select Project Members to Attend') }}
                             </label>
-                            <button type="button" onclick="toggleAllProjectAttendees()" style="background: none; border: none; font-size: 11px; font-weight: 800; color: var(--nx-primary-500); cursor: pointer;">
+                            <button type="button" onclick="toggleAllProjectAttendees()" style="background: none; border: none; font-size: 11px; font-weight: 800; color: var(--ula-accent-default); cursor: pointer;">
                                 ✓ {{ __('Select / Unselect All') }}
                             </button>
                         </div>
-                        <div id="project-attendees-list" style="max-height: 140px; overflow-y: auto; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px;"></div>
+                        <div id="project-attendees-list" style="max-height: 140px; overflow-y: auto; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px;"></div>
                     </div>
                 </div>
 
                 <!-- Meeting Title -->
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Meeting Title') }} *</label>
-                    <input type="text" name="title" required placeholder="e.g. Weekly Strategy Sync, Milestone Review" style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--nx-shadow-inset-3d);">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Meeting Title') }} *</label>
+                    <input type="text" name="title" required placeholder="e.g. Weekly Strategy Sync, Milestone Review" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--ula-shadow-xs);">
                 </div>
 
                 <!-- Meeting Description -->
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Description / Agenda') }}</label>
-                    <textarea name="description" rows="2" placeholder="Brief outline of topics to discuss..." style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 500; resize: vertical; box-shadow: var(--nx-shadow-inset-3d);"></textarea>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Description / Agenda') }}</label>
+                    <textarea name="description" rows="2" placeholder="Brief outline of topics to discuss..." style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 500; resize: vertical; box-shadow: var(--ula-shadow-xs);"></textarea>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <!-- Room Selection -->
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Meeting Room') }}</label>
-                        <select name="room_id" style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Meeting Room') }}</label>
+                        <select name="room_id" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             @foreach($rooms as $r)
                                 <option value="{{ $r->id }}">🚪 {{ $r->name }} ({{ ucfirst($r->type) }})</option>
                             @endforeach
@@ -201,8 +201,8 @@
                     </div>
                     <!-- Duration -->
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Duration') }}</label>
-                        <select name="duration_minutes" style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Duration') }}</label>
+                        <select name="duration_minutes" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             <option value="15">15 {{ __('Minutes') }}</option>
                             <option value="30" selected>30 {{ __('Minutes') }}</option>
                             <option value="45">45 {{ __('Minutes') }}</option>
@@ -215,23 +215,23 @@
 
                 <!-- Date & Time -->
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Scheduled Date & Time') }} *</label>
-                    <input type="datetime-local" name="scheduled_at" id="meeting-scheduled-at-input" required style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--nx-shadow-inset-3d);">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Scheduled Date & Time') }} *</label>
+                    <input type="datetime-local" name="scheduled_at" id="meeting-scheduled-at-input" required style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--ula-shadow-xs);">
                 </div>
 
                 <!-- General Attendees Selection (Shown when scope is general) -->
                 <div id="meeting-general-attendees-field">
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">
                         👥 {{ __('Select Attendees to Invite') }}
                     </label>
-                    <div style="max-height: 140px; overflow-y: auto; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px;">
+                    <div style="max-height: 140px; overflow-y: auto; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px;">
                         @foreach($members as $m)
                             @if($m->user_id !== $user->id)
-                                <label style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--nx-text-primary); cursor: pointer; padding: 4px 6px; border-radius: 6px; transition: background 0.2s;" onmouseover="this.style.background='var(--nx-bg-surface)'" onmouseout="this.style.background='transparent'">
+                                <label style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--ula-text-primary); cursor: pointer; padding: 4px 6px; border-radius: 6px; transition: background 0.2s;" onmouseover="this.style.background='var(--ula-surface-card)'" onmouseout="this.style.background='transparent'">
                                     <span style="display: flex; align-items: center; gap: 8px;">
-                                        <input type="checkbox" name="attendee_ids[]" value="{{ $m->user_id }}" style="accent-color: var(--nx-primary-500);">
+                                        <input type="checkbox" name="attendee_ids[]" value="{{ $m->user_id }}" style="accent-color: var(--ula-accent-default);">
                                         <strong>{{ $m->user->name }}</strong>
-                                        <span style="font-size: 11px; color: var(--nx-text-muted);">({{ $m->user->email }})</span>
+                                        <span style="font-size: 11px; color: var(--ula-text-muted);">({{ $m->user->email }})</span>
                                     </span>
                                     <span class="nav-badge-pill" style="font-size: 10px;">{{ $m->role->name ?? 'Member' }}</span>
                                 </label>
@@ -240,7 +240,7 @@
                     </div>
                 </div>
 
-                <div style="background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 12px; padding: 12px; font-size: 11px; color: var(--nx-text-secondary); display: flex; align-items: center; gap: 8px;">
+                <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 12px; padding: 12px; font-size: 11px; color: var(--ula-text-secondary); display: flex; align-items: center; gap: 8px;">
                     <span style="font-size: 18px;">🔔</span>
                     <span>{{ __('Email invitations with direct Join links will be dispatched automatically, and all attendees will receive sound chime alerts before the session starts.') }}</span>
                 </div>
@@ -256,13 +256,13 @@
     <div id="manual-time-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 500px; border-radius: 20px; padding: 24px;">
             <div class="modal-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                <h3 class="modal-title" style="font-size: 18px; font-weight: 900; color: var(--nx-text-primary);">✍️ {{ __('Log Manual Time Entry') }}</h3>
-                <button onclick="closeManualTimeModal()" class="modal-close" style="background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--nx-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
+                <h3 class="modal-title" style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);">✍️ {{ __('Log Manual Time Entry') }}</h3>
+                <button onclick="closeManualTimeModal()" class="modal-close" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ula-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
             </div>
             <form id="manual-time-form" onsubmit="logManualTimeSubmit(event)" style="display: flex; flex-direction: column; gap: 14px;">
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Project') }} *</label>
-                    <select name="project_id" required style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Project') }} *</label>
+                    <select name="project_id" required style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         @foreach($projects as $p)
                             <option value="{{ $p->id }}">📁 {{ $p->name }}</option>
                         @endforeach
@@ -270,17 +270,17 @@
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Start Time') }} *</label>
-                        <input type="datetime-local" name="started_at" required style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 12px; font-weight: 600; box-shadow: var(--nx-shadow-inset-3d);">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Start Time') }} *</label>
+                        <input type="datetime-local" name="started_at" required style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 12px; font-weight: 600; box-shadow: var(--ula-shadow-xs);">
                     </div>
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('End Time') }} *</label>
-                        <input type="datetime-local" name="ended_at" required style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 12px; font-weight: 600; box-shadow: var(--nx-shadow-inset-3d);">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('End Time') }} *</label>
+                        <input type="datetime-local" name="ended_at" required style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 12px; font-weight: 600; box-shadow: var(--ula-shadow-xs);">
                     </div>
                 </div>
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Description') }}</label>
-                    <input type="text" name="description" placeholder="What did you work on?" style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--nx-shadow-inset-3d);">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Description') }}</label>
+                    <input type="text" name="description" placeholder="What did you work on?" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--ula-shadow-xs);">
                 </div>
                 <button type="submit" class="tactile-btn btn-primary" style="margin-top: 8px; padding: 12px; font-size: 14px; justify-content: center; width: 100%;">
                     ⏱️ {{ __('Log Time') }}
@@ -293,13 +293,13 @@
     <div id="reject-timesheet-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 480px; border-radius: 20px; padding: 24px;">
             <div class="modal-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                <h3 class="modal-title" style="font-size: 18px; font-weight: 900; color: var(--nx-text-primary);">❌ {{ __('Reject Timesheet') }}</h3>
-                <button onclick="closeRejectModal()" class="modal-close" style="background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--nx-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
+                <h3 class="modal-title" style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);">❌ {{ __('Reject Timesheet') }}</h3>
+                <button onclick="closeRejectModal()" class="modal-close" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ula-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
             </div>
             <form onsubmit="rejectTimesheetSubmit(event)" style="display: flex; flex-direction: column; gap: 14px;">
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Feedback Reason for Employee') }} *</label>
-                    <textarea id="reject-reason-input" required rows="3" placeholder="Please clarify the 6 hours logged on Friday..." style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--nx-shadow-inset-3d);"></textarea>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Feedback Reason for Employee') }} *</label>
+                    <textarea id="reject-reason-input" required rows="3" placeholder="Please clarify the 6 hours logged on Friday..." style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--ula-shadow-xs);"></textarea>
                 </div>
                 <button type="submit" class="tactile-btn" style="margin-top: 8px; padding: 12px; font-size: 14px; justify-content: center; background: #D96B5F; color: white; width: 100%;">
                     ❌ {{ __('Confirm Rejection & Send Feedback') }}
@@ -312,18 +312,18 @@
     <div id="project-hub-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 1100px; width: 95vw; max-height: 90vh; display: flex; flex-direction: column; padding: 24px; overflow: hidden; border-radius: 24px;">
             <!-- Hub Header -->
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid var(--nx-border-subtle); padding-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid var(--ula-border-subtle); padding-bottom: 14px;">
                 <div>
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap;">
-                        <span id="hub-proj-code" class="nav-badge-pill" style="font-family: var(--nx-font-mono); font-size: 12px;">PRJ-01</span>
-                        <h2 id="hub-proj-name" style="font-size: 20px; font-weight: 900; margin: 0; color: var(--nx-text-primary);">Project Name</h2>
+                        <span id="hub-proj-code" class="nav-badge-pill" style="font-family: var(--ula-font-mono); font-size: 12px;">PRJ-01</span>
+                        <h2 id="hub-proj-name" style="font-size: 20px; font-weight: 900; margin: 0; color: var(--ula-text-primary);">Project Name</h2>
                         <span id="hub-proj-status" class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F;">Active</span>
                         <span id="hub-proj-priority" class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.15); color: #D6A23A;">High</span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 16px; font-size: 12px; color: var(--nx-text-muted); flex-wrap: wrap;">
-                        <span>👤 {{ __('Manager') }}: <strong id="hub-proj-manager" style="color: var(--nx-text-primary);">Name</strong></span>
-                        <span><span class="material-symbols-rounded" style="font-size: 20px; color: var(--nx-primary-500);">apartment</span> {{ __('Department') }}: <strong id="hub-proj-dept" style="color: var(--nx-text-primary);">Dept</strong></span>
-                        <span>📅 {{ __('Due Date') }}: <strong id="hub-proj-due" style="color: var(--nx-text-primary);">Date</strong></span>
+                    <div style="display: flex; align-items: center; gap: 16px; font-size: 12px; color: var(--ula-text-muted); flex-wrap: wrap;">
+                        <span>👤 {{ __('Manager') }}: <strong id="hub-proj-manager" style="color: var(--ula-text-primary);">Name</strong></span>
+                        <span><span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-accent-default);">apartment</span> {{ __('Department') }}: <strong id="hub-proj-dept" style="color: var(--ula-text-primary);">Dept</strong></span>
+                        <span>📅 {{ __('Due Date') }}: <strong id="hub-proj-due" style="color: var(--ula-text-primary);">Date</strong></span>
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
@@ -333,7 +333,7 @@
                     <button onclick="openNewTaskForCurrentProject()" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px;">
                         <span>+</span> {{ __('Add Task') }}
                     </button>
-                    <button onclick="closeProjectHub()" class="modal-close" style="background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--nx-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
+                    <button onclick="closeProjectHub()" class="modal-close" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ula-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
                 </div>
             </div>
 
@@ -345,8 +345,8 @@
                         <span class="kpi-title">{{ __('Progress') }}</span>
                         <div class="kpi-icon-box">📊</div>
                     </div>
-                    <div id="hub-kpi-progress-pct" class="kpi-value" style="font-size: 20px; color: var(--nx-primary-500);">0%</div>
-                    <div id="hub-kpi-tasks-ratio" style="font-size: 11px; color: var(--nx-text-muted);">0 / 0 tasks done</div>
+                    <div id="hub-kpi-progress-pct" class="kpi-value" style="font-size: 20px; color: var(--ula-accent-default);">0%</div>
+                    <div id="hub-kpi-tasks-ratio" style="font-size: 11px; color: var(--ula-text-muted);">0 / 0 tasks done</div>
                 </div>
                 <!-- Hours & Effort KPI -->
                 <div class="kpi-card" style="padding: 14px;">
@@ -354,8 +354,8 @@
                         <span class="kpi-title">{{ __('Actual vs Planned') }}</span>
                         <div class="kpi-icon-box">⏱️</div>
                     </div>
-                    <div id="hub-kpi-hours" class="kpi-value" style="font-size: 20px; color: var(--nx-primary-500);">0 / 0 h</div>
-                    <div id="hub-kpi-hours-var" style="font-size: 11px; color: var(--nx-text-muted);">Variance: 0h</div>
+                    <div id="hub-kpi-hours" class="kpi-value" style="font-size: 20px; color: var(--ula-accent-default);">0 / 0 h</div>
+                    <div id="hub-kpi-hours-var" style="font-size: 11px; color: var(--ula-text-muted);">Variance: 0h</div>
                 </div>
                 <!-- Financials & Margin KPI -->
                 <div class="kpi-card" style="padding: 14px;">
@@ -363,7 +363,7 @@
                         <span class="kpi-title">{{ __('Budget & Cost') }}</span>
                         <div class="kpi-icon-box">💰</div>
                     </div>
-                    <div id="hub-kpi-budget" class="kpi-value" style="font-size: 20px; color: var(--nx-primary-500);">$0 / $0</div>
+                    <div id="hub-kpi-budget" class="kpi-value" style="font-size: 20px; color: var(--ula-accent-default);">$0 / $0</div>
                     <div id="hub-kpi-margin" style="font-size: 11px; color: #4F9B5F;">Margin: $0 (0%)</div>
                 </div>
                 <!-- Health & Overdue KPI -->
@@ -378,14 +378,14 @@
             </div>
 
             <!-- Hub Inner Navigation Tabs -->
-            <div style="display: flex; gap: 8px; margin-bottom: 14px; background: var(--nx-bg-surface-subtle); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--nx-border-subtle); box-shadow: var(--nx-shadow-inset-3d);">
+            <div style="display: flex; gap: 8px; margin-bottom: 14px; background: var(--ula-surface-page-alt); padding: 4px; border-radius: var(--ula-radius-sm); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
                 <button onclick="switchHubTab('kanban')" id="hub-tab-btn-kanban" class="tactile-btn btn-primary" style="flex: 1; padding: 8px; font-size: 12px; justify-content: center;">
                     📌 {{ __('Kanban Board') }}
                 </button>
-                <button onclick="switchHubTab('tasks')" id="hub-tab-btn-tasks" class="tactile-btn btn-secondary" style="flex: 1; padding: 8px; font-size: 12px; justify-content: center; background: transparent; border: none; box-shadow: none; color: var(--nx-text-secondary);">
+                <button onclick="switchHubTab('tasks')" id="hub-tab-btn-tasks" class="tactile-btn btn-secondary" style="flex: 1; padding: 8px; font-size: 12px; justify-content: center; background: transparent; border: none; box-shadow: none; color: var(--ula-text-secondary);">
                     📋 {{ __('Task Table') }}
                 </button>
-                <button onclick="switchHubTab('timelog')" id="hub-tab-btn-timelog" class="tactile-btn btn-secondary" style="flex: 1; padding: 8px; font-size: 12px; justify-content: center; background: transparent; border: none; box-shadow: none; color: var(--nx-text-secondary);">
+                <button onclick="switchHubTab('timelog')" id="hub-tab-btn-timelog" class="tactile-btn btn-secondary" style="flex: 1; padding: 8px; font-size: 12px; justify-content: center; background: transparent; border: none; box-shadow: none; color: var(--ula-text-secondary);">
                     ⏱️ {{ __('Time Entries Log') }}
                 </button>
             </div>
@@ -396,40 +396,40 @@
                 <div id="hub-view-kanban" style="display: block;">
                     <div style="display: grid; grid-template-columns: repeat(5, minmax(200px, 1fr)); gap: 12px; align-items: start;">
                         <!-- Backlog -->
-                        <div class="kanban-column" style="background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: var(--radius-lg); padding: 12px;">
-                            <div class="kanban-col-header" style="color: var(--nx-text-secondary); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 800; font-size: 12px;">
+                        <div class="kanban-column" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 12px;">
+                            <div class="kanban-col-header" style="color: var(--ula-text-secondary); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 800; font-size: 12px;">
                                 <span>📌 Backlog</span>
                                 <span id="col-count-backlog" class="nav-badge-pill">0</span>
                             </div>
                             <div id="kanban-col-backlog" style="display: flex; flex-direction: column; gap: 8px;"></div>
                         </div>
                         <!-- Ready -->
-                        <div class="kanban-column" style="background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: var(--radius-lg); padding: 12px;">
-                            <div class="kanban-col-header" style="color: var(--nx-primary-600); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 800; font-size: 12px;">
+                        <div class="kanban-column" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 12px;">
+                            <div class="kanban-col-header" style="color: var(--ula-accent-press); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 800; font-size: 12px;">
                                 <span>🎯 Ready</span>
                                 <span id="col-count-ready" class="nav-badge-pill">0</span>
                             </div>
                             <div id="kanban-col-ready" style="display: flex; flex-direction: column; gap: 8px;"></div>
                         </div>
                         <!-- In Progress -->
-                        <div class="kanban-column" style="background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: var(--radius-lg); padding: 12px;">
-                            <div class="kanban-col-header" style="color: var(--nx-primary-500); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 800; font-size: 12px;">
+                        <div class="kanban-column" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 12px;">
+                            <div class="kanban-col-header" style="color: var(--ula-accent-default); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 800; font-size: 12px;">
                                 <span>⚡ In Progress</span>
                                 <span id="col-count-in_progress" class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F;">0</span>
                             </div>
                             <div id="kanban-col-in_progress" style="display: flex; flex-direction: column; gap: 8px;"></div>
                         </div>
                         <!-- Review / QA -->
-                        <div class="kanban-column" style="background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: var(--radius-lg); padding: 12px;">
-                            <div class="kanban-col-header" style="color: var(--status-warning); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 800; font-size: 12px;">
+                        <div class="kanban-column" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 12px;">
+                            <div class="kanban-col-header" style="color: var(--ula-status-warning); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 800; font-size: 12px;">
                                 <span>🔍 Review / QA</span>
                                 <span id="col-count-review" class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.2); color: #D6A23A;">0</span>
                             </div>
                             <div id="kanban-col-review" style="display: flex; flex-direction: column; gap: 8px;"></div>
                         </div>
                         <!-- Done -->
-                        <div class="kanban-column" style="background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: var(--radius-lg); padding: 12px;">
-                            <div class="kanban-col-header" style="color: var(--nx-primary-500); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 800; font-size: 12px;">
+                        <div class="kanban-column" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 12px;">
+                            <div class="kanban-col-header" style="color: var(--ula-accent-default); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 800; font-size: 12px;">
                                 <span>🎉 Done</span>
                                 <span id="col-count-done" class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F;">0</span>
                             </div>
@@ -486,34 +486,34 @@
     <div id="task-details-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 850px; width: 95vw; max-height: 90vh; display: flex; flex-direction: column; padding: 24px; overflow: hidden; border-radius: 24px;">
             <!-- Header -->
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; border-bottom: 1px solid var(--nx-border-subtle); padding-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; border-bottom: 1px solid var(--ula-border-subtle); padding-bottom: 12px; flex-wrap: wrap; gap: 10px;">
                 <div>
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap;">
-                        <span id="task-modal-code" class="nav-badge-pill" style="font-family: var(--nx-font-mono);">#1</span>
-                        <h2 id="task-modal-title" style="font-size: 18px; font-weight: 900; margin: 0; color: var(--nx-text-primary);">Task Title</h2>
+                        <span id="task-modal-code" class="nav-badge-pill" style="font-family: var(--ula-font-mono);">#1</span>
+                        <h2 id="task-modal-title" style="font-size: 18px; font-weight: 900; margin: 0; color: var(--ula-text-primary);">Task Title</h2>
                         <span id="task-modal-status-badge" class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F;">In Progress</span>
                         <span id="task-modal-priority-badge" class="nav-badge-pill" style="background: rgba(217, 107, 95, 0.2); color: #D96B5F;">Urgent</span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--nx-text-muted); flex-wrap: wrap;">
-                        <span>📁 {{ __('Project') }}: <strong id="task-modal-project" style="color: var(--nx-text-primary);">Project Name</strong></span>
-                        <span onclick="if(window.currentModalTaskAssigneeMemberId) { closeTaskDetailsModal(); openMemberProfileModal(window.currentModalTaskAssigneeMemberId); }" style="cursor: pointer;" title="{{ __('Click to view member profile, tasks & hours') }}">👤 {{ __('Assignee') }}: <strong id="task-modal-assignee" style="color: var(--nx-primary-500); text-decoration: underline;">Assignee</strong></span>
-                        <span>📅 {{ __('Due Date') }}: <strong id="task-modal-due" style="color: var(--nx-text-primary);">Date</strong></span>
+                    <div style="display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--ula-text-muted); flex-wrap: wrap;">
+                        <span>📁 {{ __('Project') }}: <strong id="task-modal-project" style="color: var(--ula-text-primary);">Project Name</strong></span>
+                        <span onclick="if(window.currentModalTaskAssigneeMemberId) { closeTaskDetailsModal(); openMemberProfileModal(window.currentModalTaskAssigneeMemberId); }" style="cursor: pointer;" title="{{ __('Click to view member profile, tasks & hours') }}">👤 {{ __('Assignee') }}: <strong id="task-modal-assignee" style="color: var(--ula-accent-default); text-decoration: underline;">Assignee</strong></span>
+                        <span>📅 {{ __('Due Date') }}: <strong id="task-modal-due" style="color: var(--ula-text-primary);">Date</strong></span>
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <button id="task-modal-timer-btn" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--nx-primary-500); border: 1px solid rgba(79, 155, 95, 0.3); padding: 6px 14px; font-size: 12px;">
+                    <button id="task-modal-timer-btn" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-accent-default); border: 1px solid rgba(79, 155, 95, 0.3); padding: 6px 14px; font-size: 12px;">
                         ▶ {{ __('Start Timer') }}
                     </button>
-                    <button onclick="closeTaskDetailsModal()" class="modal-close" style="background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--nx-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
+                    <button onclick="closeTaskDetailsModal()" class="modal-close" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ula-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
                 </div>
             </div>
 
             <!-- Task Quick Status Changer Bar & PM Approval Actions -->
             <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--nx-bg-surface-subtle); padding: 10px 16px; border-radius: var(--radius-md); border: 1px solid var(--nx-border-subtle); box-shadow: var(--nx-shadow-inset-3d); flex-wrap: wrap; gap: 10px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-page-alt); padding: 10px 16px; border-radius: var(--ula-radius-sm); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs); flex-wrap: wrap; gap: 10px;">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 12px; font-weight: 800; color: var(--nx-text-secondary);">⚡ {{ __('Status') }}:</span>
-                        <select id="task-modal-status-select" onchange="updateCurrentTaskStatus(this.value)" style="background: var(--nx-bg-surface); border: 1px solid var(--nx-border-subtle); color: var(--nx-text-primary); font-size: 12px; font-weight: 700; border-radius: 8px; padding: 5px 12px; outline: none;">
+                        <span style="font-size: 12px; font-weight: 800; color: var(--ula-text-secondary);">⚡ {{ __('Status') }}:</span>
+                        <select id="task-modal-status-select" onchange="updateCurrentTaskStatus(this.value)" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); color: var(--ula-text-primary); font-size: 12px; font-weight: 700; border-radius: 8px; padding: 5px 12px; outline: none;">
                             <option value="backlog">📌 {{ __('Backlog') }}</option>
                             <option value="ready">🎯 {{ __('Ready') }}</option>
                             <option value="in_progress">⚡ {{ __('In Progress') }}</option>
@@ -521,44 +521,44 @@
                             <option value="done">🎉 {{ __('Done / Completed') }}</option>
                         </select>
                     </div>
-                    <div style="font-size: 12px; font-family: var(--nx-font-mono); font-weight: 800; color: var(--nx-primary-500);">
+                    <div style="font-size: 12px; font-family: var(--ula-font-mono); font-weight: 800; color: var(--ula-accent-default);">
                         ⏱️ <span id="task-modal-hours">0h / 0h</span>
                     </div>
                 </div>
 
                 <!-- Approval Status Alert & Action Box -->
-                <div id="task-modal-approval-banner" style="display: none; padding: 12px 16px; border-radius: var(--radius-md); font-size: 12px; font-weight: 700; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <div id="task-modal-approval-banner" style="display: none; padding: 12px 16px; border-radius: var(--ula-radius-sm); font-size: 12px; font-weight: 700; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
                     <div id="task-modal-approval-text" style="display: flex; align-items: center; gap: 8px;"></div>
                     <div id="task-modal-approval-actions" style="display: flex; gap: 8px;"></div>
                 </div>
             </div>
 
             <!-- Sub-Tabs Segmented Control -->
-            <div class="task-modal-segmented-bar" style="display: flex; gap: 4px; margin-bottom: 16px; background: var(--nx-bg-surface-subtle); padding: 4px; border-radius: 12px; border: 1px solid var(--nx-border-subtle); box-shadow: var(--nx-shadow-inset-3d); overflow-x: auto;">
+            <div class="task-modal-segmented-bar" style="display: flex; gap: 4px; margin-bottom: 16px; background: var(--ula-surface-page-alt); padding: 4px; border-radius: 12px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs); overflow-x: auto;">
                 <button type="button" onclick="switchTaskInspectorTab('details')" id="task-tab-btn-details" class="tactile-btn btn-primary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px;">
                     <span>📝</span>
                     <span>{{ __('Details') }}</span>
                 </button>
-                <button type="button" onclick="switchTaskInspectorTab('checklist')" id="task-tab-btn-checklist" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--nx-text-secondary);">
+                <button type="button" onclick="switchTaskInspectorTab('checklist')" id="task-tab-btn-checklist" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--ula-text-secondary);">
                     <span>☑️</span>
                     <span>{{ __('Checklist') }}</span>
-                    <span id="task-checklist-count" style="font-size: 10px; background: rgba(36, 92, 58, 0.15); color: var(--nx-primary-500); padding: 1px 7px; border-radius: 9999px; font-weight: 800; font-family: var(--nx-font-mono);">0</span>
+                    <span id="task-checklist-count" style="font-size: 10px; background: rgba(36, 92, 58, 0.15); color: var(--ula-accent-default); padding: 1px 7px; border-radius: 9999px; font-weight: 800; font-family: var(--ula-font-mono);">0</span>
                 </button>
-                <button type="button" onclick="switchTaskInspectorTab('attachments')" id="task-tab-btn-attachments" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--nx-text-secondary);">
+                <button type="button" onclick="switchTaskInspectorTab('attachments')" id="task-tab-btn-attachments" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--ula-text-secondary);">
                     <span>📎</span>
                     <span>{{ __('Files') }}</span>
-                    <span id="task-attachments-count" style="font-size: 10px; background: rgba(36, 92, 58, 0.15); color: var(--nx-primary-500); padding: 1px 7px; border-radius: 9999px; font-weight: 800; font-family: var(--nx-font-mono);">0</span>
+                    <span id="task-attachments-count" style="font-size: 10px; background: rgba(36, 92, 58, 0.15); color: var(--ula-accent-default); padding: 1px 7px; border-radius: 9999px; font-weight: 800; font-family: var(--ula-font-mono);">0</span>
                 </button>
-                <button type="button" onclick="switchTaskInspectorTab('comments')" id="task-tab-btn-comments" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--nx-text-secondary);">
+                <button type="button" onclick="switchTaskInspectorTab('comments')" id="task-tab-btn-comments" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--ula-text-secondary);">
                     <span>💬</span>
                     <span>{{ __('Discussions') }}</span>
-                    <span id="task-comments-count" style="font-size: 10px; background: rgba(36, 92, 58, 0.15); color: var(--nx-primary-500); padding: 1px 7px; border-radius: 9999px; font-weight: 800; font-family: var(--nx-font-mono);">0</span>
+                    <span id="task-comments-count" style="font-size: 10px; background: rgba(36, 92, 58, 0.15); color: var(--ula-accent-default); padding: 1px 7px; border-radius: 9999px; font-weight: 800; font-family: var(--ula-font-mono);">0</span>
                 </button>
-                <button type="button" onclick="switchTaskInspectorTab('dependencies')" id="task-tab-btn-dependencies" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--nx-text-secondary);">
+                <button type="button" onclick="switchTaskInspectorTab('dependencies')" id="task-tab-btn-dependencies" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--ula-text-secondary);">
                     <span>🔗</span>
                     <span>{{ __('Dependencies') }}</span>
                 </button>
-                <button type="button" onclick="switchTaskInspectorTab('timelog')" id="task-tab-btn-timelog" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--nx-text-secondary);">
+                <button type="button" onclick="switchTaskInspectorTab('timelog')" id="task-tab-btn-timelog" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--ula-text-secondary);">
                     <span>⏱️</span>
                     <span>{{ __('Time Log') }}</span>
                 </button>
@@ -569,8 +569,8 @@
                 <!-- 1. Details -->
                 <div id="task-inspector-details" style="display: block;">
                     <div style="margin-bottom: 14px;">
-                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--nx-text-secondary); text-transform: uppercase; margin-bottom: 6px;">{{ __('Description') }}</label>
-                        <div id="task-modal-description" style="background: var(--nx-bg-surface-subtle); padding: 14px; border-radius: 12px; font-size: 13px; color: var(--nx-text-primary); line-height: 1.5; border: 1px solid var(--nx-border-subtle); box-shadow: var(--nx-shadow-inset-3d);">
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 6px;">{{ __('Description') }}</label>
+                        <div id="task-modal-description" style="background: var(--ula-surface-page-alt); padding: 14px; border-radius: 12px; font-size: 13px; color: var(--ula-text-primary); line-height: 1.5; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
                             —
                         </div>
                     </div>
@@ -579,7 +579,7 @@
                 <!-- 2. Checklist -->
                 <div id="task-inspector-checklist" style="display: none;">
                     <form onsubmit="addTaskChecklistItem(event)" style="display: flex; gap: 8px; margin-bottom: 14px;">
-                        <input type="text" id="new-checklist-title-input" required placeholder="{{ __('Add checklist sub-item (e.g. Write unit tests, create migration)...') }}" style="flex: 1; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 9px 12px; color: var(--nx-text-primary); outline: none; font-size: 12px; font-weight: 600; box-shadow: var(--nx-shadow-inset-3d);">
+                        <input type="text" id="new-checklist-title-input" required placeholder="{{ __('Add checklist sub-item (e.g. Write unit tests, create migration)...') }}" style="flex: 1; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 9px 12px; color: var(--ula-text-primary); outline: none; font-size: 12px; font-weight: 600; box-shadow: var(--ula-shadow-xs);">
                         <button type="submit" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px;">
                             <span>+</span> {{ __('Add Item') }}
                         </button>
@@ -589,11 +589,11 @@
 
                 <!-- 3. Attachments & Files -->
                 <div id="task-inspector-attachments" style="display: none;">
-                    <form onsubmit="uploadTaskAttachmentSubmit(event)" style="background: var(--nx-bg-surface-subtle); border: 1px dashed var(--nx-border-subtle); border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 14px;">
+                    <form onsubmit="uploadTaskAttachmentSubmit(event)" style="background: var(--ula-surface-page-alt); border: 1px dashed var(--ula-border-subtle); border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 14px;">
                         <div style="font-size: 24px; margin-bottom: 6px;">📎</div>
-                        <div style="font-size: 12px; font-weight: 800; color: var(--nx-text-primary); margin-bottom: 8px;">{{ __('Upload Document or Attachment to Task') }}</div>
+                        <div style="font-size: 12px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 8px;">{{ __('Upload Document or Attachment to Task') }}</div>
                         <div style="display: flex; justify-content: center; gap: 8px; align-items: center; max-width: 420px; margin: 0 auto;">
-                            <input type="file" id="task-file-input" required style="font-size: 12px; color: var(--nx-text-primary);">
+                            <input type="file" id="task-file-input" required style="font-size: 12px; color: var(--ula-text-primary);">
                             <button type="submit" class="tactile-btn btn-primary" style="padding: 6px 14px; font-size: 12px;">
                                 📤 {{ __('Upload') }}
                             </button>
@@ -608,10 +608,10 @@
                     
                     <!-- Quick Mention Suggestion Chips -->
                     <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap;">
-                        <span style="font-size: 11px; font-weight: 800; color: var(--nx-text-secondary);">@ {{ __('Mention') }}:</span>
+                        <span style="font-size: 11px; font-weight: 800; color: var(--ula-text-secondary);">@ {{ __('Mention') }}:</span>
                         @foreach($members->take(6) as $chipMember)
                             @if($chipMember->user_id !== $user->id)
-                                <button type="button" onclick="insertMentionHandle('{{ $chipMember->user->name }}')" class="nav-badge-pill" style="cursor: pointer; font-size: 10px; border: 1px solid var(--nx-border-subtle); background: var(--nx-bg-surface-subtle); color: var(--nx-primary-500); font-weight: 700;" title="{{ __('Click to mention :name', ['name' => $chipMember->user->name]) }}">
+                                <button type="button" onclick="insertMentionHandle('{{ $chipMember->user->name }}')" class="nav-badge-pill" style="cursor: pointer; font-size: 10px; border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-page-alt); color: var(--ula-accent-default); font-weight: 700;" title="{{ __('Click to mention :name', ['name' => $chipMember->user->name]) }}">
                                     @<span>{{ $chipMember->user->name }}</span>
                                 </button>
                             @endif
@@ -619,7 +619,7 @@
                     </div>
 
                     <form onsubmit="addTaskCommentSubmit(event)" style="display: flex; gap: 8px;">
-                        <input type="text" id="new-comment-body-input" required placeholder="{{ __('Write a comment or status update... Type @name to mention') }}" style="flex: 1; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 9px 12px; color: var(--nx-text-primary); outline: none; font-size: 12px; font-weight: 600; box-shadow: var(--nx-shadow-inset-3d);">
+                        <input type="text" id="new-comment-body-input" required placeholder="{{ __('Write a comment or status update... Type @name to mention') }}" style="flex: 1; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 9px 12px; color: var(--ula-text-primary); outline: none; font-size: 12px; font-weight: 600; box-shadow: var(--ula-shadow-xs);">
                         <button type="submit" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px;">
                             💬 {{ __('Post') }}
                         </button>
@@ -628,10 +628,10 @@
 
                 <!-- 5. Dependencies -->
                 <div id="task-inspector-dependencies" style="display: none;">
-                    <div style="background: var(--nx-bg-surface-subtle); padding: 14px; border-radius: 12px; margin-bottom: 14px; border: 1px solid var(--nx-border-subtle); box-shadow: var(--nx-shadow-inset-3d);">
-                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--nx-text-secondary); text-transform: uppercase; margin-bottom: 6px;">🔗 {{ __('Add Predecessor / Blocker Task') }}</label>
+                    <div style="background: var(--ula-surface-page-alt); padding: 14px; border-radius: 12px; margin-bottom: 14px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 6px;">🔗 {{ __('Add Predecessor / Blocker Task') }}</label>
                         <form onsubmit="addTaskDependencySubmit(event)" style="display: flex; gap: 8px;">
-                            <select id="dependency-blocker-select" required style="flex: 1; background: var(--nx-bg-surface); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 8px 12px; color: var(--nx-text-primary); font-size: 12px; font-weight: 600;">
+                            <select id="dependency-blocker-select" required style="flex: 1; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 8px 12px; color: var(--ula-text-primary); font-size: 12px; font-weight: 600;">
                                 <option value="">— {{ __('Select Blocker Task') }} —</option>
                                 @foreach($tasks as $oth)
                                     <option value="{{ $oth->id }}">#{{ $oth->task_number }} {{ $oth->title }} ({{ $oth->project->code ?? 'PRJ' }})</option>
@@ -666,15 +666,15 @@
 
     <!-- Comprehensive Team Member Profile Modal -->
     <div id="member-details-modal" class="modal" style="display: none; align-items: center; justify-content: center; z-index: 9999;">
-        <div class="modal-box" style="max-width: 860px; width: 95%; max-height: 90vh; display: flex; flex-direction: column; padding: 0; overflow: hidden; border-radius: var(--radius-xl); box-shadow: var(--shadow-modal-3d); border: 1px solid var(--nx-border-subtle); background: var(--nx-bg-surface);">
+        <div class="modal-box" style="max-width: 860px; width: 95%; max-height: 90vh; display: flex; flex-direction: column; padding: 0; overflow: hidden; border-radius: var(--ula-radius-xl); box-shadow: var(--ula-shadow-xl); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card);">
             
             <!-- Modal Hero Header -->
-            <div style="background: linear-gradient(135deg, rgba(79, 155, 95, 0.12) 0%, rgba(36, 92, 58, 0.22) 100%); padding: 24px; border-bottom: 1px solid var(--nx-border-subtle); position: relative;">
-                <button onclick="closeMemberProfileModal()" style="position: absolute; top: 16px; inset-inline-end: 16px; width: 32px; height: 32px; border-radius: 50%; background: var(--nx-bg-surface); border: 1px solid var(--nx-border-subtle); color: var(--nx-text-secondary); font-size: 16px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--nx-shadow-soft-3d); transition: all 0.2s;">✕</button>
+            <div style="background: linear-gradient(135deg, rgba(79, 155, 95, 0.12) 0%, rgba(36, 92, 58, 0.22) 100%); padding: 24px; border-bottom: 1px solid var(--ula-border-subtle); position: relative;">
+                <button onclick="closeMemberProfileModal()" style="position: absolute; top: 16px; inset-inline-end: 16px; width: 32px; height: 32px; border-radius: 50%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); color: var(--ula-text-secondary); font-size: 16px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--ula-shadow-xs); transition: all 0.2s;">✕</button>
 
                 <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
                     <!-- Avatar -->
-                    <div id="mp-avatar-container" style="position: relative; width: 76px; height: 76px; border-radius: 20px; background: var(--nx-accent-gradient); border: 3px solid #FFFDF6; box-shadow: 0 10px 25px rgba(36, 92, 58, 0.25); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 900; color: white; flex-shrink: 0; overflow: hidden;">
+                    <div id="mp-avatar-container" style="position: relative; width: 76px; height: 76px; border-radius: 20px; background: var(--ula-gradient-accent); border: 3px solid #FFFDF6; box-shadow: 0 10px 25px rgba(36, 92, 58, 0.25); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 900; color: white; flex-shrink: 0; overflow: hidden;">
                         <img id="mp-avatar-img" src="" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; display: none;">
                         <span id="mp-avatar-fallback">AB</span>
                         <div style="position: absolute; bottom: -2px; inset-inline-end: -2px; width: 16px; height: 16px; border-radius: 50%; background: #4F9B5F; border: 3px solid #FFFDF6;" title="Online"></div>
@@ -683,12 +683,12 @@
                     <!-- Details -->
                     <div style="flex: 1; min-width: 200px;">
                         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                            <h2 id="mp-user-name" style="font-size: 22px; font-weight: 900; color: var(--nx-text-primary); margin: 0;">Member Name</h2>
-                            <span id="mp-user-nickname" class="nav-badge-pill" style="font-family: var(--nx-font-mono); font-size: 11px;">@nickname</span>
+                            <h2 id="mp-user-name" style="font-size: 22px; font-weight: 900; color: var(--ula-text-primary); margin: 0;">Member Name</h2>
+                            <span id="mp-user-nickname" class="nav-badge-pill" style="font-family: var(--ula-font-mono); font-size: 11px;">@nickname</span>
                             <span id="mp-user-role" class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F; font-size: 11px;">Employee</span>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; font-size: 12px; color: var(--nx-text-secondary);">
-                            <span id="mp-job-title" style="font-weight: 700; color: var(--nx-text-primary);">Senior Engineer</span>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; font-size: 12px; color: var(--ula-text-secondary);">
+                            <span id="mp-job-title" style="font-weight: 700; color: var(--ula-text-primary);">Senior Engineer</span>
                             <span>•</span>
                             <span id="mp-dept-team">Engineering Team</span>
                             <span>•</span>
@@ -706,14 +706,14 @@
             </div>
 
             <!-- Profile Nav Tabs -->
-            <div style="display: flex; border-bottom: 1px solid var(--nx-border-subtle); background: var(--nx-bg-surface-subtle); padding: 0 16px;">
-                <button onclick="switchMemberProfileTab('about')" id="mp-tab-btn-about" class="member-profile-tab-btn active" style="padding: 14px 18px; font-size: 13px; font-weight: 800; border: none; background: transparent; cursor: pointer; color: var(--nx-primary-500); border-bottom: 3px solid var(--nx-primary-500); transition: all 0.2s;">
+            <div style="display: flex; border-bottom: 1px solid var(--ula-border-subtle); background: var(--ula-surface-page-alt); padding: 0 16px;">
+                <button onclick="switchMemberProfileTab('about')" id="mp-tab-btn-about" class="member-profile-tab-btn active" style="padding: 14px 18px; font-size: 13px; font-weight: 800; border: none; background: transparent; cursor: pointer; color: var(--ula-accent-default); border-bottom: 3px solid var(--ula-accent-default); transition: all 0.2s;">
                     👤 {{ __('Profile & About') }}
                 </button>
-                <button onclick="switchMemberProfileTab('tasks')" id="mp-tab-btn-tasks" class="member-profile-tab-btn" style="padding: 14px 18px; font-size: 13px; font-weight: 700; border: none; background: transparent; cursor: pointer; color: var(--nx-text-secondary); border-bottom: 3px solid transparent; transition: all 0.2s;">
+                <button onclick="switchMemberProfileTab('tasks')" id="mp-tab-btn-tasks" class="member-profile-tab-btn" style="padding: 14px 18px; font-size: 13px; font-weight: 700; border: none; background: transparent; cursor: pointer; color: var(--ula-text-secondary); border-bottom: 3px solid transparent; transition: all 0.2s;">
                     📋 {{ __('Assigned Tasks') }} <span id="mp-tasks-count-pill" class="nav-badge-pill" style="font-size: 10px; margin-inline-start: 4px;">0</span>
                 </button>
-                <button onclick="switchMemberProfileTab('time')" id="mp-tab-btn-time" class="member-profile-tab-btn" style="padding: 14px 18px; font-size: 13px; font-weight: 700; border: none; background: transparent; cursor: pointer; color: var(--nx-text-secondary); border-bottom: 3px solid transparent; transition: all 0.2s;">
+                <button onclick="switchMemberProfileTab('time')" id="mp-tab-btn-time" class="member-profile-tab-btn" style="padding: 14px 18px; font-size: 13px; font-weight: 700; border: none; background: transparent; cursor: pointer; color: var(--ula-text-secondary); border-bottom: 3px solid transparent; transition: all 0.2s;">
                     ⏱️ {{ __('Work Time & Logs') }} <span id="mp-hours-count-pill" class="nav-badge-pill" style="font-size: 10px; margin-inline-start: 4px;">0h</span>
                 </button>
             </div>
@@ -726,58 +726,58 @@
                     
                     <!-- Contact Cards Grid -->
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
-                        <div style="background: var(--nx-bg-surface-subtle); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--nx-border-subtle); box-shadow: var(--nx-shadow-inset-3d);">
-                            <div style="font-size: 10px; font-weight: 800; color: var(--nx-text-muted); text-transform: uppercase;">✉️ {{ __('Email Address') }}</div>
-                            <div id="mp-info-email" style="font-size: 12px; font-weight: 700; color: var(--nx-text-primary); margin-top: 4px; word-break: break-all;">user@company.com</div>
+                        <div style="background: var(--ula-surface-page-alt); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
+                            <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;">✉️ {{ __('Email Address') }}</div>
+                            <div id="mp-info-email" style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary); margin-top: 4px; word-break: break-all;">user@company.com</div>
                         </div>
-                        <div style="background: var(--nx-bg-surface-subtle); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--nx-border-subtle); box-shadow: var(--nx-shadow-inset-3d);">
-                            <div style="font-size: 10px; font-weight: 800; color: var(--nx-text-muted); text-transform: uppercase;">📱 {{ __('Phone') }}</div>
-                            <div id="mp-info-phone" style="font-size: 12px; font-weight: 700; color: var(--nx-text-primary); margin-top: 4px;">—</div>
+                        <div style="background: var(--ula-surface-page-alt); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
+                            <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;">📱 {{ __('Phone') }}</div>
+                            <div id="mp-info-phone" style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary); margin-top: 4px;">—</div>
                         </div>
-                        <div style="background: var(--nx-bg-surface-subtle); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--nx-border-subtle); box-shadow: var(--nx-shadow-inset-3d);">
-                            <div style="font-size: 10px; font-weight: 800; color: var(--nx-text-muted); text-transform: uppercase;">🎂 {{ __('Birthday') }}</div>
-                            <div id="mp-info-dob" style="font-size: 12px; font-weight: 700; color: var(--nx-text-primary); margin-top: 4px;">—</div>
+                        <div style="background: var(--ula-surface-page-alt); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
+                            <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;">🎂 {{ __('Birthday') }}</div>
+                            <div id="mp-info-dob" style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary); margin-top: 4px;">—</div>
                         </div>
-                        <div style="background: var(--nx-bg-surface-subtle); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--nx-border-subtle); box-shadow: var(--nx-shadow-inset-3d);">
-                            <div style="font-size: 10px; font-weight: 800; color: var(--nx-text-muted); text-transform: uppercase;">📅 {{ __('Joined Workspace') }}</div>
-                            <div id="mp-info-joined" style="font-size: 12px; font-weight: 700; color: var(--nx-text-primary); margin-top: 4px;">Jan 01, 2026</div>
+                        <div style="background: var(--ula-surface-page-alt); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
+                            <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;">📅 {{ __('Joined Workspace') }}</div>
+                            <div id="mp-info-joined" style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary); margin-top: 4px;">Jan 01, 2026</div>
                         </div>
                     </div>
 
                     <!-- Bio Section -->
-                    <div style="background: var(--nx-bg-surface-subtle); padding: 16px; border-radius: 14px; border: 1px solid var(--nx-border-subtle); box-shadow: var(--nx-shadow-inset-3d);">
-                        <div style="font-size: 11px; font-weight: 800; color: var(--nx-text-secondary); text-transform: uppercase; margin-bottom: 6px;">📝 {{ __('About / Biography') }}</div>
-                        <div id="mp-info-bio" style="font-size: 13px; line-height: 1.6; color: var(--nx-text-primary); font-weight: 500;">No bio provided.</div>
+                    <div style="background: var(--ula-surface-page-alt); padding: 16px; border-radius: 14px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
+                        <div style="font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 6px;">📝 {{ __('About / Biography') }}</div>
+                        <div id="mp-info-bio" style="font-size: 13px; line-height: 1.6; color: var(--ula-text-primary); font-weight: 500;">No bio provided.</div>
                     </div>
 
                     <!-- Skills & Hobbies in 2 Columns -->
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                        <div style="background: var(--nx-bg-surface-subtle); padding: 16px; border-radius: 14px; border: 1px solid var(--nx-border-subtle); box-shadow: var(--nx-shadow-inset-3d);">
-                            <div style="font-size: 11px; font-weight: 800; color: var(--nx-text-secondary); text-transform: uppercase; margin-bottom: 8px;">⚡ {{ __('Skills & Expertise') }}</div>
+                        <div style="background: var(--ula-surface-page-alt); padding: 16px; border-radius: 14px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
+                            <div style="font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 8px;">⚡ {{ __('Skills & Expertise') }}</div>
                             <div id="mp-info-skills" style="display: flex; flex-wrap: wrap; gap: 6px;">
-                                <span style="font-size: 11px; color: var(--nx-text-muted);">—</span>
+                                <span style="font-size: 11px; color: var(--ula-text-muted);">—</span>
                             </div>
                         </div>
-                        <div style="background: var(--nx-bg-surface-subtle); padding: 16px; border-radius: 14px; border: 1px solid var(--nx-border-subtle); box-shadow: var(--nx-shadow-inset-3d);">
-                            <div style="font-size: 11px; font-weight: 800; color: var(--nx-text-secondary); text-transform: uppercase; margin-bottom: 8px;">🎯 {{ __('Hobbies & Interests') }}</div>
+                        <div style="background: var(--ula-surface-page-alt); padding: 16px; border-radius: 14px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
+                            <div style="font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 8px;">🎯 {{ __('Hobbies & Interests') }}</div>
                             <div id="mp-info-hobbies" style="display: flex; flex-wrap: wrap; gap: 6px;">
-                                <span style="font-size: 11px; color: var(--nx-text-muted);">—</span>
+                                <span style="font-size: 11px; color: var(--ula-text-muted);">—</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Social Media Links -->
-                    <div style="background: var(--nx-bg-surface-subtle); padding: 16px; border-radius: 14px; border: 1px solid var(--nx-border-subtle); box-shadow: var(--nx-shadow-inset-3d);">
-                        <div style="font-size: 11px; font-weight: 800; color: var(--nx-text-secondary); text-transform: uppercase; margin-bottom: 10px;">🌐 {{ __('Social Profiles & Portfolio') }}</div>
+                    <div style="background: var(--ula-surface-page-alt); padding: 16px; border-radius: 14px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
+                        <div style="font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 10px;">🌐 {{ __('Social Profiles & Portfolio') }}</div>
                         <div id="mp-info-socials" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                            <span style="font-size: 11px; color: var(--nx-text-muted);">—</span>
+                            <span style="font-size: 11px; color: var(--ula-text-muted);">—</span>
                         </div>
                     </div>
 
                     <!-- Notes -->
-                    <div id="mp-notes-container" style="background: var(--nx-bg-surface-subtle); padding: 16px; border-radius: 14px; border: 1px solid var(--nx-border-subtle); box-shadow: var(--nx-shadow-inset-3d); display: none;">
-                        <div style="font-size: 11px; font-weight: 800; color: var(--nx-text-secondary); text-transform: uppercase; margin-bottom: 6px;">📌 {{ __('Work Preferences & Notes') }}</div>
-                        <div id="mp-info-notes" style="font-size: 12px; color: var(--nx-text-primary); line-height: 1.5;"></div>
+                    <div id="mp-notes-container" style="background: var(--ula-surface-page-alt); padding: 16px; border-radius: 14px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs); display: none;">
+                        <div style="font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 6px;">📌 {{ __('Work Preferences & Notes') }}</div>
+                        <div id="mp-info-notes" style="font-size: 12px; color: var(--ula-text-primary); line-height: 1.5;"></div>
                     </div>
 
                 </div>
@@ -793,11 +793,11 @@
                         </div>
                         <div class="kpi-card" style="margin-bottom: 0; padding: 14px;">
                             <div class="kpi-title" style="font-size: 11px;">{{ __('In Progress') }}</div>
-                            <div id="mp-task-stat-progress" class="kpi-value" style="font-size: 20px; color: var(--nx-primary-500);">0</div>
+                            <div id="mp-task-stat-progress" class="kpi-value" style="font-size: 20px; color: var(--ula-accent-default);">0</div>
                         </div>
                         <div class="kpi-card" style="margin-bottom: 0; padding: 14px;">
                             <div class="kpi-title" style="font-size: 11px;">{{ __('Pending / Ready') }}</div>
-                            <div id="mp-task-stat-pending" class="kpi-value" style="font-size: 20px; color: var(--status-warning);">0</div>
+                            <div id="mp-task-stat-pending" class="kpi-value" style="font-size: 20px; color: var(--ula-status-warning);">0</div>
                         </div>
                         <div class="kpi-card" style="margin-bottom: 0; padding: 14px;">
                             <div class="kpi-title" style="font-size: 11px;">{{ __('Completed') }}</div>
@@ -807,7 +807,7 @@
 
                     <!-- Tasks Feed Container -->
                     <div id="mp-tasks-list-container" style="display: flex; flex-direction: column; gap: 8px;">
-                        <div style="text-align: center; color: var(--nx-text-muted); font-size: 12px; padding: 24px;">
+                        <div style="text-align: center; color: var(--ula-text-muted); font-size: 12px; padding: 24px;">
                             {{ __('No tasks assigned to this member.') }}
                         </div>
                     </div>
@@ -822,8 +822,8 @@
                         <div class="kpi-card" style="margin-bottom: 0; padding: 16px; display: flex; align-items: center; justify-content: space-between;">
                             <div>
                                 <div class="kpi-title" style="font-size: 11px;">{{ __('Total Logged Effort') }}</div>
-                                <div id="mp-time-total-hours" class="kpi-value" style="font-size: 24px; color: var(--nx-primary-500);">0.0h</div>
-                                <div style="font-size: 10px; color: var(--nx-text-muted); margin-top: 2px;">{{ __('Tracked across all initiatives') }}</div>
+                                <div id="mp-time-total-hours" class="kpi-value" style="font-size: 24px; color: var(--ula-accent-default);">0.0h</div>
+                                <div style="font-size: 10px; color: var(--ula-text-muted); margin-top: 2px;">{{ __('Tracked across all initiatives') }}</div>
                             </div>
                             <div style="font-size: 32px;">⏱️</div>
                         </div>
@@ -832,15 +832,15 @@
                             <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; color: #4F9B5F;">
                                 <span style="animation: pulse 1.5s infinite;">🟢</span> {{ __('Live Stopwatch Status') }}
                             </div>
-                            <div id="mp-active-timer-text" style="font-size: 13px; font-weight: 800; color: var(--nx-text-primary); margin-top: 6px;">
+                            <div id="mp-active-timer-text" style="font-size: 13px; font-weight: 800; color: var(--ula-text-primary); margin-top: 6px;">
                                 {{ __('No active timer running') }}
                             </div>
                         </div>
                     </div>
 
                     <!-- Time Entries History Table -->
-                    <div class="card" style="margin-bottom: 0; padding: 0; overflow: hidden; border-radius: var(--radius-lg);">
-                        <div style="padding: 12px 16px; background: var(--nx-bg-surface-subtle); border-bottom: 1px solid var(--nx-border-subtle); font-size: 12px; font-weight: 800; color: var(--nx-text-primary);">
+                    <div class="card" style="margin-bottom: 0; padding: 0; overflow: hidden; border-radius: var(--ula-radius-lg);">
+                        <div style="padding: 12px 16px; background: var(--ula-surface-page-alt); border-bottom: 1px solid var(--ula-border-subtle); font-size: 12px; font-weight: 800; color: var(--ula-text-primary);">
                             ⏱️ {{ __('Recent Work Logs') }}
                         </div>
                         <div style="overflow-x: auto;">
@@ -856,7 +856,7 @@
                                 </thead>
                                 <tbody id="mp-time-entries-tbody">
                                     <tr>
-                                        <td colspan="5" style="text-align: center; color: var(--nx-text-muted); padding: 20px;">{{ __('No work logs recorded yet.') }}</td>
+                                        <td colspan="5" style="text-align: center; color: var(--ula-text-muted); padding: 20px;">{{ __('No work logs recorded yet.') }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -874,16 +874,16 @@
     <div id="invite-modal" class="modal">
         <div class="modal-box">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 style="font-size: 18px; font-weight: 800; color: var(--brand-navy);">📨 {{ __('Invite & Guest Access') }}</h3>
+                <h3 style="font-size: 18px; font-weight: 800; color: var(--ula-palm-900);">📨 {{ __('Invite & Guest Access') }}</h3>
                 <button onclick="closeInviteModal()" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
             </div>
 
             <!-- Tabs -->
             <div style="display: flex; gap: 8px; margin-bottom: 20px; background: #f1f5f9; padding: 4px; border-radius: 10px;">
-                <button onclick="switchInviteTab('guest')" id="tab-guest-btn" style="flex: 1; padding: 8px; border-radius: 8px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; background: var(--brand-teal); color: white;">
+                <button onclick="switchInviteTab('guest')" id="tab-guest-btn" style="flex: 1; padding: 8px; border-radius: 8px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; background: var(--ula-status-info); color: white;">
                     🔗 {{ __('Guest Meeting Link') }}
                 </button>
-                <button onclick="switchInviteTab('member')" id="tab-member-btn" style="flex: 1; padding: 8px; border-radius: 8px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; background: none; color: var(--nx-text-muted);">
+                <button onclick="switchInviteTab('member')" id="tab-member-btn" style="flex: 1; padding: 8px; border-radius: 8px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; background: none; color: var(--ula-text-muted);">
                     👤 {{ __('Team Member') }}
                 </button>
             </div>
@@ -892,7 +892,7 @@
             <div id="guest-tab-content">
                 <div style="display: flex; flex-direction: column; gap: 14px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Destination Room') }}</label>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Destination Room') }}</label>
                         @php
                             $defaultOffice = $offices->firstWhere('is_default', true) ?: $offices->first();
                             $defaultOfficeId = $defaultOffice?->id;
@@ -901,7 +901,7 @@
                                 return ($rFloorId == $defaultOfficeId) ? 0 : 1;
                             });
                         @endphp
-                        <select id="invite-room-select" onchange="onInviteRoomSelected(this)" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <select id="invite-room-select" onchange="onInviteRoomSelected(this)" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             @foreach($sortedRooms as $r)
                                 @php
                                     $rFloor = $r->floor ?? $r->map?->floor;
@@ -921,13 +921,13 @@
                     </div>
 
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Guest Name / Label') }}</label>
-                        <input type="text" id="invite-guest-name" value="Investor / Partner" placeholder="e.g. Sarah Miller" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Guest Name / Label') }}</label>
+                        <input type="text" id="invite-guest-name" value="Investor / Partner" placeholder="e.g. Sarah Miller" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                     </div>
 
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Link Expiration') }}</label>
-                        <select id="invite-guest-hours" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Link Expiration') }}</label>
+                        <select id="invite-guest-hours" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             <option value="1">1 Hour</option>
                             <option value="12">12 Hours</option>
                             <option value="24" selected>24 Hours (1 Day)</option>
@@ -941,12 +941,12 @@
 
                     <div id="guest-result-box" style="display: none; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 12px; margin-top: 10px;">
                         <div style="font-size: 11px; font-weight: 800; color: #34d399; text-transform: uppercase; margin-bottom: 6px;">✅ Invitation Link Ready!</div>
-                        <input type="text" id="guest-link-output" readonly style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 6px; padding: 8px; color: var(--brand-teal); font-size: 12px; font-family: var(--nx-font-mono); margin-bottom: 8px;">
+                        <input type="text" id="guest-link-output" readonly style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 6px; padding: 8px; color: var(--ula-status-info); font-size: 12px; font-family: var(--ula-font-mono); margin-bottom: 8px;">
                         <div style="display: flex; gap: 8px;">
-                            <button type="button" onclick="copyModalGuestLink(this)" id="btn-copy-link" style="flex: 1; background: var(--brand-primary); color: white; font-weight: 700; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-size: 12px;">
+                            <button type="button" onclick="copyModalGuestLink(this)" id="btn-copy-link" style="flex: 1; background: var(--ula-palm-900); color: white; font-weight: 700; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-size: 12px;">
                                 📋 {{ __('Copy Link') }}
                             </button>
-                            <a id="guest-open-link" href="#" target="_blank" style="background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); color: var(--nx-text-primary); font-weight: 700; text-decoration: none; border-radius: 6px; padding: 8px 12px; font-size: 12px; display: flex; align-items: center;">
+                            <a id="guest-open-link" href="#" target="_blank" style="background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); color: var(--ula-text-primary); font-weight: 700; text-decoration: none; border-radius: 6px; padding: 8px 12px; font-size: 12px; display: flex; align-items: center;">
                                 👁️ {{ __('Open') }}
                             </a>
                         </div>
@@ -959,34 +959,34 @@
                 <form method="POST" action="{{ route('organization.members.store') }}" style="display: flex; flex-direction: column; gap: 14px;">
                     @csrf
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Full Name') }} *</label>
-                        <input type="text" name="name" required placeholder="e.g. Sarah Jenkins" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Full Name') }} *</label>
+                        <input type="text" name="name" required placeholder="e.g. Sarah Jenkins" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                     </div>
 
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Email Address') }} *</label>
-                        <input type="email" name="email" required placeholder="sarah@company.com" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Email Address') }} *</label>
+                        <input type="email" name="email" required placeholder="sarah@company.com" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <div>
-                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Access Role') }} *</label>
-                            <select name="role_id" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Access Role') }} *</label>
+                            <select name="role_id" required style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                                 @foreach($roles as $role)
                                     <option value="{{ $role->id }}">{{ $role->name }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div>
-                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Initial Password') }}</label>
-                            <input type="password" name="password" placeholder="Default: 12345678" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Initial Password') }}</label>
+                            <input type="password" name="password" placeholder="Default: 12345678" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         </div>
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <div>
-                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Department') }}</label>
-                            <select name="department_id" onchange="filterTeamsForInvite(this.value)" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Department') }}</label>
+                            <select name="department_id" onchange="filterTeamsForInvite(this.value)" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                                 <option value="">— {{ __('No Department') }} —</option>
                                 @foreach($departments as $d)
                                     <option value="{{ $d->id }}">{{ $d->name }}</option>
@@ -994,8 +994,8 @@
                             </select>
                         </div>
                         <div>
-                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Sub-Team') }}</label>
-                            <select name="team_id" id="invite-team-select" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Sub-Team') }}</label>
+                            <select name="team_id" id="invite-team-select" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                                 <option value="">— {{ __('No Team') }} —</option>
                             </select>
                         </div>
@@ -1003,12 +1003,12 @@
 
                     <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 12px;">
                         <div>
-                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Job Title') }}</label>
-                            <input type="text" name="job_title" placeholder="e.g. Senior Software Architect" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Job Title') }}</label>
+                            <input type="text" name="job_title" placeholder="e.g. Senior Software Architect" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         </div>
                         <div>
-                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Status') }}</label>
-                            <select name="status" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                            <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Status') }}</label>
+                            <select name="status" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                                 <option value="active">🟢 {{ __('Active') }}</option>
                                 <option value="invited">✉️ {{ __('Invited') }}</option>
                             </select>
@@ -1034,8 +1034,8 @@
                 @csrf
                 <div id="department-method-field"></div>
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Department Name') }}</label>
-                    <input type="text" name="name" id="department-name-input" required placeholder="e.g. Engineering & IT, Marketing, Sales" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Department Name') }}</label>
+                    <input type="text" name="name" id="department-name-input" required placeholder="e.g. Engineering & IT, Marketing, Sales" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
                 <button type="submit" class="header-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px; justify-content: center;">
                     💾 <span id="department-form-btn-text">{{ __('Create Department') }}</span>
@@ -1055,12 +1055,12 @@
                 @csrf
                 <div id="team-method-field"></div>
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Sub-Team Name') }}</label>
-                    <input type="text" name="name" id="team-name-input" required placeholder="e.g. Frontend Team, QA Core, DevOps" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Sub-Team Name') }}</label>
+                    <input type="text" name="name" id="team-name-input" required placeholder="e.g. Frontend Team, QA Core, DevOps" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 6px;">{{ __('Parent Department') }}</label>
-                    <select name="department_id" id="team-department-select" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Parent Department') }}</label>
+                    <select name="department_id" id="team-department-select" required style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         <option value="">— {{ __('Select Department') }} —</option>
                         @foreach($departments as $d)
                             <option value="{{ $d->id }}">{{ $d->name }}</option>
@@ -1084,15 +1084,15 @@
             <form id="assign-form" method="POST" action="" style="display: flex; flex-direction: column; gap: 14px;">
                 @csrf
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('Employee / Member') }}</label>
-                    <div id="assign-member-name" style="font-size: 14px; font-weight: 800; color: var(--nx-text-primary); background: var(--bg-elevated); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--nx-border-subtle);">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Employee / Member') }}</label>
+                    <div id="assign-member-name" style="font-size: 14px; font-weight: 800; color: var(--ula-text-primary); background: var(--ula-surface-raised); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--ula-border-subtle);">
                         Member Name
                     </div>
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('Department') }}</label>
-                    <select name="department_id" id="assign-dept-select" onchange="filterTeamsForAssign(this.value)" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Department') }}</label>
+                    <select name="department_id" id="assign-dept-select" onchange="filterTeamsForAssign(this.value)" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         <option value="">— {{ __('No Department') }} —</option>
                         @foreach($departments as $d)
                             <option value="{{ $d->id }}">{{ $d->name }}</option>
@@ -1101,20 +1101,20 @@
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('Sub-Team') }}</label>
-                    <select name="team_id" id="assign-team-select" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Sub-Team') }}</label>
+                    <select name="team_id" id="assign-team-select" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         <option value="">— {{ __('No Team') }} —</option>
                     </select>
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('Job Title') }}</label>
-                    <input type="text" name="job_title" id="assign-job-title" placeholder="e.g. Lead Software Architect, Growth Specialist" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Job Title') }}</label>
+                    <input type="text" name="job_title" id="assign-job-title" placeholder="e.g. Lead Software Architect, Growth Specialist" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('Access Role') }}</label>
-                    <select name="role_id" id="assign-role-select" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Access Role') }}</label>
+                    <select name="role_id" id="assign-role-select" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         @foreach($roles as $role)
                             <option value="{{ $role->id }}">{{ $role->name }}</option>
                         @endforeach
@@ -1141,19 +1141,19 @@
                 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('Full Name') }} *</label>
-                        <input type="text" name="name" id="edit-member-name-input" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Full Name') }} *</label>
+                        <input type="text" name="name" id="edit-member-name-input" required style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                     </div>
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('Email Address') }} *</label>
-                        <input type="email" name="email" id="edit-member-email-input" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Email Address') }} *</label>
+                        <input type="email" name="email" id="edit-member-email-input" required style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                     </div>
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('Department') }}</label>
-                        <select name="department_id" id="edit-member-dept-select" onchange="filterTeamsForEditMember(this.value)" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Department') }}</label>
+                        <select name="department_id" id="edit-member-dept-select" onchange="filterTeamsForEditMember(this.value)" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             <option value="">— {{ __('No Department') }} —</option>
                             @foreach($departments as $d)
                                 <option value="{{ $d->id }}">{{ $d->name }}</option>
@@ -1161,30 +1161,30 @@
                         </select>
                     </div>
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('Sub-Team') }}</label>
-                        <select name="team_id" id="edit-member-team-select" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Sub-Team') }}</label>
+                        <select name="team_id" id="edit-member-team-select" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             <option value="">— {{ __('No Team') }} —</option>
                         </select>
                     </div>
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('Job Title') }}</label>
-                    <input type="text" name="job_title" id="edit-member-job-title" placeholder="e.g. Senior Project Manager, Software Engineer" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Job Title') }}</label>
+                    <input type="text" name="job_title" id="edit-member-job-title" placeholder="e.g. Senior Project Manager, Software Engineer" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('Access Role') }} *</label>
-                        <select name="role_id" id="edit-member-role-select" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Access Role') }} *</label>
+                        <select name="role_id" id="edit-member-role-select" required style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             @foreach($roles as $role)
                                 <option value="{{ $role->id }}">{{ $role->name }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('Account Status') }} *</label>
-                        <select name="status" id="edit-member-status-select" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Account Status') }} *</label>
+                        <select name="status" id="edit-member-status-select" required style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             <option value="active">🟢 {{ __('Active') }}</option>
                             <option value="suspended">🔴 {{ __('Suspended') }}</option>
                             <option value="invited">✉️ {{ __('Invited') }}</option>
@@ -1193,16 +1193,16 @@
                 </div>
 
                 <!-- Granular Office Access Permissions -->
-                <div style="background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 12px;">
-                    <label style="display: block; font-size: 12px; font-weight: 800; color: var(--nx-text-primary); margin-bottom: 4px;">
+                <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 12px;">
+                    <label style="display: block; font-size: 12px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 4px;">
                         🏢 {{ __('Allowed Offices') }}
                     </label>
-                    <div style="font-size: 11px; color: var(--nx-text-muted); margin-bottom: 8px;">
+                    <div style="font-size: 11px; color: var(--ula-text-muted); margin-bottom: 8px;">
                         {{ __('Select which branches this member can enter (Leave all unchecked for full company access).') }}
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 6px; max-height: 110px; overflow-y: auto;">
                         @foreach($offices as $off)
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--nx-text-primary); cursor: pointer;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ula-text-primary); cursor: pointer;">
                             <input type="checkbox" name="allowed_offices[]" value="{{ $off->id }}" class="edit-member-office-cb" id="edit-office-{{ $off->id }}">
                             <span>🏢 <strong>{{ $off->name }}</strong> ({{ $off->city_location ?: __('Primary') }})</span>
                         </label>
@@ -1211,23 +1211,23 @@
                 </div>
 
                 <!-- Granular Room Access Permissions -->
-                <div style="background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 12px;">
-                    <label style="display: block; font-size: 12px; font-weight: 800; color: var(--nx-text-primary); margin-bottom: 4px;">
+                <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 12px;">
+                    <label style="display: block; font-size: 12px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 4px;">
                         🚪 {{ __('Allowed Rooms') }}
                     </label>
-                    <div style="font-size: 11px; color: var(--nx-text-muted); margin-bottom: 8px;">
+                    <div style="font-size: 11px; color: var(--ula-text-muted); margin-bottom: 8px;">
                         {{ __('Select specific private/conference rooms this user is allowed to access.') }}
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 8px; max-height: 130px; overflow-y: auto;">
                         @foreach($offices as $off)
                             @if($off->rooms->count() > 0)
-                            <div style="border-bottom: 1px dashed var(--nx-border-subtle); padding-bottom: 4px; margin-bottom: 4px;">
-                                <div style="font-size: 11px; font-weight: 800; color: var(--nx-primary-500); margin-bottom: 4px;">
+                            <div style="border-bottom: 1px dashed var(--ula-border-subtle); padding-bottom: 4px; margin-bottom: 4px;">
+                                <div style="font-size: 11px; font-weight: 800; color: var(--ula-accent-default); margin-bottom: 4px;">
                                     🏢 {{ $off->name }}:
                                 </div>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
                                     @foreach($off->rooms as $rm)
-                                    <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--nx-text-primary); cursor: pointer;">
+                                    <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ula-text-primary); cursor: pointer;">
                                         <input type="checkbox" name="allowed_rooms[]" value="{{ $rm->id }}" class="edit-member-room-cb" id="edit-room-{{ $rm->id }}">
                                         <span>🚪 {{ $rm->name }}</span>
                                     </label>
@@ -1256,22 +1256,22 @@
             <form method="POST" action="{{ route('offices.store') }}" style="display: flex; flex-direction: column; gap: 14px;">
                 @csrf
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('Office Branch Name') }} *</label>
-                    <input type="text" name="name" required placeholder="e.g. Cairo Branch, Riyadh HQ, Dubai Innovation Hub" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Office Branch Name') }} *</label>
+                    <input type="text" name="name" required placeholder="e.g. Cairo Branch, Riyadh HQ, Dubai Innovation Hub" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('City / Location') }}</label>
-                    <input type="text" name="city_location" placeholder="e.g. Cairo, Egypt or Riyadh, KSA" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('City / Location') }}</label>
+                    <input type="text" name="city_location" placeholder="e.g. Cairo, Egypt or Riyadh, KSA" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('Description') }}</label>
-                    <textarea name="description" rows="3" placeholder="Brief description of this branch and its teams..." style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;"></textarea>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Description') }}</label>
+                    <textarea name="description" rows="3" placeholder="Brief description of this branch and its teams..." style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;"></textarea>
                 </div>
 
                 <div>
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--nx-text-primary); cursor: pointer;">
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--ula-text-primary); cursor: pointer;">
                         <input type="checkbox" name="is_default" value="1">
                         <span>⭐ {{ __('Set as Primary / Default Office') }}</span>
                     </label>
@@ -1295,22 +1295,22 @@
                 @csrf
                 @method('PUT')
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('Office Branch Name') }} *</label>
-                    <input type="text" name="name" id="edit-office-name-input" required style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Office Branch Name') }} *</label>
+                    <input type="text" name="name" id="edit-office-name-input" required style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('City / Location') }}</label>
-                    <input type="text" name="city_location" id="edit-office-city-input" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('City / Location') }}</label>
+                    <input type="text" name="city_location" id="edit-office-city-input" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('Description') }}</label>
-                    <textarea name="description" id="edit-office-desc-input" rows="3" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;"></textarea>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Description') }}</label>
+                    <textarea name="description" id="edit-office-desc-input" rows="3" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;"></textarea>
                 </div>
 
                 <div>
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--nx-text-primary); cursor: pointer;">
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--ula-text-primary); cursor: pointer;">
                         <input type="checkbox" name="is_default" id="edit-office-default-input" value="1">
                         <span>⭐ {{ __('Set as Primary / Default Office') }}</span>
                     </label>
@@ -1333,21 +1333,21 @@
             <form id="change-member-password-form" method="POST" action="" style="display: flex; flex-direction: column; gap: 14px;">
                 @csrf
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('User Name') }}</label>
-                    <div id="change-password-user-name" style="font-size: 14px; font-weight: 800; color: var(--nx-primary-500); background: var(--bg-elevated); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--nx-border-subtle);">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('User Name') }}</label>
+                    <div id="change-password-user-name" style="font-size: 14px; font-weight: 800; color: var(--ula-accent-default); background: var(--ula-surface-raised); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--ula-border-subtle);">
                         User Name
                     </div>
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('New Password') }} *</label>
-                    <input type="password" name="password" required minlength="8" placeholder="••••••••" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
-                    <span style="font-size: 11px; color: var(--nx-text-muted); margin-top: 2px; display: block;">{{ __('Minimum 8 characters') }}</span>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('New Password') }} *</label>
+                    <input type="password" name="password" required minlength="8" placeholder="••••••••" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    <span style="font-size: 11px; color: var(--ula-text-muted); margin-top: 2px; display: block;">{{ __('Minimum 8 characters') }}</span>
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--nx-text-secondary); margin-bottom: 4px;">{{ __('Confirm New Password') }} *</label>
-                    <input type="password" name="password_confirmation" required minlength="8" placeholder="••••••••" style="width: 100%; background: var(--bg-elevated); border: 1px solid var(--nx-border-subtle); border-radius: 8px; padding: 10px; color: var(--nx-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Confirm New Password') }} *</label>
+                    <input type="password" name="password_confirmation" required minlength="8" placeholder="••••••••" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
 
                 <button type="submit" class="header-btn btn-primary" style="margin-top: 8px; padding: 12px; font-size: 14px; justify-content: center; background: linear-gradient(135deg, #D6A23A 0%, #B88628 100%);">
@@ -1373,7 +1373,7 @@
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionInspect()">
             <span><span class="ctx-icon">🔍</span>{{ __('Inspect & Edit') }}</span>
-            <span style="font-size: 10px; color: var(--nx-text-muted); font-family: var(--nx-font-mono);">↵</span>
+            <span style="font-size: 10px; color: var(--ula-text-muted); font-family: var(--ula-font-mono);">↵</span>
         </a>
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionStartTimer()">
@@ -1387,7 +1387,7 @@
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionOpenMoveModal()">
             <span><span class="ctx-icon">➡️</span>{{ __('Move to Project') }}</span>
-            <span style="font-size: 11px; color: var(--nx-text-muted);">›</span>
+            <span style="font-size: 11px; color: var(--ula-text-muted);">›</span>
         </a>
 
         <div class="ctx-divider"></div>
@@ -1404,7 +1404,7 @@
 
         <a href="javascript:void(0)" class="ctx-item danger" onclick="ctxActionDelete()">
             <span><span class="ctx-icon">🗑️</span>{{ __('Delete Task') }}</span>
-            <span style="font-size: 10px; color: #D96B5F; font-family: var(--nx-font-mono);">Del</span>
+            <span style="font-size: 10px; color: #D96B5F; font-family: var(--ula-font-mono);">Del</span>
         </a>
     </div>
 
@@ -1412,16 +1412,16 @@
     <div id="move-task-modal" class="modal">
         <div class="modal-box" style="max-width: 420px;">
             <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <h3 style="font-size: 16px; font-weight: 900; color: var(--nx-text-primary);">➡️ {{ __('Move Task to Project') }}</h3>
-                <button type="button" onclick="closeMoveTaskModal()" style="background: none; border: none; font-size: 18px; color: var(--nx-text-muted); cursor: pointer;">✕</button>
+                <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);">➡️ {{ __('Move Task to Project') }}</h3>
+                <button type="button" onclick="closeMoveTaskModal()" style="background: none; border: none; font-size: 18px; color: var(--ula-text-muted); cursor: pointer;">✕</button>
             </div>
             <form onsubmit="submitMoveTask(event)" style="display: flex; flex-direction: column; gap: 14px; margin-top: 14px;">
                 <input type="hidden" id="move-task-id-input">
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--nx-text-secondary); margin-bottom: 6px; text-transform: uppercase;">
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 6px; text-transform: uppercase;">
                         📁 {{ __('Target Project') }}
                     </label>
-                    <select id="move-target-project-select" required style="width: 100%; background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--nx-text-primary); font-size: 13px; font-weight: 600;">
+                    <select id="move-target-project-select" required style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); font-size: 13px; font-weight: 600;">
                         @foreach($projects as $p)
                             <option value="{{ $p->id }}">{{ $p->name }} ({{ $p->code }})</option>
                         @endforeach
@@ -1437,17 +1437,17 @@
     <!-- Modal: Member Profile & Comprehensive Attendance Session Details -->
     <div id="member-profile-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 850px; width: 95vw; max-height: 90vh; display: flex; flex-direction: column; padding: 24px; overflow: hidden; border-radius: 24px;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid var(--nx-border-subtle); padding-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid var(--ula-border-subtle); padding-bottom: 14px;">
                 <div style="display: flex; align-items: center; gap: 14px;">
-                    <div id="mp-avatar-box" style="width: 48px; height: 48px; border-radius: 14px; background: var(--nx-accent-gradient); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; color: white; box-shadow: var(--nx-shadow-soft-3d);">
+                    <div id="mp-avatar-box" style="width: 48px; height: 48px; border-radius: 14px; background: var(--ula-gradient-accent); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px; color: white; box-shadow: var(--ula-shadow-xs);">
                         US
                     </div>
                     <div>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <h2 id="mp-name" style="font-size: 18px; font-weight: 900; margin: 0; color: var(--nx-text-primary);">Member Name</h2>
+                            <h2 id="mp-name" style="font-size: 18px; font-weight: 900; margin: 0; color: var(--ula-text-primary);">Member Name</h2>
                             <span id="mp-status-pill" class="nav-badge-pill" style="font-size: 11px;">Active</span>
                         </div>
-                        <div id="mp-sub" style="font-size: 12px; color: var(--nx-text-muted); margin-top: 2px;">
+                        <div id="mp-sub" style="font-size: 12px; color: var(--ula-text-muted); margin-top: 2px;">
                             Role • Department • Job Title
                         </div>
                     </div>
@@ -1456,7 +1456,7 @@
                     <button type="button" onclick="inspectMemberTimesheetTab()" class="tactile-btn btn-primary" style="padding: 6px 14px; font-size: 11px;">
                         ⏱️ {{ __('Open In Timesheets') }}
                     </button>
-                    <button onclick="closeMemberProfileModal()" class="modal-close" style="background: var(--nx-bg-surface-subtle); border: 1px solid var(--nx-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--nx-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
+                    <button onclick="closeMemberProfileModal()" class="modal-close" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ula-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
                 </div>
             </div>
 
@@ -1467,21 +1467,21 @@
                         <span class="kpi-title">{{ __('Today Office Time') }}</span>
                         <div class="kpi-icon-box">🏢</div>
                     </div>
-                    <div id="mp-kpi-office-time" class="kpi-value" style="font-size: 18px; font-family: var(--nx-font-mono); color: var(--nx-primary-500);">00:00:00</div>
+                    <div id="mp-kpi-office-time" class="kpi-value" style="font-size: 18px; font-family: var(--ula-font-mono); color: var(--ula-accent-default);">00:00:00</div>
                 </div>
                 <div class="kpi-card" style="padding: 12px;">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Today Task Time') }}</span>
                         <div class="kpi-icon-box">⏱️</div>
                     </div>
-                    <div id="mp-kpi-task-time" class="kpi-value" style="font-size: 18px; font-family: var(--nx-font-mono); color: #4F9B5F;">00:00:00</div>
+                    <div id="mp-kpi-task-time" class="kpi-value" style="font-size: 18px; font-family: var(--ula-font-mono); color: #4F9B5F;">00:00:00</div>
                 </div>
                 <div class="kpi-card" style="padding: 12px;">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Current Location') }}</span>
                         <div class="kpi-icon-box">📍</div>
                     </div>
-                    <div id="mp-kpi-location" class="kpi-value" style="font-size: 13px; font-weight: 800; color: var(--nx-text-primary);">Main Office</div>
+                    <div id="mp-kpi-location" class="kpi-value" style="font-size: 13px; font-weight: 800; color: var(--ula-text-primary);">Main Office</div>
                 </div>
             </div>
 
@@ -1489,10 +1489,10 @@
             <div style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px;">
                 <!-- Attendance Sessions Section -->
                 <div>
-                    <h4 style="font-size: 13px; font-weight: 900; color: var(--nx-text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                    <h4 style="font-size: 13px; font-weight: 900; color: var(--ula-text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
                         <span>🏢</span> {{ __('Today Attendance & Room Presence Sessions') }}
                     </h4>
-                    <div style="border: 1px solid var(--nx-border-subtle); border-radius: 12px; overflow: hidden;">
+                    <div style="border: 1px solid var(--ula-border-subtle); border-radius: 12px; overflow: hidden;">
                         <table class="data-table" style="font-size: 12px;">
                             <thead>
                                 <tr>
@@ -1505,7 +1505,7 @@
                             </thead>
                             <tbody id="mp-attendance-tbody">
                                 <tr>
-                                    <td colspan="5" style="text-align: center; padding: 20px; color: var(--nx-text-muted);">
+                                    <td colspan="5" style="text-align: center; padding: 20px; color: var(--ula-text-muted);">
                                         ⏳ {{ __('Loading member session details...') }}
                                     </td>
                                 </tr>
@@ -1516,10 +1516,10 @@
 
                 <!-- Assigned Tasks Section -->
                 <div>
-                    <h4 style="font-size: 13px; font-weight: 900; color: var(--nx-text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                    <h4 style="font-size: 13px; font-weight: 900; color: var(--ula-text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
                         <span>📋</span> {{ __('Assigned Active Tasks & Work In Progress') }}
                     </h4>
-                    <div style="border: 1px solid var(--nx-border-subtle); border-radius: 12px; overflow: hidden;">
+                    <div style="border: 1px solid var(--ula-border-subtle); border-radius: 12px; overflow: hidden;">
                         <table class="data-table" style="font-size: 12px;">
                             <thead>
                                 <tr>
@@ -1532,7 +1532,7 @@
                             </thead>
                             <tbody id="mp-tasks-tbody">
                                 <tr>
-                                    <td colspan="5" style="text-align: center; padding: 20px; color: var(--nx-text-muted);">
+                                    <td colspan="5" style="text-align: center; padding: 20px; color: var(--ula-text-muted);">
                                         ⏳ {{ __('Loading tasks...') }}
                                     </td>
                                 </tr>

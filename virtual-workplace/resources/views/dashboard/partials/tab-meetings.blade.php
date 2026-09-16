@@ -1,11 +1,11 @@
 <div id="tab-meetings" class="tab-view">
     <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
         <div>
-            <h1 class="page-title" style="font-size: 22px; font-weight: 800; color: var(--nx-text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
-                <span class="material-symbols-rounded" style="font-size: 24px; color: var(--nx-accent);">calendar_month</span>
+            <h1 class="page-title" style="font-size: 22px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                <span class="material-symbols-rounded" style="font-size: 24px; color: var(--ula-highlight-default);">calendar_month</span>
                 <span>{{ __('Scheduled Meetings & Sessions') }}</span>
             </h1>
-            <p class="page-subtitle" style="font-size: 13px; color: var(--nx-text-secondary);">{{ __('Schedule general or project meetings, manage attendee invitations, and broadcast sound alerts.') }}</p>
+            <p class="page-subtitle" style="font-size: 13px; color: var(--ula-text-secondary);">{{ __('Schedule general or project meetings, manage attendee invitations, and broadcast sound alerts.') }}</p>
         </div>
         <div style="display: flex; gap: 10px; align-items: center;">
             <x-btn variant="primary" size="md" onclick="openScheduleMeetingModal('general')" icon="add">
@@ -24,7 +24,7 @@
                 </div>
             </div>
             <div class="kpi-value">{{ $upcomingMeetings->count() }}</div>
-            <div class="kpi-trend" style="color: var(--nx-status-live);">
+            <div class="kpi-trend" style="color: var(--ula-status-success);">
                 <span class="material-symbols-rounded" style="font-size: 14px;">play_circle</span>
                 <span>{{ __('Ready to join') }}</span>
             </div>
@@ -63,7 +63,7 @@
                 </div>
             </div>
             <div class="kpi-value">{{ $allMeetings->count() }}</div>
-            <div class="kpi-trend" style="color: var(--nx-status-live);">
+            <div class="kpi-trend" style="color: var(--ula-status-success);">
                 <span class="material-symbols-rounded" style="font-size: 14px;">check_circle</span>
                 <span>{{ $allMeetings->where('status', 'ended')->count() }} {{ __('Completed') }}</span>
             </div>
@@ -71,10 +71,10 @@
     </div>
 
     <!-- Meetings Table Card -->
-    <div class="card" style="border-radius: var(--nx-radius-lg); overflow: hidden; padding: 0;">
-        <div style="padding: 20px 24px; border-bottom: 1px solid var(--nx-border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--nx-bg-surface);">
-            <h3 style="font-size: 16px; font-weight: 800; color: var(--nx-text-primary); display: flex; align-items: center; gap: 8px;">
-                <span class="material-symbols-rounded" style="font-size: 18px; color: var(--nx-accent);">event_note</span>
+    <div class="card" style="border-radius: var(--ula-radius-lg); overflow: hidden; padding: 0;">
+        <div style="padding: 20px 24px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-card);">
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--ula-text-primary); display: flex; align-items: center; gap: 8px;">
+                <span class="material-symbols-rounded" style="font-size: 18px; color: var(--ula-highlight-default);">event_note</span>
                 <span>{{ __('All Organization Meetings & Sessions') }} ({{ $allMeetings->count() }})</span>
             </h3>
         </div>
@@ -103,55 +103,55 @@
                         @endphp
                         <tr>
                             <td>
-                                <div style="font-weight: 700; color: var(--nx-text-primary); font-size: 13px;">{{ $m->title }}</div>
+                                <div style="font-weight: 700; color: var(--ula-text-primary); font-size: 13px;">{{ $m->title }}</div>
                                 @if($m->description)
-                                    <div style="font-size: 11px; color: var(--nx-text-muted);">{{ Str::limit($m->description, 40) }}</div>
+                                    <div style="font-size: 11px; color: var(--ula-text-muted);">{{ Str::limit($m->description, 40) }}</div>
                                 @endif
                             </td>
                             <td>
                                 @if($m->project)
-                                    <span class="nav-badge-pill" style="background: rgba(60, 107, 76, 0.12); color: var(--nx-palm-500); display: inline-flex; align-items: center; gap: 4px;">
+                                    <span class="nav-badge-pill" style="background: rgba(60, 107, 76, 0.12); color: var(--ula-palm-700); display: inline-flex; align-items: center; gap: 4px;">
                                         <span class="material-symbols-rounded" style="font-size: 14px;">folder</span>
                                         <span>{{ $m->project->name }}</span>
                                     </span>
                                 @else
-                                    <span class="nav-badge-pill" style="background: rgba(211, 165, 83, 0.15); color: var(--nx-gold-600); display: inline-flex; align-items: center; gap: 4px;">
+                                    <span class="nav-badge-pill" style="background: rgba(211, 165, 83, 0.15); color: var(--ula-gold-600); display: inline-flex; align-items: center; gap: 4px;">
                                         <span class="material-symbols-rounded" style="font-size: 14px;">public</span>
                                         <span>{{ __('General') }}</span>
                                     </span>
                                 @endif
                             </td>
                             <td>
-                                <div style="font-weight: 600; color: var(--nx-text-primary); font-size: 12px; font-family: 'IBM Plex Mono', monospace;">
+                                <div style="font-weight: 600; color: var(--ula-text-primary); font-size: 12px; font-family: 'IBM Plex Mono', monospace;">
                                     {{ $m->scheduled_at ? $m->scheduled_at->format('M d, Y') : __('Instant') }}
                                 </div>
-                                <div style="font-size: 11px; color: var(--nx-text-muted); font-family: 'IBM Plex Mono', monospace;">
+                                <div style="font-size: 11px; color: var(--ula-text-muted); font-family: 'IBM Plex Mono', monospace;">
                                     {{ $m->scheduled_at ? $m->scheduled_at->format('h:i A') : $m->created_at->format('h:i A') }}
                                 </div>
                             </td>
-                            <td style="font-size: 12px; font-weight: 600; color: var(--nx-text-secondary); font-family: 'IBM Plex Mono', monospace;">
+                            <td style="font-size: 12px; font-weight: 600; color: var(--ula-text-secondary); font-family: 'IBM Plex Mono', monospace;">
                                 {{ $m->duration_minutes ?? 30 }} {{ __('min') }}
                             </td>
                             <td>
-                                <span style="color: var(--nx-palm-700); font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                                <span style="color: var(--ula-palm-800); font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
                                     <span class="material-symbols-rounded" style="font-size: 15px;">meeting_room</span>
                                     <span>{{ $m->room->name ?? 'Meeting Room' }}</span>
                                 </span>
                             </td>
                             <td>
-                                <div style="font-size: 12px; font-weight: 600; color: var(--nx-text-primary);">
+                                <div style="font-size: 12px; font-weight: 600; color: var(--ula-text-primary);">
                                     {{ $m->creator->name ?? 'Admin' }}
                                 </div>
                             </td>
                             <td>
                                 <div style="display: flex; align-items: center;">
                                     @foreach($mParts as $p)
-                                        <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--nx-palm-900); color: white; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid var(--nx-bg-surface); margin-inline-start: -6px;" title="{{ $p->user->name ?? 'Attendee' }}">
+                                        <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--ula-palm-900); color: white; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid var(--ula-surface-card); margin-inline-start: -6px;" title="{{ $p->user->name ?? 'Attendee' }}">
                                             {{ strtoupper(substr($p->user->name ?? 'A', 0, 1)) }}
                                         </div>
                                     @endforeach
                                     @if($moreParts > 0)
-                                        <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--nx-palm-700); color: white; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid var(--nx-bg-surface); margin-inline-start: -6px;">
+                                        <div style="width: 24px; height: 24px; border-radius: 50%; background: var(--ula-palm-800); color: white; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 2px solid var(--ula-surface-card); margin-inline-start: -6px;">
                                             +{{ $moreParts }}
                                         </div>
                                     @endif
@@ -186,9 +186,9 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" style="text-align: center; color: var(--nx-text-muted); padding: 48px 16px;">
-                                <span class="material-symbols-rounded" style="font-size: 36px; color: var(--nx-sand-400); display: block; margin-bottom: 8px;">calendar_month</span>
-                                <div style="font-size: 14px; font-weight: 500; color: var(--nx-text-secondary);">{{ __('No meetings scheduled yet.') }}</div>
+                            <td colspan="9" style="text-align: center; color: var(--ula-text-muted); padding: 48px 16px;">
+                                <span class="material-symbols-rounded" style="font-size: 36px; color: var(--ula-sand-400); display: block; margin-bottom: 8px;">calendar_month</span>
+                                <div style="font-size: 14px; font-weight: 500; color: var(--ula-text-secondary);">{{ __('No meetings scheduled yet.') }}</div>
                             </td>
                         </tr>
                     @endforelse

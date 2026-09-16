@@ -7,8 +7,8 @@
             <div class="nx-hero-greeting-pill">
                 <span style="width: 8px; height: 8px; border-radius: 50%; background: #3C6B4C; display: inline-block;"></span>
                 <span>{{ __('Ready to Collaborate') }}</span>
-                <span style="color: var(--nx-text-mute);">·</span>
-                <span style="color: var(--nx-text-mute);">{{ $organization->name }}</span>
+                <span style="color: var(--ula-text-muted);">·</span>
+                <span style="color: var(--ula-text-muted);">{{ $organization->name }}</span>
             </div>
 
             <h1 class="nx-hero-title">
@@ -62,7 +62,7 @@
                 <span style="font-size: 18px; font-weight: 300; color: #142B24; line-height: 1.2;">
                     {{ now()->format('d') }} {{ now()->locale(app()->getLocale())->translatedFormat('F') }}
                 </span>
-                <span style="font-size: 11px; color: #8E9D95; font-family: 'IBM Plex Mono', monospace;">
+                <span style="font-size: 11px; color: #857a6c; font-family: 'IBM Plex Mono', monospace;">
                     {{ now()->format('Y') }}
                 </span>
             </div>
@@ -216,7 +216,7 @@
                                 <span style="font-size: 13px; font-weight: 500; color: #142B24; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                     {{ $meeting->title }}
                                 </span>
-                                <span style="font-size: 11px; color: #5A6B63;">
+                                <span style="font-size: 11px; color: #665d52;">
                                     {{ $meeting->room->name ?? ($meeting->project->name ?? __('General Room')) }}
                                 </span>
                             </div>
@@ -234,7 +234,7 @@
                         <p style="font-size: 13px; font-weight: 500; color: #142B24; margin: 0 0 4px 0;">
                             {{ __('No meetings scheduled for today') }}
                         </p>
-                        <p style="font-size: 11px; color: #8E9D95; margin: 0 0 12px 0;">
+                        <p style="font-size: 11px; color: #857a6c; margin: 0 0 12px 0;">
                             {{ __('All clear for today. You can schedule a new meeting anytime.') }}
                         </p>
                         <button type="button" onclick="openScheduleMeetingModal('general')" class="nx-btn-secondary" style="height: 34px; padding: 0 14px; font-size: 12px;">
@@ -291,7 +291,7 @@
                             <span class="nx-legend-dot" style="background: #E8DECC;"></span>
                             <span>{{ __('Vacancy Rate') }}</span>
                         </span>
-                        <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 500; color: #8E9D95;">{{ 100 - $occupancyPercent }}%</span>
+                        <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 500; color: #857a6c;">{{ 100 - $occupancyPercent }}%</span>
                     </div>
                 </div>
             </div>
@@ -308,7 +308,7 @@
                 </span>
             </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: #8E9D95;">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: #857a6c;">
             <span>{{ __('UlaSpace Workplace') }}</span>
             <span>·</span>
             <span>ALULA</span>

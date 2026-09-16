@@ -289,7 +289,7 @@
             } else {
                 showToastNotification('🌿 {{ __('Focus Mode Disabled. Welcome back!') }}');
                 if (bannerBtn) bannerBtn.textContent = '{{ __('Enable Focus Mode →') }}';
-                if (quickBtn) quickBtn.style.background = 'var(--accent-gradient)';
+                if (quickBtn) quickBtn.style.background = 'var(--ula-gradient-accent)';
             }
         }
 
@@ -523,14 +523,14 @@
             if (tab === 'guest') {
                 guestTab.style.display = 'block';
                 memberTab.style.display = 'none';
-                guestBtn.style.background = 'var(--accent-primary)';
+                guestBtn.style.background = 'var(--ula-accent-default)';
                 guestBtn.style.color = 'white';
                 memberBtn.style.background = 'none';
                 memberBtn.style.color = '#94a3b8';
             } else {
                 guestTab.style.display = 'none';
                 memberTab.style.display = 'block';
-                memberBtn.style.background = 'var(--accent-primary)';
+                memberBtn.style.background = 'var(--ula-accent-default)';
                 memberBtn.style.color = 'white';
                 guestBtn.style.background = 'none';
                 guestBtn.style.color = '#94a3b8';
@@ -640,7 +640,7 @@
                     playNotificationChime();
                     const newest = currentNotifications.find(n => !n.is_read) || currentNotifications[0];
                     if (newest) {
-                        showToastNotification(`${newest.icon || '🔔'} <strong>${newest.title}</strong><br><small style="color: var(--text-muted);">${newest.body || ''}</small>`);
+                        showToastNotification(`${newest.icon || '🔔'} <strong>${newest.title}</strong><br><small style="color: var(--ula-text-muted);">${newest.body || ''}</small>`);
                         triggerDesktopNotification(newest);
                     }
                 }
@@ -690,9 +690,9 @@
 
             if (filtered.length === 0) {
                 container.innerHTML = `
-                    <div style="padding: 36px 18px; text-align: center; color: var(--text-muted);">
+                    <div style="padding: 36px 18px; text-align: center; color: var(--ula-text-muted);">
                         <div style="font-size: 32px; margin-bottom: 8px;">🎉</div>
-                        <strong style="display: block; font-size: 13px; color: var(--text-primary); margin-bottom: 4px;">{{ __('All caught up!') }}</strong>
+                        <strong style="display: block; font-size: 13px; color: var(--ula-text-primary); margin-bottom: 4px;">{{ __('All caught up!') }}</strong>
                         <span style="font-size: 12px;">{{ __('No notifications in this category.') }}</span>
                     </div>
                 `;
@@ -709,10 +709,10 @@
                     <div class="notif-icon-box">${n.icon || '🔔'}</div>
                     <div style="flex: 1; min-width: 0;">
                         <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 2px;">
-                            <strong style="font-size: 12px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${n.title}</strong>
-                            <span style="font-size: 10px; color: var(--text-muted); flex-shrink: 0;">${n.created_at_human || ''}</span>
+                            <strong style="font-size: 12px; color: var(--ula-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${n.title}</strong>
+                            <span style="font-size: 10px; color: var(--ula-text-muted); flex-shrink: 0;">${n.created_at_human || ''}</span>
                         </div>
-                        <p style="font-size: 11px; color: var(--text-secondary); margin: 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${n.body || ''}</p>
+                        <p style="font-size: 11px; color: var(--ula-text-secondary); margin: 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${n.body || ''}</p>
                     </div>
                     ${!n.is_read ? '<div class="notif-unread-dot"></div>' : ''}
                 `;
@@ -1358,7 +1358,7 @@
                     card.innerHTML = `
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
                             <span class="badge badge-blue" style="font-size: 10px;">#${t.task_number || 1}</span>
-                            <select onchange="updateHubTaskStatus('${t.id}', this.value)" style="background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); font-size: 10px; font-weight: 700; border-radius: 4px; padding: 2px;">
+                            <select onchange="updateHubTaskStatus('${t.id}', this.value)" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); color: var(--ula-text-primary); font-size: 10px; font-weight: 700; border-radius: 4px; padding: 2px;">
                                 <option value="backlog" ${t.status === 'backlog' ? 'selected' : ''}>Backlog</option>
                                 <option value="ready" ${t.status === 'ready' ? 'selected' : ''}>Ready</option>
                                 <option value="in_progress" ${t.status === 'in_progress' ? 'selected' : ''}>In Progress</option>
@@ -1366,9 +1366,9 @@
                                 <option value="done" ${t.status === 'done' ? 'selected' : ''}>Done</option>
                             </select>
                         </div>
-                        <div style="font-weight: 800; font-size: 13px; margin-bottom: 4px; color: var(--text-primary);">${t.title}</div>
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; border-top: 1px solid var(--border-color); padding-top: 6px; font-size: 11px;">
-                            <span style="color: var(--text-muted);">👤 ${t.assignee ? t.assignee.name.split(' ')[0] : 'Unassigned'}</span>
+                        <div style="font-weight: 800; font-size: 13px; margin-bottom: 4px; color: var(--ula-text-primary);">${t.title}</div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; border-top: 1px solid var(--ula-border-subtle); padding-top: 6px; font-size: 11px;">
+                            <span style="color: var(--ula-text-muted);">👤 ${t.assignee ? t.assignee.name.split(' ')[0] : 'Unassigned'}</span>
                             <button onclick="startTaskTimer('${p.id}', '${t.id}', '${t.title.replace(/'/g, "\\'")}', '${p.name.replace(/'/g, "\\'")}')" class="header-btn" style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 2px 6px; font-size: 10px;">
                                 ▶ Timer
                             </button>
@@ -1382,8 +1382,8 @@
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td style="font-family: monospace; font-weight: 700;">#${t.task_number || 1}</td>
-                        <td style="font-weight: 800; color: var(--text-primary);">${t.title}</td>
-                        <td>${t.assignee ? t.assignee.name : '<span style="color: var(--text-muted);">Unassigned</span>'}</td>
+                        <td style="font-weight: 800; color: var(--ula-text-primary);">${t.title}</td>
+                        <td>${t.assignee ? t.assignee.name : '<span style="color: var(--ula-text-muted);">Unassigned</span>'}</td>
                         <td><span class="badge ${t.status === 'done' ? 'badge-green' : (t.status === 'in_progress' ? 'badge-teal' : 'badge-gray')}">${t.status}</span></td>
                         <td><span class="badge ${t.priority === 'urgent' ? 'badge-crimson' : (t.priority === 'high' ? 'badge-amber' : 'badge-gray')}">${t.priority}</span></td>
                         <td style="font-family: monospace;">${t.estimated_hours || 0}h / ${t.actual_hours || 0}h</td>
@@ -1410,7 +1410,7 @@
                 timelogBody.innerHTML = '';
                 const entries = p.time_entries || [];
                 if (entries.length === 0) {
-                    timelogBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--text-muted);">No time tracked on this project yet.</td></tr>';
+                    timelogBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 20px; color: var(--ula-text-muted);">No time tracked on this project yet.</td></tr>';
                 } else {
                     entries.forEach(e => {
                         const tr = document.createElement('tr');
@@ -1420,7 +1420,7 @@
                             <td style="font-weight: 700;">${e.user ? e.user.name : 'Member'}</td>
                             <td>${e.task ? e.task.title : '—'}</td>
                             <td style="font-weight: 800; color: #34d399; font-family: monospace;">${hrs}h</td>
-                            <td style="font-size: 11px; color: var(--text-secondary);">${e.description || 'Work session'}</td>
+                            <td style="font-size: 11px; color: var(--ula-text-secondary);">${e.description || 'Work session'}</td>
                             <td><span class="badge badge-gray">${e.entry_type}</span></td>
                             <td><span class="badge ${e.status === 'approved' ? 'badge-green' : (e.status === 'submitted' ? 'badge-amber' : 'badge-gray')}">${e.status}</span></td>
                         `;
@@ -1446,7 +1446,7 @@
                 }
                 if (knbBtn) {
                     knbBtn.className = 'tactile-btn btn-secondary';
-                    knbBtn.style = 'padding: 7px 14px; font-size: 12px; background: transparent; border: none; box-shadow: none; color: var(--text-secondary);';
+                    knbBtn.style = 'padding: 7px 14px; font-size: 12px; background: transparent; border: none; box-shadow: none; color: var(--ula-text-secondary);';
                 }
                 localStorage.setItem('alltasks_view', 'table');
             } else {
@@ -1458,7 +1458,7 @@
                 }
                 if (tblBtn) {
                     tblBtn.className = 'tactile-btn btn-secondary';
-                    tblBtn.style = 'padding: 7px 14px; font-size: 12px; background: transparent; border: none; box-shadow: none; color: var(--text-secondary);';
+                    tblBtn.style = 'padding: 7px 14px; font-size: 12px; background: transparent; border: none; box-shadow: none; color: var(--ula-text-secondary);';
                 }
                 localStorage.setItem('alltasks_view', 'kanban');
             }
@@ -1653,7 +1653,7 @@
                             const hint = document.createElement('div');
                             hint.className = 'mytasks-empty-hint';
                             hint.id = `mytasks-empty-${st}`;
-                            hint.style.cssText = 'text-align: center; padding: 18px 8px; color: var(--text-muted); font-size: 11px; border: 1px dashed var(--border-color); border-radius: var(--radius-md);';
+                            hint.style.cssText = 'text-align: center; padding: 18px 8px; color: var(--ula-text-muted); font-size: 11px; border: 1px dashed var(--ula-border-subtle); border-radius: var(--ula-radius-sm);';
                             hint.textContent = "{{ __('No tasks in this stage.') }}";
                             col.appendChild(hint);
                         }
@@ -1978,7 +1978,7 @@
                     btn.style.background = (t === tab) ? '' : 'transparent';
                     btn.style.border = (t === tab) ? '' : 'none';
                     btn.style.boxShadow = (t === tab) ? '' : 'none';
-                    btn.style.color = (t === tab) ? '' : 'var(--text-secondary)';
+                    btn.style.color = (t === tab) ? '' : 'var(--ula-text-secondary)';
                 }
             });
         }
@@ -2285,13 +2285,13 @@
             if (checkContainer) {
                 checkContainer.innerHTML = '';
                 if (items.length === 0) {
-                    checkContainer.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 8px;">{{ __("No checklist items yet. Add sub-items above.") }}</div>';
+                    checkContainer.innerHTML = '<div style="font-size: 12px; color: var(--ula-text-muted); padding: 8px;">{{ __("No checklist items yet. Add sub-items above.") }}</div>';
                 } else {
                     items.forEach(item => {
                         const div = document.createElement('div');
-                        div.style = 'display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface-subtle); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color);';
+                        div.style = 'display: flex; align-items: center; justify-content: space-between; background: var(--ula-surface-page-alt); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--ula-border-subtle);';
                         div.innerHTML = `
-                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: var(--text-primary); text-decoration: ${item.is_completed ? 'line-through' : 'none'}; opacity: ${item.is_completed ? 0.6 : 1};">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: var(--ula-text-primary); text-decoration: ${item.is_completed ? 'line-through' : 'none'}; opacity: ${item.is_completed ? 0.6 : 1};">
                                 <input type="checkbox" onchange="toggleTaskChecklistItem('${item.id}')" ${item.is_completed ? 'checked' : ''}>
                                 <span>${item.title}</span>
                             </label>
@@ -2310,15 +2310,15 @@
             if (attContainer) {
                 attContainer.innerHTML = '';
                 if (attachments.length === 0) {
-                    attContainer.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 8px; grid-column: 1 / -1;">{{ __("No files attached to this task.") }}</div>';
+                    attContainer.innerHTML = '<div style="font-size: 12px; color: var(--ula-text-muted); padding: 8px; grid-column: 1 / -1;">{{ __("No files attached to this task.") }}</div>';
                 } else {
                     attachments.forEach(att => {
                         const card = document.createElement('div');
-                        card.style = 'background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; gap: 6px;';
+                        card.style = 'background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; gap: 6px;';
                         const uploader = att.user ? att.user.name : '{{ __("Member") }}';
                         card.innerHTML = `
-                            <div style="font-weight: 800; font-size: 12px; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">📄 ${att.file_name}</div>
-                            <div style="font-size: 10px; color: var(--text-muted);">👤 ${uploader} • ${(att.file_size / 1024).toFixed(1)} KB</div>
+                            <div style="font-weight: 800; font-size: 12px; color: var(--ula-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">📄 ${att.file_name}</div>
+                            <div style="font-size: 10px; color: var(--ula-text-muted);">👤 ${uploader} • ${(att.file_size / 1024).toFixed(1)} KB</div>
                             <div style="display: flex; gap: 6px; margin-top: 4px;">
                                 <a href="${att.file_url || ('/uploads/tasks/' + t.id + '/' + att.file_name)}" target="_blank" download class="tactile-btn btn-secondary" style="flex: 1; padding: 4px 8px; font-size: 10px; text-align: center; text-decoration: none;">⬇ {{ __("Download") }}</a>
                                 <button type="button" onclick="deleteTaskAttachmentAction('${att.id}')" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.3); padding: 4px 8px; font-size: 10px;">🗑️</button>
@@ -2336,19 +2336,19 @@
             if (commContainer) {
                 commContainer.innerHTML = '';
                 if (comments.length === 0) {
-                    commContainer.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 8px;">{{ __("No discussions or comments yet.") }}</div>';
+                    commContainer.innerHTML = '<div style="font-size: 12px; color: var(--ula-text-muted); padding: 8px;">{{ __("No discussions or comments yet.") }}</div>';
                 } else {
                     comments.forEach(c => {
                         const box = document.createElement('div');
-                        box.style = 'background: var(--bg-surface-subtle); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px;';
+                        box.style = 'background: var(--ula-surface-page-alt); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--ula-border-subtle); font-size: 12px;';
                         const author = c.user ? c.user.name : '{{ __("Member") }}';
                         const time = new Date(c.created_at).toLocaleString();
                         box.innerHTML = `
                             <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11px;">
-                                <strong style="color: var(--brand-forest);">👤 ${author}</strong>
-                                <span style="color: var(--text-muted);">${time}</span>
+                                <strong style="color: var(--ula-palm-900);">👤 ${author}</strong>
+                                <span style="color: var(--ula-text-muted);">${time}</span>
                             </div>
-                            <div style="color: var(--text-primary); line-height: 1.4;">${c.body || ''}</div>
+                            <div style="color: var(--ula-text-primary); line-height: 1.4;">${c.body || ''}</div>
                         `;
                         commContainer.appendChild(box);
                     });
@@ -2361,11 +2361,11 @@
             if (depContainer) {
                 depContainer.innerHTML = '';
                 if (deps.length === 0) {
-                    depContainer.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 8px;">{{ __("No blocker dependencies. This task can be started immediately.") }}</div>';
+                    depContainer.innerHTML = '<div style="font-size: 12px; color: var(--ula-text-muted); padding: 8px;">{{ __("No blocker dependencies. This task can be started immediately.") }}</div>';
                 } else {
                     deps.forEach(d => {
                         const item = document.createElement('div');
-                        item.style = 'background: var(--bg-surface-subtle); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 12px; display: flex; justify-content: space-between; align-items: center;';
+                        item.style = 'background: var(--ula-surface-page-alt); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--ula-border-subtle); font-size: 12px; display: flex; justify-content: space-between; align-items: center;';
                         const depTask = d.depends_on_task || {};
                         item.innerHTML = `
                             <span>🔒 <strong>{{ __("Depends On:") }}</strong> #${depTask.task_number || ''} ${depTask.title || '{{ __("Predecessor Task") }}'}</span>
@@ -2382,7 +2382,7 @@
                 timeBody.innerHTML = '';
                 const entries = t.time_entries || [];
                 if (entries.length === 0) {
-                    timeBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 14px; color: var(--text-muted);">{{ __("No time tracked on this task yet.") }}</td></tr>';
+                    timeBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 14px; color: var(--ula-text-muted);">{{ __("No time tracked on this task yet.") }}</td></tr>';
                 } else {
                     entries.forEach(e => {
                         const tr = document.createElement('tr');
@@ -2390,7 +2390,7 @@
                         tr.innerHTML = `
                             <td>${new Date(e.started_at).toLocaleDateString()}</td>
                             <td style="font-weight: 700;">${e.user ? e.user.name : '{{ __("Member") }}'}</td>
-                            <td style="font-weight: 800; color: var(--brand-forest); font-family: monospace;">${hrs} {{ __("h") }}</td>
+                            <td style="font-weight: 800; color: var(--ula-palm-900); font-family: monospace;">${hrs} {{ __("h") }}</td>
                             <td style="font-size: 11px;">${e.description || '{{ __("Work session") }}'}</td>
                             <td><span class="badge ${e.status === 'approved' ? 'badge-green' : 'badge-gray'}">${e.status === 'approved' ? '{{ __("Approved") }}' : '{{ __("Pending") }}'}</span></td>
                         `;
@@ -2460,18 +2460,18 @@
 
             if (lblGeneral && lblProject) {
                 if (isProject) {
-                    lblProject.style.background = 'var(--bg-surface)';
-                    lblProject.style.color = 'var(--brand-forest)';
-                    lblProject.style.boxShadow = 'var(--shadow-soft-3d)';
+                    lblProject.style.background = 'var(--ula-surface-card)';
+                    lblProject.style.color = 'var(--ula-palm-900)';
+                    lblProject.style.boxShadow = 'var(--ula-shadow-xs)';
                     lblGeneral.style.background = 'transparent';
-                    lblGeneral.style.color = 'var(--text-secondary)';
+                    lblGeneral.style.color = 'var(--ula-text-secondary)';
                     lblGeneral.style.boxShadow = 'none';
                 } else {
-                    lblGeneral.style.background = 'var(--bg-surface)';
-                    lblGeneral.style.color = 'var(--brand-forest)';
-                    lblGeneral.style.boxShadow = 'var(--shadow-soft-3d)';
+                    lblGeneral.style.background = 'var(--ula-surface-card)';
+                    lblGeneral.style.color = 'var(--ula-palm-900)';
+                    lblGeneral.style.boxShadow = 'var(--ula-shadow-xs)';
                     lblProject.style.background = 'transparent';
-                    lblProject.style.color = 'var(--text-secondary)';
+                    lblProject.style.color = 'var(--ula-text-secondary)';
                     lblProject.style.boxShadow = 'none';
                 }
             }
@@ -2484,7 +2484,7 @@
 
             if (!projectId || !projectMembersMap[projectId] || projectMembersMap[projectId].length === 0) {
                 box.style.display = 'block';
-                container.innerHTML = '<div style="font-size: 11px; color: var(--text-muted); padding: 8px;">{{ __("No assigned members in this project yet. All project roles will be notified automatically.") }}</div>';
+                container.innerHTML = '<div style="font-size: 11px; color: var(--ula-text-muted); padding: 8px;">{{ __("No assigned members in this project yet. All project roles will be notified automatically.") }}</div>';
                 return;
             }
 
@@ -2494,12 +2494,12 @@
             projectMembersMap[projectId].forEach(m => {
                 if (m.id === '{{ $user->id }}') return;
                 const label = document.createElement('label');
-                label.style = "display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--text-primary); cursor: pointer; padding: 4px 6px; border-radius: 6px; transition: background 0.2s;";
+                label.style = "display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--ula-text-primary); cursor: pointer; padding: 4px 6px; border-radius: 6px; transition: background 0.2s;";
                 label.innerHTML = `
                     <span style="display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" name="attendee_ids[]" value="${m.id}" checked class="proj-attendee-chk" style="accent-color: var(--brand-forest);">
+                        <input type="checkbox" name="attendee_ids[]" value="${m.id}" checked class="proj-attendee-chk" style="accent-color: var(--ula-palm-900);">
                         <strong>${m.name}</strong>
-                        <span style="font-size: 11px; color: var(--text-muted);">(${m.email})</span>
+                        <span style="font-size: 11px; color: var(--ula-text-muted);">(${m.email})</span>
                     </span>
                     <span class="nav-badge-pill" style="font-size: 10px;">{{ __("Project Team") }}</span>
                 `;
@@ -2600,9 +2600,9 @@
             btn.disabled = true;
             btn.innerHTML = '⏳ {{ __('Testing Connection...') }}';
             resultBox.style.display = 'block';
-            resultBox.style.background = 'var(--bg-surface-subtle)';
-            resultBox.style.color = 'var(--text-secondary)';
-            resultBox.style.border = '1px solid var(--border-color)';
+            resultBox.style.background = 'var(--ula-surface-page-alt)';
+            resultBox.style.color = 'var(--ula-text-secondary)';
+            resultBox.style.border = '1px solid var(--ula-border-subtle)';
             resultBox.innerHTML = '🔄 {{ __('Connecting to mail server and sending test packet...') }}';
 
             fetch("{{ route('organization.smtp.test') }}", {
@@ -2698,8 +2698,8 @@
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <span style="font-size: 24px;">🔔</span>
                             <div style="flex: 1;">
-                                <div style="font-size: 13px; font-weight: 900; color: var(--brand-forest);">${m.title}</div>
-                                <div style="font-size: 11px; color: var(--text-secondary);">${m.project_name ? '📁 ' + m.project_name + ' • ' : ''}🚪 ${m.room_name} (${timeLabel})</div>
+                                <div style="font-size: 13px; font-weight: 900; color: var(--ula-palm-900);">${m.title}</div>
+                                <div style="font-size: 11px; color: var(--ula-text-secondary);">${m.project_name ? '📁 ' + m.project_name + ' • ' : ''}🚪 ${m.room_name} (${timeLabel})</div>
                             </div>
                             <a href="{{ route('office') }}" class="tactile-btn btn-primary" style="padding: 5px 12px; font-size: 11px; text-decoration: none;">🚀 {{ __('Join') }}</a>
                         </div>
@@ -2759,7 +2759,7 @@
             // Render Channels
             if (channelsContainer) {
                 if (!channels.length) {
-                    channelsContainer.innerHTML = `<div style="padding: 10px 12px; font-size: 11px; color: var(--text-muted); text-align: center;">{{ __('No channels found') }}</div>`;
+                    channelsContainer.innerHTML = `<div style="padding: 10px 12px; font-size: 11px; color: var(--ula-text-muted); text-align: center;">{{ __('No channels found') }}</div>`;
                 } else {
                     channelsContainer.innerHTML = channels.map(c => {
                         const isActive = activeChatChannelId === c.id;
@@ -2769,13 +2769,13 @@
                                  class="chat-roster-item"
                                  data-name="${escapeHtml(c.name).toLowerCase()}"
                                  style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; border-radius: 10px; cursor: pointer; transition: all 0.2s; background: ${isActive ? 'rgba(79, 155, 95, 0.15)' : 'transparent'}; border: 1px solid ${isActive ? 'rgba(79, 155, 95, 0.35)' : 'transparent'};"
-                                 onmouseover="if(!${isActive}) this.style.background='var(--bg-surface)'"
+                                 onmouseover="if(!${isActive}) this.style.background='var(--ula-surface-card)'"
                                  onmouseout="if(!${isActive}) this.style.background='transparent'">
                                 <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
-                                    <span style="font-weight: 900; color: var(--brand-forest); font-size: 13px;">${icon}</span>
-                                    <span style="font-size: 12px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${c.name}</span>
+                                    <span style="font-weight: 900; color: var(--ula-palm-900); font-size: 13px;">${icon}</span>
+                                    <span style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${c.name}</span>
                                 </div>
-                                ${c.last_message ? `<span style="font-size: 10px; color: var(--text-muted);">${c.last_message.created_at}</span>` : ''}
+                                ${c.last_message ? `<span style="font-size: 10px; color: var(--ula-text-muted);">${c.last_message.created_at}</span>` : ''}
                             </div>
                         `;
                     }).join('');
@@ -2785,7 +2785,7 @@
             // Render Direct Messages Roster
             if (membersContainer) {
                 if (!members.length) {
-                    membersContainer.innerHTML = `<div style="padding: 10px 12px; font-size: 11px; color: var(--text-muted); text-align: center;">{{ __('No colleagues found') }}</div>`;
+                    membersContainer.innerHTML = `<div style="padding: 10px 12px; font-size: 11px; color: var(--ula-text-muted); text-align: center;">{{ __('No colleagues found') }}</div>`;
                 } else {
                     membersContainer.innerHTML = members.map(m => {
                         const isSelected = activeChatTargetUserId === m.user_id;
@@ -2797,20 +2797,20 @@
                                  class="chat-roster-item"
                                  data-name="${escapeHtml(m.name).toLowerCase()} ${escapeHtml(m.nickname || '').toLowerCase()} ${escapeHtml(m.job_title || '').toLowerCase()}"
                                  style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; cursor: pointer; transition: all 0.2s; background: ${isSelected ? 'rgba(79, 155, 95, 0.15)' : 'transparent'}; border: 1px solid ${isSelected ? 'rgba(79, 155, 95, 0.35)' : 'transparent'};"
-                                 onmouseover="if(!${isSelected}) this.style.background='var(--bg-surface)'"
+                                 onmouseover="if(!${isSelected}) this.style.background='var(--ula-surface-card)'"
                                  onmouseout="if(!${isSelected}) this.style.background='transparent'">
-                                <div style="position: relative; width: 34px; height: 34px; border-radius: 10px; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; color: white; flex-shrink: 0; box-shadow: var(--shadow-soft-3d); overflow: hidden;">
+                                <div style="position: relative; width: 34px; height: 34px; border-radius: 10px; background: var(--ula-gradient-accent); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; color: white; flex-shrink: 0; box-shadow: var(--ula-shadow-xs); overflow: hidden;">
                                     ${m.avatar_url ? `<img src="${m.avatar_url}" style="width:100%;height:100%;object-fit:cover;">` : initials}
-                                    <div style="position: absolute; bottom: -1px; inset-inline-end: -1px; width: 10px; height: 10px; border-radius: 50%; background: #4F9B5F; border: 2px solid var(--bg-surface-subtle);" title="Online"></div>
+                                    <div style="position: absolute; bottom: -1px; inset-inline-end: -1px; width: 10px; height: 10px; border-radius: 50%; background: #4F9B5F; border: 2px solid var(--ula-surface-page-alt);" title="Online"></div>
                                 </div>
                                 <div style="flex: 1; min-width: 0;">
                                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                                        <span style="font-size: 12px; font-weight: 800; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                                            ${escapeHtml(m.name)} ${m.is_self ? '<span style="font-size: 10px; color: var(--text-muted);">({{ __('You') }})</span>' : ''}
+                                        <span style="font-size: 12px; font-weight: 800; color: var(--ula-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                            ${escapeHtml(m.name)} ${m.is_self ? '<span style="font-size: 10px; color: var(--ula-text-muted);">({{ __('You') }})</span>' : ''}
                                         </span>
-                                        ${m.last_message ? `<span style="font-size: 9px; color: var(--text-muted); margin-inline-start: 4px;">${m.last_message.created_at}</span>` : ''}
+                                        ${m.last_message ? `<span style="font-size: 9px; color: var(--ula-text-muted); margin-inline-start: 4px;">${m.last_message.created_at}</span>` : ''}
                                     </div>
-                                    <div style="font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px;">
+                                    <div style="font-size: 11px; color: var(--ula-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px;">
                                         ${escapeHtml(lastMsgPreview)}
                                     </div>
                                 </div>
@@ -2927,12 +2927,12 @@
 
                 if (!data.messages || !data.messages.length) {
                     container.innerHTML = `
-                        <div style="text-align: center; color: var(--nx-text-muted); font-size: var(--nx-font-size-xs); padding: 40px;">
+                        <div style="text-align: center; color: var(--ula-text-muted); font-size: var(--ula-size-xs); padding: 40px;">
                             <div style="margin-bottom: 8px; display: flex; justify-content: center;">
-                                <span class="material-symbols-rounded" style="font-size: 28px; color: var(--nx-primary-500);">waving_hand</span>
+                                <span class="material-symbols-rounded" style="font-size: 28px; color: var(--ula-accent-default);">waving_hand</span>
                             </div>
-                            <div style="font-weight: var(--nx-font-weight-bold); color: var(--nx-text-primary); font-size: var(--nx-font-size-sm);">{{ __('No messages in this conversation yet.') }}</div>
-                            <div style="font-size: 11px; margin-top: 4px; color: var(--nx-text-secondary);">{{ __('Send a message below to start the discussion!') }}</div>
+                            <div style="font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-size: var(--ula-size-sm);">{{ __('No messages in this conversation yet.') }}</div>
+                            <div style="font-size: 11px; margin-top: 4px; color: var(--ula-text-secondary);">{{ __('Send a message below to start the discussion!') }}</div>
                         </div>
                     `;
                     return;
@@ -2945,19 +2945,19 @@
                     return `
                         <div style="display: flex; gap: 10px; align-items: flex-end; justify-content: ${isMine ? 'flex-end' : 'flex-start'};">
                             ${!isMine ? `
-                                <div style="width: 30px; height: 30px; border-radius: var(--nx-radius-sm); background: var(--nx-accent-gradient); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: var(--nx-font-weight-bold); color: white; flex-shrink: 0; box-shadow: var(--nx-shadow-soft-3d); overflow: hidden; font-family: var(--nx-font-mono);">
+                                <div style="width: 30px; height: 30px; border-radius: var(--ula-radius-sm); background: var(--ula-gradient-accent); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: var(--ula-weight-bold); color: white; flex-shrink: 0; box-shadow: var(--ula-shadow-xs); overflow: hidden; font-family: var(--ula-font-mono);">
                                     ${msg.sender.avatar_url ? `<img src="${msg.sender.avatar_url}" style="width:100%;height:100%;object-fit:cover;">` : initials}
                                 </div>
                             ` : ''}
 
                             <div style="max-width: 70%; display: flex; flex-direction: column; align-items: ${isMine ? 'flex-end' : 'flex-start'};">
-                                ${!isMine ? `<span style="font-size: 10px; font-weight: var(--nx-font-weight-bold); color: var(--nx-text-secondary); margin-bottom: 2px; margin-inline-start: 4px;">${escapeHtml(msg.sender.name)}</span>` : ''}
+                                ${!isMine ? `<span style="font-size: 10px; font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary); margin-bottom: 2px; margin-inline-start: 4px;">${escapeHtml(msg.sender.name)}</span>` : ''}
                                 
-                                <div style="padding: 10px 14px; border-radius: ${isMine ? '14px 14px 2px 14px' : '14px 14px 14px 2px'}; background: ${isMine ? 'var(--nx-accent-gradient)' : 'var(--nx-bg-surface)'}; color: ${isMine ? '#FFFDF6' : 'var(--nx-text-primary)'}; border: 1px solid ${isMine ? 'transparent' : 'var(--nx-border-subtle)'}; box-shadow: var(--nx-shadow-soft-3d); font-size: var(--nx-font-size-xs); line-height: 1.5; word-break: break-word;">
+                                <div style="padding: 10px 14px; border-radius: ${isMine ? '14px 14px 2px 14px' : '14px 14px 14px 2px'}; background: ${isMine ? 'var(--ula-gradient-accent)' : 'var(--ula-surface-card)'}; color: ${isMine ? '#FFFDF6' : 'var(--ula-text-primary)'}; border: 1px solid ${isMine ? 'transparent' : 'var(--ula-border-subtle)'}; box-shadow: var(--ula-shadow-xs); font-size: var(--ula-size-xs); line-height: 1.5; word-break: break-word;">
                                     ${escapeHtml(msg.body).replace(/\n/g, '<br>')}
                                 </div>
                                 
-                                <span style="font-size: 9px; color: var(--nx-text-muted); margin-top: 3px; margin-inline-start: 4px; margin-inline-end: 4px; font-family: var(--nx-font-mono);">
+                                <span style="font-size: 9px; color: var(--ula-text-muted); margin-top: 3px; margin-inline-start: 4px; margin-inline-end: 4px; font-family: var(--ula-font-mono);">
                                     ${msg.created_at}
                                 </span>
                             </div>
@@ -3088,7 +3088,7 @@
                     if (p.skills && p.skills.length) {
                         skillsContainer.innerHTML = p.skills.map(sk => `<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F; font-size: 11px; font-weight: 700;">⚡ ${escapeHtml(sk)}</span>`).join('');
                     } else {
-                        skillsContainer.innerHTML = `<span style="font-size: 11px; color: var(--text-muted); font-style: italic;">— {{ __('No skills listed') }} —</span>`;
+                        skillsContainer.innerHTML = `<span style="font-size: 11px; color: var(--ula-text-muted); font-style: italic;">— {{ __('No skills listed') }} —</span>`;
                     }
                 }
 
@@ -3098,7 +3098,7 @@
                     if (p.hobbies && p.hobbies.length) {
                         hobbiesContainer.innerHTML = p.hobbies.map(hb => `<span class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.15); color: #D6A23A; font-size: 11px; font-weight: 700;">🎯 ${escapeHtml(hb)}</span>`).join('');
                     } else {
-                        hobbiesContainer.innerHTML = `<span style="font-size: 11px; color: var(--text-muted); font-style: italic;">— {{ __('No hobbies listed') }} —</span>`;
+                        hobbiesContainer.innerHTML = `<span style="font-size: 11px; color: var(--ula-text-muted); font-style: italic;">— {{ __('No hobbies listed') }} —</span>`;
                     }
                 }
 
@@ -3112,7 +3112,7 @@
                     if (links.twitter) socialHtml.push(`<a href="${links.twitter}" target="_blank" class="tactile-btn btn-secondary" style="font-size: 11px; padding: 4px 10px; text-decoration: none;">🐦 X (Twitter)</a>`);
                     if (links.website) socialHtml.push(`<a href="${links.website}" target="_blank" class="tactile-btn btn-secondary" style="font-size: 11px; padding: 4px 10px; text-decoration: none;">🌐 Website</a>`);
 
-                    socialsContainer.innerHTML = socialHtml.length ? socialHtml.join('') : `<span style="font-size: 11px; color: var(--text-muted); font-style: italic;">— {{ __('No social links attached') }} —</span>`;
+                    socialsContainer.innerHTML = socialHtml.length ? socialHtml.join('') : `<span style="font-size: 11px; color: var(--ula-text-muted); font-style: italic;">— {{ __('No social links attached') }} —</span>`;
                 }
 
                 // Notes
@@ -3135,7 +3135,7 @@
                 const tasksContainer = document.getElementById('mp-tasks-list-container');
                 if (tasksContainer) {
                     if (!data.tasks || !data.tasks.length) {
-                        tasksContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 12px; padding: 30px;">{{ __('No tasks assigned to this member.') }}</div>`;
+                        tasksContainer.innerHTML = `<div style="text-align: center; color: var(--ula-text-muted); font-size: 12px; padding: 30px;">{{ __('No tasks assigned to this member.') }}</div>`;
                     } else {
                         tasksContainer.innerHTML = data.tasks.map(t => {
                             const priorityColors = {
@@ -3145,12 +3145,12 @@
                                 'low': 'background: rgba(148, 163, 184, 0.15); color: #64748B;'
                             };
                             return `
-                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-radius: 12px; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); box-shadow: var(--shadow-soft-3d); gap: 12px; flex-wrap: wrap;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-radius: 12px; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs); gap: 12px; flex-wrap: wrap;">
                                     <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
                                         <span class="nav-badge-pill" style="font-family: monospace; font-size: 10px; font-weight: 800;">#${t.task_number}</span>
                                         <div>
-                                            <div style="font-weight: 800; font-size: 13px; color: var(--text-primary);">${escapeHtml(t.title)}</div>
-                                            <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px; font-size: 11px; color: var(--text-secondary);">
+                                            <div style="font-weight: 800; font-size: 13px; color: var(--ula-text-primary);">${escapeHtml(t.title)}</div>
+                                            <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px; font-size: 11px; color: var(--ula-text-secondary);">
                                                 <span>📁 ${escapeHtml(t.project ? t.project.name : 'General')}</span>
                                                 ${t.due_date ? `<span>• 📅 ${t.due_date} ${t.is_overdue ? '<span style="color:#D96B5F;font-weight:800;">({{ __('Overdue') }})</span>' : ''}</span>` : ''}
                                                 ${t.checklist_count ? `<span>• ☑️ ${t.checklist_done}/${t.checklist_count}</span>` : ''}
@@ -3181,15 +3181,15 @@
                 const tbody = document.getElementById('mp-time-entries-tbody');
                 if (tbody) {
                     if (!data.time_entries || !data.time_entries.length) {
-                        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 20px;">{{ __('No work logs recorded yet.') }}</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--ula-text-muted); padding: 20px;">{{ __('No work logs recorded yet.') }}</td></tr>`;
                     } else {
                         tbody.innerHTML = data.time_entries.map(te => `
                             <tr>
-                                <td style="font-size: 12px; font-weight: 700; color: var(--text-primary);">${te.date}</td>
-                                <td style="font-size: 12px; font-weight: 700; color: var(--brand-forest);">📁 ${escapeHtml(te.project_name)}</td>
-                                <td style="font-size: 12px; color: var(--text-secondary);">${escapeHtml(te.task_title)}</td>
+                                <td style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary);">${te.date}</td>
+                                <td style="font-size: 12px; font-weight: 700; color: var(--ula-palm-900);">📁 ${escapeHtml(te.project_name)}</td>
+                                <td style="font-size: 12px; color: var(--ula-text-secondary);">${escapeHtml(te.task_title)}</td>
                                 <td><span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F; font-weight: 800;">${te.duration_hours}h</span></td>
-                                <td style="font-size: 11px; color: var(--text-muted);">${escapeHtml(te.description)}</td>
+                                <td style="font-size: 11px; color: var(--ula-text-muted);">${escapeHtml(te.description)}</td>
                             </tr>
                         `).join('');
                     }
@@ -3203,14 +3203,14 @@
 
         function switchMemberProfileTab(tabName) {
             document.querySelectorAll('.member-profile-tab-btn').forEach(btn => {
-                btn.style.color = 'var(--text-secondary)';
+                btn.style.color = 'var(--ula-text-secondary)';
                 btn.style.borderBottomColor = 'transparent';
                 btn.classList.remove('active');
             });
             const activeBtn = document.getElementById(`mp-tab-btn-${tabName}`);
             if (activeBtn) {
-                activeBtn.style.color = 'var(--brand-forest)';
-                activeBtn.style.borderBottomColor = 'var(--brand-forest)';
+                activeBtn.style.color = 'var(--ula-palm-900)';
+                activeBtn.style.borderBottomColor = 'var(--ula-palm-900)';
                 activeBtn.classList.add('active');
             }
 
@@ -3417,7 +3417,7 @@
                     if (!taskEntries.length) {
                         tasksTbody.innerHTML = `
                             <tr>
-                                <td colspan="7" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                                <td colspan="7" style="text-align: center; padding: 36px; color: var(--ula-text-muted);">
                                     <div style="font-size: 28px; margin-bottom: 6px;">📋</div>
                                     {{ __('No task work sessions recorded on this date.') }}
                                 </td>
@@ -3431,21 +3431,21 @@
                             } else if (te.status === 'in_progress') {
                                 statusBadge = '<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F; font-weight: 800;">⚡ {{ __('In Progress') }}</span>';
                             } else {
-                                statusBadge = '<span class="nav-badge-pill" style="background: var(--bg-surface-subtle); color: var(--text-secondary);">✓ {{ __('Completed') }}</span>';
+                                statusBadge = '<span class="nav-badge-pill" style="background: var(--ula-surface-page-alt); color: var(--ula-text-secondary);">✓ {{ __('Completed') }}</span>';
                             }
 
                             const billableBadge = te.is_billable
-                                ? '<span class="nav-badge-pill" style="background: rgba(36, 92, 58, 0.15); color: var(--brand-forest); font-weight: 800;">💎 {{ __('Billable') }}</span>'
-                                : '<span class="nav-badge-pill" style="color: var(--text-muted);">{{ __('Standard') }}</span>';
+                                ? '<span class="nav-badge-pill" style="background: rgba(36, 92, 58, 0.15); color: var(--ula-palm-900); font-weight: 800;">💎 {{ __('Billable') }}</span>'
+                                : '<span class="nav-badge-pill" style="color: var(--ula-text-muted);">{{ __('Standard') }}</span>';
 
                             const empInitials = (te.user_name || 'U').substring(0, 2).toUpperCase();
                             const empCell = `
                                 <div onclick="openMemberProfileModal('${te.user_id}')" style="display: flex; align-items: center; gap: 8px; cursor: pointer;" title="{{ __('Inspect Member Sessions') }}">
                                     ${te.user_avatar
                                         ? `<img src="${te.user_avatar}" style="width: 26px; height: 26px; border-radius: 8px; object-fit: cover;">`
-                                        : `<div style="width: 26px; height: 26px; border-radius: 8px; background: var(--accent-gradient); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 10px;">${empInitials}</div>`
+                                        : `<div style="width: 26px; height: 26px; border-radius: 8px; background: var(--ula-gradient-accent); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 10px;">${empInitials}</div>`
                                     }
-                                    <span style="font-weight: 800; color: var(--brand-forest); font-size: 12px;">${escapeHtml(te.user_name || 'Member')}</span>
+                                    <span style="font-weight: 800; color: var(--ula-palm-900); font-size: 12px;">${escapeHtml(te.user_name || 'Member')}</span>
                                 </div>
                             `;
 
@@ -3453,16 +3453,16 @@
                                 <tr>
                                     <td>${empCell}</td>
                                     <td>
-                                        <div style="font-weight: 800; color: var(--text-primary);">${escapeHtml(te.task_title || 'Work Session')}</div>
-                                        ${te.description ? `<div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">${escapeHtml(te.description)}</div>` : ''}
+                                        <div style="font-weight: 800; color: var(--ula-text-primary);">${escapeHtml(te.task_title || 'Work Session')}</div>
+                                        ${te.description ? `<div style="font-size: 11px; color: var(--ula-text-muted); margin-top: 2px;">${escapeHtml(te.description)}</div>` : ''}
                                     </td>
                                     <td>
-                                        <span class="nav-badge-pill" style="font-weight: 700; color: var(--brand-forest);">📁 ${escapeHtml(te.project_name || 'General')}</span>
+                                        <span class="nav-badge-pill" style="font-weight: 700; color: var(--ula-palm-900);">📁 ${escapeHtml(te.project_name || 'General')}</span>
                                     </td>
-                                    <td style="font-family: monospace; font-size: 12px; font-weight: 700; color: var(--text-secondary);">
+                                    <td style="font-family: monospace; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">
                                         ${te.started_at || '—'} ➔ ${te.ended_at || '—'}
                                     </td>
-                                    <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--brand-forest);">
+                                    <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--ula-palm-900);">
                                         ${te.duration_formatted || '00m'}
                                     </td>
                                     <td>${billableBadge}</td>
@@ -3486,7 +3486,7 @@
                     if (!attSessions.length) {
                         attTbody.innerHTML = `
                             <tr>
-                                <td colspan="6" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                                <td colspan="6" style="text-align: center; padding: 36px; color: var(--ula-text-muted);">
                                     <div style="font-size: 28px; margin-bottom: 6px;">🏢</div>
                                     {{ __('No virtual office presence recorded on this date.') }}
                                 </td>
@@ -3500,7 +3500,7 @@
                             } else if (s.status === 'idle_paused') {
                                 statusPill = '<span class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.2); color: #D6A23A; font-weight: 800;">⏸️ {{ __('Idle Paused') }}</span>';
                             } else {
-                                statusPill = '<span class="nav-badge-pill" style="background: var(--bg-surface-subtle); color: var(--text-muted);">⚪ {{ __('Completed') }}</span>';
+                                statusPill = '<span class="nav-badge-pill" style="background: var(--ula-surface-page-alt); color: var(--ula-text-muted);">⚪ {{ __('Completed') }}</span>';
                             }
 
                             const empInitials = (s.user_name || 'U').substring(0, 2).toUpperCase();
@@ -3508,9 +3508,9 @@
                                 <div onclick="openMemberProfileModal('${s.user_id}')" style="display: flex; align-items: center; gap: 8px; cursor: pointer;" title="{{ __('Inspect Member Sessions') }}">
                                     ${s.user_avatar
                                         ? `<img src="${s.user_avatar}" style="width: 26px; height: 26px; border-radius: 8px; object-fit: cover;">`
-                                        : `<div style="width: 26px; height: 26px; border-radius: 8px; background: var(--accent-gradient); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 10px;">${empInitials}</div>`
+                                        : `<div style="width: 26px; height: 26px; border-radius: 8px; background: var(--ula-gradient-accent); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 10px;">${empInitials}</div>`
                                     }
-                                    <span style="font-weight: 800; color: var(--brand-forest); font-size: 12px;">${escapeHtml(s.user_name || 'Member')}</span>
+                                    <span style="font-weight: 800; color: var(--ula-palm-900); font-size: 12px;">${escapeHtml(s.user_name || 'Member')}</span>
                                 </div>
                             `;
 
@@ -3521,18 +3521,18 @@
                                         <div style="display: flex; align-items: center; gap: 8px;">
                                             <span style="font-size: 16px;">📍</span>
                                             <div>
-                                                <div style="font-weight: 800; color: var(--text-primary);">${escapeHtml(s.branch_name || 'Main Office')}</div>
-                                                <div style="font-size: 11px; color: var(--text-muted);">🚪 ${escapeHtml(s.room_name || 'General Space')}</div>
+                                                <div style="font-weight: 800; color: var(--ula-text-primary);">${escapeHtml(s.branch_name || 'Main Office')}</div>
+                                                <div style="font-size: 11px; color: var(--ula-text-muted);">🚪 ${escapeHtml(s.room_name || 'General Space')}</div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td style="font-family: monospace; font-size: 12px; font-weight: 700; color: var(--text-secondary);">
+                                    <td style="font-family: monospace; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">
                                         🟢 ${s.check_in || '—'}
                                     </td>
-                                    <td style="font-family: monospace; font-size: 12px; font-weight: 700; color: var(--text-secondary);">
+                                    <td style="font-family: monospace; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">
                                         🔴 ${s.check_out || '{{ __('Still in Office') }}'}
                                     </td>
-                                    <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--brand-forest);">
+                                    <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--ula-palm-900);">
                                         ${s.duration_formatted || '00m'}
                                     </td>
                                     <td>${statusPill}</td>
@@ -3569,7 +3569,7 @@
                 if (!roster.length) {
                     tbody.innerHTML = `
                         <tr>
-                            <td colspan="7" style="text-align: center; padding: 24px; color: var(--text-muted);">
+                            <td colspan="7" style="text-align: center; padding: 24px; color: var(--ula-text-muted);">
                                 {{ __('No team members found in organization.') }}
                             </td>
                         </tr>
@@ -3581,7 +3581,7 @@
                     const initials = (m.name || 'U').substring(0, 2).toUpperCase();
                     const statusBadge = m.is_online
                         ? '<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F; font-weight: 800;">🟢 {{ __("Online (In Office)") }}</span>'
-                        : '<span class="nav-badge-pill" style="background: var(--bg-surface-subtle); color: var(--text-muted);">⚪ {{ __("Offline") }}</span>';
+                        : '<span class="nav-badge-pill" style="background: var(--ula-surface-page-alt); color: var(--ula-text-muted);">⚪ {{ __("Offline") }}</span>';
 
                     let activeTaskLabel = '—';
                     if (m.active_task) {
@@ -3589,8 +3589,8 @@
                     }
 
                     const officeLoc = m.is_online
-                        ? `<div style="font-weight: 800; color: var(--brand-forest);">${escapeHtml(m.office_name)}</div><div style="font-size: 10px; color: var(--text-muted);">🚪 ${escapeHtml(m.room_name)}</div>`
-                        : `<span style="color: var(--text-muted);">—</span>`;
+                        ? `<div style="font-weight: 800; color: var(--ula-palm-900);">${escapeHtml(m.office_name)}</div><div style="font-size: 10px; color: var(--ula-text-muted);">🚪 ${escapeHtml(m.room_name)}</div>`
+                        : `<span style="color: var(--ula-text-muted);">—</span>`;
 
                     return `
                         <tr>
@@ -3598,20 +3598,20 @@
                                 <div onclick="openMemberProfileModal('${m.user_id}')" style="display: flex; align-items: center; gap: 10px; cursor: pointer;" title="{{ __('Click to inspect member sessions & details') }}">
                                     ${m.avatar_url
                                         ? `<img src="${m.avatar_url}" style="width: 32px; height: 32px; border-radius: 10px; object-fit: cover;">`
-                                        : `<div style="width: 32px; height: 32px; border-radius: 10px; background: var(--accent-gradient); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px;">${initials}</div>`
+                                        : `<div style="width: 32px; height: 32px; border-radius: 10px; background: var(--ula-gradient-accent); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px;">${initials}</div>`
                                     }
                                     <div>
-                                        <div style="font-weight: 800; color: var(--brand-forest); display: flex; align-items: center; gap: 4px;">
+                                        <div style="font-weight: 800; color: var(--ula-palm-900); display: flex; align-items: center; gap: 4px;">
                                             <span>${escapeHtml(m.name)}</span>
                                             <span style="font-size: 10px; opacity: 0.7;">👁️</span>
                                         </div>
-                                        <div style="font-size: 11px; color: var(--text-muted);">${escapeHtml(m.job_title || m.role_name)}</div>
+                                        <div style="font-size: 11px; color: var(--ula-text-muted);">${escapeHtml(m.job_title || m.role_name)}</div>
                                     </div>
                                 </div>
                             </td>
                             <td>${statusBadge}</td>
                             <td>${officeLoc}</td>
-                            <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--brand-forest);">
+                            <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--ula-palm-900);">
                                 ${m.total_office_formatted}
                             </td>
                             <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: #4F9B5F;">
@@ -3623,7 +3623,7 @@
                                     <button type="button" onclick="openMemberProfileModal('${m.user_id}')" class="tactile-btn btn-secondary" style="padding: 4px 8px; font-size: 11px;" title="{{ __('View Sessions') }}">
                                         🔍 {{ __('Sessions') }}
                                     </button>
-                                    <button type="button" onclick="selectMemberInTimesheet('${m.user_id}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--brand-forest); border: 1px solid rgba(79, 155, 95, 0.3); padding: 4px 8px; font-size: 11px;" title="{{ __('Filter Timesheet') }}">
+                                    <button type="button" onclick="selectMemberInTimesheet('${m.user_id}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-palm-900); border: 1px solid rgba(79, 155, 95, 0.3); padding: 4px 8px; font-size: 11px;" title="{{ __('Filter Timesheet') }}">
                                         ⏱️ {{ __('Timesheet') }}
                                     </button>
                                 </div>
@@ -3667,8 +3667,8 @@
             const attTbody = document.getElementById('mp-attendance-tbody');
             const tasksTbody = document.getElementById('mp-tasks-tbody');
 
-            if (attTbody) attTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--text-muted);">⏳ {{ __('Loading sessions...') }}</td></tr>`;
-            if (tasksTbody) tasksTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--text-muted);">⏳ {{ __('Loading tasks...') }}</td></tr>`;
+            if (attTbody) attTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--ula-text-muted);">⏳ {{ __('Loading sessions...') }}</td></tr>`;
+            if (tasksTbody) tasksTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--ula-text-muted);">⏳ {{ __('Loading tasks...') }}</td></tr>`;
 
             try {
                 // 1. Fetch user profile + activity
@@ -3684,7 +3684,7 @@
                     if (subEl) subEl.textContent = `${u.role_name || 'Member'} • ${u.department || 'General'} • ${u.job_title || ''}`;
                     if (statusPill) {
                         statusPill.textContent = u.status || 'Active';
-                        statusPill.style.background = u.status === 'active' ? 'rgba(79, 155, 95, 0.2)' : 'var(--bg-surface-subtle)';
+                        statusPill.style.background = u.status === 'active' ? 'rgba(79, 155, 95, 0.2)' : 'var(--ula-surface-page-alt)';
                     }
                     if (avatarBox) {
                         if (u.avatar_url) {
@@ -3698,13 +3698,13 @@
                     const tasks = actData.tasks || [];
                     if (tasksTbody) {
                         if (!tasks.length) {
-                            tasksTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 18px; color: var(--text-muted);">{{ __('No active tasks assigned.') }}</td></tr>`;
+                            tasksTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 18px; color: var(--ula-text-muted);">{{ __('No active tasks assigned.') }}</td></tr>`;
                         } else {
                             tasksTbody.innerHTML = tasks.map(t => `
                                 <tr>
-                                    <td style="font-weight: 800; color: var(--text-primary);">${escapeHtml(t.title)}</td>
+                                    <td style="font-weight: 800; color: var(--ula-text-primary);">${escapeHtml(t.title)}</td>
                                     <td><span class="nav-badge-pill">📁 ${escapeHtml(t.project_name)}</span></td>
-                                    <td style="font-size: 11px; color: var(--text-muted);">${t.due_date || '—'}</td>
+                                    <td style="font-size: 11px; color: var(--ula-text-muted);">${t.due_date || '—'}</td>
                                     <td><span class="nav-badge-pill" style="font-size: 10px;">${t.priority}</span></td>
                                     <td><span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F;">${t.status}</span></td>
                                 </tr>
@@ -3719,28 +3719,28 @@
                     if (taskKpi) taskKpi.textContent = tsData.total_task_formatted || '00:00:00';
                     if (locKpi) {
                         locKpi.textContent = tsData.is_in_office ? '🟢 {{ __("In Virtual Office") }}' : '⚪ {{ __("Offline") }}';
-                        locKpi.style.color = tsData.is_in_office ? 'var(--brand-forest)' : 'var(--text-muted)';
+                        locKpi.style.color = tsData.is_in_office ? 'var(--ula-palm-900)' : 'var(--ula-text-muted)';
                     }
 
                     const sessions = tsData.attendance_sessions || [];
                     if (attTbody) {
                         if (!sessions.length) {
-                            attTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 18px; color: var(--text-muted);">{{ __('No presence sessions logged today.') }}</td></tr>`;
+                            attTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 18px; color: var(--ula-text-muted);">{{ __('No presence sessions logged today.') }}</td></tr>`;
                         } else {
                             attTbody.innerHTML = sessions.map(s => {
                                 const stPill = s.status === 'active'
                                     ? '<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F; font-weight: 800;">🟢 {{ __("Live") }}</span>'
-                                    : '<span class="nav-badge-pill" style="color: var(--text-muted);">⚪ {{ __("Completed") }}</span>';
+                                    : '<span class="nav-badge-pill" style="color: var(--ula-text-muted);">⚪ {{ __("Completed") }}</span>';
 
                                 return `
                                     <tr>
                                         <td>
-                                            <div style="font-weight: 800; color: var(--text-primary);">${escapeHtml(s.branch_name || 'Main Office')}</div>
-                                            <div style="font-size: 11px; color: var(--text-muted);">🚪 ${escapeHtml(s.room_name || 'General Space')}</div>
+                                            <div style="font-weight: 800; color: var(--ula-text-primary);">${escapeHtml(s.branch_name || 'Main Office')}</div>
+                                            <div style="font-size: 11px; color: var(--ula-text-muted);">🚪 ${escapeHtml(s.room_name || 'General Space')}</div>
                                         </td>
-                                        <td style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">🟢 ${s.check_in || '—'}</td>
-                                        <td style="font-family: monospace; font-size: 11px; color: var(--text-secondary);">🔴 ${s.check_out || '{{ __("Still in Office") }}'}</td>
-                                        <td style="font-family: monospace; font-weight: 900; color: var(--brand-forest);">${s.duration_formatted || '00m'}</td>
+                                        <td style="font-family: monospace; font-size: 11px; color: var(--ula-text-secondary);">🟢 ${s.check_in || '—'}</td>
+                                        <td style="font-family: monospace; font-size: 11px; color: var(--ula-text-secondary);">🔴 ${s.check_out || '{{ __("Still in Office") }}'}</td>
+                                        <td style="font-family: monospace; font-weight: 900; color: var(--ula-palm-900);">${s.duration_formatted || '00m'}</td>
                                         <td>${stPill}</td>
                                     </tr>
                                 `;

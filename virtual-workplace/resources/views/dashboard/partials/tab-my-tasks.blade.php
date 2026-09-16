@@ -1,14 +1,14 @@
 <div id="tab-my-tasks" class="tab-view">
-    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--nx-spacing-6); flex-wrap: wrap; gap: var(--nx-spacing-4);">
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-7); flex-wrap: wrap; gap: var(--ula-space-5);">
         <div>
-            <h1 class="page-title" style="font-size: var(--nx-font-size-2xl); font-weight: var(--nx-font-weight-black); color: var(--nx-text-primary); margin-bottom: var(--nx-spacing-1); display: flex; align-items: center; gap: var(--nx-spacing-2);">
-                <span class="material-symbols-rounded" style="font-size: 28px; color: var(--nx-primary-500);">task_alt</span>
+            <h1 class="page-title" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); margin-bottom: var(--ula-space-2); display: flex; align-items: center; gap: var(--ula-space-3);">
+                <span class="material-symbols-rounded" style="font-size: 28px; color: var(--ula-accent-default);">task_alt</span>
                 <span>{{ __('My Tasks & Action Items') }}</span>
             </h1>
-            <p class="page-subtitle" style="font-size: var(--nx-font-size-sm); color: var(--nx-text-secondary);">{{ __('Track and log time against your personal assigned tasks.') }}</p>
+            <p class="page-subtitle" style="font-size: var(--ula-size-sm); color: var(--ula-text-secondary);">{{ __('Track and log time against your personal assigned tasks.') }}</p>
         </div>
-        <div style="display: flex; gap: var(--nx-spacing-3);">
-            <button onclick="openNewTaskModal()" class="tactile-btn btn-primary" style="padding: 10px 18px; font-size: var(--nx-font-size-sm); display: inline-flex; align-items: center; gap: var(--nx-spacing-2);">
+        <div style="display: flex; gap: var(--ula-space-4);">
+            <button onclick="openNewTaskModal()" class="tactile-btn btn-primary" style="padding: 10px 18px; font-size: var(--ula-size-sm); display: inline-flex; align-items: center; gap: var(--ula-space-3);">
                 <span class="material-symbols-rounded" style="font-size: 18px;">add</span>
                 <span>{{ __('New Task') }}</span>
             </button>
@@ -16,12 +16,12 @@
     </div>
 
     <!-- Task Status Columns Grid (5-Column Kanban matching All Tasks) -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--nx-spacing-4);">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--ula-space-5);">
         @php
             $myKanbanCols = [
-                'backlog' => ['title' => __('Backlog'), 'icon' => 'inventory_2', 'color' => 'var(--nx-text-secondary)', 'border' => 'var(--nx-border-subtle)'],
-                'ready' => ['title' => __('Ready'), 'icon' => 'adjust', 'color' => 'var(--nx-primary-500)', 'border' => 'var(--nx-primary-500)'],
-                'in_progress' => ['title' => __('In Progress'), 'icon' => 'bolt', 'color' => 'var(--nx-primary-600)', 'border' => 'var(--nx-primary-600)'],
+                'backlog' => ['title' => __('Backlog'), 'icon' => 'inventory_2', 'color' => 'var(--ula-text-secondary)', 'border' => 'var(--ula-border-subtle)'],
+                'ready' => ['title' => __('Ready'), 'icon' => 'adjust', 'color' => 'var(--ula-accent-default)', 'border' => 'var(--ula-accent-default)'],
+                'in_progress' => ['title' => __('In Progress'), 'icon' => 'bolt', 'color' => 'var(--ula-accent-press)', 'border' => 'var(--ula-accent-press)'],
                 'review' => ['title' => __('Review / QA'), 'icon' => 'pageview', 'color' => '#D6A23A', 'border' => '#D6A23A'],
                 'done' => ['title' => __('Done'), 'icon' => 'check_circle', 'color' => '#4F9B5F', 'border' => '#4F9B5F'],
             ];
@@ -31,13 +31,13 @@
             @php
                 $colTasks = ($colKey === 'review') ? $myTasks->whereIn('status', ['review', 'qa']) : $myTasks->where('status', $colKey);
             @endphp
-            <div class="card mytasks-kanban-column" id="mytasks-kanban-zone-{{ $colKey }}" style="border-radius: var(--nx-radius-lg); padding: var(--nx-spacing-4); background: var(--nx-bg-surface-subtle); display: flex; flex-direction: column; border: 1px solid var(--nx-border-subtle);">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid {{ $colMeta['border'] }}; padding-bottom: 10px; margin-bottom: var(--nx-spacing-3);">
-                    <h3 style="font-size: var(--nx-font-size-sm); font-weight: var(--nx-font-weight-black); color: var(--nx-text-primary); display: flex; align-items: center; gap: 6px; margin: 0;">
+            <div class="card mytasks-kanban-column" id="mytasks-kanban-zone-{{ $colKey }}" style="border-radius: var(--ula-radius-lg); padding: var(--ula-space-5); background: var(--ula-surface-page-alt); display: flex; flex-direction: column; border: 1px solid var(--ula-border-subtle);">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid {{ $colMeta['border'] }}; padding-bottom: 10px; margin-bottom: var(--ula-space-4);">
+                    <h3 style="font-size: var(--ula-size-sm); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); display: flex; align-items: center; gap: 6px; margin: 0;">
                         <span class="material-symbols-rounded" style="font-size: 16px; color: {{ $colMeta['color'] }};">{{ $colMeta['icon'] }}</span>
                         <span>{{ $colMeta['title'] }}</span>
                     </h3>
-                    <span class="nav-badge-pill" id="mytasks-kanban-cnt-{{ $colKey }}" style="font-weight: var(--nx-font-weight-bold); font-family: var(--nx-font-mono);">{{ $colTasks->count() }}</span>
+                    <span class="nav-badge-pill" id="mytasks-kanban-cnt-{{ $colKey }}" style="font-weight: var(--ula-weight-bold); font-family: var(--ula-font-mono);">{{ $colTasks->count() }}</span>
                 </div>
 
                 <div class="kanban-cards-container" id="mytasks-kanban-col-{{ $colKey }}" data-status="{{ $colKey }}" style="display: flex; flex-direction: column; gap: 10px; flex: 1; min-height: 120px;">
@@ -56,11 +56,11 @@
                             <!-- Header: Project Code & Action Buttons -->
                             <div class="task-card-header">
                                 <div class="task-card-tags">
-                                    <span class="task-code-badge" style="font-family: var(--nx-font-mono); direction: ltr; display: inline-block; unicode-bidi: isolate;">
+                                    <span class="task-code-badge" style="font-family: var(--ula-font-mono); direction: ltr; display: inline-block; unicode-bidi: isolate;">
                                         {{ $t->project->code ?? 'PRJ' }}-#{{ $t->task_number ?? 1 }}
                                     </span>
                                     @if($t->checklistItems && $t->checklistItems->count() > 0)
-                                        <span class="badge-pill badge-green" style="font-size: 9.5px; font-family: var(--nx-font-mono); display: inline-flex; align-items: center; gap: 2px;" title="{{ __('Checklist Progress') }}">
+                                        <span class="badge-pill badge-green" style="font-size: 9.5px; font-family: var(--ula-font-mono); display: inline-flex; align-items: center; gap: 2px;" title="{{ __('Checklist Progress') }}">
                                             <span class="material-symbols-rounded" style="font-size: 11px;">check_box</span>
                                             <span>{{ $t->checklistItems->where('is_completed', true)->count() }}/{{ $t->checklistItems->count() }}</span>
                                         </span>
@@ -92,7 +92,7 @@
                             </h4>
 
                             @if($t->approval_status === 'pending_approval')
-                                <div style="background: rgba(214, 162, 58, 0.15); border: 1px solid rgba(214, 162, 58, 0.35); color: #D6A23A; font-size: 10px; font-weight: var(--nx-font-weight-bold); padding: 4px 8px; border-radius: var(--nx-radius-sm); display: flex; align-items: center; justify-content: space-between;">
+                                <div style="background: rgba(214, 162, 58, 0.15); border: 1px solid rgba(214, 162, 58, 0.35); color: #D6A23A; font-size: 10px; font-weight: var(--ula-weight-bold); padding: 4px 8px; border-radius: var(--ula-radius-sm); display: flex; align-items: center; justify-content: space-between;">
                                     <span style="display: inline-flex; align-items: center; gap: 3px;">
                                         <span class="material-symbols-rounded" style="font-size: 12px;">hourglass_top</span>
                                         <span>{{ __('Pending PM Approval') }}</span>
@@ -105,7 +105,7 @@
                                     @endif
                                 </div>
                             @elseif($t->approval_status === 'rejected')
-                                <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); color: #D96B5F; font-size: 10px; font-weight: var(--nx-font-weight-bold); padding: 4px 8px; border-radius: var(--nx-radius-sm); display: inline-flex; align-items: center; gap: 3px;">
+                                <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); color: #D96B5F; font-size: 10px; font-weight: var(--ula-weight-bold); padding: 4px 8px; border-radius: var(--ula-radius-sm); display: inline-flex; align-items: center; gap: 3px;">
                                     <span class="material-symbols-rounded" style="font-size: 12px;">warning</span>
                                     <span>{{ __('Changes Requested') }}</span>
                                 </div>
@@ -114,11 +114,11 @@
                             <!-- Metadata: Project & Due Date -->
                             <div class="task-card-meta">
                                 <span class="task-project-name" style="display: inline-flex; align-items: center; gap: 3px;">
-                                    <span class="material-symbols-rounded" style="font-size: 13px; color: var(--nx-text-muted);">folder</span>
+                                    <span class="material-symbols-rounded" style="font-size: 13px; color: var(--ula-text-muted);">folder</span>
                                     <span>{{ $t->project->name ?? 'General' }}</span>
                                 </span>
                                 @if($t->due_date)
-                                    <span class="task-due-date {{ $t->due_date->isPast() && $t->status !== 'done' ? 'is-overdue' : '' }}" style="display: inline-flex; align-items: center; gap: 3px; font-family: var(--nx-font-mono);">
+                                    <span class="task-due-date {{ $t->due_date->isPast() && $t->status !== 'done' ? 'is-overdue' : '' }}" style="display: inline-flex; align-items: center; gap: 3px; font-family: var(--ula-font-mono);">
                                         <span class="material-symbols-rounded" style="font-size: 12px;">calendar_today</span>
                                         <span>{{ $t->due_date->format('M d') }}</span>
                                     </span>
@@ -137,14 +137,14 @@
                                     </select>
                                 </div>
 
-                                <button type="button" onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="tactile-btn" style="background: var(--nx-primary-surface); color: var(--nx-primary-500); border: 1px solid var(--nx-border-subtle); padding: 3px 8px; font-size: 10.5px; border-radius: var(--nx-radius-full); display: inline-flex; align-items: center; gap: 2px; font-family: var(--nx-font-mono);" title="{{ __('Start Timer') }}">
+                                <button type="button" onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="tactile-btn" style="background: var(--ula-surface-accent-soft); color: var(--ula-accent-default); border: 1px solid var(--ula-border-subtle); padding: 3px 8px; font-size: 10.5px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 2px; font-family: var(--ula-font-mono);" title="{{ __('Start Timer') }}">
                                     <span class="material-symbols-rounded" style="font-size: 12px;">play_arrow</span>
                                     <span>{{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h</span>
                                 </button>
                             </div>
                         </div>
                     @empty
-                        <div class="mytasks-empty-hint" id="mytasks-empty-{{ $colKey }}" style="text-align: center; padding: 18px 8px; color: var(--nx-text-muted); font-size: var(--nx-font-size-xs); border: 1px dashed var(--nx-border-subtle); border-radius: var(--nx-radius-md);">
+                        <div class="mytasks-empty-hint" id="mytasks-empty-{{ $colKey }}" style="text-align: center; padding: 18px 8px; color: var(--ula-text-muted); font-size: var(--ula-size-xs); border: 1px dashed var(--ula-border-subtle); border-radius: var(--ula-radius-md);">
                             {{ __('No tasks in this stage.') }}
                         </div>
                     @endforelse
