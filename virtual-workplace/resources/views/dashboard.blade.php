@@ -932,6 +932,41 @@
             align-items: center;
             gap: 4px;
         }
+        /* Stacked KPI card variant used by several tabs (projects, billing, meetings,
+           timesheets, all-tasks): a kpi-header row (title + icon chip) above the
+           value, instead of the icon-beside-text layout above. */
+        .kpi-card:has(.kpi-header) {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .kpi-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .kpi-icon-box {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: linear-gradient(145deg, #437E51 0%, #225433 100%);
+            border: 1px solid #1B4529;
+            color: #FFFFFF !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 4px 12px rgba(34, 84, 51, 0.32), inset 0 1px 1px rgba(255, 255, 255, 0.45);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+            flex-shrink: 0;
+        }
+        .kpi-trend {
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
 
         /* ── Badges ── */
         .badge {
