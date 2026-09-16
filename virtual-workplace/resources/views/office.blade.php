@@ -2243,7 +2243,7 @@
 
             // 2. Intelligent Placement Facing the Central Open Walkway & Avoiding Shared Walls
             const mapCenter = { x: MAP_WIDTH_PX / 2, y: MAP_HEIGHT_PX / 2 };
-            const outerMargin = 60; // Outer exterior building perimeter margins
+            const outerMargin = 16; // Authoritative outer map canvas border margin
 
             let bestCandidate = null;
             let bestScore = -Infinity;
@@ -2268,16 +2268,16 @@
                     const orw = other.bounds.width * TILE_SIZE;
                     const orh = other.bounds.height * TILE_SIZE;
 
-                    // Test if exit outside point is inside or touching other room with 12px safety margin
-                    if (cand.exitOutsideX >= orx - 12 && cand.exitOutsideX <= orx + orw + 12 &&
-                        cand.exitOutsideY >= ory - 12 && cand.exitOutsideY <= ory + orh + 12) {
+                    // Test if exit outside point is inside or touching other room with 6px safety margin
+                    if (cand.exitOutsideX >= orx - 6 && cand.exitOutsideX <= orx + orw + 6 &&
+                        cand.exitOutsideY >= ory - 6 && cand.exitOutsideY <= ory + orh + 6) {
                         isInsideOtherRoom = true;
                         break;
                     }
 
                     // Test if door position itself on the wall falls on a shared wall segment
-                    if (cand.x >= orx - 6 && cand.x <= orx + orw + 6 &&
-                        cand.y >= ory - 6 && cand.y <= ory + orh + 6) {
+                    if (cand.x >= orx - 4 && cand.x <= orx + orw + 4 &&
+                        cand.y >= ory - 4 && cand.y <= ory + orh + 4) {
                         isInsideOtherRoom = true;
                         break;
                     }
@@ -2305,14 +2305,29 @@
                 }
             }
 
-            // Fallback if all sides were outer perimeter
+            // Fallback (strictly prioritize candidates NOT inside other rooms)
             if (!bestCandidate) {
-                candidates.sort((a, b) => {
+                const nonOverlapping = candidates.filter(cand => {
+                    for (const other of rooms) {
+                        if (other.id === r.id || !other.bounds) continue;
+                        const orx = other.bounds.x * TILE_SIZE;
+                        const ory = other.bounds.y * TILE_SIZE;
+                        const orw = other.bounds.width * TILE_SIZE;
+                        const orh = other.bounds.height * TILE_SIZE;
+                        if (cand.exitOutsideX >= orx - 4 && cand.exitOutsideX <= orx + orw + 4 &&
+                            cand.exitOutsideY >= ory - 4 && cand.exitOutsideY <= ory + orh + 4) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+                const pool = nonOverlapping.length > 0 ? nonOverlapping : candidates;
+                pool.sort((a, b) => {
                     const da = Math.hypot(a.exitOutsideX - mapCenter.x, a.exitOutsideY - mapCenter.y);
                     const db = Math.hypot(b.exitOutsideX - mapCenter.x, b.exitOutsideY - mapCenter.y);
                     return da - db;
                 });
-                bestCandidate = candidates[0];
+                bestCandidate = pool[0];
             }
 
             const portal = {
@@ -2709,16 +2724,18 @@
                 return null; // Explicit failure: NEVER return [goal]
             }
 
-            const path = [];
+            const path = [{ x: start.x, y: start.y }];
             let curr = goalNode;
+            const gridNodes = [];
             while (curr) {
-                path.push({
+                gridNodes.push({
                     x: curr.c * NAV_GRID_STEP + (NAV_GRID_STEP / 2),
                     y: curr.r * NAV_GRID_STEP + (NAV_GRID_STEP / 2)
                 });
                 curr = curr.parent;
             }
-            path.reverse();
+            gridNodes.reverse();
+            path.push(...gridNodes);
             path.push({ x: goal.x, y: goal.y });
             return path;
         }
