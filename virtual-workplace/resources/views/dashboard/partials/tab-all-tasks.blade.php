@@ -352,7 +352,7 @@
                             <!-- Header: Project Code & Action Buttons -->
                             <div class="task-card-header">
                                 <div class="task-card-tags">
-                                    <span class="task-code-badge" style="font-family: var(--nx-font-mono);">
+                                    <span class="task-code-badge" style="font-family: var(--nx-font-mono); direction: ltr; display: inline-block; unicode-bidi: isolate;">
                                         {{ $t->project->code ?? 'PRJ' }}-#{{ $t->task_number ?? 1 }}
                                     </span>
                                     @if($t->checklistItems && $t->checklistItems->count() > 0)

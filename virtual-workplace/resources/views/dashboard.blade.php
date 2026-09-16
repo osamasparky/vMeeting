@@ -1689,31 +1689,33 @@
     <main class="main-content">
 
         @if(session('superadmin_impersonator_id'))
-        <div class="relative overflow-hidden rounded-[var(--nx-radius-lg)] border border-[var(--nx-gold-400)] bg-[var(--nx-palm-900)] text-[var(--nx-sand-100)] p-3.5 sm:p-4 mb-5 shadow-[var(--nx-shadow-md)] flex items-center justify-between flex-wrap gap-3">
-            <div class="flex items-center gap-2.5 text-[13px] font-medium">
-                <span class="material-symbols-rounded text-[20px] text-[var(--nx-gold-400)]">admin_panel_settings</span>
-                <span>{{ __('You are currently logged in as company:') }} <strong class="text-[var(--nx-gold-400)] underline underline-offset-2">{{ session('superadmin_impersonated_org_name') }}</strong> ({{ Auth::user()->name }})</span>
+        <div style="background: var(--nx-palm-950, #0B1410); border: 1px solid rgba(211, 165, 83, 0.5); border-radius: var(--nx-radius-lg, 14px); color: var(--nx-sand-100, #F9F4EE); padding: 12px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; box-shadow: var(--nx-shadow-sm);">
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600;">
+                <span class="material-symbols-rounded" style="font-size: 20px; color: var(--nx-gold-400, #D3A553);">admin_panel_settings</span>
+                <span>{{ __('You are currently logged in as company:') }} <strong style="color: var(--nx-gold-400, #D3A553); text-decoration: underline;">{{ session('superadmin_impersonated_org_name') }}</strong> ({{ Auth::user()->name }})</span>
             </div>
-            <form method="POST" action="{{ route('impersonate.leave') }}" class="m-0 inline-flex">
+            <form method="POST" action="{{ route('impersonate.leave') }}" style="margin: 0; display: inline-flex;">
                 @csrf
-                <x-btn type="submit" variant="nav-cta" size="sm" icon="arrow_back">
+                <button type="submit" style="background: rgba(211, 165, 83, 0.15); color: var(--nx-sand-100, #F9F4EE); border: 1px solid var(--nx-gold-400, #D3A553); padding: 6px 14px; border-radius: var(--nx-radius-full, 9999px); font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease;">
+                    <span class="material-symbols-rounded" style="font-size: 16px;">logout</span>
                     <span>{{ __('Return to Super Admin') }}</span>
-                </x-btn>
+                </button>
             </form>
         </div>
         @endif
 
         @if(session('org_impersonator_id'))
-        <div class="relative overflow-hidden rounded-[var(--nx-radius-lg)] border border-[var(--nx-palm-300)] bg-[var(--nx-palm-700)] text-[var(--nx-sand-100)] p-3.5 sm:p-4 mb-5 shadow-[var(--nx-shadow-md)] flex items-center justify-between flex-wrap gap-3">
-            <div class="flex items-center gap-2.5 text-[13px] font-medium">
-                <span class="material-symbols-rounded text-[20px] text-[var(--nx-palm-300)]">switch_account</span>
-                <span>{{ __('You are currently logged in as team member:') }} <strong class="text-[var(--nx-sand-200)] underline underline-offset-2">{{ Auth::user()->name }}</strong> ({{ Auth::user()->email }})</span>
+        <div style="background: var(--nx-palm-900, #142B24); border: 1px solid rgba(78, 166, 111, 0.4); border-radius: var(--nx-radius-lg, 14px); color: var(--nx-sand-100, #F9F4EE); padding: 12px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; box-shadow: var(--nx-shadow-sm);">
+            <div style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600;">
+                <span class="material-symbols-rounded" style="font-size: 20px; color: var(--nx-palm-300, #4EA66F);">switch_account</span>
+                <span>{{ __('You are currently logged in as team member:') }} <strong style="color: var(--nx-sand-200, #F4EDE1); text-decoration: underline;">{{ Auth::user()->name }}</strong> ({{ Auth::user()->email }})</span>
             </div>
-            <form method="POST" action="{{ route('organization.members.impersonate.leave') }}" class="m-0 inline-flex">
+            <form method="POST" action="{{ route('organization.members.impersonate.leave') }}" style="margin: 0; display: inline-flex;">
                 @csrf
-                <x-btn type="submit" variant="nav-cta" size="sm" icon="logout">
+                <button type="submit" style="background: rgba(78, 166, 111, 0.15); color: var(--nx-sand-100, #F9F4EE); border: 1px solid var(--nx-palm-300, #4EA66F); padding: 6px 14px; border-radius: var(--nx-radius-full, 9999px); font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease;">
+                    <span class="material-symbols-rounded" style="font-size: 16px;">logout</span>
                     <span>{{ __('Leave Impersonation') }}</span>
-                </x-btn>
+                </button>
             </form>
         </div>
         @endif
@@ -1819,22 +1821,26 @@
         </div>
 
         @if(session('success'))
-        <div style="background: rgba(79, 155, 95, 0.15); border: 1px solid rgba(79, 155, 95, 0.35); color: #2E6B40; border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-soft-3d);">
+        <div style="background: rgba(60, 107, 76, 0.12); border: 1px solid rgba(60, 107, 76, 0.3); color: var(--nx-status-live, #3C6B4C); border-radius: var(--nx-radius-md, 12px); padding: 12px 18px; margin-bottom: 20px; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--nx-shadow-sm);">
             <div style="display: flex; align-items: center; gap: 8px;">
-                <span>✅</span>
+                <span class="material-symbols-rounded" style="font-size: 18px;">check_circle</span>
                 <span>{{ session('success') }}</span>
             </div>
-            <button onclick="this.parentElement.remove()" style="background: none; border: none; font-size: 16px; cursor: pointer; color: #2E6B40;">✕</button>
+            <button onclick="this.parentElement.remove()" style="background: none; border: none; font-size: 16px; cursor: pointer; color: var(--nx-status-live, #3C6B4C); display: flex; align-items: center;">
+                <span class="material-symbols-rounded" style="font-size: 18px;">close</span>
+            </button>
         </div>
         @endif
 
         @if(session('error'))
-        <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); color: #D96B5F; border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; font-weight: 800; font-size: 13px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-soft-3d);">
+        <div style="background: rgba(154, 88, 39, 0.12); border: 1px solid rgba(154, 88, 39, 0.3); color: var(--nx-status-attention, #9A5827); border-radius: var(--nx-radius-md, 12px); padding: 12px 18px; margin-bottom: 20px; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--nx-shadow-sm);">
             <div style="display: flex; align-items: center; gap: 8px;">
-                <span>⚠️</span>
+                <span class="material-symbols-rounded" style="font-size: 18px;">warning</span>
                 <span>{{ session('error') }}</span>
             </div>
-            <button onclick="this.parentElement.remove()" style="background: none; border: none; font-size: 16px; cursor: pointer; color: #D96B5F;">✕</button>
+            <button onclick="this.parentElement.remove()" style="background: none; border: none; font-size: 16px; cursor: pointer; color: var(--nx-status-attention, #9A5827); display: flex; align-items: center;">
+                <span class="material-symbols-rounded" style="font-size: 18px;">close</span>
+            </button>
         </div>
         @endif
 
