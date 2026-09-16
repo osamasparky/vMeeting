@@ -6,6 +6,24 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+/* Tailwind theme bridge — UlaSpace utilities (bg-page, text-ink, ...) resolve
+   to the ula tokens in ulaspace-tokens.css. Additive: existing utilities
+   built on the brand/bg/text palette below are untouched. */
+@theme {
+  --color-page: var(--ula-surface-page);
+  --color-card: var(--ula-surface-card);
+  --color-raised: var(--ula-surface-raised);
+  --color-ink: var(--ula-text-primary);
+  --color-body: var(--ula-text-body);
+  --color-muted: var(--ula-text-muted);
+  --color-accent: var(--ula-accent-default);
+  --color-highlight: var(--ula-highlight-default);
+  --color-line: var(--ula-border-subtle);
+  --font-ar: var(--ula-font-ar);
+  --font-en: var(--ula-font-en);
+  --font-mono: var(--ula-font-mono);
+}
+
 :root {
   /* ── 1. Color Palette (HSL Architecture) ── */
   --brand-500: hsl(228, 89%, 60%);

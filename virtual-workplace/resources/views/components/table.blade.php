@@ -2,12 +2,12 @@
     'headers' => [],
 ])
 
-<div class="w-full overflow-hidden rounded-[var(--nx-radius-lg)] border border-[var(--nx-border-subtle)] bg-[var(--nx-bg-surface)] shadow-[var(--nx-shadow-sm)]">
+<div class="w-full overflow-hidden rounded-[var(--ula-radius-lg)] border border-[var(--ula-border-subtle)] bg-[var(--ula-surface-card)] shadow-[var(--ula-shadow-xs)]">
     <div class="overflow-x-auto">
         <table class="w-full text-start border-collapse text-[14px]">
             @if(!empty($headers))
                 <thead>
-                    <tr class="border-b border-[var(--nx-border-subtle)] bg-[var(--nx-sand-100)] text-[var(--nx-text-secondary)] font-medium text-[13px]">
+                    <tr class="border-b border-[var(--ula-border-subtle)] bg-[var(--ula-surface-page-alt)] text-[var(--ula-text-secondary)] font-medium text-[13px]">
                         @foreach($headers as $header)
                             <th scope="col" class="px-5 py-3.5 text-start font-semibold select-none">
                                 {{ $header }}
@@ -16,7 +16,7 @@
                     </tr>
                 </thead>
             @endif
-            <tbody class="divide-y divide-[var(--nx-border-subtle)] text-[var(--nx-text-primary)]">
+            <tbody class="divide-y divide-[var(--ula-border-subtle)] text-[var(--ula-text-primary)]">
                 {{ $slot }}
             </tbody>
         </table>

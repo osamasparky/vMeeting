@@ -6,54 +6,68 @@
     'href' => null,
     'type' => 'button',
     'disabled' => false,
-    'pill' => true,
+    'loading' => false,
+    'pill' => false,       // Figma buttons use radius 10/14/18; set true for a pill
 ])
 
 @php
-    $baseClasses = 'inline-flex items-center justify-center font-medium transition-all duration-200 select-none cursor-pointer focus:outline-none disabled:opacity-45 disabled:pointer-events-none disabled:cursor-not-allowed';
-    
-    // Sizing
+    /* Figma: Button Primary/Secondary/Ghost/Danger — Small 36h pad-x 16 r10,
+       Medium 44h pad-x 22 r14, Large 52h pad-x 26 r18, gap 8, text Button/* */
+    $baseClasses = 'inline-flex items-center justify-center select-none cursor-pointer border transition-[background-color,border-color,box-shadow,transform] focus:outline-none disabled:pointer-events-none disabled:cursor-not-allowed';
+    $baseClasses .= ' duration-[var(--ula-duration-fast)] ease-[var(--ula-ease-out)]';
+
+    $isGhost = in_array($variant, ['ghost', 'outline']);
+
     $sizeClasses = match($size) {
-        'sm' => 'h-[36px] px-3.5 text-[13px] gap-1.5 font-semibold',
-        'lg' => 'h-[52px] px-6 text-[17px] gap-2.5 font-semibold',
-        default => 'h-[44px] px-5 text-[15px] gap-2 font-semibold',
+        'sm' => ($isGhost ? 'px-3 ' : 'px-4 ') . 'h-[36px] text-[13px] gap-2 font-semibold',
+        'lg' => ($isGhost ? 'px-5 ' : 'px-[26px] ') . 'h-[52px] text-[17px] gap-2 font-semibold',
+        default => ($isGhost ? 'px-[18px] ' : 'px-[22px] ') . 'h-[44px] text-[15px] gap-2 font-semibold',
     };
 
-    // Radii
-    $radiusClass = $pill ? 'rounded-full' : 'rounded-[var(--nx-radius-md)]';
+    $radiusClass = $pill ? 'rounded-[var(--ula-radius-pill)]' : match($size) {
+        'sm' => 'rounded-[var(--ula-radius-sm)]',
+        'lg' => 'rounded-[18px]',
+        default => 'rounded-[var(--ula-radius-md)]',
+    };
 
-    // Variants
+    $disabledClasses = 'disabled:bg-[var(--ula-surface-sunken)] disabled:border-[var(--ula-border-subtle)] disabled:text-[var(--ula-text-muted)] disabled:shadow-none';
+
     $variantClasses = match($variant) {
-        'secondary' => 'bg-[var(--nx-sand-200)] text-[var(--nx-palm-900)] hover:bg-[var(--nx-sand-300)] active:scale-[0.98] border border-[var(--nx-border-subtle)]',
-        'outline' => 'bg-transparent text-[var(--nx-palm-900)] border border-[var(--nx-border-default)] hover:border-[var(--nx-border-strong)] hover:bg-[var(--nx-bg-surface-hover)] active:scale-[0.98]',
-        'ghost' => 'bg-transparent text-[var(--nx-text-primary)] hover:bg-[var(--nx-bg-surface-hover)] active:scale-[0.98]',
-        'danger' => 'bg-[var(--nx-terracotta-500)] text-white hover:brightness-110 active:scale-[0.98] shadow-[var(--nx-shadow-sm)]',
-        'nav-cta' => 'bg-[#ede6d9] text-[#142b24] hover:bg-[#f9f6ef] active:scale-[0.98] font-medium shadow-[var(--nx-shadow-sm)]',
-        default => 'bg-[var(--nx-palm-900)] text-[#ffffff] hover:bg-[var(--nx-palm-700)] active:scale-[0.98] shadow-[var(--nx-shadow-sm)] hover:shadow-[var(--nx-shadow-md)] hover:-translate-y-[1px]',
+        'secondary' => 'bg-[var(--ula-surface-card)] border-[var(--ula-border-strong)] text-[var(--ula-text-strong)] hover:bg-[var(--ula-surface-hover)] hover:border-[var(--ula-border-hover)] active:bg-[var(--ula-surface-pressed)]',
+        'outline' => 'bg-transparent border-[var(--ula-border-default)] text-[var(--ula-text-strong)] hover:bg-[var(--ula-surface-hover)] hover:border-[var(--ula-border-hover)] active:bg-[var(--ula-surface-pressed)]',
+        'ghost' => 'bg-transparent border-transparent text-[var(--ula-text-link)] hover:bg-[var(--ula-surface-accent-soft)] active:bg-[var(--ula-surface-pressed)]',
+        'danger' => 'bg-[var(--ula-status-danger)] border-[var(--ula-status-danger)] text-[var(--ula-text-on-accent)] hover:bg-[var(--ula-status-danger-hover)] hover:border-[var(--ula-status-danger-hover)]',
+        'nav-cta' => 'bg-[var(--ula-control-cta-on-dark)] border-transparent text-[var(--ula-text-on-cta)] font-medium hover:bg-[var(--ula-control-cta-on-dark-hover)] shadow-[var(--ula-shadow-xs)]',
+        default => 'bg-[var(--ula-accent-default)] border-[var(--ula-accent-default)] text-[var(--ula-accent-fg)] hover:bg-[var(--ula-accent-hover)] hover:border-[var(--ula-accent-hover)] active:bg-[var(--ula-accent-press)] shadow-[var(--ula-shadow-xs)]',
     };
 
-    $focusClass = 'focus-visible:ring-2 focus-visible:ring-[var(--nx-accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--nx-bg-surface)]';
-    $classes = "{$baseClasses} {$sizeClasses} {$radiusClass} {$variantClasses} {$focusClass}";
+    $focusClass = 'focus-visible:shadow-[var(--ula-focus-ring)]';
+    $classes = "{$baseClasses} {$sizeClasses} {$radiusClass} {$variantClasses} {$disabledClasses} {$focusClass}";
+    $iconClass = 'material-symbols-rounded text-[1.25em] leading-none';
 @endphp
 
 @if($href)
     <a href="{{ $href }}" {{ $attributes->merge(['class' => $classes]) }}>
-        @if($icon && $iconPosition === 'start')
-            <span class="material-symbols-rounded text-[1.2em] leading-none">{{ $icon }}</span>
+        @if($loading)
+            <span class="w-[18px] h-[18px] rounded-full border-2 border-current border-t-transparent animate-spin shrink-0"></span>
+        @elseif($icon && $iconPosition === 'start')
+            <span class="{{ $iconClass }}">{{ $icon }}</span>
         @endif
         <span>{{ $slot }}</span>
-        @if($icon && $iconPosition === 'end')
-            <span class="material-symbols-rounded text-[1.2em] leading-none nx-mirror-rtl">{{ $icon }}</span>
+        @if(!$loading && $icon && $iconPosition === 'end')
+            <span class="{{ $iconClass }} ula-mirror-rtl">{{ $icon }}</span>
         @endif
     </a>
 @else
-    <button type="{{ $type }}" {{ $disabled ? 'disabled' : '' }} {{ $attributes->merge(['class' => $classes]) }}>
-        @if($icon && $iconPosition === 'start')
-            <span class="material-symbols-rounded text-[1.2em] leading-none">{{ $icon }}</span>
+    <button type="{{ $type }}" {{ ($disabled || $loading) ? 'disabled' : '' }} {{ $attributes->merge(['class' => $classes]) }}>
+        @if($loading)
+            <span class="w-[18px] h-[18px] rounded-full border-2 border-current border-t-transparent animate-spin shrink-0"></span>
+        @elseif($icon && $iconPosition === 'start')
+            <span class="{{ $iconClass }}">{{ $icon }}</span>
         @endif
         <span>{{ $slot }}</span>
-        @if($icon && $iconPosition === 'end')
-            <span class="material-symbols-rounded text-[1.2em] leading-none nx-mirror-rtl">{{ $icon }}</span>
+        @if(!$loading && $icon && $iconPosition === 'end')
+            <span class="{{ $iconClass }} ula-mirror-rtl">{{ $icon }}</span>
         @endif
     </button>
 @endif

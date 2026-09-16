@@ -15,6 +15,7 @@
     <!-- Design System CSS -->
     <link rel="stylesheet" href="{{ asset('css/ulaspace-tokens.css') }}">
     <link rel="stylesheet" href="{{ asset('css/modern-design-system.css') }}">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Three.js for 3D Spatial Canvas -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" nonce="{{ $cspNonce ?? '' }}"></script>

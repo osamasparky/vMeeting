@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="{{ asset('css/ulaspace-tokens.css') }}">
     <link rel="stylesheet" href="{{ asset('css/ulaspace-dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/modern-design-system.css') }}">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         :root {

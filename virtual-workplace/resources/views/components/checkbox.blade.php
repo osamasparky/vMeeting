@@ -11,20 +11,20 @@
     $inputId = $id ?? ($name ?? 'checkbox_' . uniqid());
 @endphp
 
-<label for="{{ $inputId }}" class="inline-flex items-center gap-2.5 cursor-pointer select-none group text-[14px] text-[var(--nx-text-primary)] {{ $disabled ? 'opacity-50 cursor-not-allowed' : '' }}">
+{{-- Figma: Checkbox — box 20px, radius 6, border 1.5 border/strong, checked accent/default, gap 11 --}}
+<label for="{{ $inputId }}" class="inline-flex items-center gap-[11px] cursor-pointer select-none group text-[15px] text-[var(--ula-text-primary)] {{ $disabled ? 'opacity-50 cursor-not-allowed' : '' }}">
     <div class="relative flex items-center justify-center">
-        <input 
-            type="checkbox" 
-            id="{{ $inputId }}" 
-            name="{{ $name }}" 
+        <input
+            type="checkbox"
+            id="{{ $inputId }}"
+            name="{{ $name }}"
             value="{{ $value }}"
             {{ $checked ? 'checked' : '' }}
             {{ $disabled ? 'disabled' : '' }}
             {{ $attributes->merge(['class' => 'peer sr-only']) }}
         >
-        <!-- Custom Box -->
-        <div class="w-5 h-5 rounded-[var(--nx-radius-xs)] border-[1.5px] border-[var(--nx-border-strong)] bg-[var(--nx-bg-surface)] transition-all duration-150 peer-checked:bg-[var(--nx-accent)] peer-checked:border-[var(--nx-accent)] peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--nx-accent)] peer-focus-visible:ring-offset-2 flex items-center justify-center text-white">
-            <span class="material-symbols-rounded text-[15px] opacity-0 peer-checked:opacity-100 font-bold transition-opacity duration-150">
+        <div class="w-5 h-5 rounded-[var(--ula-radius-xs)] border-[1.5px] border-[var(--ula-border-strong)] bg-[var(--ula-surface-page)] transition-[background-color,border-color] duration-[var(--ula-duration-fast)] ease-[var(--ula-ease-out)] peer-checked:bg-[var(--ula-accent-default)] peer-checked:border-[var(--ula-accent-default)] peer-focus-visible:shadow-[var(--ula-focus-ring)] flex items-center justify-center text-[var(--ula-accent-fg)]">
+            <span class="material-symbols-rounded text-[15px] opacity-0 peer-checked:opacity-100 font-bold transition-opacity duration-[var(--ula-duration-instant)]">
                 check
             </span>
         </div>

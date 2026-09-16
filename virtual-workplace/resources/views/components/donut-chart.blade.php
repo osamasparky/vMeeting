@@ -3,8 +3,8 @@
     'size' => 'default',  // default (112px), lg (126px), sm (80px)
     'label' => null,      // e.g. "78%"
     'caption' => null,    // sub-label under percentage
-    'accentColor' => 'var(--nx-accent)',
-    'trackColor' => 'var(--nx-stone-track)',
+    'accentColor' => 'var(--ula-highlight-default)',
+    'trackColor' => 'var(--ula-control-track-off)',
 ])
 
 @php
@@ -55,17 +55,17 @@
             stroke-dasharray="{{ $circumference }}"
             stroke-dashoffset="{{ $offset }}"
             stroke-linecap="round"
-            class="transition-all duration-700 ease-out"
+            class="transition-[stroke-dashoffset] duration-[var(--ula-duration-ambient)] ease-[var(--ula-ease-out)]"
         />
     </svg>
 
     <!-- Center content -->
     <div class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-        <span class="font-semibold text-[var(--nx-text-primary)] {{ $textSize }} font-['IBM_Plex_Sans_Arabic',sans-serif] leading-none">
+        <span class="font-semibold text-[var(--ula-text-primary)] {{ $textSize }} font-[family-name:var(--ula-font-ar)] leading-none">
             {{ $displayLabel }}
         </span>
         @if($caption)
-            <span class="text-[10px] text-[var(--nx-text-secondary)] font-normal mt-1 leading-tight max-w-[80%]">
+            <span class="text-[10px] text-[var(--ula-text-secondary)] font-normal mt-1 leading-tight max-w-[80%]">
                 {{ $caption }}
             </span>
         @endif

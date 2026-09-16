@@ -6,33 +6,39 @@
 ])
 
 @php
+    /* Figma: Tag — pill, 29h, pad-x 12, gap 6, dot 7px, tonal fill, no border.
+       Chip (variant "filter") — pill, 36h, pad-x 16, surface/card + border. */
+    $isChip = $variant === 'filter';
+
     $variantClass = match($variant) {
-        'live' => 'bg-[var(--nx-status-live-bg)] text-[var(--nx-status-live)] border-[rgba(60,107,76,0.2)]',
-        'scheduled' => 'bg-[var(--nx-status-scheduled-bg)] text-[var(--nx-gold-600)] border-[rgba(211,165,83,0.3)]',
-        'attention' => 'bg-[var(--nx-status-attention-bg)] text-[var(--nx-status-attention)] border-[rgba(154,88,39,0.25)]',
-        'cancelled' => 'bg-[var(--nx-status-cancelled-bg)] text-[var(--nx-status-cancelled)] border-[rgba(142,135,124,0.25)]',
-        'accent' => 'bg-[var(--nx-gold-200)] text-[var(--nx-palm-900)] border-[rgba(211,165,83,0.3)]',
-        'filter' => 'bg-[var(--nx-bg-surface)] text-[var(--nx-text-primary)] border-[var(--nx-border-default)] hover:border-[var(--nx-border-strong)]',
-        default => 'bg-[var(--nx-sand-200)] text-[var(--nx-text-secondary)] border-[var(--nx-border-subtle)]',
+        'live' => 'bg-[var(--ula-tone-palm-bg)] text-[var(--ula-tone-palm-fg)]',
+        'scheduled' => 'bg-[var(--ula-tone-gold-bg)] text-[var(--ula-tone-gold-fg)]',
+        'attention' => 'bg-[var(--ula-tone-terracotta-bg)] text-[var(--ula-tone-terracotta-fg)]',
+        'cancelled' => 'bg-[var(--ula-tone-stone-bg)] text-[var(--ula-tone-stone-fg)]',
+        'accent' => 'bg-[var(--ula-highlight-default)] text-[var(--ula-text-on-gold)]',
+        'filter' => 'bg-[var(--ula-surface-card)] text-[var(--ula-text-body)] border border-[var(--ula-border-default)] hover:bg-[var(--ula-surface-hover)] hover:border-[var(--ula-border-hover)]',
+        default => 'bg-[var(--ula-tone-sand-bg)] text-[var(--ula-tone-sand-fg)]',
     };
 
     $dotColor = match($variant) {
-        'live' => 'bg-[var(--nx-status-live)]',
-        'scheduled' => 'bg-[var(--nx-status-scheduled)]',
-        'attention' => 'bg-[var(--nx-status-attention)]',
-        'cancelled' => 'bg-[var(--nx-status-cancelled)]',
-        default => 'bg-[var(--nx-accent)]',
+        'live' => 'bg-[var(--ula-tone-palm-dot)]',
+        'scheduled' => 'bg-[var(--ula-tone-gold-dot)]',
+        'attention' => 'bg-[var(--ula-tone-terracotta-dot)]',
+        'cancelled' => 'bg-[var(--ula-tone-stone-dot)]',
+        default => 'bg-[var(--ula-highlight-default)]',
     };
 
-    $sizeClass = $size === 'sm' ? 'px-2 py-0.5 text-[11px] gap-1' : 'px-2.5 py-1 text-[12px] gap-1.5';
+    $sizeClass = $isChip
+        ? 'h-[36px] px-4 text-[15px] gap-2'
+        : ($size === 'sm' ? 'h-[24px] px-2.5 text-[12px] gap-1.5' : 'h-[29px] px-3 text-[13px] gap-1.5');
 @endphp
 
-<span {{ $attributes->merge(['class' => "inline-flex items-center justify-center font-semibold rounded-full border {$sizeClass} {$variantClass} select-none leading-none"]) }}>
+<span {{ $attributes->merge(['class' => "inline-flex items-center justify-center font-medium rounded-[var(--ula-radius-pill)] leading-none select-none transition-[background-color,border-color] duration-[var(--ula-duration-fast)] ease-[var(--ula-ease-out)] {$sizeClass} {$variantClass}"]) }}>
     @if($dot)
-        <span class="w-1.5 h-1.5 rounded-full {{ $dotColor }} shrink-0"></span>
+        <span class="w-[7px] h-[7px] rounded-full {{ $dotColor }} shrink-0"></span>
     @endif
     @if($icon)
-        <span class="material-symbols-rounded text-[14px] leading-none">{{ $icon }}</span>
+        <span class="material-symbols-rounded text-[16px] leading-none">{{ $icon }}</span>
     @endif
     <span>{{ $slot }}</span>
 </span>

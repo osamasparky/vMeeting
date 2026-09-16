@@ -18,25 +18,25 @@
     };
 
     $variantClass = match($variant) {
-        'elevated' => 'bg-[var(--nx-bg-surface-elevated)] border border-[var(--nx-border-subtle)] shadow-[var(--nx-shadow-md)]',
-        'glass' => 'bg-[var(--nx-bg-capsule)] backdrop-blur-[var(--nx-backdrop-blur)] border border-[var(--nx-border-subtle)] shadow-[var(--nx-shadow-sm)]',
-        'dark' => 'bg-[var(--nx-palm-900)] text-white border border-[var(--nx-border-on-dark)] shadow-[var(--nx-shadow-lg)]',
-        default => 'bg-[var(--nx-bg-surface)] border border-[var(--nx-border-subtle)] shadow-[var(--nx-shadow-sm)]',
+        'elevated' => 'bg-[var(--ula-surface-raised)] border border-[var(--ula-border-subtle)] shadow-[var(--ula-shadow-md)]',
+        'glass' => 'bg-[var(--ula-surface-capsule)] backdrop-blur-[var(--ula-backdrop-blur)] border border-[var(--ula-border-subtle)] shadow-[var(--ula-shadow-sm)]',
+        'dark' => 'bg-[var(--ula-surface-dark)] text-[var(--ula-text-on-dark)] border border-[var(--ula-border-on-dark)] shadow-[var(--ula-shadow-lg)]',
+        default => 'bg-[var(--ula-surface-card)] border border-[var(--ula-border-subtle)] shadow-[var(--ula-shadow-xs)]',
     };
 
-    $hoverClass = $hover ? 'transition-all duration-200 hover:border-[var(--nx-border-strong)] hover:shadow-[var(--nx-shadow-md)] hover:-translate-y-0.5' : 'transition-colors duration-200';
+    $hoverClass = $hover ? 'transition-all duration-200 hover:border-[var(--ula-border-strong)] hover:shadow-[var(--ula-shadow-md)] hover:-translate-y-0.5' : 'transition-colors duration-200';
 @endphp
 
-<div {{ $attributes->merge(['class' => "rounded-[var(--nx-radius-lg)] {$variantClass} {$hoverClass} overflow-hidden"]) }}>
+<div {{ $attributes->merge(['class' => "rounded-[var(--ula-radius-lg)] {$variantClass} {$hoverClass} overflow-hidden"]) }}>
     @if($header || $title)
-        <div class="flex items-center justify-between px-5 py-4 sm:px-6 border-b border-[var(--nx-border-subtle)]">
+        <div class="flex items-center justify-between px-5 py-4 sm:px-6 border-b border-[var(--ula-border-subtle)]">
             @if($title)
                 <div class="flex flex-col">
-                    <h3 class="text-[16px] font-semibold text-[var(--nx-text-primary)] leading-tight">
+                    <h3 class="text-[18px] font-semibold text-[var(--ula-text-primary)] leading-[var(--ula-lh-heading)]">
                         {{ $title }}
                     </h3>
                     @if($subtitle)
-                        <span class="text-[12px] text-[var(--nx-text-muted)] mt-0.5">
+                        <span class="text-[13px] text-[var(--ula-text-secondary)] mt-0.5">
                             {{ $subtitle }}
                         </span>
                     @endif
@@ -58,7 +58,7 @@
     </div>
 
     @if($footer)
-        <div class="px-5 py-3.5 sm:px-6 bg-[var(--nx-sand-100)] border-t border-[var(--nx-border-subtle)]">
+        <div class="px-5 py-3.5 sm:px-6 bg-[var(--ula-surface-page-alt)] border-t border-[var(--ula-border-subtle)]">
             {{ $footer }}
         </div>
     @endif
