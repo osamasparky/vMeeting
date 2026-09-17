@@ -1761,13 +1761,14 @@
                 <button class="mobile-menu-btn" onclick="toggleDashboardSidebar()">
                     <span class="material-symbols-rounded text-[22px]">menu</span>
                 </button>
-                <div class="flex flex-col">
-                    <h1 id="page-primary-title" class="text-[22px] font-semibold text-[var(--nx-text-primary)] leading-tight font-['IBM_Plex_Sans_Arabic',sans-serif]">
-                        {{ __('Dashboard') }}
-                    </h1>
-                    <p id="page-primary-subtitle" class="text-[12px] text-[var(--nx-text-muted)] font-normal mt-0.5">
-                        {{ __('Welcome to your virtual workspace') }}
-                    </p>
+                {{-- The page title used to be duplicated here (App Bar) and again in each
+                     tab's own .page-header. Every tab but "overview" already carries its
+                     own title, so this element only ever repeated it; kept as hidden spans
+                     (not removed) so scripts.blade.php's per-tab title/subtitle swap has
+                     nothing left to break. --}}
+                <div class="hidden">
+                    <h1 id="page-primary-title"></h1>
+                    <p id="page-primary-subtitle"></p>
                 </div>
             </div>
 
