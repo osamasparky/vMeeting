@@ -203,7 +203,12 @@
         }
 
         .nx-footer-links a:hover {
-            color: #ffffff;
+            color: var(--ula-white);
+        }
+
+        .nx-footer-links span {
+            color: var(--ula-sand-400);
+            font-size: 13px;
         }
 
         .nx-footer-bottom {
@@ -339,9 +344,9 @@
             <div class="nx-footer-col">
                 <h4>{{ __('Legal & Privacy') }}</h4>
                 <ul class="nx-footer-links">
-                    <li><a href="#">{{ __('Privacy Policy') }}</a></li>
-                    <li><a href="#">{{ __('Terms of Service') }}</a></li>
-                    <li><a href="#">{{ __('Security & Data Protection') }}</a></li>
+                    <li><span>{{ __('Privacy Policy') }}</span></li>
+                    <li><span>{{ __('Terms of Service') }}</span></li>
+                    <li><span>{{ __('Security & Data Protection') }}</span></li>
                 </ul>
             </div>
         </div>
@@ -351,7 +356,8 @@
                 © {{ date('Y') }} UlaSpace Inc. {{ __('All rights reserved.') }}
             </div>
             <div>
-                <span>🌿 {{ __('Crafted for Next-Gen Remote Teams') }}</span>
+                <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-icon-accent); vertical-align: text-bottom;">eco</span>
+                <span>{{ __('Crafted for Next-Gen Remote Teams') }}</span>
             </div>
         </div>
     </footer>

@@ -218,10 +218,16 @@
                 <div class="nx-hero-preview p-6">
                     <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
                         <div class="flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-[var(--ula-status-success)]"></span>
-                            <span class="text-[12px] font-medium text-[var(--ula-sand-300)]">Floor 1 • Main Headquarters</span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-[var(--ula-tone-palm-dot)]"></span>
+                            <span class="ula-headline-group">
+                                <span class="ula-headline-ar" style="font-size: 12px; color: var(--ula-text-on-dark);">الطابق الأول · المقر الرئيسي</span>
+                                <span class="ula-headline-en" style="font-size: 10px; color: var(--ula-text-on-dark-muted);">Floor 1 · Main Headquarters</span>
+                            </span>
                         </div>
-                        <span class="text-[11px] font-mono text-[var(--ula-sand-400)]">18 Active Members</span>
+                        <span class="ula-headline-group" style="align-items: flex-end;">
+                            <span class="ula-headline-ar" style="font-size: 11px; color: var(--ula-text-on-dark);"><span style="direction: ltr; unicode-bidi: isolate">18</span> عضواً متصلاً</span>
+                            <span class="ula-headline-en" style="font-size: 9px; color: var(--ula-text-on-dark-muted); font-family: var(--ula-font-mono);">18 Active Members</span>
+                        </span>
                     </div>
 
                     <!-- Room capsules preview -->
@@ -229,23 +235,35 @@
                         <div class="p-3.5 rounded-[var(--ula-radius-md)] bg-white/5 border border-white/10 flex flex-col gap-1.5">
                             <div class="flex items-center justify-between">
                                 <span class="text-[13px] font-semibold text-white">قاعة النخيل</span>
-                                <span class="px-1.5 py-0.5 rounded text-[10px] bg-[var(--ula-tone-palm-bg)] text-[var(--ula-status-success)] font-bold">LIVE</span>
+                                <x-badge variant="live" size="sm" dot>مباشر</x-badge>
                             </div>
-                            <span class="text-[11px] text-[var(--ula-sand-400)]">Palm Boardroom • 4 In Call</span>
+                            <span class="ula-headline-group">
+                                <span class="ula-headline-ar" style="font-size: 11px; color: var(--ula-text-on-dark-muted);"><span style="direction: ltr; unicode-bidi: isolate">4</span> في مكالمة</span>
+                                <span class="ula-headline-en" style="font-size: 9px; color: var(--ula-text-on-dark-muted); opacity: 0.75;">Palm Boardroom · 4 In Call</span>
+                            </span>
                         </div>
 
                         <div class="p-3.5 rounded-[var(--ula-radius-md)] bg-white/5 border border-white/10 flex flex-col gap-1.5">
                             <div class="flex items-center justify-between">
                                 <span class="text-[13px] font-semibold text-white">مساحة الابتكار</span>
-                                <span class="px-1.5 py-0.5 rounded text-[10px] bg-[var(--ula-tone-gold-bg)] text-[var(--ula-gold-600)] font-bold">OPEN</span>
+                                <x-badge variant="scheduled" size="sm" dot>متاح</x-badge>
                             </div>
-                            <span class="text-[11px] text-[var(--ula-sand-400)]">Innovation Lounge • 2 Desks</span>
+                            <span class="ula-headline-group">
+                                <span class="ula-headline-ar" style="font-size: 11px; color: var(--ula-text-on-dark-muted);">مكتبان متاحان</span>
+                                <span class="ula-headline-en" style="font-size: 9px; color: var(--ula-text-on-dark-muted); opacity: 0.75;">Innovation Lounge · 2 Desks</span>
+                            </span>
                         </div>
                     </div>
 
-                    <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[12px] text-[var(--ula-sand-400)]">
-                        <span>🎙️ Spatial Audio Mesh</span>
-                        <span>⚡ Ultra-low latency WebRTC</span>
+                    <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[12px] text-[var(--ula-text-on-dark-muted)]">
+                        <span class="flex items-center gap-1.5">
+                            <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-icon-accent);">graphic_eq</span>
+                            {{ __('Spatial Audio Mesh') }}
+                        </span>
+                        <span class="flex items-center gap-1.5">
+                            <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-icon-highlight);">bolt</span>
+                            {{ __('Ultra-low latency WebRTC') }}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -338,8 +356,75 @@
         </div>
     </section>
 
-    <!-- ── 4. Final Call-to-Action ── -->
-    <section id="pricing" class="py-20 px-6 text-center max-w-4xl mx-auto">
+    <!-- ── 4. Pricing (Figma Component: Plan Cards, reusing register.blade.php's $plans) ── -->
+    <section id="pricing" class="py-20 px-6">
+        <div class="nx-section-header">
+            <x-badge variant="accent" :dot="true" class="mb-3">
+                {{ __('الباقات والأسعار') }}
+            </x-badge>
+            <h2 class="text-[34px] font-semibold text-[var(--ula-text-primary)] leading-tight mb-3 font-['IBM_Plex_Sans_Arabic',sans-serif]">
+                باقة تناسب حجم فريقك
+            </h2>
+            <p class="text-[15px] text-[var(--ula-text-secondary)]">
+                {{ __('Start free, upgrade any time as your team grows.') }}
+            </p>
+        </div>
+
+        @php
+            $planNameAr = ['Free' => 'مجاني', 'Starter' => 'مبتدئ', 'Business' => 'أعمال', 'Enterprise' => 'مؤسسات'];
+            $planHighlight = [
+                'free' => ['دردشة وصوت أساسي', 'مكتب افتراضي واحد'],
+                'starter' => ['مكالمات فيديو', 'مشاركة الشاشة'],
+                'business' => ['تحليلات الأداء', 'علامة تجارية مخصصة'],
+                'enterprise' => ['دخول موحد (SSO)', 'دعم ذو أولوية'],
+            ];
+        @endphp
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
+            @foreach($plans as $plan)
+                <x-card
+                    variant="{{ $plan->slug === 'business' ? 'elevated' : 'default' }}"
+                    padding="lg"
+                    hover
+                    class="{{ $plan->slug === 'business' ? 'ring-2 ring-[var(--ula-accent-default)]' : '' }} flex flex-col"
+                >
+                    @if($plan->slug === 'business')
+                        <x-badge variant="scheduled" size="sm" class="self-start mb-3">{{ __('الأكثر شيوعاً') }}</x-badge>
+                    @endif
+
+                    <div class="ula-headline-group mb-4">
+                        <span class="ula-headline-ar" style="font-size: 19px;">{{ $planNameAr[$plan->name] ?? $plan->name }}</span>
+                        <span class="ula-headline-en" style="font-size: 12px;">{{ $plan->name }}</span>
+                    </div>
+
+                    <div class="mb-5" style="direction: ltr; unicode-bidi: isolate;">
+                        <span class="text-[28px] font-bold text-[var(--ula-text-primary)]" style="font-family: var(--ula-font-mono);">${{ number_format($plan->price, 0) }}</span>
+                        <span class="text-[13px] text-[var(--ula-text-muted)]">/mo</span>
+                    </div>
+
+                    <ul class="flex flex-col gap-2.5 mb-6 flex-1">
+                        <li class="flex items-center gap-2 text-[13px] text-[var(--ula-text-body)]">
+                            <span class="material-symbols-rounded text-[16px]" style="color: var(--ula-icon-accent);">group</span>
+                            <span><span style="direction: ltr; unicode-bidi: isolate">{{ $plan->seat_limit === 0 ? '∞' : $plan->seat_limit }}</span> {{ __('مقعداً') }}</span>
+                        </li>
+                        @foreach($planHighlight[$plan->slug] ?? [] as $line)
+                            <li class="flex items-center gap-2 text-[13px] text-[var(--ula-text-body)]">
+                                <span class="material-symbols-rounded text-[16px]" style="color: var(--ula-icon-accent);">check_circle</span>
+                                <span>{{ $line }}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+
+                    <x-btn href="{{ route('register') }}" variant="{{ $plan->slug === 'business' ? 'primary' : 'outline' }}" size="md" class="w-full">
+                        <span>{{ __('ابدأ الآن') }}</span>
+                    </x-btn>
+                </x-card>
+            @endforeach
+        </div>
+    </section>
+
+    <!-- ── 5. Final Call-to-Action ── -->
+    <section class="py-20 px-6 text-center max-w-4xl mx-auto">
         <h2 class="text-[36px] font-semibold text-[var(--ula-text-primary)] mb-4 font-['IBM_Plex_Sans_Arabic',sans-serif]">
             جاهز لنقل فريقك إلى بيئة عمل المستقبل؟
         </h2>
