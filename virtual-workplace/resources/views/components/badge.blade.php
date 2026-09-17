@@ -33,7 +33,7 @@
         : ($size === 'sm' ? 'h-[24px] px-2.5 text-[12px] gap-1.5' : 'h-[29px] px-3 text-[13px] gap-1.5');
 @endphp
 
-<span {{ $attributes->merge(['class' => "inline-flex items-center justify-center font-medium rounded-[var(--ula-radius-pill)] leading-none select-none transition-[background-color,border-color] duration-[var(--ula-duration-fast)] ease-[var(--ula-ease-out)] {$sizeClass} {$variantClass}"]) }}>
+<span {{ $attributes->merge(['class' => "inline-flex items-center justify-center whitespace-nowrap font-medium rounded-[var(--ula-radius-pill)] leading-none select-none transition-[background-color,border-color] duration-[var(--ula-duration-fast)] ease-[var(--ula-ease-out)] {$sizeClass} {$variantClass}"]) }}>
     @if($dot)
         <span class="w-[7px] h-[7px] rounded-full {{ $dotColor }} shrink-0"></span>
     @endif

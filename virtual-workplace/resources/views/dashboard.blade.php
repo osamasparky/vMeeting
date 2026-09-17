@@ -1756,24 +1756,21 @@
         @endif
 
         <!-- Top App Bar Navigation Header (Figma App Bar Component) -->
-        <div class="flex items-center justify-between mb-6 gap-4 flex-wrap">
-            <div class="flex items-center gap-3.5">
+        <div class="grid grid-cols-[auto_1fr_auto] items-center mb-6 gap-4">
+            <div class="flex items-center gap-3.5 min-w-0">
                 <button class="mobile-menu-btn" onclick="toggleDashboardSidebar()">
                     <span class="material-symbols-rounded text-[22px]">menu</span>
                 </button>
-                {{-- The page title used to be duplicated here (App Bar) and again in each
-                     tab's own .page-header. Every tab but "overview" already carries its
-                     own title, so this element only ever repeated it; kept as hidden spans
-                     (not removed) so scripts.blade.php's per-tab title/subtitle swap has
-                     nothing left to break. --}}
-                <div class="hidden">
-                    <h1 id="page-primary-title"></h1>
-                    <p id="page-primary-subtitle"></p>
-                </div>
+                {{-- Compact, single-line page title — replaces each tab's own big
+                     <h1>, which duplicated this same text underneath. Text is swapped
+                     per tab by scripts.blade.php; #page-primary-subtitle stays unused
+                     (each tab keeps its own longer subtitle in its .page-header). --}}
+                <h1 id="page-primary-title" class="text-[15px] font-semibold text-[var(--ula-text-primary)] whitespace-nowrap font-['IBM_Plex_Sans_Arabic',sans-serif]">{{ __('Dashboard') }}</h1>
+                <p id="page-primary-subtitle" class="hidden"></p>
             </div>
 
-            <!-- Search Field (Figma: h46, radius-md, border-default) -->
-            <div class="flex-1 max-w-[380px] relative flex items-center">
+            <!-- Search Field (Figma: h46, radius-md, border-default) — centered in the row -->
+            <div class="w-full max-w-[380px] mx-auto relative flex items-center">
                 <span class="material-symbols-rounded absolute inset-inline-start-4 text-[20px] text-[var(--ula-icon-secondary)] pointer-events-none">search</span>
                 <input type="text" class="w-full h-[46px] bg-[var(--ula-surface-page)] border border-[var(--ula-border-default)] rounded-[var(--ula-radius-md)] px-4 ps-11 text-[14px] font-normal text-[var(--ula-text-primary)] placeholder-[var(--ula-text-muted)] focus:border-[var(--ula-border-focus)] focus:shadow-[var(--ula-focus-ring)] focus:outline-none transition-colors" placeholder="{{ __('Search people, rooms, files...') }}" id="globalSearchInput" onkeyup="handleGlobalSearch(this.value)">
             </div>

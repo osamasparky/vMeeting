@@ -13,7 +13,7 @@
 @php
     /* Figma: Button Primary/Secondary/Ghost/Danger — Small 36h pad-x 16 r10,
        Medium 44h pad-x 22 r14, Large 52h pad-x 26 r18, gap 8, text Button/* */
-    $baseClasses = 'inline-flex items-center justify-center select-none cursor-pointer border transition-[background-color,border-color,box-shadow,transform] focus:outline-none disabled:pointer-events-none disabled:cursor-not-allowed';
+    $baseClasses = 'inline-flex items-center justify-center whitespace-nowrap select-none cursor-pointer border transition-[background-color,border-color,box-shadow,transform] focus:outline-none disabled:pointer-events-none disabled:cursor-not-allowed';
     $baseClasses .= ' duration-[var(--ula-duration-fast)] ease-[var(--ula-ease-out)]';
 
     $isGhost = in_array($variant, ['ghost', 'outline']);

@@ -1,9 +1,5 @@
 <div id="tab-workload" class="tab-view">
     <div class="page-header" style="margin-bottom: var(--ula-space-7);">
-        <h1 class="page-title" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); margin-bottom: var(--ula-space-2); display: flex; align-items: center; gap: var(--ula-space-3);">
-            <span class="material-symbols-rounded" style="font-size: 28px; color: var(--ula-accent-default);">stacked_bar_chart</span>
-            <span>{{ __('Team Capacity & Workload Matrix') }}</span>
-        </h1>
         <p class="page-subtitle" style="font-size: var(--ula-size-sm); color: var(--ula-text-secondary);">{{ __('Monitor weekly employee availability, assigned hours, and capacity utilization.') }}</p>
     </div>
 
