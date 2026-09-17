@@ -22,7 +22,7 @@
     <div class="auth-left">
         <div class="auth-card">
             <div class="auth-logo">
-                <div class="logo-icon" style="background: var(--ula-palm-900, #142B24); border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; box-shadow: var(--ula-shadow-sm); padding: 6px;">
+                <div class="logo-icon" style="background: var(--ula-palm-900); border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; box-shadow: var(--ula-shadow-sm); padding: 6px;">
                     <img src="{{ asset('images/ulaspace-icon.png') }}" alt="UlaSpace" style="width: 26px; height: auto; object-fit: contain;">
                 </div>
                 <div>

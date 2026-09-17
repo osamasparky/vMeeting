@@ -85,8 +85,8 @@
             align-items: center;
             justify-content: center;
             padding: 60px;
-            background: linear-gradient(145deg, #142B24 0%, #1B3223 50%, #0e1c17 100%);
-            color: var(--ula-sand-100, #f9f6ef);
+            background: linear-gradient(145deg, var(--ula-palm-900) 0%, var(--ula-palm-800) 50%, var(--ula-palm-950) 100%);
+            color: var(--ula-sand-100);
             position: relative;
             overflow: hidden;
         }
@@ -114,9 +114,9 @@
             max-width: 460px;
             background: var(--ula-surface-card);
             border: 1px solid var(--ula-border-subtle);
-            border-radius: var(--ula-radius-xl, 20px);
+            border-radius: var(--ula-radius-xl);
             padding: 40px 32px;
-            box-shadow: var(--ula-shadow-md, 0 8px 24px -8px rgba(27, 50, 35, 0.12));
+            box-shadow: var(--ula-shadow-md);
             animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -135,12 +135,12 @@
         .logo-icon {
             width: 42px;
             height: 42px;
-            background: linear-gradient(135deg, #142B24 0%, #1E412F 100%);
-            border-radius: var(--ula-radius-md, 12px);
+            background: linear-gradient(135deg, var(--ula-palm-900) 0%, var(--ula-palm-700) 100%);
+            border-radius: var(--ula-radius-md);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #FFFFFF;
+            color: var(--ula-white);
             box-shadow: var(--ula-shadow-sm);
         }
 
@@ -206,7 +206,7 @@
             padding-inline-start: 42px;
             background: var(--ula-surface-page);
             border: 1px solid var(--ula-border-subtle);
-            border-radius: var(--ula-radius-md, 12px);
+            border-radius: var(--ula-radius-md);
             color: var(--ula-text-primary);
             font-size: 14px;
             font-weight: 500;
@@ -303,7 +303,7 @@
 
         .alert {
             padding: 12px 16px;
-            border-radius: var(--ula-radius-md, 12px);
+            border-radius: var(--ula-radius-md);
             font-size: 13px;
             font-weight: 600;
             margin-bottom: 20px;
@@ -339,11 +339,11 @@
             margin: 0 auto 24px;
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: var(--ula-radius-xl, 20px);
+            border-radius: var(--ula-radius-xl);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--ula-sand-300, #EADCC9);
+            color: var(--ula-sand-300);
         }
         .brand-panel-icon .material-symbols-rounded {
             font-size: 38px;
@@ -352,11 +352,11 @@
             font-size: 28px;
             font-weight: 800;
             margin-bottom: 14px;
-            color: var(--ula-sand-100, #f9f6ef);
+            color: var(--ula-sand-100);
             letter-spacing: -0.3px;
         }
         .brand-description {
-            color: var(--ula-sand-400, #E3D2BB);
+            color: var(--ula-sand-400);
             font-size: 15px;
             line-height: 1.7;
             font-weight: 400;
@@ -367,7 +367,7 @@
             border: 1px solid var(--ula-border-subtle);
             color: var(--ula-text-primary);
             padding: 8px 14px;
-            border-radius: var(--ula-radius-md, 12px);
+            border-radius: var(--ula-radius-md);
             font-size: 13px;
             text-decoration: none;
             font-weight: 700;
@@ -386,13 +386,50 @@
             width: 18px;
             height: 18px;
             border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: white;
+            border-top-color: var(--ula-white);
             border-radius: 50%;
             animation: spinnerRotate 0.6s linear infinite;
             display: none;
         }
         .btn-loading .spinner { display: block; }
         .btn-loading .btn-text { display: none; }
+
+        /* Submit buttons (login/register): .nx-btn--primary has no rule of its
+           own in the regenerated ulaspace-tokens.css (it isn't a Figma token,
+           it's this page's own primary-action treatment), so it lives here. */
+        .nx-btn.nx-btn--primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--ula-space-3, 8px);
+            border: 1px solid transparent;
+            border-radius: var(--ula-radius-md);
+            font-family: var(--font-ar);
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color var(--ula-duration-fast) var(--ula-ease-out), border-color var(--ula-duration-fast) var(--ula-ease-out);
+            background: var(--ula-accent-default);
+            border-color: var(--ula-accent-default);
+            color: var(--ula-accent-fg);
+        }
+        .nx-btn.nx-btn--primary:hover {
+            background: var(--ula-accent-hover);
+            border-color: var(--ula-accent-hover);
+        }
+        .nx-btn.nx-btn--primary:active {
+            background: var(--ula-accent-press);
+            border-color: var(--ula-accent-press);
+        }
+        .nx-btn.nx-btn--primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .nx-btn.nx-btn--primary:focus-visible {
+            box-shadow: var(--ula-focus-ring);
+            outline: none;
+        }
 
         @keyframes spinnerRotate {
             to { transform: rotate(360deg); }
