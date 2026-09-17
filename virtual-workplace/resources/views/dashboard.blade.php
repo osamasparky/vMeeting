@@ -8,8 +8,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/ulaspace-tokens.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/ulaspace-dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/modern-design-system.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/ulaspace-dashboard.css') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" nonce="{{ $cspNonce ?? '' }}"></script>
     <style>
@@ -207,10 +207,6 @@
             border-color: #26382B !important;
         }
         [data-theme="dark"] .card {
-            background: #101C15;
-            border-color: #26382B;
-        }
-        [data-theme="dark"] .kpi-card {
             background: #101C15;
             border-color: #26382B;
         }
@@ -886,87 +882,10 @@
             .kpi-grid { grid-template-columns: 1fr; }
         }
 
-        .kpi-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-xl);
-            padding: 18px 20px;
-            box-shadow: var(--shadow-card);
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        .kpi-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-hover);
-            border-color: var(--brand-forest);
-        }
-        .kpi-card:hover .icon-box-3d {
-            transform: scale(1.05);
-        }
-        .kpi-info {
-            flex: 1;
-            min-width: 0;
-        }
-        .kpi-title {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-secondary);
-            letter-spacing: -0.1px;
-        }
-        .kpi-value {
-            font-size: 26px;
-            font-weight: 900;
-            color: var(--text-primary);
-            line-height: 1.1;
-            margin: 2px 0 4px 0;
-        }
-        .kpi-sub {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--brand-forest);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        /* Stacked KPI card variant used by several tabs (projects, billing, meetings,
-           timesheets, all-tasks): a kpi-header row (title + icon chip) above the
-           value, instead of the icon-beside-text layout above. */
-        .kpi-card:has(.kpi-header) {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        .kpi-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-        .kpi-icon-box {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            background: linear-gradient(145deg, #437E51 0%, #225433 100%);
-            border: 1px solid #1B4529;
-            color: #FFFFFF !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            box-shadow: 0 4px 12px rgba(34, 84, 51, 0.32), inset 0 1px 1px rgba(255, 255, 255, 0.45);
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-            flex-shrink: 0;
-        }
-        .kpi-trend {
-            font-size: 11px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
+        /* .kpi-card/.kpi-info/.kpi-title/.kpi-value/.kpi-sub/.kpi-header/
+           .kpi-icon-box/.kpi-trend intentionally NOT defined here — this
+           page loads ulaspace-dashboard.css, which now owns the single
+           shared definition for every page rendering .kpi-card markup. */
 
         /* ── Badges ── */
         .badge {

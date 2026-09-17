@@ -12,8 +12,8 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
     <!-- Centralized UlaSpace Design System Tokens -->
     <link rel="stylesheet" href="{{ asset('css/ulaspace-tokens.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/ulaspace-dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/modern-design-system.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/ulaspace-dashboard.css') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
@@ -456,63 +456,16 @@
             margin-bottom: 24px;
         }
 
-        .kpi-card {
-            background: var(--ula-surface-card);
-            border: 1px solid var(--ula-border-subtle);
-            border-radius: var(--ula-radius-lg);
-            padding: 18px 20px;
-            box-shadow: var(--ula-shadow-xs);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: var(--ula-transition-smooth);
-        }
-
-        .kpi-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--ula-shadow-lg);
-            border-color: var(--ula-palm-900);
-        }
-
-        .kpi-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .kpi-title {
-            font-size: 11px;
-            font-weight: 800;
-            color: var(--ula-text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .kpi-icon-box {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            background: linear-gradient(145deg, #437E51 0%, #225433 100%);
-            border: 1px solid #1B4529;
-            color: #FFFFFF !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            box-shadow: 0 4px 12px rgba(34, 84, 51, 0.32), inset 0 1px 1px rgba(255, 255, 255, 0.45);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.25);
-        }
-
-        .kpi-value {
-            font-size: 24px;
-            font-weight: 900;
-            color: var(--ula-text-primary);
-            font-family: 'Inter', sans-serif;
-            margin-bottom: 4px;
-        }
+        /* .kpi-card/.kpi-header/.kpi-title/.kpi-icon-box/.kpi-value intentionally
+           NOT redefined here — this page already loads ulaspace-dashboard.css,
+           which defines all five (plus .kpi-trend) for the whole platform. A
+           local copy here used to shadow it with near-identical but separately
+           maintained values, so this page's cards could silently drift from
+           every other page's the next time only one of the two got edited.
+           (The shared rules used to live only in dashboard.blade.php's own
+           inline <style>, which this page never loads — moved into
+           ulaspace-dashboard.css so it is actually shared, not just assumed
+           to be.) */
 
         /* Navigation Sub Tabs */
         .hub-tabs-nav {
@@ -635,7 +588,7 @@
         .kanban-card {
             background: var(--ula-surface-card);
             border: 1px solid var(--ula-border-subtle);
-            border-radius: var(--ula-radius-sm);
+            border-radius: var(--ula-radius-md);
             padding: 14px;
             box-shadow: var(--ula-shadow-xs);
             margin-bottom: 12px;
@@ -646,8 +599,8 @@
 
         .kanban-card:hover {
             transform: translateY(-2px);
-            border-color: var(--ula-palm-900);
-            box-shadow: var(--ula-shadow-xs);
+            border-color: var(--ula-border-strong);
+            box-shadow: var(--ula-shadow-md);
         }
 
         /* ── ClickUp 3D Tactile Task Context Menu ── */
@@ -1178,13 +1131,13 @@
             <li class="nav-category-title">{{ __('Workspace') }}</li>
             <li>
                 <a href="{{ route('dashboard') }}#overview" class="sidebar-link-btn">
-                    <span class="nav-icon">📊</span>
+                    <span class="nav-icon material-symbols-rounded">dashboard</span>
                     <span class="nav-label-text">{{ __('Dashboard') }}</span>
                 </a>
             </li>
             <li>
                 <a href="{{ route('office') }}" class="sidebar-link-btn" style="background: var(--ula-tone-palm-bg); color: var(--ula-tone-palm-fg);">
-                    <span class="nav-icon">🚀</span>
+                    <span class="nav-icon material-symbols-rounded">view_in_ar</span>
                     <span class="nav-label-text">{{ __('Enter Office') }}</span>
                     <span class="sidebar-badge-pill" style="background: #4F9B5F; color: white;">LIVE</span>
                 </a>
@@ -1194,7 +1147,7 @@
             <li class="nav-category-title">{{ __('Projects & Tasks') }}</li>
             <li>
                 <a href="{{ route('dashboard') }}#projects" class="sidebar-link-btn active">
-                    <span class="nav-icon">📁</span>
+                    <span class="nav-icon material-symbols-rounded">folder</span>
                     <span class="nav-label-text">{{ __('Projects Portfolio') }}</span>
                     <span class="sidebar-badge-pill">{{ $stats['total_projects'] ?? 0 }}</span>
                 </a>
@@ -1202,7 +1155,7 @@
             @if($membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || $membership->role?->slug === 'company_admin')
             <li>
                 <a href="{{ route('dashboard') }}#all-tasks" class="sidebar-link-btn">
-                    <span class="nav-icon">📑</span>
+                    <span class="nav-icon material-symbols-rounded">list_alt</span>
                     <span class="nav-label-text">{{ __('All Tasks') }}</span>
                     <span class="sidebar-badge-pill">{{ $stats['total_tasks'] ?? 0 }}</span>
                 </a>
@@ -1210,27 +1163,27 @@
             @endif
             <li>
                 <a href="{{ route('dashboard') }}#my-tasks" class="sidebar-link-btn">
-                    <span class="nav-icon">⚡</span>
+                    <span class="nav-icon material-symbols-rounded">task_alt</span>
                     <span class="nav-label-text">{{ __('My Tasks') }}</span>
                     <span class="sidebar-badge-pill">{{ $myTasks->count() }}</span>
                 </a>
             </li>
             <li>
                 <a href="{{ route('dashboard') }}#chat" class="sidebar-link-btn">
-                    <span class="nav-icon">💬</span>
+                    <span class="nav-icon material-symbols-rounded">chat</span>
                     <span class="nav-label-text">{{ __('Team Chat & DMs') }}</span>
                     <span class="sidebar-badge-pill" style="background: var(--ula-tone-palm-bg); color: var(--ula-tone-palm-fg);">LIVE</span>
                 </a>
             </li>
             <li>
                 <a href="{{ route('dashboard') }}#timesheets" class="sidebar-link-btn">
-                    <span class="nav-icon">⏱️</span>
+                    <span class="nav-icon material-symbols-rounded">timer</span>
                     <span class="nav-label-text">{{ __('Timesheets & Time') }}</span>
                 </a>
             </li>
             <li>
                 <a href="{{ route('dashboard') }}#meetings" class="sidebar-link-btn">
-                    <span class="nav-icon">📅</span>
+                    <span class="nav-icon material-symbols-rounded">calendar_month</span>
                     <span class="nav-label-text">{{ __('Meetings & Schedule') }}</span>
                     <span class="sidebar-badge-pill">{{ $upcomingProjectMeetings->count() }}</span>
                 </a>
@@ -1245,7 +1198,7 @@
             @if($membership->hasPermission('members.view') || $membership->hasPermission('members.manage'))
             <li>
                 <a href="{{ route('dashboard') }}#members" class="sidebar-link-btn">
-                    <span class="nav-icon">👥</span>
+                    <span class="nav-icon material-symbols-rounded">group</span>
                     <span class="nav-label-text">{{ __('Team Members') }}</span>
                     <span class="sidebar-badge-pill">{{ $stats['active_members'] ?? 0 }}</span>
                 </a>
@@ -1254,7 +1207,7 @@
             @if($membership->hasPermission('rooms.manage'))
             <li>
                 <a href="{{ route('dashboard') }}#rooms" class="sidebar-link-btn">
-                    <span class="nav-icon">🚪</span>
+                    <span class="nav-icon material-symbols-rounded">meeting_room</span>
                     <span class="nav-label-text">{{ __('Meeting Rooms') }}</span>
                     <span class="sidebar-badge-pill">{{ $stats['total_rooms'] ?? 0 }}</span>
                 </a>
@@ -1263,7 +1216,7 @@
             @if($membership->hasPermission('departments.manage') || $membership->hasPermission('teams.manage'))
             <li>
                 <a href="{{ route('dashboard') }}#departments" class="sidebar-link-btn">
-                    <span class="nav-icon">🏛️</span>
+                    <span class="nav-icon material-symbols-rounded">corporate_fare</span>
                     <span class="nav-label-text">{{ __('Departments') }}</span>
                     <span class="sidebar-badge-pill">{{ $stats['total_departments'] ?? 0 }}</span>
                 </a>
@@ -1272,7 +1225,7 @@
             @if($membership->hasPermission('organizations.manage'))
             <li>
                 <a href="{{ route('dashboard') }}#settings" class="sidebar-link-btn">
-                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-icon material-symbols-rounded">settings</span>
                     <span class="nav-label-text">{{ __('Workspace Settings') }}</span>
                 </a>
             </li>
@@ -1283,7 +1236,7 @@
                 <li class="nav-category-title" style="color: #E5B54F;">{{ __('Super Admin') }}</li>
                 <li>
                     <a href="{{ route('superadmin.dashboard') }}" class="sidebar-link-btn" style="color: #E5B54F;">
-                        <span class="nav-icon">👑</span>
+                        <span class="nav-icon material-symbols-rounded">admin_panel_settings</span>
                         <span class="nav-label-text">{{ __('Super Admin Portal') }}</span>
                     </a>
                 </li>
@@ -1366,7 +1319,7 @@
                     </div>
                     <div style="display: flex; align-items: center; gap: 14px;">
                         <span id="hub-live-timer-clock" style="font-size: 20px; font-weight: 900; font-family: monospace; color: var(--ula-palm-900);">00:00:00</span>
-                        <button onclick="stopHubGlobalTimer()" class="tactile-btn" style="background: #FEE2E2; color: #B91C1C; border: 1px solid #FECACA; padding: 6px 14px; font-size: 12px;">
+                        <button onclick="stopHubGlobalTimer()" class="tactile-btn" style="background: var(--ula-terracotta-200); color: var(--ula-terracotta-600); border: 1px solid var(--ula-terracotta-300); padding: 6px 14px; font-size: 12px;">
                             ⏹ {{ __('Stop Timer') }}
                         </button>
                     </div>
@@ -1425,7 +1378,7 @@
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Task Progress') }}</span>
-                        <div class="kpi-icon-box">📊</div>
+                        <div class="kpi-icon-box material-symbols-rounded">bar_chart</div>
                     </div>
                     <div class="kpi-value" style="color: var(--ula-palm-900);">{{ $kpis['progress_pct'] ?? 0 }}%</div>
                     <div style="width: 100%; background: var(--ula-surface-page-alt); height: 7px; border-radius: 9999px; overflow: hidden; margin-bottom: 6px;">
@@ -1443,7 +1396,7 @@
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Actual vs Planned') }}</span>
-                        <div class="kpi-icon-box">⏱️</div>
+                        <div class="kpi-icon-box material-symbols-rounded">timer</div>
                     </div>
                     <div class="kpi-value">{{ $kpis['actual_hours'] ?? 0 }}h</div>
                     <div style="font-size: 11px; color: var(--ula-text-secondary); margin-bottom: 4px;">
@@ -1458,7 +1411,7 @@
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Budget & Cost') }}</span>
-                        <div class="kpi-icon-box">💰</div>
+                        <div class="kpi-icon-box material-symbols-rounded">payments</div>
                     </div>
                     <div class="kpi-value">${{ number_format($kpis['labor_cost'] ?? 0, 2) }}</div>
                     <div style="font-size: 11px; color: var(--ula-text-secondary); margin-bottom: 4px;">
@@ -1473,7 +1426,7 @@
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Revenue & Margin') }}</span>
-                        <div class="kpi-icon-box">📈</div>
+                        <div class="kpi-icon-box material-symbols-rounded">trending_up</div>
                     </div>
                     <div class="kpi-value" style="color: var(--ula-palm-900);">${{ number_format($kpis['billable_revenue'] ?? 0, 2) }}</div>
                     <div style="font-size: 11px; color: var(--ula-text-secondary); margin-bottom: 4px;">
@@ -1488,7 +1441,7 @@
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Sprint Workload') }}</span>
-                        <div class="kpi-icon-box">⚡</div>
+                        <div class="kpi-icon-box material-symbols-rounded">bolt</div>
                     </div>
                     <div class="kpi-value">{{ ($kpis['in_progress_tasks'] ?? 0) + ($kpis['review_tasks'] ?? 0) }}</div>
                     <div style="font-size: 11px; color: var(--ula-text-secondary); margin-bottom: 4px;">
@@ -1503,7 +1456,7 @@
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Team Meetings') }}</span>
-                        <div class="kpi-icon-box">📅</div>
+                        <div class="kpi-icon-box material-symbols-rounded">calendar_month</div>
                     </div>
                     <div class="kpi-value">{{ $upcomingProjectMeetings->count() }}</div>
                     <div style="font-size: 11px; color: var(--ula-palm-900); margin-bottom: 4px; font-weight: 800;">
@@ -2358,7 +2311,7 @@
                                     </td>
                                     <td>
                                         @if($wm['status'] === 'overloaded')
-                                            <span class="badge-pill" style="background: #FEE2E2; color: #B91C1C; border: 1px solid #FECACA;">⚠️ {{ __('Overloaded') }}</span>
+                                            <span class="badge-pill" style="background: var(--ula-terracotta-200); color: var(--ula-terracotta-600); border: 1px solid var(--ula-terracotta-300);">⚠️ {{ __('Overloaded') }}</span>
                                         @elseif($wm['status'] === 'optimal')
                                             <span class="badge-pill badge-green">⚡ {{ __('Optimal') }}</span>
                                         @else
