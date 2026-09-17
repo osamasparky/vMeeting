@@ -798,6 +798,47 @@ body {
   border-color: var(--ula-border-strong);
   box-shadow: var(--ula-shadow-md);
 }
+
+/* --- Legacy button hook (.nx-btn) ---------------------------------------
+   Several pages (login, register, welcome, profile tab) still markup
+   their submit/CTA buttons as `.nx-btn .nx-btn--primary` — that class
+   pair never had a rule anywhere, so those buttons rendered as bare
+   unstyled <button>/<a> elements. Defined once here since the class is
+   loaded on every page via ulaspace-tokens.css. */
+.nx-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ula-space-3);
+  height: 44px;
+  padding: 0 var(--ula-space-7);
+  border: var(--ula-border-width-hairline) solid transparent;
+  border-radius: var(--ula-radius-md);
+  font-family: var(--ula-font-ar);
+  font-size: var(--ula-size-body);
+  font-weight: var(--ula-weight-semibold);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--ula-duration-fast) var(--ula-ease-out),
+              border-color var(--ula-duration-fast) var(--ula-ease-out);
+}
+.nx-btn--primary {
+  background: var(--ula-accent-default);
+  border-color: var(--ula-accent-default);
+  color: var(--ula-accent-fg);
+}
+.nx-btn--primary:hover {
+  background: var(--ula-accent-hover);
+  border-color: var(--ula-accent-hover);
+}
+.nx-btn--primary:active {
+  background: var(--ula-accent-press);
+  border-color: var(--ula-accent-press);
+}
+.nx-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 .ula-glass {
   background: var(--ula-surface-capsule);
   backdrop-filter: var(--ula-backdrop-blur);

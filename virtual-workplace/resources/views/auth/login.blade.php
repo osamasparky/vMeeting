@@ -22,12 +22,12 @@
     <div class="auth-left">
         <div class="auth-card">
             <div class="auth-logo">
-                <div class="logo-icon" style="background: var(--nx-palm-900, #142B24); border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; box-shadow: var(--nx-shadow-sm); padding: 6px;">
+                <div class="logo-icon" style="background: var(--ula-palm-900, #142B24); border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; box-shadow: var(--ula-shadow-sm); padding: 6px;">
                     <img src="{{ asset('images/ulaspace-icon.png') }}" alt="UlaSpace" style="width: 26px; height: auto; object-fit: contain;">
                 </div>
                 <div>
                     <span class="logo-text" style="display: block; line-height: 1.1; font-weight: 800;">UlaSpace</span>
-                    <span style="font-size: 10px; font-weight: 700; color: var(--text-secondary); letter-spacing: 0.5px; text-transform: uppercase;">{{ __('Virtual Workplace') }}</span>
+                    <span style="font-size: 10px; font-weight: 700; color: var(--ula-text-secondary); letter-spacing: 0.5px; text-transform: uppercase;">{{ __('Virtual Workplace') }}</span>
                 </div>
             </div>
 

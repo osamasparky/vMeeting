@@ -22,12 +22,12 @@
     <div class="auth-left" style="max-width: 640px; margin: 0 auto; width: 100%;">
         <div class="auth-card" style="max-width: 580px;">
             <div class="auth-logo">
-                <div class="logo-icon" style="background: var(--nx-palm-900, #142B24); border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; box-shadow: var(--nx-shadow-sm); padding: 6px;">
+                <div class="logo-icon" style="background: var(--ula-palm-900, #142B24); border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; box-shadow: var(--ula-shadow-sm); padding: 6px;">
                     <img src="{{ asset('images/ulaspace-icon.png') }}" alt="UlaSpace" style="width: 26px; height: auto; object-fit: contain;">
                 </div>
                 <div>
                     <span class="logo-text" style="display: block; line-height: 1.1; font-weight: 800;">UlaSpace</span>
-                    <span style="font-size: 10px; font-weight: 700; color: var(--text-secondary); letter-spacing: 0.5px; text-transform: uppercase;">{{ __('Virtual Workplace') }}</span>
+                    <span style="font-size: 10px; font-weight: 700; color: var(--ula-text-secondary); letter-spacing: 0.5px; text-transform: uppercase;">{{ __('Virtual Workplace') }}</span>
                 </div>
             </div>
 
@@ -156,18 +156,18 @@
                         <div
                             class="plan-card-opt {{ $index === 0 ? 'selected' : '' }}"
                             onclick="selectPlan('{{ $plan->id }}', this)"
-                            style="border: 1.5px solid var(--border-color); background: var(--bg-input); border-radius: var(--nx-radius-md, 12px); padding: 12px; cursor: pointer; transition: all 0.2s;"
+                            style="border: 1.5px solid var(--ula-border-subtle); background: var(--ula-surface-page); border-radius: var(--ula-radius-md, 12px); padding: 12px; cursor: pointer; transition: all 0.2s;"
                         >
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
                                 <div style="display: flex; align-items: center; gap: 6px;">
-                                    <span class="material-symbols-rounded" style="font-size: 16px; color: var(--nx-palm-500, #1E412F);">verified</span>
-                                    <strong style="font-size: 13px; color: var(--text-primary);">{{ $plan->name }}</strong>
+                                    <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-palm-700, #1E412F);">verified</span>
+                                    <strong style="font-size: 13px; color: var(--ula-text-primary);">{{ $plan->name }}</strong>
                                 </div>
-                                <span style="font-size: 12px; font-weight: 700; font-family: var(--font-mono); color: var(--status-success);">${{ number_format($plan->price, 0) }}/mo</span>
+                                <span style="font-size: 12px; font-weight: 700; font-family: var(--ula-font-mono); color: var(--ula-status-success);">${{ number_format($plan->price, 0) }}/mo</span>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-secondary); font-weight: 500;">
+                            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--ula-text-secondary); font-weight: 500;">
                                 <span class="material-symbols-rounded" style="font-size: 14px;">group</span>
-                                <span><strong style="font-family: var(--font-mono);">{{ $plan->seat_limit === 0 ? __('Unlimited') : $plan->seat_limit }}</strong> {{ __('Seats') }}</span>
+                                <span><strong style="font-family: var(--ula-font-mono);">{{ $plan->seat_limit === 0 ? __('Unlimited') : $plan->seat_limit }}</strong> {{ __('Seats') }}</span>
                             </div>
                         </div>
                         @endforeach
@@ -191,9 +191,9 @@
 @section('styles')
 <style>
     .plan-card-opt.selected {
-        border-color: var(--nx-palm-500, #1E412F) !important;
+        border-color: var(--ula-palm-700, #1E412F) !important;
         background: rgba(30, 65, 47, 0.06) !important;
-        box-shadow: 0 0 0 1px var(--nx-palm-500, #1E412F);
+        box-shadow: 0 0 0 1px var(--ula-palm-700, #1E412F);
     }
 </style>
 @endsection

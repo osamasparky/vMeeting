@@ -5,18 +5,18 @@
         <div class="modal-card" style="max-width: 540px;">
             <div class="modal-header">
                 <div class="modal-title"><span>⚙️</span> {{ __('Audio & Video Device Settings') }}</div>
-                <button onclick="closeDeviceSettingsModal()" style="background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button>
+                <button onclick="closeDeviceSettingsModal()" style="background:none; border:none; color:var(--ula-text-muted); font-size:20px; cursor:pointer;">✕</button>
             </div>
             
             <!-- Video Preview Box -->
-            <div style="position: relative; width: 100%; height: 200px; background: #070F0A; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+            <div style="position: relative; width: 100%; height: 200px; background: #070F0A; border-radius: 12px; overflow: hidden; border: 1px solid var(--ula-border-subtle); display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
                 <video id="device-preview-video" autoplay playsinline muted style="width: 100%; height: 100%; object-fit: cover;"></video>
-                <div id="device-no-preview" style="display: none; color: var(--text-muted); font-size: 12px; font-weight: 700;">📷 {{ __('Camera Preview Inactive') }}</div>
+                <div id="device-no-preview" style="display: none; color: var(--ula-text-muted); font-size: 12px; font-weight: 700;">📷 {{ __('Camera Preview Inactive') }}</div>
             </div>
 
             <!-- Mic Volume Level Meter -->
             <div style="margin-bottom: 14px;">
-                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px;">
                     <span>🎙️ {{ __('Microphone Input Test') }}</span>
                     <span id="mic-level-val">0%</span>
                 </div>
@@ -46,7 +46,7 @@
             </div>
 
             <div style="display: flex; gap: 8px; margin-top: 8px;">
-                <button onclick="closeDeviceSettingsModal()" class="action-link-btn" style="flex: 1; background: var(--brand-primary); color: white; justify-content: center; padding: 10px;">
+                <button onclick="closeDeviceSettingsModal()" class="action-link-btn" style="flex: 1; background: var(--ula-palm-900); color: white; justify-content: center; padding: 10px;">
                     ✓ {{ __('Done & Save Settings') }}
                 </button>
             </div>
@@ -58,10 +58,10 @@
         <div class="modal-card" style="max-width: 600px;">
             <div class="modal-header">
                 <div class="modal-title"><span>🩺</span> {{ __('WebRTC & Media Diagnostics') }}</div>
-                <button onclick="closeDiagnosticsModal()" style="background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button>
+                <button onclick="closeDiagnosticsModal()" style="background:none; border:none; color:var(--ula-text-muted); font-size:20px; cursor:pointer;">✕</button>
             </div>
 
-            <div id="diag-loading" style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 13px;">
+            <div id="diag-loading" style="text-align: center; padding: 20px; color: var(--ula-text-muted); font-size: 13px;">
                 ⏳ {{ __('Running automated WebRTC & STUN/TURN checks...') }}
             </div>
 
@@ -69,7 +69,7 @@
                 <!-- Overall Status Banner -->
                 <div id="diag-overall-box" style="padding: 12px 16px; border-radius: 12px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(52, 211, 153, 0.3); display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                        <div style="font-size: 10px; font-weight: 800; color: var(--brand-primary); text-transform: uppercase;">{{ __('Overall Connection Quality') }}</div>
+                        <div style="font-size: 10px; font-weight: 800; color: var(--ula-palm-900); text-transform: uppercase;">{{ __('Overall Connection Quality') }}</div>
                         <div id="diag-overall-text" style="font-size: 16px; font-weight: 900; color: #6EE7B7;">{{ __('Excellent') }}</div>
                     </div>
                     <span id="diag-overall-badge" style="font-size: 24px;">🟢</span>
@@ -77,26 +77,26 @@
 
                 <!-- Diagnostics Grid -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; padding: 10px;">
-                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 800;">📷 {{ __('Camera Access') }}</div>
+                    <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px;">
+                        <div style="font-size: 10px; color: var(--ula-text-muted); font-weight: 800;">📷 {{ __('Camera Access') }}</div>
                         <div id="diag-cam-status" style="font-size: 13px; font-weight: 800; color: #10B981;">✓ {{ __('Verified') }}</div>
                     </div>
-                    <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; padding: 10px;">
-                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 800;">🎙️ {{ __('Microphone Access') }}</div>
+                    <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px;">
+                        <div style="font-size: 10px; color: var(--ula-text-muted); font-weight: 800;">🎙️ {{ __('Microphone Access') }}</div>
                         <div id="diag-mic-status" style="font-size: 13px; font-weight: 800; color: #10B981;">✓ {{ __('Verified') }}</div>
                     </div>
-                    <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; padding: 10px;">
-                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 800;">⚡ {{ __('Internet Ping (RTT)') }}</div>
+                    <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px;">
+                        <div style="font-size: 10px; color: var(--ula-text-muted); font-weight: 800;">⚡ {{ __('Internet Ping (RTT)') }}</div>
                         <div id="diag-ping-status" style="font-size: 13px; font-weight: 800; color: #6EE7B7;">32 ms</div>
                     </div>
-                    <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; padding: 10px;">
-                        <div style="font-size: 10px; color: var(--text-muted); font-weight: 800;">🌐 {{ __('STUN & TURN Relay') }}</div>
+                    <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px;">
+                        <div style="font-size: 10px; color: var(--ula-text-muted); font-weight: 800;">🌐 {{ __('STUN & TURN Relay') }}</div>
                         <div id="diag-turn-status" style="font-size: 13px; font-weight: 800; color: #10B981;">✓ {{ __('Active (Coturn)') }}</div>
                     </div>
                 </div>
 
                 <!-- Telemetry Stats Table -->
-                <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); border-radius: 10px; padding: 12px; font-family: monospace; font-size: 11px; line-height: 1.6; color: var(--text-secondary);">
+                <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 12px; font-family: monospace; font-size: 11px; line-height: 1.6; color: var(--ula-text-secondary);">
                     <div style="display: flex; justify-content: space-between;"><span>SFU Host:</span> <span id="diag-livekit-host" style="color: #93C5FD;">wss://nextspace.munazzah.com/livekit</span></div>
                     <div style="display: flex; justify-content: space-between;"><span>Packet Loss:</span> <span id="diag-packet-loss" style="color: #6EE7B7;">0.0%</span></div>
                     <div style="display: flex; justify-content: space-between;"><span>Jitter:</span> <span id="diag-jitter" style="color: #6EE7B7;">4 ms</span></div>
@@ -105,7 +105,7 @@
 
                 <div style="display: flex; gap: 8px;">
                     <button onclick="runDiagnosticsCheck()" class="action-link-btn" style="flex: 1; justify-content: center;">🔄 {{ __('Re-run Check') }}</button>
-                    <button onclick="copyDiagnosticsReport()" class="action-link-btn" style="flex: 1; background: var(--brand-accent); color: white; justify-content: center;">📋 {{ __('Copy Report for Support') }}</button>
+                    <button onclick="copyDiagnosticsReport()" class="action-link-btn" style="flex: 1; background: var(--ula-highlight-default); color: white; justify-content: center;">📋 {{ __('Copy Report for Support') }}</button>
                 </div>
             </div>
         </div>
@@ -116,11 +116,11 @@
         <div class="modal-card" style="max-width: 650px; padding: 20px;">
             <div class="modal-header">
                 <div class="modal-title" style="display: flex; align-items: center; gap: 12px;">
-                    <div id="spotlight-avatar-box" style="width: 42px; height: 42px; border-radius: 12px; overflow: hidden; background: var(--bg-card); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; color: var(--brand-primary); border: 2px solid var(--border-color);">
+                    <div id="spotlight-avatar-box" style="width: 42px; height: 42px; border-radius: 12px; overflow: hidden; background: var(--ula-surface-card); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; color: var(--ula-palm-900); border: 2px solid var(--ula-border-subtle);">
                     </div>
                     <div>
-                        <div id="spotlight-user-name" style="font-size: 16px; font-weight: 800; color: var(--text-primary);"></div>
-                        <div id="spotlight-user-subtitle" style="font-size: 11px; color: var(--text-secondary);"></div>
+                        <div id="spotlight-user-name" style="font-size: 16px; font-weight: 800; color: var(--ula-text-primary);"></div>
+                        <div id="spotlight-user-subtitle" style="font-size: 11px; color: var(--ula-text-secondary);"></div>
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
@@ -130,15 +130,15 @@
                     <button id="spotlight-wave-btn" onclick="sendWaveToSpotlightUser()" class="action-link-btn" style="background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.4); color: #93C5FD; font-size: 11px; padding: 4px 10px;">
                         <span>👋</span> {{ __('Wave') }}
                     </button>
-                    <button onclick="closeUserSpotlight()" style="background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button>
+                    <button onclick="closeUserSpotlight()" style="background:none; border:none; color:var(--ula-text-muted); font-size:20px; cursor:pointer;">✕</button>
                 </div>
             </div>
 
             <!-- Spotlight Video Viewport -->
-            <div id="spotlight-video-container" style="position: relative; width: 100%; height: 320px; background: #070F0A; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-color); box-shadow: inset 0 0 40px rgba(0,0,0,0.8);">
+            <div id="spotlight-video-container" style="position: relative; width: 100%; height: 320px; background: #070F0A; border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid var(--ula-border-subtle); box-shadow: inset 0 0 40px rgba(0,0,0,0.8);">
                 <video id="spotlight-video-player" autoplay playsinline style="width: 100%; height: 100%; object-fit: contain; display: none;"></video>
-                <div id="spotlight-no-video" style="display: flex; flex-direction: column; align-items: center; gap: 12px; color: var(--text-muted);">
-                    <div id="spotlight-big-avatar" style="width: 86px; height: 86px; border-radius: 24px; background: rgba(16, 185, 129, 0.15); border: 2px solid var(--brand-primary); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; color: #6EE7B7; overflow: hidden;">
+                <div id="spotlight-no-video" style="display: flex; flex-direction: column; align-items: center; gap: 12px; color: var(--ula-text-muted);">
+                    <div id="spotlight-big-avatar" style="width: 86px; height: 86px; border-radius: 24px; background: rgba(16, 185, 129, 0.15); border: 2px solid var(--ula-palm-900); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; color: #6EE7B7; overflow: hidden;">
                     </div>
                     <span style="font-size: 13px; font-weight: 700;">{{ __('Live camera stream is currently offline') }}</span>
                 </div>
@@ -150,8 +150,8 @@
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <span style="font-size: 22px;">⏱️</span>
                         <div>
-                            <div style="font-size: 10px; font-weight: 800; color: var(--brand-primary); text-transform: uppercase; letter-spacing: 0.5px;">{{ __('Currently Working On:') }}</div>
-                            <div id="spotlight-timer-task" style="font-size: 13px; font-weight: 800; color: var(--text-primary);"></div>
+                            <div style="font-size: 10px; font-weight: 800; color: var(--ula-palm-900); text-transform: uppercase; letter-spacing: 0.5px;">{{ __('Currently Working On:') }}</div>
+                            <div id="spotlight-timer-task" style="font-size: 13px; font-weight: 800; color: var(--ula-text-primary);"></div>
                         </div>
                     </div>
                     <div id="spotlight-timer-clock" style="font-family: monospace; font-size: 16px; font-weight: 900; color: #6EE7B7; letter-spacing: 1px;"></div>
@@ -159,7 +159,7 @@
 
                 <!-- Assigned Tasks List -->
                 <div>
-                    <div style="font-size: 11px; font-weight: 900; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="font-size: 11px; font-weight: 900; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
                         <span>📋 {{ __('Assigned Tasks & Progress') }}</span>
                         <span id="spotlight-tasks-count" class="guest-badge" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(52, 211, 153, 0.3); color: #6EE7B7;">0 Tasks</span>
                     </div>
@@ -176,7 +176,7 @@
         <div class="modal-card" style="max-width: 1100px; height: 85vh;">
             <div class="modal-header">
                 <div class="modal-title"><span>🎥</span> {{ __('Office Live Cameras Gallery') }}</div>
-                <button onclick="closeCameraGalleryModal()" style="background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer;">✕</button>
+                <button onclick="closeCameraGalleryModal()" style="background:none; border:none; color:var(--ula-text-muted); font-size:20px; cursor:pointer;">✕</button>
             </div>
             <div id="camera-gallery-grid" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; padding: 6px;">
                 <!-- Populated dynamically via JS -->
@@ -189,7 +189,7 @@
         <div class="modal-card">
             <div class="modal-header">
                 <div class="modal-title"><span>⚡</span> {{ __('Instant Guest Invitation Link') }}</div>
-                <button onclick="closeGuestModal()" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
+                <button onclick="closeGuestModal()" style="background:none; border:none; color:var(--ula-text-muted); font-size:18px; cursor:pointer;">✕</button>
             </div>
             <div class="input-group">
                 <label class="input-label">{{ __('Select Target Meeting Room') }}</label>
@@ -203,14 +203,14 @@
                 <label class="input-label">{{ __('Guest Label / Name') }}</label>
                 <input type="text" class="styled-input" id="invite-guest-name" value="Investor / Partner">
             </div>
-            <button onclick="generateGuestLink()" class="action-link-btn" style="background: var(--brand-primary); color: white; justify-content: center; padding: 12px; font-size: 13px;">
+            <button onclick="generateGuestLink()" class="action-link-btn" style="background: var(--ula-palm-900); color: white; justify-content: center; padding: 12px; font-size: 13px;">
                 ⚡ {{ __('Generate Instant Guest Link') }}
             </button>
-            <div id="guest-link-result" style="display: none; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px; flex-direction: column; gap: 8px;">
+            <div id="guest-link-result" style="display: none; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--ula-border-subtle); border-radius: 12px; padding: 12px; flex-direction: column; gap: 8px;">
                 <input type="text" id="guest-link-input" readonly class="styled-input" style="font-family: monospace; font-size: 11px;">
                 <div style="display: flex; gap: 8px;">
                     <button onclick="copyGuestLink()" class="action-link-btn" style="flex: 1; justify-content: center;">📋 {{ __('Copy Link') }}</button>
-                    <button onclick="openGuestInNewWindow()" class="action-link-btn" style="flex: 1; background: var(--brand-accent); color: white; justify-content: center;">🚀 {{ __('Open Guest') }}</button>
+                    <button onclick="openGuestInNewWindow()" class="action-link-btn" style="flex: 1; background: var(--ula-highlight-default); color: white; justify-content: center;">🚀 {{ __('Open Guest') }}</button>
                 </div>
             </div>
         </div>
@@ -221,7 +221,7 @@
         <div class="modal-card">
             <div class="modal-header">
                 <div class="modal-title"><span>👥</span> {{ __('Active People in Office') }}</div>
-                <button onclick="closeOccupantsModal()" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
+                <button onclick="closeOccupantsModal()" style="background:none; border:none; color:var(--ula-text-muted); font-size:18px; cursor:pointer;">✕</button>
             </div>
             <div id="occupants-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 380px; overflow-y: auto;">
                 <!-- Populated dynamically via JS -->
@@ -234,15 +234,15 @@
         <div class="modal-card">
             <div class="modal-header">
                 <div class="modal-title"><span>📁</span> <span id="room-files-title">{{ __('Room Documents & Assets') }}</span></div>
-                <button onclick="closeRoomFilesModal()" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
+                <button onclick="closeRoomFilesModal()" style="background:none; border:none; color:var(--ula-text-muted); font-size:18px; cursor:pointer;">✕</button>
             </div>
             
             <!-- Upload Box -->
-            <div style="background: var(--bg-input); border: 2px dashed var(--border-color); border-radius: 14px; padding: 18px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+            <div style="background: var(--ula-surface-page); border: 2px dashed var(--ula-border-subtle); border-radius: 14px; padding: 18px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;">
                 <input type="file" id="room-file-input" style="display:none;" onchange="handleRoomFileUpload(this)">
                 <span style="font-size: 28px;">📤</span>
                 <span style="font-size: 12px; font-weight: 700;">{{ __('Upload PDF, Slides, or Images to this Room Repository') }}</span>
-                <button onclick="document.getElementById('room-file-input').click()" class="action-link-btn" style="background: var(--brand-primary); color: white;">
+                <button onclick="document.getElementById('room-file-input').click()" class="action-link-btn" style="background: var(--ula-palm-900); color: white;">
                     <span>⬆️</span> {{ __('Choose File to Upload') }}
                 </button>
             </div>
@@ -283,9 +283,9 @@
                 <div class="dock-divider"></div>
 
                 <button onclick="undoWhiteboard()" class="wb-tool-btn" title="Undo">↩️</button>
-                <button onclick="clearWhiteboard()" class="wb-tool-btn" title="Clear Board" style="color: var(--brand-crimson);">🗑️</button>
+                <button onclick="clearWhiteboard()" class="wb-tool-btn" title="Clear Board" style="color: var(--ula-status-danger);">🗑️</button>
                 <button onclick="exportWhiteboard()" class="action-link-btn" style="padding: 6px 12px;">💾 {{ __('Export PNG') }}</button>
-                <button onclick="closeWhiteboardModal()" style="background:none; border:none; color:var(--text-muted); font-size:20px; cursor:pointer; margin-inline-start: auto;">✕</button>
+                <button onclick="closeWhiteboardModal()" style="background:none; border:none; color:var(--ula-text-muted); font-size:20px; cursor:pointer; margin-inline-start: auto;">✕</button>
             </div>
 
             <!-- Whiteboard Main Workspace & Sticky Notes Sidebar -->
@@ -346,7 +346,7 @@
         <div class="modal-card" style="max-width: 900px; height: 80vh;">
             <div class="modal-header">
                 <div class="modal-title"><span>📼</span> {{ __('Session Recordings & Gallery') }}</div>
-                <button onclick="closeRecordingsGallery()" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
+                <button onclick="closeRecordingsGallery()" style="background:none; border:none; color:var(--ula-text-muted); font-size:18px; cursor:pointer;">✕</button>
             </div>
             <div id="recordings-list" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;"></div>
         </div>
@@ -360,10 +360,10 @@
             </div>
             <div class="knock-alert-box">
                 <div style="font-size: 32px;">🚪✊</div>
-                <strong id="knock-requester-name" style="font-size: 14px; color: var(--text-primary);">A colleague is knocking...</strong>
-                <span style="font-size: 12px; color: var(--text-secondary);">{{ __('They are requesting permission to enter this locked private room.') }}</span>
+                <strong id="knock-requester-name" style="font-size: 14px; color: var(--ula-text-primary);">A colleague is knocking...</strong>
+                <span style="font-size: 12px; color: var(--ula-text-secondary);">{{ __('They are requesting permission to enter this locked private room.') }}</span>
                 <div style="display: flex; gap: 10px; margin-top: 6px;">
-                    <button onclick="respondToKnock(true)" class="action-link-btn" style="flex: 1; justify-content: center; background: var(--brand-primary); color: white;">
+                    <button onclick="respondToKnock(true)" class="action-link-btn" style="flex: 1; justify-content: center; background: var(--ula-palm-900); color: white;">
                         ✅ {{ __('Let In') }}
                     </button>
                     <button onclick="respondToKnock(false)" class="action-link-btn" style="flex: 1; justify-content: center; background: rgba(239, 68, 68, 0.15); color: #F87171;">
@@ -376,25 +376,25 @@
 
     <!-- ── 7. In-Office My Tasks Drawer & Quick Time Tracker ── -->
     <div class="task-drawer" id="my-task-drawer">
-        <div style="padding: 16px; background: var(--bg-surface); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-size: 14px; font-weight: 900; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+        <div style="padding: 16px; background: var(--ula-surface-card); border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 14px; font-weight: 900; color: var(--ula-text-primary); display: flex; align-items: center; gap: 8px;">
                 <span>📝</span> <span>{{ __('My Tasks & Time Tracker') }}</span>
             </div>
-            <button onclick="closeMyTaskDrawer()" style="background: none; border: none; color: var(--text-muted); font-size: 18px; cursor: pointer;">✕</button>
+            <button onclick="closeMyTaskDrawer()" style="background: none; border: none; color: var(--ula-text-muted); font-size: 18px; cursor: pointer;">✕</button>
         </div>
 
         <!-- Active Running Task Hero Card -->
         <div id="office-active-timer-hero" style="display: none; padding: 14px 16px; background: rgba(16, 185, 129, 0.12); border-bottom: 1px solid rgba(52, 211, 153, 0.3);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <span style="font-size: 10px; font-weight: 800; color: var(--brand-primary); text-transform: uppercase; display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 10px; font-weight: 800; color: var(--ula-palm-900); text-transform: uppercase; display: flex; align-items: center; gap: 4px;">
                     <span class="live-dot" style="width: 6px; height: 6px;"></span>
                     {{ __('Active Task Timer') }}
                 </span>
                 <span id="office-timer-clock" style="font-family: monospace; font-size: 15px; font-weight: 900; color: #34D399; letter-spacing: 1px;">00:00:00</span>
             </div>
-            <div id="office-timer-title" style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;"></div>
+            <div id="office-timer-title" style="font-size: 13px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 4px;"></div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span id="office-timer-project" style="font-size: 11px; font-weight: 700; color: var(--text-secondary);"></span>
+                <span id="office-timer-project" style="font-size: 11px; font-weight: 700; color: var(--ula-text-secondary);"></span>
                 <button onclick="stopActiveOfficeTask()" class="tactile-btn" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: #F87171; padding: 4px 12px; font-size: 11px;">
                     ⏹️ {{ __('Stop Task') }}
                 </button>
@@ -402,13 +402,13 @@
         </div>
 
         <!-- Task Search & Filters -->
-        <div style="padding: 10px 14px; border-bottom: 1px solid var(--border-card); background: var(--bg-dock);">
-            <input type="text" id="office-task-search" placeholder="{{ __('Search assigned tasks...') }}" oninput="filterOfficeTasks(this.value)" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 8px 12px; font-size: 12px; color: var(--text-primary); outline: none;">
+        <div style="padding: 10px 14px; border-bottom: 1px solid var(--ula-border-subtle); background: var(--ula-surface-capsule-strong);">
+            <input type="text" id="office-task-search" placeholder="{{ __('Search assigned tasks...') }}" oninput="filterOfficeTasks(this.value)" style="width: 100%; background: var(--ula-surface-page); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 8px 12px; font-size: 12px; color: var(--ula-text-primary); outline: none;">
         </div>
 
         <!-- Task List Scroll Container -->
         <div id="office-tasks-list" style="flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
-            <div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 12px;">
+            <div style="text-align: center; padding: 20px; color: var(--ula-text-muted); font-size: 12px;">
                 ⏳ {{ __('Loading your assigned tasks...') }}
             </div>
         </div>
@@ -421,13 +421,13 @@
             <h3 style="font-size: 17px; font-weight: 900; color: #F59E0B; margin-bottom: 8px;">
                 {{ __('Are you still online?') }}
             </h3>
-            <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+            <p style="font-size: 13px; color: var(--ula-text-secondary); line-height: 1.6; margin-bottom: 16px;">
                 {{ __('We noticed you have been inactive for a while. Please confirm you are still working so your office attendance time continues calculating.') }}
             </p>
 
             <!-- Countdown Timer Progress Bar -->
             <div style="margin-bottom: 20px;">
-                <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; color: var(--text-muted); margin-bottom: 6px;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; color: var(--ula-text-muted); margin-bottom: 6px;">
                     <span>⏳ {{ __('Auto-pause in:') }}</span>
                     <span id="idle-countdown-clock" style="font-family: monospace; font-weight: 900; color: #F59E0B; font-size: 14px;">03:00</span>
                 </div>
@@ -446,10 +446,10 @@
     <div id="office-idle-paused-overlay" class="modal-overlay" style="display: none; z-index: 1000006; background: rgba(5, 12, 8, 0.95); backdrop-filter: blur(20px);">
         <div class="modal-card" style="max-width: 480px; text-align: center; padding: 32px 24px; border: 1px solid rgba(52, 211, 153, 0.3);">
             <div style="font-size: 52px; margin-bottom: 12px;">⏸️</div>
-            <h3 style="font-size: 18px; font-weight: 900; color: var(--text-primary); margin-bottom: 10px;">
+            <h3 style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary); margin-bottom: 10px;">
                 {{ __('Office Time Tracking Paused') }}
             </h3>
-            <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px;">
+            <p style="font-size: 13px; color: var(--ula-text-muted); line-height: 1.6; margin-bottom: 24px;">
                 {{ __('Your office session calculation was paused due to inactivity. Click below whenever you are ready to resume attendance.') }}
             </p>
 
@@ -466,7 +466,7 @@
             <h3 id="incoming-ring-title" style="font-size: 18px; font-weight: 900; color: #FCD34D; margin-bottom: 6px;">
                 {{ __('Incoming Ring Call') }}
             </h3>
-            <p id="incoming-ring-desc" style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px;">
+            <p id="incoming-ring-desc" style="font-size: 13px; color: var(--ula-text-secondary); line-height: 1.6; margin-bottom: 20px;">
                 {{ __('A colleague is ringing you for immediate attention.') }}
             </p>
             <div style="display: flex; gap: 10px;">
@@ -511,8 +511,8 @@
     <div id="custom-image-modal" class="modal-overlay" style="display: none; z-index: 1000008; background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(16px);" onclick="closeCustomImageModal()">
         <div class="modal-card" style="max-width: 85vw; max-height: 85vh; padding: 12px; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255,255,255,0.15); display: flex; flex-direction: column; align-items: center;" onclick="event.stopPropagation()">
             <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 6px 12px 10px;">
-                <span id="custom-image-modal-title" style="font-size: 14px; font-weight: 800; color: var(--text-main);">🖼️ {{ __('Image Viewer') }}</span>
-                <button type="button" onclick="closeCustomImageModal()" style="background: none; border: none; font-size: 22px; color: var(--text-muted); cursor: pointer;">✕</button>
+                <span id="custom-image-modal-title" style="font-size: 14px; font-weight: 800; color: var(--ula-text-primary);">🖼️ {{ __('Image Viewer') }}</span>
+                <button type="button" onclick="closeCustomImageModal()" style="background: none; border: none; font-size: 22px; color: var(--ula-text-muted); cursor: pointer;">✕</button>
             </div>
             <div style="overflow: auto; max-height: 75vh; display: flex; align-items: center; justify-content: center; width: 100%;">
                 <img id="custom-image-modal-img" src="" alt="Custom Artwork" style="max-width: 100%; max-height: 70vh; object-fit: contain; border-radius: 8px;">
@@ -527,13 +527,13 @@
             <h3 id="custom-link-modal-title" style="font-size: 17px; font-weight: 900; color: #93C5FD; margin-bottom: 8px;">
                 {{ __('Open Interactive Portal') }}
             </h3>
-            <p id="custom-link-modal-url" style="font-size: 13px; color: var(--text-muted); margin-bottom: 22px; word-break: break-all; background: rgba(15, 23, 42, 0.6); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); font-family: monospace;">
+            <p id="custom-link-modal-url" style="font-size: 13px; color: var(--ula-text-muted); margin-bottom: 22px; word-break: break-all; background: rgba(15, 23, 42, 0.6); padding: 10px; border-radius: 8px; border: 1px solid var(--ula-border-subtle); font-family: monospace;">
             </p>
             <div style="display: flex; gap: 10px;">
                 <a id="custom-link-modal-btn" href="#" target="_blank" rel="noopener noreferrer" class="action-link-btn" style="flex: 1; justify-content: center; background: #3B82F6; color: white; padding: 12px; font-size: 13px; font-weight: 800; text-decoration: none;">
                     🚀 {{ __('Visit Link') }}
                 </a>
-                <button type="button" onclick="closeCustomLinkModal()" class="action-link-btn" style="background: rgba(255,255,255,0.1); color: var(--text-muted); padding: 12px 18px; font-size: 13px; font-weight: 800;">
+                <button type="button" onclick="closeCustomLinkModal()" class="action-link-btn" style="background: rgba(255,255,255,0.1); color: var(--ula-text-muted); padding: 12px 18px; font-size: 13px; font-weight: 800;">
                     ✕ {{ __('Cancel') }}
                 </button>
             </div>
