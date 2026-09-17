@@ -229,8 +229,8 @@
 
         .form-input:focus {
             background: var(--bg-card);
-            border-color: var(--nx-palm-500, #1E412F);
-            box-shadow: 0 0 0 3px rgba(30, 65, 47, 0.12);
+            border-color: var(--brand-accent);
+            box-shadow: var(--ula-focus-ring);
         }
 
         .form-input::placeholder {
@@ -281,13 +281,13 @@
         .form-check-input {
             width: 16px;
             height: 16px;
-            accent-color: var(--nx-palm-700, #1B3223);
+            accent-color: var(--brand-accent);
             cursor: pointer;
             border-radius: 4px;
         }
 
         .form-link {
-            color: var(--nx-palm-700, #1B3223);
+            color: var(--brand-accent);
             font-size: 13px;
             text-decoration: none;
             font-weight: 700;
@@ -305,7 +305,7 @@
         }
 
         .auth-footer a {
-            color: var(--nx-palm-700, #1B3223);
+            color: var(--brand-accent);
             text-decoration: none;
             font-weight: 700;
         }
@@ -390,8 +390,8 @@
             transition: all 0.15s ease;
         }
         .lang-switch-btn:hover {
-            border-color: var(--nx-palm-500, #1E412F);
-            color: var(--nx-palm-700, #1B3223);
+            border-color: var(--brand-accent);
+            color: var(--brand-accent);
         }
 
         .spinner {
