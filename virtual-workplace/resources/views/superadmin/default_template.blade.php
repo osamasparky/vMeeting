@@ -9,10 +9,10 @@
 <!-- ── Header Banner ── -->
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 16px;">
     <div>
-        <h2 style="font-size: 20px; font-weight: 900; color: var(--text-primary); margin: 0 0 4px 0;">
+        <h2 style="font-size: 20px; font-weight: 900; color: var(--ula-text-primary); margin: 0 0 4px 0;">
             🏢 {{ __('Subscription Plan Office Blueprints') }}
         </h2>
-        <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
+        <p style="font-size: 13px; color: var(--ula-text-muted); margin: 0;">
             {{ __('Configure and design dedicated default office floorplans and rooms for each subscription plan tier.') }}
         </p>
     </div>
@@ -28,7 +28,7 @@
 </div>
 
 <!-- ── Plan Selector Bar ── -->
-<div style="display: flex; gap: 8px; margin-bottom: 20px; background: var(--bg-surface-subtle); padding: 6px; border-radius: 16px; border: 1px solid var(--border-color); flex-wrap: wrap;">
+<div style="display: flex; gap: 8px; margin-bottom: 20px; background: var(--ula-surface-page-alt); padding: 6px; border-radius: 16px; border: 1px solid var(--ula-border-subtle); flex-wrap: wrap;">
     @foreach($allPlans as $p)
         @php
             $isActivePlan = ($selectedPlan && $selectedPlan->id === $p->id);
@@ -37,10 +37,10 @@
         @endphp
         <a href="{{ route('superadmin.template', ['plan' => $p->slug]) }}" 
            class="tactile-btn" 
-           style="flex: 1; min-width: 170px; padding: 10px 16px; font-size: 13px; font-weight: 800; text-decoration: none; justify-content: center; border: {{ $isActivePlan ? '2px solid var(--brand-forest)' : '1px solid transparent' }}; background: {{ $isActivePlan ? 'var(--accent-gradient)' : 'transparent' }}; color: {{ $isActivePlan ? 'white' : 'var(--text-secondary)' }}; box-shadow: {{ $isActivePlan ? '0 4px 14px rgba(36, 92, 58, 0.3)' : 'none' }};">
+           style="flex: 1; min-width: 170px; padding: 10px 16px; font-size: 13px; font-weight: 800; text-decoration: none; justify-content: center; border: {{ $isActivePlan ? '2px solid var(--ula-palm-900)' : '1px solid transparent' }}; background: {{ $isActivePlan ? 'var(--ula-gradient-accent)' : 'transparent' }}; color: {{ $isActivePlan ? 'white' : 'var(--ula-text-secondary)' }}; box-shadow: {{ $isActivePlan ? '0 4px 14px rgba(36, 92, 58, 0.3)' : 'none' }};">
             @if($p->slug === 'free') 🟢 @elseif($p->slug === 'starter') ⚡ @elseif($p->slug === 'business') 💎 @else 👑 @endif
             <span>{{ $p->name }}</span>
-            <span style="font-size: 11px; background: {{ $isActivePlan ? 'rgba(255,255,255,0.25)' : 'var(--bg-elevated)' }}; padding: 2px 8px; border-radius: 999px; margin-inline-start: 6px;">
+            <span style="font-size: 11px; background: {{ $isActivePlan ? 'rgba(255,255,255,0.25)' : 'var(--ula-surface-raised)' }}; padding: 2px 8px; border-radius: 999px; margin-inline-start: 6px;">
                 {{ $tierRoomsCount }} {{ __('Rooms') }}
             </span>
         </a>
@@ -53,24 +53,24 @@
 <div style="display: grid; grid-template-columns: 1fr 360px; gap: 20px; margin-bottom: 24px;">
 
     <!-- Left: Interactive Canvas Viewport -->
-    <div class="panel-card" style="padding: 0; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; background: #07120C; border: 1px solid var(--border-color); box-shadow: var(--shadow-card);">
+    <div class="panel-card" style="padding: 0; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; background: #07120C; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
         
         <!-- Canvas Studio Toolbar -->
-        <div style="padding: 12px 18px; background: var(--bg-surface-subtle); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div style="padding: 12px 18px; background: var(--ula-surface-page-alt); border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <!-- Left: Tool Selector -->
-            <div style="display: flex; gap: 6px; align-items: center; background: var(--bg-base); padding: 4px; border-radius: 12px; border: 1px solid var(--border-color);">
-                <button type="button" id="tool-btn-select" onclick="setDrawTool('select')" class="tactile-btn" style="padding: 6px 14px; font-size: 12px; border: none; background: var(--accent-gradient); color: white;">
+            <div style="display: flex; gap: 6px; align-items: center; background: var(--ula-surface-page); padding: 4px; border-radius: 12px; border: 1px solid var(--ula-border-subtle);">
+                <button type="button" id="tool-btn-select" onclick="setDrawTool('select')" class="tactile-btn" style="padding: 6px 14px; font-size: 12px; border: none; background: var(--ula-gradient-accent); color: white;">
                     <span>🖱️</span> <span>{{ __('Select & Move') }}</span>
                 </button>
-                <button type="button" id="tool-btn-draw" onclick="setDrawTool('draw')" class="tactile-btn" style="padding: 6px 14px; font-size: 12px; border: none; background: transparent; color: var(--text-secondary);">
+                <button type="button" id="tool-btn-draw" onclick="setDrawTool('draw')" class="tactile-btn" style="padding: 6px 14px; font-size: 12px; border: none; background: transparent; color: var(--ula-text-secondary);">
                     <span>✏️</span> <span>{{ __('Draw Room') }}</span>
                 </button>
             </div>
 
             <!-- Center: Blueprint Status -->
-            <div style="font-size: 12px; font-weight: 800; color: var(--brand-forest); display: flex; align-items: center; gap: 8px;">
+            <div style="font-size: 12px; font-weight: 800; color: var(--ula-palm-900); display: flex; align-items: center; gap: 8px;">
                 <span>📐 {{ $template->width }}x{{ $template->height }} Grid</span>
-                <span style="color: var(--text-muted);">•</span>
+                <span style="color: var(--ula-text-muted);">•</span>
                 <span id="canvas-rooms-count">{{ count($template->rooms_data ?: []) }} {{ __('Rooms Configured') }}</span>
             </div>
 
@@ -94,8 +94,8 @@
         </div>
 
         <!-- Bottom Blueprint Upload Footer -->
-        <div style="padding: 12px 18px; background: var(--bg-surface-subtle); border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-            <div style="font-size: 12px; color: var(--text-secondary);">
+        <div style="padding: 12px 18px; background: var(--ula-surface-page-alt); border-top: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div style="font-size: 12px; color: var(--ula-text-secondary);">
                 <span>🖼️ <strong>{{ __('Floorplan Artwork') }}:</strong> {{ basename($template->background_image_url ?: 'office_floorplan.jpg') }}</span>
             </div>
             <form method="POST" action="{{ route('superadmin.template.background') }}" enctype="multipart/form-data" style="margin: 0; display: flex; gap: 8px;">
@@ -122,9 +122,9 @@
             </div>
 
             <!-- Empty State when no room is selected -->
-            <div id="inspector-empty" style="text-align: center; padding: 30px 10px; color: var(--text-muted);">
+            <div id="inspector-empty" style="text-align: center; padding: 30px 10px; color: var(--ula-text-muted);">
                 <div style="font-size: 38px; margin-bottom: 10px;">🚪</div>
-                <strong style="display: block; font-size: 13px; color: var(--text-primary); margin-bottom: 4px;">{{ __('No Room Selected') }}</strong>
+                <strong style="display: block; font-size: 13px; color: var(--ula-text-primary); margin-bottom: 4px;">{{ __('No Room Selected') }}</strong>
                 <p style="font-size: 12px; margin: 0; line-height: 1.5;">
                     {{ __('Click on any room on the blueprint or click "Draw Room" to create and configure a new room.') }}
                 </p>
@@ -135,17 +135,17 @@
                 
                 <!-- 1. Room Name (Rename) -->
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--brand-forest); margin-bottom: 6px;">
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-palm-900); margin-bottom: 6px;">
                         🏷️ {{ __('Room Name') }}
                     </label>
-                    <input type="text" id="insp-name" oninput="updateSelectedRoomProp('name', this.value)" placeholder="e.g. Executive Board Room" style="width: 100%; background: var(--bg-surface-subtle); border: 2px solid var(--brand-forest); border-radius: 10px; padding: 10px 12px; color: var(--text-primary); font-size: 13px; font-weight: 800; outline: none; box-shadow: var(--shadow-inset-3d);">
+                    <input type="text" id="insp-name" oninput="updateSelectedRoomProp('name', this.value)" placeholder="e.g. Executive Board Room" style="width: 100%; background: var(--ula-surface-page-alt); border: 2px solid var(--ula-palm-900); border-radius: 10px; padding: 10px 12px; color: var(--ula-text-primary); font-size: 13px; font-weight: 800; outline: none; box-shadow: var(--ula-shadow-xs);">
                 </div>
 
                 <!-- 2. Room Type & Access Mode -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <div>
-                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Room Type') }}</label>
-                        <select id="insp-type" onchange="updateSelectedRoomProp('type', this.value)" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; color: var(--text-primary); font-size: 11px; font-weight: 700; outline: none;">
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Room Type') }}</label>
+                        <select id="insp-type" onchange="updateSelectedRoomProp('type', this.value)" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 8px; color: var(--ula-text-primary); font-size: 11px; font-weight: 700; outline: none;">
                             <option value="meeting">Meeting / Conference</option>
                             <option value="private">Private Office / Focus</option>
                             <option value="lounge">Lounge / Collaborative</option>
@@ -154,8 +154,8 @@
                         </select>
                     </div>
                     <div>
-                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Access Privacy') }}</label>
-                        <select id="insp-access" onchange="updateSelectedRoomProp('access_mode', this.value)" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; color: var(--text-primary); font-size: 11px; font-weight: 700; outline: none;">
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Access Privacy') }}</label>
+                        <select id="insp-access" onchange="updateSelectedRoomProp('access_mode', this.value)" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 8px; color: var(--ula-text-primary); font-size: 11px; font-weight: 700; outline: none;">
                             <option value="public">🟢 Public (Open)</option>
                             <option value="knock">✊ Knock to Enter</option>
                             <option value="locked">🔒 Locked by Default</option>
@@ -166,42 +166,42 @@
                 <!-- 3. Capacity & Theme Color -->
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                     <div>
-                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Capacity (Seats)') }}</label>
-                        <input type="number" id="insp-capacity" min="1" max="100" oninput="updateSelectedRoomProp('capacity', parseInt(this.value) || 1)" style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; color: var(--text-primary); font-size: 12px; font-weight: 700; outline: none;">
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Capacity (Seats)') }}</label>
+                        <input type="number" id="insp-capacity" min="1" max="100" oninput="updateSelectedRoomProp('capacity', parseInt(this.value) || 1)" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 8px; color: var(--ula-text-primary); font-size: 12px; font-weight: 700; outline: none;">
                     </div>
                     <div>
-                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Theme Color') }}</label>
-                        <input type="color" id="insp-color" oninput="updateSelectedRoomProp('color', this.value)" style="width: 100%; height: 34px; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 2px; cursor: pointer;">
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Theme Color') }}</label>
+                        <input type="color" id="insp-color" oninput="updateSelectedRoomProp('color', this.value)" style="width: 100%; height: 34px; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 2px; cursor: pointer;">
                     </div>
                 </div>
 
                 <!-- 4. Acoustic Sound Isolation Boundary -->
-                <div style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px;">
-                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 11px; font-weight: 700; color: var(--text-primary);">
+                <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 11px; font-weight: 700; color: var(--ula-text-primary);">
                         <input type="checkbox" id="insp-isolation" onchange="updateSelectedRoomIsolation(this.checked)" style="width: 16px; height: 16px;">
                         <span>🎙️ {{ __('Acoustic Sound Isolation') }}</span>
                     </label>
                 </div>
 
                 <!-- 5. Grid Bounds (X, Y, W, H) -->
-                <div style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px;">
-                    <span style="display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">📐 {{ __('Grid Tile Bounds') }}</span>
+                <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px;">
+                    <span style="display: block; font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase; margin-bottom: 6px;">📐 {{ __('Grid Tile Bounds') }}</span>
                     <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
                         <div>
-                            <label style="font-size: 9px; color: var(--text-muted);">X</label>
-                            <input type="number" id="insp-x" min="0" oninput="updateSelectedRoomBound('x', parseInt(this.value) || 0)" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 4px; color: var(--text-primary); font-size: 11px; font-weight: 700; text-align: center;">
+                            <label style="font-size: 9px; color: var(--ula-text-muted);">X</label>
+                            <input type="number" id="insp-x" min="0" oninput="updateSelectedRoomBound('x', parseInt(this.value) || 0)" style="width: 100%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 6px; padding: 4px; color: var(--ula-text-primary); font-size: 11px; font-weight: 700; text-align: center;">
                         </div>
                         <div>
-                            <label style="font-size: 9px; color: var(--text-muted);">Y</label>
-                            <input type="number" id="insp-y" min="0" oninput="updateSelectedRoomBound('y', parseInt(this.value) || 0)" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 4px; color: var(--text-primary); font-size: 11px; font-weight: 700; text-align: center;">
+                            <label style="font-size: 9px; color: var(--ula-text-muted);">Y</label>
+                            <input type="number" id="insp-y" min="0" oninput="updateSelectedRoomBound('y', parseInt(this.value) || 0)" style="width: 100%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 6px; padding: 4px; color: var(--ula-text-primary); font-size: 11px; font-weight: 700; text-align: center;">
                         </div>
                         <div>
-                            <label style="font-size: 9px; color: var(--text-muted);">W</label>
-                            <input type="number" id="insp-w" min="1" oninput="updateSelectedRoomBound('width', parseInt(this.value) || 1)" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 4px; color: var(--text-primary); font-size: 11px; font-weight: 700; text-align: center;">
+                            <label style="font-size: 9px; color: var(--ula-text-muted);">W</label>
+                            <input type="number" id="insp-w" min="1" oninput="updateSelectedRoomBound('width', parseInt(this.value) || 1)" style="width: 100%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 6px; padding: 4px; color: var(--ula-text-primary); font-size: 11px; font-weight: 700; text-align: center;">
                         </div>
                         <div>
-                            <label style="font-size: 9px; color: var(--text-muted);">H</label>
-                            <input type="number" id="insp-h" min="1" oninput="updateSelectedRoomBound('height', parseInt(this.value) || 1)" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 6px; padding: 4px; color: var(--text-primary); font-size: 11px; font-weight: 700; text-align: center;">
+                            <label style="font-size: 9px; color: var(--ula-text-muted);">H</label>
+                            <input type="number" id="insp-h" min="1" oninput="updateSelectedRoomBound('height', parseInt(this.value) || 1)" style="width: 100%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 6px; padding: 4px; color: var(--ula-text-primary); font-size: 11px; font-weight: 700; text-align: center;">
                         </div>
                     </div>
                 </div>
@@ -226,12 +226,12 @@
                 @csrf
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
                     <div>
-                        <label style="display: block; font-size: 10px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Grid Width') }}</label>
-                        <input type="number" name="width" value="{{ $template->width }}" min="10" max="100" required style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; color: var(--text-primary); font-size: 12px; font-weight: 700;">
+                        <label style="display: block; font-size: 10px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Grid Width') }}</label>
+                        <input type="number" name="width" value="{{ $template->width }}" min="10" max="100" required style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 8px; color: var(--ula-text-primary); font-size: 12px; font-weight: 700;">
                     </div>
                     <div>
-                        <label style="display: block; font-size: 10px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px;">{{ __('Grid Height') }}</label>
-                        <input type="number" name="height" value="{{ $template->height }}" min="10" max="100" required style="width: 100%; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px; color: var(--text-primary); font-size: 12px; font-weight: 700;">
+                        <label style="display: block; font-size: 10px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Grid Height') }}</label>
+                        <input type="number" name="height" value="{{ $template->height }}" min="10" max="100" required style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 8px; color: var(--ula-text-primary); font-size: 12px; font-weight: 700;">
                     </div>
                 </div>
 
@@ -285,11 +285,11 @@
 <div id="syncModal" class="modal-overlay">
     <div class="modal-card" style="border-radius: 24px; padding: 26px; max-width: 520px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h3 style="font-size: 17px; font-weight: 900; color: var(--text-primary);">🔄 {{ __('Sync Office Template to Companies') }}</h3>
-            <button onclick="closeSyncModal()" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-primary); font-weight: 800;">✕</button>
+            <h3 style="font-size: 17px; font-weight: 900; color: var(--ula-text-primary);">🔄 {{ __('Sync Office Template to Companies') }}</h3>
+            <button onclick="closeSyncModal()" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ula-text-primary); font-weight: 800;">✕</button>
         </div>
 
-        <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+        <p style="font-size: 13px; color: var(--ula-text-secondary); line-height: 1.6; margin-bottom: 16px;">
             {{ __('Synchronize the office blueprint floorplan and the configured default rooms for :plan tier.', ['plan' => $selectedPlan ? $selectedPlan->name : '']) }}
         </p>
 
@@ -299,19 +299,19 @@
 
             <!-- Sync Scope Selection -->
             <div style="margin-bottom: 16px;">
-                <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
+                <label style="display: block; font-size: 12px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 8px;">
                     🎯 {{ __('Target Organizations') }}
                 </label>
                 <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <label style="display: flex; align-items: center; gap: 10px; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); padding: 10px 14px; border-radius: 12px; cursor: pointer;">
+                    <label style="display: flex; align-items: center; gap: 10px; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); padding: 10px 14px; border-radius: 12px; cursor: pointer;">
                         <input type="radio" name="sync_scope" value="plan_only" checked>
-                        <span style="font-size: 12px; font-weight: 700; color: var(--text-primary);">
+                        <span style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary);">
                             {{ __('Only companies subscribed to :plan (:count companies)', ['plan' => $selectedPlan ? $selectedPlan->name : 'this plan', 'count' => $planCompaniesCount]) }}
                         </span>
                     </label>
-                    <label style="display: flex; align-items: center; gap: 10px; background: var(--bg-surface-subtle); border: 1px solid var(--border-color); padding: 10px 14px; border-radius: 12px; cursor: pointer;">
+                    <label style="display: flex; align-items: center; gap: 10px; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); padding: 10px 14px; border-radius: 12px; cursor: pointer;">
                         <input type="radio" name="sync_scope" value="all">
-                        <span style="font-size: 12px; font-weight: 700; color: var(--text-primary);">
+                        <span style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary);">
                             {{ __('All registered companies (:count companies)', ['count' => $totalCompanies]) }}
                         </span>
                     </label>
@@ -319,7 +319,7 @@
             </div>
 
             <div style="background: rgba(214, 162, 58, 0.1); border: 1px solid rgba(214, 162, 58, 0.3); border-radius: 12px; padding: 14px; margin-bottom: 20px;">
-                <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 12px; font-weight: 700; color: var(--text-primary);">
+                <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 12px; font-weight: 700; color: var(--ula-text-primary);">
                     <input type="checkbox" name="overwrite_rooms" value="1" checked style="margin-top: 2px;">
                     <span>⚠️ {{ __('Overwrite and apply these exact rooms & boundaries') }}</span>
                 </label>
@@ -411,10 +411,10 @@
 
     function setDrawTool(tool) {
         currentTool = tool;
-        document.getElementById('tool-btn-select').style.background = tool === 'select' ? 'var(--accent-gradient)' : 'transparent';
-        document.getElementById('tool-btn-select').style.color = tool === 'select' ? 'white' : 'var(--text-secondary)';
-        document.getElementById('tool-btn-draw').style.background = tool === 'draw' ? 'var(--accent-gradient)' : 'transparent';
-        document.getElementById('tool-btn-draw').style.color = tool === 'draw' ? 'white' : 'var(--text-secondary)';
+        document.getElementById('tool-btn-select').style.background = tool === 'select' ? 'var(--ula-gradient-accent)' : 'transparent';
+        document.getElementById('tool-btn-select').style.color = tool === 'select' ? 'white' : 'var(--ula-text-secondary)';
+        document.getElementById('tool-btn-draw').style.background = tool === 'draw' ? 'var(--ula-gradient-accent)' : 'transparent';
+        document.getElementById('tool-btn-draw').style.color = tool === 'draw' ? 'white' : 'var(--ula-text-secondary)';
 
         const hintEl = document.getElementById('draw-hint-text');
         if (tool === 'draw') {
@@ -638,7 +638,7 @@
 
         tbody.innerHTML = '';
         if (defaultRooms.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 30px;">{{ __('No rooms drawn yet. Use "Draw Room" tool above to draw rooms.') }}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--ula-text-muted); padding: 30px;">{{ __('No rooms drawn yet. Use "Draw Room" tool above to draw rooms.') }}</td></tr>`;
             return;
         }
 
@@ -653,18 +653,18 @@
             tr.onclick = () => selectRoom(idx);
 
             tr.innerHTML = `
-                <td><strong style="color: var(--text-muted);">${idx + 1}</strong></td>
+                <td><strong style="color: var(--ula-text-muted);">${idx + 1}</strong></td>
                 <td>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <div style="width: 12px; height: 12px; border-radius: 4px; background: ${r.color || '#3F7D4F'};"></div>
-                        <strong style="color: var(--text-primary); font-size: 13px;">${r.name || 'Room'}</strong>
+                        <strong style="color: var(--ula-text-primary); font-size: 13px;">${r.name || 'Room'}</strong>
                         ${isSel ? '<span class="badge-status badge-active" style="font-size: 9px; padding: 2px 6px;">● {{ __("Selected") }}</span>' : ''}
                     </div>
                 </td>
                 <td><span class="badge-status badge-plan" style="font-size: 11px; text-transform: uppercase;">${r.type || 'meeting'}</span></td>
                 <td><span class="badge-status badge-active" style="font-size: 11px;">${r.access_mode || 'public'}</span></td>
-                <td><strong>${r.capacity || 8}</strong> <span style="font-size: 11px; color: var(--text-muted);">{{ __('seats') }}</span></td>
-                <td><code style="background: var(--bg-surface-subtle); padding: 4px 8px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--brand-forest);">X:${b.x}, Y:${b.y} (${b.width}x${b.height})</code></td>
+                <td><strong>${r.capacity || 8}</strong> <span style="font-size: 11px; color: var(--ula-text-muted);">{{ __('seats') }}</span></td>
+                <td><code style="background: var(--ula-surface-page-alt); padding: 4px 8px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-palm-900);">X:${b.x}, Y:${b.y} (${b.width}x${b.height})</code></td>
                 <td>${isIsolated ? '<span class="badge-status badge-active" style="font-size: 11px;">🎙️ {{ __("Acoustic") }}</span>' : '<span class="badge-status" style="font-size: 11px; background: rgba(59, 130, 246, 0.15); color: #60A5FA;">🔊 {{ __("Open") }}</span>'}</td>
                 <td>
                     <button type="button" onclick="event.stopPropagation(); selectRoom(${idx});" class="tactile-btn btn-secondary" style="padding: 4px 8px; font-size: 11px;">

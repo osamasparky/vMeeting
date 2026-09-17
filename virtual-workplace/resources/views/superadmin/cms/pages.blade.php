@@ -9,10 +9,10 @@
     <!-- Top Action Bar -->
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
         <div>
-            <h2 style="font-size: 20px; font-weight: 900; color: var(--text-primary); margin-bottom: 4px;">
+            <h2 style="font-size: 20px; font-weight: 900; color: var(--ula-text-primary); margin-bottom: 4px;">
                 🌐 {{ __('Public Website Pages') }}
             </h2>
-            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
+            <p style="font-size: 13px; color: var(--ula-text-muted); margin: 0;">
                 {{ __('Manage dynamic content, 3D scenes, sections, and bilingual SEO for the NextSpace public website.') }}
             </p>
         </div>
@@ -30,7 +30,7 @@
     </div>
 
     <!-- Pages Data Table -->
-    <div class="panel-card" style="border-radius: var(--radius-xl); padding: 24px;">
+    <div class="panel-card" style="border-radius: var(--ula-radius-xl); padding: 24px;">
         <div class="data-table-container">
             <table class="data-table">
                 <thead>
@@ -47,15 +47,15 @@
                     @forelse($pages as $p)
                         <tr>
                             <td>
-                                <strong style="font-size: 14px; color: var(--text-primary); display: block;">
+                                <strong style="font-size: 14px; color: var(--ula-text-primary); display: block;">
                                     📄 {{ $p->title_en }}
                                 </strong>
-                                <span style="font-size: 11px; font-family: monospace; color: var(--brand-forest); font-weight: 700;">
+                                <span style="font-size: 11px; font-family: monospace; color: var(--ula-palm-900); font-weight: 700;">
                                     /{{ $p->slug === 'home' ? '' : $p->slug }}
                                 </span>
                             </td>
                             <td>
-                                <span style="font-size: 13px; font-weight: 700; color: var(--text-primary);">
+                                <span style="font-size: 13px; font-weight: 700; color: var(--ula-text-primary);">
                                     {{ $p->title_ar }}
                                 </span>
                             </td>
@@ -70,7 +70,7 @@
                                 </span>
                             </td>
                             <td>
-                                <span style="font-size: 12px; color: var(--text-muted);">
+                                <span style="font-size: 12px; color: var(--ula-text-muted);">
                                     {{ $p->updated_at ? $p->updated_at->diffForHumans() : '—' }}
                                 </span>
                             </td>
@@ -82,7 +82,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" style="text-align: center; padding: 36px; color: var(--text-muted);">
+                            <td colspan="6" style="text-align: center; padding: 36px; color: var(--ula-text-muted);">
                                 {{ __('No CMS pages found.') }}
                             </td>
                         </tr>

@@ -9,10 +9,10 @@
     <!-- Top Action Bar -->
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
         <div>
-            <h2 style="font-size: 20px; font-weight: 900; color: var(--text-primary); margin-bottom: 4px;">
+            <h2 style="font-size: 20px; font-weight: 900; color: var(--ula-text-primary); margin-bottom: 4px;">
                 📁 {{ __('Nano Banana & 3D Media Asset Manager') }}
             </h2>
-            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
+            <p style="font-size: 13px; color: var(--ula-text-muted); margin: 0;">
                 {{ __('Upload and manage GLB, GLTF, looping MP4/WebM videos, and architectural floorplans. Swap assets in sections instantly.') }}
             </p>
         </div>
@@ -24,13 +24,13 @@
     </div>
 
     @if(session('success'))
-        <div style="background: rgba(79, 155, 95, 0.15); border: 1px solid rgba(79, 155, 95, 0.35); color: #4F9B5F; padding: 14px 18px; border-radius: var(--radius-md); font-size: 13px; font-weight: 800;">
+        <div style="background: rgba(79, 155, 95, 0.15); border: 1px solid rgba(79, 155, 95, 0.35); color: #4F9B5F; padding: 14px 18px; border-radius: var(--ula-radius-sm); font-size: 13px; font-weight: 800;">
             ✅ {{ session('success') }}
         </div>
     @endif
 
     <!-- Upload Asset Card -->
-    <div class="panel-card" style="border-radius: var(--radius-xl); padding: 24px;">
+    <div class="panel-card" style="border-radius: var(--ula-radius-xl); padding: 24px;">
         <div class="panel-header" style="margin-bottom: 20px;">
             <div class="panel-title">
                 <span>📤</span>
@@ -43,14 +43,14 @@
             @csrf
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 18px;">
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px; text-transform: uppercase;">
                         🏷️ {{ __('Asset Name') }} *
                     </label>
                     <input type="text" name="name" required placeholder="e.g. Hero 3D Office Scene" class="form-input" style="width: 100%;">
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px; text-transform: uppercase;">
                         📦 {{ __('Asset Type') }} *
                     </label>
                     <select name="asset_type" required class="form-input" style="width: 100%;">
@@ -63,21 +63,21 @@
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px; text-transform: uppercase;">
                         🏷️ {{ __('Version Tag') }}
                     </label>
                     <input type="text" name="version_tag" placeholder="e.g. hero-office-v2" class="form-input" style="width: 100%;">
                 </div>
 
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px; text-transform: uppercase;">
                         🏷️ {{ __('Tags (Comma separated)') }}
                     </label>
                     <input type="text" name="tags" placeholder="hero, 3d, nano-banana" class="form-input" style="width: 100%;">
                 </div>
 
                 <div style="grid-column: 1 / -1;">
-                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase;">
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px; text-transform: uppercase;">
                         📁 {{ __('Select File') }} *
                     </label>
                     <input type="file" name="file" required class="form-input" style="width: 100%;">
@@ -93,7 +93,7 @@
     </div>
 
     <!-- Asset Library Grid -->
-    <div class="panel-card" style="border-radius: var(--radius-xl); padding: 24px;">
+    <div class="panel-card" style="border-radius: var(--ula-radius-xl); padding: 24px;">
         <div class="panel-header" style="margin-bottom: 20px;">
             <div class="panel-title">
                 <span>📚</span>
@@ -103,7 +103,7 @@
 
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px;">
             @forelse($assets as $ast)
-                <div style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
+                <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
                     <div style="height: 150px; background: #071A16; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
                         @if($ast->asset_type === 'image')
                             <img src="{{ $ast->url }}" alt="{{ $ast->name }}" style="width: 100%; height: 100%; object-fit: cover;">
@@ -112,7 +112,7 @@
                         @elseif(str_starts_with($ast->asset_type, '3d'))
                             <div style="text-align: center;">
                                 <span style="font-size: 44px; display: block;">🧊</span>
-                                <span style="font-size: 11px; font-weight: 800; color: var(--brand-forest);">3D MODEL ({{ strtoupper($ast->asset_type) }})</span>
+                                <span style="font-size: 11px; font-weight: 800; color: var(--ula-palm-900);">3D MODEL ({{ strtoupper($ast->asset_type) }})</span>
                             </div>
                         @else
                             <span style="font-size: 40px;">📁</span>
@@ -124,10 +124,10 @@
                     </div>
 
                     <div style="padding: 16px;">
-                        <strong style="font-size: 13px; color: var(--text-primary); display: block; margin-bottom: 4px; word-break: break-word;">
+                        <strong style="font-size: 13px; color: var(--ula-text-primary); display: block; margin-bottom: 4px; word-break: break-word;">
                             {{ $ast->name }}
                         </strong>
-                        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">
+                        <div style="font-size: 11px; color: var(--ula-text-muted); margin-bottom: 12px;">
                             Tag: <strong>{{ $ast->version_tag ?? 'v1' }}</strong> • {{ $ast->created_at ? $ast->created_at->format('Y-m-d') : '' }}
                         </div>
 
@@ -147,7 +147,7 @@
                     </div>
                 </div>
             @empty
-                <div style="grid-column: 1 / -1; text-align: center; padding: 48px; color: var(--text-muted);">
+                <div style="grid-column: 1 / -1; text-align: center; padding: 48px; color: var(--ula-text-muted);">
                     {{ __('No media assets uploaded yet.') }}
                 </div>
             @endforelse
