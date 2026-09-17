@@ -1619,7 +1619,7 @@
                                                     </span>
                                                 @endif
                                                 @if($t->isRecurring())
-                                                    <span class="badge-pill" style="font-size: 9px; background: rgba(59,130,246,0.15); color: #2563EB; border: 1px solid rgba(59,130,246,0.3);" title="{{ __('Recurring :rule', ['rule' => $t->recurrence_rule]) }}">
+                                                    <span class="badge-pill" style="font-size: 9px; background: rgba(214, 162, 58, 0.15); color: #D6A23A; border: 1px solid rgba(214, 162, 58, 0.3);" title="{{ __('Recurring :rule', ['rule' => $t->recurrence_rule]) }}">
                                                         🔄 {{ ucfirst($t->recurrence_rule) }}
                                                     </span>
                                                 @endif
@@ -1794,7 +1794,7 @@
                                             <div style="font-weight: 800; color: var(--ula-text-primary); font-size: 13px; display: flex; align-items: center; gap: 6px;">
                                                 <span>{{ $t->title }}</span>
                                                 @if($t->isRecurring())
-                                                    <span class="badge-pill" style="font-size: 9px; background: rgba(59,130,246,0.15); color: #2563EB; border: 1px solid rgba(59,130,246,0.3);" title="{{ __('Recurring :rule', ['rule' => $t->recurrence_rule]) }}">
+                                                    <span class="badge-pill" style="font-size: 9px; background: rgba(214, 162, 58, 0.15); color: #D6A23A; border: 1px solid rgba(214, 162, 58, 0.3);" title="{{ __('Recurring :rule', ['rule' => $t->recurrence_rule]) }}">
                                                         🔄 {{ ucfirst($t->recurrence_rule) }}
                                                     </span>
                                                 @endif
@@ -2236,10 +2236,10 @@
 
                     <!-- Gantt Legend -->
                     <div style="padding: 8px 24px; display: flex; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid var(--ula-border-subtle); background: var(--ula-surface-page-alt);">
-                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #42774C; display: inline-block;"></span> {{ __('Done') }}</span>
-                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #2563EB; display: inline-block;"></span> {{ __('In Progress') }}</span>
-                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #D97706; display: inline-block;"></span> {{ __('Review/QA') }}</span>
-                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #64748B; display: inline-block;"></span> {{ __('Backlog/Ready') }}</span>
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #3c6b4c; display: inline-block;"></span> {{ __('Done') }}</span>
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #b98a37; display: inline-block;"></span> {{ __('In Progress') }}</span>
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #b46c34; display: inline-block;"></span> {{ __('Review/QA') }}</span>
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #a49889; display: inline-block;"></span> {{ __('Backlog/Ready') }}</span>
                         <span style="font-size: 11px; margin-inline-start: auto; color: var(--ula-text-muted);">↔ {{ __('Drag bars to reschedule') }}</span>
                     </div>
 
@@ -2644,13 +2644,16 @@
         let frappeGanttCurrentView = 'Week';
         let ganttCurrentPopoverTaskId = null;
 
+        // UlaSpace palette only (palm/gold/terracotta/stone) — no blue/purple/
+        // slate exist in the design system, so 6 statuses are spread across
+        // shades within those families rather than borrowing generic hues.
         const GANTT_STATUS_COLORS = {
-            done:        '#42774C',
-            in_progress: '#2563EB',
-            review:      '#D97706',
-            qa:          '#7C3AED',
-            ready:       '#64748B',
-            backlog:     '#94A3B8',
+            done:        '#3c6b4c', // --ula-palm-500
+            in_progress: '#b98a37', // --ula-gold-500
+            review:      '#b46c34', // --ula-terracotta-400
+            qa:          '#7d451d', // --ula-terracotta-600
+            ready:       '#a49889', // --ula-stone-400
+            backlog:     '#c1b6a6', // --ula-stone-300
         };
 
         // Build Frappe Gantt task objects from PHP $ganttTasks
@@ -2750,12 +2753,12 @@
             const style = document.createElement('style');
             style.id = 'gantt-status-styles';
             style.textContent = `
-                .gantt .bar-wrapper.gantt-bar-done         .bar { fill: #42774C !important; }
-                .gantt .bar-wrapper.gantt-bar-in_progress  .bar { fill: #2563EB !important; }
-                .gantt .bar-wrapper.gantt-bar-review       .bar { fill: #D97706 !important; }
-                .gantt .bar-wrapper.gantt-bar-qa           .bar { fill: #7C3AED !important; }
-                .gantt .bar-wrapper.gantt-bar-ready        .bar { fill: #64748B !important; }
-                .gantt .bar-wrapper.gantt-bar-backlog      .bar { fill: #94A3B8 !important; }
+                .gantt .bar-wrapper.gantt-bar-done         .bar { fill: #3c6b4c !important; }
+                .gantt .bar-wrapper.gantt-bar-in_progress  .bar { fill: #b98a37 !important; }
+                .gantt .bar-wrapper.gantt-bar-review       .bar { fill: #b46c34 !important; }
+                .gantt .bar-wrapper.gantt-bar-qa           .bar { fill: #7d451d !important; }
+                .gantt .bar-wrapper.gantt-bar-ready        .bar { fill: #a49889 !important; }
+                .gantt .bar-wrapper.gantt-bar-backlog      .bar { fill: #c1b6a6 !important; }
                 .gantt .bar-label { font-size: 11px !important; font-weight: 800 !important; fill: #ffffff !important; }
             `;
             document.head.appendChild(style);
@@ -2782,8 +2785,7 @@
             const meta = task._meta || {};
             ganttCurrentPopoverTaskId = task.id;
 
-            const statusColors = { done: '#42774C', in_progress: '#2563EB', review: '#D97706', qa: '#7C3AED', ready: '#64748B', backlog: '#94A3B8' };
-            const color = statusColors[meta.status] || '#64748B';
+            const color = GANTT_STATUS_COLORS[meta.status] || GANTT_STATUS_COLORS.backlog;
 
             document.getElementById('gantt-popover-content').innerHTML = `
                 <div style="font-weight: 900; font-size: 13px; color: var(--ula-text-primary); margin-bottom: 8px; line-height: 1.4;">${task.name}</div>
