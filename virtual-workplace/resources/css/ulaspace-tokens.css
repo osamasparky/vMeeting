@@ -799,13 +799,20 @@ body {
   box-shadow: var(--ula-shadow-md);
 }
 
-/* --- Legacy button hook (.nx-btn) ---------------------------------------
+/* --- Legacy button hook (.nx-btn.nx-btn--primary) -----------------------
    Several pages (login, register, welcome, profile tab) still markup
    their submit/CTA buttons as `.nx-btn .nx-btn--primary` — that class
    pair never had a rule anywhere, so those buttons rendered as bare
    unstyled <button>/<a> elements. Defined once here since the class is
-   loaded on every page via ulaspace-tokens.css. */
-.nx-btn {
+   loaded on every page via ulaspace-tokens.css.
+   Scoped as the COMPOUND selector `.nx-btn.nx-btn--primary` rather than
+   a bare `.nx-btn` — the dashboard's own button family (.nx-btn-primary/
+   -secondary/-outline/-danger, single dash, in ulaspace-dashboard.css)
+   is unrelated but happens to combine with a literal `nx-btn` class on
+   the same elements; a bare `.nx-btn` rule here would win the cascade
+   (this file loads after ulaspace-dashboard.css) and silently strip
+   their border/background. */
+.nx-btn.nx-btn--primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -821,21 +828,19 @@ body {
   cursor: pointer;
   transition: background-color var(--ula-duration-fast) var(--ula-ease-out),
               border-color var(--ula-duration-fast) var(--ula-ease-out);
-}
-.nx-btn--primary {
   background: var(--ula-accent-default);
   border-color: var(--ula-accent-default);
   color: var(--ula-accent-fg);
 }
-.nx-btn--primary:hover {
+.nx-btn.nx-btn--primary:hover {
   background: var(--ula-accent-hover);
   border-color: var(--ula-accent-hover);
 }
-.nx-btn--primary:active {
+.nx-btn.nx-btn--primary:active {
   background: var(--ula-accent-press);
   border-color: var(--ula-accent-press);
 }
-.nx-btn:disabled {
+.nx-btn.nx-btn--primary:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }

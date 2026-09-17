@@ -175,18 +175,54 @@ body {
     height: 42px;
     padding: 0 18px;
     border-radius: 9999px;
-    background: transparent;
+    background: var(--nx-surface-card);
     color: var(--nx-text-main) !important;
     font-size: 13px;
     font-weight: 500;
     text-decoration: none;
-    border: 1px solid var(--nx-border-line);
+    border: 1px solid var(--ula-border-strong, var(--nx-border-line));
     cursor: pointer;
     transition: all 0.2s ease;
 }
 .nx-btn-outline:hover {
     border-color: var(--nx-text-main);
     background: var(--nx-surface-subtle);
+}
+
+.nx-btn-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 42px;
+    padding: 0 18px;
+    border-radius: 9999px;
+    background: var(--ula-surface-danger-soft, #ecc9ae);
+    color: var(--ula-icon-danger, #b46c34) !important;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.nx-btn-danger:hover {
+    background: var(--ula-status-danger, #9a5827);
+    color: #FFFFFF !important;
+}
+
+/* Size modifier — combines with nx-btn-primary/secondary/outline/danger,
+   which otherwise only ship the default (42px) size. */
+.nx-btn-sm {
+    height: 30px !important;
+    padding: 0 12px !important;
+    font-size: 12px !important;
+    gap: 6px !important;
+}
+.nx-btn-lg {
+    height: 50px !important;
+    padding: 0 26px !important;
+    font-size: 15px !important;
 }
 
 .nx-hero-date-card {

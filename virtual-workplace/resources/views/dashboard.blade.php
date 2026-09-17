@@ -1772,10 +1772,10 @@
                 </div>
             </div>
 
-            <!-- Soft Search Bar -->
+            <!-- Search Field (Figma: h46, radius-md, border-default) -->
             <div class="flex-1 max-w-[380px] relative flex items-center">
-                <span class="material-symbols-rounded absolute inset-inline-start-3.5 text-[18px] text-[var(--nx-text-muted)] pointer-events-none">search</span>
-                <input type="text" class="w-full bg-[var(--nx-bg-surface)] border border-[var(--nx-border-subtle)] rounded-full py-2.5 px-4 ps-10 text-[13px] font-normal text-[var(--nx-text-primary)] placeholder-[var(--nx-text-muted)] focus:border-[var(--nx-palm-900)] focus:outline-none transition-colors" placeholder="{{ __('Search people, rooms, files...') }}" id="globalSearchInput" onkeyup="handleGlobalSearch(this.value)">
+                <span class="material-symbols-rounded absolute inset-inline-start-4 text-[20px] text-[var(--ula-icon-secondary)] pointer-events-none">search</span>
+                <input type="text" class="w-full h-[46px] bg-[var(--ula-surface-page)] border border-[var(--ula-border-default)] rounded-[var(--ula-radius-md)] px-4 ps-11 text-[14px] font-normal text-[var(--ula-text-primary)] placeholder-[var(--ula-text-muted)] focus:border-[var(--ula-border-focus)] focus:shadow-[var(--ula-focus-ring)] focus:outline-none transition-colors" placeholder="{{ __('Search people, rooms, files...') }}" id="globalSearchInput" onkeyup="handleGlobalSearch(this.value)">
             </div>
 
             <!-- Header Actions Group -->
@@ -1827,31 +1827,26 @@
 
                 <x-icon-btn icon="dark_mode" onclick="toggleThemeMode()" title="{{ __('Toggle Dark / Light Mode') }}" size="md" variant="subtle" />
 
-                <!-- Language Switcher -->
+                <!-- Language Switcher (Figma: same Icon Button as its siblings, globe only) -->
                 @if(app()->getLocale() === 'ar')
-                    <a href="{{ route('lang.switch', 'en') }}" class="inline-flex items-center gap-1 px-3 py-2 rounded-[var(--nx-radius-md)] bg-[var(--nx-bg-surface)] border border-[var(--nx-border-subtle)] text-[12px] font-semibold text-[var(--nx-text-primary)] hover:border-[var(--nx-palm-900)] transition-colors" title="{{ __('Switch to English') }}">
-                        <span class="material-symbols-rounded text-[16px] text-[var(--nx-accent)]">language</span>
-                        <span>EN</span>
-                    </a>
+                    <x-icon-btn icon="language" href="{{ route('lang.switch', 'en') }}" title="{{ __('Switch to English') }}" size="md" variant="subtle" />
                 @else
-                    <a href="{{ route('lang.switch', 'ar') }}" class="inline-flex items-center gap-1 px-3 py-2 rounded-[var(--nx-radius-md)] bg-[var(--nx-bg-surface)] border border-[var(--nx-border-subtle)] text-[12px] font-semibold text-[var(--nx-text-primary)] hover:border-[var(--nx-palm-900)] transition-colors" title="{{ __('التبديل إلى العربية') }}">
-                        <span class="material-symbols-rounded text-[16px] text-[var(--nx-accent)]">language</span>
-                        <span>عربي</span>
-                    </a>
+                    <x-icon-btn icon="language" href="{{ route('lang.switch', 'ar') }}" title="{{ __('التبديل إلى العربية') }}" size="md" variant="subtle" />
                 @endif
 
-                <!-- User Profile Capsule (App Bar spec) -->
-                <div onclick="switchAdminTab('profile')" class="cursor-pointer flex items-center gap-2 py-1 px-2.5 rounded-full bg-[var(--nx-bg-surface)] border border-[var(--nx-border-subtle)] shadow-[var(--nx-shadow-sm)] hover:border-[var(--nx-palm-900)] transition-all" title="{{ __('View Profile') }}">
-                    <div class="w-7 h-7 rounded-full overflow-hidden bg-[var(--nx-sand-200)] flex items-center justify-center text-[var(--nx-palm-900)] font-bold text-[11px] shrink-0">
+                <!-- User Profile (Figma App Bar: avatar + name/role, divider before it) -->
+                <div onclick="switchAdminTab('profile')" class="cursor-pointer flex items-center gap-2.5 ps-3 border-s border-[var(--ula-border-subtle)] hover:opacity-80 transition-opacity" title="{{ __('View Profile') }}">
+                    <div class="w-9 h-9 rounded-full overflow-hidden bg-[var(--ula-tone-palm-bg)] flex items-center justify-center text-[var(--ula-tone-palm-fg)] font-bold text-[13px] shrink-0">
                         @if($user->avatar_url)
                             <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="w-full h-full object-cover">
                         @else
                             <span>{{ strtoupper(substr($user->name, 0, 2)) }}</span>
                         @endif
                     </div>
-                    <span class="text-[12px] font-medium text-[var(--nx-text-primary)] pe-1.5 hidden sm:inline">
-                        {{ explode(' ', $user->name)[0] }}
-                    </span>
+                    <div class="hidden sm:flex flex-col leading-tight">
+                        <span class="text-[13px] font-semibold text-[var(--ula-text-primary)]">{{ explode(' ', $user->name)[0] }}</span>
+                        <span class="text-[11px] text-[var(--ula-text-muted)]">{{ $membership->role->name ?? __('Company Admin') }}</span>
+                    </div>
                 </div>
             </div>
         </div>

@@ -5,6 +5,44 @@
 
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
 
+/* Cairo — self-hosted, the UlaSpace Arabic typeface (Figma "font/ar").
+   Falls back to IBM Plex Sans Arabic (imported above) until this loads. */
+@font-face {
+  font-family: 'Cairo';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/fonts/cairo/Cairo-Light.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Cairo';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/cairo/Cairo-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Cairo';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/cairo/Cairo-Medium.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Cairo';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/cairo/Cairo-SemiBold.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Cairo';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/cairo/Cairo-Bold.ttf') format('truetype');
+}
+
 :root {
   /* --- TYPOGRAPHY FAMILIES --- */
   --nx-font-ar: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -258,3 +296,559 @@ body {
   color: var(--nx-text-secondary);
   line-height: 1.3;
 }
+
+/* ==========================================================================
+   ULASPACE — --ula-* TOKENS
+   Read directly from the Figma source file "UlaSpace — Design System"
+   (uploads/UlaSpace - Design System.fig). Additive: the --nx-* tokens above
+   stay in place for views not yet migrated; new/updated views should use
+   --ula-* (and the Tailwind utilities bridged from them in app.css) instead.
+   Figma `surface/page` -> CSS `--ula-surface-page`, mechanical in both directions.
+   ========================================================================== */
+:root {
+  /* --- Primitives (never reference directly in a component) --- */
+  --ula-palm-50:  #f0f4f0;
+  --ula-palm-100: #dbe6dd;
+  --ula-palm-200: #b6c9bb;
+  --ula-palm-300: #8baa94;
+  --ula-palm-400: #5e8a6c;
+  --ula-palm-500: #3c6b4c;
+  --ula-palm-600: #2a5439;
+  --ula-palm-700: #1e412f;
+  --ula-palm-800: #1b3223;
+  --ula-palm-900: #142b24;
+  --ula-palm-950: #0e1c17;
+  --ula-palm-chrome: #17221f;
+
+  --ula-sand-50:  #fbf8f2;
+  --ula-sand-100: #f9f6ef;
+  --ula-sand-200: #f4ede1;
+  --ula-sand-300: #ede6d9;
+  --ula-sand-400: #e3d2bb;
+  --ula-sand-500: #d6c0a2;
+  --ula-sand-600: #c3a882;
+
+  --ula-stone-100: #e8e4dc;
+  --ula-stone-200: #d9d3c8;
+  --ula-stone-300: #c1b6a6;
+  --ula-stone-400: #a49889;
+  --ula-stone-500: #857a6c;
+  --ula-stone-600: #665d52;
+  --ula-stone-700: #4a443c;
+
+  --ula-gold-200: #f0dfbc;
+  --ula-gold-300: #e6c88b;
+  --ula-gold-400: #d3a553;
+  --ula-gold-500: #b98a37;
+  --ula-gold-600: #946c27;
+
+  --ula-terracotta-200: #ecc9ae;
+  --ula-terracotta-300: #d99a6c;
+  --ula-terracotta-400: #b46c34;
+  --ula-terracotta-500: #9a5827;
+  --ula-terracotta-600: #7d451d;
+
+  --ula-white: #ffffff;
+  --ula-black: #0b1410;
+
+  --ula-alpha-ivory-8:  rgba(237, 230, 217, 0.08);
+  --ula-alpha-ivory-10: rgba(237, 230, 217, 0.10);
+  --ula-alpha-ivory-14: rgba(237, 230, 217, 0.14);
+  --ula-alpha-ivory-16: rgba(237, 230, 217, 0.16);
+  --ula-alpha-ivory-18: rgba(237, 230, 217, 0.18);
+  --ula-alpha-ivory-30: rgba(237, 230, 217, 0.30);
+  --ula-alpha-page-35:  rgba(251, 248, 242, 0.35);
+  --ula-alpha-page-72:  rgba(251, 248, 242, 0.72);
+  --ula-alpha-palm-950-48: rgba(14, 28, 23, 0.48);
+  --ula-alpha-palm-950-62: rgba(14, 28, 23, 0.62);
+  --ula-alpha-palm-950-72: rgba(14, 28, 23, 0.72);
+  --ula-alpha-palm-400-14: rgba(94, 138, 108, 0.14);
+  --ula-alpha-gold-400-18: rgba(211, 165, 83, 0.18);
+  --ula-alpha-terracotta-400-20: rgba(180, 108, 52, 0.20);
+  --ula-alpha-shadow-6:  rgba(27, 50, 35, 0.06);
+  --ula-alpha-shadow-10: rgba(27, 50, 35, 0.10);
+  --ula-alpha-shadow-14: rgba(27, 50, 35, 0.14);
+  --ula-alpha-shadow-18: rgba(27, 50, 35, 0.18);
+  --ula-alpha-shadow-22: rgba(27, 50, 35, 0.22);
+  --ula-alpha-black-50: rgba(0, 0, 0, 0.50);
+  --ula-alpha-black-55: rgba(0, 0, 0, 0.55);
+  --ula-alpha-black-60: rgba(0, 0, 0, 0.60);
+
+  /* --- Typography --- */
+  --ula-font-ar:   'Cairo', 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
+  --ula-font-en:   'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --ula-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --ula-font-family: var(--ula-font-ar);
+
+  --ula-size-display-lg: 56px;
+  --ula-size-display:    44px;
+  --ula-size-h1:         34px;
+  --ula-size-h2:         26px;
+  --ula-size-h3:         21px;
+  --ula-size-h4:         18px;
+  --ula-size-body-lg:    17px;
+  --ula-size-body:       15px;
+  --ula-size-sm:         13px;
+  --ula-size-xs:         12px;
+  --ula-size-label:      11px;
+  --ula-size-display-en: 24px;
+  --ula-size-h1-en:      18px;
+  --ula-size-h2-en:      15px;
+  --ula-size-body-en:    14px;
+
+  --ula-weight-light:    300;
+  --ula-weight-regular:  400;
+  --ula-weight-medium:   500;
+  --ula-weight-semibold: 600;
+  --ula-weight-bold:     700;
+
+  --ula-lh-display: 1.25;
+  --ula-lh-heading: 1.4;
+  --ula-lh-hero:    1.3;
+  --ula-lh-body:    1.6;
+  --ula-lh-en:      1.5;
+  --ula-lh-metric:  1.1;
+  --ula-tracking-brand: 0.14em;
+
+  /* --- Spacing & layout --- */
+  --ula-space-0:  0px;
+  --ula-space-1:  2px;
+  --ula-space-2:  4px;
+  --ula-space-3:  8px;
+  --ula-space-4:  12px;
+  --ula-space-5:  16px;
+  --ula-space-6:  20px;
+  --ula-space-7:  24px;
+  --ula-space-8:  32px;
+  --ula-space-9:  40px;
+  --ula-space-10: 48px;
+  --ula-space-11: 64px;
+  --ula-space-12: 80px;
+  --ula-space-13: 96px;
+  --ula-space-14: 128px;
+
+  --ula-layout-gutter:    var(--ula-space-7);
+  --ula-layout-card-pad:  var(--ula-space-6);
+  --ula-layout-panel-pad: var(--ula-space-7);
+  --ula-layout-section-y: var(--ula-space-12);
+  --ula-layout-container-max:    1280px;
+  --ula-layout-container-narrow: 880px;
+  --ula-size-touch-target: 44px;
+  --ula-grid-columns: 12;
+
+  /* --- Shape --- */
+  --ula-radius-xs:   6px;
+  --ula-radius-sm:   10px;
+  --ula-radius-md:   14px;
+  --ula-radius-lg:   20px;
+  --ula-radius-xl:   28px;
+  --ula-radius-pill: 999px;
+  --ula-border-width-hairline: 1px;
+  --ula-border-width-thick:    1.5px;
+  --ula-blur-panel: 14px;
+
+  /* --- Motion --- */
+  --ula-duration-instant: 90ms;
+  --ula-duration-fast:    160ms;
+  --ula-duration-base:    240ms;
+  --ula-duration-slow:    360ms;
+  --ula-duration-ambient: 700ms;
+  --ula-ease-out:      cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ula-ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);
+  --ula-ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* --- Elevation --- */
+  --ula-shadow-xs: 0 1px 2px 0 var(--ula-shadow-xs-color);
+  --ula-shadow-sm: 0 2px 8px -2px var(--ula-shadow-sm-color);
+  --ula-shadow-md: 0 8px 24px -8px var(--ula-shadow-md-color);
+  --ula-shadow-lg: 0 20px 48px -12px var(--ula-shadow-lg-color);
+  --ula-shadow-xl: 0 32px 80px -16px var(--ula-shadow-xl-color);
+  --ula-shadow-on-map: 0 8px 24px -8px var(--ula-shadow-on-map-color);
+  --ula-focus-ring:         0 0 0 2px var(--ula-focus-gap), 0 0 0 4px var(--ula-focus-ring-color);
+  --ula-focus-ring-on-dark: 0 0 0 2px var(--ula-focus-gap-on-dark), 0 0 0 4px var(--ula-focus-ring-color);
+  --ula-backdrop-blur: blur(var(--ula-blur-panel));
+
+  /* --- Semantic — Light (default) --- */
+  --ula-surface-page:        var(--ula-sand-50);
+  --ula-surface-page-alt:    var(--ula-sand-200);
+  --ula-surface-card:        var(--ula-sand-100);
+  --ula-surface-raised:      var(--ula-white);
+  --ula-surface-sunken:      var(--ula-sand-200);
+  --ula-surface-hover:       var(--ula-sand-200);
+  --ula-surface-pressed:     var(--ula-sand-300);
+  --ula-surface-dark:        var(--ula-palm-900);
+  --ula-surface-dark-alt:    var(--ula-palm-800);
+  --ula-surface-accent-soft: var(--ula-palm-50);
+  --ula-surface-gold-soft:   var(--ula-gold-200);
+  --ula-surface-danger-soft: var(--ula-terracotta-200);
+  --ula-surface-warm:        var(--ula-sand-400);
+  --ula-surface-overlay:     var(--ula-alpha-palm-950-48);
+  --ula-surface-capsule:     var(--ula-alpha-palm-950-62);
+  --ula-surface-capsule-strong: var(--ula-alpha-palm-950-72);
+  --ula-surface-map-chrome:  var(--ula-palm-chrome);
+  --ula-surface-map-canvas:  var(--ula-palm-950);
+
+  --ula-text-primary:        var(--ula-palm-900);
+  --ula-text-strong:         var(--ula-palm-800);
+  --ula-text-body:           var(--ula-stone-700);
+  --ula-text-secondary:      var(--ula-stone-600);
+  --ula-text-muted:          var(--ula-stone-500);
+  --ula-text-disabled:       var(--ula-stone-400);
+  --ula-text-on-dark:        var(--ula-sand-100);
+  --ula-text-on-dark-muted:  var(--ula-sand-400);
+  --ula-text-on-dark-subtle: var(--ula-stone-300);
+  --ula-text-on-accent:      var(--ula-sand-50);
+  --ula-text-on-gold:        var(--ula-palm-900);
+  --ula-text-on-cta:         var(--ula-palm-900);
+  --ula-text-link:           var(--ula-palm-600);
+  --ula-text-link-hover:     var(--ula-palm-800);
+  --ula-text-danger:         var(--ula-terracotta-600);
+
+  --ula-border-subtle:        var(--ula-stone-100);
+  --ula-border-default:       var(--ula-stone-200);
+  --ula-border-strong:        var(--ula-stone-300);
+  --ula-border-hover:         var(--ula-stone-500);
+  --ula-border-focus:         var(--ula-palm-500);
+  --ula-border-danger:        var(--ula-terracotta-400);
+  --ula-border-on-dark:       var(--ula-alpha-ivory-18);
+  --ula-border-on-dark-subtle: var(--ula-alpha-ivory-10);
+
+  --ula-accent-default: var(--ula-palm-700);
+  --ula-accent-hover:   var(--ula-palm-600);
+  --ula-accent-press:   var(--ula-palm-800);
+  --ula-accent-fg:      var(--ula-sand-50);
+
+  --ula-highlight-default: var(--ula-gold-400);
+  --ula-highlight-ink:     var(--ula-gold-600);
+
+  --ula-status-success:         var(--ula-palm-500);
+  --ula-status-success-on-dark: var(--ula-palm-300);
+  --ula-status-warning:         var(--ula-gold-500);
+  --ula-status-danger:          var(--ula-terracotta-500);
+  --ula-status-danger-hover:    var(--ula-terracotta-600);
+  --ula-status-info:            var(--ula-palm-400);
+
+  --ula-focus-ring-color:   var(--ula-gold-400);
+  --ula-focus-gap:          var(--ula-sand-50);
+  --ula-focus-gap-on-dark:  var(--ula-palm-900);
+
+  --ula-icon-primary:     var(--ula-palm-800);
+  --ula-icon-secondary:   var(--ula-stone-600);
+  --ula-icon-muted:       var(--ula-stone-500);
+  --ula-icon-subtle:      var(--ula-stone-300);
+  --ula-icon-disabled:    var(--ula-stone-400);
+  --ula-icon-accent:      var(--ula-palm-600);
+  --ula-icon-highlight:   var(--ula-gold-500);
+  --ula-icon-danger:      var(--ula-terracotta-400);
+  --ula-icon-on-dark:     var(--ula-sand-100);
+  --ula-icon-on-dark-subtle: var(--ula-stone-300);
+  --ula-icon-on-accent:   var(--ula-sand-50);
+
+  --ula-brand-mark-green: var(--ula-palm-700);
+  --ula-brand-mark-ivory: var(--ula-sand-100);
+
+  --ula-tone-palm-bg:  var(--ula-palm-100);
+  --ula-tone-palm-fg:  var(--ula-palm-700);
+  --ula-tone-palm-dot: var(--ula-palm-500);
+  --ula-tone-gold-bg:  var(--ula-gold-200);
+  --ula-tone-gold-fg:  var(--ula-gold-600);
+  --ula-tone-gold-dot: var(--ula-gold-400);
+  --ula-tone-terracotta-bg:  var(--ula-terracotta-200);
+  --ula-tone-terracotta-fg:  var(--ula-terracotta-600);
+  --ula-tone-terracotta-dot: var(--ula-terracotta-400);
+  --ula-tone-stone-bg:  var(--ula-stone-100);
+  --ula-tone-stone-fg:  var(--ula-stone-700);
+  --ula-tone-stone-dot: var(--ula-stone-400);
+  --ula-tone-sand-bg:   var(--ula-sand-400);
+  --ula-tone-sand-fg:   var(--ula-terracotta-600);
+
+  --ula-control-dark-fill:          var(--ula-alpha-ivory-8);
+  --ula-control-dark-fill-strong:   var(--ula-alpha-ivory-10);
+  --ula-control-dark-fill-strong-hover: var(--ula-alpha-ivory-18);
+  --ula-control-dark-fill-hover:    var(--ula-alpha-ivory-16);
+  --ula-control-dark-border:        var(--ula-alpha-ivory-16);
+  --ula-control-dark-border-subtle: var(--ula-alpha-ivory-14);
+  --ula-control-cta-on-dark:        var(--ula-sand-300);
+  --ula-control-cta-on-dark-hover:  var(--ula-sand-100);
+  --ula-control-track-off:          var(--ula-stone-300);
+
+  --ula-media-stripe-a: var(--ula-sand-400);
+  --ula-media-stripe-b: var(--ula-sand-500);
+  --ula-media-label-bg: var(--ula-alpha-page-72);
+  --ula-media-label-fg: var(--ula-stone-700);
+  --ula-spinner-track:  var(--ula-alpha-page-35);
+  --ula-spinner-head:   var(--ula-sand-50);
+
+  --ula-shadow-xs-color: var(--ula-alpha-shadow-6);
+  --ula-shadow-sm-color: var(--ula-alpha-shadow-10);
+  --ula-shadow-md-color: var(--ula-alpha-shadow-14);
+  --ula-shadow-lg-color: var(--ula-alpha-shadow-18);
+  --ula-shadow-xl-color: var(--ula-alpha-shadow-22);
+  --ula-shadow-on-map-color: var(--ula-alpha-black-55);
+
+  --ula-gradient-accent: linear-gradient(135deg, var(--ula-palm-900) 0%, var(--ula-palm-700) 100%);
+  --ula-transition-smooth: all var(--ula-duration-base) var(--ula-ease-in-out);
+
+  --ula-scrim-hero: linear-gradient(to top, rgba(14, 28, 23, 0.66) 0%, rgba(14, 28, 23, 0.10) 55%, rgba(14, 28, 23, 0) 100%);
+  --ula-scrim-bottom: linear-gradient(to top, rgba(14, 28, 23, 0.72) 0%, rgba(14, 28, 23, 0.18) 48%, rgba(14, 28, 23, 0) 100%);
+  --ula-scrim-caption: linear-gradient(to top, rgba(14, 28, 23, 0.55) 0%, rgba(14, 28, 23, 0) 70%);
+  --ula-scrim-welcome-rtl: linear-gradient(to left, rgba(251, 248, 242, 0.96) 0%, rgba(251, 248, 242, 0.80) 42%, rgba(251, 248, 242, 0) 78%);
+  --ula-scrim-welcome-ltr: linear-gradient(to right, rgba(251, 248, 242, 0.96) 0%, rgba(251, 248, 242, 0.80) 42%, rgba(251, 248, 242, 0) 78%);
+}
+
+/* --- Semantic — Dark (system preference) --- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ula-surface-page:        var(--ula-palm-950);
+    --ula-surface-page-alt:    var(--ula-palm-900);
+    --ula-surface-card:        var(--ula-palm-900);
+    --ula-surface-raised:      var(--ula-palm-800);
+    --ula-surface-sunken:      var(--ula-palm-950);
+    --ula-surface-hover:       var(--ula-palm-800);
+    --ula-surface-pressed:     var(--ula-palm-950);
+    --ula-surface-dark:        var(--ula-palm-950);
+    --ula-surface-dark-alt:    var(--ula-palm-900);
+    --ula-surface-accent-soft: var(--ula-alpha-palm-400-14);
+    --ula-surface-gold-soft:   var(--ula-alpha-gold-400-18);
+    --ula-surface-danger-soft: var(--ula-alpha-terracotta-400-20);
+    --ula-surface-warm:        var(--ula-palm-800);
+
+    --ula-text-primary:   var(--ula-sand-100);
+    --ula-text-strong:    var(--ula-sand-100);
+    --ula-text-body:      var(--ula-sand-300);
+    --ula-text-secondary: var(--ula-sand-400);
+    --ula-text-muted:     var(--ula-stone-300);
+    --ula-text-disabled:  var(--ula-stone-500);
+    --ula-text-link:      var(--ula-gold-300);
+    --ula-text-link-hover: var(--ula-gold-200);
+    --ula-text-danger:    var(--ula-terracotta-300);
+
+    --ula-border-subtle:  var(--ula-alpha-ivory-10);
+    --ula-border-default: var(--ula-alpha-ivory-18);
+    --ula-border-strong:  var(--ula-alpha-ivory-30);
+    --ula-border-hover:   var(--ula-stone-300);
+    --ula-border-focus:   var(--ula-palm-400);
+    --ula-border-danger:  var(--ula-terracotta-300);
+
+    --ula-accent-default: var(--ula-palm-400);
+    --ula-accent-hover:   var(--ula-palm-300);
+    --ula-accent-press:   var(--ula-palm-500);
+    --ula-accent-fg:      var(--ula-palm-950);
+
+    --ula-icon-primary:   var(--ula-sand-100);
+    --ula-icon-secondary: var(--ula-sand-400);
+    --ula-icon-muted:     var(--ula-stone-300);
+    --ula-icon-subtle:    var(--ula-stone-500);
+    --ula-icon-disabled:  var(--ula-stone-500);
+    --ula-icon-accent:    var(--ula-palm-300);
+    --ula-icon-highlight: var(--ula-gold-400);
+    --ula-icon-danger:    var(--ula-terracotta-300);
+
+    --ula-tone-palm-bg:  var(--ula-alpha-palm-400-14);
+    --ula-tone-palm-fg:  var(--ula-palm-300);
+    --ula-tone-palm-dot: var(--ula-palm-400);
+    --ula-tone-gold-bg:  var(--ula-alpha-gold-400-18);
+    --ula-tone-gold-fg:  var(--ula-gold-300);
+    --ula-tone-terracotta-bg: var(--ula-alpha-terracotta-400-20);
+    --ula-tone-terracotta-fg: var(--ula-terracotta-300);
+    --ula-tone-terracotta-dot: var(--ula-terracotta-300);
+    --ula-tone-stone-bg: var(--ula-alpha-ivory-10);
+    --ula-tone-stone-fg: var(--ula-stone-200);
+    --ula-tone-sand-bg:  var(--ula-alpha-ivory-16);
+    --ula-tone-sand-fg:  var(--ula-sand-400);
+
+    --ula-control-track-off: var(--ula-alpha-ivory-30);
+
+    --ula-focus-gap: var(--ula-palm-950);
+    --ula-spinner-head: var(--ula-palm-950);
+
+    --ula-shadow-sm-color: var(--ula-alpha-black-50);
+    --ula-shadow-md-color: var(--ula-alpha-black-55);
+    --ula-shadow-lg-color: var(--ula-alpha-black-60);
+
+    --ula-scrim-welcome-rtl: linear-gradient(to left, rgba(14, 28, 23, 0.96) 0%, rgba(14, 28, 23, 0.80) 42%, rgba(14, 28, 23, 0) 78%);
+    --ula-scrim-welcome-ltr: linear-gradient(to right, rgba(14, 28, 23, 0.96) 0%, rgba(14, 28, 23, 0.80) 42%, rgba(14, 28, 23, 0) 78%);
+  }
+}
+
+/* Explicit dark: [data-theme="dark"] or .dark — same block, attribute wins */
+[data-theme="dark"], .dark {
+  --ula-surface-page:        var(--ula-palm-950);
+  --ula-surface-page-alt:    var(--ula-palm-900);
+  --ula-surface-card:        var(--ula-palm-900);
+  --ula-surface-raised:      var(--ula-palm-800);
+  --ula-surface-sunken:      var(--ula-palm-950);
+  --ula-surface-hover:       var(--ula-palm-800);
+  --ula-surface-pressed:     var(--ula-palm-950);
+  --ula-surface-dark:        var(--ula-palm-950);
+  --ula-surface-dark-alt:    var(--ula-palm-900);
+  --ula-surface-accent-soft: var(--ula-alpha-palm-400-14);
+  --ula-surface-gold-soft:   var(--ula-alpha-gold-400-18);
+  --ula-surface-danger-soft: var(--ula-alpha-terracotta-400-20);
+  --ula-surface-warm:        var(--ula-palm-800);
+
+  --ula-text-primary:   var(--ula-sand-100);
+  --ula-text-strong:    var(--ula-sand-100);
+  --ula-text-body:      var(--ula-sand-300);
+  --ula-text-secondary: var(--ula-sand-400);
+  --ula-text-muted:     var(--ula-stone-300);
+  --ula-text-disabled:  var(--ula-stone-500);
+  --ula-text-link:      var(--ula-gold-300);
+  --ula-text-link-hover: var(--ula-gold-200);
+  --ula-text-danger:    var(--ula-terracotta-300);
+
+  --ula-border-subtle:  var(--ula-alpha-ivory-10);
+  --ula-border-default: var(--ula-alpha-ivory-18);
+  --ula-border-strong:  var(--ula-alpha-ivory-30);
+  --ula-border-hover:   var(--ula-stone-300);
+  --ula-border-focus:   var(--ula-palm-400);
+  --ula-border-danger:  var(--ula-terracotta-300);
+
+  --ula-accent-default: var(--ula-palm-400);
+  --ula-accent-hover:   var(--ula-palm-300);
+  --ula-accent-press:   var(--ula-palm-500);
+  --ula-accent-fg:      var(--ula-palm-950);
+
+  --ula-icon-primary:   var(--ula-sand-100);
+  --ula-icon-secondary: var(--ula-sand-400);
+  --ula-icon-muted:     var(--ula-stone-300);
+  --ula-icon-subtle:    var(--ula-stone-500);
+  --ula-icon-disabled:  var(--ula-stone-500);
+  --ula-icon-accent:    var(--ula-palm-300);
+  --ula-icon-highlight: var(--ula-gold-400);
+  --ula-icon-danger:    var(--ula-terracotta-300);
+
+  --ula-tone-palm-bg:  var(--ula-alpha-palm-400-14);
+  --ula-tone-palm-fg:  var(--ula-palm-300);
+  --ula-tone-palm-dot: var(--ula-palm-400);
+  --ula-tone-gold-bg:  var(--ula-alpha-gold-400-18);
+  --ula-tone-gold-fg:  var(--ula-gold-300);
+  --ula-tone-terracotta-bg: var(--ula-alpha-terracotta-400-20);
+  --ula-tone-terracotta-fg: var(--ula-terracotta-300);
+  --ula-tone-terracotta-dot: var(--ula-terracotta-300);
+  --ula-tone-stone-bg: var(--ula-alpha-ivory-10);
+  --ula-tone-stone-fg: var(--ula-stone-200);
+  --ula-tone-sand-bg:  var(--ula-alpha-ivory-16);
+  --ula-tone-sand-fg:  var(--ula-sand-400);
+
+  --ula-control-track-off: var(--ula-alpha-ivory-30);
+
+  --ula-focus-gap: var(--ula-palm-950);
+  --ula-spinner-head: var(--ula-palm-950);
+
+  --ula-shadow-sm-color: var(--ula-alpha-black-50);
+  --ula-shadow-md-color: var(--ula-alpha-black-55);
+  --ula-shadow-lg-color: var(--ula-alpha-black-60);
+
+  --ula-scrim-welcome-rtl: linear-gradient(to left, rgba(14, 28, 23, 0.96) 0%, rgba(14, 28, 23, 0.80) 42%, rgba(14, 28, 23, 0) 78%);
+  --ula-scrim-welcome-ltr: linear-gradient(to right, rgba(14, 28, 23, 0.96) 0%, rgba(14, 28, 23, 0.80) 42%, rgba(14, 28, 23, 0) 78%);
+}
+
+[dir="rtl"] {
+  font-family: var(--ula-font-ar);
+  --ula-scrim-welcome: var(--ula-scrim-welcome-rtl);
+}
+[dir="ltr"] {
+  font-family: var(--ula-font-en);
+  --ula-scrim-welcome: var(--ula-scrim-welcome-ltr);
+}
+
+[dir="rtl"] .ula-mirror-rtl { transform: scaleX(-1); }
+
+/* --- Type utilities (Figma text styles) --- */
+.ula-display-lg { font-family: var(--ula-font-ar); font-size: var(--ula-size-display-lg); font-weight: var(--ula-weight-semibold); line-height: var(--ula-lh-display); }
+.ula-display    { font-family: var(--ula-font-ar); font-size: var(--ula-size-display); font-weight: var(--ula-weight-semibold); line-height: var(--ula-lh-display); }
+.ula-h1 { font-family: var(--ula-font-ar); font-size: var(--ula-size-h1); font-weight: var(--ula-weight-semibold); line-height: var(--ula-lh-display); }
+.ula-h2 { font-family: var(--ula-font-ar); font-size: var(--ula-size-h2); font-weight: var(--ula-weight-semibold); line-height: var(--ula-lh-heading); }
+.ula-h3 { font-family: var(--ula-font-ar); font-size: var(--ula-size-h3); font-weight: var(--ula-weight-semibold); line-height: var(--ula-lh-heading); }
+.ula-h4 { font-family: var(--ula-font-ar); font-size: var(--ula-size-h4); font-weight: var(--ula-weight-semibold); line-height: var(--ula-lh-heading); }
+.ula-hero { font-family: var(--ula-font-ar); font-size: 30px; font-weight: var(--ula-weight-semibold); line-height: var(--ula-lh-hero); }
+.ula-body-lg { font-family: var(--ula-font-ar); font-size: var(--ula-size-body-lg); line-height: var(--ula-lh-body); }
+.ula-body    { font-family: var(--ula-font-ar); font-size: var(--ula-size-body); line-height: var(--ula-lh-body); }
+.ula-body-sm { font-family: var(--ula-font-ar); font-size: var(--ula-size-sm); line-height: var(--ula-lh-body); }
+.ula-label   { font-family: var(--ula-font-ar); font-size: var(--ula-size-body); font-weight: var(--ula-weight-medium); line-height: var(--ula-lh-body); }
+.ula-metric  { font-family: var(--ula-font-ar); font-size: 34px; font-weight: var(--ula-weight-light); line-height: var(--ula-lh-metric); }
+.ula-en-display { font-family: var(--ula-font-en); font-size: var(--ula-size-display-en); font-weight: var(--ula-weight-light); line-height: var(--ula-lh-heading); }
+.ula-en-body { font-family: var(--ula-font-en); font-size: var(--ula-size-body-en); line-height: var(--ula-lh-en); }
+.ula-mono { font-family: var(--ula-font-mono); font-size: var(--ula-size-xs); line-height: var(--ula-lh-en); }
+.ula-brand-label {
+  font-family: var(--ula-font-en);
+  font-size: var(--ula-size-label);
+  font-weight: var(--ula-weight-medium);
+  letter-spacing: var(--ula-tracking-brand);
+  text-transform: uppercase;
+}
+
+.ula-headline-group { display: flex; flex-direction: column; gap: var(--ula-space-1); }
+.ula-headline-ar { font-family: var(--ula-font-ar); font-weight: var(--ula-weight-semibold); color: var(--ula-text-primary); line-height: var(--ula-lh-hero); }
+.ula-headline-en { font-family: var(--ula-font-en); font-weight: var(--ula-weight-light); color: var(--ula-text-secondary); line-height: var(--ula-lh-heading); }
+
+/* --- Surface utilities --- */
+.ula-card {
+  background-color: var(--ula-surface-card);
+  border: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
+  border-radius: var(--ula-radius-lg);
+  box-shadow: var(--ula-shadow-xs);
+  transition: transform var(--ula-duration-base) var(--ula-ease-out),
+              box-shadow var(--ula-duration-base) var(--ula-ease-out),
+              border-color var(--ula-duration-base) var(--ula-ease-out);
+}
+.ula-card-hover:hover {
+  transform: translateY(-2px);
+  border-color: var(--ula-border-strong);
+  box-shadow: var(--ula-shadow-md);
+}
+
+/* --- Legacy button hook (.nx-btn.nx-btn--primary) -----------------------
+   Several pages (login, register, welcome, profile tab) still markup
+   their submit/CTA buttons as `.nx-btn .nx-btn--primary` — that class
+   pair never had a rule anywhere, so those buttons rendered as bare
+   unstyled <button>/<a> elements. Defined once here since the class is
+   loaded on every page via ulaspace-tokens.css.
+   Scoped as the COMPOUND selector `.nx-btn.nx-btn--primary` rather than
+   a bare `.nx-btn` — the dashboard's own button family (.nx-btn-primary/
+   -secondary/-outline/-danger, single dash, in ulaspace-dashboard.css)
+   is unrelated but happens to combine with a literal `nx-btn` class on
+   the same elements; a bare `.nx-btn` rule here would win the cascade
+   (this file loads after ulaspace-dashboard.css) and silently strip
+   their border/background. */
+.nx-btn.nx-btn--primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ula-space-3);
+  height: 44px;
+  padding: 0 var(--ula-space-7);
+  border: var(--ula-border-width-hairline) solid transparent;
+  border-radius: var(--ula-radius-md);
+  font-family: var(--ula-font-ar);
+  font-size: var(--ula-size-body);
+  font-weight: var(--ula-weight-semibold);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--ula-duration-fast) var(--ula-ease-out),
+              border-color var(--ula-duration-fast) var(--ula-ease-out);
+  background: var(--ula-accent-default);
+  border-color: var(--ula-accent-default);
+  color: var(--ula-accent-fg);
+}
+.nx-btn.nx-btn--primary:hover {
+  background: var(--ula-accent-hover);
+  border-color: var(--ula-accent-hover);
+}
+.nx-btn.nx-btn--primary:active {
+  background: var(--ula-accent-press);
+  border-color: var(--ula-accent-press);
+}
+.nx-btn.nx-btn--primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.ula-glass {
+  background: var(--ula-surface-capsule);
+  backdrop-filter: var(--ula-backdrop-blur);
+  -webkit-backdrop-filter: var(--ula-backdrop-blur);
+  border: var(--ula-border-width-hairline) solid var(--ula-border-on-dark);
+}
+.ula-container { max-width: var(--ula-layout-container-max); margin-inline: auto; padding-inline: var(--ula-layout-gutter); }
+.ula-container-narrow { max-width: var(--ula-layout-container-narrow); margin-inline: auto; padding-inline: var(--ula-layout-gutter); }
