@@ -1,6 +1,10 @@
 <div id="tab-projects" class="tab-view">
     <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
         <div>
+            <h1 class="page-title" style="font-size: 22px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                <span class="material-symbols-rounded" style="font-size: 24px; color: var(--ula-highlight-default);">folder</span>
+                <span>{{ __('Projects Portfolio') }}</span>
+            </h1>
             <p class="page-subtitle" style="font-size: 13px; color: var(--ula-text-secondary);">{{ __('Manage company initiatives, milestones, tasks, and budgets.') }}</p>
         </div>
         @if($membership->hasPermission('projects.manage') || $membership->role?->slug === 'company_admin')

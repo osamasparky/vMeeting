@@ -1,6 +1,10 @@
 <div id="tab-my-tasks" class="tab-view">
     <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-7); flex-wrap: wrap; gap: var(--ula-space-5);">
         <div>
+            <h1 class="page-title" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); margin-bottom: var(--ula-space-2); display: flex; align-items: center; gap: var(--ula-space-3);">
+                <span class="material-symbols-rounded" style="font-size: 28px; color: var(--ula-accent-default);">task_alt</span>
+                <span>{{ __('My Tasks & Action Items') }}</span>
+            </h1>
             <p class="page-subtitle" style="font-size: var(--ula-size-sm); color: var(--ula-text-secondary);">{{ __('Track and log time against your personal assigned tasks.') }}</p>
         </div>
         <div style="display: flex; gap: var(--ula-space-4);">

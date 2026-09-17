@@ -14,38 +14,26 @@
 
     <style>
         :root {
-            --bg-primary: var(--nx-bg-page, #F9F4EE);
-            --bg-card: var(--nx-bg-surface, #FFFFFF);
-            --bg-input: var(--nx-sand-100, #F9F4EE);
-            --border-color: var(--nx-border-subtle, rgba(27, 50, 35, 0.08));
-            --text-primary: var(--nx-text-primary, #142B24);
-            --text-secondary: var(--nx-text-secondary, #5A6B63);
-            --text-muted: var(--nx-text-muted, #8E9D95);
-            --brand-primary: var(--nx-palm-900, #142B24);
-            --brand-accent: var(--nx-palm-700, #1B3223);
-            --brand-emerald: var(--nx-palm-500, #1E412F);
-            --status-success: var(--nx-status-live, #3C6B4C);
-            --status-error: var(--nx-status-attention, #9A5827);
-            --font-ar: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-en: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-mono: 'IBM Plex Mono', monospace;
+            --bg-primary: var(--ula-surface-page);
+            --bg-card: var(--ula-surface-card);
+            --bg-input: var(--ula-surface-sunken);
+            --border-color: var(--ula-border-subtle);
+            --text-primary: var(--ula-text-primary);
+            --text-secondary: var(--ula-text-secondary);
+            --text-muted: var(--ula-text-muted);
+            --brand-primary: var(--ula-palm-900);
+            --brand-accent: var(--ula-accent-default);
+            --brand-emerald: var(--ula-palm-500);
+            --status-success: var(--ula-status-success);
+            --status-error: var(--ula-status-danger);
+            --font-ar: var(--ula-font-ar);
+            --font-en: var(--ula-font-en);
+            --font-mono: var(--ula-font-mono);
             --font-family: var(--font-en);
         }
 
         [dir="rtl"], [lang="ar"] {
             --font-family: var(--font-ar);
-        }
-
-        [data-theme="dark"], html.dark, body.dark-mode {
-            --bg-primary: var(--nx-palm-950, #0B1410);
-            --bg-card: var(--nx-palm-900, #142B24);
-            --bg-input: var(--nx-palm-950, #0B1410);
-            --border-color: var(--nx-border-subtle, rgba(237, 230, 217, 0.12));
-            --text-primary: var(--nx-sand-100, #F9F4EE);
-            --text-secondary: var(--nx-sand-400, #E3D2BB);
-            --text-muted: var(--nx-text-muted, #A4B5AD);
-            --brand-primary: var(--nx-palm-300, #4EA66F);
-            --brand-accent: var(--nx-sand-300, #EADCC9);
         }
 
         * {
@@ -97,8 +85,8 @@
             align-items: center;
             justify-content: center;
             padding: 60px;
-            background: linear-gradient(145deg, #142B24 0%, #1B3223 50%, #0B1410 100%);
-            color: var(--nx-sand-100, #F9F4EE);
+            background: linear-gradient(145deg, #142B24 0%, #1B3223 50%, #0e1c17 100%);
+            color: var(--ula-sand-100, #f9f6ef);
             position: relative;
             overflow: hidden;
         }
@@ -124,11 +112,11 @@
         .auth-card {
             width: 100%;
             max-width: 460px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--nx-radius-xl, 20px);
+            background: var(--ula-surface-card);
+            border: 1px solid var(--ula-border-subtle);
+            border-radius: var(--ula-radius-xl, 20px);
             padding: 40px 32px;
-            box-shadow: var(--nx-shadow-md, 0 8px 24px -8px rgba(27, 50, 35, 0.12));
+            box-shadow: var(--ula-shadow-md, 0 8px 24px -8px rgba(27, 50, 35, 0.12));
             animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -148,12 +136,12 @@
             width: 42px;
             height: 42px;
             background: linear-gradient(135deg, #142B24 0%, #1E412F 100%);
-            border-radius: var(--nx-radius-md, 12px);
+            border-radius: var(--ula-radius-md, 12px);
             display: flex;
             align-items: center;
             justify-content: center;
             color: #FFFFFF;
-            box-shadow: var(--nx-shadow-sm);
+            box-shadow: var(--ula-shadow-sm);
         }
 
         .logo-icon .material-symbols-rounded {
@@ -163,20 +151,20 @@
         .logo-text {
             font-size: 19px;
             font-weight: 800;
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
             letter-spacing: -0.2px;
         }
 
         .auth-title {
             font-size: 24px;
             font-weight: 800;
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
             margin-bottom: 6px;
             line-height: 1.25;
         }
 
         .auth-subtitle {
-            color: var(--text-secondary);
+            color: var(--ula-text-secondary);
             font-size: 14px;
             margin-bottom: 24px;
             line-height: 1.5;
@@ -191,7 +179,7 @@
             display: block;
             font-size: 12px;
             font-weight: 700;
-            color: var(--text-secondary);
+            color: var(--ula-text-secondary);
             margin-bottom: 6px;
             letter-spacing: 0.2px;
         }
@@ -205,7 +193,7 @@
             inset-inline-start: 14px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-muted);
+            color: var(--ula-text-muted);
             font-size: 20px;
             pointer-events: none;
             display: flex;
@@ -216,10 +204,10 @@
             width: 100%;
             padding: 12px 16px;
             padding-inline-start: 42px;
-            background: var(--bg-input);
-            border: 1px solid var(--border-color);
-            border-radius: var(--nx-radius-md, 12px);
-            color: var(--text-primary);
+            background: var(--ula-surface-page);
+            border: 1px solid var(--ula-border-subtle);
+            border-radius: var(--ula-radius-md, 12px);
+            color: var(--ula-text-primary);
             font-size: 14px;
             font-weight: 500;
             font-family: inherit;
@@ -234,7 +222,7 @@
         }
 
         .form-input::placeholder {
-            color: var(--text-muted);
+            color: var(--ula-text-muted);
             font-weight: 400;
         }
 
@@ -245,7 +233,7 @@
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: var(--text-muted);
+            color: var(--ula-text-muted);
             cursor: pointer;
             padding: 4px;
             display: flex;
@@ -254,7 +242,7 @@
         }
 
         .password-toggle:hover {
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
         }
 
         .password-toggle .material-symbols-rounded {
@@ -274,7 +262,7 @@
             gap: 8px;
             font-size: 13px;
             font-weight: 600;
-            color: var(--text-secondary);
+            color: var(--ula-text-secondary);
             cursor: pointer;
         }
 
@@ -300,7 +288,7 @@
             text-align: center;
             margin-top: 24px;
             font-size: 13px;
-            color: var(--text-secondary);
+            color: var(--ula-text-secondary);
             font-weight: 500;
         }
 
@@ -315,7 +303,7 @@
 
         .alert {
             padding: 12px 16px;
-            border-radius: var(--nx-radius-md, 12px);
+            border-radius: var(--ula-radius-md, 12px);
             font-size: 13px;
             font-weight: 600;
             margin-bottom: 20px;
@@ -327,13 +315,13 @@
         .alert-error {
             background: rgba(154, 88, 39, 0.08);
             border: 1px solid rgba(154, 88, 39, 0.25);
-            color: var(--status-error);
+            color: var(--ula-status-danger);
         }
 
         .alert-success {
             background: rgba(60, 107, 76, 0.08);
             border: 1px solid rgba(60, 107, 76, 0.25);
-            color: var(--status-success);
+            color: var(--ula-status-success);
         }
 
         .alert .material-symbols-rounded {
@@ -351,11 +339,11 @@
             margin: 0 auto 24px;
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: var(--nx-radius-xl, 20px);
+            border-radius: var(--ula-radius-xl, 20px);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--nx-sand-300, #EADCC9);
+            color: var(--ula-sand-300, #EADCC9);
         }
         .brand-panel-icon .material-symbols-rounded {
             font-size: 38px;
@@ -364,26 +352,26 @@
             font-size: 28px;
             font-weight: 800;
             margin-bottom: 14px;
-            color: var(--nx-sand-100, #F9F4EE);
+            color: var(--ula-sand-100, #f9f6ef);
             letter-spacing: -0.3px;
         }
         .brand-description {
-            color: var(--nx-sand-400, #E3D2BB);
+            color: var(--ula-sand-400, #E3D2BB);
             font-size: 15px;
             line-height: 1.7;
             font-weight: 400;
         }
 
         .lang-switch-btn {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
+            background: var(--ula-surface-card);
+            border: 1px solid var(--ula-border-subtle);
+            color: var(--ula-text-primary);
             padding: 8px 14px;
-            border-radius: var(--nx-radius-md, 12px);
+            border-radius: var(--ula-radius-md, 12px);
             font-size: 13px;
             text-decoration: none;
             font-weight: 700;
-            box-shadow: var(--nx-shadow-sm);
+            box-shadow: var(--ula-shadow-sm);
             display: inline-flex;
             align-items: center;
             gap: 6px;

@@ -4,6 +4,10 @@
             <!-- Page Header -->
             <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
                 <div>
+                    <h1 class="page-title" style="font-size: 22px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-rounded" style="font-size: 24px; color: var(--ula-highlight-default);">meeting_room</span>
+                        <span>{{ __('Meeting Rooms & Spatial Office Distribution') }}</span>
+                    </h1>
                     <p class="page-subtitle" style="font-size: 13px; color: var(--ula-text-secondary);">
                         {{ __('Explore, inspect, and organize rooms across all company branches, maps, and spatial floorplans.') }}
                     </p>

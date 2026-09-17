@@ -100,7 +100,7 @@
                         <input type="checkbox" name="remember" class="form-check-input">
                         {{ __('Remember me') }}
                     </label>
-                    <span style="color: var(--text-muted); font-size: 13px; font-weight: 700;">{{ __('Forgot password?') }}</span>
+                    <a href="#" class="form-link">{{ __('Forgot password?') }}</a>
                 </div>
 
                 <button type="submit" class="nx-btn nx-btn--primary" id="loginBtn" style="width: 100%; justify-content: center; padding: 12px 20px; font-weight: 700;">

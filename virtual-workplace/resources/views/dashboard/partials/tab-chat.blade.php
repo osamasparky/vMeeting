@@ -1,6 +1,10 @@
 <div id="tab-chat" class="tab-view">
     <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-5); flex-wrap: wrap; gap: var(--ula-space-4);">
         <div>
+            <h1 class="page-title" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); margin-bottom: var(--ula-space-2); display: flex; align-items: center; gap: var(--ula-space-3);">
+                <span class="material-symbols-rounded" style="font-size: 26px; color: var(--ula-accent-default);">chat</span>
+                <span>{{ __('Team Chat & Direct Messages') }}</span>
+            </h1>
             <p class="page-subtitle" style="font-size: var(--ula-size-xs); color: var(--ula-text-secondary); margin: 0;">{{ __('Realtime company communication, direct colleague messaging, and team collaboration channels.') }}</p>
         </div>
         <div style="display: flex; gap: var(--ula-space-3); align-items: center;">

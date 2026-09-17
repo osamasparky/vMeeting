@@ -1,5 +1,9 @@
 <div id="tab-profile" class="tab-view">
     <div class="page-header" style="margin-bottom: var(--ula-space-7, 24px);">
+        <h1 class="page-title" style="font-size: var(--ula-size-h3, 24px); font-weight: 800; color: var(--ula-text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+            <span class="material-symbols-rounded" style="font-size: 28px; color: var(--ula-palm-700, #1E412F);">account_circle</span>
+            <span>{{ __('User Profile & Account') }}</span>
+        </h1>
         <p class="page-subtitle" style="font-size: var(--ula-size-sm, 14px); color: var(--ula-text-secondary);">{{ __('Manage your digital identity, avatar, contact details, skills, social links, and security.') }}</p>
     </div>
 

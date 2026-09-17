@@ -18,99 +18,38 @@
            ═══════════════════════════════════════════════════════════════ */
         :root {
             /* Light Theme (Warm Ivory & Forest Palm Baseline) */
-            --bg-base: var(--ula-surface-page, #F9F4EE);
-            --bg-surface: var(--ula-surface-card, #FFFFFF);
-            --bg-surface-subtle: var(--ula-sand-200, #F4EDE1);
-            --bg-surface-hover: var(--ula-sand-200, #F4EDE1);
-            --bg-card: var(--ula-surface-card, #FFFFFF);
-            --bg-input: var(--ula-sand-100, #F9F4EE);
-            --bg-elevated: var(--ula-surface-raised, #FFFFFF);
-            --border-color: var(--ula-border-subtle, rgba(27, 50, 35, 0.08));
-            --border-color-glow: rgba(211, 165, 83, 0.35);
+                                                --bg-surface-hover: var(--ula-sand-200, #F4EDE1);
+                                                            --border-color-glow: rgba(211, 165, 83, 0.35);
 
-            --text-primary: var(--ula-text-primary, #142B24);
-            --text-secondary: var(--ula-text-secondary, #5A6B63);
-            --text-muted: var(--ula-text-muted, #8E9D95);
-            --text-dim: var(--ula-sand-500, #C1B6A6);
-
-            --brand-primary: var(--ula-palm-900, #142B24);
-            --brand-forest: var(--ula-palm-900, #142B24);
-            --brand-sage: var(--ula-palm-500, #1E412F);
-            --brand-emerald: var(--ula-palm-500, #3C6B4C);
-            --brand-teal: var(--ula-palm-900, #142B24);
-            --brand-pine: var(--ula-palm-800, #1B3223);
-            --brand-navy: var(--ula-palm-950, #0B1410);
-            --brand-green: var(--ula-palm-500, #3C6B4C);
+                                                
+                                                                        --brand-pine: var(--ula-palm-800, #1B3223);
+                        --brand-green: var(--ula-palm-500, #3C6B4C);
             --brand-orange: #b46c34;
 
-            --status-success: var(--ula-status-success, #3C6B4C);
-            --status-warning: var(--ula-status-warning, #D3A553);
-            --status-danger: var(--ula-status-danger, #9A5827);
-            --status-info: var(--ula-palm-900, #142B24);
+                                                --status-info: var(--ula-palm-900, #142B24);
 
-            --shadow-card: var(--ula-shadow-sm, 0 2px 8px -2px rgba(27, 50, 35, 0.10));
-            --shadow-hover: var(--ula-shadow-md, 0 8px 24px -8px rgba(27, 50, 35, 0.14));
-            --shadow-tactile-btn: var(--ula-shadow-sm);
-            --shadow-tactile-secondary: var(--ula-shadow-sm);
-            --shadow-soft-3d: 0 1px 3px rgba(27, 50, 35, 0.08);
-            --shadow-inset-3d: inset 0 1px 2px rgba(27, 50, 35, 0.05);
-
-            --accent-gradient: linear-gradient(135deg, #142B24 0%, #1E412F 100%);
+                                                                        
+            --ula-gradient-accent: linear-gradient(135deg, #142B24 0%, #1E412F 100%);
             --radius-xs: 6px;
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-xl: 20px;
-
-            --font-ar: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-en: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-mono: 'IBM Plex Mono', monospace;
-            --font-family: var(--font-en);
-        }
+                                                
+                                                        }
 
         [dir="rtl"], [lang="ar"] {
-            --font-family: var(--font-ar);
-        }
+                    }
 
         [data-theme="dark"], html.dark, body.dark-mode {
-            --bg-base: var(--ula-palm-950, #0B1410);
-            --bg-surface: var(--ula-palm-900, #142B24);
-            --bg-surface-subtle: #17221F;
-            --bg-surface-hover: #1e382f;
-            --bg-card: var(--ula-palm-900, #142B24);
-            --bg-input: var(--ula-palm-950, #0B1410);
-            --bg-elevated: var(--ula-palm-700, #1B3223);
-            --border-color: var(--ula-border-subtle, rgba(237, 230, 217, 0.12));
-            --border-color-glow: rgba(211, 165, 83, 0.35);
+                                                --bg-surface-hover: #1b3223;
+                                                            --border-color-glow: rgba(211, 165, 83, 0.35);
 
-            --text-primary: var(--ula-sand-100, #F9F4EE);
-            --text-secondary: var(--ula-sand-400, #E3D2BB);
-            --text-muted: var(--ula-text-muted, #A4B5AD);
-            --text-dim: #63756D;
+                                                
+                                                                        --brand-pine: var(--ula-palm-700, #1E412F);
+                        --brand-green: var(--ula-palm-500, #8baa94);
+            --brand-orange: #e6c88b;
 
-            --brand-primary: var(--ula-palm-300, #4EA66F);
-            --brand-forest: var(--ula-sand-100, #F9F4EE);
-            --brand-sage: var(--ula-palm-300, #4EA66F);
-            --brand-emerald: var(--ula-palm-300, #4EA66F);
-            --brand-teal: var(--ula-palm-300, #4EA66F);
-            --brand-pine: var(--ula-palm-500, #1E412F);
-            --brand-navy: var(--ula-sand-100, #F9F4EE);
-            --brand-green: var(--ula-palm-300, #4EA66F);
-            --brand-orange: #e5b765;
+                                                --status-info: var(--ula-palm-500, #8baa94);
 
-            --status-success: var(--ula-status-success, #4EA66F);
-            --status-warning: var(--ula-status-warning, #E5B765);
-            --status-danger: var(--ula-status-danger, #C9743A);
-            --status-info: var(--ula-palm-300, #4EA66F);
-
-            --shadow-card: 0 2px 8px -2px rgba(0, 0, 0, 0.40);
-            --shadow-hover: 0 8px 24px -8px rgba(0, 0, 0, 0.50);
-            --shadow-tactile-btn: 0 2px 8px -2px rgba(0, 0, 0, 0.40);
-            --shadow-tactile-secondary: 0 2px 8px -2px rgba(0, 0, 0, 0.40);
-            --shadow-soft-3d: 0 1px 3px rgba(0, 0, 0, 0.3);
-            --shadow-inset-3d: inset 0 1px 3px rgba(0, 0, 0, 0.4);
-
-            --accent-gradient: linear-gradient(135deg, #1E412F 0%, #3C6B4C 100%);
+                                                                        
+            --ula-gradient-accent: linear-gradient(135deg, #1E412F 0%, #3C6B4C 100%);
         }
 
         * {
@@ -121,7 +60,6 @@
         }
 
         body {
-            font-family: var(--ula-font-family);
             background-color: var(--ula-surface-page);
             color: var(--ula-text-primary);
             min-height: 100vh;

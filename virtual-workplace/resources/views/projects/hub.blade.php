@@ -12,122 +12,58 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
     <!-- Centralized UlaSpace Design System Tokens -->
     <link rel="stylesheet" href="{{ asset('css/ulaspace-tokens.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/modern-design-system.css') }}">
     <link rel="stylesheet" href="{{ asset('css/ulaspace-dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/modern-design-system.css') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         :root {
             /* 🌿 UlaSpace Design Tokens Mapping */
-            --bg-primary: var(--nx-bg-page);
-            --bg-canvas: var(--nx-bg-page);
-            --bg-body: var(--nx-bg-page);
-            --bg-secondary: var(--nx-bg-surface);
-            --bg-surface: var(--nx-bg-surface);
-            --bg-surface-subtle: var(--nx-sand-200);
-            --bg-card: var(--nx-bg-card);
-            --bg-elevated: var(--nx-bg-surface-elevated);
-            --bg-surface-elevated: var(--nx-bg-surface-elevated);
-            
-            --sidebar-bg: var(--nx-bg-surface);
-            --sidebar-text: var(--nx-text-primary);
-            --sidebar-text-muted: var(--nx-text-muted);
-            --sidebar-hover: var(--nx-bg-surface-hover);
-            --sidebar-active: var(--nx-palm-900);
-            --sidebar-border: var(--nx-border-subtle);
+                        --bg-canvas: var(--ula-surface-page);
+                        --bg-secondary: var(--ula-surface-card);
+                                                                        
+                                                                        
+                                    --border-focus: var(--ula-palm-900);
 
-            --border-color: var(--nx-border-subtle);
-            --border-subtle: var(--nx-border-subtle);
-            --border-focus: var(--nx-palm-900);
-
-            --text-primary: var(--nx-text-primary);
-            --text-secondary: var(--nx-text-secondary);
-            --text-muted: var(--nx-text-muted);
-            --text-dim: var(--nx-sand-500);
-
+                                                
             /* Core Brand Green & Accents */
-            --brand-forest: var(--nx-palm-900);
-            --brand-workspace: var(--nx-palm-700);
-            --brand-sage: var(--nx-palm-500);
-            --brand-leaf: var(--nx-palm-300);
+                        --brand-workspace: var(--ula-palm-800);
+                        --brand-leaf: var(--ula-palm-500);
             --brand-soft-sage: #BFD4B8;
-            --brand-gold: var(--nx-gold-400);
-            --accent-gold: var(--nx-gold-400);
-            --status-warning: var(--nx-status-scheduled);
-            --status-danger: var(--nx-status-attention);
-            --status-success: var(--nx-status-live);
-            --status-info: var(--nx-palm-900);
+                        --accent-gold: var(--ula-gold-400);
+                                                --status-info: var(--ula-palm-900);
 
-            --accent-gradient: linear-gradient(135deg, var(--nx-palm-900) 0%, var(--nx-palm-700) 100%);
-            --accent-gradient-gold: linear-gradient(135deg, var(--nx-gold-400) 0%, var(--nx-gold-600) 100%);
+            --ula-gradient-accent: linear-gradient(135deg, var(--ula-palm-900) 0%, var(--ula-palm-800) 100%);
+            --ula-gradient-accent-gold: linear-gradient(135deg, var(--ula-gold-400) 0%, var(--ula-gold-600) 100%);
 
             /* 3D Shadows & Elevation */
-            --shadow-soft-3d: var(--nx-shadow-sm);
-            --shadow-card: var(--nx-shadow-sm);
-            --shadow-elevated: var(--nx-shadow-md);
-            --shadow-inset-3d: inset 0 1px 2px rgba(27, 50, 35, 0.05);
-
-            --radius-sm: var(--nx-radius-sm);
-            --radius-md: var(--nx-radius-md);
-            --radius-lg: var(--nx-radius-lg);
-            --radius-xl: var(--nx-radius-xl);
-            --radius-full: var(--nx-radius-pill);
-            
-            --transition-smooth: all var(--nx-duration-base) var(--nx-ease-standard);
-            --font-family: var(--nx-font-family);
-        }
+                                                
+                                                                        
+            --ula-transition-smooth: all var(--ula-duration-base) var(--ula-ease-in-out);
+                    }
 
         [dir="rtl"], [lang="ar"] {
-            --font-family: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-family: var(--ula-font-ar);
         }
 
         [dir="ltr"], [lang="en"] {
-            --font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-family: var(--ula-font-en);
         }
 
         /* 🌙 Dark Spatial Workspace Mode */
         [data-theme="dark"], body.dark-mode {
-            --bg-primary: var(--nx-palm-950);
-            --bg-canvas: var(--nx-palm-950);
-            --bg-body: var(--nx-palm-950);
-            --bg-secondary: var(--nx-palm-900);
-            --bg-surface: var(--nx-palm-900);
-            --bg-surface-subtle: #17221F;
-            --bg-card: var(--nx-palm-900);
-            --bg-elevated: var(--nx-palm-700);
-            --bg-surface-elevated: var(--nx-palm-700);
+                        --bg-canvas: var(--ula-palm-950);
+                        --bg-secondary: var(--ula-palm-900);
+                                                            
+                                                                        
+                                    --border-focus: var(--ula-highlight-default);
 
-            --sidebar-bg: var(--nx-palm-900);
-            --sidebar-text: var(--nx-sand-100);
-            --sidebar-text-muted: var(--nx-sand-400);
-            --sidebar-hover: #1e382f;
-            --sidebar-active: var(--nx-palm-700);
-            --sidebar-border: var(--nx-border-subtle);
-
-            --border-color: var(--nx-border-subtle);
-            --border-subtle: var(--nx-border-subtle);
-            --border-focus: var(--nx-accent);
-
-            --text-primary: var(--nx-sand-100);
-            --text-secondary: var(--nx-sand-400);
-            --text-muted: #a4b5ad;
-            --text-dim: #63756d;
-
-            --brand-forest: var(--nx-palm-300);
-            --brand-workspace: var(--nx-palm-300);
-            --brand-sage: var(--nx-palm-300);
-            --brand-leaf: var(--nx-palm-300);
-            --brand-gold: var(--nx-gold-400);
-            --status-danger: var(--nx-status-attention);
-            --status-warning: var(--nx-status-scheduled);
-            --status-success: var(--nx-status-live);
-
-            --accent-gradient: linear-gradient(135deg, var(--nx-palm-900) 0%, var(--nx-palm-700) 100%);
-            --shadow-soft-3d: var(--nx-shadow-sm);
-            --shadow-card: var(--nx-shadow-sm);
-            --shadow-elevated: var(--nx-shadow-md);
-            --shadow-inset-3d: inset 0 2px 6px rgba(0, 0, 0, 0.55);
-        }
+                                                
+                        --brand-workspace: var(--ula-palm-500);
+                        --brand-leaf: var(--ula-palm-500);
+                                                
+            --ula-gradient-accent: linear-gradient(135deg, var(--ula-palm-900) 0%, var(--ula-palm-800) 100%);
+                                                        }
 
         * {
             box-sizing: border-box;
@@ -136,7 +72,6 @@
         }
 
         body {
-            font-family: var(--ula-font-family);
             background-color: var(--ula-surface-page);
             color: var(--ula-text-primary);
             min-height: 100vh;
@@ -154,20 +89,20 @@
         /* ── WORKSPACE APP SHELL & SIDEBAR ── */
         .app-sidebar {
             width: 270px;
-            background: var(--ula-surface-card);
-            color: var(--ula-text-primary);
+            background: var(--ula-surface-dark);
+            color: var(--ula-text-on-dark);
             height: 100vh;
             position: sticky;
             top: 0;
             display: flex;
             flex-direction: column;
-            border-inline-end: 1px solid var(--ula-border-subtle);
+            border-inline-end: 1px solid var(--ula-border-on-dark);
             z-index: 200;
             transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             flex-shrink: 0;
             overflow-y: auto;
             overflow-x: hidden;
-            box-shadow: var(--ula-shadow-xs);
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
         }
 
         .app-sidebar.collapsed {
@@ -179,7 +114,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid var(--ula-border-subtle);
+            border-bottom: 1px solid var(--ula-border-on-dark);
         }
 
         .brand-logo-area {
@@ -209,12 +144,12 @@
             font-size: 15px;
             font-weight: 900;
             letter-spacing: -0.2px;
-            color: var(--ula-text-primary);
+            color: #FFFDF6;
         }
 
         .brand-sub {
             font-size: 11px;
-            color: var(--ula-text-muted);
+            color: var(--ula-text-on-dark-muted);
         }
 
         .sidebar-nav-list {
@@ -231,7 +166,7 @@
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 0.8px;
-            color: var(--ula-text-muted);
+            color: var(--ula-text-on-dark-muted);
             padding: 12px 14px 6px 14px;
             white-space: nowrap;
         }
@@ -246,7 +181,7 @@
             gap: 12px;
             padding: 10px 14px;
             border-radius: var(--ula-radius-sm);
-            color: var(--ula-text-secondary);
+            color: var(--ula-text-on-dark);
             font-size: 13px;
             font-weight: 700;
             transition: var(--ula-transition-smooth);
@@ -256,8 +191,8 @@
         }
 
         .sidebar-link-btn:hover {
-            background: var(--ula-surface-hover);
-            color: var(--ula-text-primary);
+            background: var(--ula-control-dark-fill-hover);
+            color: #FFFDF6;
             transform: translateX(2px);
         }
 
@@ -266,13 +201,9 @@
         }
 
         .sidebar-link-btn.active {
-            background: var(--ula-palm-900);
-            color: var(--ula-sand-50);
-            box-shadow: var(--ula-shadow-sm);
-        }
-        .sidebar-link-btn.active .sidebar-badge-pill {
-            background: rgba(255, 255, 255, 0.22);
-            color: #FFFFFF;
+            background: var(--ula-control-dark-fill-strong);
+            color: #FFFDF6;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
         }
 
         .sidebar-link-btn .nav-icon {
@@ -291,8 +222,8 @@
 
         .sidebar-badge-pill {
             margin-inline-start: auto;
-            background: var(--ula-tone-palm-bg);
-            color: var(--ula-tone-palm-fg);
+            background: rgba(255, 255, 255, 0.15);
+            color: #FFFDF6;
             font-size: 11px;
             font-weight: 800;
             padding: 2px 8px;
@@ -301,7 +232,7 @@
 
         .sidebar-footer {
             padding: 16px;
-            border-top: 1px solid var(--ula-border-subtle);
+            border-top: 1px solid var(--ula-border-on-dark);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -456,16 +387,63 @@
             margin-bottom: 24px;
         }
 
-        /* .kpi-card/.kpi-header/.kpi-title/.kpi-icon-box/.kpi-value intentionally
-           NOT redefined here — this page already loads ulaspace-dashboard.css,
-           which defines all five (plus .kpi-trend) for the whole platform. A
-           local copy here used to shadow it with near-identical but separately
-           maintained values, so this page's cards could silently drift from
-           every other page's the next time only one of the two got edited.
-           (The shared rules used to live only in dashboard.blade.php's own
-           inline <style>, which this page never loads — moved into
-           ulaspace-dashboard.css so it is actually shared, not just assumed
-           to be.) */
+        .kpi-card {
+            background: var(--ula-surface-card);
+            border: 1px solid var(--ula-border-subtle);
+            border-radius: var(--ula-radius-lg);
+            padding: 18px 20px;
+            box-shadow: var(--ula-shadow-xs);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: var(--ula-transition-smooth);
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--ula-shadow-lg);
+            border-color: var(--ula-palm-900);
+        }
+
+        .kpi-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .kpi-title {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--ula-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .kpi-icon-box {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: linear-gradient(145deg, #437E51 0%, #225433 100%);
+            border: 1px solid #1B4529;
+            color: #FFFFFF !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 4px 12px rgba(34, 84, 51, 0.32), inset 0 1px 1px rgba(255, 255, 255, 0.45);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+        }
+
+        .kpi-value {
+            font-size: 24px;
+            font-weight: 900;
+            color: var(--ula-text-primary);
+            font-family: 'Inter', sans-serif;
+            margin-bottom: 4px;
+        }
 
         /* Navigation Sub Tabs */
         .hub-tabs-nav {
@@ -588,7 +566,7 @@
         .kanban-card {
             background: var(--ula-surface-card);
             border: 1px solid var(--ula-border-subtle);
-            border-radius: var(--ula-radius-md);
+            border-radius: var(--ula-radius-sm);
             padding: 14px;
             box-shadow: var(--ula-shadow-xs);
             margin-bottom: 12px;
@@ -599,8 +577,8 @@
 
         .kanban-card:hover {
             transform: translateY(-2px);
-            border-color: var(--ula-border-strong);
-            box-shadow: var(--ula-shadow-md);
+            border-color: var(--ula-palm-900);
+            box-shadow: var(--ula-shadow-xs);
         }
 
         /* ── ClickUp 3D Tactile Task Context Menu ── */
@@ -1121,7 +1099,7 @@
                     <div class="brand-sub">{{ __('Virtual Workplace') }}</div>
                 </div>
             </div>
-            <button onclick="toggleSidebarCollapse()" class="tactile-btn btn-secondary" style="padding: 4px 8px; font-size: 11px; background: transparent; border: 1px solid var(--ula-border-default); color: var(--ula-text-muted);" title="{{ __('Toggle Slim Sidebar') }}">
+            <button onclick="toggleSidebarCollapse()" class="tactile-btn btn-secondary" style="padding: 4px 8px; font-size: 11px; background: transparent; border: 1px solid var(--ula-border-on-dark); color: var(--ula-text-on-dark-muted);" title="{{ __('Toggle Slim Sidebar') }}">
                 ↔
             </button>
         </div>
@@ -1131,15 +1109,15 @@
             <li class="nav-category-title">{{ __('Workspace') }}</li>
             <li>
                 <a href="{{ route('dashboard') }}#overview" class="sidebar-link-btn">
-                    <span class="nav-icon material-symbols-rounded">dashboard</span>
+                    <span class="nav-icon">📊</span>
                     <span class="nav-label-text">{{ __('Dashboard') }}</span>
                 </a>
             </li>
             <li>
-                <a href="{{ route('office') }}" class="sidebar-link-btn" style="background: var(--ula-tone-palm-bg); color: var(--ula-tone-palm-fg);">
-                    <span class="nav-icon material-symbols-rounded">view_in_ar</span>
+                <a href="{{ route('office') }}" class="sidebar-link-btn" style="background: rgba(79, 155, 95, 0.18); color: #7EE092;">
+                    <span class="nav-icon">🚀</span>
                     <span class="nav-label-text">{{ __('Enter Office') }}</span>
-                    <span class="sidebar-badge-pill">{{ __('مباشر') }}</span>
+                    <span class="sidebar-badge-pill" style="background: #4F9B5F; color: white;">LIVE</span>
                 </a>
             </li>
 
@@ -1147,7 +1125,7 @@
             <li class="nav-category-title">{{ __('Projects & Tasks') }}</li>
             <li>
                 <a href="{{ route('dashboard') }}#projects" class="sidebar-link-btn active">
-                    <span class="nav-icon material-symbols-rounded">folder</span>
+                    <span class="nav-icon">📁</span>
                     <span class="nav-label-text">{{ __('Projects Portfolio') }}</span>
                     <span class="sidebar-badge-pill">{{ $stats['total_projects'] ?? 0 }}</span>
                 </a>
@@ -1155,7 +1133,7 @@
             @if($membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || $membership->role?->slug === 'company_admin')
             <li>
                 <a href="{{ route('dashboard') }}#all-tasks" class="sidebar-link-btn">
-                    <span class="nav-icon material-symbols-rounded">list_alt</span>
+                    <span class="nav-icon">📑</span>
                     <span class="nav-label-text">{{ __('All Tasks') }}</span>
                     <span class="sidebar-badge-pill">{{ $stats['total_tasks'] ?? 0 }}</span>
                 </a>
@@ -1163,27 +1141,27 @@
             @endif
             <li>
                 <a href="{{ route('dashboard') }}#my-tasks" class="sidebar-link-btn">
-                    <span class="nav-icon material-symbols-rounded">task_alt</span>
+                    <span class="nav-icon">⚡</span>
                     <span class="nav-label-text">{{ __('My Tasks') }}</span>
                     <span class="sidebar-badge-pill">{{ $myTasks->count() }}</span>
                 </a>
             </li>
             <li>
                 <a href="{{ route('dashboard') }}#chat" class="sidebar-link-btn">
-                    <span class="nav-icon material-symbols-rounded">chat</span>
+                    <span class="nav-icon">💬</span>
                     <span class="nav-label-text">{{ __('Team Chat & DMs') }}</span>
-                    <span class="sidebar-badge-pill">{{ __('مباشر') }}</span>
+                    <span class="sidebar-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #7EE092;">LIVE</span>
                 </a>
             </li>
             <li>
                 <a href="{{ route('dashboard') }}#timesheets" class="sidebar-link-btn">
-                    <span class="nav-icon material-symbols-rounded">timer</span>
+                    <span class="nav-icon">⏱️</span>
                     <span class="nav-label-text">{{ __('Timesheets & Time') }}</span>
                 </a>
             </li>
             <li>
                 <a href="{{ route('dashboard') }}#meetings" class="sidebar-link-btn">
-                    <span class="nav-icon material-symbols-rounded">calendar_month</span>
+                    <span class="nav-icon">📅</span>
                     <span class="nav-label-text">{{ __('Meetings & Schedule') }}</span>
                     <span class="sidebar-badge-pill">{{ $upcomingProjectMeetings->count() }}</span>
                 </a>
@@ -1198,7 +1176,7 @@
             @if($membership->hasPermission('members.view') || $membership->hasPermission('members.manage'))
             <li>
                 <a href="{{ route('dashboard') }}#members" class="sidebar-link-btn">
-                    <span class="nav-icon material-symbols-rounded">group</span>
+                    <span class="nav-icon">👥</span>
                     <span class="nav-label-text">{{ __('Team Members') }}</span>
                     <span class="sidebar-badge-pill">{{ $stats['active_members'] ?? 0 }}</span>
                 </a>
@@ -1207,7 +1185,7 @@
             @if($membership->hasPermission('rooms.manage'))
             <li>
                 <a href="{{ route('dashboard') }}#rooms" class="sidebar-link-btn">
-                    <span class="nav-icon material-symbols-rounded">meeting_room</span>
+                    <span class="nav-icon">🚪</span>
                     <span class="nav-label-text">{{ __('Meeting Rooms') }}</span>
                     <span class="sidebar-badge-pill">{{ $stats['total_rooms'] ?? 0 }}</span>
                 </a>
@@ -1216,7 +1194,7 @@
             @if($membership->hasPermission('departments.manage') || $membership->hasPermission('teams.manage'))
             <li>
                 <a href="{{ route('dashboard') }}#departments" class="sidebar-link-btn">
-                    <span class="nav-icon material-symbols-rounded">corporate_fare</span>
+                    <span class="nav-icon">🏛️</span>
                     <span class="nav-label-text">{{ __('Departments') }}</span>
                     <span class="sidebar-badge-pill">{{ $stats['total_departments'] ?? 0 }}</span>
                 </a>
@@ -1225,7 +1203,7 @@
             @if($membership->hasPermission('organizations.manage'))
             <li>
                 <a href="{{ route('dashboard') }}#settings" class="sidebar-link-btn">
-                    <span class="nav-icon material-symbols-rounded">settings</span>
+                    <span class="nav-icon">⚙️</span>
                     <span class="nav-label-text">{{ __('Workspace Settings') }}</span>
                 </a>
             </li>
@@ -1236,7 +1214,7 @@
                 <li class="nav-category-title" style="color: #E5B54F;">{{ __('Super Admin') }}</li>
                 <li>
                     <a href="{{ route('superadmin.dashboard') }}" class="sidebar-link-btn" style="color: #E5B54F;">
-                        <span class="nav-icon material-symbols-rounded">admin_panel_settings</span>
+                        <span class="nav-icon">👑</span>
                         <span class="nav-label-text">{{ __('Super Admin Portal') }}</span>
                     </a>
                 </li>
@@ -1249,13 +1227,13 @@
                     {{ strtoupper(substr($user->name, 0, 2)) }}
                 </div>
                 <div class="user-info-text">
-                    <div style="font-size: 12px; font-weight: 800; color: var(--ula-text-primary);">{{ $user->name }}</div>
-                    <div style="font-size: 10px; color: var(--ula-text-muted);">{{ $membership->role->name ?? 'Member' }}</div>
+                    <div style="font-size: 12px; font-weight: 800; color: #FFFDF6;">{{ $user->name }}</div>
+                    <div style="font-size: 10px; color: var(--ula-text-on-dark-muted);">{{ $membership->role->name ?? 'Member' }}</div>
                 </div>
             </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" style="background: transparent; border: none; color: var(--ula-text-muted); cursor: pointer; font-size: 14px;" title="{{ __('Logout') }}">
+                <button type="submit" style="background: transparent; border: none; color: var(--ula-text-on-dark-muted); cursor: pointer; font-size: 14px;" title="{{ __('Logout') }}">
                     🚪
                 </button>
             </form>
@@ -1319,7 +1297,7 @@
                     </div>
                     <div style="display: flex; align-items: center; gap: 14px;">
                         <span id="hub-live-timer-clock" style="font-size: 20px; font-weight: 900; font-family: monospace; color: var(--ula-palm-900);">00:00:00</span>
-                        <button onclick="stopHubGlobalTimer()" class="tactile-btn" style="background: var(--ula-terracotta-200); color: var(--ula-terracotta-600); border: 1px solid var(--ula-terracotta-300); padding: 6px 14px; font-size: 12px;">
+                        <button onclick="stopHubGlobalTimer()" class="tactile-btn" style="background: #FEE2E2; color: #B91C1C; border: 1px solid #FECACA; padding: 6px 14px; font-size: 12px;">
                             ⏹ {{ __('Stop Timer') }}
                         </button>
                     </div>
@@ -1378,7 +1356,7 @@
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Task Progress') }}</span>
-                        <div class="kpi-icon-box material-symbols-rounded">bar_chart</div>
+                        <div class="kpi-icon-box">📊</div>
                     </div>
                     <div class="kpi-value" style="color: var(--ula-palm-900);">{{ $kpis['progress_pct'] ?? 0 }}%</div>
                     <div style="width: 100%; background: var(--ula-surface-page-alt); height: 7px; border-radius: 9999px; overflow: hidden; margin-bottom: 6px;">
@@ -1396,7 +1374,7 @@
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Actual vs Planned') }}</span>
-                        <div class="kpi-icon-box material-symbols-rounded">timer</div>
+                        <div class="kpi-icon-box">⏱️</div>
                     </div>
                     <div class="kpi-value">{{ $kpis['actual_hours'] ?? 0 }}h</div>
                     <div style="font-size: 11px; color: var(--ula-text-secondary); margin-bottom: 4px;">
@@ -1411,7 +1389,7 @@
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Budget & Cost') }}</span>
-                        <div class="kpi-icon-box material-symbols-rounded">payments</div>
+                        <div class="kpi-icon-box">💰</div>
                     </div>
                     <div class="kpi-value">${{ number_format($kpis['labor_cost'] ?? 0, 2) }}</div>
                     <div style="font-size: 11px; color: var(--ula-text-secondary); margin-bottom: 4px;">
@@ -1426,7 +1404,7 @@
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Revenue & Margin') }}</span>
-                        <div class="kpi-icon-box material-symbols-rounded">trending_up</div>
+                        <div class="kpi-icon-box">📈</div>
                     </div>
                     <div class="kpi-value" style="color: var(--ula-palm-900);">${{ number_format($kpis['billable_revenue'] ?? 0, 2) }}</div>
                     <div style="font-size: 11px; color: var(--ula-text-secondary); margin-bottom: 4px;">
@@ -1441,7 +1419,7 @@
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Sprint Workload') }}</span>
-                        <div class="kpi-icon-box material-symbols-rounded">bolt</div>
+                        <div class="kpi-icon-box">⚡</div>
                     </div>
                     <div class="kpi-value">{{ ($kpis['in_progress_tasks'] ?? 0) + ($kpis['review_tasks'] ?? 0) }}</div>
                     <div style="font-size: 11px; color: var(--ula-text-secondary); margin-bottom: 4px;">
@@ -1456,7 +1434,7 @@
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Team Meetings') }}</span>
-                        <div class="kpi-icon-box material-symbols-rounded">calendar_month</div>
+                        <div class="kpi-icon-box">📅</div>
                     </div>
                     <div class="kpi-value">{{ $upcomingProjectMeetings->count() }}</div>
                     <div style="font-size: 11px; color: var(--ula-palm-900); margin-bottom: 4px; font-weight: 800;">
@@ -1619,7 +1597,7 @@
                                                     </span>
                                                 @endif
                                                 @if($t->isRecurring())
-                                                    <span class="badge-pill" style="font-size: 9px; background: rgba(214, 162, 58, 0.15); color: #D6A23A; border: 1px solid rgba(214, 162, 58, 0.3);" title="{{ __('Recurring :rule', ['rule' => $t->recurrence_rule]) }}">
+                                                    <span class="badge-pill" style="font-size: 9px; background: rgba(59,130,246,0.15); color: #2563EB; border: 1px solid rgba(59,130,246,0.3);" title="{{ __('Recurring :rule', ['rule' => $t->recurrence_rule]) }}">
                                                         🔄 {{ ucfirst($t->recurrence_rule) }}
                                                     </span>
                                                 @endif
@@ -1794,7 +1772,7 @@
                                             <div style="font-weight: 800; color: var(--ula-text-primary); font-size: 13px; display: flex; align-items: center; gap: 6px;">
                                                 <span>{{ $t->title }}</span>
                                                 @if($t->isRecurring())
-                                                    <span class="badge-pill" style="font-size: 9px; background: rgba(214, 162, 58, 0.15); color: #D6A23A; border: 1px solid rgba(214, 162, 58, 0.3);" title="{{ __('Recurring :rule', ['rule' => $t->recurrence_rule]) }}">
+                                                    <span class="badge-pill" style="font-size: 9px; background: rgba(59,130,246,0.15); color: #2563EB; border: 1px solid rgba(59,130,246,0.3);" title="{{ __('Recurring :rule', ['rule' => $t->recurrence_rule]) }}">
                                                         🔄 {{ ucfirst($t->recurrence_rule) }}
                                                     </span>
                                                 @endif
@@ -2236,10 +2214,10 @@
 
                     <!-- Gantt Legend -->
                     <div style="padding: 8px 24px; display: flex; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid var(--ula-border-subtle); background: var(--ula-surface-page-alt);">
-                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #3c6b4c; display: inline-block;"></span> {{ __('Done') }}</span>
-                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #b98a37; display: inline-block;"></span> {{ __('In Progress') }}</span>
-                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #b46c34; display: inline-block;"></span> {{ __('Review/QA') }}</span>
-                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #a49889; display: inline-block;"></span> {{ __('Backlog/Ready') }}</span>
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #42774C; display: inline-block;"></span> {{ __('Done') }}</span>
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #2563EB; display: inline-block;"></span> {{ __('In Progress') }}</span>
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #D97706; display: inline-block;"></span> {{ __('Review/QA') }}</span>
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #64748B; display: inline-block;"></span> {{ __('Backlog/Ready') }}</span>
                         <span style="font-size: 11px; margin-inline-start: auto; color: var(--ula-text-muted);">↔ {{ __('Drag bars to reschedule') }}</span>
                     </div>
 
@@ -2311,7 +2289,7 @@
                                     </td>
                                     <td>
                                         @if($wm['status'] === 'overloaded')
-                                            <span class="badge-pill" style="background: var(--ula-terracotta-200); color: var(--ula-terracotta-600); border: 1px solid var(--ula-terracotta-300);">⚠️ {{ __('Overloaded') }}</span>
+                                            <span class="badge-pill" style="background: #FEE2E2; color: #B91C1C; border: 1px solid #FECACA;">⚠️ {{ __('Overloaded') }}</span>
                                         @elseif($wm['status'] === 'optimal')
                                             <span class="badge-pill badge-green">⚡ {{ __('Optimal') }}</span>
                                         @else
@@ -2644,16 +2622,13 @@
         let frappeGanttCurrentView = 'Week';
         let ganttCurrentPopoverTaskId = null;
 
-        // UlaSpace palette only (palm/gold/terracotta/stone) — no blue/purple/
-        // slate exist in the design system, so 6 statuses are spread across
-        // shades within those families rather than borrowing generic hues.
         const GANTT_STATUS_COLORS = {
-            done:        '#3c6b4c', // --ula-palm-500
-            in_progress: '#b98a37', // --ula-gold-500
-            review:      '#b46c34', // --ula-terracotta-400
-            qa:          '#7d451d', // --ula-terracotta-600
-            ready:       '#a49889', // --ula-stone-400
-            backlog:     '#c1b6a6', // --ula-stone-300
+            done:        '#42774C',
+            in_progress: '#2563EB',
+            review:      '#D97706',
+            qa:          '#7C3AED',
+            ready:       '#64748B',
+            backlog:     '#94A3B8',
         };
 
         // Build Frappe Gantt task objects from PHP $ganttTasks
@@ -2753,12 +2728,12 @@
             const style = document.createElement('style');
             style.id = 'gantt-status-styles';
             style.textContent = `
-                .gantt .bar-wrapper.gantt-bar-done         .bar { fill: #3c6b4c !important; }
-                .gantt .bar-wrapper.gantt-bar-in_progress  .bar { fill: #b98a37 !important; }
-                .gantt .bar-wrapper.gantt-bar-review       .bar { fill: #b46c34 !important; }
-                .gantt .bar-wrapper.gantt-bar-qa           .bar { fill: #7d451d !important; }
-                .gantt .bar-wrapper.gantt-bar-ready        .bar { fill: #a49889 !important; }
-                .gantt .bar-wrapper.gantt-bar-backlog      .bar { fill: #c1b6a6 !important; }
+                .gantt .bar-wrapper.gantt-bar-done         .bar { fill: #42774C !important; }
+                .gantt .bar-wrapper.gantt-bar-in_progress  .bar { fill: #2563EB !important; }
+                .gantt .bar-wrapper.gantt-bar-review       .bar { fill: #D97706 !important; }
+                .gantt .bar-wrapper.gantt-bar-qa           .bar { fill: #7C3AED !important; }
+                .gantt .bar-wrapper.gantt-bar-ready        .bar { fill: #64748B !important; }
+                .gantt .bar-wrapper.gantt-bar-backlog      .bar { fill: #94A3B8 !important; }
                 .gantt .bar-label { font-size: 11px !important; font-weight: 800 !important; fill: #ffffff !important; }
             `;
             document.head.appendChild(style);
@@ -2785,7 +2760,8 @@
             const meta = task._meta || {};
             ganttCurrentPopoverTaskId = task.id;
 
-            const color = GANTT_STATUS_COLORS[meta.status] || GANTT_STATUS_COLORS.backlog;
+            const statusColors = { done: '#42774C', in_progress: '#2563EB', review: '#D97706', qa: '#7C3AED', ready: '#64748B', backlog: '#94A3B8' };
+            const color = statusColors[meta.status] || '#64748B';
 
             document.getElementById('gantt-popover-content').innerHTML = `
                 <div style="font-weight: 900; font-size: 13px; color: var(--ula-text-primary); margin-bottom: 8px; line-height: 1.4;">${task.name}</div>

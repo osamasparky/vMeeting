@@ -13,29 +13,15 @@
 
     <style>
         :root {
-            --bg-page: var(--nx-bg-page, #0B1410);
-            --bg-surface: var(--nx-bg-surface, #142B24);
-            --bg-card: #142B24;
-            --text-primary: var(--nx-sand-100, #F9F4EE);
-            --text-secondary: var(--nx-sand-400, #E3D2BB);
-            --text-muted: var(--nx-text-muted, #A4B5AD);
-            --border-panel: rgba(237, 230, 217, 0.12);
-            --brand-primary: var(--nx-palm-300, #4EA66F);
-            --brand-accent: var(--nx-sand-300, #EADCC9);
-            --font-ar: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-en: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            --font-mono: 'IBM Plex Mono', monospace;
-            --font-family: var(--font-en);
-        }
+                                                                                                                                                                    }
 
         [dir="rtl"], [lang="ar"] {
-            --font-family: var(--font-ar);
-        }
+                    }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-family); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: var(--bg-page);
-            color: var(--text-primary);
+            background: var(--ula-surface-page);
+            color: var(--ula-text-primary);
             min-height: 100vh;
             overflow-x: hidden;
             display: flex;
@@ -64,20 +50,20 @@
         .brand-logo {
             width: 42px;
             height: 42px;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-panel);
-            border-radius: var(--nx-radius-md, 12px);
+            background: var(--ula-surface-card);
+            border: 1px solid var(--ula-border-default);
+            border-radius: var(--ula-radius-md, 12px);
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 6px;
-            box-shadow: var(--nx-shadow-sm);
+            box-shadow: var(--ula-shadow-sm);
         }
 
         .brand-name {
             font-size: 20px;
             font-weight: 800;
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
             letter-spacing: -0.2px;
         }
 
@@ -88,19 +74,19 @@
         }
 
         .btn-link {
-            color: var(--text-secondary);
+            color: var(--ula-text-secondary);
             text-decoration: none;
             font-size: 14px;
             font-weight: 600;
             padding: 8px 16px;
-            border-radius: var(--nx-radius-md, 12px);
+            border-radius: var(--ula-radius-md, 12px);
             transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             gap: 6px;
         }
         .btn-link:hover {
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
             background: rgba(255, 255, 255, 0.06);
         }
 
@@ -121,7 +107,7 @@
             border-radius: 9999px;
             font-size: 13px;
             font-weight: 700;
-            color: var(--brand-primary);
+            color: var(--ula-palm-900);
             margin-bottom: 24px;
         }
 
@@ -134,7 +120,7 @@
         }
 
         .gradient-text {
-            background: linear-gradient(135deg, #4EA66F 0%, #D3A553 100%);
+            background: linear-gradient(135deg, #8baa94 0%, #D3A553 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -142,7 +128,7 @@
         .hero-desc {
             font-size: 18px;
             line-height: 1.7;
-            color: var(--text-secondary);
+            color: var(--ula-text-secondary);
             max-width: 720px;
             margin: 0 auto 36px;
             font-weight: 400;
@@ -167,9 +153,9 @@
         }
 
         .feature-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-panel);
-            border-radius: var(--nx-radius-xl, 16px);
+            background: var(--ula-surface-card);
+            border: 1px solid var(--ula-border-default);
+            border-radius: var(--ula-radius-xl, 16px);
             padding: 28px;
             transition: transform 0.2s, border-color 0.2s;
         }
@@ -182,11 +168,11 @@
             width: 48px;
             height: 48px;
             background: rgba(255, 255, 255, 0.06);
-            border-radius: var(--nx-radius-md, 12px);
+            border-radius: var(--ula-radius-md, 12px);
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--brand-primary);
+            color: var(--ula-palm-900);
             margin-bottom: 16px;
         }
 
@@ -194,23 +180,23 @@
             font-size: 17px;
             font-weight: 700;
             margin-bottom: 8px;
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
         }
 
         .feature-desc {
             font-size: 14px;
             line-height: 1.6;
-            color: var(--text-secondary);
+            color: var(--ula-text-secondary);
         }
 
         footer {
             margin-top: auto;
-            border-top: 1px solid var(--border-panel);
+            border-top: 1px solid var(--ula-border-default);
             padding: 24px;
             text-align: center;
             font-size: 13px;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
+            color: var(--ula-text-muted);
+            font-family: var(--ula-font-mono);
         }
     </style>
 </head>
@@ -273,7 +259,7 @@
                     <span class="material-symbols-rounded" style="font-size: 20px;">meeting_room</span>
                     <span>{{ __('Enter Workplace Floor') }}</span>
                 </a>
-                <a href="{{ route('dashboard') }}" class="btn-link" style="border: 1px solid var(--border-panel); padding: 12px 24px;">
+                <a href="{{ route('dashboard') }}" class="btn-link" style="border: 1px solid var(--ula-border-default); padding: 12px 24px;">
                     <span class="material-symbols-rounded" style="font-size: 18px;">dashboard</span>
                     <span>{{ __('Workspace Dashboard') }}</span>
                 </a>
@@ -282,7 +268,7 @@
                     <span class="material-symbols-rounded" style="font-size: 20px;">add_circle</span>
                     <span>{{ __('Get Started Free') }}</span>
                 </a>
-                <a href="{{ route('login') }}" class="btn-link" style="border: 1px solid var(--border-panel); padding: 12px 24px;">
+                <a href="{{ route('login') }}" class="btn-link" style="border: 1px solid var(--ula-border-default); padding: 12px 24px;">
                     <span class="material-symbols-rounded" style="font-size: 18px;">login</span>
                     <span>{{ __('Sign In to Workplace') }}</span>
                 </a>

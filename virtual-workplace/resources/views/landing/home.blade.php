@@ -8,25 +8,25 @@
     /* ── Hero Arch Block ── */
     .nx-hero-section {
         padding: 40px 24px 80px;
-        max-width: var(--nx-container-max);
+        max-width: var(--ula-layout-container-max);
         margin: 0 auto;
     }
 
     .nx-hero-arch-card {
         position: relative;
-        background: var(--nx-palm-900);
+        background: var(--ula-palm-900);
         color: #ffffff;
-        border-radius: var(--nx-radius-arch) var(--nx-radius-arch) var(--nx-radius-xl) var(--nx-radius-xl);
+        border-radius: var(--ula-radius-xl) var(--ula-radius-xl) var(--ula-radius-xl) var(--ula-radius-xl);
         padding: 80px 48px 64px;
         overflow: hidden;
-        box-shadow: var(--nx-shadow-xl);
+        box-shadow: var(--ula-shadow-xl);
         border: 1px solid rgba(237, 230, 217, 0.15);
     }
 
     .nx-hero-scrim {
         position: absolute;
         inset: 0;
-        background: var(--nx-scrim-hero);
+        background: var(--ula-scrim-hero);
         pointer-events: none;
     }
 
@@ -44,17 +44,17 @@
         align-items: center;
         gap: 8px;
         padding: 6px 16px;
-        border-radius: var(--nx-radius-pill);
+        border-radius: var(--ula-radius-pill);
         background: rgba(237, 230, 217, 0.12);
         border: 1px solid rgba(237, 230, 217, 0.25);
-        color: var(--nx-sand-300);
+        color: var(--ula-sand-300);
         font-size: 13px;
         font-weight: 500;
         margin-bottom: 24px;
     }
 
     .nx-hero-title-ar {
-        font-family: var(--nx-font-ar);
+        font-family: var(--ula-font-ar);
         font-size: clamp(32px, 4.2vw, 54px);
         font-weight: 600;
         line-height: 1.25;
@@ -63,21 +63,21 @@
     }
 
     .nx-hero-title-en {
-        font-family: var(--nx-font-en);
+        font-family: var(--ula-font-en);
         font-size: clamp(16px, 2vw, 22px);
         font-weight: 300;
-        color: var(--nx-sand-400);
+        color: var(--ula-sand-400);
         line-height: 1.5;
         margin-bottom: 32px;
     }
 
     .nx-hero-preview {
         position: relative;
-        border-radius: var(--nx-radius-lg);
+        border-radius: var(--ula-radius-lg);
         overflow: hidden;
         border: 1px solid rgba(237, 230, 217, 0.2);
-        box-shadow: var(--nx-shadow-lg);
-        background: var(--nx-palm-950);
+        box-shadow: var(--ula-shadow-lg);
+        background: var(--ula-palm-950);
         min-height: 360px;
         display: flex;
         flex-direction: column;
@@ -86,7 +86,7 @@
     /* ── Features Section ── */
     .nx-features-section {
         padding: 80px 24px;
-        max-width: var(--nx-container-max);
+        max-width: var(--ula-layout-container-max);
         margin: 0 auto;
     }
 
@@ -103,12 +103,12 @@
     }
 
     .nx-feature-card {
-        background: var(--nx-bg-surface);
-        border: 1px solid var(--nx-border-subtle);
-        border-radius: var(--nx-radius-lg);
+        background: var(--ula-surface-card);
+        border: 1px solid var(--ula-border-subtle);
+        border-radius: var(--ula-radius-lg);
         padding: 36px 32px;
-        box-shadow: var(--nx-shadow-sm);
-        transition: all var(--nx-duration-base) var(--nx-ease-standard);
+        box-shadow: var(--ula-shadow-sm);
+        transition: all var(--ula-duration-base) var(--ula-ease-in-out);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -116,16 +116,16 @@
 
     .nx-feature-card:hover {
         transform: translateY(-3px);
-        border-color: var(--nx-border-strong);
-        box-shadow: var(--nx-shadow-md);
+        border-color: var(--ula-border-strong);
+        box-shadow: var(--ula-shadow-md);
     }
 
     .nx-feature-icon-box {
         width: 52px;
         height: 52px;
-        border-radius: var(--nx-radius-md);
-        background: var(--nx-sand-200);
-        color: var(--nx-accent);
+        border-radius: var(--ula-radius-md);
+        background: var(--ula-sand-200);
+        color: var(--ula-highlight-default);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -135,14 +135,14 @@
     /* ── Heritage Identity Quote Section ── */
     .nx-identity-section {
         padding: 60px 24px;
-        max-width: var(--nx-container-max);
+        max-width: var(--ula-layout-container-max);
         margin: 0 auto;
     }
 
     .nx-quote-card {
-        background: var(--nx-palm-900);
+        background: var(--ula-palm-900);
         color: #ffffff;
-        border-radius: var(--nx-radius-xl);
+        border-radius: var(--ula-radius-xl);
         padding: 64px 48px;
         text-align: center;
         position: relative;
@@ -154,14 +154,14 @@
         font-size: clamp(20px, 2.5vw, 28px);
         font-weight: 600;
         line-height: 1.6;
-        color: var(--nx-sand-100);
+        color: var(--ula-sand-100);
         max-width: 860px;
         margin: 0 auto 20px;
     }
 
     .nx-quote-author {
         font-size: 14px;
-        color: var(--nx-sand-400);
+        color: var(--ula-sand-400);
         font-weight: 400;
         letter-spacing: 0.05em;
     }
@@ -183,7 +183,7 @@
                 <!-- Content Column -->
                 <div>
                     <div class="nx-hero-tag">
-                        <span class="material-symbols-rounded text-[18px] text-[var(--nx-accent)]">spark</span>
+                        <span class="material-symbols-rounded text-[18px] text-[var(--ula-highlight-default)]">spark</span>
                         <span>{{ __('Next-Generation Spatial Virtual Workplace') }}</span>
                     </div>
 
@@ -200,14 +200,14 @@
                             <x-btn href="{{ route('office') }}" variant="nav-cta" size="lg" icon="apartment">
                                 <span>{{ __('Enter Workplace Floor') }}</span>
                             </x-btn>
-                            <x-btn href="{{ route('dashboard') }}" variant="outline" size="lg" class="text-white border-white/20 hover:border-white/40">
+                            <x-btn href="{{ route('dashboard') }}" variant="outline" size="lg" class="!text-white !border-white/20 hover:!border-white/40">
                                 <span>{{ __('Dashboard') }}</span>
                             </x-btn>
                         @else
                             <x-btn href="{{ route('register') }}" variant="nav-cta" size="lg">
                                 <span>{{ __('Book a Demo') }}</span>
                             </x-btn>
-                            <x-btn href="{{ route('login') }}" variant="outline" size="lg" class="text-white border-white/20 hover:border-white/40">
+                            <x-btn href="{{ route('login') }}" variant="outline" size="lg" class="!text-white !border-white/20 hover:!border-white/40">
                                 <span>{{ __('Sign In') }}</span>
                             </x-btn>
                         @endauth
@@ -218,16 +218,10 @@
                 <div class="nx-hero-preview p-6">
                     <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-4">
                         <div class="flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-[var(--ula-tone-palm-dot)]"></span>
-                            <span class="ula-headline-group">
-                                <span class="ula-headline-ar" style="font-size: 12px; color: var(--ula-text-on-dark);">الطابق الأول · المقر الرئيسي</span>
-                                <span class="ula-headline-en" style="font-size: 10px; color: var(--ula-text-on-dark-muted);">Floor 1 · Main Headquarters</span>
-                            </span>
+                            <span class="w-2.5 h-2.5 rounded-full bg-[var(--ula-status-success)]"></span>
+                            <span class="text-[12px] font-medium text-[var(--ula-sand-300)]">Floor 1 • Main Headquarters</span>
                         </div>
-                        <span class="ula-headline-group" style="align-items: flex-end;">
-                            <span class="ula-headline-ar" style="font-size: 11px; color: var(--ula-text-on-dark);"><span style="direction: ltr; unicode-bidi: isolate">18</span> عضواً متصلاً</span>
-                            <span class="ula-headline-en" style="font-size: 9px; color: var(--ula-text-on-dark-muted); font-family: var(--ula-font-mono);">18 Active Members</span>
-                        </span>
+                        <span class="text-[11px] font-mono text-[var(--ula-sand-400)]">18 Active Members</span>
                     </div>
 
                     <!-- Room capsules preview -->
@@ -235,35 +229,23 @@
                         <div class="p-3.5 rounded-[var(--ula-radius-md)] bg-white/5 border border-white/10 flex flex-col gap-1.5">
                             <div class="flex items-center justify-between">
                                 <span class="text-[13px] font-semibold text-white">قاعة النخيل</span>
-                                <x-badge variant="live" size="sm" dot>مباشر</x-badge>
+                                <span class="px-1.5 py-0.5 rounded text-[10px] bg-[var(--ula-tone-palm-bg)] text-[var(--ula-status-success)] font-bold">LIVE</span>
                             </div>
-                            <span class="ula-headline-group">
-                                <span class="ula-headline-ar" style="font-size: 11px; color: var(--ula-text-on-dark-muted);"><span style="direction: ltr; unicode-bidi: isolate">4</span> في مكالمة</span>
-                                <span class="ula-headline-en" style="font-size: 9px; color: var(--ula-text-on-dark-muted); opacity: 0.75;">Palm Boardroom · 4 In Call</span>
-                            </span>
+                            <span class="text-[11px] text-[var(--ula-sand-400)]">Palm Boardroom • 4 In Call</span>
                         </div>
 
                         <div class="p-3.5 rounded-[var(--ula-radius-md)] bg-white/5 border border-white/10 flex flex-col gap-1.5">
                             <div class="flex items-center justify-between">
                                 <span class="text-[13px] font-semibold text-white">مساحة الابتكار</span>
-                                <x-badge variant="scheduled" size="sm" dot>متاح</x-badge>
+                                <span class="px-1.5 py-0.5 rounded text-[10px] bg-[var(--ula-tone-gold-bg)] text-[var(--ula-gold-600)] font-bold">OPEN</span>
                             </div>
-                            <span class="ula-headline-group">
-                                <span class="ula-headline-ar" style="font-size: 11px; color: var(--ula-text-on-dark-muted);">مكتبان متاحان</span>
-                                <span class="ula-headline-en" style="font-size: 9px; color: var(--ula-text-on-dark-muted); opacity: 0.75;">Innovation Lounge · 2 Desks</span>
-                            </span>
+                            <span class="text-[11px] text-[var(--ula-sand-400)]">Innovation Lounge • 2 Desks</span>
                         </div>
                     </div>
 
-                    <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[12px] text-[var(--ula-text-on-dark-muted)]">
-                        <span class="flex items-center gap-1.5">
-                            <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-icon-accent);">graphic_eq</span>
-                            {{ __('Spatial Audio Mesh') }}
-                        </span>
-                        <span class="flex items-center gap-1.5">
-                            <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-icon-highlight);">bolt</span>
-                            {{ __('Ultra-low latency WebRTC') }}
-                        </span>
+                    <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[12px] text-[var(--ula-sand-400)]">
+                        <span>🎙️ Spatial Audio Mesh</span>
+                        <span>⚡ Ultra-low latency WebRTC</span>
                     </div>
                 </div>
             </div>
@@ -276,10 +258,10 @@
             <x-badge variant="accent" :dot="true" class="mb-3">
                 {{ __('Platform Capabilities') }}
             </x-badge>
-            <h2 class="text-[34px] font-semibold text-[var(--nx-text-primary)] leading-tight mb-3 font-['IBM_Plex_Sans_Arabic',sans-serif]">
+            <h2 class="text-[34px] font-semibold text-[var(--ula-text-primary)] leading-tight mb-3 font-['IBM_Plex_Sans_Arabic',sans-serif]">
                 مصمم لبيئات العمل الحديثة التي تجمع بين التراث والابتكار
             </h2>
-            <p class="text-[15px] text-[var(--nx-text-secondary)]">
+            <p class="text-[15px] text-[var(--ula-text-secondary)]">
                 Everything you need to run a high-trust, collaborative virtual headquarters.
             </p>
         </div>
@@ -291,14 +273,14 @@
                     <div class="nx-feature-icon-box">
                         <span class="material-symbols-rounded text-[28px]">graphic_eq</span>
                     </div>
-                    <h3 class="text-[18px] font-semibold text-[var(--nx-text-primary)] mb-2">
+                    <h3 class="text-[18px] font-semibold text-[var(--ula-text-primary)] mb-2">
                         الصوت والفيديو المكاني (Spatial Audio)
                     </h3>
-                    <p class="text-[14px] text-[var(--nx-text-secondary)] leading-relaxed">
+                    <p class="text-[14px] text-[var(--ula-text-secondary)] leading-relaxed">
                         تواصل تلقائي يحاكي الواقع تماماً، حيث يقوى الصوت تدريجياً كلما اقتربت من زملائك على خريطة المقر دون الحاجة لروابط مكالمات معقدة.
                     </p>
                 </div>
-                <div class="mt-6 pt-4 border-t border-[var(--nx-border-subtle)] text-[12px] font-mono text-[var(--nx-text-muted)]">
+                <div class="mt-6 pt-4 border-t border-[var(--ula-border-subtle)] text-[12px] font-mono text-[var(--ula-text-muted)]">
                     Proximity-based WebRTC Mesh
                 </div>
             </div>
@@ -309,14 +291,14 @@
                     <div class="nx-feature-icon-box">
                         <span class="material-symbols-rounded text-[28px]">meeting_room</span>
                     </div>
-                    <h3 class="text-[18px] font-semibold text-[var(--nx-text-primary)] mb-2">
+                    <h3 class="text-[18px] font-semibold text-[var(--ula-text-primary)] mb-2">
                         قاعات اجتماعات ذكية وأبواب خاصة
                     </h3>
-                    <p class="text-[14px] text-[var(--nx-text-secondary)] leading-relaxed">
+                    <p class="text-[14px] text-[var(--ula-text-secondary)] leading-relaxed">
                         أبواب غرف قابلة للقفل مع جرس استئذان ومشاركة شاشة بدقة فائقة وعزل صوتي كامل لضمان سرية المحادثات الاستراتيجية.
                     </p>
                 </div>
-                <div class="mt-6 pt-4 border-t border-[var(--nx-border-subtle)] text-[12px] font-mono text-[var(--nx-text-muted)]">
+                <div class="mt-6 pt-4 border-t border-[var(--ula-border-subtle)] text-[12px] font-mono text-[var(--ula-text-muted)]">
                     Isolated Audio Zones & Knocking
                 </div>
             </div>
@@ -327,14 +309,14 @@
                     <div class="nx-feature-icon-box">
                         <span class="material-symbols-rounded text-[28px]">architecture</span>
                     </div>
-                    <h3 class="text-[18px] font-semibold text-[var(--nx-text-primary)] mb-2">
+                    <h3 class="text-[18px] font-semibold text-[var(--ula-text-primary)] mb-2">
                         محرر الخرائط ومكتبة الأثاث التفاعلي
                     </h3>
-                    <p class="text-[14px] text-[var(--nx-text-secondary)] leading-relaxed">
+                    <p class="text-[14px] text-[var(--ula-text-secondary)] leading-relaxed">
                         صمم مخطط مكتبك بالكامل بسحب وإفلات المكاتب الفاخرة، والنباتات، والسبورات البيضاء، والشاشات التفاعلية بسهولة.
                     </p>
                 </div>
-                <div class="mt-6 pt-4 border-t border-[var(--nx-border-subtle)] text-[12px] font-mono text-[var(--nx-text-muted)]">
+                <div class="mt-6 pt-4 border-t border-[var(--ula-border-subtle)] text-[12px] font-mono text-[var(--ula-text-muted)]">
                     Custom Floorplan Architect & Catalog
                 </div>
             </div>
@@ -344,7 +326,7 @@
     <!-- ── 3. Identity Quote Section (Figma: Heritage Section) ── -->
     <section class="nx-identity-section">
         <div class="nx-quote-card">
-            <div class="w-12 h-12 rounded-full bg-[var(--nx-accent)] text-white flex items-center justify-center mx-auto mb-6 shadow-[var(--nx-shadow-md)]">
+            <div class="w-12 h-12 rounded-full bg-[var(--ula-highlight-default)] text-white flex items-center justify-center mx-auto mb-6 shadow-[var(--ula-shadow-md)]">
                 <span class="material-symbols-rounded text-[24px]">format_quote</span>
             </div>
             <p class="nx-quote-text">
@@ -356,79 +338,12 @@
         </div>
     </section>
 
-    <!-- ── 4. Pricing (Figma Component: Plan Cards, reusing register.blade.php's $plans) ── -->
-    <section id="pricing" class="py-20 px-6">
-        <div class="nx-section-header">
-            <x-badge variant="accent" :dot="true" class="mb-3">
-                {{ __('الباقات والأسعار') }}
-            </x-badge>
-            <h2 class="text-[34px] font-semibold text-[var(--ula-text-primary)] leading-tight mb-3 font-['IBM_Plex_Sans_Arabic',sans-serif]">
-                باقة تناسب حجم فريقك
-            </h2>
-            <p class="text-[15px] text-[var(--ula-text-secondary)]">
-                {{ __('Start free, upgrade any time as your team grows.') }}
-            </p>
-        </div>
-
-        @php
-            $planNameAr = ['Free' => 'مجاني', 'Starter' => 'مبتدئ', 'Business' => 'أعمال', 'Enterprise' => 'مؤسسات'];
-            $planHighlight = [
-                'free' => ['دردشة وصوت أساسي', 'مكتب افتراضي واحد'],
-                'starter' => ['مكالمات فيديو', 'مشاركة الشاشة'],
-                'business' => ['تحليلات الأداء', 'علامة تجارية مخصصة'],
-                'enterprise' => ['دخول موحد (SSO)', 'دعم ذو أولوية'],
-            ];
-        @endphp
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
-            @foreach($plans as $plan)
-                <x-card
-                    variant="{{ $plan->slug === 'business' ? 'elevated' : 'default' }}"
-                    padding="lg"
-                    hover
-                    class="{{ $plan->slug === 'business' ? 'ring-2 ring-[var(--ula-accent-default)]' : '' }} flex flex-col"
-                >
-                    @if($plan->slug === 'business')
-                        <x-badge variant="scheduled" size="sm" class="self-start mb-3">{{ __('الأكثر شيوعاً') }}</x-badge>
-                    @endif
-
-                    <div class="ula-headline-group mb-4">
-                        <span class="ula-headline-ar" style="font-size: 19px;">{{ $planNameAr[$plan->name] ?? $plan->name }}</span>
-                        <span class="ula-headline-en" style="font-size: 12px;">{{ $plan->name }}</span>
-                    </div>
-
-                    <div class="mb-5" style="direction: ltr; unicode-bidi: isolate;">
-                        <span class="text-[28px] font-bold text-[var(--ula-text-primary)]" style="font-family: var(--ula-font-mono);">${{ number_format($plan->price, 0) }}</span>
-                        <span class="text-[13px] text-[var(--ula-text-muted)]">/mo</span>
-                    </div>
-
-                    <ul class="flex flex-col gap-2.5 mb-6 flex-1">
-                        <li class="flex items-center gap-2 text-[13px] text-[var(--ula-text-body)]">
-                            <span class="material-symbols-rounded text-[16px]" style="color: var(--ula-icon-accent);">group</span>
-                            <span><span style="direction: ltr; unicode-bidi: isolate">{{ $plan->seat_limit === 0 ? '∞' : $plan->seat_limit }}</span> {{ __('مقعداً') }}</span>
-                        </li>
-                        @foreach($planHighlight[$plan->slug] ?? [] as $line)
-                            <li class="flex items-center gap-2 text-[13px] text-[var(--ula-text-body)]">
-                                <span class="material-symbols-rounded text-[16px]" style="color: var(--ula-icon-accent);">check_circle</span>
-                                <span>{{ $line }}</span>
-                            </li>
-                        @endforeach
-                    </ul>
-
-                    <x-btn href="{{ route('register') }}" variant="{{ $plan->slug === 'business' ? 'primary' : 'outline' }}" size="md" class="w-full">
-                        <span>{{ __('ابدأ الآن') }}</span>
-                    </x-btn>
-                </x-card>
-            @endforeach
-        </div>
-    </section>
-
-    <!-- ── 5. Final Call-to-Action ── -->
-    <section class="py-20 px-6 text-center max-w-4xl mx-auto">
-        <h2 class="text-[36px] font-semibold text-[var(--nx-text-primary)] mb-4 font-['IBM_Plex_Sans_Arabic',sans-serif]">
+    <!-- ── 4. Final Call-to-Action ── -->
+    <section id="pricing" class="py-20 px-6 text-center max-w-4xl mx-auto">
+        <h2 class="text-[36px] font-semibold text-[var(--ula-text-primary)] mb-4 font-['IBM_Plex_Sans_Arabic',sans-serif]">
             جاهز لنقل فريقك إلى بيئة عمل المستقبل؟
         </h2>
-        <p class="text-[16px] text-[var(--nx-text-secondary)] mb-8 max-w-xl mx-auto">
+        <p class="text-[16px] text-[var(--ula-text-secondary)] mb-8 max-w-xl mx-auto">
             انضم إلى المئات من الشركات الرائدة التي تبني ثقافة عمل قوية ومتصلة مع UlaSpace.
         </p>
         <div class="flex items-center justify-center gap-4 flex-wrap">

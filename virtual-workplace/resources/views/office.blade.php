@@ -24,52 +24,18 @@
 
     <style>
         :root[data-theme="dark"], :root {
-            --brand-primary: var(--nx-palm-300, #3c6b4c);
-            --brand-primary-hover: var(--nx-palm-500, #1e412f);
-            --brand-accent: var(--nx-accent, #d3a553);
-            --brand-gold: var(--nx-gold-400, #d3a553);
-            --brand-crimson: var(--nx-terracotta-500, #9a5827);
-            --brand-teal: var(--nx-palm-300, #3c6b4c);
-
-            --bg-body: var(--nx-palm-950, #0b1410);
-            --bg-dock: rgba(20, 43, 36, 0.92);
-            --bg-surface: var(--nx-palm-900, #142b24);
-            --bg-card: var(--nx-palm-700, #1b3223);
-            --bg-input: rgba(11, 20, 16, 0.90);
-            --border-color: rgba(237, 230, 217, 0.15);
-            --border-card: rgba(237, 230, 217, 0.12);
-
-            --text-primary: var(--nx-sand-100, #f9f4ee);
-            --text-secondary: var(--nx-sand-400, #e3d2bb);
-            --text-muted: var(--nx-sand-500, #c1b6a6);
-
-            --shadow-dock: var(--nx-shadow-xl);
-            --shadow-card: var(--nx-shadow-lg);
-        }
+                        --brand-primary-hover: var(--ula-palm-700, #1e412f);
+                                                
+                                                                                    
+                                    
+                                }
 
         :root[data-theme="light"] {
-            --brand-primary: #059669;
-            --brand-primary-hover: #047857;
-            --brand-accent: #2563EB;
-            --brand-gold: #D97706;
-            --brand-crimson: #DC2626;
-            --brand-teal: #0D9488;
-
-            --bg-body: #F4F7F4;
-            --bg-dock: rgba(255, 255, 255, 0.95);
-            --bg-surface: rgba(255, 255, 255, 0.98);
-            --bg-card: rgba(240, 248, 243, 0.92);
-            --bg-input: rgba(245, 250, 247, 0.95);
-            --border-color: rgba(5, 150, 105, 0.20);
-            --border-card: rgba(5, 150, 105, 0.14);
-
-            --text-primary: #0F172A;
-            --text-secondary: #475569;
-            --text-muted: #94A3B8;
-
-            --shadow-dock: 0 20px 40px rgba(0, 0, 0, 0.12);
-            --shadow-card: 0 10px 25px rgba(0, 0, 0, 0.08);
-        }
+                        --brand-primary-hover: #047857;
+                                                
+                                                                                    
+                                    
+                                }
 
         * {
             margin: 0;
@@ -80,8 +46,8 @@
 
         body {
             font-family: 'Cairo', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-body);
-            color: var(--text-primary);
+            background: var(--ula-surface-page);
+            color: var(--ula-text-primary);
             height: 100vh;
             overflow: hidden;
             display: flex;
@@ -107,21 +73,21 @@
         }
 
         .glass-pill {
-            background: var(--bg-dock);
+            background: var(--ula-surface-capsule-strong);
             backdrop-filter: blur(24px);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--ula-border-subtle);
             border-radius: 16px;
             padding: 8px 16px;
             display: flex;
             align-items: center;
             gap: 10px;
-            box-shadow: var(--shadow-card);
+            box-shadow: var(--ula-shadow-xs);
         }
 
         .org-badge {
             font-size: 13px;
             font-weight: 800;
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -140,8 +106,8 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: var(--brand-primary);
-            box-shadow: 0 0 10px var(--brand-primary);
+            background: var(--ula-palm-900);
+            box-shadow: 0 0 10px var(--ula-palm-900);
         }
 
         .guest-badge {
@@ -155,9 +121,9 @@
         }
 
         .action-link-btn {
-            background: var(--bg-input);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
+            background: var(--ula-surface-page);
+            border: 1px solid var(--ula-border-subtle);
+            color: var(--ula-text-primary);
             padding: 6px 12px;
             border-radius: 10px;
             font-size: 12px;
@@ -170,8 +136,8 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .action-link-btn:hover {
-            border-color: var(--brand-primary);
-            color: var(--brand-primary);
+            border-color: var(--ula-palm-900);
+            color: var(--ula-palm-900);
             transform: translateY(-1px);
         }
         .action-link-btn.btn-danger {
@@ -186,7 +152,7 @@
             width: 100%;
             height: 100%;
             position: relative;
-            background: var(--nx-map-dark-bg);
+            background: var(--ula-surface-map-canvas);
             overflow: hidden;
             z-index: 1;
         }
@@ -206,15 +172,15 @@
             bottom: 24px;
             left: 50%;
             transform: translateX(-50%);
-            background: var(--bg-dock);
+            background: var(--ula-surface-capsule-strong);
             backdrop-filter: blur(24px);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--ula-border-subtle);
             border-radius: 20px;
             padding: 8px 14px;
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: var(--shadow-dock);
+            box-shadow: var(--ula-shadow-lg);
             z-index: 60;
         }
 
@@ -224,12 +190,12 @@
             align-items: center;
             justify-content: center;
             gap: 3px;
-            background: var(--bg-input);
-            border: 1px solid var(--border-card);
+            background: var(--ula-surface-page);
+            border: 1px solid var(--ula-border-subtle);
             border-radius: 12px;
             width: 58px;
             height: 52px;
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
             font-size: 10px;
             font-weight: 800;
             cursor: pointer;
@@ -239,13 +205,13 @@
             font-size: 18px;
         }
         .dock-btn:hover {
-            border-color: var(--brand-primary);
-            color: var(--brand-primary);
+            border-color: var(--ula-palm-900);
+            color: var(--ula-palm-900);
             transform: translateY(-2px);
         }
         .dock-btn.active {
             background: rgba(16, 185, 129, 0.18);
-            border-color: var(--brand-primary);
+            border-color: var(--ula-palm-900);
             color: #34D399;
             box-shadow: 0 0 14px rgba(16, 185, 129, 0.3);
         }
@@ -258,7 +224,7 @@
         .dock-divider {
             width: 1px;
             height: 32px;
-            background: var(--border-color);
+            background: var(--ula-border-subtle);
             margin: 0 4px;
         }
 
@@ -270,9 +236,9 @@
             width: 190px;
             height: 125px;
             background: rgba(10, 22, 16, 0.95);
-            border: 2px solid var(--border-color);
+            border: 2px solid var(--ula-border-subtle);
             border-radius: 14px;
-            box-shadow: var(--shadow-dock);
+            box-shadow: var(--ula-shadow-lg);
             z-index: 65;
             overflow: hidden;
             display: flex;
@@ -320,11 +286,11 @@
             width: 320px;
             height: 200px;
             background: rgba(10, 22, 16, 0.95);
-            border: 2px solid var(--border-color);
+            border: 2px solid var(--ula-border-subtle);
             border-radius: 16px;
             overflow: hidden;
             position: relative;
-            box-shadow: var(--shadow-dock);
+            box-shadow: var(--ula-shadow-lg);
             pointer-events: auto;
             display: flex;
             flex-direction: column;
@@ -415,14 +381,14 @@
             transition: all 0.15s ease;
         }
         .v-btn:hover {
-            background: var(--brand-primary);
-            border-color: var(--brand-primary);
+            background: var(--ula-palm-900);
+            border-color: var(--ula-palm-900);
             color: white;
             transform: translateY(-1px);
         }
         .v-btn.active {
-            background: var(--brand-primary);
-            border-color: var(--brand-primary);
+            background: var(--ula-palm-900);
+            border-color: var(--ula-palm-900);
             color: white;
         }
         .video-wrapper {
@@ -459,11 +425,11 @@
             bottom: 96px;
             inset-inline-start: 20px;
             width: 340px;
-            background: var(--bg-surface);
+            background: var(--ula-surface-card);
             backdrop-filter: blur(24px);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--ula-border-subtle);
             border-radius: 20px;
-            box-shadow: var(--shadow-dock);
+            box-shadow: var(--ula-shadow-lg);
             display: none;
             flex-direction: column;
             z-index: 55;
@@ -471,16 +437,16 @@
         }
         .chat-header {
             padding: 14px 16px;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--ula-border-subtle);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: var(--bg-dock);
+            background: var(--ula-surface-capsule-strong);
         }
         .chat-tabs {
             display: flex;
             padding: 4px;
-            background: var(--bg-input);
+            background: var(--ula-surface-page);
             border-radius: 10px;
             margin: 8px 12px;
             gap: 4px;
@@ -492,12 +458,12 @@
             font-size: 11px;
             font-weight: 800;
             border-radius: 6px;
-            color: var(--text-secondary);
+            color: var(--ula-text-secondary);
             cursor: pointer;
             transition: all 0.15s;
         }
         .chat-tab.active {
-            background: var(--brand-primary);
+            background: var(--ula-palm-900);
             color: white;
         }
         .chat-messages {
@@ -509,8 +475,8 @@
             gap: 8px;
         }
         .msg-bubble {
-            background: var(--bg-card);
-            border: 1px solid var(--border-card);
+            background: var(--ula-surface-card);
+            border: 1px solid var(--ula-border-subtle);
             border-radius: 10px;
             padding: 8px 12px;
             font-size: 12px;
@@ -527,12 +493,12 @@
             justify-content: space-between;
             font-size: 10px;
             font-weight: 800;
-            color: var(--brand-primary);
+            color: var(--ula-palm-900);
         }
         .chat-input-bar {
             padding: 10px 12px;
-            border-top: 1px solid var(--border-color);
-            background: var(--bg-dock);
+            border-top: 1px solid var(--ula-border-subtle);
+            background: var(--ula-surface-capsule-strong);
             display: flex;
             align-items: center;
             gap: 6px;
@@ -562,7 +528,7 @@
         .more-menu-item {
             background: transparent;
             border: none;
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
             padding: 9px 12px;
             border-radius: 10px;
             display: flex;
@@ -588,11 +554,11 @@
             inset-inline-start: 16px;
             width: 360px;
             height: calc(100vh - 165px);
-            background: var(--bg-dock);
+            background: var(--ula-surface-capsule-strong);
             backdrop-filter: blur(28px);
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--ula-border-subtle);
             border-radius: 20px;
-            box-shadow: var(--shadow-dock);
+            box-shadow: var(--ula-shadow-lg);
             z-index: 60;
             display: none;
             flex-direction: column;
@@ -601,8 +567,8 @@
         }
 
         .task-card-item {
-            background: var(--bg-card);
-            border: 1px solid var(--border-card);
+            background: var(--ula-surface-card);
+            border: 1px solid var(--ula-border-subtle);
             border-radius: 12px;
             padding: 12px;
             display: flex;
@@ -664,8 +630,8 @@
         }
 
         .modal-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
+            background: var(--ula-surface-card);
+            border: 1px solid var(--ula-border-subtle);
             border-radius: 24px;
             width: 90vw;
             max-width: 600px;
@@ -675,20 +641,20 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
-            box-shadow: var(--shadow-dock);
+            box-shadow: var(--ula-shadow-lg);
         }
 
         .modal-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--ula-border-subtle);
             padding-bottom: 12px;
         }
         .modal-title {
             font-size: 16px;
             font-weight: 900;
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -702,22 +668,22 @@
         .input-label {
             font-size: 11px;
             font-weight: 800;
-            color: var(--text-secondary);
+            color: var(--ula-text-secondary);
             text-transform: uppercase;
         }
         .styled-input {
             width: 100%;
-            background: var(--bg-input);
-            border: 1px solid var(--border-color);
+            background: var(--ula-surface-page);
+            border: 1px solid var(--ula-border-subtle);
             border-radius: 10px;
             padding: 10px 14px;
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
             font-size: 13px;
             font-weight: 700;
             outline: none;
         }
         .styled-input:focus {
-            border-color: var(--brand-primary);
+            border-color: var(--ula-palm-900);
         }
 
         /* Avatar Picker Grid */
@@ -727,8 +693,8 @@
             gap: 14px;
         }
         .avatar-card-picker {
-            background: var(--bg-card);
-            border: 2px solid var(--border-color);
+            background: var(--ula-surface-card);
+            border: 2px solid var(--ula-border-subtle);
             border-radius: 16px;
             padding: 14px;
             display: flex;
@@ -739,7 +705,7 @@
             transition: all 0.2s;
         }
         .avatar-card-picker:hover, .avatar-card-picker.selected {
-            border-color: var(--brand-primary);
+            border-color: var(--ula-palm-900);
             background: rgba(16, 185, 129, 0.12);
             box-shadow: 0 0 16px rgba(16, 185, 129, 0.25);
         }
@@ -754,7 +720,7 @@
         /* ── Knock Alert Dialog ── */
         .knock-alert-box {
             background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(59, 130, 246, 0.15));
-            border: 1px solid var(--brand-primary);
+            border: 1px solid var(--ula-palm-900);
             border-radius: 16px;
             padding: 16px;
             display: flex;
@@ -769,14 +735,14 @@
             align-items: center;
             gap: 8px;
             padding: 10px 16px;
-            background: var(--bg-dock);
-            border-bottom: 1px solid var(--border-color);
+            background: var(--ula-surface-capsule-strong);
+            border-bottom: 1px solid var(--ula-border-subtle);
             overflow-x: auto;
         }
         .wb-tool-btn {
-            background: var(--bg-input);
-            border: 1px solid var(--border-card);
-            color: var(--text-primary);
+            background: var(--ula-surface-page);
+            border: 1px solid var(--ula-border-subtle);
+            color: var(--ula-text-primary);
             width: 34px;
             height: 34px;
             border-radius: 8px;
@@ -788,9 +754,9 @@
             transition: all 0.15s;
         }
         .wb-tool-btn:hover, .wb-tool-btn.active {
-            background: var(--brand-primary);
+            background: var(--ula-palm-900);
             color: white;
-            border-color: var(--brand-primary);
+            border-color: var(--ula-palm-900);
         }
         .color-dot {
             width: 22px;
@@ -845,18 +811,18 @@
                             @if(!empty($organization->logo_url))
                                 <img src="{{ $organization->logo_url }}" alt="{{ $organization->name }}" style="height: 24px; width: auto; object-fit: contain;">
                             @else
-                                <span class="material-symbols-rounded" style="color: var(--nx-map-gold); font-size: 24px;">apartment</span>
+                                <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 24px;">apartment</span>
                             @endif
                             <div style="overflow: hidden;">
-                                <strong style="display: block; font-size: 13px; color: var(--nx-map-text); white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">{{ $organization->name }}</strong>
-                                <span style="font-size: 11px; color: var(--nx-map-muted);">{{ $user->name ?? 'User' }}</span>
+                                <strong style="display: block; font-size: 13px; color: var(--ula-text-on-dark); white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">{{ $organization->name }}</strong>
+                                <span style="font-size: 11px; color: var(--ula-text-on-dark-subtle);">{{ $user->name ?? 'User' }}</span>
                             </div>
                         </div>
 
                         <!-- Menu Actions -->
                         @if(empty($user->is_guest))
-                        <a href="{{ route('dashboard') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #F9F4EE; font-size: 12px; font-weight: 600; transition: background 0.15s ease;">
-                            <span class="material-symbols-rounded" style="font-size: 18px; color: var(--nx-map-gold);">dashboard</span>
+                        <a href="{{ route('dashboard') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #f9f6ef; font-size: 12px; font-weight: 600; transition: background 0.15s ease;">
+                            <span class="material-symbols-rounded" style="font-size: 18px; color: var(--ula-highlight-default);">dashboard</span>
                             <span>{{ __('Dashboard') }}</span>
                         </a>
                         @endif
@@ -884,28 +850,28 @@
                         </a>
                         @endif
 
-                        <button type="button" onclick="openDiagnosticsModal(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #F9F4EE; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                        <button type="button" onclick="openDiagnosticsModal(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #f9f6ef; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                             <span class="material-symbols-rounded" style="font-size: 18px;">network_check</span>
                             <span>{{ __('Diagnostics') }}</span>
                         </button>
 
-                        <button type="button" onclick="toggleChatDrawer(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #F9F4EE; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                        <button type="button" onclick="toggleChatDrawer(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #f9f6ef; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                             <span class="material-symbols-rounded" style="font-size: 18px;">chat</span>
                             <span>{{ __('Chat & Notes') }}</span>
                         </button>
 
-                        <button type="button" onclick="toggleAppTheme(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #F9F4EE; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                        <button type="button" onclick="toggleAppTheme(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #f9f6ef; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                             <span class="material-symbols-rounded" style="font-size: 18px;">light_mode</span>
                             <span>{{ __('Toggle Theme') }}</span>
                         </button>
 
                         @if(app()->getLocale() === 'ar')
-                            <a href="{{ route('lang.switch', 'en') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #F9F4EE; font-size: 12px; font-weight: 600;">
+                            <a href="{{ route('lang.switch', 'en') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #f9f6ef; font-size: 12px; font-weight: 600;">
                                 <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
                                 <span>English</span>
                             </a>
                         @else
-                            <a href="{{ route('lang.switch', 'ar') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #F9F4EE; font-size: 12px; font-weight: 600;">
+                            <a href="{{ route('lang.switch', 'ar') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #f9f6ef; font-size: 12px; font-weight: 600;">
                                 <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
                                 <span>العربية</span>
                             </a>
@@ -921,7 +887,7 @@
                     @elseif(!empty($organization->settings?->logo_url))
                         <img src="{{ $organization->settings->logo_url }}" alt="{{ $organization->name }}" style="height: 18px; width: auto; object-fit: contain;">
                     @else
-                        <span class="material-symbols-rounded" style="color: var(--nx-map-gold); font-size: 18px;">apartment</span>
+                        <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 18px;">apartment</span>
                     @endif
                     <span>{{ $organization->name }}</span>
                 </div>
@@ -929,7 +895,7 @@
                 <!-- Branch / Floor Switcher Button -->
                 @if(isset($userAllowedOffices) && $userAllowedOffices->count() > 1 && empty($user->is_guest))
                 <div style="position: relative; display: inline-block;">
-                    <button type="button" onclick="toggleOfficeDropdown(event)" class="nx-toolbar-btn" style="color: var(--nx-map-gold); border-color: rgba(211, 165, 83, 0.35); font-weight: 600;" title="{{ __('Switch Office Branch') }}">
+                    <button type="button" onclick="toggleOfficeDropdown(event)" class="nx-toolbar-btn" style="color: var(--ula-highlight-default); border-color: rgba(211, 165, 83, 0.35); font-weight: 600;" title="{{ __('Switch Office Branch') }}">
                         <span class="material-symbols-rounded" style="font-size: 18px;">domain</span>
                         <span>{{ $floor->name }}</span>
                         <span class="material-symbols-rounded" style="font-size: 16px;">arrow_drop_down</span>
@@ -1045,7 +1011,7 @@
                 <span class="live-dot" style="width: 6px; height: 6px;"></span>
                 📹 {{ $user->name ?? __('You') }}
             </span>
-            <button onclick="toggleCamera()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; line-height: 1;" title="{{ __('Stop Camera') }}">✕</button>
+            <button onclick="toggleCamera()" style="background:none; border:none; color:var(--ula-text-muted); cursor:pointer; font-size:12px; line-height: 1;" title="{{ __('Stop Camera') }}">✕</button>
         </div>
         <div class="local-cam-viewport">
             <video id="local-video-elem" autoplay playsinline muted></video>
@@ -1065,7 +1031,7 @@
                 <button onclick="focusActiveScreenShare()" class="action-link-btn" id="btn-chat-focus-screen" style="display: none; padding: 3px 8px; font-size: 10px; color: #34D399; border-color: rgba(52, 211, 153, 0.4);" title="{{ __('View Screen Share') }}">
                     🖥️ {{ __('Screen') }}
                 </button>
-                <button onclick="toggleChatDrawer()" style="background:none; border:none; color:var(--text-muted); font-size:16px; cursor:pointer;">✕</button>
+                <button onclick="toggleChatDrawer()" style="background:none; border:none; color:var(--ula-text-muted); font-size:16px; cursor:pointer;">✕</button>
             </div>
         </div>
         <div class="chat-tabs">
@@ -1082,7 +1048,7 @@
             <input type="file" id="chat-file-input" style="display:none;" onchange="handleChatFileUpload(this)">
             <button onclick="document.getElementById('chat-file-input').click()" class="action-link-btn" style="padding: 6px 8px;" title="{{ __('Attach File') }}">📎</button>
             <input type="text" id="chat-msg-input" placeholder="{{ __('Type your message here...') }}" class="styled-input" style="padding: 8px 10px; font-size: 12px;" onkeydown="if(event.key==='Enter') sendChatMessage()">
-            <button onclick="sendChatMessage()" class="action-link-btn" style="background: var(--brand-primary); color: white; padding: 6px 12px;">➤</button>
+            <button onclick="sendChatMessage()" class="action-link-btn" style="background: var(--ula-palm-900); color: white; padding: 6px 12px;">➤</button>
         </div>
     </div>
 
@@ -1141,7 +1107,7 @@
         </button>
 
         <!-- Floating Live Task Timer Pill In Dock -->
-        <div id="floating-task-timer-pill" class="nx-toolbar-btn" style="display: none; background: rgba(211, 165, 83, 0.2); border-color: var(--nx-map-gold); color: var(--nx-map-gold); height: 46px; padding: 4px 10px; cursor: pointer; border-radius: 12px; flex-direction: column; justify-content: center; gap: 2px;" onclick="openMyTaskDrawer()" title="{{ __('Click to manage active task') }}">
+        <div id="floating-task-timer-pill" class="nx-toolbar-btn" style="display: none; background: rgba(211, 165, 83, 0.2); border-color: var(--ula-highlight-default); color: var(--ula-highlight-default); height: 46px; padding: 4px 10px; cursor: pointer; border-radius: 12px; flex-direction: column; justify-content: center; gap: 2px;" onclick="openMyTaskDrawer()" title="{{ __('Click to manage active task') }}">
             <div style="display: flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 15px;">timer</span>
                 <span id="dock-timer-task-name" style="max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; font-weight: 700;">{{ __('Task') }}</span>
@@ -1169,7 +1135,7 @@
     </div>
 
     <!-- ── Floating In-World Contextual Prompts & Menus ── -->
-    <div id="furniture-sit-prompt" style="display: none; position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); background: rgba(14, 25, 19, 0.94); backdrop-filter: blur(20px); border: 1px solid rgba(211, 165, 83, 0.45); border-radius: 24px; padding: 6px 18px; color: var(--nx-sand-100, #F9F4EE); font-size: 12px; font-weight: 700; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5); z-index: 9999; pointer-events: none; transition: opacity 0.2s ease;">
+    <div id="furniture-sit-prompt" style="display: none; position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); background: rgba(14, 25, 19, 0.94); backdrop-filter: blur(20px); border: 1px solid rgba(211, 165, 83, 0.45); border-radius: 24px; padding: 6px 18px; color: var(--ula-sand-100, #f9f6ef); font-size: 12px; font-weight: 700; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5); z-index: 9999; pointer-events: none; transition: opacity 0.2s ease;">
         <span id="furniture-sit-prompt-text">🪑 {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> {{ __('to Sit at Desk') }}</span>
     </div>
 
@@ -1534,7 +1500,7 @@
             if (!el) {
                 el = document.createElement('div');
                 el.id = 'fit-map-debug-overlay';
-                el.style.cssText = 'position:fixed;top:70px;inset-inline-start:16px;background:rgba(11,20,16,0.92);backdrop-filter:blur(16px);border:1px solid rgba(211,165,83,0.5);border-radius:12px;padding:10px 14px;color:#F9F4EE;font-family:IBM Plex Mono,monospace;font-size:11px;z-index:99999;pointer-events:none;line-height:1.5;box-shadow:0 12px 30px rgba(0,0,0,0.7);';
+                el.style.cssText = 'position:fixed;top:70px;inset-inline-start:16px;background:rgba(11,20,16,0.92);backdrop-filter:blur(16px);border:1px solid rgba(211,165,83,0.5);border-radius:12px;padding:10px 14px;color:#f9f6ef;font-family:IBM Plex Mono,monospace;font-size:11px;z-index:99999;pointer-events:none;line-height:1.5;box-shadow:0 12px 30px rgba(0,0,0,0.7);';
                 document.body.appendChild(el);
             }
             el.innerHTML = `
@@ -2178,51 +2144,6 @@
         let lastCanvasClickPos = { x: 0, y: 0 };
         const roomDoorPortalsCache = new Map();
 
-        // Mirrors App\Domains\Workspace\Support\RoomBoundsGap::MIN_ROOM_GAP_PX.
-        // Floor is 36px from A* grid quantization (node centers at c*16+8,
-        // capsule band [12, G-12] needs the first usable node at offset 24);
-        // 48 is the next tile-aligned value, giving 12px slack.
-        const MIN_ROOM_GAP_PX = 48;
-
-        // Single formula for a door's geometry on a given wall side/offset,
-        // shared by the explicit-config path and the "auto" candidate search
-        // below so the two can never drift apart from each other or from
-        // editor.blade.php's door preview.
-        function buildPortalOnSide(side, off, rx, ry, rw, rh) {
-            let cx = 0, cy = 0, inX = 0, inY = 0, outX = 0, outY = 0;
-            if (side === 'bottom') {
-                cx = rx + (rw * off);
-                cy = ry + rh;
-                inX = cx; inY = cy - 26;
-                outX = cx; outY = cy + 32;
-            } else if (side === 'top') {
-                cx = rx + (rw * off);
-                cy = ry;
-                inX = cx; inY = cy + 26;
-                outX = cx; outY = cy - 32;
-            } else if (side === 'right') {
-                cx = rx + rw;
-                cy = ry + (rh * off);
-                inX = cx - 26; inY = cy;
-                outX = cx + 32; outY = cy;
-            } else if (side === 'left') {
-                cx = rx;
-                cy = ry + (rh * off);
-                inX = cx + 26; inY = cy;
-                outX = cx - 32; outY = cy;
-            }
-            return {
-                side: side,
-                offset: off,
-                x: cx,
-                y: cy,
-                entryInsideX: inX,
-                entryInsideY: inY,
-                exitOutsideX: outX,
-                exitOutsideY: outY,
-            };
-        }
-
         function getRoomDoorPortal(r) {
             if (!r || !r.bounds) return null;
             if (roomDoorPortalsCache.has(r.id)) {
@@ -2239,79 +2160,73 @@
             const explicitSide = r.bounds.doorSide || r.bounds.door_side || r.door_side || r.doorSide || null;
             const explicitOffset = (typeof r.bounds.doorOffset === 'number') ? r.bounds.doorOffset : null;
 
-            // Explicit admin configuration wins outright — it is never
-            // relocated by the "avoid other rooms" heuristic below, and must
-            // match editor.blade.php's preview (doorSide + doorOffset,
-            // default bottom/0.5) exactly, or the editor lies about where
-            // the door actually is.
-            if (explicitSide && explicitSide !== 'auto') {
-                const cand = buildPortalOnSide(explicitSide.toLowerCase(), explicitOffset !== null ? explicitOffset : 0.5, rx, ry, rw, rh);
-                const portal = {
-                    x: cand.x,
-                    y: cand.y,
-                    width: doorWidth,
-                    height: 20,
-                    wallSide: cand.side,
-                    entryInsideX: cand.entryInsideX,
-                    entryInsideY: cand.entryInsideY,
-                    exitOutsideX: cand.exitOutsideX,
-                    exitOutsideY: cand.exitOutsideY
-                };
-                roomDoorPortalsCache.set(r.id, portal);
-                return portal;
-            }
-
-            // 2. No explicit config: search all 4 sides x 7 offset samples
-            const offsetSamples = [0.5, 0.75, 0.82, 0.25, 0.18, 0.65, 0.35];
-            const sides = ['bottom', 'top', 'right', 'left'];
+            // Candidate wall sides and offset samples
+            const offsetSamples = (explicitOffset !== null) 
+                ? [explicitOffset] 
+                : [0.5, 0.75, 0.82, 0.25, 0.18, 0.65, 0.35];
 
             const candidates = [];
+            const sides = (explicitSide && explicitSide !== 'auto') 
+                ? [explicitSide.toLowerCase()] 
+                : ['bottom', 'top', 'right', 'left'];
+
             for (const side of sides) {
                 for (const off of offsetSamples) {
-                    candidates.push(buildPortalOnSide(side, off, rx, ry, rw, rh));
+                    let cx = 0, cy = 0, inX = 0, inY = 0, outX = 0, outY = 0;
+                    if (side === 'bottom') {
+                        cx = rx + (rw * off);
+                        cy = ry + rh;
+                        inX = cx; inY = cy - 26;
+                        outX = cx; outY = cy + 32;
+                    } else if (side === 'top') {
+                        cx = rx + (rw * off);
+                        cy = ry;
+                        inX = cx; inY = cy + 26;
+                        outX = cx; outY = cy - 32;
+                    } else if (side === 'right') {
+                        cx = rx + rw;
+                        cy = ry + (rh * off);
+                        inX = cx - 26; inY = cy;
+                        outX = cx + 32; outY = cy;
+                    } else if (side === 'left') {
+                        cx = rx;
+                        cy = ry + (rh * off);
+                        inX = cx + 26; inY = cy;
+                        outX = cx - 32; outY = cy;
+                    }
+
+                    candidates.push({
+                        side: side,
+                        offset: off,
+                        x: cx,
+                        y: cy,
+                        entryInsideX: inX,
+                        entryInsideY: inY,
+                        exitOutsideX: outX,
+                        exitOutsideY: outY,
+                    });
                 }
             }
 
-            // 3. Intelligent Placement Facing the Central Open Walkway & Avoiding Shared Walls
-            // Score against the office's own footprint center, not the raw
-            // background canvas center — the canvas (e.g. a 2194x1952
-            // decorative image) is typically far larger than the room
-            // cluster, so MAP_WIDTH_PX/2,MAP_HEIGHT_PX/2 can sit well
-            // outside the office entirely and bias doors to face away from
-            // the rest of the rooms instead of toward the shared corridor.
-            let officeCenterX = MAP_WIDTH_PX / 2;
-            let officeCenterY = MAP_HEIGHT_PX / 2;
-            let centerSumX = 0, centerSumY = 0, centerCount = 0;
-            for (const other of rooms) {
-                if (!other.bounds) continue;
-                centerSumX += (other.bounds.x + other.bounds.width / 2) * TILE_SIZE;
-                centerSumY += (other.bounds.y + other.bounds.height / 2) * TILE_SIZE;
-                centerCount++;
-            }
-            if (centerCount > 0) {
-                officeCenterX = centerSumX / centerCount;
-                officeCenterY = centerSumY / centerCount;
-            }
-            const mapCenter = { x: officeCenterX, y: officeCenterY };
+            // 2. Intelligent Placement Facing the Central Open Walkway & Avoiding Shared Walls
+            const mapCenter = { x: MAP_WIDTH_PX / 2, y: MAP_HEIGHT_PX / 2 };
             const outerMargin = 16; // Authoritative outer map canvas border margin
 
             let bestCandidate = null;
             let bestScore = -Infinity;
 
             for (const cand of candidates) {
-                // A. Disqualify outer exterior building walls touching outer map canvas border
-                if (cand.exitOutsideX < outerMargin || cand.exitOutsideX > MAP_WIDTH_PX - outerMargin ||
-                    cand.exitOutsideY < outerMargin || cand.exitOutsideY > MAP_HEIGHT_PX - outerMargin) {
-                    continue; // Skip: Outer exterior building wall facing outside margins!
+                // A. Disqualify outer exterior building walls touching outer map canvas border (unless explicitly chosen)
+                if (!explicitSide || explicitSide === 'auto') {
+                    if (cand.exitOutsideX < outerMargin || cand.exitOutsideX > MAP_WIDTH_PX - outerMargin ||
+                        cand.exitOutsideY < outerMargin || cand.exitOutsideY > MAP_HEIGHT_PX - outerMargin) {
+                        continue; // Skip: Outer exterior building wall facing outside margins!
+                    }
                 }
 
-                // B. Require a REAL walkable corridor to every other room, not
-                // just "not touching". Uses the same AABB clearance formula as
-                // App\Domains\Workspace\Support\RoomBoundsGap::distanceBetween
-                // (max of the two axis separations, not hypot — a diagonal
-                // gap can't be walked through on the diagonal).
-                let hasInsufficientClearance = false;
-                let minClearanceToOtherRooms = 99999;
+                // B. Check overlap with other rooms (MUST NOT touch or enter any other room!)
+                let isInsideOtherRoom = false;
+                let minDistanceToOtherRooms = 99999;
 
                 for (const other of rooms) {
                     if (other.id === r.id || !other.bounds) continue;
@@ -2320,28 +2235,36 @@
                     const orw = other.bounds.width * TILE_SIZE;
                     const orh = other.bounds.height * TILE_SIZE;
 
-                    const dx = Math.max(orx - cand.exitOutsideX, 0, cand.exitOutsideX - (orx + orw));
-                    const dy = Math.max(ory - cand.exitOutsideY, 0, cand.exitOutsideY - (ory + orh));
-                    const clearance = Math.max(dx, dy);
-
-                    // The exit point only needs to own half the corridor;
-                    // the neighboring room supplies the other half.
-                    if (clearance < MIN_ROOM_GAP_PX / 2) {
-                        hasInsufficientClearance = true;
+                    // Test if exit outside point is inside or touching other room with 6px safety margin
+                    if (cand.exitOutsideX >= orx - 6 && cand.exitOutsideX <= orx + orw + 6 &&
+                        cand.exitOutsideY >= ory - 6 && cand.exitOutsideY <= ory + orh + 6) {
+                        isInsideOtherRoom = true;
                         break;
                     }
-                    if (clearance < minClearanceToOtherRooms) {
-                        minClearanceToOtherRooms = clearance;
+
+                    // Test if door position itself on the wall falls on a shared wall segment
+                    if (cand.x >= orx - 4 && cand.x <= orx + orw + 4 &&
+                        cand.y >= ory - 4 && cand.y <= ory + orh + 4) {
+                        isInsideOtherRoom = true;
+                        break;
+                    }
+
+                    // Calculate clearance distance to other room's rectangle
+                    const dx = Math.max(orx - cand.exitOutsideX, 0, cand.exitOutsideX - (orx + orw));
+                    const dy = Math.max(ory - cand.exitOutsideY, 0, cand.exitOutsideY - (ory + orh));
+                    const dist = Math.hypot(dx, dy);
+                    if (dist < minDistanceToOtherRooms) {
+                        minDistanceToOtherRooms = dist;
                     }
                 }
 
-                if (hasInsufficientClearance) {
-                    continue; // Discard: not enough room for the avatar to walk through here
+                if (isInsideOtherRoom) {
+                    continue; // Discard: this position touches another room!
                 }
 
                 // C. Score candidate: closer to Central Open Corridor + open clearance distance
                 const distToCenter = Math.hypot(cand.exitOutsideX - mapCenter.x, cand.exitOutsideY - mapCenter.y);
-                const score = (1200 - distToCenter) + (minClearanceToOtherRooms * 4) + (cand.offset === 0.5 ? 25 : 0);
+                const score = (1200 - distToCenter) + (minDistanceToOtherRooms * 4) + (cand.offset === 0.5 ? 25 : 0);
 
                 if (score > bestScore) {
                     bestScore = score;
@@ -2349,27 +2272,23 @@
                 }
             }
 
-            // Fallback: a degraded door beats no door, but flag it so it's
-            // observable instead of silently shipping a bad placement.
-            let usedFallback = false;
+            // Fallback (strictly prioritize candidates NOT inside other rooms)
             if (!bestCandidate) {
-                usedFallback = true;
-                const withClearance = candidates.filter(cand => {
+                const nonOverlapping = candidates.filter(cand => {
                     for (const other of rooms) {
                         if (other.id === r.id || !other.bounds) continue;
                         const orx = other.bounds.x * TILE_SIZE;
                         const ory = other.bounds.y * TILE_SIZE;
                         const orw = other.bounds.width * TILE_SIZE;
                         const orh = other.bounds.height * TILE_SIZE;
-                        const dx = Math.max(orx - cand.exitOutsideX, 0, cand.exitOutsideX - (orx + orw));
-                        const dy = Math.max(ory - cand.exitOutsideY, 0, cand.exitOutsideY - (ory + orh));
-                        if (Math.max(dx, dy) < MIN_ROOM_GAP_PX / 2) {
+                        if (cand.exitOutsideX >= orx - 4 && cand.exitOutsideX <= orx + orw + 4 &&
+                            cand.exitOutsideY >= ory - 4 && cand.exitOutsideY <= ory + orh + 4) {
                             return false;
                         }
                     }
                     return true;
                 });
-                const pool = withClearance.length > 0 ? withClearance : candidates;
+                const pool = nonOverlapping.length > 0 ? nonOverlapping : candidates;
                 pool.sort((a, b) => {
                     const da = Math.hypot(a.exitOutsideX - mapCenter.x, a.exitOutsideY - mapCenter.y);
                     const db = Math.hypot(b.exitOutsideX - mapCenter.x, b.exitOutsideY - mapCenter.y);
@@ -2389,11 +2308,6 @@
                 exitOutsideX: bestCandidate.exitOutsideX,
                 exitOutsideY: bestCandidate.exitOutsideY
             };
-
-            if (usedFallback) {
-                portal.degraded = true;
-                console.warn(`[office] Room "${r.name || r.id}" has no door position with a full walkable corridor; using degraded fallback placement.`);
-            }
 
             roomDoorPortalsCache.set(r.id, portal);
             return portal;
@@ -2698,12 +2612,7 @@
 
             let goalNode = null;
             let iterations = 0;
-            // Large real maps (e.g. a 2194x1952 background at 16px tiles)
-            // can need a genuinely long detour around a single big room; a
-            // budget too close to the grid size can exhaust before the
-            // search escapes that room's "shadow". 12000 comfortably covers
-            // routing around any one room on the maps this app ships today.
-            const maxIterations = 12000;
+            const maxIterations = 4000;
 
             while (openSet.length > 0 && iterations++ < maxIterations) {
                 let bestIdx = 0;
@@ -4338,7 +4247,7 @@
             else ctx.rect(x - nameW / 2, badgeY, nameW, badgeH);
             ctx.stroke();
 
-            ctx.fillStyle = isSitting ? '#FFFFFF' : (isSelf ? '#86EFAC' : '#F9F4EE');
+            ctx.fillStyle = isSitting ? '#FFFFFF' : (isSelf ? '#86EFAC' : '#f9f6ef');
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(displayName, x, badgeY + (badgeH / 2));
@@ -5487,7 +5396,7 @@
 
         async function loadRoomFiles(roomId) {
             const list = document.getElementById('room-files-list');
-            list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted);">⏳ {{ __("Loading files...") }}</div>`;
+            list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--ula-text-muted);">⏳ {{ __("Loading files...") }}</div>`;
 
             try {
                 const res = await fetch(`/organizations/${CONFIG.org.id}/rooms/${roomId}/files`, {
@@ -5498,7 +5407,7 @@
                 const files = data.files || [];
 
                 if (files.length === 0) {
-                    list.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted);">📂 {{ __("No documents uploaded to this room yet.") }}</div>`;
+                    list.innerHTML = `<div style="text-align:center; padding:30px; color:var(--ula-text-muted);">📂 {{ __("No documents uploaded to this room yet.") }}</div>`;
                     return;
                 }
 
@@ -5506,10 +5415,10 @@
                 files.forEach(f => {
                     const sizeKb = (f.file_size / 1024).toFixed(1);
                     html += `
-                        <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
                             <div>
-                                <strong style="font-size: 12px; color: var(--text-primary); display: block;">📄 ${f.name}</strong>
-                                <span style="font-size: 10px; color: var(--text-secondary);">${f.uploader_name} • ${sizeKb} KB • ${new Date(f.created_at).toLocaleDateString()}</span>
+                                <strong style="font-size: 12px; color: var(--ula-text-primary); display: block;">📄 ${f.name}</strong>
+                                <span style="font-size: 10px; color: var(--ula-text-secondary);">${f.uploader_name} • ${sizeKb} KB • ${new Date(f.created_at).toLocaleDateString()}</span>
                             </div>
                             <div style="display: flex; gap: 6px;">
                                 <a href="${f.file_url}" download class="action-link-btn" style="padding: 4px 8px; font-size: 11px;">💾 {{ __("Download") }}</a>
@@ -5520,7 +5429,7 @@
                 });
                 list.innerHTML = html;
             } catch(e) {
-                list.innerHTML = `<div style="color:var(--brand-crimson); text-align:center; padding:20px;">❌ {{ __("Failed to load room files") }}</div>`;
+                list.innerHTML = `<div style="color:var(--ula-status-danger); text-align:center; padding:20px;">❌ {{ __("Failed to load room files") }}</div>`;
             }
         }
 
@@ -6026,7 +5935,7 @@
         async function openRecordingsGallery() {
             document.getElementById('recordings-modal').style.display = 'flex';
             const list = document.getElementById('recordings-list');
-            list.innerHTML = `<div style="text-align:center; padding:40px 0; color:var(--text-muted);">⏳ {{ __("Loading recordings...") }}</div>`;
+            list.innerHTML = `<div style="text-align:center; padding:40px 0; color:var(--ula-text-muted);">⏳ {{ __("Loading recordings...") }}</div>`;
 
             try {
                 const res = await fetch(`/organizations/${CONFIG.org.id}/recordings`, {
@@ -6036,17 +5945,17 @@
                 const data = await res.json();
                 const recs = data.recordings || [];
                 if (recs.length === 0) {
-                    list.innerHTML = `<div style="text-align:center; padding:40px 0; color:var(--text-muted);">📼 {{ __("No recordings saved yet.") }}</div>`;
+                    list.innerHTML = `<div style="text-align:center; padding:40px 0; color:var(--ula-text-muted);">📼 {{ __("No recordings saved yet.") }}</div>`;
                     return;
                 }
                 let html = '';
                 recs.forEach(r => {
                     const downloadUrl = `/organizations/${CONFIG.org.id}/recordings/${r.id}/download`;
                     html += `
-                        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 12px; padding: 14px; display: flex; justify-content: space-between; align-items: center;">
                             <div>
-                                <strong style="font-size: 13px; color: var(--text-primary); display: block;">${r.title}</strong>
-                                <span style="font-size: 11px; color: var(--text-secondary);">${new Date(r.created_at).toLocaleString()} • ${Math.round(r.duration_seconds || 0)}s • ${r.recorded_by_name || 'Member'}</span>
+                                <strong style="font-size: 13px; color: var(--ula-text-primary); display: block;">${r.title}</strong>
+                                <span style="font-size: 11px; color: var(--ula-text-secondary);">${new Date(r.created_at).toLocaleString()} • ${Math.round(r.duration_seconds || 0)}s • ${r.recorded_by_name || 'Member'}</span>
                             </div>
                             <div style="display: flex; gap: 8px;">
                                 <a href="${downloadUrl}" download="meeting_recording.mp4" class="action-link-btn">💾 {{ __("Download MP4") }}</a>
@@ -6057,7 +5966,7 @@
                 });
                 list.innerHTML = html;
             } catch(e) {
-                list.innerHTML = `<div style="color:var(--brand-crimson); text-align:center; padding:20px;">❌ {{ __("Failed to load recordings") }}</div>`;
+                list.innerHTML = `<div style="color:var(--ula-status-danger); text-align:center; padding:20px;">❌ {{ __("Failed to load recordings") }}</div>`;
             }
         }
         function closeRecordingsGallery() { document.getElementById('recordings-modal').style.display = 'none'; }
@@ -6135,14 +6044,14 @@
 
             const localRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
             let html = `
-                <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center;">
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <span style="font-size: 20px;">${userGender === 'female' ? '👩' : '👨'}</span>
                         <div>
-                            <strong style="font-size: 13px; color: var(--text-primary); display: block;">
+                            <strong style="font-size: 13px; color: var(--ula-text-primary); display: block;">
                                 ${localAvatar.name} <span style="font-size: 10px; color: #34D399; font-weight: 800;">({{ __('You / Host') }})</span>
                             </strong>
-                            <span style="font-size: 11px; color: var(--text-secondary);">🏢 ${localRoom ? localRoom.name : '{{ __("Open Floor") }}'}</span>
+                            <span style="font-size: 11px; color: var(--ula-text-secondary);">🏢 ${localRoom ? localRoom.name : '{{ __("Open Floor") }}'}</span>
                         </div>
                     </div>
                     <span style="font-size: 10px; background: rgba(16, 185, 129, 0.15); color: #10B981; padding: 3px 8px; border-radius: 6px; font-weight: 800;">🟢 {{ __('Active') }}</span>
@@ -6151,10 +6060,10 @@
 
             if (remoteAvatars.size === 0) {
                 html += `
-                    <div style="text-align: center; padding: 24px; color: var(--text-muted); font-size: 12px;">
+                    <div style="text-align: center; padding: 24px; color: var(--ula-text-muted); font-size: 12px;">
                         👥 {{ __("No other colleagues or guests in this office yet.") }}
                         <div style="margin-top: 10px;">
-                            <button onclick="closeOccupantsModal(); openGuestInviteModal();" class="action-link-btn" style="display: inline-flex; background: var(--brand-primary); color: white; padding: 6px 12px; font-size: 11px;">
+                            <button onclick="closeOccupantsModal(); openGuestInviteModal();" class="action-link-btn" style="display: inline-flex; background: var(--ula-palm-900); color: white; padding: 6px 12px; font-size: 11px;">
                                 ⚡ {{ __("Invite a Guest Now") }}
                             </button>
                         </div>
@@ -6165,14 +6074,14 @@
                     const r = getCurrentRoom(av.x, av.y);
                     const avGender = av.gender || 'male';
                     html += `
-                        <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center;">
+                        <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center;">
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <span style="font-size: 20px;">${avGender === 'female' ? '👩' : '👨'}</span>
                                 <div>
-                                    <strong style="font-size: 13px; color: var(--text-primary); display: block;">
+                                    <strong style="font-size: 13px; color: var(--ula-text-primary); display: block;">
                                         ${av.name} ${av.isGuest ? '<span style="font-size: 10px; color: #F59E0B; font-weight: 800;">(Guest)</span>' : ''}
                                     </strong>
-                                    <span style="font-size: 11px; color: var(--text-secondary);">🏢 ${r ? r.name : '{{ __("Open Floor") }}'}</span>
+                                    <span style="font-size: 11px; color: var(--ula-text-secondary);">🏢 ${r ? r.name : '{{ __("Open Floor") }}'}</span>
                                 </div>
                             </div>
                             <div style="display: flex; gap: 6px; align-items: center;">
@@ -6312,7 +6221,7 @@
                 bigAv.innerHTML = `<img src="${avObj.avatarUrl}" style="width:100%;height:100%;object-fit:cover;">`;
             }
 
-            tasksList.innerHTML = `<div style="text-align:center; padding: 12px; color: var(--text-muted); font-size:12px;">⏳ {{ __("Loading profile activity...") }}</div>`;
+            tasksList.innerHTML = `<div style="text-align:center; padding: 12px; color: var(--ula-text-muted); font-size:12px;">⏳ {{ __("Loading profile activity...") }}</div>`;
             modal.style.display = 'flex';
 
             // Fetch live activity & task list from server API
@@ -6335,7 +6244,7 @@
                         // Privacy protection: completely hide timer and tasks for guest viewers
                         if (timerBox) timerBox.style.display = 'none';
                         if (tasksCount) tasksCount.textContent = '🔒 {{ __("Restricted") }}';
-                        tasksList.innerHTML = `<div style="text-align:center; padding: 14px; color: var(--text-muted); font-size:12px; font-weight: 600;">🔒 {{ __("المهام خاصة بأعضاء الفريق") }}</div>`;
+                        tasksList.innerHTML = `<div style="text-align:center; padding: 14px; color: var(--ula-text-muted); font-size:12px; font-weight: 600;">🔒 {{ __("المهام خاصة بأعضاء الفريق") }}</div>`;
                     } else {
                         // Active Timer for members
                         if (data.active_timer) {
@@ -6359,19 +6268,19 @@
                         tasksCount.textContent = `${data.tasks.length} ${data.tasks.length === 1 ? 'Task' : 'Tasks'}`;
                         if (data.tasks.length > 0) {
                             tasksList.innerHTML = data.tasks.map(t => `
-                                <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                                <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
                                     <div style="display: flex; align-items: center; gap: 8px;">
                                         <span style="font-size: 14px;">${t.status === 'done' ? '✅' : (t.status === 'in_progress' ? '⚡' : '📌')}</span>
                                         <div>
-                                            <div style="font-size: 12px; font-weight: 800; color: var(--text-primary); text-decoration: ${t.status === 'done' ? 'line-through' : 'none'};">${t.title}</div>
-                                            <div style="font-size: 10px; color: var(--text-secondary);">${t.project_name} ${t.due_date ? '• 📅 ' + t.due_date : ''}</div>
+                                            <div style="font-size: 12px; font-weight: 800; color: var(--ula-text-primary); text-decoration: ${t.status === 'done' ? 'line-through' : 'none'};">${t.title}</div>
+                                            <div style="font-size: 10px; color: var(--ula-text-secondary);">${t.project_name} ${t.due_date ? '• 📅 ' + t.due_date : ''}</div>
                                         </div>
                                     </div>
                                     <span class="guest-badge" style="text-transform: uppercase; font-size: 9px;">${t.status.replace('_', ' ')}</span>
                                 </div>
                             `).join('');
                         } else {
-                            tasksList.innerHTML = `<div style="text-align:center; padding: 12px; color: var(--text-muted); font-size:12px;">☕ {{ __("No pending tasks assigned.") }}</div>`;
+                            tasksList.innerHTML = `<div style="text-align:center; padding: 12px; color: var(--ula-text-muted); font-size:12px;">☕ {{ __("No pending tasks assigned.") }}</div>`;
                         }
                     }
                 }
@@ -6481,7 +6390,7 @@
             } catch (e) {
                 console.error('Error loading office tasks:', e);
                 if (listEl) {
-                    listEl.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 12px; padding: 20px;">❌ {{ __('Failed to load tasks.') }}</div>`;
+                    listEl.innerHTML = `<div style="text-align: center; color: var(--ula-text-muted); font-size: 12px; padding: 20px;">❌ {{ __('Failed to load tasks.') }}</div>`;
                 }
             }
         }
@@ -6492,7 +6401,7 @@
 
             if (!tasks || !tasks.length) {
                 listEl.innerHTML = `
-                    <div style="text-align: center; padding: 30px 14px; color: var(--text-muted); font-size: 12px;">
+                    <div style="text-align: center; padding: 30px 14px; color: var(--ula-text-muted); font-size: 12px;">
                         <div style="font-size: 28px; margin-bottom: 6px;">☕</div>
                         {{ __('No pending tasks assigned to you.') }}
                     </div>
@@ -6516,10 +6425,10 @@
                     <div class="task-card-item ${isRunning ? 'running' : ''}" id="office-task-${t.id}" style="${isDone ? 'opacity: 0.75;' : ''}">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
                             <div style="min-width: 0;">
-                                <div style="font-size: 10px; font-weight: 800; color: var(--brand-primary); margin-bottom: 2px;">
+                                <div style="font-size: 10px; font-weight: 800; color: var(--ula-palm-900); margin-bottom: 2px;">
                                     📁 ${escapeHtml(t.project_name || 'General')}
                                 </div>
-                                <div style="font-size: 13px; font-weight: 800; color: var(--text-primary); line-height: 1.3; ${isDone ? 'text-decoration: line-through;' : ''}">
+                                <div style="font-size: 13px; font-weight: 800; color: var(--ula-text-primary); line-height: 1.3; ${isDone ? 'text-decoration: line-through;' : ''}">
                                     ${escapeHtml(t.title)}
                                 </div>
                             </div>
@@ -6529,9 +6438,9 @@
                         </div>
 
                         <!-- Status Selector & Action Row -->
-                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border-card);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--ula-border-subtle);">
                             <div style="display: flex; align-items: center; gap: 6px;">
-                                <select onchange="updateOfficeTaskStatus('${t.id}', this.value)" style="background: rgba(15, 23, 42, 0.75); border: 1px solid var(--border-card); color: var(--text-primary); border-radius: 6px; padding: 3px 6px; font-size: 10px; font-weight: 800; cursor: pointer; outline: none;">
+                                <select onchange="updateOfficeTaskStatus('${t.id}', this.value)" style="background: rgba(15, 23, 42, 0.75); border: 1px solid var(--ula-border-subtle); color: var(--ula-text-primary); border-radius: 6px; padding: 3px 6px; font-size: 10px; font-weight: 800; cursor: pointer; outline: none;">
                                     <option value="backlog" ${t.status === 'backlog' ? 'selected' : ''}>📋 {{ __('Backlog') }}</option>
                                     <option value="ready" ${t.status === 'ready' ? 'selected' : ''}>📌 {{ __('Ready') }}</option>
                                     <option value="in_progress" ${t.status === 'in_progress' ? 'selected' : ''}>⚡ {{ __('In Progress') }}</option>
@@ -6539,7 +6448,7 @@
                                     <option value="qa" ${t.status === 'qa' ? 'selected' : ''}>🧪 {{ __('QA') }}</option>
                                     <option value="done" ${t.status === 'done' ? 'selected' : ''}>✅ {{ __('Done') }}</option>
                                 </select>
-                                <span style="font-size: 10px; color: var(--text-muted);">
+                                <span style="font-size: 10px; color: var(--ula-text-muted);">
                                     ${t.due_date ? `📅 ${t.due_date}` : ''}
                                 </span>
                             </div>
@@ -6693,7 +6602,7 @@
 
             if (!msgs.length) {
                 container.innerHTML = headerHint + `
-                    <div style="text-align: center; padding: 24px 10px; color: var(--text-muted); font-size: 11px;">
+                    <div style="text-align: center; padding: 24px 10px; color: var(--ula-text-muted); font-size: 11px;">
                         💬 ${chatScope === 'global' ? '{{ __("No general messages yet. Send a message to everyone!") }}' : '{{ __("No messages in this room yet.") }}'}
                     </div>
                 `;
@@ -6829,7 +6738,7 @@
 
             // Local user card
             const selfCard = document.createElement('div');
-            selfCard.style.cssText = 'position: relative; height: 200px; background: #08120D; border-radius: 14px; overflow: hidden; border: 2px solid var(--brand-primary); display: flex; align-items: center; justify-content: center; cursor: pointer;';
+            selfCard.style.cssText = 'position: relative; height: 200px; background: #08120D; border-radius: 14px; overflow: hidden; border: 2px solid var(--ula-palm-900); display: flex; align-items: center; justify-content: center; cursor: pointer;';
             const localSrc = localMediaStream || (localAvatar.videoEl ? localAvatar.videoEl.srcObject : null);
             if (camActive && localSrc) {
                 const selfVid = document.createElement('video');
@@ -6841,7 +6750,7 @@
                 selfCard.appendChild(selfVid);
             } else {
                 const init = (localAvatar.name || 'You').substring(0, 2).toUpperCase();
-                selfCard.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; gap:8px;"><div style="width:52px;height:52px;border-radius:50%;background:rgba(16,185,129,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#6EE7B7;">${init}</div><span style="font-size:11px;color:var(--text-muted);">{{ __("Camera Off") }}</span></div>`;
+                selfCard.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; gap:8px;"><div style="width:52px;height:52px;border-radius:50%;background:rgba(16,185,129,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#6EE7B7;">${init}</div><span style="font-size:11px;color:var(--ula-text-muted);">{{ __("Camera Off") }}</span></div>`;
             }
             const selfLabel = document.createElement('div');
             selfLabel.style.cssText = 'position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; color: #6EE7B7;';
@@ -6853,7 +6762,7 @@
             // Remote users
             remoteAvatars.forEach(av => {
                 const rCard = document.createElement('div');
-                rCard.style.cssText = 'position: relative; height: 200px; background: #0F172A; border-radius: 14px; overflow: hidden; border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; cursor: pointer;';
+                rCard.style.cssText = 'position: relative; height: 200px; background: #0F172A; border-radius: 14px; overflow: hidden; border: 1px solid var(--ula-border-subtle); display: flex; align-items: center; justify-content: center; cursor: pointer;';
                 
                 const remoteRoom = getCurrentRoom(av.x, av.y);
                 let canViewRemoteVideo = false;
@@ -6900,9 +6809,9 @@
                     if (remoteRoom && (!localRoom || localRoom.id !== remoteRoom.id)) {
                         statusHtml = `<span style="font-size:11px; color:#FCA5A5; font-weight:700;">🔒 {{ __("In Private Room:") }} ${remoteRoom.name.split(' - ')[0]}</span>`;
                     } else if (av.camActive && !canViewRemoteVideo) {
-                        statusHtml = `<span style="font-size:11px; color:var(--text-muted);">🏢 {{ __("Out of visual range") }}</span>`;
+                        statusHtml = `<span style="font-size:11px; color:var(--ula-text-muted);">🏢 {{ __("Out of visual range") }}</span>`;
                     } else {
-                        statusHtml = `<span style="font-size:11px; color:var(--text-muted);">${av.camActive ? '🟢 {{ __("Camera Active") }}' : '{{ __("Camera Off") }}'}</span>`;
+                        statusHtml = `<span style="font-size:11px; color:var(--ula-text-muted);">${av.camActive ? '🟢 {{ __("Camera Active") }}' : '{{ __("Camera Off") }}'}</span>`;
                     }
                     rCard.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; padding:10px;"><div style="width:52px;height:52px;border-radius:50%;background:rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#93C5FD;">${init}</div>${statusHtml}</div>`;
                 }

@@ -5,44 +5,10 @@
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
-:root {
-    --nx-canvas-bg: #F9F4EE;
-    --nx-surface-card: #FFFFFF;
-    --nx-surface-subtle: #FAF6F0;
-    --nx-surface-sand: #F4EDE1;
-    --nx-border-line: rgba(20, 43, 36, 0.08);
-    --nx-border-hover: rgba(20, 43, 36, 0.20);
-    --nx-palm-hero: #142B24;
-    --nx-palm-dark: #0B1410;
-    --nx-palm-hover: #1B3223;
-    --nx-gold-accent: #D3A553;
-    --nx-live-green: #3C6B4C;
-    --nx-text-main: #142B24;
-    --nx-text-sub: #5A6B63;
-    --nx-text-mute: #8E9D95;
-}
-
-[data-theme="dark"], html.dark, body.dark-mode {
-    --nx-canvas-bg: #0B1410;
-    --nx-surface-card: #142B24;
-    --nx-surface-subtle: #17221F;
-    --nx-surface-sand: #1B3223;
-    --nx-border-line: rgba(237, 230, 217, 0.12);
-    --nx-border-hover: rgba(237, 230, 217, 0.25);
-    --nx-palm-hero: #4EA66F;
-    --nx-palm-dark: #0B1410;
-    --nx-palm-hover: #3C6B4C;
-    --nx-gold-accent: #E5B765;
-    --nx-live-green: #4EA66F;
-    --nx-text-main: #F9F4EE;
-    --nx-text-sub: #E3D2BB;
-    --nx-text-mute: #A4B5AD;
-}
-
 /* ── Main Layout Canvas ── */
 body {
-    background-color: var(--nx-canvas-bg) !important;
-    color: var(--nx-text-main);
+    background-color: var(--ula-surface-page) !important;
+    color: var(--ula-text-primary);
     font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', -apple-system, sans-serif;
     margin: 0;
     padding: 0;
@@ -71,8 +37,8 @@ body {
     position: relative;
     overflow: hidden;
     border-radius: 20px;
-    border: 1px solid var(--nx-border-line);
-    background: var(--nx-surface-card);
+    border: 1px solid var(--ula-border-subtle);
+    background: var(--ula-surface-card);
     background-image: radial-gradient(circle at 100% 0%, rgba(211, 165, 83, 0.08) 0%, transparent 50%), radial-gradient(circle at 0% 100%, rgba(20, 43, 36, 0.03) 0%, transparent 40%);
     padding: 28px 32px;
     margin-bottom: 24px;
@@ -90,18 +56,18 @@ body {
     gap: 8px;
     padding: 4px 12px;
     border-radius: 9999px;
-    background: var(--nx-surface-sand);
-    border: 1px solid var(--nx-border-line);
+    background: var(--ula-surface-warm);
+    border: 1px solid var(--ula-border-subtle);
     font-size: 12px;
     font-weight: 600;
-    color: var(--nx-text-main);
+    color: var(--ula-text-primary);
     margin-bottom: 12px;
 }
 
 .nx-hero-title {
     font-size: 26px;
     font-weight: 600;
-    color: var(--nx-text-main);
+    color: var(--ula-text-primary);
     line-height: 1.25;
     margin: 0 0 6px 0;
     letter-spacing: -0.3px;
@@ -109,7 +75,7 @@ body {
 
 .nx-hero-tagline {
     font-size: 13px;
-    color: var(--nx-text-sub);
+    color: var(--ula-text-secondary);
     margin: 0 0 20px 0;
     line-height: 1.5;
 }
@@ -129,7 +95,7 @@ body {
     height: 42px;
     padding: 0 22px;
     border-radius: 9999px;
-    background: var(--nx-palm-hero);
+    background: var(--ula-surface-dark);
     color: #FFFFFF !important;
     font-size: 13px;
     font-weight: 600;
@@ -140,7 +106,7 @@ body {
     transition: all 0.2s ease;
 }
 .nx-btn-primary:hover {
-    background: var(--nx-palm-hover);
+    background: var(--ula-accent-hover);
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(20, 43, 36, 0.28);
 }
@@ -153,12 +119,12 @@ body {
     height: 42px;
     padding: 0 20px;
     border-radius: 9999px;
-    background: var(--nx-surface-sand);
-    color: var(--nx-text-main) !important;
+    background: var(--ula-surface-warm);
+    color: var(--ula-text-primary) !important;
     font-size: 13px;
     font-weight: 600;
     text-decoration: none;
-    border: 1px solid var(--nx-border-line);
+    border: 1px solid var(--ula-border-subtle);
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -175,54 +141,18 @@ body {
     height: 42px;
     padding: 0 18px;
     border-radius: 9999px;
-    background: var(--nx-surface-card);
-    color: var(--nx-text-main) !important;
+    background: transparent;
+    color: var(--ula-text-primary) !important;
     font-size: 13px;
     font-weight: 500;
     text-decoration: none;
-    border: 1px solid var(--ula-border-strong, var(--nx-border-line));
+    border: 1px solid var(--ula-border-subtle);
     cursor: pointer;
     transition: all 0.2s ease;
 }
 .nx-btn-outline:hover {
-    border-color: var(--nx-text-main);
-    background: var(--nx-surface-subtle);
-}
-
-.nx-btn-danger {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    height: 42px;
-    padding: 0 18px;
-    border-radius: 9999px;
-    background: var(--ula-surface-danger-soft, #ecc9ae);
-    color: var(--ula-icon-danger, #b46c34) !important;
-    font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-.nx-btn-danger:hover {
-    background: var(--ula-status-danger, #9a5827);
-    color: #FFFFFF !important;
-}
-
-/* Size modifier — combines with nx-btn-primary/secondary/outline/danger,
-   which otherwise only ship the default (42px) size. */
-.nx-btn-sm {
-    height: 30px !important;
-    padding: 0 12px !important;
-    font-size: 12px !important;
-    gap: 6px !important;
-}
-.nx-btn-lg {
-    height: 50px !important;
-    padding: 0 26px !important;
-    font-size: 15px !important;
+    border-color: var(--ula-text-primary);
+    background: var(--ula-surface-page-alt);
 }
 
 .nx-hero-date-card {
@@ -231,8 +161,8 @@ body {
     gap: 16px;
     padding: 14px 18px;
     border-radius: 16px;
-    background: var(--nx-surface-subtle);
-    border: 1px solid var(--nx-border-line);
+    background: var(--ula-surface-page-alt);
+    border: 1px solid var(--ula-border-subtle);
     flex-shrink: 0;
 }
 
@@ -252,8 +182,8 @@ body {
 }
 
 .nx-stat-card {
-    background: var(--nx-surface-card);
-    border: 1px solid var(--nx-border-line);
+    background: var(--ula-surface-card);
+    border: 1px solid var(--ula-border-subtle);
     border-radius: 16px;
     padding: 18px 20px;
     min-height: 110px;
@@ -267,7 +197,7 @@ body {
 .nx-stat-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(20, 43, 36, 0.07);
-    border-color: var(--nx-border-hover);
+    border-color: var(--ula-border-hover);
 }
 
 .nx-stat-top {
@@ -280,13 +210,13 @@ body {
 .nx-stat-title {
     font-size: 13px;
     font-weight: 500;
-    color: var(--nx-text-sub);
+    color: var(--ula-text-secondary);
     line-height: 1.3;
 }
 
 .nx-stat-subtitle {
     font-size: 11px;
-    color: var(--nx-text-mute);
+    color: var(--ula-text-muted);
     display: block;
     margin-top: 1px;
 }
@@ -303,25 +233,25 @@ body {
 .nx-stat-icon-wrap.emerald { background: #E7F3EC; color: #3C6B4C; }
 .nx-stat-icon-wrap.gold { background: #F9F1E2; color: #D3A553; }
 .nx-stat-icon-wrap.sage { background: #EAF0EB; color: #1B3223; }
-.nx-stat-icon-wrap.muted { background: var(--nx-surface-sand); color: var(--nx-text-mute); }
+.nx-stat-icon-wrap.muted { background: var(--ula-surface-warm); color: var(--ula-text-muted); }
 
 .nx-stat-number {
     font-size: 34px;
     font-weight: 300;
-    color: var(--nx-text-main);
+    color: var(--ula-text-primary);
     line-height: 1;
     font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', sans-serif;
     letter-spacing: -0.5px;
     margin-top: 12px;
 }
 .nx-stat-number.is-zero {
-    color: var(--nx-text-mute);
+    color: var(--ula-text-muted);
     opacity: 0.65;
 }
 
 .nx-stat-caption {
     font-size: 11px;
-    color: var(--nx-text-mute);
+    color: var(--ula-text-muted);
     margin-top: 4px;
 }
 
@@ -342,8 +272,8 @@ body {
 }
 
 .nx-panel-card {
-    background: var(--nx-surface-card);
-    border: 1px solid var(--nx-border-line);
+    background: var(--ula-surface-card);
+    border: 1px solid var(--ula-border-subtle);
     border-radius: 18px;
     padding: 22px;
     box-shadow: 0 1px 4px rgba(20, 43, 36, 0.03);
@@ -362,7 +292,7 @@ body {
 .nx-panel-title {
     font-size: 15px;
     font-weight: 600;
-    color: var(--nx-text-main);
+    color: var(--ula-text-primary);
     margin: 0;
 }
 
@@ -376,8 +306,8 @@ body {
 .nx-quick-tile {
     height: 78px;
     padding: 12px 14px;
-    background: var(--nx-surface-subtle);
-    border: 1px solid var(--nx-border-line);
+    background: var(--ula-surface-page-alt);
+    border: 1px solid var(--ula-border-subtle);
     border-radius: 14px;
     display: flex;
     flex-direction: column;
@@ -391,26 +321,26 @@ body {
     box-sizing: border-box;
 }
 .nx-quick-tile:hover {
-    background: var(--nx-surface-card);
+    background: var(--ula-surface-card);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(20, 43, 36, 0.08);
-    outline: 1px solid var(--nx-palm-hero);
+    outline: 1px solid var(--ula-surface-dark);
 }
 
 .nx-quick-tile-icon {
     font-size: 20px;
-    color: var(--nx-palm-hero);
+    color: var(--ula-surface-dark);
 }
 .nx-quick-tile-title {
     font-size: 12px;
     font-weight: 600;
-    color: var(--nx-text-main);
+    color: var(--ula-text-primary);
     display: block;
     line-height: 1.2;
 }
 .nx-quick-tile-subtitle {
     font-size: 10px;
-    color: var(--nx-text-mute);
+    color: var(--ula-text-muted);
     display: block;
 }
 
@@ -426,14 +356,14 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 10px 14px;
-    background: var(--nx-surface-subtle);
-    border: 1px solid var(--nx-border-line);
+    background: var(--ula-surface-page-alt);
+    border: 1px solid var(--ula-border-subtle);
     border-radius: 12px;
     transition: all 0.15s ease;
 }
 .nx-meeting-row:hover {
-    background: var(--nx-surface-card);
-    border-color: var(--nx-border-hover);
+    background: var(--ula-surface-card);
+    border-color: var(--ula-border-hover);
     box-shadow: 0 4px 12px rgba(20, 43, 36, 0.05);
 }
 
@@ -441,11 +371,11 @@ body {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11px;
     font-weight: 500;
-    color: var(--nx-text-sub);
-    background: var(--nx-surface-card);
+    color: var(--ula-text-secondary);
+    background: var(--ula-surface-card);
     padding: 4px 8px;
     border-radius: 6px;
-    border: 1px solid var(--nx-border-line);
+    border: 1px solid var(--ula-border-subtle);
     flex-shrink: 0;
 }
 
@@ -477,7 +407,7 @@ body {
     gap: 8px;
     margin-top: 14px;
     padding-top: 12px;
-    border-top: 1px solid var(--nx-border-line);
+    border-top: 1px solid var(--ula-border-subtle);
     font-size: 12px;
 }
 
@@ -485,7 +415,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    color: var(--nx-text-sub);
+    color: var(--ula-text-secondary);
 }
 
 .nx-legend-dot {
@@ -499,104 +429,11 @@ body {
 /* ── 4. Bottom Quote Banner ── */
 .nx-quote-banner {
     padding: 14px 22px;
-    background: var(--nx-surface-subtle);
-    border: 1px solid var(--nx-border-line);
+    background: var(--ula-surface-page-alt);
+    border: 1px solid var(--ula-border-subtle);
     border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-}
-
-/* ── 5. KPI Cards ──
-   Single shared definition for every page that renders .kpi-card markup
-   (dashboard.blade.php's own tabs, projects/hub.blade.php, and any future
-   page). Do NOT redefine these locally in a page's own <style> block —
-   this file is what every one of those pages already loads, so a local
-   copy only drifts out of sync with this one. .kpi-grid itself stays
-   page-local since column-count tuning is legitimately per-page. */
-.kpi-card {
-    background: var(--bg-surface);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-xl);
-    padding: 18px 20px;
-    box-shadow: var(--shadow-card);
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-}
-.kpi-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-hover);
-    border-color: var(--brand-forest);
-}
-.kpi-card:hover .icon-box-3d {
-    transform: scale(1.05);
-}
-[data-theme="dark"] .kpi-card {
-    background: #101C15;
-    border-color: #26382B;
-}
-.kpi-info {
-    flex: 1;
-    min-width: 0;
-}
-.kpi-title {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--text-secondary);
-    letter-spacing: -0.1px;
-}
-.kpi-value {
-    font-size: 26px;
-    font-weight: 900;
-    color: var(--text-primary);
-    line-height: 1.1;
-    margin: 2px 0 4px 0;
-}
-.kpi-sub {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--brand-forest);
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-/* Stacked KPI card variant used by several tabs (projects, billing, meetings,
-   timesheets, all-tasks) and the project hub: a kpi-header row (title + icon
-   chip) above the value, instead of the icon-beside-text layout above. */
-.kpi-card:has(.kpi-header) {
-    flex-direction: column;
-    align-items: stretch;
-}
-.kpi-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8px;
-}
-.kpi-icon-box {
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
-    background: linear-gradient(145deg, #437E51 0%, #225433 100%);
-    border: 1px solid #1B4529;
-    color: #FFFFFF !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    box-shadow: 0 4px 12px rgba(34, 84, 51, 0.32), inset 0 1px 1px rgba(255, 255, 255, 0.45);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-    flex-shrink: 0;
-}
-.kpi-trend {
-    font-size: 11px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 4px;
 }

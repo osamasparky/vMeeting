@@ -1,312 +1,48 @@
 /* ==========================================================================
-   ULASPACE DESIGN SYSTEM — CSS DESIGN TOKENS & 4-WAY THEME ARCHITECTURE
-   Source: UlaSpace — Design System (Figma Key: FGzWcAAHW0jnskIgxsCW9l)
+   ULASPACE DESIGN SYSTEM — TOKENS
+   Generated from the Figma source file "UlaSpace — Design System"
+   (uploads/UlaSpace - Design System.fig, exported 2026-09-16).
+
+   Every value below is the literal value read out of the Figma variable
+   collections: Primitives (62), Color (104 · Light/Dark), Spacing (22),
+   Shape (9), Typography (23), Motion (8).
+
+   Naming mirrors Figma 1:1 — Figma `surface/page` becomes `--ula-surface-page`.
+   Theme: prefers-color-scheme is the default; [data-theme] / .dark override it.
+   A legacy bridge for the retired --nx-* / --brand-* names sits at the bottom.
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+/* --- FONTS -------------------------------------------------------------- */
+/* Cairo is self-hosted. Drop the woff2 files in public/fonts/cairo/.
+   Download: https://fonts.google.com/specimen/Cairo (Latin + Arabic subsets)
+   IBM Plex Sans / Mono stay on the Google CDN — swap the same way if needed. */
+/* @import must be the first rule in the stylesheet (CSS spec) — anything
+   ahead of it, @font-face included, makes conformant parsers drop it. */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
 
-/* Cairo — self-hosted, the UlaSpace Arabic typeface (Figma "font/ar").
-   Falls back to IBM Plex Sans Arabic (imported above) until this loads. */
 @font-face {
   font-family: 'Cairo';
   font-style: normal;
-  font-weight: 300;
+  font-weight: 300 700;
   font-display: swap;
-  src: url('/fonts/cairo/Cairo-Light.ttf') format('truetype');
+  src: url('/fonts/cairo/cairo-arabic.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF;
 }
 @font-face {
   font-family: 'Cairo';
   font-style: normal;
-  font-weight: 400;
+  font-weight: 300 700;
   font-display: swap;
-  src: url('/fonts/cairo/Cairo-Regular.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'Cairo';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('/fonts/cairo/Cairo-Medium.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'Cairo';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('/fonts/cairo/Cairo-SemiBold.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'Cairo';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('/fonts/cairo/Cairo-Bold.ttf') format('truetype');
+  src: url('/fonts/cairo/cairo-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215;
 }
 
 :root {
-  /* --- TYPOGRAPHY FAMILIES --- */
-  --nx-font-ar: 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
-  --nx-font-en: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --nx-font-mono: 'IBM Plex Mono', monospace;
+  /* ======================================================================
+     PRIMITIVES  (Figma collection "Primitives")
+     ====================================================================== */
 
-  /* Default font mapping based on document language */
-  --nx-font-family: var(--nx-font-ar);
-
-  /* --- BRAND COLOR RAMPS --- */
-  /* Palm (Primary Brand Green & Dark Canvas) */
-  --nx-palm-950: #0b1410;
-  --nx-palm-900: #142b24;
-  --nx-palm-800: #17221f;
-  --nx-palm-700: #1b3223;
-  --nx-palm-500: #1e412f;
-  --nx-palm-300: #3c6b4c;
-  --nx-palm-100: #e8f2ec;
-
-  /* Sand & Ivory (Light Surfaces & Containers) */
-  --nx-sand-50:  #ffffff;
-  --nx-sand-100: #f9f4ee;
-  --nx-sand-200: #f4ede1;
-  --nx-sand-300: #ede6d9;
-  --nx-sand-400: #e3d2bb;
-  --nx-sand-500: #c1b6a6;
-
-  /* Gold & Ochre (Accent, Highlights & Focus) */
-  --nx-gold-200: #f6ebda;
-  --nx-gold-400: #d3a553;
-  --nx-gold-600: #b46c34;
-
-  /* Terracotta (Attention / Danger / Warning) */
-  --nx-terracotta-100: #faeae6;
-  --nx-terracotta-500: #9a5827;
-
-  /* Stone (Neutral / Track / Inactive) */
-  --nx-stone-track: #e8e4dc;
-  --nx-stone-text:  #8e877c;
-
-  /* --- SPACING SCALE (4px Base) --- */
-  --nx-space-1:   4px;
-  --nx-space-2:   8px;
-  --nx-space-3:   12px;
-  --nx-space-3-5: 14px;
-  --nx-space-4:   16px;
-  --nx-space-5:   20px;
-  --nx-space-6:   24px;
-  --nx-space-8:   32px;
-  --nx-space-10:  40px;
-  --nx-space-12:  48px;
-  --nx-space-16:  64px;
-  --nx-space-20:  80px;
-  --nx-space-24:  96px;
-  --nx-space-30:  120px;
-
-  /* Container & Layout Tokens */
-  --nx-container-max: 1440px;
-  --nx-container-narrow: 1120px;
-  --nx-card-pad: 24px;
-  --nx-panel-pad: 32px;
-  --nx-gutter: 32px;
-
-  /* --- CORNER RADII --- */
-  --nx-radius-xs:   6px;
-  --nx-radius-sm:   10px;
-  --nx-radius-md:   14px;
-  --nx-radius-lg:   16px;
-  --nx-radius-xl:   20px;
-  --nx-radius-arch: 48px;
-  --nx-radius-pill: 9999px;
-
-  /* --- SHADOWS & ELEVATION --- */
-  --nx-shadow-sm:     0 2px 8px -2px rgba(27, 50, 35, 0.10);
-  --nx-shadow-md:     0 8px 24px -8px rgba(27, 50, 35, 0.14);
-  --nx-shadow-lg:     0 20px 48px -12px rgba(27, 50, 35, 0.18);
-  --nx-shadow-xl:     0 32px 80px -16px rgba(27, 50, 35, 0.22);
-  --nx-shadow-on-map: 0 8px 24px -8px rgba(0, 0, 0, 0.55);
-
-  /* --- BLUR & GLASSMORPHISM --- */
-  --nx-backdrop-blur: blur(14px);
-
-  /* --- MOTION & DURATIONS --- */
-  --nx-duration-fast: 120ms;
-  --nx-duration-base: 200ms;
-  --nx-duration-slow: 320ms;
-  --nx-ease-standard: cubic-bezier(0.2, 0.0, 0, 1.0);
-  --nx-ease-out:      cubic-bezier(0.0, 0.0, 0.2, 1.0);
-
-  /* --- SEMANTIC TOKENS (LIGHT MODE DEFAULT) --- */
-  --nx-bg-page:             var(--nx-sand-100);
-  --nx-bg-surface:          var(--nx-sand-50);
-  --nx-bg-surface-elevated: var(--nx-sand-50);
-  --nx-bg-surface-hover:    var(--nx-sand-200);
-  --nx-bg-card:             var(--nx-sand-50);
-  --nx-bg-capsule:          rgba(255, 255, 255, 0.75);
-
-  --nx-text-primary:        var(--nx-palm-900);
-  --nx-text-secondary:      #5a6b63;
-  --nx-text-muted:          #8e9d95;
-  --nx-text-placeholder:    var(--nx-sand-500);
-  --nx-text-on-dark:        #ffffff;
-  --nx-text-on-dark-muted:  var(--nx-sand-400);
-
-  --nx-border-subtle:       rgba(27, 50, 35, 0.08);
-  --nx-border-default:      rgba(27, 50, 35, 0.16);
-  --nx-border-strong:       rgba(27, 50, 35, 0.28);
-  --nx-border-on-dark:      rgba(237, 230, 217, 0.15);
-
-  --nx-accent:              var(--nx-gold-400);
-  --nx-accent-hover:        var(--nx-gold-600);
-  --nx-accent-fg:           #ffffff;
-
-  --nx-status-live:         var(--nx-palm-300);
-  --nx-status-live-bg:      var(--nx-palm-100);
-  --nx-status-scheduled:    var(--nx-gold-400);
-  --nx-status-scheduled-bg: var(--nx-gold-200);
-  --nx-status-attention:    var(--nx-terracotta-500);
-  --nx-status-attention-bg: var(--nx-terracotta-100);
-  --nx-status-cancelled:    var(--nx-stone-text);
-  --nx-status-cancelled-bg: var(--nx-stone-track);
-
-  --nx-focus-ring:          0 0 0 2px var(--nx-bg-surface), 0 0 0 4px var(--nx-gold-400);
-  --nx-focus-ring-on-dark:  0 0 0 2px var(--nx-palm-900), 0 0 0 4px var(--nx-gold-400);
-
-  /* Scrims */
-  --nx-scrim-hero: linear-gradient(to top, rgba(11, 20, 16, 0.66) 0%, rgba(11, 20, 16, 0.10) 55%, transparent 100%);
-  --nx-scrim-welcome-rtl: linear-gradient(to left, rgba(249, 244, 238, 0.96) 0%, rgba(249, 244, 238, 0.80) 42%, rgba(249, 244, 238, 0) 78%);
-  --nx-scrim-welcome-ltr: linear-gradient(to right, rgba(249, 244, 238, 0.96) 0%, rgba(249, 244, 238, 0.80) 42%, rgba(249, 244, 238, 0) 78%);
-  --nx-scrim-caption: linear-gradient(to top, rgba(11, 20, 16, 0.55) 0%, transparent 70%);
-}
-
-/* --- DARK MODE OVERRIDES --- */
-[data-theme="dark"], .dark {
-  --nx-bg-page:             var(--nx-palm-950);
-  --nx-bg-surface:          var(--nx-palm-900);
-  --nx-bg-surface-elevated: var(--nx-palm-700);
-  --nx-bg-surface-hover:    #1e382f;
-  --nx-bg-card:             var(--nx-palm-900);
-  --nx-bg-capsule:          rgba(20, 43, 36, 0.75);
-
-  --nx-text-primary:        var(--nx-sand-100);
-  --nx-text-secondary:      var(--nx-sand-400);
-  --nx-text-muted:          #a4b5ad;
-  --nx-text-placeholder:    #63756d;
-
-  --nx-border-subtle:       rgba(237, 230, 217, 0.12);
-  --nx-border-default:      rgba(237, 230, 217, 0.22);
-  --nx-border-strong:       rgba(237, 230, 217, 0.38);
-
-  --nx-shadow-sm:           0 2px 8px -2px rgba(0, 0, 0, 0.40);
-  --nx-shadow-md:           0 8px 24px -8px rgba(0, 0, 0, 0.50);
-  --nx-shadow-lg:           0 20px 48px -12px rgba(0, 0, 0, 0.60);
-  --nx-shadow-xl:           0 32px 80px -16px rgba(0, 0, 0, 0.70);
-
-  --nx-status-live:         #4ea66f;
-  --nx-status-live-bg:      rgba(78, 166, 111, 0.18);
-  --nx-status-scheduled:    #e5b765;
-  --nx-status-scheduled-bg: rgba(229, 183, 101, 0.18);
-  --nx-status-attention:    #c9743a;
-  --nx-status-attention-bg: rgba(201, 116, 58, 0.18);
-  --nx-status-cancelled:    #a4b5ad;
-  --nx-status-cancelled-bg: rgba(164, 181, 173, 0.15);
-
-  --nx-focus-ring:          0 0 0 2px var(--nx-palm-900), 0 0 0 4px var(--nx-gold-400);
-
-  --nx-scrim-welcome-rtl: linear-gradient(to left, rgba(20, 43, 36, 0.96) 0%, rgba(20, 43, 36, 0.80) 42%, rgba(20, 43, 36, 0) 78%);
-  --nx-scrim-welcome-ltr: linear-gradient(to right, rgba(20, 43, 36, 0.96) 0%, rgba(20, 43, 36, 0.80) 42%, rgba(20, 43, 36, 0) 78%);
-}
-
-/* --- RTL & LTR BILINGUAL RULES --- */
-[dir="rtl"] {
-  font-family: var(--nx-font-ar);
-  --nx-scrim-welcome: var(--nx-scrim-welcome-rtl);
-}
-
-[dir="ltr"] {
-  font-family: var(--nx-font-en);
-  --nx-scrim-welcome: var(--nx-scrim-welcome-ltr);
-}
-
-/* Material Symbols Icon Sizing & Baseline */
-.material-symbols-rounded {
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-  vertical-align: middle;
-  line-height: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.material-symbols-rounded.filled {
-  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-}
-
-/* RTL Icon mirroring for directional indicators */
-[dir="rtl"] .nx-mirror-rtl {
-  transform: scaleX(-1);
-}
-
-/* --- BASE UTILITIES --- */
-body {
-  background-color: var(--nx-bg-page);
-  color: var(--nx-text-primary);
-  margin: 0;
-  padding: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.nx-card {
-  background-color: var(--nx-bg-surface);
-  border: 1px solid var(--nx-border-subtle);
-  border-radius: var(--nx-radius-lg);
-  box-shadow: var(--nx-shadow-sm);
-  transition: transform var(--nx-duration-base) var(--nx-ease-standard),
-              box-shadow var(--nx-duration-base) var(--nx-ease-standard),
-              border-color var(--nx-duration-base) var(--nx-ease-standard);
-}
-
-.nx-card-hover:hover {
-  transform: translateY(-2px);
-  border-color: var(--nx-border-strong);
-  box-shadow: var(--nx-shadow-md);
-}
-
-.nx-glass {
-  background: var(--nx-bg-capsule);
-  backdrop-filter: var(--nx-backdrop-blur);
-  -webkit-backdrop-filter: var(--nx-backdrop-blur);
-  border: 1px solid var(--nx-border-subtle);
-}
-
-/* Two-Line Rule Typography */
-.nx-headline-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--nx-space-1);
-}
-
-.nx-headline-ar {
-  font-family: var(--nx-font-ar);
-  font-weight: 600;
-  color: var(--nx-text-primary);
-  line-height: 1.3;
-}
-
-.nx-headline-en {
-  font-family: var(--nx-font-en);
-  font-weight: 300;
-  color: var(--nx-text-secondary);
-  line-height: 1.3;
-}
-
-/* ==========================================================================
-   ULASPACE — --ula-* TOKENS
-   Read directly from the Figma source file "UlaSpace — Design System"
-   (uploads/UlaSpace - Design System.fig). Additive: the --nx-* tokens above
-   stay in place for views not yet migrated; new/updated views should use
-   --ula-* (and the Tailwind utilities bridged from them in app.css) instead.
-   Figma `surface/page` -> CSS `--ula-surface-page`, mechanical in both directions.
-   ========================================================================== */
-:root {
-  /* --- Primitives (never reference directly in a component) --- */
+  /* Palm — brand green ramp */
   --ula-palm-50:  #f0f4f0;
   --ula-palm-100: #dbe6dd;
   --ula-palm-200: #b6c9bb;
@@ -320,6 +56,7 @@ body {
   --ula-palm-950: #0e1c17;
   --ula-palm-chrome: #17221f;
 
+  /* Sand — warm paper ramp */
   --ula-sand-50:  #fbf8f2;
   --ula-sand-100: #f9f6ef;
   --ula-sand-200: #f4ede1;
@@ -328,6 +65,7 @@ body {
   --ula-sand-500: #d6c0a2;
   --ula-sand-600: #c3a882;
 
+  /* Stone — neutral ramp */
   --ula-stone-100: #e8e4dc;
   --ula-stone-200: #d9d3c8;
   --ula-stone-300: #c1b6a6;
@@ -336,12 +74,14 @@ body {
   --ula-stone-600: #665d52;
   --ula-stone-700: #4a443c;
 
+  /* Gold — highlight ramp */
   --ula-gold-200: #f0dfbc;
   --ula-gold-300: #e6c88b;
   --ula-gold-400: #d3a553;
   --ula-gold-500: #b98a37;
   --ula-gold-600: #946c27;
 
+  /* Terracotta — danger / warm attention ramp */
   --ula-terracotta-200: #ecc9ae;
   --ula-terracotta-300: #d99a6c;
   --ula-terracotta-400: #b46c34;
@@ -351,6 +91,7 @@ body {
   --ula-white: #ffffff;
   --ula-black: #0b1410;
 
+  /* Alphas */
   --ula-alpha-ivory-8:  rgba(237, 230, 217, 0.08);
   --ula-alpha-ivory-10: rgba(237, 230, 217, 0.10);
   --ula-alpha-ivory-14: rgba(237, 230, 217, 0.14);
@@ -374,7 +115,9 @@ body {
   --ula-alpha-black-55: rgba(0, 0, 0, 0.55);
   --ula-alpha-black-60: rgba(0, 0, 0, 0.60);
 
-  /* --- Typography --- */
+  /* ======================================================================
+     TYPOGRAPHY  (Figma collection "Typography")
+     ====================================================================== */
   --ula-font-ar:   'Cairo', 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
   --ula-font-en:   'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --ula-font-mono: 'IBM Plex Mono', ui-monospace, monospace;
@@ -391,6 +134,7 @@ body {
   --ula-size-sm:         13px;
   --ula-size-xs:         12px;
   --ula-size-label:      11px;
+  /* English companion line sizes */
   --ula-size-display-en: 24px;
   --ula-size-h1-en:      18px;
   --ula-size-h2-en:      15px;
@@ -402,15 +146,18 @@ body {
   --ula-weight-semibold: 600;
   --ula-weight-bold:     700;
 
+  /* Line heights carried by the Figma text styles */
   --ula-lh-display: 1.25;
   --ula-lh-heading: 1.4;
   --ula-lh-hero:    1.3;
   --ula-lh-body:    1.6;
   --ula-lh-en:      1.5;
   --ula-lh-metric:  1.1;
-  --ula-tracking-brand: 0.14em;
+  --ula-tracking-brand: 0.14em; /* Label/Brand, uppercase */
 
-  /* --- Spacing & layout --- */
+  /* ======================================================================
+     SPACING & LAYOUT  (Figma collection "Spacing")
+     ====================================================================== */
   --ula-space-0:  0px;
   --ula-space-1:  2px;
   --ula-space-2:  4px;
@@ -427,16 +174,18 @@ body {
   --ula-space-13: 96px;
   --ula-space-14: 128px;
 
-  --ula-layout-gutter:    var(--ula-space-7);
-  --ula-layout-card-pad:  var(--ula-space-6);
-  --ula-layout-panel-pad: var(--ula-space-7);
-  --ula-layout-section-y: var(--ula-space-12);
+  --ula-layout-gutter:    var(--ula-space-7);  /* 24 */
+  --ula-layout-card-pad:  var(--ula-space-6);  /* 20 */
+  --ula-layout-panel-pad: var(--ula-space-7);  /* 24 */
+  --ula-layout-section-y: var(--ula-space-12); /* 80 */
   --ula-layout-container-max:    1280px;
   --ula-layout-container-narrow: 880px;
   --ula-size-touch-target: 44px;
   --ula-grid-columns: 12;
 
-  /* --- Shape --- */
+  /* ======================================================================
+     SHAPE  (Figma collection "Shape")
+     ====================================================================== */
   --ula-radius-xs:   6px;
   --ula-radius-sm:   10px;
   --ula-radius-md:   14px;
@@ -447,7 +196,9 @@ body {
   --ula-border-width-thick:    1.5px;
   --ula-blur-panel: 14px;
 
-  /* --- Motion --- */
+  /* ======================================================================
+     MOTION  (Figma collection "Motion")
+     ====================================================================== */
   --ula-duration-instant: 90ms;
   --ula-duration-fast:    160ms;
   --ula-duration-base:    240ms;
@@ -457,7 +208,9 @@ body {
   --ula-ease-in-out:   cubic-bezier(0.4, 0, 0.2, 1);
   --ula-ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* --- Elevation --- */
+  /* ======================================================================
+     ELEVATION  (Figma effect styles)
+     ====================================================================== */
   --ula-shadow-xs: 0 1px 2px 0 var(--ula-shadow-xs-color);
   --ula-shadow-sm: 0 2px 8px -2px var(--ula-shadow-sm-color);
   --ula-shadow-md: 0 8px 24px -8px var(--ula-shadow-md-color);
@@ -468,7 +221,9 @@ body {
   --ula-focus-ring-on-dark: 0 0 0 2px var(--ula-focus-gap-on-dark), 0 0 0 4px var(--ula-focus-ring-color);
   --ula-backdrop-blur: blur(var(--ula-blur-panel));
 
-  /* --- Semantic — Light (default) --- */
+  /* ======================================================================
+     SEMANTIC — LIGHT  (Figma collection "Color", mode: Light)
+     ====================================================================== */
   --ula-surface-page:        var(--ula-sand-50);
   --ula-surface-page-alt:    var(--ula-sand-200);
   --ula-surface-card:        var(--ula-sand-100);
@@ -547,6 +302,7 @@ body {
   --ula-brand-mark-green: var(--ula-palm-700);
   --ula-brand-mark-ivory: var(--ula-sand-100);
 
+  /* Tonal pairs — badges, avatars, status blocks */
   --ula-tone-palm-bg:  var(--ula-palm-100);
   --ula-tone-palm-fg:  var(--ula-palm-700);
   --ula-tone-palm-dot: var(--ula-palm-500);
@@ -562,6 +318,7 @@ body {
   --ula-tone-sand-bg:   var(--ula-sand-400);
   --ula-tone-sand-fg:   var(--ula-terracotta-600);
 
+  /* Controls on dark chrome */
   --ula-control-dark-fill:          var(--ula-alpha-ivory-8);
   --ula-control-dark-fill-strong:   var(--ula-alpha-ivory-10);
   --ula-control-dark-fill-strong-hover: var(--ula-alpha-ivory-18);
@@ -586,9 +343,11 @@ body {
   --ula-shadow-xl-color: var(--ula-alpha-shadow-22);
   --ula-shadow-on-map-color: var(--ula-alpha-black-55);
 
+  /* Composites used by app chrome (individual views may scope their own value) */
   --ula-gradient-accent: linear-gradient(135deg, var(--ula-palm-900) 0%, var(--ula-palm-700) 100%);
   --ula-transition-smooth: all var(--ula-duration-base) var(--ula-ease-in-out);
 
+  /* Scrims — Figma fill styles Scrim/* */
   --ula-scrim-hero: linear-gradient(to top, rgba(14, 28, 23, 0.66) 0%, rgba(14, 28, 23, 0.10) 55%, rgba(14, 28, 23, 0) 100%);
   --ula-scrim-bottom: linear-gradient(to top, rgba(14, 28, 23, 0.72) 0%, rgba(14, 28, 23, 0.18) 48%, rgba(14, 28, 23, 0) 100%);
   --ula-scrim-caption: linear-gradient(to top, rgba(14, 28, 23, 0.55) 0%, rgba(14, 28, 23, 0) 70%);
@@ -596,7 +355,9 @@ body {
   --ula-scrim-welcome-ltr: linear-gradient(to right, rgba(251, 248, 242, 0.96) 0%, rgba(251, 248, 242, 0.80) 42%, rgba(251, 248, 242, 0) 78%);
 }
 
-/* --- Semantic — Dark (system preference) --- */
+/* ======================================================================
+   SEMANTIC — DARK  (Figma collection "Color", mode: Dark)
+   ====================================================================== */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --ula-surface-page:        var(--ula-palm-950);
@@ -744,6 +505,7 @@ body {
   --ula-scrim-welcome-ltr: linear-gradient(to right, rgba(14, 28, 23, 0.96) 0%, rgba(14, 28, 23, 0.80) 42%, rgba(14, 28, 23, 0) 78%);
 }
 
+/* --- DIRECTION --------------------------------------------------------- */
 [dir="rtl"] {
   font-family: var(--ula-font-ar);
   --ula-scrim-welcome: var(--ula-scrim-welcome-rtl);
@@ -753,9 +515,43 @@ body {
   --ula-scrim-welcome: var(--ula-scrim-welcome-ltr);
 }
 
+/* --- BASE -------------------------------------------------------------- */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--ula-surface-page);
+  color: var(--ula-text-primary);
+  /* No font-family here on purpose: [dir="rtl"]/[dir="ltr"] above set it on
+     <html>, and font-family inherits. Setting it again here with the static,
+     always-Arabic --ula-font-family would override that switch for every
+     page's English/LTR mode. */
+  font-size: var(--ula-size-body);
+  line-height: var(--ula-lh-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a { color: var(--ula-text-link); text-decoration: none; }
+a:hover { color: var(--ula-text-link-hover); text-decoration: underline; }
+
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: none;
+  box-shadow: var(--ula-focus-ring);
+}
+
+/* Material Symbols */
+.material-symbols-rounded {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.material-symbols-rounded.filled { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
 [dir="rtl"] .ula-mirror-rtl { transform: scaleX(-1); }
 
-/* --- Type utilities (Figma text styles) --- */
+/* --- TYPE UTILITIES (Figma text styles) -------------------------------- */
 .ula-display-lg { font-family: var(--ula-font-ar); font-size: var(--ula-size-display-lg); font-weight: var(--ula-weight-semibold); line-height: var(--ula-lh-display); }
 .ula-display    { font-family: var(--ula-font-ar); font-size: var(--ula-size-display); font-weight: var(--ula-weight-semibold); line-height: var(--ula-lh-display); }
 .ula-h1 { font-family: var(--ula-font-ar); font-size: var(--ula-size-h1); font-weight: var(--ula-weight-semibold); line-height: var(--ula-lh-display); }
@@ -779,11 +575,12 @@ body {
   text-transform: uppercase;
 }
 
+/* Two-line rule: Arabic headline + English companion */
 .ula-headline-group { display: flex; flex-direction: column; gap: var(--ula-space-1); }
 .ula-headline-ar { font-family: var(--ula-font-ar); font-weight: var(--ula-weight-semibold); color: var(--ula-text-primary); line-height: var(--ula-lh-hero); }
 .ula-headline-en { font-family: var(--ula-font-en); font-weight: var(--ula-weight-light); color: var(--ula-text-secondary); line-height: var(--ula-lh-heading); }
 
-/* --- Surface utilities --- */
+/* --- SURFACE UTILITIES ------------------------------------------------- */
 .ula-card {
   background-color: var(--ula-surface-card);
   border: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
@@ -798,52 +595,6 @@ body {
   border-color: var(--ula-border-strong);
   box-shadow: var(--ula-shadow-md);
 }
-
-/* --- Legacy button hook (.nx-btn.nx-btn--primary) -----------------------
-   Several pages (login, register, welcome, profile tab) still markup
-   their submit/CTA buttons as `.nx-btn .nx-btn--primary` — that class
-   pair never had a rule anywhere, so those buttons rendered as bare
-   unstyled <button>/<a> elements. Defined once here since the class is
-   loaded on every page via ulaspace-tokens.css.
-   Scoped as the COMPOUND selector `.nx-btn.nx-btn--primary` rather than
-   a bare `.nx-btn` — the dashboard's own button family (.nx-btn-primary/
-   -secondary/-outline/-danger, single dash, in ulaspace-dashboard.css)
-   is unrelated but happens to combine with a literal `nx-btn` class on
-   the same elements; a bare `.nx-btn` rule here would win the cascade
-   (this file loads after ulaspace-dashboard.css) and silently strip
-   their border/background. */
-.nx-btn.nx-btn--primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--ula-space-3);
-  height: 44px;
-  padding: 0 var(--ula-space-7);
-  border: var(--ula-border-width-hairline) solid transparent;
-  border-radius: var(--ula-radius-md);
-  font-family: var(--ula-font-ar);
-  font-size: var(--ula-size-body);
-  font-weight: var(--ula-weight-semibold);
-  text-decoration: none;
-  cursor: pointer;
-  transition: background-color var(--ula-duration-fast) var(--ula-ease-out),
-              border-color var(--ula-duration-fast) var(--ula-ease-out);
-  background: var(--ula-accent-default);
-  border-color: var(--ula-accent-default);
-  color: var(--ula-accent-fg);
-}
-.nx-btn.nx-btn--primary:hover {
-  background: var(--ula-accent-hover);
-  border-color: var(--ula-accent-hover);
-}
-.nx-btn.nx-btn--primary:active {
-  background: var(--ula-accent-press);
-  border-color: var(--ula-accent-press);
-}
-.nx-btn.nx-btn--primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
 .ula-glass {
   background: var(--ula-surface-capsule);
   backdrop-filter: var(--ula-backdrop-blur);
@@ -852,3 +603,35 @@ body {
 }
 .ula-container { max-width: var(--ula-layout-container-max); margin-inline: auto; padding-inline: var(--ula-layout-gutter); }
 .ula-container-narrow { max-width: var(--ula-layout-container-narrow); margin-inline: auto; padding-inline: var(--ula-layout-gutter); }
+
+/* ==========================================================================
+   LEGACY BRIDGE — retired token names mapped onto UlaSpace tokens.
+   Views were swept to the --ula-* names; this block only protects anything
+   generated at runtime or added outside the sweep. Safe to delete once
+   `grep -r "\-\-nx-\|\-\-brand-\|\-\-bg-base" resources/` comes back empty.
+   ========================================================================== */
+:root {
+  --nx-font-ar: var(--ula-font-ar);
+  --nx-font-en: var(--ula-font-en);
+  --nx-font-mono: var(--ula-font-mono);
+  --nx-bg-page: var(--ula-surface-page);
+  --nx-bg-surface: var(--ula-surface-card);
+  --nx-bg-surface-elevated: var(--ula-surface-raised);
+  --nx-bg-surface-hover: var(--ula-surface-hover);
+  --nx-bg-card: var(--ula-surface-card);
+  --nx-bg-capsule: var(--ula-surface-capsule);
+  --nx-text-primary: var(--ula-text-primary);
+  --nx-text-secondary: var(--ula-text-secondary);
+  --nx-text-muted: var(--ula-text-muted);
+  --nx-text-on-dark: var(--ula-text-on-dark);
+  --nx-border-subtle: var(--ula-border-subtle);
+  --nx-border-default: var(--ula-border-default);
+  --nx-border-strong: var(--ula-border-strong);
+  --nx-accent: var(--ula-accent-default);
+  --nx-radius-lg: var(--ula-radius-lg);
+  --nx-radius-pill: var(--ula-radius-pill);
+  --nx-shadow-sm: var(--ula-shadow-sm);
+  --nx-shadow-md: var(--ula-shadow-md);
+  --nx-shadow-lg: var(--ula-shadow-lg);
+  --nx-focus-ring: var(--ula-focus-ring);
+}

@@ -1,5 +1,9 @@
 <div id="tab-settings" class="tab-view">
     <div class="page-header" style="margin-bottom: 20px;">
+        <h1 class="page-title" style="font-size: 22px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
+            <span class="material-symbols-rounded" style="font-size: 24px; color: var(--ula-highlight-default);">settings</span>
+            <span>{{ __('Workspace Settings') }}</span>
+        </h1>
         <p class="page-subtitle" style="font-size: 13px; color: var(--ula-text-secondary);">{{ __('Configure organization branding, custom SMTP mail servers, and AI office blueprint engine.') }}</p>
     </div>
 

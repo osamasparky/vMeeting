@@ -21,55 +21,17 @@
 
     <style>
         :root[data-theme="dark"], :root {
-            --brand-primary: var(--nx-palm-300, #3c6b4c);
-            --brand-primary-hover: var(--nx-palm-500, #1e412f);
-            --brand-accent: var(--nx-accent, #d3a553);
-            --brand-gold: var(--nx-gold-400, #d3a553);
-            --brand-crimson: var(--nx-terracotta-500, #9a5827);
-            --brand-teal: var(--nx-palm-300, #3c6b4c);
-
-            --bg-body: var(--nx-palm-950, #0b1410);
-            --bg-dock: rgba(20, 43, 36, 0.92);
-            --bg-surface: var(--nx-palm-900, #142b24);
-            --bg-card: var(--nx-palm-700, #1b3223);
-            --bg-input: rgba(11, 20, 16, 0.90);
-            --border-color: rgba(237, 230, 217, 0.15);
-            --border-card: rgba(237, 230, 217, 0.12);
-            --border-panel: rgba(237, 230, 217, 0.18);
-
-            --text-primary: var(--nx-sand-100, #f9f4ee);
-            --text-secondary: var(--nx-sand-400, #e3d2bb);
-            --text-muted: var(--nx-sand-500, #c1b6a6);
-            --text-main: var(--nx-sand-100, #f9f4ee);
-            --text-dim: var(--nx-sand-500, #c1b6a6);
-
-            --shadow-elevated: 0 16px 36px rgba(0, 0, 0, 0.4);
-            --shadow-panel: 0 8px 24px rgba(0, 0, 0, 0.35);
-        }
+                        --brand-primary-hover: var(--ula-palm-700, #1e412f);
+                                                
+                                                                                                
+                                                            
+                                }
 
         :root[data-theme="light"] {
-            --brand-primary: #059669;
-            --brand-primary-hover: #047857;
-            --brand-accent: #2563EB;
-            --brand-gold: #D97706;
-            --brand-crimson: #DC2626;
-            --brand-teal: #0D9488;
-
-            --bg-body: #F4F7F4;
-            --bg-dock: rgba(255, 255, 255, 0.95);
-            --bg-surface: rgba(255, 255, 255, 0.98);
-            --bg-card: rgba(240, 248, 243, 0.92);
-            --bg-input: rgba(245, 250, 247, 0.95);
-            --border-color: rgba(5, 150, 105, 0.20);
-            --border-card: rgba(5, 150, 105, 0.14);
-            --border-panel: rgba(5, 150, 105, 0.18);
-
-            --text-primary: #0F172A;
-            --text-secondary: #475569;
-            --text-muted: #94A3B8;
-            --text-main: #0F172A;
-            --text-dim: #64748B;
-        }
+                        --brand-primary-hover: #047857;
+                                                
+                                                                                                
+                                                                    }
 
         * {
             margin: 0;
@@ -80,8 +42,8 @@
 
         body {
             font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-body);
-            color: var(--text-primary);
+            background: var(--ula-surface-page);
+            color: var(--ula-text-primary);
             height: 100vh;
             overflow: hidden;
             display: flex;
@@ -131,7 +93,7 @@
             display: flex;
             align-items: center;
             background: rgba(11, 20, 16, 0.9);
-            border: 1px solid var(--border-panel);
+            border: 1px solid var(--ula-border-default);
             border-radius: 12px;
             padding: 3px;
             gap: 2px;
@@ -145,7 +107,7 @@
             background: transparent;
             border: 1px solid transparent;
             border-radius: 9px;
-            color: var(--text-muted);
+            color: var(--ula-text-muted);
             font-size: 12px;
             font-weight: 700;
             cursor: pointer;
@@ -153,7 +115,7 @@
         }
         .tool-btn:hover {
             background: rgba(60, 107, 76, 0.2);
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
         }
         .tool-btn.active {
             background: rgba(60, 107, 76, 0.35);
@@ -168,18 +130,18 @@
             justify-content: center;
             width: 34px;
             height: 34px;
-            background: var(--bg-input);
-            border: 1px solid var(--border-panel);
+            background: var(--ula-surface-page);
+            border: 1px solid var(--ula-border-default);
             border-radius: 10px;
-            color: var(--text-muted);
+            color: var(--ula-text-muted);
             font-size: 13px;
             cursor: pointer;
             transition: all 0.18s;
         }
         .tool-icon-btn:hover {
             background: rgba(60, 107, 76, 0.2);
-            border-color: var(--brand-primary);
-            color: var(--text-primary);
+            border-color: var(--ula-palm-900);
+            color: var(--ula-text-primary);
             transform: scale(1.05);
         }
         .tool-icon-btn.danger:hover {
@@ -219,7 +181,7 @@
             text-decoration: none;
             background: transparent;
             border: none;
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
             font-size: 12px;
             font-weight: 600;
             cursor: pointer;
@@ -239,7 +201,7 @@
         .more-menu-item {
             background: transparent;
             border: none;
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
             padding: 9px 12px;
             border-radius: 8px;
             display: flex;
@@ -280,13 +242,13 @@
             transform: translateY(-1px);
         }
         .act-btn-secondary {
-            background: var(--bg-input);
-            border: 1px solid var(--border-panel);
-            color: var(--text-primary);
+            background: var(--ula-surface-page);
+            border: 1px solid var(--ula-border-default);
+            color: var(--ula-text-primary);
         }
         .act-btn-secondary:hover {
-            border-color: var(--brand-primary);
-            color: var(--brand-primary);
+            border-color: var(--ula-palm-900);
+            color: var(--ula-palm-900);
         }
 
         /* Floating View Nav Overlay */
@@ -299,16 +261,16 @@
             gap: 6px;
             background: rgba(14, 25, 19, 0.95);
             backdrop-filter: blur(14px);
-            border: 1px solid var(--border-panel);
+            border: 1px solid var(--ula-border-default);
             padding: 6px 10px;
             border-radius: 14px;
-            box-shadow: var(--shadow-panel);
+            box-shadow: var(--ula-shadow-md);
             z-index: 10;
         }
         .view-btn {
-            background: var(--bg-input);
-            border: 1px solid var(--border-card);
-            color: var(--text-primary);
+            background: var(--ula-surface-page);
+            border: 1px solid var(--ula-border-subtle);
+            color: var(--ula-text-primary);
             width: 32px;
             height: 32px;
             border-radius: 8px;
@@ -321,8 +283,8 @@
             transition: all 0.15s;
         }
         .view-btn:hover {
-            border-color: var(--brand-primary);
-            color: var(--brand-primary);
+            border-color: var(--ula-palm-900);
+            color: var(--ula-palm-900);
             transform: scale(1.05);
         }
 
@@ -333,7 +295,7 @@
             margin-top: -12px;
             background: rgba(13, 27, 20, 0.95);
             backdrop-filter: blur(16px);
-            border: 1px solid var(--brand-primary);
+            border: 1px solid var(--ula-palm-900);
             border-radius: 10px;
             padding: 4px 8px;
             display: none;
@@ -343,9 +305,9 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
         }
         .float-act-btn {
-            background: var(--bg-input);
-            border: 1px solid var(--border-card);
-            color: var(--text-primary);
+            background: var(--ula-surface-page);
+            border: 1px solid var(--ula-border-subtle);
+            color: var(--ula-text-primary);
             padding: 4px 8px;
             border-radius: 6px;
             font-size: 11px;
@@ -355,7 +317,7 @@
         }
         .float-act-btn:hover {
             background: rgba(60, 107, 76, 0.25);
-            border-color: var(--brand-primary);
+            border-color: var(--ula-palm-900);
             color: #86EFAC;
         }
 
@@ -365,12 +327,12 @@
             height: 100%;
             background: rgba(14, 25, 19, 0.96);
             backdrop-filter: blur(28px);
-            border-inline-start: 1px solid var(--border-panel);
+            border-inline-start: 1px solid var(--ula-border-default);
             display: flex;
             flex-direction: column;
             z-index: 20;
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--shadow-panel);
+            box-shadow: var(--ula-shadow-md);
         }
         .customizer-drawer.collapsed {
             transform: translateX(100%);
@@ -383,7 +345,7 @@
 
         .drawer-header {
             padding: 14px 18px;
-            border-bottom: 1px solid var(--border-panel);
+            border-bottom: 1px solid var(--ula-border-default);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -391,7 +353,7 @@
         .drawer-title {
             font-size: 14px;
             font-weight: 700;
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -399,12 +361,12 @@
 
         .drawer-tabs {
             display: flex;
-            background: var(--bg-input);
+            background: var(--ula-surface-page);
             padding: 4px;
             margin: 10px 14px;
             border-radius: 12px;
             gap: 4px;
-            border: 1px solid var(--border-card);
+            border: 1px solid var(--ula-border-subtle);
         }
         .drawer-tab {
             flex: 1;
@@ -413,15 +375,15 @@
             border-radius: 8px;
             font-size: 11px;
             font-weight: 700;
-            color: var(--text-muted);
+            color: var(--ula-text-muted);
             cursor: pointer;
             transition: all 0.18s;
         }
         .drawer-tab:hover {
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
         }
         .drawer-tab.active {
-            background: var(--brand-primary);
+            background: var(--ula-palm-900);
             color: white;
             box-shadow: 0 2px 8px rgba(60, 107, 76, 0.4);
         }
@@ -443,11 +405,11 @@
         }
         .search-box {
             width: 100%;
-            background: var(--bg-input);
-            border: 1px solid var(--border-panel);
+            background: var(--ula-surface-page);
+            border: 1px solid var(--ula-border-default);
             border-radius: 10px;
             padding: 9px 36px 9px 12px;
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
             font-size: 12px;
             font-weight: 600;
             outline: none;
@@ -457,7 +419,7 @@
             padding: 9px 12px 9px 36px;
         }
         .search-box:focus {
-            border-color: var(--brand-primary);
+            border-color: var(--ula-palm-900);
             box-shadow: 0 0 10px rgba(60, 107, 76, 0.3);
         }
         .search-clear-btn {
@@ -465,14 +427,14 @@
             inset-inline-end: 10px;
             background: none;
             border: none;
-            color: var(--text-muted);
+            color: var(--ula-text-muted);
             cursor: pointer;
             font-size: 13px;
             display: none;
             padding: 2px 4px;
         }
         .search-clear-btn:hover {
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
         }
 
         .category-filter-bar {
@@ -495,10 +457,10 @@
             align-items: center;
             gap: 5px;
             padding: 5px 10px;
-            background: var(--bg-input);
-            border: 1px solid var(--border-card);
+            background: var(--ula-surface-page);
+            border: 1px solid var(--ula-border-subtle);
             border-radius: 18px;
-            color: var(--text-muted);
+            color: var(--ula-text-muted);
             font-size: 11px;
             font-weight: 700;
             white-space: nowrap;
@@ -508,14 +470,14 @@
             flex-shrink: 0;
         }
         .cat-pill:hover {
-            border-color: var(--brand-primary);
-            color: var(--text-primary);
+            border-color: var(--ula-palm-900);
+            color: var(--ula-text-primary);
             background: rgba(60, 107, 76, 0.2);
             transform: translateY(-1px);
         }
         .cat-pill.active {
             background: linear-gradient(135deg, rgba(60, 107, 76, 0.4), rgba(30, 65, 47, 0.4));
-            border-color: var(--brand-primary);
+            border-color: var(--ula-palm-900);
             color: #86EFAC;
             box-shadow: 0 2px 8px rgba(60, 107, 76, 0.3);
         }
@@ -528,8 +490,8 @@
         }
 
         .category-group {
-            background: var(--bg-input);
-            border: 1px solid var(--border-card);
+            background: var(--ula-surface-page);
+            border: 1px solid var(--ula-border-subtle);
             border-radius: 12px;
             overflow: hidden;
             transition: border-color 0.2s;
@@ -544,7 +506,7 @@
             justify-content: space-between;
             font-size: 12px;
             font-weight: 700;
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
             cursor: pointer;
             background: rgba(255, 255, 255, 0.02);
             transition: background 0.15s;
@@ -554,7 +516,7 @@
         }
         .cat-chevron {
             font-size: 11px;
-            color: var(--text-muted);
+            color: var(--ula-text-muted);
             transition: transform 0.2s;
         }
 
@@ -575,8 +537,8 @@
         }
 
         .furn-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-card);
+            background: var(--ula-surface-card);
+            border: 1px solid var(--ula-border-subtle);
             border-radius: 10px;
             padding: 8px 6px;
             display: flex;
@@ -590,7 +552,7 @@
             overflow: hidden;
         }
         .furn-card:hover {
-            border-color: var(--brand-primary);
+            border-color: var(--ula-palm-900);
             background: rgba(60, 107, 76, 0.2);
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4), 0 0 10px rgba(60, 107, 76, 0.3);
@@ -650,7 +612,7 @@
         .furn-label {
             font-size: 11px;
             font-weight: 700;
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
             line-height: 1.25;
             max-width: 100%;
             overflow: hidden;
@@ -660,8 +622,8 @@
 
         /* ── Inspector Controls ── */
         .prop-section {
-            background: var(--bg-input);
-            border: 1px solid var(--border-card);
+            background: var(--ula-surface-page);
+            border: 1px solid var(--ula-border-subtle);
             border-radius: 12px;
             padding: 14px;
             display: flex;
@@ -671,24 +633,24 @@
         .prop-label {
             font-size: 11px;
             font-weight: 700;
-            color: var(--text-muted);
+            color: var(--ula-text-muted);
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
         .prop-input {
             width: 100%;
             background: rgba(0, 0, 0, 0.35);
-            border: 1px solid var(--border-panel);
+            border: 1px solid var(--ula-border-default);
             border-radius: 8px;
             padding: 8px 12px;
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
             font-size: 12px;
             font-weight: 600;
             outline: none;
             transition: border-color 0.2s;
         }
         .prop-input:focus {
-            border-color: var(--brand-primary);
+            border-color: var(--ula-palm-900);
         }
 
         .rotation-grid {
@@ -699,17 +661,17 @@
         .rot-btn {
             padding: 6px 0;
             text-align: center;
-            background: var(--bg-card);
-            border: 1px solid var(--border-card);
+            background: var(--ula-surface-card);
+            border: 1px solid var(--ula-border-subtle);
             border-radius: 6px;
-            color: var(--text-primary);
+            color: var(--ula-text-primary);
             font-size: 11px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.15s;
         }
         .rot-btn:hover, .rot-btn.active {
-            background: var(--brand-primary);
+            background: var(--ula-palm-900);
             color: white;
         }
 
@@ -759,17 +721,17 @@
                                 @if(!empty($organization->logo_url))
                                     <img src="{{ $organization->logo_url }}" alt="{{ $organization->name }}" style="height: 24px; width: auto; object-fit: contain;">
                                 @else
-                                    <span class="material-symbols-rounded" style="color: var(--nx-map-gold); font-size: 24px;">apartment</span>
+                                    <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 24px;">apartment</span>
                                 @endif
                                 <div style="overflow: hidden;">
-                                    <strong style="display: block; font-size: 13px; color: var(--nx-map-text); white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">{{ $organization->name }}</strong>
-                                    <span style="font-size: 11px; color: var(--nx-map-muted);">{{ __('Floor Map Designer') }}</span>
+                                    <strong style="display: block; font-size: 13px; color: var(--ula-text-on-dark); white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">{{ $organization->name }}</strong>
+                                    <span style="font-size: 11px; color: var(--ula-text-on-dark-subtle);">{{ __('Floor Map Designer') }}</span>
                                 </div>
                             </div>
 
                             <!-- Actions -->
-                            <a href="{{ route('dashboard') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #F9F4EE; font-size: 12px; font-weight: 600;">
-                                <span class="material-symbols-rounded" style="font-size: 18px; color: var(--nx-map-gold);">dashboard</span>
+                            <a href="{{ route('dashboard') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #f9f6ef; font-size: 12px; font-weight: 600;">
+                                <span class="material-symbols-rounded" style="font-size: 18px; color: var(--ula-highlight-default);">dashboard</span>
                                 <span>{{ __('Dashboard') }}</span>
                             </a>
 
@@ -790,18 +752,18 @@
 
                             <div style="height: 1px; background: rgba(237, 230, 217, 0.12); margin: 6px 0;"></div>
 
-                            <button type="button" onclick="toggleAppTheme(); closeEditorMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #F9F4EE; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                            <button type="button" onclick="toggleAppTheme(); closeEditorMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #f9f6ef; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                                 <span class="material-symbols-rounded" style="font-size: 18px;">light_mode</span>
                                 <span>{{ __('Toggle Theme') }}</span>
                             </button>
 
                             @if(app()->getLocale() === 'ar')
-                                <a href="{{ route('lang.switch', 'en') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #F9F4EE; font-size: 12px; font-weight: 600;">
+                                <a href="{{ route('lang.switch', 'en') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #f9f6ef; font-size: 12px; font-weight: 600;">
                                     <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
                                     <span>English (EN)</span>
                                 </a>
                             @else
-                                <a href="{{ route('lang.switch', 'ar') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #F9F4EE; font-size: 12px; font-weight: 600;">
+                                <a href="{{ route('lang.switch', 'ar') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #f9f6ef; font-size: 12px; font-weight: 600;">
                                     <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
                                     <span>العربية (AR)</span>
                                 </a>
@@ -815,14 +777,14 @@
                         @if(!empty($organization->logo_url))
                             <img src="{{ $organization->logo_url }}" alt="{{ $organization->name }}" style="height: 18px; width: auto; object-fit: contain;">
                         @else
-                            <span class="material-symbols-rounded" style="color: var(--nx-map-gold); font-size: 18px;">apartment</span>
+                            <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 18px;">apartment</span>
                         @endif
                         <span>{{ $organization->name }}</span>
                     </div>
 
                     <!-- Branch Switcher -->
                     <div style="position: relative; display: inline-block;">
-                        <button type="button" onclick="toggleBranchDropdown(event)" class="nx-toolbar-btn" style="color: var(--nx-map-gold); border-color: rgba(211, 165, 83, 0.35); font-weight: 600;" title="{{ __('Switch Office Branch') }}">
+                        <button type="button" onclick="toggleBranchDropdown(event)" class="nx-toolbar-btn" style="color: var(--ula-highlight-default); border-color: rgba(211, 165, 83, 0.35); font-weight: 600;" title="{{ __('Switch Office Branch') }}">
                             <span class="material-symbols-rounded" style="font-size: 18px;">domain</span>
                             <span style="max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $floor->name }}</span>
                             <span class="material-symbols-rounded" style="font-size: 16px;">arrow_drop_down</span>
@@ -917,7 +879,7 @@
             <div class="floating-item-actions" id="floating-actions">
                 <button class="float-act-btn" onclick="rotateSelectedItem(90)">🔄 +90°</button>
                 <button class="float-act-btn" onclick="duplicateSelectedItem()">📋 {{ __('Clone') }}</button>
-                <button class="float-act-btn" onclick="deleteSelectedItem()" style="color: var(--brand-crimson);">🗑️</button>
+                <button class="float-act-btn" onclick="deleteSelectedItem()" style="color: var(--ula-status-danger);">🗑️</button>
             </div>
 
             <!-- View Navigation Controls -->
@@ -938,7 +900,7 @@
                     <span>✨</span>
                     <span>{{ __('Customize Floor & Furniture') }}</span>
                 </div>
-                <button onclick="toggleCustomizerDrawer()" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
+                <button onclick="toggleCustomizerDrawer()" style="background:none; border:none; color:var(--ula-text-muted); font-size:18px; cursor:pointer;">✕</button>
             </div>
 
             <div class="drawer-tabs">
@@ -969,12 +931,12 @@
                     </div>
 
                     <!-- Catalog Quick Stats & Expand/Collapse Toggle -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--text-muted); padding: 0 4px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--ula-text-muted); padding: 0 4px;">
                         @php
                             $totalCatalogCount = $furnitureCategories->sum(function($c) { return $c->items->count(); }) + 12;
                         @endphp
                         <span id="catalog-count-label" style="font-weight: 700; color: #A7F3D0;">✨ {{ $totalCatalogCount }} {{ __('Items Available') }}</span>
-                        <button type="button" onclick="expandAllCategories()" style="background:none; border:none; color:var(--brand-primary); font-size:11px; font-weight:800; cursor:pointer; text-decoration: underline;">
+                        <button type="button" onclick="expandAllCategories()" style="background:none; border:none; color:var(--ula-palm-900); font-size:11px; font-weight:800; cursor:pointer; text-decoration: underline;">
                             {{ __('Toggle All') }}
                         </button>
                     </div>
@@ -1186,7 +1148,7 @@
                 <!-- 2. SELECTED ITEM INSPECTOR TAB -->
                 <div id="drawer-view-inspector" style="display: none; flex-direction: column; gap: 12px;">
                     <div class="prop-section" id="inspector-empty-msg">
-                        <div style="font-size: 12px; color: var(--text-muted); text-align: center; padding: 24px 0;">
+                        <div style="font-size: 12px; color: var(--ula-text-muted); text-align: center; padding: 24px 0;">
                             👆 {{ __('Click any object or room on the map to edit its properties, rotation, boundaries, and acoustic settings.') }}
                         </div>
                     </div>
@@ -1195,7 +1157,7 @@
                         
                         <!-- Object Fields -->
                         <div id="inspector-object-fields" class="prop-section" style="display: none;">
-                            <strong style="font-size: 13px; color: var(--text-main);">🪑 {{ __('Object Properties') }}</strong>
+                            <strong style="font-size: 13px; color: var(--ula-text-primary);">🪑 {{ __('Object Properties') }}</strong>
                             <div>
                                 <label class="prop-label">{{ __('Name') }}</label>
                                 <input type="text" class="prop-input" id="prop-name" oninput="updateSelectedProp('name', this.value)">
@@ -1228,7 +1190,7 @@
                             </div>
                             <div>
                                 <label class="prop-label">{{ __('Interaction') }}</label>
-                                <div id="prop-interaction-badge" style="font-size: 11px; font-weight: 700; color: var(--brand-primary); padding: 4px 8px; background: rgba(16,185,129,0.1); border-radius: 6px; display: inline-block;">NONE</div>
+                                <div id="prop-interaction-badge" style="font-size: 11px; font-weight: 700; color: var(--ula-palm-900); padding: 4px 8px; background: rgba(16,185,129,0.1); border-radius: 6px; display: inline-block;">NONE</div>
                             </div>
 
                             <!-- 🏢 1. Company Logo / Branding Inspector Box -->
@@ -1237,7 +1199,7 @@
                                     <span style="font-size: 12px; font-weight: 800; color: #34D399;">🏢 {{ __('Company Logo') }}</span>
                                     <span class="furn-type-badge" style="background: rgba(16, 185, 129, 0.2); color: #6EE7B7;">Logo</span>
                                 </div>
-                                <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+                                <div style="font-size: 11px; color: var(--ula-text-muted); line-height: 1.4;">
                                     {{ __('Displays your company logo on the workplace floor or reception.') }}
                                 </div>
                                 @if($organization->logo_url)
@@ -1294,8 +1256,8 @@
                                     <input type="text" class="prop-input" id="prop-link-title" placeholder="{{ __('e.g. Project Notion Board') }}" oninput="updateSelectedLinkProp('title', this.value)">
                                 </div>
                                 <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
-                                    <span style="font-size: 11px; color: var(--text-secondary);">{{ __('Open in New Browser Tab') }}</span>
-                                    <input type="checkbox" id="prop-link-newtab" checked onchange="updateSelectedLinkProp('openInNewTab', this.checked)" style="accent-color: var(--brand-primary); cursor: pointer; width: 16px; height: 16px;">
+                                    <span style="font-size: 11px; color: var(--ula-text-secondary);">{{ __('Open in New Browser Tab') }}</span>
+                                    <input type="checkbox" id="prop-link-newtab" checked onchange="updateSelectedLinkProp('openInNewTab', this.checked)" style="accent-color: var(--ula-palm-900); cursor: pointer; width: 16px; height: 16px;">
                                 </div>
                             </div>
 
@@ -1320,7 +1282,7 @@
 
                         <!-- Room Fields -->
                         <div id="inspector-room-fields" class="prop-section" style="display: none;">
-                            <strong style="font-size: 13px; color: var(--text-main);">🏢 {{ __('Room Properties & Audio') }}</strong>
+                            <strong style="font-size: 13px; color: var(--ula-text-primary);">🏢 {{ __('Room Properties & Audio') }}</strong>
                             <div>
                                 <label class="prop-label">{{ __('Room Name') }}</label>
                                 <input type="text" class="prop-input" id="prop-room-name" placeholder="{{ __('e.g. Conference Room A') }}" oninput="updateRoomProp('name', this.value)">
@@ -1340,9 +1302,9 @@
                             <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
                                     <span style="font-size: 12px; font-weight: 800; color: #34D399;">🎙️ {{ __('Acoustic Isolation') }}</span>
-                                    <input type="checkbox" id="prop-room-isolation" onchange="updateRoomProp('audio_isolation', this.checked)" style="width: 18px; height: 18px; accent-color: var(--brand-primary); cursor: pointer;">
+                                    <input type="checkbox" id="prop-room-isolation" onchange="updateRoomProp('audio_isolation', this.checked)" style="width: 18px; height: 18px; accent-color: var(--ula-palm-900); cursor: pointer;">
                                 </div>
-                                <span style="font-size: 11px; color: var(--text-muted);" id="prop-room-bounds-label"></span>
+                                <span style="font-size: 11px; color: var(--ula-text-muted);" id="prop-room-bounds-label"></span>
                             </div>
 
                             <div>
@@ -1360,7 +1322,7 @@
                                 <label class="prop-label">{{ __('Door Position on Wall') }}</label>
                                 <div style="display: flex; align-items: center; gap: 8px;">
                                     <input type="range" class="prop-input" id="prop-room-door-offset" min="15" max="85" value="50" step="5" oninput="updateRoomProp('doorOffset', this.value / 100); document.getElementById('door-offset-val').textContent = this.value + '%';">
-                                    <span id="door-offset-val" style="font-size: 11px; font-weight: 800; color: var(--brand-primary); min-width: 32px;">50%</span>
+                                    <span id="door-offset-val" style="font-size: 11px; font-weight: 800; color: var(--ula-palm-900); min-width: 32px;">50%</span>
                                 </div>
                             </div>
 
@@ -1380,7 +1342,7 @@
                 <!-- 3. ROOMS DIRECTORY TAB -->
                 <div id="drawer-view-rooms" style="display: none; flex-direction: column; gap: 10px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 12px; font-weight: 800; color: var(--text-muted);">{{ __('All Configured Rooms') }}</span>
+                        <span style="font-size: 12px; font-weight: 800; color: var(--ula-text-muted);">{{ __('All Configured Rooms') }}</span>
                         <button class="tool-btn" onclick="setTool('room')">➕ {{ __('New Room') }}</button>
                     </div>
                     <div id="rooms-list-container" style="display: flex; flex-direction: column; gap: 8px;"></div>
@@ -1389,7 +1351,7 @@
                 <!-- 4. FLOORS & BACKGROUNDS TAB -->
                 <div id="drawer-view-floors" style="display: none; flex-direction: column; gap: 12px;">
                     <!-- Quick Action Tools Bar (Moved from Burger Menu) -->
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 6px; background: rgba(0,0,0,0.35); border: 1px solid var(--border-panel); border-radius: 12px;">
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 6px; background: rgba(0,0,0,0.35); border: 1px solid var(--ula-border-default); border-radius: 12px;">
                         <label class="tool-btn" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; margin: 0; background: rgba(255,255,255,0.05);" title="{{ __('Upload Custom Floorplan') }}">
                             <span class="material-symbols-rounded" style="font-size: 20px; color: #F59E0B;">upload_file</span>
                             <span style="font-weight: 700;">{{ __('Upload') }}</span>
@@ -1412,10 +1374,10 @@
 
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="font-size: 11px; font-weight: 800; color: #A7F3D0;">🎨 {{ __('Floor Styles Library (1200×708)') }}</span>
-                        <span style="font-size: 10px; color: var(--text-muted); font-family: monospace;">18 Styles</span>
+                        <span style="font-size: 10px; color: var(--ula-text-muted); font-family: monospace;">18 Styles</span>
                     </div>
 
-                    <div style="font-size: 11px; color: var(--text-muted); line-height: 1.4;">
+                    <div style="font-size: 11px; color: var(--ula-text-muted); line-height: 1.4;">
                         {{ __('اختر نمط الأرضية لتطبيقه فوراً كخلفية للمكتب بمقاس 1200×708 بكسل:') }}
                     </div>
 
@@ -1423,7 +1385,7 @@
                         <!-- Injected via JavaScript -->
                     </div>
 
-                    <div style="padding-top: 8px; border-top: 1px solid var(--border-panel); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="padding-top: 8px; border-top: 1px solid var(--ula-border-default); display: flex; justify-content: space-between; align-items: center;">
                         <button type="button" class="tool-btn" onclick="clearCurrentFloorBackground()" style="color: #F87171; border-color: rgba(239,68,68,0.3); font-size: 11px; width: 100%; justify-content: center;">
                             🗑️ {{ __('Remove Floor Background') }}
                         </button>
@@ -1609,13 +1571,13 @@
             grid.innerHTML = FLOOR_CATALOG.map(f => {
                 const isActive = currentBg.includes(f.id);
                 return `
-                    <div class="furn-card ${isActive ? 'selected' : ''}" style="display:flex; flex-direction:column; gap:4px; padding:6px; cursor:pointer; position:relative; border-radius:12px; border:1px solid ${isActive ? 'var(--brand-primary)' : 'var(--border-card)'}; background:var(--bg-input);" onclick="applyFloorBackground('${f.url}', 1200, 708)">
+                    <div class="furn-card ${isActive ? 'selected' : ''}" style="display:flex; flex-direction:column; gap:4px; padding:6px; cursor:pointer; position:relative; border-radius:12px; border:1px solid ${isActive ? 'var(--ula-palm-900)' : 'var(--ula-border-subtle)'}; background:var(--ula-surface-page);" onclick="applyFloorBackground('${f.url}', 1200, 708)">
                         <div style="position:relative; width:100%; height:75px; border-radius:8px; overflow:hidden; background:#0B1C13;">
                             <img src="${f.thumb}" alt="${f.name_en}" style="width:100%; height:100%; object-fit:cover;">
                             <span style="position:absolute; bottom:3px; inset-inline-end:3px; background:rgba(0,0,0,0.7); font-size:9px; font-family:monospace; padding:1px 4px; border-radius:4px; color:#A7F3D0;">1200×708</span>
                             ${isActive ? '<span style="position:absolute; top:3px; inset-inline-start:3px; background:#10B981; font-size:9px; font-weight:800; padding:1px 6px; border-radius:4px; color:#fff;">✓ نشط</span>' : ''}
                         </div>
-                        <div style="font-size:11px; font-weight:700; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:start;">
+                        <div style="font-size:11px; font-weight:700; color:var(--ula-text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:start;">
                             ${isAr ? f.name_ar : f.name_en}
                         </div>
                     </div>
@@ -2842,16 +2804,16 @@
             const container = document.getElementById('rooms-list-container');
             if (!container) return;
             if (rooms.length === 0) {
-                container.innerHTML = `<div style="font-size: 11px; color: var(--text-muted); text-align: center; padding: 16px;">{{ __("No rooms configured yet. Click Add Room to create one.") }}</div>`;
+                container.innerHTML = `<div style="font-size: 11px; color: var(--ula-text-muted); text-align: center; padding: 16px;">{{ __("No rooms configured yet. Click Add Room to create one.") }}</div>`;
                 return;
             }
             let html = '';
             rooms.forEach((r, idx) => {
                 html += `
-                    <div style="background: var(--bg-card); border: 1px solid var(--border-card); border-radius: 8px; padding: 10px; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; display: flex; align-items: center; justify-content: space-between;">
                         <div style="display: flex; flex-direction: column; gap: 2px;">
-                            <strong style="font-size: 12px; color: var(--text-main);">🏢 ${r.name}</strong>
-                            <span style="font-size: 10px; color: var(--text-muted);">${r.type || 'meeting'} • ${r.capacity || 10} seats</span>
+                            <strong style="font-size: 12px; color: var(--ula-text-primary);">🏢 ${r.name}</strong>
+                            <span style="font-size: 10px; color: var(--ula-text-muted);">${r.type || 'meeting'} • ${r.capacity || 10} seats</span>
                         </div>
                         <button onclick="selectRoomByIndex(${idx})" class="tool-btn" style="padding: 4px 8px; font-size: 11px;">🔍</button>
                     </div>
@@ -3184,13 +3146,13 @@
         function selectAiStyle(styleKey) {
             document.querySelectorAll('.ai-style-card').forEach(el => {
                 el.classList.remove('active');
-                el.style.borderColor = 'var(--border-card)';
-                el.style.background = 'var(--bg-surface)';
+                el.style.borderColor = 'var(--ula-border-subtle)';
+                el.style.background = 'var(--ula-surface-card)';
             });
             const sel = document.getElementById('ai-style-' + styleKey);
             if (sel) {
                 sel.classList.add('active');
-                sel.style.borderColor = 'var(--brand-primary)';
+                sel.style.borderColor = 'var(--ula-palm-900)';
                 sel.style.background = 'rgba(16, 185, 129, 0.1)';
             }
             const radio = document.querySelector(`input[name="ai_style"][value="${styleKey}"]`);
@@ -3362,36 +3324,36 @@
 
     <!-- ── AI Office & Floorplan Generator Modal ── -->
     <div id="ai-generator-modal" style="display: none; position: fixed; inset: 0; background: rgba(6, 13, 9, 0.85); backdrop-filter: blur(14px); z-index: 99999; align-items: center; justify-content: center; padding: 20px;">
-        <div style="background: var(--bg-dock); border: 1px solid var(--border-card); border-radius: var(--radius-xl); width: 100%; max-width: 820px; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-modal); display: flex; flex-direction: column;">
+        <div style="background: var(--ula-surface-capsule-strong); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); width: 100%; max-width: 820px; max-height: 90vh; overflow-y: auto; box-shadow: var(--ula-shadow-xl); display: flex; flex-direction: column;">
             
             <!-- Modal Header -->
-            <div style="padding: 22px 26px; border-bottom: 1px solid var(--border-card); display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface);">
+            <div style="padding: 22px 26px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-card);">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <div style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #10B981, #059669); color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);">
                         ✨
                     </div>
                     <div>
-                        <h2 style="font-size: 17px; font-weight: 900; color: var(--text-main); margin-bottom: 2px;">
+                        <h2 style="font-size: 17px; font-weight: 900; color: var(--ula-text-primary); margin-bottom: 2px;">
                             {{ __('AI Virtual Office & Blueprint Generator') }}
                         </h2>
-                        <p style="font-size: 12px; color: var(--text-dim);">
+                        <p style="font-size: 12px; color: var(--ula-text-muted);">
                             {{ __('Generate bespoke 3D isometric floorplans using OpenAI DALL-E 3 with automatic room isolation.') }}
                         </p>
                     </div>
                 </div>
-                <button type="button" onclick="closeAiGeneratorModal()" style="background: none; border: none; color: var(--text-dim); font-size: 22px; cursor: pointer; padding: 4px;">✕</button>
+                <button type="button" onclick="closeAiGeneratorModal()" style="background: none; border: none; color: var(--ula-text-muted); font-size: 22px; cursor: pointer; padding: 4px;">✕</button>
             </div>
 
             <!-- Loading State Overlay -->
             <div id="ai-modal-loading-box" style="display: none; flex-direction: column; align-items: center; justify-content: center; padding: 60px 30px; text-align: center; gap: 18px;">
                 <div style="width: 64px; height: 64px; border: 4px solid rgba(16, 185, 129, 0.2); border-top-color: #10B981; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                <h3 style="font-size: 18px; font-weight: 900; color: var(--text-main);">
+                <h3 style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);">
                     ✨ {{ __('Generating 3D Isometric Office Blueprint...') }}
                 </h3>
                 <div id="ai-loading-step-text" style="font-size: 13px; color: #34D399; font-weight: 700; max-width: 480px;">
                     🧠 {{ __('Analyzing room requirements & architectural parameters...') }}
                 </div>
-                <p style="font-size: 11px; color: var(--text-dim); max-width: 420px;">
+                <p style="font-size: 11px; color: var(--ula-text-muted); max-width: 420px;">
                     {{ __('DALL-E 3 creates high-definition architectural renders. This process usually takes between 15 to 30 seconds.') }}
                 </p>
             </div>
@@ -3400,19 +3362,19 @@
             <div id="ai-modal-form-content" style="padding: 24px 26px; display: flex; flex-direction: column; gap: 20px;">
                 
                 <!-- Plan Quota Header Pill Card -->
-                <div style="background: var(--bg-surface); border: 1px solid var(--border-card); border-radius: var(--radius-lg); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                     <div>
-                        <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-dim); display: block;">{{ __('Active Subscription Tier') }}</span>
-                        <strong style="font-size: 14px; color: var(--brand-forest);">⭐ {{ $plan->name ?? 'Standard Plan' }}</strong>
+                        <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--ula-text-muted); display: block;">{{ __('Active Subscription Tier') }}</span>
+                        <strong style="font-size: 14px; color: var(--ula-palm-900);">⭐ {{ $plan->name ?? 'Standard Plan' }}</strong>
                     </div>
                     <div style="display: flex; gap: 16px; align-items: center;">
                         <div style="text-align: center;">
-                            <span style="font-size: 10px; color: var(--text-dim); display: block;">🏢 {{ __('Total Rooms') }}</span>
+                            <span style="font-size: 10px; color: var(--ula-text-muted); display: block;">🏢 {{ __('Total Rooms') }}</span>
                             <span id="ai-quota-rooms-val" style="font-size: 14px; font-weight: 900; color: #10B981;">0 / ∞</span>
                         </div>
-                        <div style="width: 1px; height: 26px; background: var(--border-card);"></div>
+                        <div style="width: 1px; height: 26px; background: var(--ula-border-subtle);"></div>
                         <div style="text-align: center;">
-                            <span style="font-size: 10px; color: var(--text-dim); display: block;">🖥️ {{ __('Total Workstations / Desks') }}</span>
+                            <span style="font-size: 10px; color: var(--ula-text-muted); display: block;">🖥️ {{ __('Total Workstations / Desks') }}</span>
                             <span id="ai-quota-seats-val" style="font-size: 14px; font-weight: 900; color: #3B82F6;">0 / ∞</span>
                         </div>
                     </div>
@@ -3420,17 +3382,17 @@
 
                 <!-- 1. Architectural Style Selection -->
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-main); margin-bottom: 10px;">
+                    <label style="display: block; font-size: 12px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 10px;">
                         🎨 {{ __('1. Choose Office Architectural Style') }}
                     </label>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
                         @foreach($aiStyles as $key => $style)
-                        <div class="ai-style-card {{ $loop->first ? 'active' : '' }}" id="ai-style-{{ $key }}" onclick="selectAiStyle('{{ $key }}')" style="background: {{ $loop->first ? 'rgba(16, 185, 129, 0.1)' : 'var(--bg-surface)' }}; border: 1px solid {{ $loop->first ? 'var(--brand-primary)' : 'var(--border-card)' }}; border-radius: var(--radius-md); padding: 12px; cursor: pointer; transition: all 0.2s ease;">
+                        <div class="ai-style-card {{ $loop->first ? 'active' : '' }}" id="ai-style-{{ $key }}" onclick="selectAiStyle('{{ $key }}')" style="background: {{ $loop->first ? 'rgba(16, 185, 129, 0.1)' : 'var(--ula-surface-card)' }}; border: 1px solid {{ $loop->first ? 'var(--ula-palm-900)' : 'var(--ula-border-subtle)' }}; border-radius: var(--ula-radius-sm); padding: 12px; cursor: pointer; transition: all 0.2s ease;">
                             <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer;">
-                                <input type="radio" name="ai_style" value="{{ $key }}" {{ $loop->first ? 'checked' : '' }} style="margin-top: 3px; accent-color: var(--brand-forest);">
+                                <input type="radio" name="ai_style" value="{{ $key }}" {{ $loop->first ? 'checked' : '' }} style="margin-top: 3px; accent-color: var(--ula-palm-900);">
                                 <div>
-                                    <strong style="font-size: 12px; color: var(--text-main); display: block;">{{ $style['name'] }}</strong>
-                                    <span style="font-size: 10px; color: var(--text-dim); line-height: 1.3; display: block; margin-top: 2px;">{{ $style['name_ar'] }}</span>
+                                    <strong style="font-size: 12px; color: var(--ula-text-primary); display: block;">{{ $style['name'] }}</strong>
+                                    <span style="font-size: 10px; color: var(--ula-text-muted); line-height: 1.3; display: block; margin-top: 2px;">{{ $style['name_ar'] }}</span>
                                 </div>
                             </label>
                         </div>
@@ -3440,101 +3402,101 @@
 
                 <!-- 2. Room Breakdown & Desks Steppers -->
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 800; color: var(--text-main); margin-bottom: 10px;">
+                    <label style="display: block; font-size: 12px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 10px;">
                         🏢 {{ __('2. Customize Room Quantities & Desk Counts') }}
                     </label>
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px;">
                         
                         <!-- Meeting Rooms -->
-                        <div style="background: var(--bg-surface); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 12px;">
+                        <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-sm); padding: 12px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                 <div>
                                     <strong style="font-size: 12px; color: #8B5CF6; display: block;">🏢 {{ __('Meeting Boardrooms') }}</strong>
-                                    <span style="font-size: 10px; color: var(--text-dim);">{{ __('غرف اجتماعات زجاجية') }}</span>
+                                    <span style="font-size: 10px; color: var(--ula-text-muted);">{{ __('غرف اجتماعات زجاجية') }}</span>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 6px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-meeting', -1, 0, 6)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">-</button>
-                                    <input type="text" id="ai-inp-meeting" value="1" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--text-main); font-size: 13px;">
+                                    <input type="text" id="ai-inp-meeting" value="1" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--ula-text-primary); font-size: 13px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-meeting', 1, 0, 6)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">+</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Team Offices & Desks -->
-                        <div style="background: var(--bg-surface); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 12px;">
+                        <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-sm); padding: 12px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                                 <div>
                                     <strong style="font-size: 12px; color: #3B82F6; display: block;">💼 {{ __('Team Offices') }}</strong>
-                                    <span style="font-size: 10px; color: var(--text-dim);">{{ __('مكاتب عمل جماعية/فردية') }}</span>
+                                    <span style="font-size: 10px; color: var(--ula-text-muted);">{{ __('مكاتب عمل جماعية/فردية') }}</span>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 6px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-office', -1, 1, 8)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">-</button>
-                                    <input type="text" id="ai-inp-office" value="1" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--text-main); font-size: 13px;">
+                                    <input type="text" id="ai-inp-office" value="1" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--ula-text-primary); font-size: 13px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-office', 1, 1, 8)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">+</button>
                                 </div>
                             </div>
-                            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-card); padding-top: 6px; margin-top: 4px;">
-                                <span style="font-size: 10px; color: var(--text-dim);">🖥️ {{ __('Desks per office') }}:</span>
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--ula-border-subtle); padding-top: 6px; margin-top: 4px;">
+                                <span style="font-size: 10px; color: var(--ula-text-muted);">🖥️ {{ __('Desks per office') }}:</span>
                                 <div style="display: flex; align-items: center; gap: 4px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-desks', -1, 1, 12)" class="tactile-btn" style="width: 22px; height: 22px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 10px;">-</button>
-                                    <input type="text" id="ai-inp-desks" value="2" readonly style="width: 24px; text-align: center; background: none; border: none; font-weight: 800; color: var(--text-main); font-size: 11px;">
+                                    <input type="text" id="ai-inp-desks" value="2" readonly style="width: 24px; text-align: center; background: none; border: none; font-weight: 800; color: var(--ula-text-primary); font-size: 11px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-desks', 1, 1, 12)" class="tactile-btn" style="width: 22px; height: 22px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 10px;">+</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Thinking & Focus Pods -->
-                        <div style="background: var(--bg-surface); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 12px;">
+                        <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-sm); padding: 12px;">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div>
                                     <strong style="font-size: 12px; color: #06B6D4; display: block;">💡 {{ __('Thinking / Focus Pods') }}</strong>
-                                    <span style="font-size: 10px; color: var(--text-dim);">{{ __('غرف التركيز والعصف الذهني') }}</span>
+                                    <span style="font-size: 10px; color: var(--ula-text-muted);">{{ __('غرف التركيز والعصف الذهني') }}</span>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 6px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-thinking', -1, 0, 4)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">-</button>
-                                    <input type="text" id="ai-inp-thinking" value="0" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--text-main); font-size: 13px;">
+                                    <input type="text" id="ai-inp-thinking" value="0" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--ula-text-primary); font-size: 13px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-thinking', 1, 0, 4)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">+</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Rest & Gaming Lounge -->
-                        <div style="background: var(--bg-surface); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 12px;">
+                        <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-sm); padding: 12px;">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div>
                                     <strong style="font-size: 12px; color: #EC4899; display: block;">🛋️ {{ __('Rest & Gaming Lounge') }}</strong>
-                                    <span style="font-size: 10px; color: var(--text-dim);">{{ __('صالة الاستراحة والترفيه') }}</span>
+                                    <span style="font-size: 10px; color: var(--ula-text-muted);">{{ __('صالة الاستراحة والترفيه') }}</span>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 6px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-rest', -1, 0, 3)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">-</button>
-                                    <input type="text" id="ai-inp-rest" value="0" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--text-main); font-size: 13px;">
+                                    <input type="text" id="ai-inp-rest" value="0" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--ula-text-primary); font-size: 13px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-rest', 1, 0, 3)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">+</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Presentation Theater / Auditorium -->
-                        <div style="background: var(--bg-surface); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 12px;">
+                        <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-sm); padding: 12px;">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div>
                                     <strong style="font-size: 12px; color: #E11D48; display: block;">🎭 {{ __('Presentation Theater') }}</strong>
-                                    <span style="font-size: 10px; color: var(--text-dim);">{{ __('مسرح وقاعة عروض ومؤتمرات') }}</span>
+                                    <span style="font-size: 10px; color: var(--ula-text-muted);">{{ __('مسرح وقاعة عروض ومؤتمرات') }}</span>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 6px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-theater', -1, 0, 2)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">-</button>
-                                    <input type="text" id="ai-inp-theater" value="0" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--text-main); font-size: 13px;">
+                                    <input type="text" id="ai-inp-theater" value="0" readonly style="width: 32px; text-align: center; background: none; border: none; font-weight: 800; color: var(--ula-text-primary); font-size: 13px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-theater', 1, 0, 2)" class="tactile-btn" style="width: 26px; height: 26px; padding: 0; display: flex; align-items: center; justify-content: center; font-weight: 900;">+</button>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Default Amenities Card -->
-                        <div style="background: rgba(16, 185, 129, 0.08); border: 1px dashed rgba(52, 211, 153, 0.35); border-radius: var(--radius-md); padding: 12px; display: flex; flex-direction: column; justify-content: center;">
+                        <div style="background: rgba(16, 185, 129, 0.08); border: 1px dashed rgba(52, 211, 153, 0.35); border-radius: var(--ula-radius-sm); padding: 12px; display: flex; flex-direction: column; justify-content: center;">
                             <strong style="font-size: 11px; color: #34D399; display: flex; align-items: center; gap: 6px;">
                                 <span>☕</span> {{ __('Coffee Corner & Reception') }}
                             </strong>
-                            <span style="font-size: 10px; color: var(--text-dim); margin-top: 2px;">
+                            <span style="font-size: 10px; color: var(--ula-text-muted); margin-top: 2px;">
                                 ✓ {{ __('Always included automatically in every floorplan') }}
                             </span>
                         </div>
@@ -3545,7 +3507,7 @@
                 <div id="ai-quota-warning-box" style="display: none; background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); border-radius: 10px; padding: 12px 16px; font-size: 12px; color: #D96B5F; font-weight: 700;"></div>
 
                 <!-- Action Buttons -->
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border-card);">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--ula-border-subtle);">
                     <button type="button" onclick="closeAiGeneratorModal()" class="tactile-btn" style="padding: 10px 20px; font-size: 13px;">
                         {{ __('Cancel') }}
                     </button>

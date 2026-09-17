@@ -32,9 +32,8 @@
         }
 
         body {
-            font-family: var(--nx-font-family);
-            background-color: var(--nx-bg-page);
-            color: var(--nx-text-primary);
+            background-color: var(--ula-surface-page);
+            color: var(--ula-text-primary);
             min-height: 100vh;
             overflow-x: hidden;
             line-height: 1.6;
@@ -49,15 +48,15 @@
             right: 0;
             z-index: 1000;
             padding: 14px 32px;
-            transition: all var(--nx-duration-base) var(--nx-ease-standard);
-            backdrop-filter: var(--nx-backdrop-blur);
-            -webkit-backdrop-filter: var(--nx-backdrop-blur);
+            transition: all var(--ula-duration-base) var(--ula-ease-in-out);
+            backdrop-filter: var(--ula-backdrop-blur);
+            -webkit-backdrop-filter: var(--ula-backdrop-blur);
             background: rgba(20, 43, 36, 0.92);
             border-bottom: 1px solid rgba(237, 230, 217, 0.12);
         }
 
         .nx-header-container {
-            max-width: var(--nx-container-max);
+            max-width: var(--ula-layout-container-max);
             margin: 0 auto;
             display: flex;
             align-items: center;
@@ -77,7 +76,7 @@
             width: 36px;
             height: 40px;
             border-radius: 18px 18px 4px 4px;
-            background: var(--nx-accent);
+            background: var(--ula-highlight-default);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -85,7 +84,7 @@
         }
 
         .nx-brand-text h1 {
-            font-family: var(--nx-font-en);
+            font-family: var(--ula-font-en);
             font-size: 20px;
             font-weight: 600;
             letter-spacing: -0.3px;
@@ -97,7 +96,7 @@
             display: block;
             font-size: 11px;
             font-weight: 500;
-            color: var(--nx-sand-400);
+            color: var(--ula-sand-400);
             letter-spacing: 0.08em;
             text-transform: uppercase;
         }
@@ -111,12 +110,12 @@
 
         .nx-nav-link {
             padding: 8px 16px;
-            color: var(--nx-sand-400);
+            color: var(--ula-sand-400);
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
-            border-radius: var(--nx-radius-pill);
-            transition: all var(--nx-duration-fast) var(--nx-ease-standard);
+            border-radius: var(--ula-radius-pill);
+            transition: all var(--ula-duration-fast) var(--ula-ease-in-out);
         }
 
         .nx-nav-link:hover {
@@ -135,14 +134,14 @@
             align-items: center;
             gap: 6px;
             padding: 7px 14px;
-            border-radius: var(--nx-radius-pill);
+            border-radius: var(--ula-radius-pill);
             background: rgba(237, 230, 217, 0.08);
             border: 1px solid rgba(237, 230, 217, 0.15);
-            color: var(--nx-sand-300);
+            color: var(--ula-sand-300);
             text-decoration: none;
             font-size: 12px;
             font-weight: 600;
-            transition: all var(--nx-duration-fast) ease;
+            transition: all var(--ula-duration-fast) ease;
         }
 
         .nx-lang-pill:hover {
@@ -158,21 +157,21 @@
             color: #ffffff;
             font-size: 20px;
             padding: 6px 12px;
-            border-radius: var(--nx-radius-md);
+            border-radius: var(--ula-radius-md);
             cursor: pointer;
         }
 
         /* ── Master Footer ── */
         .nx-footer {
-            background: var(--nx-palm-950);
-            color: var(--nx-sand-400);
+            background: var(--ula-palm-950);
+            color: var(--ula-sand-400);
             border-top: 1px solid rgba(237, 230, 217, 0.12);
             padding: 80px 32px 36px;
             position: relative;
         }
 
         .nx-footer-grid {
-            max-width: var(--nx-container-max);
+            max-width: var(--ula-layout-container-max);
             margin: 0 auto;
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 1fr;
@@ -197,23 +196,18 @@
         }
 
         .nx-footer-links a {
-            color: var(--nx-sand-400);
+            color: var(--ula-sand-400);
             text-decoration: none;
             font-size: 13px;
-            transition: color var(--nx-duration-fast);
+            transition: color var(--ula-duration-fast);
         }
 
         .nx-footer-links a:hover {
             color: #ffffff;
         }
 
-        .nx-footer-links span {
-            color: var(--nx-sand-400);
-            font-size: 13px;
-        }
-
         .nx-footer-bottom {
-            max-width: var(--nx-container-max);
+            max-width: var(--ula-layout-container-max);
             margin: 0 auto;
             padding-top: 24px;
             border-top: 1px solid rgba(237, 230, 217, 0.08);
@@ -318,7 +312,7 @@
                         <span>Virtual Workplace</span>
                     </div>
                 </div>
-                <p style="font-size: 13px; color: var(--nx-sand-400); max-width: 320px; line-height: 1.7; margin-bottom: 20px;">
+                <p style="font-size: 13px; color: var(--ula-sand-400); max-width: 320px; line-height: 1.7; margin-bottom: 20px;">
                     {{ __("Your team's space, anywhere. The next-generation spatial virtual office where distributed teams meet, collaborate, and connect naturally.") }}
                 </p>
             </div>
@@ -345,9 +339,9 @@
             <div class="nx-footer-col">
                 <h4>{{ __('Legal & Privacy') }}</h4>
                 <ul class="nx-footer-links">
-                    <li><span>{{ __('Privacy Policy') }}</span></li>
-                    <li><span>{{ __('Terms of Service') }}</span></li>
-                    <li><span>{{ __('Security & Data Protection') }}</span></li>
+                    <li><a href="#">{{ __('Privacy Policy') }}</a></li>
+                    <li><a href="#">{{ __('Terms of Service') }}</a></li>
+                    <li><a href="#">{{ __('Security & Data Protection') }}</a></li>
                 </ul>
             </div>
         </div>
@@ -357,8 +351,7 @@
                 © {{ date('Y') }} UlaSpace Inc. {{ __('All rights reserved.') }}
             </div>
             <div>
-                <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-icon-accent); vertical-align: text-bottom;">eco</span>
-                <span>{{ __('Crafted for Next-Gen Remote Teams') }}</span>
+                <span>🌿 {{ __('Crafted for Next-Gen Remote Teams') }}</span>
             </div>
         </div>
     </footer>
