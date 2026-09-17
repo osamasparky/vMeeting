@@ -1139,7 +1139,7 @@
                 <a href="{{ route('office') }}" class="sidebar-link-btn" style="background: var(--ula-tone-palm-bg); color: var(--ula-tone-palm-fg);">
                     <span class="nav-icon material-symbols-rounded">view_in_ar</span>
                     <span class="nav-label-text">{{ __('Enter Office') }}</span>
-                    <span class="sidebar-badge-pill" style="background: #4F9B5F; color: white;">LIVE</span>
+                    <span class="sidebar-badge-pill">{{ __('مباشر') }}</span>
                 </a>
             </li>
 
@@ -1172,7 +1172,7 @@
                 <a href="{{ route('dashboard') }}#chat" class="sidebar-link-btn">
                     <span class="nav-icon material-symbols-rounded">chat</span>
                     <span class="nav-label-text">{{ __('Team Chat & DMs') }}</span>
-                    <span class="sidebar-badge-pill" style="background: var(--ula-tone-palm-bg); color: var(--ula-tone-palm-fg);">LIVE</span>
+                    <span class="sidebar-badge-pill">{{ __('مباشر') }}</span>
                 </a>
             </li>
             <li>
