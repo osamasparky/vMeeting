@@ -154,20 +154,20 @@
         /* ── WORKSPACE APP SHELL & SIDEBAR ── */
         .app-sidebar {
             width: 270px;
-            background: var(--ula-surface-dark);
-            color: var(--ula-text-on-dark);
+            background: var(--ula-surface-card);
+            color: var(--ula-text-primary);
             height: 100vh;
             position: sticky;
             top: 0;
             display: flex;
             flex-direction: column;
-            border-inline-end: 1px solid var(--ula-border-on-dark);
+            border-inline-end: 1px solid var(--ula-border-subtle);
             z-index: 200;
             transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             flex-shrink: 0;
             overflow-y: auto;
             overflow-x: hidden;
-            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+            box-shadow: var(--ula-shadow-xs);
         }
 
         .app-sidebar.collapsed {
@@ -179,7 +179,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid var(--ula-border-on-dark);
+            border-bottom: 1px solid var(--ula-border-subtle);
         }
 
         .brand-logo-area {
@@ -209,12 +209,12 @@
             font-size: 15px;
             font-weight: 900;
             letter-spacing: -0.2px;
-            color: #FFFDF6;
+            color: var(--ula-text-primary);
         }
 
         .brand-sub {
             font-size: 11px;
-            color: var(--ula-text-on-dark-muted);
+            color: var(--ula-text-muted);
         }
 
         .sidebar-nav-list {
@@ -231,7 +231,7 @@
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 0.8px;
-            color: var(--ula-text-on-dark-muted);
+            color: var(--ula-text-muted);
             padding: 12px 14px 6px 14px;
             white-space: nowrap;
         }
@@ -246,7 +246,7 @@
             gap: 12px;
             padding: 10px 14px;
             border-radius: var(--ula-radius-sm);
-            color: var(--ula-text-on-dark);
+            color: var(--ula-text-secondary);
             font-size: 13px;
             font-weight: 700;
             transition: var(--ula-transition-smooth);
@@ -256,8 +256,8 @@
         }
 
         .sidebar-link-btn:hover {
-            background: var(--ula-control-dark-fill-hover);
-            color: #FFFDF6;
+            background: var(--ula-surface-hover);
+            color: var(--ula-text-primary);
             transform: translateX(2px);
         }
 
@@ -266,9 +266,13 @@
         }
 
         .sidebar-link-btn.active {
-            background: var(--ula-control-dark-fill-strong);
-            color: #FFFDF6;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+            background: var(--ula-palm-900);
+            color: var(--ula-sand-50);
+            box-shadow: var(--ula-shadow-sm);
+        }
+        .sidebar-link-btn.active .sidebar-badge-pill {
+            background: rgba(255, 255, 255, 0.22);
+            color: #FFFFFF;
         }
 
         .sidebar-link-btn .nav-icon {
@@ -287,8 +291,8 @@
 
         .sidebar-badge-pill {
             margin-inline-start: auto;
-            background: rgba(255, 255, 255, 0.15);
-            color: #FFFDF6;
+            background: var(--ula-tone-palm-bg);
+            color: var(--ula-tone-palm-fg);
             font-size: 11px;
             font-weight: 800;
             padding: 2px 8px;
@@ -297,7 +301,7 @@
 
         .sidebar-footer {
             padding: 16px;
-            border-top: 1px solid var(--ula-border-on-dark);
+            border-top: 1px solid var(--ula-border-subtle);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -1164,7 +1168,7 @@
                     <div class="brand-sub">{{ __('Virtual Workplace') }}</div>
                 </div>
             </div>
-            <button onclick="toggleSidebarCollapse()" class="tactile-btn btn-secondary" style="padding: 4px 8px; font-size: 11px; background: transparent; border: 1px solid var(--ula-border-on-dark); color: var(--ula-text-on-dark-muted);" title="{{ __('Toggle Slim Sidebar') }}">
+            <button onclick="toggleSidebarCollapse()" class="tactile-btn btn-secondary" style="padding: 4px 8px; font-size: 11px; background: transparent; border: 1px solid var(--ula-border-default); color: var(--ula-text-muted);" title="{{ __('Toggle Slim Sidebar') }}">
                 ↔
             </button>
         </div>
@@ -1179,7 +1183,7 @@
                 </a>
             </li>
             <li>
-                <a href="{{ route('office') }}" class="sidebar-link-btn" style="background: rgba(79, 155, 95, 0.18); color: #7EE092;">
+                <a href="{{ route('office') }}" class="sidebar-link-btn" style="background: var(--ula-tone-palm-bg); color: var(--ula-tone-palm-fg);">
                     <span class="nav-icon">🚀</span>
                     <span class="nav-label-text">{{ __('Enter Office') }}</span>
                     <span class="sidebar-badge-pill" style="background: #4F9B5F; color: white;">LIVE</span>
@@ -1215,7 +1219,7 @@
                 <a href="{{ route('dashboard') }}#chat" class="sidebar-link-btn">
                     <span class="nav-icon">💬</span>
                     <span class="nav-label-text">{{ __('Team Chat & DMs') }}</span>
-                    <span class="sidebar-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #7EE092;">LIVE</span>
+                    <span class="sidebar-badge-pill" style="background: var(--ula-tone-palm-bg); color: var(--ula-tone-palm-fg);">LIVE</span>
                 </a>
             </li>
             <li>
@@ -1292,13 +1296,13 @@
                     {{ strtoupper(substr($user->name, 0, 2)) }}
                 </div>
                 <div class="user-info-text">
-                    <div style="font-size: 12px; font-weight: 800; color: #FFFDF6;">{{ $user->name }}</div>
-                    <div style="font-size: 10px; color: var(--ula-text-on-dark-muted);">{{ $membership->role->name ?? 'Member' }}</div>
+                    <div style="font-size: 12px; font-weight: 800; color: var(--ula-text-primary);">{{ $user->name }}</div>
+                    <div style="font-size: 10px; color: var(--ula-text-muted);">{{ $membership->role->name ?? 'Member' }}</div>
                 </div>
             </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" style="background: transparent; border: none; color: var(--ula-text-on-dark-muted); cursor: pointer; font-size: 14px;" title="{{ __('Logout') }}">
+                <button type="submit" style="background: transparent; border: none; color: var(--ula-text-muted); cursor: pointer; font-size: 14px;" title="{{ __('Logout') }}">
                     🚪
                 </button>
             </form>
