@@ -45,7 +45,7 @@
         </div>
 
         @if($icon)
-            <div class="w-9 h-9 rounded-full flex items-center justify-center shrink-0 {{ $isZero ? 'bg-[var(--ula-surface-sunken)] text-[var(--ula-text-muted)] opacity-60' : $iconStyles }}">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 {{ $isZero ? 'bg-[var(--ula-surface-sunken)] text-[var(--ula-text-muted)] opacity-60' : $iconStyles }}">
                 <span class="material-symbols-rounded text-[20px]">{{ $icon }}</span>
             </div>
         @endif

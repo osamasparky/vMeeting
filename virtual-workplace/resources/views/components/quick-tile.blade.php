@@ -22,13 +22,13 @@
                 {{ $icon }}
             </span>
             @if($badge)
-                <span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-[var(--ula-gold-200)] text-[var(--ula-gold-600)]">
+                <span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-[var(--ula-tone-gold-bg)] text-[var(--ula-tone-gold-fg)]">
                     {{ $badge }}
                 </span>
             @endif
         </div>
         <div class="flex flex-col mt-2">
-            <span class="{{ $titleSize }} font-medium text-[var(--ula-text-primary)] group-hover:text-[var(--ula-palm-900)]">
+            <span class="{{ $titleSize }} font-medium text-[var(--ula-text-primary)] group-hover:text-[var(--ula-text-strong)]">
                 {{ $title }}
             </span>
             @if($subtitle)
@@ -45,7 +45,7 @@
                 {{ $icon }}
             </span>
             @if($badge)
-                <span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-[var(--ula-gold-200)] text-[var(--ula-gold-600)]">
+                <span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-[var(--ula-tone-gold-bg)] text-[var(--ula-tone-gold-fg)]">
                     {{ $badge }}
                 </span>
             @endif

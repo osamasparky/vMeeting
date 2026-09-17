@@ -711,18 +711,18 @@
 
         .btn-primary {
             background: var(--ula-gradient-accent);
-            color: #FFFDF6;
-            border: 1px solid #1E4E31;
+            color: var(--ula-accent-fg);
+            border: 1px solid var(--ula-palm-800);
             box-shadow: var(--ula-shadow-sm);
         }
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(36, 92, 58, 0.32);
-            color: #FFFDF6;
+            box-shadow: var(--ula-shadow-md);
+            color: var(--ula-accent-fg);
         }
         .btn-primary:active {
             transform: translateY(1px);
-            box-shadow: 0 2px 6px rgba(36, 92, 58, 0.2);
+            box-shadow: var(--ula-shadow-xs);
         }
 
         .btn-secondary {
@@ -738,10 +738,10 @@
         }
 
         .btn-success {
-            background: linear-gradient(180deg, #5CA96C 0%, #3F7D4F 100%);
-            color: #FFFDF6;
-            border: 1px solid #2B5737;
-            box-shadow: 0 4px 14px rgba(63, 125, 79, 0.25);
+            background: var(--ula-status-success);
+            color: var(--ula-accent-fg);
+            border: 1px solid var(--ula-palm-800);
+            box-shadow: var(--ula-shadow-sm);
         }
 
         .btn-outline {

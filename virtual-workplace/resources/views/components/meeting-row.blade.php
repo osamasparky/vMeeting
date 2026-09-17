@@ -70,16 +70,16 @@
         @if(!empty($avatars))
             <div class="hidden sm:flex items-center -space-x-2 rtl:space-x-reverse">
                 @foreach(array_slice($avatars, 0, 3) as $avatar)
-                    <div class="w-6 h-6 rounded-full border-2 border-[var(--ula-surface-card)] bg-[var(--ula-sand-300)] overflow-hidden">
+                    <div class="w-6 h-6 rounded-full border-2 border-[var(--ula-surface-card)] bg-[var(--ula-tone-stone-bg)] overflow-hidden">
                         @if(is_string($avatar) && filter_var($avatar, FILTER_VALIDATE_URL))
                             <img src="{{ $avatar }}" class="w-full h-full object-cover">
                         @else
-                            <span class="text-[10px] flex items-center justify-center h-full text-[var(--ula-palm-900)] font-semibold">{{ substr($avatar, 0, 1) }}</span>
+                            <span class="text-[10px] flex items-center justify-center h-full text-[var(--ula-tone-stone-fg)] font-semibold">{{ substr($avatar, 0, 1) }}</span>
                         @endif
                     </div>
                 @endforeach
                 @if(count($avatars) > 3)
-                    <div class="w-6 h-6 rounded-full border-2 border-[var(--ula-surface-card)] bg-[var(--ula-stone-100)] text-[var(--ula-stone-500)] text-[10px] font-mono flex items-center justify-center">
+                    <div class="w-6 h-6 rounded-full border-2 border-[var(--ula-surface-card)] bg-[var(--ula-tone-stone-bg)] text-[var(--ula-tone-stone-fg)] text-[10px] font-mono flex items-center justify-center">
                         +{{ count($avatars) - 3 }}
                     </div>
                 @endif

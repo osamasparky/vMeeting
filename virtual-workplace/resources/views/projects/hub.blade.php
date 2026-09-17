@@ -306,20 +306,20 @@
         }
 
         .btn-primary {
-            background: #245C3A;
-            color: #FFFDF6;
-            box-shadow: 0 3px 0 #183F27, 0 6px 14px rgba(36, 92, 58, 0.25);
+            background: var(--ula-accent-default);
+            color: var(--ula-accent-fg);
+            box-shadow: 0 3px 0 var(--ula-palm-800), var(--ula-shadow-sm);
         }
 
         .btn-primary:hover {
-            background: #1C4D30;
+            background: var(--ula-accent-hover);
             transform: translateY(-1.5px);
-            box-shadow: 0 4px 0 #183F27, 0 8px 18px rgba(36, 92, 58, 0.32);
+            box-shadow: 0 4px 0 var(--ula-palm-800), var(--ula-shadow-md);
         }
 
         .btn-primary:active {
             transform: translateY(2px);
-            box-shadow: 0 1px 0 #183F27;
+            box-shadow: 0 1px 0 var(--ula-palm-800);
         }
 
         .btn-secondary {
