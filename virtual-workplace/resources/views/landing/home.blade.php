@@ -15,7 +15,7 @@
     .nx-hero-arch-card {
         position: relative;
         background: var(--ula-palm-900);
-        color: #ffffff;
+        color: var(--ula-white);
         border-radius: var(--ula-radius-xl) var(--ula-radius-xl) var(--ula-radius-xl) var(--ula-radius-xl);
         padding: 80px 48px 64px;
         overflow: hidden;
@@ -58,7 +58,7 @@
         font-size: clamp(32px, 4.2vw, 54px);
         font-weight: 600;
         line-height: 1.25;
-        color: #ffffff;
+        color: var(--ula-white);
         margin-bottom: 12px;
     }
 
@@ -141,7 +141,7 @@
 
     .nx-quote-card {
         background: var(--ula-palm-900);
-        color: #ffffff;
+        color: var(--ula-white);
         border-radius: var(--ula-radius-xl);
         padding: 64px 48px;
         text-align: center;
@@ -270,6 +270,49 @@
         </div>
     </section>
 
+    <!-- ── 1b. Spaces (Figma: Page Block — Feature/Media split) ── -->
+    <section id="spaces" class="nx-features-section">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <x-badge variant="accent" :dot="true" class="mb-3">
+                    {{ __('المساحات الذكية') }}
+                </x-badge>
+                <h2 class="text-[30px] font-semibold text-[var(--ula-text-primary)] leading-tight mb-4 font-['IBM_Plex_Sans_Arabic',sans-serif]">
+                    مكتب افتراضي يشبه مكتبك الحقيقي
+                </h2>
+                <p class="text-[15px] text-[var(--ula-text-secondary)] mb-8 leading-relaxed">
+                    {{ __('Design your floor once, and every teammate walks in to the same place — desks, meeting rooms, lounges, and quiet corners, all where you put them.') }}
+                </p>
+                <ul class="flex flex-col gap-5">
+                    <li class="flex items-start gap-3">
+                        <span class="material-symbols-rounded text-[22px] shrink-0" style="color: var(--ula-icon-accent);">chair</span>
+                        <div>
+                            <span class="block text-[15px] font-semibold text-[var(--ula-text-primary)]">مكاتب فردية ومساحات عمل مشتركة</span>
+                            <span class="block text-[13px] text-[var(--ula-text-secondary)]">Private desks and open collaboration zones</span>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="material-symbols-rounded text-[22px] shrink-0" style="color: var(--ula-icon-accent);">meeting_room</span>
+                        <div>
+                            <span class="block text-[15px] font-semibold text-[var(--ula-text-primary)]">قاعات اجتماعات قابلة للقفل</span>
+                            <span class="block text-[13px] text-[var(--ula-text-secondary)]">Lockable meeting rooms with knock-to-enter</span>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="material-symbols-rounded text-[22px] shrink-0" style="color: var(--ula-icon-accent);">workspaces</span>
+                        <div>
+                            <span class="block text-[15px] font-semibold text-[var(--ula-text-primary)]">صالات استراحة وزوايا هادئة</span>
+                            <span class="block text-[13px] text-[var(--ula-text-secondary)]">Lounges and quiet corners for focus work</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="rounded-[var(--ula-radius-xl)] overflow-hidden border border-[var(--ula-border-subtle)] shadow-[var(--ula-shadow-lg)]">
+                <img src="{{ asset('images/isometric_office_preview.jpg') }}" alt="{{ __('UlaSpace virtual office floor preview') }}" class="w-full h-auto block">
+            </div>
+        </div>
+    </section>
+
     <!-- ── 2. Features Grid (Figma Component: Feature Cards) ── -->
     <section id="features" class="nx-features-section">
         <div class="nx-section-header">
@@ -338,6 +381,48 @@
                     Custom Floorplan Architect & Catalog
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- ── 2b. Meetings (Figma Component: Meeting Row) ── -->
+    <section id="meetings" class="nx-features-section">
+        <div class="nx-section-header">
+            <x-badge variant="accent" :dot="true" class="mb-3">
+                {{ __('الاجتماعات') }}
+            </x-badge>
+            <h2 class="text-[34px] font-semibold text-[var(--ula-text-primary)] leading-tight mb-3 font-['IBM_Plex_Sans_Arabic',sans-serif]">
+                جدول اجتماعاتك في مكان واحد
+            </h2>
+            <p class="text-[15px] text-[var(--ula-text-secondary)]">
+                {{ __('See what\'s live, what\'s next, and who\'s in the room — before you even walk in.') }}
+            </p>
+        </div>
+
+        <div class="max-w-2xl mx-auto rounded-[var(--ula-radius-lg)] border border-[var(--ula-border-subtle)] bg-[var(--ula-surface-card)] p-3 shadow-[var(--ula-shadow-xs)]">
+            <div class="flex flex-col gap-2">
+                <x-meeting-row
+                    time="10:00"
+                    title="مراجعة تصميم المنتج"
+                    room="قاعة النخيل"
+                    status="live"
+                    :avatars="['أ', 'س', 'م']"
+                />
+                <x-meeting-row
+                    time="11:30"
+                    title="مزامنة الفريق الأسبوعية"
+                    room="غرفة الابتكار"
+                    status="scheduled"
+                    :avatars="['ر', 'ن']"
+                />
+                <x-meeting-row
+                    time="14:00"
+                    title="مقابلة عميل جديد"
+                    room="مساحة الاستقبال"
+                    status="attention"
+                    :avatars="['ي']"
+                />
+            </div>
+            <p class="text-[11px] text-[var(--ula-text-muted)] text-center mt-3">{{ __('Sample schedule for illustration') }}</p>
         </div>
     </section>
 

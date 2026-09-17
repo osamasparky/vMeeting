@@ -44,8 +44,7 @@
         .nx-header {
             position: fixed;
             top: 0;
-            left: 0;
-            right: 0;
+            inset-inline: 0;
             z-index: 1000;
             padding: 14px 32px;
             transition: all var(--ula-duration-base) var(--ula-ease-in-out);
@@ -69,7 +68,7 @@
             align-items: center;
             gap: 12px;
             text-decoration: none;
-            color: #ffffff;
+            color: var(--ula-white);
         }
 
         .nx-brand-arch {
@@ -88,7 +87,7 @@
             font-size: 20px;
             font-weight: 600;
             letter-spacing: -0.3px;
-            color: #ffffff;
+            color: var(--ula-white);
             line-height: 1.1;
         }
 
@@ -119,7 +118,7 @@
         }
 
         .nx-nav-link:hover {
-            color: #ffffff;
+            color: var(--ula-white);
             background: rgba(237, 230, 217, 0.08);
         }
 
@@ -146,7 +145,7 @@
 
         .nx-lang-pill:hover {
             background: rgba(237, 230, 217, 0.16);
-            color: #ffffff;
+            color: var(--ula-white);
         }
 
         /* ── Mobile Navigation Toggle ── */
@@ -154,7 +153,7 @@
             display: none;
             background: rgba(237, 230, 217, 0.08);
             border: 1px solid rgba(237, 230, 217, 0.15);
-            color: #ffffff;
+            color: var(--ula-white);
             font-size: 20px;
             padding: 6px 12px;
             border-radius: var(--ula-radius-md);
@@ -182,7 +181,7 @@
         .nx-footer-col h4 {
             font-size: 14px;
             font-weight: 600;
-            color: #ffffff;
+            color: var(--ula-white);
             margin-bottom: 20px;
             text-transform: uppercase;
             letter-spacing: 0.05em;
