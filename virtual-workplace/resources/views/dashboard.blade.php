@@ -671,7 +671,7 @@
 
         .btn-secondary {
             background: var(--ula-surface-page-alt);
-            color: var(--ula-palm-900);
+            color: var(--ula-text-primary);
             border: 1px solid var(--ula-border-subtle);
             box-shadow: var(--ula-shadow-xs);
         }
@@ -938,7 +938,7 @@
         }
         .ctx-quick-btn:hover {
             background: rgba(36, 92, 58, 0.12);
-            color: var(--ula-palm-900);
+            color: var(--ula-text-primary);
             border-color: var(--ula-palm-900);
             transform: translateY(-1px);
         }
@@ -958,7 +958,7 @@
         }
         .ctx-item:hover {
             background: var(--ula-surface-page-alt);
-            color: var(--ula-palm-900);
+            color: var(--ula-text-primary);
             border-color: var(--ula-border-subtle);
             transform: translateX({{ app()->getLocale() === 'ar' ? '-2px' : '2px' }});
         }
@@ -1145,7 +1145,7 @@
         }
         .notif-tab-btn.active {
             background: var(--ula-surface-page-alt);
-            color: var(--ula-palm-900);
+            color: var(--ula-text-primary);
             border-color: var(--ula-border-subtle);
         }
         .notif-item {
@@ -1395,7 +1395,7 @@
                         <span class="material-symbols-rounded text-[18px]">domain</span>
                         <span>{{ __('Offices & Branches') }}</span>
                     </span>
-                    <span class="nav-badge-pill" style="background: rgba(36, 92, 58, 0.2); color: var(--ula-palm-900);">{{ $offices->count() }}</span>
+                    <span class="nav-badge-pill" style="background: rgba(36, 92, 58, 0.2); color: var(--ula-text-primary);">{{ $offices->count() }}</span>
                 </button>
                 @endif
                 @if($membership->hasPermission('rooms.manage'))
@@ -1509,7 +1509,7 @@
                 <div style="font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ula-text-primary);">
                     {{ $user->name }}
                     @if($user->nickname)
-                        <span style="font-size: 10px; color: var(--ula-palm-900); font-weight: 600;">({{ '@' . $user->nickname }})</span>
+                        <span style="font-size: 10px; color: var(--ula-text-primary); font-weight: 600;">({{ '@' . $user->nickname }})</span>
                     @endif
                 </div>
                 <div style="font-size: 10px; color: var(--ula-text-muted);">{{ $membership->role->name ?? 'Company Admin' }}</div>
@@ -1599,7 +1599,7 @@
                                 <span id="notifHeaderCount" class="badge-status badge-active" style="font-size: 10px; padding: 2px 8px; display: none;">0 new</span>
                             </div>
                             <div style="display: flex; gap: 8px; align-items: center;">
-                                <button type="button" onclick="markAllNotificationsAsRead()" style="background: none; border: none; font-size: 11px; font-weight: 700; color: var(--ula-palm-900); cursor: pointer;" title="{{ __('Mark all as read') }}">
+                                <button type="button" onclick="markAllNotificationsAsRead()" style="background: none; border: none; font-size: 11px; font-weight: 700; color: var(--ula-text-primary); cursor: pointer;" title="{{ __('Mark all as read') }}">
                                     {{ __('Mark read') }}
                                 </button>
                                 <button type="button" onclick="clearAllNotificationsFromServer()" style="background: none; border: none; font-size: 11px; font-weight: 700; color: var(--ula-text-muted); cursor: pointer;" title="{{ __('Clear all') }}">

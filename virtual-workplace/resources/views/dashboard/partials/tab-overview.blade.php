@@ -59,7 +59,7 @@
                 <span style="font-size: 11px; font-weight: 600; color: var(--ula-gold-400); text-transform: uppercase; letter-spacing: 0.5px;">
                     {{ now()->locale(app()->getLocale())->translatedFormat('l') }}
                 </span>
-                <span style="font-size: 18px; font-weight: 300; color: var(--ula-palm-900); line-height: 1.2;">
+                <span style="font-size: 18px; font-weight: 300; color: var(--ula-text-primary); line-height: 1.2;">
                     {{ now()->format('d') }} {{ now()->locale(app()->getLocale())->translatedFormat('F') }}
                 </span>
                 <span style="font-size: 11px; color: var(--ula-stone-500); font-family: 'IBM Plex Mono', monospace;">
@@ -213,7 +213,7 @@
                                 {{ $meeting->scheduled_at ? $meeting->scheduled_at->format('h:i A') : __('Now') }}
                             </span>
                             <div style="display: flex; flex-direction: column; min-width: 0;">
-                                <span style="font-size: 13px; font-weight: 500; color: var(--ula-palm-900); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                <span style="font-size: 13px; font-weight: 500; color: var(--ula-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                     {{ $meeting->title }}
                                 </span>
                                 <span style="font-size: 11px; color: var(--ula-stone-600);">
@@ -275,7 +275,7 @@
                             <span class="nx-legend-dot" style="background: var(--ula-palm-500);"></span>
                             <span>{{ __('Open Rooms') }}</span>
                         </span>
-                        <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--ula-palm-900);">{{ $openRooms }}</span>
+                        <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--ula-text-primary);">{{ $openRooms }}</span>
                     </div>
 
                     <div class="nx-legend-item">
@@ -283,7 +283,7 @@
                             <span class="nx-legend-dot" style="background: var(--ula-gold-400);"></span>
                             <span>{{ __('Locked Rooms') }}</span>
                         </span>
-                        <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--ula-palm-900);">{{ $closedRooms }}</span>
+                        <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--ula-text-primary);">{{ $closedRooms }}</span>
                     </div>
 
                     <div class="nx-legend-item">
@@ -303,7 +303,7 @@
         <div style="display: flex; align-items: center; gap: 12px;">
             <span class="material-symbols-rounded" style="font-size: 22px; color: var(--ula-gold-400);">format_quote</span>
             <div style="display: flex; flex-direction: column;">
-                <span style="font-size: 13px; font-weight: 500; color: var(--ula-palm-900);">
+                <span style="font-size: 13px; font-weight: 500; color: var(--ula-text-primary);">
                     {{ __('Better spaces carve greater teams.') }}
                 </span>
             </div>
