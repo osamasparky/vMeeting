@@ -20,18 +20,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-        :root[data-theme="dark"], :root {
-                        --brand-primary-hover: var(--ula-palm-700, #1e412f);
-                                                
-                                                                                                
-                                                            
-                                }
-
-        :root[data-theme="light"] {
-                        --brand-primary-hover: #047857;
-                                                
-                                                                                                
-                                                                    }
+        /* The old :root[data-theme] blocks here only ever declared
+           --brand-primary-hover (retired --brand- prefix), which nothing
+           in this file references. Removed rather than kept unused. */
 
         * {
             margin: 0;
@@ -55,7 +46,7 @@
             width: 95%;
             max-width: 1720px;
             height: calc(100vh - 24px);
-            background: radial-gradient(circle at center, #0B1C13 0%, #050B08 100%);
+            background: radial-gradient(circle at center, var(--ula-palm-950) 0%, var(--ula-black) 100%);
             border: 2px solid rgba(237, 230, 217, 0.16);
             border-radius: 28px;
             box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), inset 0 0 80px rgba(0, 0, 0, 0.6);
@@ -120,7 +111,7 @@
         .tool-btn.active {
             background: rgba(60, 107, 76, 0.35);
             border-color: rgba(134, 239, 172, 0.4);
-            color: #86EFAC;
+            color: var(--ula-status-success);
             box-shadow: 0 2px 8px rgba(60, 107, 76, 0.3);
         }
 
@@ -147,7 +138,7 @@
         .tool-icon-btn.danger:hover {
             background: rgba(239, 68, 68, 0.15);
             border-color: rgba(239, 68, 68, 0.5);
-            color: #F87171;
+            color: var(--ula-status-danger);
         }
 
         /* ── Editor Dropdowns ── */
@@ -191,11 +182,11 @@
         }
         .editor-dropdown-item:hover {
             background: rgba(60, 107, 76, 0.25);
-            color: #86EFAC;
+            color: var(--ula-status-success);
         }
         .editor-dropdown-item.active {
             background: rgba(60, 107, 76, 0.4);
-            color: #86EFAC;
+            color: var(--ula-status-success);
         }
 
         .more-menu-item {
@@ -216,7 +207,7 @@
         }
         .more-menu-item:hover {
             background: rgba(255, 255, 255, 0.08);
-            color: #86EFAC;
+            color: var(--ula-status-success);
         }
 
         .act-btn {
@@ -233,7 +224,7 @@
             text-decoration: none;
         }
         .act-btn-emerald {
-            background: linear-gradient(135deg, #10B981, #059669);
+            background: linear-gradient(135deg, var(--ula-status-success), var(--ula-status-success));
             color: white;
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
@@ -318,7 +309,7 @@
         .float-act-btn:hover {
             background: rgba(60, 107, 76, 0.25);
             border-color: var(--ula-palm-900);
-            color: #86EFAC;
+            color: var(--ula-status-success);
         }
 
         /* ── Right Customizer Drawer ── */
@@ -478,7 +469,7 @@
         .cat-pill.active {
             background: linear-gradient(135deg, rgba(60, 107, 76, 0.4), rgba(30, 65, 47, 0.4));
             border-color: var(--ula-palm-900);
-            color: #86EFAC;
+            color: var(--ula-status-success);
             box-shadow: 0 2px 8px rgba(60, 107, 76, 0.3);
         }
         .cat-pill-count {
@@ -486,7 +477,7 @@
             padding: 1px 5px;
             border-radius: 8px;
             background: rgba(0, 0, 0, 0.4);
-            color: #86EFAC;
+            color: var(--ula-status-success);
         }
 
         .category-group {
@@ -558,7 +549,7 @@
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4), 0 0 10px rgba(60, 107, 76, 0.3);
         }
         .furn-card.active {
-            border-color: #86EFAC;
+            border-color: var(--ula-status-success);
             background: rgba(60, 107, 76, 0.35);
             box-shadow: 0 0 14px rgba(60, 107, 76, 0.5);
         }
@@ -575,13 +566,13 @@
         .furn-dim-badge {
             background: rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #94A3B8;
+            color: var(--ula-stone-400);
             padding: 1px 5px;
             border-radius: 4px;
         }
         .furn-type-badge {
             background: rgba(60, 107, 76, 0.3);
-            color: #86EFAC;
+            color: var(--ula-status-success);
             padding: 1px 5px;
             border-radius: 4px;
         }
@@ -730,12 +721,12 @@
                             </div>
 
                             <!-- Actions -->
-                            <a href="{{ route('dashboard') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #f9f6ef; font-size: 12px; font-weight: 600;">
+                            <a href="{{ route('dashboard') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--ula-white); font-size: 12px; font-weight: 600;">
                                 <span class="material-symbols-rounded" style="font-size: 18px; color: var(--ula-highlight-default);">dashboard</span>
                                 <span>{{ __('Dashboard') }}</span>
                             </a>
 
-                            <a href="{{ route('office', ['office' => $floor->id]) }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #86EFAC; font-size: 12px; font-weight: 600;">
+                            <a href="{{ route('office', ['office' => $floor->id]) }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--ula-status-success); font-size: 12px; font-weight: 600;">
                                 <span class="material-symbols-rounded" style="font-size: 18px;">meeting_room</span>
                                 <span>{{ __('Enter Live Office') }}</span>
                             </a>
@@ -743,7 +734,7 @@
                             @if(session('superadmin_impersonator_id'))
                             <form method="POST" action="{{ route('impersonate.leave') }}" style="margin: 0;">
                                 @csrf
-                                <button type="submit" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #93C5FD; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                                <button type="submit" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: var(--ula-accent-default); font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                                     <span class="material-symbols-rounded" style="font-size: 18px;">shield</span>
                                     <span>{{ __('Return to Super Admin') }}</span>
                                 </button>
@@ -752,18 +743,18 @@
 
                             <div style="height: 1px; background: rgba(237, 230, 217, 0.12); margin: 6px 0;"></div>
 
-                            <button type="button" onclick="toggleAppTheme(); closeEditorMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #f9f6ef; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                            <button type="button" onclick="toggleAppTheme(); closeEditorMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: var(--ula-white); font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                                 <span class="material-symbols-rounded" style="font-size: 18px;">light_mode</span>
                                 <span>{{ __('Toggle Theme') }}</span>
                             </button>
 
                             @if(app()->getLocale() === 'ar')
-                                <a href="{{ route('lang.switch', 'en') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #f9f6ef; font-size: 12px; font-weight: 600;">
+                                <a href="{{ route('lang.switch', 'en') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--ula-white); font-size: 12px; font-weight: 600;">
                                     <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
                                     <span>English (EN)</span>
                                 </a>
                             @else
-                                <a href="{{ route('lang.switch', 'ar') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #f9f6ef; font-size: 12px; font-weight: 600;">
+                                <a href="{{ route('lang.switch', 'ar') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--ula-white); font-size: 12px; font-weight: 600;">
                                     <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
                                     <span>العربية (AR)</span>
                                 </a>
@@ -791,16 +782,16 @@
                         </button>
                         <div id="branch-select-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); inset-inline-start: 0; min-width: 250px; background: rgba(14, 25, 19, 0.98); backdrop-filter: blur(18px); border: 1px solid rgba(237, 230, 217, 0.20); border-radius: 14px; box-shadow: 0 16px 36px rgba(0,0,0,0.65); padding: 6px; z-index: 100000;">
                             <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 4px;">
-                                🏢 {{ __('Select Office Branch') }}
+                                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> {{ __('Select Office Branch') }}
                             </div>
                             @foreach($floors as $f)
-                            <a href="{{ route('editor', ['office' => $f->id]) }}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: {{ $f->id === $floor->id ? '#86EFAC' : '#E2E8F0' }}; background: {{ $f->id === $floor->id ? 'rgba(36, 92, 58, 0.45)' : 'transparent' }}; font-weight: 700; font-size: 12px; transition: background 0.15s ease;">
+                            <a href="{{ route('editor', ['office' => $f->id]) }}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: {{ $f->id === $floor->id ? 'var(--ula-status-success)' : 'var(--ula-text-on-dark)' }}; background: {{ $f->id === $floor->id ? 'rgba(36, 92, 58, 0.45)' : 'transparent' }}; font-weight: 700; font-size: 12px; transition: background 0.15s ease;">
                                 <div style="display: flex; align-items: center; gap: 8px;">
                                     <span class="material-symbols-rounded" style="font-size: 16px;">apartment</span>
                                     <span>{{ $f->name }}</span>
                                 </div>
                                 @if($f->id === $floor->id)
-                                    <span style="font-size: 10px; color: #86EFAC; font-weight: 800;">● {{ __('Editing') }}</span>
+                                    <span style="font-size: 10px; color: var(--ula-status-success); font-weight: 800;">● {{ __('Editing') }}</span>
                                 @endif
                             </a>
                             @endforeach
@@ -836,7 +827,7 @@
                         <button class="nx-toolbar-btn" onclick="duplicateSelectedItem()" title="{{ __('Clone / Duplicate') }}" style="width: 34px; height: 34px; padding: 0; justify-content: center;">
                             <span class="material-symbols-rounded" style="font-size: 18px;">content_copy</span>
                         </button>
-                        <button class="nx-toolbar-btn" onclick="deleteSelectedItem()" title="{{ __('Delete Selected (Del)') }}" style="width: 34px; height: 34px; padding: 0; justify-content: center; color: #F87171; border-color: rgba(239, 68, 68, 0.3);">
+                        <button class="nx-toolbar-btn" onclick="deleteSelectedItem()" title="{{ __('Delete Selected (Del)') }}" style="width: 34px; height: 34px; padding: 0; justify-content: center; color: var(--ula-status-danger); border-color: rgba(239, 68, 68, 0.3);">
                             <span class="material-symbols-rounded" style="font-size: 18px;">delete</span>
                         </button>
                     </div>
@@ -846,7 +837,7 @@
                 <div class="nx-toolbar-group">
                     <input type="file" id="floorplan-file-input" accept="image/jpeg,image/png,image/webp,image/jpg" style="display:none;" onchange="handleFloorplanUpload(this)">
 
-                    <button type="button" onclick="openAiGeneratorModal()" class="nx-toolbar-btn btn-accent" style="font-weight: 700; background: linear-gradient(135deg, rgba(211, 165, 83, 0.35), rgba(184, 137, 50, 0.35)); border-color: rgba(211, 165, 83, 0.6); color: #F59E0B;" title="{{ __('Generate 3D Isometric Office Floorplan & Rooms with AI') }}">
+                    <button type="button" onclick="openAiGeneratorModal()" class="nx-toolbar-btn btn-accent" style="font-weight: 700; background: linear-gradient(135deg, rgba(211, 165, 83, 0.35), rgba(184, 137, 50, 0.35)); border-color: rgba(211, 165, 83, 0.6); color: var(--ula-gold-500);" title="{{ __('Generate 3D Isometric Office Floorplan & Rooms with AI') }}">
                         <span class="material-symbols-rounded" style="font-size: 18px;">auto_awesome</span>
                         <span>{{ __('AI Generator') }}</span>
                     </button>
@@ -856,7 +847,7 @@
                         <span>{{ __('Save') }}</span>
                     </button>
 
-                    <button class="nx-toolbar-btn" onclick="publishMap()" style="background: rgba(60, 107, 76, 0.4); border-color: #3C6B4C; color: #86EFAC; font-weight: 700;" title="{{ __('Publish Map to Live Office') }}">
+                    <button class="nx-toolbar-btn" onclick="publishMap()" style="background: rgba(60, 107, 76, 0.4); border-color: var(--ula-palm-500); color: var(--ula-status-success); font-weight: 700;" title="{{ __('Publish Map to Live Office') }}">
                         <span class="material-symbols-rounded" style="font-size: 18px;">rocket_launch</span>
                         <span>{{ __('Publish') }}</span>
                     </button>
@@ -877,19 +868,19 @@
 
             <!-- Floating Selected Object Actions -->
             <div class="floating-item-actions" id="floating-actions">
-                <button class="float-act-btn" onclick="rotateSelectedItem(90)">🔄 +90°</button>
-                <button class="float-act-btn" onclick="duplicateSelectedItem()">📋 {{ __('Clone') }}</button>
-                <button class="float-act-btn" onclick="deleteSelectedItem()" style="color: var(--ula-status-danger);">🗑️</button>
+                <button class="float-act-btn" onclick="rotateSelectedItem(90)"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">rotate_right</span> +90°</button>
+                <button class="float-act-btn" onclick="duplicateSelectedItem()"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">content_copy</span> {{ __('Clone') }}</button>
+                <button class="float-act-btn" onclick="deleteSelectedItem()" style="color: var(--ula-status-danger);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">delete</span></button>
             </div>
 
             <!-- View Navigation Controls -->
             <div class="viewport-controls">
-                <button class="view-btn" onclick="toggleCustomizerDrawer()" title="{{ __('Toggle Catalog Drawer') }}">🪑</button>
-                <button class="view-btn" onclick="zoomIn()" title="{{ __('Zoom In') }}">➕</button>
-                <button class="view-btn" onclick="zoomOut()" title="{{ __('Zoom Out') }}">➖</button>
-                <button class="view-btn" onclick="resetView()" title="{{ __('Reset View (100%)') }}">🏠</button>
-                <button class="view-btn" onclick="toggleGrid()" title="{{ __('Toggle Grid') }}">🔲</button>
-                <button class="view-btn" id="btn-grid-snap" onclick="cycleGridSnap()" style="font-size: 10px; font-weight: 800; font-family: 'IBM Plex Mono', monospace; width: auto; padding: 0 8px;" title="{{ __('Grid Snap Precision') }}">🎯 4px</button>
+                <button class="view-btn" onclick="toggleCustomizerDrawer()" title="{{ __('Toggle Catalog Drawer') }}"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">chair</span></button>
+                <button class="view-btn" onclick="zoomIn()" title="{{ __('Zoom In') }}"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">add</span></button>
+                <button class="view-btn" onclick="zoomOut()" title="{{ __('Zoom Out') }}"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">remove</span></button>
+                <button class="view-btn" onclick="resetView()" title="{{ __('Reset View (100%)') }}"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">home</span></button>
+                <button class="view-btn" onclick="toggleGrid()" title="{{ __('Toggle Grid') }}"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">grid_on</span></button>
+                <button class="view-btn" id="btn-grid-snap" onclick="cycleGridSnap()" style="font-size: 10px; font-weight: 800; font-family: 'IBM Plex Mono', monospace; width: auto; padding: 0 8px;" title="{{ __('Grid Snap Precision') }}"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">target</span> 4px</button>
             </div>
         </div>
 
@@ -897,10 +888,10 @@
         <aside class="customizer-drawer" id="customizer-drawer">
             <div class="drawer-header">
                 <div class="drawer-title">
-                    <span>✨</span>
+                    <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">auto_awesome</span></span>
                     <span>{{ __('Customize Floor & Furniture') }}</span>
                 </div>
-                <button onclick="toggleCustomizerDrawer()" style="background:none; border:none; color:var(--ula-text-muted); font-size:18px; cursor:pointer;">✕</button>
+                <button onclick="toggleCustomizerDrawer()" style="background:none; border:none; color:var(--ula-text-muted); font-size:18px; cursor:pointer;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span></button>
             </div>
 
             <div class="drawer-tabs">
@@ -926,8 +917,8 @@
                     
                     <!-- Search Box with Clear Button -->
                     <div class="search-box-wrapper">
-                        <input type="text" id="furniture-search-input" class="search-box" placeholder="🔍 {{ __('Search 3D furniture, desks, rugs, plants...') }}" oninput="filterFurniture(this.value)">
-                        <button type="button" id="search-clear-btn" class="search-clear-btn" onclick="clearFurnitureSearch()">✕</button>
+                        <input type="text" id="furniture-search-input" class="search-box" placeholder="{{ __('Search 3D furniture, desks, rugs, plants...') }}" oninput="filterFurniture(this.value)">
+                        <button type="button" id="search-clear-btn" class="search-clear-btn" onclick="clearFurnitureSearch()"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span></button>
                     </div>
 
                     <!-- Catalog Quick Stats & Expand/Collapse Toggle -->
@@ -935,7 +926,7 @@
                         @php
                             $totalCatalogCount = $furnitureCategories->sum(function($c) { return $c->items->count(); }) + 12;
                         @endphp
-                        <span id="catalog-count-label" style="font-weight: 700; color: #A7F3D0;">✨ {{ $totalCatalogCount }} {{ __('Items Available') }}</span>
+                        <span id="catalog-count-label" style="font-weight: 700; color: var(--ula-status-success);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">auto_awesome</span> {{ $totalCatalogCount }} {{ __('Items Available') }}</span>
                         <button type="button" onclick="expandAllCategories()" style="background:none; border:none; color:var(--ula-palm-900); font-size:11px; font-weight:800; cursor:pointer; text-decoration: underline;">
                             {{ __('Toggle All') }}
                         </button>
@@ -944,12 +935,12 @@
                     <!-- Modern Category Filter Horizontal Bar -->
                     <div class="category-filter-bar">
                         <button type="button" class="cat-pill active" onclick="filterByCategory('all')">
-                            <span>🌟</span>
+                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">star</span></span>
                             <span>{{ __('All') }}</span>
                             <span class="cat-pill-count">{{ $totalCatalogCount }}</span>
                         </button>
                         <button type="button" class="cat-pill" onclick="filterByCategory('blueprint')">
-                            <span>📐</span>
+                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">architecture</span></span>
                             <span>{{ __('Blueprint') }}</span>
                             <span class="cat-pill-count">12</span>
                         </button>
@@ -969,7 +960,7 @@
                     <div class="category-group" id="cat-blueprint">
                         <div class="category-title-bar" onclick="toggleCategoryGroup('cat-blueprint')">
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="font-size: 15px;">📐</span>
+                                <span style="font-size: 15px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">architecture</span></span>
                                 <span>{{ __('Isometric Blueprint Objects') }}</span>
                                 <span class="cat-pill-count">12</span>
                             </div>
@@ -979,108 +970,108 @@
                             <div class="furn-card" data-name="living plant wall botanical" onclick="selectFurnitureItem('living_wall', '#2D6A4F', null, 5, 2, true, 'none', null, 3, '{{ __('Living Plant Wall') }}')">
                                 <div class="furn-card-top-badges">
                                     <span class="furn-dim-badge">5×2</span>
-                                    <span class="furn-type-badge">🌿 {{ __('Plant') }}</span>
+                                    <span class="furn-type-badge"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">potted_plant</span> {{ __('Plant') }}</span>
                                 </div>
-                                <div class="furn-icon"><span style="font-size: 30px;">🌿</span></div>
+                                <div class="furn-icon"><span style="font-size: 30px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">potted_plant</span></span></div>
                                 <div class="furn-label" title="{{ __('Living Plant Wall') }}">{{ __('Living Plant Wall') }}</div>
                             </div>
 
                             <div class="furn-card" data-name="oak boardroom table conference" onclick="selectFurnitureItem('conference_table', '#D8B589', null, 8, 3, true, 'sit', null, 2, '{{ __('Oak Boardroom Table') }}')">
                                 <div class="furn-card-top-badges">
                                     <span class="furn-dim-badge">8×3</span>
-                                    <span class="furn-type-badge">🤝 {{ __('Table') }}</span>
+                                    <span class="furn-type-badge"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">handshake</span> {{ __('Table') }}</span>
                                 </div>
-                                <div class="furn-icon"><span style="font-size: 30px;">🤝</span></div>
+                                <div class="furn-icon"><span style="font-size: 30px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">handshake</span></span></div>
                                 <div class="furn-label" title="{{ __('Oak Boardroom Table') }}">{{ __('Oak Boardroom Table') }}</div>
                             </div>
 
                             <div class="furn-card" data-name="white executive chair seating" onclick="selectFurnitureItem('chair_white', '#FFFFFF', null, 1, 1, false, 'sit', null, 1, '{{ __('White Executive Chair') }}')">
                                 <div class="furn-card-top-badges">
                                     <span class="furn-dim-badge">1×1</span>
-                                    <span class="furn-type-badge">🪑 {{ __('Sit') }}</span>
+                                    <span class="furn-type-badge"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">chair</span> {{ __('Sit') }}</span>
                                 </div>
-                                <div class="furn-icon"><span style="font-size: 30px;">🪑</span></div>
+                                <div class="furn-icon"><span style="font-size: 30px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">chair</span></span></div>
                                 <div class="furn-label" title="{{ __('White Executive Chair') }}">{{ __('White Executive Chair') }}</div>
                             </div>
 
                             <div class="furn-card" data-name="focus pod desk workstation" onclick="selectFurnitureItem('pod_workstation', '#D8B589', null, 3, 2, true, 'sit', null, 2, '{{ __('Focus Pod Desk') }}')">
                                 <div class="furn-card-top-badges">
                                     <span class="furn-dim-badge">3×2</span>
-                                    <span class="furn-type-badge">🎧 {{ __('Desk') }}</span>
+                                    <span class="furn-type-badge"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">headphones</span> {{ __('Desk') }}</span>
                                 </div>
-                                <div class="furn-icon"><span style="font-size: 30px;">🎧</span></div>
+                                <div class="furn-icon"><span style="font-size: 30px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">headphones</span></span></div>
                                 <div class="furn-label" title="{{ __('Focus Pod Desk') }}">{{ __('Focus Pod Desk') }}</div>
                             </div>
 
                             <div class="furn-card" data-name="wood feature wall partition" onclick="selectFurnitureItem('wood_panel_wall', '#C49A6C', null, 7, 1, true, 'none', null, 3, '{{ __('Wood Feature Wall') }}')">
                                 <div class="furn-card-top-badges">
                                     <span class="furn-dim-badge">7×1</span>
-                                    <span class="furn-type-badge">🪵 {{ __('Wall') }}</span>
+                                    <span class="furn-type-badge"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">forest</span> {{ __('Wall') }}</span>
                                 </div>
-                                <div class="furn-icon"><span style="font-size: 30px;">🪵</span></div>
+                                <div class="furn-icon"><span style="font-size: 30px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">forest</span></span></div>
                                 <div class="furn-label" title="{{ __('Wood Feature Wall') }}">{{ __('Wood Feature Wall') }}</div>
                             </div>
 
                             <div class="furn-card" data-name="wooden staircase stairs" onclick="selectFurnitureItem('stairs_wood', '#C49A6C', null, 3, 4, true, 'none', null, 2, '{{ __('Wooden Staircase') }}')">
                                 <div class="furn-card-top-badges">
                                     <span class="furn-dim-badge">3×4</span>
-                                    <span class="furn-type-badge">🪜 {{ __('Stairs') }}</span>
+                                    <span class="furn-type-badge"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">stairs</span> {{ __('Stairs') }}</span>
                                 </div>
-                                <div class="furn-icon"><span style="font-size: 30px;">🪜</span></div>
+                                <div class="furn-icon"><span style="font-size: 30px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">stairs</span></span></div>
                                 <div class="furn-label" title="{{ __('Wooden Staircase') }}">{{ __('Wooden Staircase') }}</div>
                             </div>
 
                             <div class="furn-card" data-name="tech 3d workbench desk" onclick="selectFurnitureItem('tech_workbench', '#D8B589', null, 4, 2, true, 'none', null, 2, '{{ __('Tech 3D Workbench') }}')">
                                 <div class="furn-card-top-badges">
                                     <span class="furn-dim-badge">4×2</span>
-                                    <span class="furn-type-badge">🛠️ {{ __('Bench') }}</span>
+                                    <span class="furn-type-badge"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">build</span> {{ __('Bench') }}</span>
                                 </div>
-                                <div class="furn-icon"><span style="font-size: 30px;">🛠️</span></div>
+                                <div class="furn-icon"><span style="font-size: 30px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">build</span></span></div>
                                 <div class="furn-label" title="{{ __('Tech 3D Workbench') }}">{{ __('Tech 3D Workbench') }}</div>
                             </div>
 
                             <div class="furn-card" data-name="reception counter desk" onclick="selectFurnitureItem('reception_counter', '#F4EFE6', null, 4, 2, true, 'drink', null, 2, '{{ __('Reception Desk') }}')">
                                 <div class="furn-card-top-badges">
                                     <span class="furn-dim-badge">4×2</span>
-                                    <span class="furn-type-badge">🛎️ {{ __('Lobby') }}</span>
+                                    <span class="furn-type-badge"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">room_service</span> {{ __('Lobby') }}</span>
                                 </div>
-                                <div class="furn-icon"><span style="font-size: 30px;">🛎️</span></div>
+                                <div class="furn-icon"><span style="font-size: 30px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">room_service</span></span></div>
                                 <div class="furn-label" title="{{ __('Reception Desk') }}">{{ __('Reception Desk') }}</div>
                             </div>
 
                             <div class="furn-card" data-name="cream 3 seater sofa lounge" onclick="selectFurnitureItem('sofa_cream', '#F4EFE6', null, 3, 2, true, 'sit', null, 1, '{{ __('Cream 3-Seater Sofa') }}')">
                                 <div class="furn-card-top-badges">
                                     <span class="furn-dim-badge">3×2</span>
-                                    <span class="furn-type-badge">🛋️ {{ __('Sofa') }}</span>
+                                    <span class="furn-type-badge"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">weekend</span> {{ __('Sofa') }}</span>
                                 </div>
-                                <div class="furn-icon"><span style="font-size: 30px;">🛋️</span></div>
+                                <div class="furn-icon"><span style="font-size: 30px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">weekend</span></span></div>
                                 <div class="furn-label" title="{{ __('Cream 3-Seater Sofa') }}">{{ __('Cream 3-Seater Sofa') }}</div>
                             </div>
 
                             <div class="furn-card" data-name="sage armchair single lounge" onclick="selectFurnitureItem('armchair_sage', '#8BA888', null, 2, 2, true, 'sit', null, 1, '{{ __('Sage Armchair') }}')">
                                 <div class="furn-card-top-badges">
                                     <span class="furn-dim-badge">2×2</span>
-                                    <span class="furn-type-badge">🛋️ {{ __('Chair') }}</span>
+                                    <span class="furn-type-badge"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">weekend</span> {{ __('Chair') }}</span>
                                 </div>
-                                <div class="furn-icon"><span style="font-size: 30px;">🛋️</span></div>
+                                <div class="furn-icon"><span style="font-size: 30px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">weekend</span></span></div>
                                 <div class="furn-label" title="{{ __('Sage Armchair') }}">{{ __('Sage Armchair') }}</div>
                             </div>
 
                             <div class="furn-card" data-name="oak coffee table lounge" onclick="selectFurnitureItem('coffee_table_oak', '#D8B589', null, 2, 1, true, 'drink', null, 2, '{{ __('Oak Coffee Table') }}')">
                                 <div class="furn-card-top-badges">
                                     <span class="furn-dim-badge">2×1</span>
-                                    <span class="furn-type-badge">☕ {{ __('Table') }}</span>
+                                    <span class="furn-type-badge"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">coffee</span> {{ __('Table') }}</span>
                                 </div>
-                                <div class="furn-icon"><span style="font-size: 30px;">☕</span></div>
+                                <div class="furn-icon"><span style="font-size: 30px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">coffee</span></span></div>
                                 <div class="furn-label" title="{{ __('Oak Coffee Table') }}">{{ __('Oak Coffee Table') }}</div>
                             </div>
 
                             <div class="furn-card" data-name="strategy whiteboard presentation" onclick="selectFurnitureItem('whiteboard_strategy', '#FFFFFF', null, 4, 1, true, 'whiteboard', null, 3, '{{ __('Strategy Board') }}')">
                                 <div class="furn-card-top-badges">
                                     <span class="furn-dim-badge">4×1</span>
-                                    <span class="furn-type-badge">📋 {{ __('Board') }}</span>
+                                    <span class="furn-type-badge"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">content_copy</span> {{ __('Board') }}</span>
                                 </div>
-                                <div class="furn-icon"><span style="font-size: 30px;">📋</span></div>
+                                <div class="furn-icon"><span style="font-size: 30px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">content_copy</span></span></div>
                                 <div class="furn-label" title="{{ __('Strategy Board') }}">{{ __('Strategy Board') }}</div>
                             </div>
                         </div>
@@ -1116,18 +1107,18 @@
                                     if ($item->slug === 'branding' && !empty($organization->logo_url)) {
                                         $itemImg = asset($organization->logo_url);
                                     }
-                                    $itemTypeTag = ($cat->slug === 'rugs' || $itemElev === 0) ? '🧶 ' . __('Rug') : ($item->interaction_type !== 'none' ? '⚡ ' . ucfirst($item->interaction_type) : "{$itemWidth}×{$itemHeight}");
-                                    if ($item->slug === 'branding') $itemTypeTag = '🏢 ' . __('Logo');
-                                    if ($item->slug === 'sticky_note') $itemTypeTag = '📝 ' . __('Note');
-                                    if ($item->slug === 'custom_link') $itemTypeTag = '🔗 ' . __('URL');
-                                    if ($item->slug === 'custom_image') $itemTypeTag = '🖼️ ' . __('Image');
+                                    $itemTypeTag = ($cat->slug === 'rugs' || $itemElev === 0) ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">texture</span> ' . __('Rug') : ($item->interaction_type !== 'none' ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> ' . ucfirst($item->interaction_type) : "{$itemWidth}×{$itemHeight}");
+                                    if ($item->slug === 'branding') $itemTypeTag = '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> ' . __('Logo');
+                                    if ($item->slug === 'sticky_note') $itemTypeTag = '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">edit_note</span> ' . __('Note');
+                                    if ($item->slug === 'custom_link') $itemTypeTag = '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">link</span> ' . __('URL');
+                                    if ($item->slug === 'custom_image') $itemTypeTag = '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">image</span> ' . __('Image');
                                 @endphp
                                 <div class="furn-card" 
                                      data-name="{{ strtolower($item->name . ' ' . $cleanCatName . ' ' . $cat->slug) }}"
                                      onclick="selectFurnitureItem('{{ $item->slug }}', '{{ $item->colors[0] ?? '#3b82f6' }}', '{{ $itemImg }}', {{ $itemWidth }}, {{ $itemHeight }}, {{ $item->collision ? 'true' : 'false' }}, '{{ $item->interaction_type }}', {{ json_encode($item->interaction_config) }}, {{ $itemElev }}, '{{ addslashes($item->name) }}')">
                                     <div class="furn-card-top-badges">
                                         <span class="furn-dim-badge">{{ $itemWidth }}×{{ $itemHeight }}</span>
-                                        <span class="furn-type-badge">{{ $itemTypeTag }}</span>
+                                        <span class="furn-type-badge">{!! $itemTypeTag !!}</span>
                                     </div>
                                     <div class="furn-icon">
                                         @if($itemImg)
@@ -1149,7 +1140,7 @@
                 <div id="drawer-view-inspector" style="display: none; flex-direction: column; gap: 12px;">
                     <div class="prop-section" id="inspector-empty-msg">
                         <div style="font-size: 12px; color: var(--ula-text-muted); text-align: center; padding: 24px 0;">
-                            👆 {{ __('Click any object or room on the map to edit its properties, rotation, boundaries, and acoustic settings.') }}
+                            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">touch_app</span> {{ __('Click any object or room on the map to edit its properties, rotation, boundaries, and acoustic settings.') }}
                         </div>
                     </div>
 
@@ -1157,7 +1148,7 @@
                         
                         <!-- Object Fields -->
                         <div id="inspector-object-fields" class="prop-section" style="display: none;">
-                            <strong style="font-size: 13px; color: var(--ula-text-primary);">🪑 {{ __('Object Properties') }}</strong>
+                            <strong style="font-size: 13px; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">chair</span> {{ __('Object Properties') }}</strong>
                             <div>
                                 <label class="prop-label">{{ __('Name') }}</label>
                                 <input type="text" class="prop-input" id="prop-name" oninput="updateSelectedProp('name', this.value)">
@@ -1181,11 +1172,11 @@
                             <div>
                                 <label class="prop-label">{{ __('Layer & Elevation') }}</label>
                                 <select class="prop-input" id="prop-elevation" onchange="updateSelectedProp('elevation', parseInt(this.value))">
-                                    <option value="0">🧶 {{ __('Ground / Rug') }}</option>
-                                    <option value="1">🪑 {{ __('Default Furniture') }}</option>
-                                    <option value="2">💼 {{ __('Desk / Table Surface') }}</option>
-                                    <option value="3">🌿 {{ __('Tall Plant / Partition') }}</option>
-                                    <option value="5">💡 {{ __('Ceiling / Overhead') }}</option>
+                                    <option value="0"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">texture</span> {{ __('Ground / Rug') }}</option>
+                                    <option value="1"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">chair</span> {{ __('Default Furniture') }}</option>
+                                    <option value="2"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">business_center</span> {{ __('Desk / Table Surface') }}</option>
+                                    <option value="3"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">potted_plant</span> {{ __('Tall Plant / Partition') }}</option>
+                                    <option value="5"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">lightbulb</span> {{ __('Ceiling / Overhead') }}</option>
                                 </select>
                             </div>
                             <div>
@@ -1193,18 +1184,18 @@
                                 <div id="prop-interaction-badge" style="font-size: 11px; font-weight: 700; color: var(--ula-palm-900); padding: 4px 8px; background: rgba(16,185,129,0.1); border-radius: 6px; display: inline-block;">NONE</div>
                             </div>
 
-                            <!-- 🏢 1. Company Logo / Branding Inspector Box -->
+                            <!-- <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> 1. Company Logo / Branding Inspector Box -->
                             <div id="inspector-branding-box" style="display: none; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(52, 211, 153, 0.25); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 12px; font-weight: 800; color: #34D399;">🏢 {{ __('Company Logo') }}</span>
-                                    <span class="furn-type-badge" style="background: rgba(16, 185, 129, 0.2); color: #6EE7B7;">Logo</span>
+                                    <span style="font-size: 12px; font-weight: 800; color: var(--ula-status-success);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> {{ __('Company Logo') }}</span>
+                                    <span class="furn-type-badge" style="background: rgba(16, 185, 129, 0.2); color: var(--ula-status-success);">Logo</span>
                                 </div>
                                 <div style="font-size: 11px; color: var(--ula-text-muted); line-height: 1.4;">
                                     {{ __('Displays your company logo on the workplace floor or reception.') }}
                                 </div>
                                 @if($organization->logo_url)
                                 <button type="button" class="act-btn act-btn-emerald" onclick="applyOrgLogoToSelected()" style="justify-content: center; padding: 8px; font-size: 11px; width: 100%;">
-                                    <span>🏢</span> <span>{{ __('Use Official Logo from Settings') }}</span>
+                                    <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span></span> <span>{{ __('Use Official Logo from Settings') }}</span>
                                 </button>
                                 @endif
                                 <div>
@@ -1214,15 +1205,15 @@
                                 <div>
                                     <input type="file" id="branding-upload-input" accept="image/*" style="display: none;" onchange="uploadObjectImageDirectly(this, 'branding')">
                                     <button type="button" class="tool-btn" onclick="document.getElementById('branding-upload-input').click()" style="width: 100%; justify-content: center; padding: 7px; font-size: 11px;">
-                                        📤 {{ __('Upload Custom Logo File') }}
+                                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">upload</span> {{ __('Upload Custom Logo File') }}
                                     </button>
                                 </div>
                             </div>
 
-                            <!-- 📝 2. Sticky Note Inspector Box -->
+                            <!-- <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">edit_note</span> 2. Sticky Note Inspector Box -->
                             <div id="inspector-stickynote-box" style="display: none; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 12px; font-weight: 800; color: #FBBF24;">📝 {{ __('Sticky Note') }}</span>
+                                    <span style="font-size: 12px; font-weight: 800; color: #FBBF24;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">edit_note</span> {{ __('Sticky Note') }}</span>
                                     <span class="furn-type-badge" style="background: rgba(245, 158, 11, 0.2); color: #FCD34D;">Note</span>
                                 </div>
                                 <div>
@@ -1241,11 +1232,11 @@
                                 </div>
                             </div>
 
-                            <!-- 🔗 3. Custom Link Inspector Box -->
+                            <!-- <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">link</span> 3. Custom Link Inspector Box -->
                             <div id="inspector-link-box" style="display: none; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 12px; font-weight: 800; color: #60A5FA;">🔗 {{ __('Interactive Web Link') }}</span>
-                                    <span class="furn-type-badge" style="background: rgba(59, 130, 246, 0.2); color: #93C5FD;">URL</span>
+                                    <span style="font-size: 12px; font-weight: 800; color: var(--ula-accent-default);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">link</span> {{ __('Interactive Web Link') }}</span>
+                                    <span class="furn-type-badge" style="background: rgba(59, 130, 246, 0.2); color: var(--ula-accent-default);">URL</span>
                                 </div>
                                 <div>
                                     <label class="prop-label">{{ __('Target URL') }}</label>
@@ -1261,11 +1252,11 @@
                                 </div>
                             </div>
 
-                            <!-- 🖼️ 4. Custom Image Inspector Box -->
+                            <!-- <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">image</span> 4. Custom Image Inspector Box -->
                             <div id="inspector-customimage-box" style="display: none; background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 12px; font-weight: 800; color: #C084FC;">🖼️ {{ __('Custom Image / Banner') }}</span>
-                                    <span class="furn-type-badge" style="background: rgba(139, 92, 246, 0.2); color: #D8B4FE;">Image</span>
+                                    <span style="font-size: 12px; font-weight: 800; color: var(--ula-terracotta-600);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">image</span> {{ __('Custom Image / Banner') }}</span>
+                                    <span class="furn-type-badge" style="background: rgba(139, 92, 246, 0.2); color: var(--ula-terracotta-300);">Image</span>
                                 </div>
                                 <div>
                                     <label class="prop-label">{{ __('Image URL') }}</label>
@@ -1274,7 +1265,7 @@
                                 <div>
                                     <input type="file" id="customimage-upload-input" accept="image/*" style="display: none;" onchange="uploadObjectImageDirectly(this, 'custom_image')">
                                     <button type="button" class="tool-btn" onclick="document.getElementById('customimage-upload-input').click()" style="width: 100%; justify-content: center; padding: 7px; font-size: 11px;">
-                                        📤 {{ __('Upload Image File') }}
+                                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">upload</span> {{ __('Upload Image File') }}
                                     </button>
                                 </div>
                             </div>
@@ -1282,7 +1273,7 @@
 
                         <!-- Room Fields -->
                         <div id="inspector-room-fields" class="prop-section" style="display: none;">
-                            <strong style="font-size: 13px; color: var(--ula-text-primary);">🏢 {{ __('Room Properties & Audio') }}</strong>
+                            <strong style="font-size: 13px; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> {{ __('Room Properties & Audio') }}</strong>
                             <div>
                                 <label class="prop-label">{{ __('Room Name') }}</label>
                                 <input type="text" class="prop-input" id="prop-room-name" placeholder="{{ __('e.g. Conference Room A') }}" oninput="updateRoomProp('name', this.value)">
@@ -1290,18 +1281,18 @@
                             <div>
                                 <label class="prop-label">{{ __('Room Type') }}</label>
                                 <select class="prop-input" id="prop-room-type" onchange="updateRoomProp('type', this.value)">
-                                    <option value="meeting">👥 {{ __('Meeting Room') }}</option>
-                                    <option value="private">🔒 {{ __('Private Office') }}</option>
-                                    <option value="focus">🎯 {{ __('Focus Pod') }}</option>
-                                    <option value="breakout">☕ {{ __('Breakout Lounge') }}</option>
-                                    <option value="reception">🛎️ {{ __('Reception Lobby') }}</option>
+                                    <option value="meeting"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">group</span> {{ __('Meeting Room') }}</option>
+                                    <option value="private"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">lock</span> {{ __('Private Office') }}</option>
+                                    <option value="focus"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">target</span> {{ __('Focus Pod') }}</option>
+                                    <option value="breakout"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">coffee</span> {{ __('Breakout Lounge') }}</option>
+                                    <option value="reception"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">room_service</span> {{ __('Reception Lobby') }}</option>
                                 </select>
                             </div>
                             
                             <!-- Acoustic Isolation Box -->
                             <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 12px; font-weight: 800; color: #34D399;">🎙️ {{ __('Acoustic Isolation') }}</span>
+                                    <span style="font-size: 12px; font-weight: 800; color: var(--ula-status-success);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">mic</span> {{ __('Acoustic Isolation') }}</span>
                                     <input type="checkbox" id="prop-room-isolation" onchange="updateRoomProp('audio_isolation', this.checked)" style="width: 18px; height: 18px; accent-color: var(--ula-palm-900); cursor: pointer;">
                                 </div>
                                 <span style="font-size: 11px; color: var(--ula-text-muted);" id="prop-room-bounds-label"></span>
@@ -1310,11 +1301,11 @@
                             <div>
                                 <label class="prop-label">{{ __('Door Placement') }}</label>
                                 <select class="prop-input" id="prop-room-door-side" onchange="updateRoomProp('doorSide', this.value)">
-                                    <option value="auto">🌟 {{ __('Auto Corridor') }}</option>
-                                    <option value="bottom">⬇️ {{ __('Bottom Wall') }}</option>
-                                    <option value="top">⬆️ {{ __('Top Wall') }}</option>
-                                    <option value="left">⬅️ {{ __('Left Wall') }}</option>
-                                    <option value="right">➡️ {{ __('Right Wall') }}</option>
+                                    <option value="auto"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">star</span> {{ __('Auto Corridor') }}</option>
+                                    <option value="bottom"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_downward</span> {{ __('Bottom Wall') }}</option>
+                                    <option value="top"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_upward</span> {{ __('Top Wall') }}</option>
+                                    <option value="left"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_back</span> {{ __('Left Wall') }}</option>
+                                    <option value="right"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_forward</span> {{ __('Right Wall') }}</option>
                                 </select>
                             </div>
 
@@ -1332,7 +1323,7 @@
                             </div>
 
                             <button class="act-btn act-btn-emerald" onclick="saveSelectedRoom()" style="margin-top: 6px; justify-content: center;">
-                                💾 {{ __('Save Room Settings') }}
+                                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">save</span> {{ __('Save Room Settings') }}
                             </button>
                         </div>
 
@@ -1343,7 +1334,7 @@
                 <div id="drawer-view-rooms" style="display: none; flex-direction: column; gap: 10px;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="font-size: 12px; font-weight: 800; color: var(--ula-text-muted);">{{ __('All Configured Rooms') }}</span>
-                        <button class="tool-btn" onclick="setTool('room')">➕ {{ __('New Room') }}</button>
+                        <button class="tool-btn" onclick="setTool('room')"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">add</span> {{ __('New Room') }}</button>
                     </div>
                     <div id="rooms-list-container" style="display: flex; flex-direction: column; gap: 8px;"></div>
                 </div>
@@ -1353,27 +1344,27 @@
                     <!-- Quick Action Tools Bar (Moved from Burger Menu) -->
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 6px; background: rgba(0,0,0,0.35); border: 1px solid var(--ula-border-default); border-radius: 12px;">
                         <label class="tool-btn" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; margin: 0; background: rgba(255,255,255,0.05);" title="{{ __('Upload Custom Floorplan') }}">
-                            <span class="material-symbols-rounded" style="font-size: 20px; color: #F59E0B;">upload_file</span>
+                            <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-gold-500);">upload_file</span>
                             <span style="font-weight: 700;">{{ __('Upload') }}</span>
                             <span style="font-size: 9px; opacity: 0.8; font-family: 'IBM Plex Sans Arabic', sans-serif;">رفع مخصص</span>
                             <input type="file" accept="image/*" style="display:none;" onchange="handleCustomFloorUpload(this)">
                         </label>
 
-                        <button type="button" class="tool-btn" onclick="deleteFloorplan()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; color: #F87171; background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3);" title="{{ __('Reset to Default Floorplan') }}">
-                            <span class="material-symbols-rounded" style="font-size: 20px; color: #F87171;">restart_alt</span>
+                        <button type="button" class="tool-btn" onclick="deleteFloorplan()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; color: var(--ula-status-danger); background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3);" title="{{ __('Reset to Default Floorplan') }}">
+                            <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-status-danger);">restart_alt</span>
                             <span style="font-weight: 700;">{{ __('Reset') }}</span>
                             <span style="font-size: 9px; opacity: 0.8; font-family: 'IBM Plex Sans Arabic', sans-serif;">استعادة</span>
                         </button>
 
-                        <button type="button" class="tool-btn" onclick="clearWorkspace()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; color: #FBBF24; background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3);" title="{{ __('Clear All Placed Furniture') }}">
-                            <span class="material-symbols-rounded" style="font-size: 20px; color: #FBBF24;">cleaning_services</span>
+                        <button type="button" class="tool-btn" onclick="clearWorkspace()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; color: var(--ula-gold-400); background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3);" title="{{ __('Clear All Placed Furniture') }}">
+                            <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-gold-400);">cleaning_services</span>
                             <span style="font-weight: 700;">{{ __('Clear') }}</span>
                             <span style="font-size: 9px; opacity: 0.8; font-family: 'IBM Plex Sans Arabic', sans-serif;">تفريغ الأثاث</span>
                         </button>
                     </div>
 
                     <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 11px; font-weight: 800; color: #A7F3D0;">🎨 {{ __('Floor Styles Library (1200×708)') }}</span>
+                        <span style="font-size: 11px; font-weight: 800; color: var(--ula-status-success);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">palette</span> {{ __('Floor Styles Library (1200×708)') }}</span>
                         <span style="font-size: 10px; color: var(--ula-text-muted); font-family: monospace;">18 Styles</span>
                     </div>
 
@@ -1386,8 +1377,8 @@
                     </div>
 
                     <div style="padding-top: 8px; border-top: 1px solid var(--ula-border-default); display: flex; justify-content: space-between; align-items: center;">
-                        <button type="button" class="tool-btn" onclick="clearCurrentFloorBackground()" style="color: #F87171; border-color: rgba(239,68,68,0.3); font-size: 11px; width: 100%; justify-content: center;">
-                            🗑️ {{ __('Remove Floor Background') }}
+                        <button type="button" class="tool-btn" onclick="clearCurrentFloorBackground()" style="color: var(--ula-status-danger); border-color: rgba(239,68,68,0.3); font-size: 11px; width: 100%; justify-content: center;">
+                            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">delete</span> {{ __('Remove Floor Background') }}
                         </button>
                     </div>
                 </div>
@@ -1572,10 +1563,10 @@
                 const isActive = currentBg.includes(f.id);
                 return `
                     <div class="furn-card ${isActive ? 'selected' : ''}" style="display:flex; flex-direction:column; gap:4px; padding:6px; cursor:pointer; position:relative; border-radius:12px; border:1px solid ${isActive ? 'var(--ula-palm-900)' : 'var(--ula-border-subtle)'}; background:var(--ula-surface-page);" onclick="applyFloorBackground('${f.url}', 1200, 708)">
-                        <div style="position:relative; width:100%; height:75px; border-radius:8px; overflow:hidden; background:#0B1C13;">
+                        <div style="position:relative; width:100%; height:75px; border-radius:8px; overflow:hidden; background:var(--ula-palm-950);">
                             <img src="${f.thumb}" alt="${f.name_en}" style="width:100%; height:100%; object-fit:cover;">
-                            <span style="position:absolute; bottom:3px; inset-inline-end:3px; background:rgba(0,0,0,0.7); font-size:9px; font-family:monospace; padding:1px 4px; border-radius:4px; color:#A7F3D0;">1200×708</span>
-                            ${isActive ? '<span style="position:absolute; top:3px; inset-inline-start:3px; background:#10B981; font-size:9px; font-weight:800; padding:1px 6px; border-radius:4px; color:#fff;">✓ نشط</span>' : ''}
+                            <span style="position:absolute; bottom:3px; inset-inline-end:3px; background:rgba(0,0,0,0.7); font-size:9px; font-family:monospace; padding:1px 4px; border-radius:4px; color:var(--ula-status-success);">1200×708</span>
+                            ${isActive ? '<span style="position:absolute; top:3px; inset-inline-start:3px; background:var(--ula-status-success); font-size:9px; font-weight:800; padding:1px 6px; border-radius:4px; color:var(--ula-white);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check</span> نشط</span>' : ''}
                         </div>
                         <div style="font-size:11px; font-weight:700; color:var(--ula-text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:start;">
                             ${isAr ? f.name_ar : f.name_en}
@@ -2812,10 +2803,10 @@
                 html += `
                     <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; display: flex; align-items: center; justify-content: space-between;">
                         <div style="display: flex; flex-direction: column; gap: 2px;">
-                            <strong style="font-size: 12px; color: var(--ula-text-primary);">🏢 ${r.name}</strong>
+                            <strong style="font-size: 12px; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> ${r.name}</strong>
                             <span style="font-size: 10px; color: var(--ula-text-muted);">${r.type || 'meeting'} • ${r.capacity || 10} seats</span>
                         </div>
-                        <button onclick="selectRoomByIndex(${idx})" class="tool-btn" style="padding: 4px 8px; font-size: 11px;">🔍</button>
+                        <button onclick="selectRoomByIndex(${idx})" class="tool-btn" style="padding: 4px 8px; font-size: 11px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span></button>
                     </div>
                 `;
             });
@@ -3195,12 +3186,12 @@
 
             if (roomBadge) {
                 roomBadge.textContent = `${totalRooms} / ${PLAN_ROOM_LIMIT < 9999 ? PLAN_ROOM_LIMIT : '∞'}`;
-                roomBadge.style.color = (PLAN_ROOM_LIMIT < 9999 && totalRooms > PLAN_ROOM_LIMIT) ? '#EF4444' : '#10B981';
+                roomBadge.style.color = (PLAN_ROOM_LIMIT < 9999 && totalRooms > PLAN_ROOM_LIMIT) ? 'var(--ula-status-danger)' : 'var(--ula-status-success)';
             }
 
             if (seatBadge) {
                 seatBadge.textContent = `${totalDesks} / ${PLAN_SEAT_LIMIT < 9999 ? PLAN_SEAT_LIMIT : '∞'}`;
-                seatBadge.style.color = (PLAN_SEAT_LIMIT < 9999 && totalDesks > PLAN_SEAT_LIMIT) ? '#EF4444' : '#3B82F6';
+                seatBadge.style.color = (PLAN_SEAT_LIMIT < 9999 && totalDesks > PLAN_SEAT_LIMIT) ? 'var(--ula-status-danger)' : 'var(--ula-accent-default)';
             }
 
             let hasError = false;
@@ -3221,7 +3212,7 @@
             if (quotaWarning) {
                 if (hasError) {
                     quotaWarning.style.display = 'block';
-                    quotaWarning.innerHTML = `⚠️ ${errorMsg}`;
+                    quotaWarning.innerHTML = `<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">warning</span> ${errorMsg}`;
                     generateBtn.disabled = true;
                     generateBtn.style.opacity = '0.5';
                     generateBtn.style.cursor = 'not-allowed';
@@ -3329,8 +3320,8 @@
             <!-- Modal Header -->
             <div style="padding: 22px 26px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-card);">
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #10B981, #059669); color: white; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);">
-                        ✨
+                    <div style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, var(--ula-status-success), var(--ula-status-success)); color: var(--ula-white); display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);">
+                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">auto_awesome</span>
                     </div>
                     <div>
                         <h2 style="font-size: 17px; font-weight: 900; color: var(--ula-text-primary); margin-bottom: 2px;">
@@ -3341,17 +3332,17 @@
                         </p>
                     </div>
                 </div>
-                <button type="button" onclick="closeAiGeneratorModal()" style="background: none; border: none; color: var(--ula-text-muted); font-size: 22px; cursor: pointer; padding: 4px;">✕</button>
+                <button type="button" onclick="closeAiGeneratorModal()" style="background: none; border: none; color: var(--ula-text-muted); font-size: 22px; cursor: pointer; padding: 4px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span></button>
             </div>
 
             <!-- Loading State Overlay -->
             <div id="ai-modal-loading-box" style="display: none; flex-direction: column; align-items: center; justify-content: center; padding: 60px 30px; text-align: center; gap: 18px;">
-                <div style="width: 64px; height: 64px; border: 4px solid rgba(16, 185, 129, 0.2); border-top-color: #10B981; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <div style="width: 64px; height: 64px; border: 4px solid rgba(16, 185, 129, 0.2); border-top-color: var(--ula-status-success); border-radius: 50%; animation: spin 1s linear infinite;"></div>
                 <h3 style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);">
-                    ✨ {{ __('Generating 3D Isometric Office Blueprint...') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">auto_awesome</span> {{ __('Generating 3D Isometric Office Blueprint...') }}
                 </h3>
-                <div id="ai-loading-step-text" style="font-size: 13px; color: #34D399; font-weight: 700; max-width: 480px;">
-                    🧠 {{ __('Analyzing room requirements & architectural parameters...') }}
+                <div id="ai-loading-step-text" style="font-size: 13px; color: var(--ula-status-success); font-weight: 700; max-width: 480px;">
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">psychology</span> {{ __('Analyzing room requirements & architectural parameters...') }}
                 </div>
                 <p style="font-size: 11px; color: var(--ula-text-muted); max-width: 420px;">
                     {{ __('DALL-E 3 creates high-definition architectural renders. This process usually takes between 15 to 30 seconds.') }}
@@ -3365,17 +3356,17 @@
                 <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                     <div>
                         <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--ula-text-muted); display: block;">{{ __('Active Subscription Tier') }}</span>
-                        <strong style="font-size: 14px; color: var(--ula-palm-900);">⭐ {{ $plan->name ?? 'Standard Plan' }}</strong>
+                        <strong style="font-size: 14px; color: var(--ula-palm-900);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">star</span> {{ $plan->name ?? 'Standard Plan' }}</strong>
                     </div>
                     <div style="display: flex; gap: 16px; align-items: center;">
                         <div style="text-align: center;">
-                            <span style="font-size: 10px; color: var(--ula-text-muted); display: block;">🏢 {{ __('Total Rooms') }}</span>
-                            <span id="ai-quota-rooms-val" style="font-size: 14px; font-weight: 900; color: #10B981;">0 / ∞</span>
+                            <span style="font-size: 10px; color: var(--ula-text-muted); display: block;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> {{ __('Total Rooms') }}</span>
+                            <span id="ai-quota-rooms-val" style="font-size: 14px; font-weight: 900; color: var(--ula-status-success);">0 / ∞</span>
                         </div>
                         <div style="width: 1px; height: 26px; background: var(--ula-border-subtle);"></div>
                         <div style="text-align: center;">
-                            <span style="font-size: 10px; color: var(--ula-text-muted); display: block;">🖥️ {{ __('Total Workstations / Desks') }}</span>
-                            <span id="ai-quota-seats-val" style="font-size: 14px; font-weight: 900; color: #3B82F6;">0 / ∞</span>
+                            <span style="font-size: 10px; color: var(--ula-text-muted); display: block;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">desktop_windows</span> {{ __('Total Workstations / Desks') }}</span>
+                            <span id="ai-quota-seats-val" style="font-size: 14px; font-weight: 900; color: var(--ula-accent-default);">0 / ∞</span>
                         </div>
                     </div>
                 </div>
@@ -3383,7 +3374,7 @@
                 <!-- 1. Architectural Style Selection -->
                 <div>
                     <label style="display: block; font-size: 12px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 10px;">
-                        🎨 {{ __('1. Choose Office Architectural Style') }}
+                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">palette</span> {{ __('1. Choose Office Architectural Style') }}
                     </label>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
                         @foreach($aiStyles as $key => $style)
@@ -3403,7 +3394,7 @@
                 <!-- 2. Room Breakdown & Desks Steppers -->
                 <div>
                     <label style="display: block; font-size: 12px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 10px;">
-                        🏢 {{ __('2. Customize Room Quantities & Desk Counts') }}
+                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> {{ __('2. Customize Room Quantities & Desk Counts') }}
                     </label>
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px;">
@@ -3412,7 +3403,7 @@
                         <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-sm); padding: 12px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                 <div>
-                                    <strong style="font-size: 12px; color: #8B5CF6; display: block;">🏢 {{ __('Meeting Boardrooms') }}</strong>
+                                    <strong style="font-size: 12px; color: var(--ula-terracotta-600); display: block;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> {{ __('Meeting Boardrooms') }}</strong>
                                     <span style="font-size: 10px; color: var(--ula-text-muted);">{{ __('غرف اجتماعات زجاجية') }}</span>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 6px;">
@@ -3427,7 +3418,7 @@
                         <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-sm); padding: 12px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                                 <div>
-                                    <strong style="font-size: 12px; color: #3B82F6; display: block;">💼 {{ __('Team Offices') }}</strong>
+                                    <strong style="font-size: 12px; color: var(--ula-accent-default); display: block;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">business_center</span> {{ __('Team Offices') }}</strong>
                                     <span style="font-size: 10px; color: var(--ula-text-muted);">{{ __('مكاتب عمل جماعية/فردية') }}</span>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 6px;">
@@ -3437,7 +3428,7 @@
                                 </div>
                             </div>
                             <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--ula-border-subtle); padding-top: 6px; margin-top: 4px;">
-                                <span style="font-size: 10px; color: var(--ula-text-muted);">🖥️ {{ __('Desks per office') }}:</span>
+                                <span style="font-size: 10px; color: var(--ula-text-muted);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">desktop_windows</span> {{ __('Desks per office') }}:</span>
                                 <div style="display: flex; align-items: center; gap: 4px;">
                                     <button type="button" onclick="changeAiCounter('ai-inp-desks', -1, 1, 12)" class="tactile-btn" style="width: 22px; height: 22px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 10px;">-</button>
                                     <input type="text" id="ai-inp-desks" value="2" readonly style="width: 24px; text-align: center; background: none; border: none; font-weight: 800; color: var(--ula-text-primary); font-size: 11px;">
@@ -3450,7 +3441,7 @@
                         <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-sm); padding: 12px;">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div>
-                                    <strong style="font-size: 12px; color: #06B6D4; display: block;">💡 {{ __('Thinking / Focus Pods') }}</strong>
+                                    <strong style="font-size: 12px; color: var(--ula-accent-default); display: block;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">lightbulb</span> {{ __('Thinking / Focus Pods') }}</strong>
                                     <span style="font-size: 10px; color: var(--ula-text-muted);">{{ __('غرف التركيز والعصف الذهني') }}</span>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 6px;">
@@ -3465,7 +3456,7 @@
                         <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-sm); padding: 12px;">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div>
-                                    <strong style="font-size: 12px; color: #EC4899; display: block;">🛋️ {{ __('Rest & Gaming Lounge') }}</strong>
+                                    <strong style="font-size: 12px; color: var(--ula-terracotta-500); display: block;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">weekend</span> {{ __('Rest & Gaming Lounge') }}</strong>
                                     <span style="font-size: 10px; color: var(--ula-text-muted);">{{ __('صالة الاستراحة والترفيه') }}</span>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 6px;">
@@ -3480,7 +3471,7 @@
                         <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-sm); padding: 12px;">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div>
-                                    <strong style="font-size: 12px; color: #E11D48; display: block;">🎭 {{ __('Presentation Theater') }}</strong>
+                                    <strong style="font-size: 12px; color: var(--ula-status-danger); display: block;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">theater_comedy</span> {{ __('Presentation Theater') }}</strong>
                                     <span style="font-size: 10px; color: var(--ula-text-muted);">{{ __('مسرح وقاعة عروض ومؤتمرات') }}</span>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 6px;">
@@ -3493,18 +3484,18 @@
 
                         <!-- Default Amenities Card -->
                         <div style="background: rgba(16, 185, 129, 0.08); border: 1px dashed rgba(52, 211, 153, 0.35); border-radius: var(--ula-radius-sm); padding: 12px; display: flex; flex-direction: column; justify-content: center;">
-                            <strong style="font-size: 11px; color: #34D399; display: flex; align-items: center; gap: 6px;">
-                                <span>☕</span> {{ __('Coffee Corner & Reception') }}
+                            <strong style="font-size: 11px; color: var(--ula-status-success); display: flex; align-items: center; gap: 6px;">
+                                <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">coffee</span></span> {{ __('Coffee Corner & Reception') }}
                             </strong>
                             <span style="font-size: 10px; color: var(--ula-text-muted); margin-top: 2px;">
-                                ✓ {{ __('Always included automatically in every floorplan') }}
+                                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check</span> {{ __('Always included automatically in every floorplan') }}
                             </span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Live Quota Warning Box -->
-                <div id="ai-quota-warning-box" style="display: none; background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); border-radius: 10px; padding: 12px 16px; font-size: 12px; color: #D96B5F; font-weight: 700;"></div>
+                <div id="ai-quota-warning-box" style="display: none; background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); border-radius: 10px; padding: 12px 16px; font-size: 12px; color: var(--ula-status-danger); font-weight: 700;"></div>
 
                 <!-- Action Buttons -->
                 <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--ula-border-subtle);">
@@ -3512,7 +3503,7 @@
                         {{ __('Cancel') }}
                     </button>
                     <button type="button" onclick="generateAiOfficeOnCanvas()" id="btn-ai-submit-generate" class="tactile-btn btn-primary" style="padding: 12px 28px; font-size: 14px; font-weight: 900; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);">
-                        <span>✨</span> {{ __('Generate Office with AI') }}
+                        <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">auto_awesome</span></span> {{ __('Generate Office with AI') }}
                     </button>
                 </div>
             </div>
