@@ -17,53 +17,25 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
+        /* UlaSpace Design Tokens Mapping.
+           Only --ula-gradient-accent and --ula-transition-smooth are
+           actually referenced below; everything else this block used to
+           carry (--bg-canvas, --bg-secondary, --border-focus, the
+           retired --brand-* prefix, --accent-gold, --status-info,
+           --ula-gradient-accent-gold) had zero usages in this file --
+           removed rather than kept unused. --font-family here was also
+           unused (nothing in this file references var(--font-family));
+           the page already correctly inherits the direction-aware font
+           from <html> via the shared ulaspace-tokens.css [dir] rules. */
         :root {
-            /* 🌿 UlaSpace Design Tokens Mapping */
-                        --bg-canvas: var(--ula-surface-page);
-                        --bg-secondary: var(--ula-surface-card);
-                                                                        
-                                                                        
-                                    --border-focus: var(--ula-palm-900);
-
-                                                
-            /* Core Brand Green & Accents */
-                        --brand-workspace: var(--ula-palm-800);
-                        --brand-leaf: var(--ula-palm-500);
-            --brand-soft-sage: #BFD4B8;
-                        --accent-gold: var(--ula-gold-400);
-                                                --status-info: var(--ula-palm-900);
-
             --ula-gradient-accent: linear-gradient(135deg, var(--ula-palm-900) 0%, var(--ula-palm-800) 100%);
-            --ula-gradient-accent-gold: linear-gradient(135deg, var(--ula-gold-400) 0%, var(--ula-gold-600) 100%);
-
-            /* 3D Shadows & Elevation */
-                                                
-                                                                        
             --ula-transition-smooth: all var(--ula-duration-base) var(--ula-ease-in-out);
-                    }
-
-        [dir="rtl"], [lang="ar"] {
-            --font-family: var(--ula-font-ar);
         }
 
-        [dir="ltr"], [lang="en"] {
-            --font-family: var(--ula-font-en);
-        }
-
-        /* 🌙 Dark Spatial Workspace Mode */
+        /* Dark Spatial Workspace Mode */
         [data-theme="dark"], body.dark-mode {
-                        --bg-canvas: var(--ula-palm-950);
-                        --bg-secondary: var(--ula-palm-900);
-                                                            
-                                                                        
-                                    --border-focus: var(--ula-highlight-default);
-
-                                                
-                        --brand-workspace: var(--ula-palm-500);
-                        --brand-leaf: var(--ula-palm-500);
-                                                
             --ula-gradient-accent: linear-gradient(135deg, var(--ula-palm-900) 0%, var(--ula-palm-800) 100%);
-                                                        }
+        }
 
         * {
             box-sizing: border-box;
@@ -130,7 +102,7 @@
             height: 38px;
             border-radius: var(--ula-radius-sm);
             background: var(--ula-gradient-accent);
-            color: #FFFDF6;
+            color: var(--ula-white);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -144,7 +116,7 @@
             font-size: 15px;
             font-weight: 900;
             letter-spacing: -0.2px;
-            color: #FFFDF6;
+            color: var(--ula-white);
         }
 
         .brand-sub {
@@ -192,7 +164,7 @@
 
         .sidebar-link-btn:hover {
             background: var(--ula-control-dark-fill-hover);
-            color: #FFFDF6;
+            color: var(--ula-white);
             transform: translateX(2px);
         }
 
@@ -202,7 +174,7 @@
 
         .sidebar-link-btn.active {
             background: var(--ula-control-dark-fill-strong);
-            color: #FFFDF6;
+            color: var(--ula-white);
             box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
         }
 
@@ -223,7 +195,7 @@
         .sidebar-badge-pill {
             margin-inline-start: auto;
             background: rgba(255, 255, 255, 0.15);
-            color: #FFFDF6;
+            color: var(--ula-white);
             font-size: 11px;
             font-weight: 800;
             padding: 2px 8px;
@@ -360,7 +332,7 @@
             inset-inline-start: 0;
             inset-inline-end: 0;
             height: 3px;
-            background: linear-gradient(90deg, #059669 0%, #10B981 100%);
+            background: linear-gradient(90deg, var(--ula-status-success) 0%, var(--ula-status-success) 100%);
         }
 
         /* Badges & Pills */
@@ -374,9 +346,9 @@
             font-weight: 800;
         }
 
-        .badge-green { background: rgba(79, 155, 95, 0.15); color: #4F9B5F; border: 1px solid rgba(79, 155, 95, 0.25); }
-        .badge-gold { background: rgba(214, 162, 58, 0.15); color: #D6A23A; border: 1px solid rgba(214, 162, 58, 0.25); }
-        .badge-danger { background: rgba(217, 107, 95, 0.15); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.25); }
+        .badge-green { background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success); border: 1px solid rgba(79, 155, 95, 0.25); }
+        .badge-gold { background: rgba(214, 162, 58, 0.15); color: var(--ula-gold-400); border: 1px solid rgba(214, 162, 58, 0.25); }
+        .badge-danger { background: rgba(217, 107, 95, 0.15); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.25); }
         .badge-neutral { background: var(--ula-surface-page-alt); color: var(--ula-text-secondary); border: 1px solid var(--ula-border-subtle); }
 
         /* KPI Grid (Enhanced Spatial Depth) */
@@ -387,63 +359,13 @@
             margin-bottom: 24px;
         }
 
-        .kpi-card {
-            background: var(--ula-surface-card);
-            border: 1px solid var(--ula-border-subtle);
-            border-radius: var(--ula-radius-lg);
-            padding: 18px 20px;
-            box-shadow: var(--ula-shadow-xs);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: var(--ula-transition-smooth);
-        }
-
-        .kpi-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--ula-shadow-lg);
-            border-color: var(--ula-palm-900);
-        }
-
-        .kpi-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 8px;
-        }
-
-        .kpi-title {
-            font-size: 11px;
-            font-weight: 800;
-            color: var(--ula-text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .kpi-icon-box {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            background: linear-gradient(145deg, #437E51 0%, #225433 100%);
-            border: 1px solid #1B4529;
-            color: #FFFFFF !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            box-shadow: 0 4px 12px rgba(34, 84, 51, 0.32), inset 0 1px 1px rgba(255, 255, 255, 0.45);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.25);
-        }
-
-        .kpi-value {
-            font-size: 24px;
-            font-weight: 900;
-            color: var(--ula-text-primary);
-            font-family: 'Inter', sans-serif;
-            margin-bottom: 4px;
-        }
+        /* .kpi-card/.kpi-header/.kpi-title/.kpi-icon-box/.kpi-value
+           intentionally NOT defined here -- ulaspace-dashboard.css (which
+           this page loads) owns the single shared definition. This is the
+           third time this exact local duplicate has reappeared in this
+           file after a token/CSS regeneration; see the comment at the top
+           of that shared block for why it keeps getting re-added instead
+           of just restored from git history. */
 
         /* Navigation Sub Tabs */
         .hub-tabs-nav {
@@ -652,7 +574,7 @@
         }
         .ctx-item.danger:hover {
             background: rgba(217, 107, 95, 0.15);
-            color: #D96B5F;
+            color: var(--ula-status-danger);
             border-color: rgba(217, 107, 95, 0.3);
         }
         .ctx-divider {
@@ -816,7 +738,7 @@
         }
         .kanban-card-chosen {
             cursor: grabbing !important;
-            background: var(--ula-surface-raised, #FFFFFF) !important;
+            background: var(--ula-surface-raised, var(--ula-white)) !important;
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18) !important;
             transform: scale(1.02);
             z-index: 100;
@@ -888,7 +810,7 @@
             padding: 2px 8px;
             border-radius: 99px;
             background: rgba(66, 119, 76, 0.15);
-            color: #4F9B5F;
+            color: var(--ula-status-success);
             border: 1px solid rgba(66, 119, 76, 0.3);
             margin-bottom: 8px;
             max-width: 100%;
@@ -919,7 +841,7 @@
         }
         .task-due-date.is-overdue {
             background: rgba(239, 68, 68, 0.12);
-            color: #EF4444;
+            color: var(--ula-status-danger);
             border-color: rgba(239, 68, 68, 0.3);
         }
         .task-card-footer {
@@ -998,7 +920,7 @@
             fill: rgba(255, 255, 255, 0.25) !important;
         }
         .gantt .bar-label {
-            fill: #ffffff !important;
+            fill: var(--ula-white) !important;
             font-size: 11px !important;
             font-weight: 800 !important;
             text-shadow: 0 1px 2px rgba(0,0,0,0.5);
@@ -1093,7 +1015,7 @@
     <aside id="sidebar-main" class="app-sidebar">
         <div class="sidebar-brand-box">
             <div class="brand-logo-area">
-                <div class="brand-emblem">🌿</div>
+                <div class="brand-emblem"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">eco</span></div>
                 <div class="brand-title-wrap">
                     <div class="brand-title">{{ $organization->name }}</div>
                     <div class="brand-sub">{{ __('Virtual Workplace') }}</div>
@@ -1109,13 +1031,13 @@
             <li class="nav-category-title">{{ __('Workspace') }}</li>
             <li>
                 <a href="{{ route('dashboard') }}#overview" class="sidebar-link-btn">
-                    <span class="nav-icon">📊</span>
+                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bar_chart</span></span>
                     <span class="nav-label-text">{{ __('Dashboard') }}</span>
                 </a>
             </li>
             <li>
-                <a href="{{ route('office') }}" class="sidebar-link-btn" style="background: rgba(79, 155, 95, 0.18); color: #7EE092;">
-                    <span class="nav-icon">🚀</span>
+                <a href="{{ route('office') }}" class="sidebar-link-btn" style="background: rgba(79, 155, 95, 0.18); color: var(--ula-status-success);">
+                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">rocket_launch</span></span>
                     <span class="nav-label-text">{{ __('Enter Office') }}</span>
                     <span class="sidebar-badge-pill">مباشر</span>
                 </a>
@@ -1125,7 +1047,7 @@
             <li class="nav-category-title">{{ __('Projects & Tasks') }}</li>
             <li>
                 <a href="{{ route('dashboard') }}#projects" class="sidebar-link-btn active">
-                    <span class="nav-icon">📁</span>
+                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span></span>
                     <span class="nav-label-text">{{ __('Projects Portfolio') }}</span>
                     <span class="sidebar-badge-pill">{{ $stats['total_projects'] ?? 0 }}</span>
                 </a>
@@ -1133,7 +1055,7 @@
             @if($membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || $membership->role?->slug === 'company_admin')
             <li>
                 <a href="{{ route('dashboard') }}#all-tasks" class="sidebar-link-btn">
-                    <span class="nav-icon">📑</span>
+                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bookmark</span></span>
                     <span class="nav-label-text">{{ __('All Tasks') }}</span>
                     <span class="sidebar-badge-pill">{{ $stats['total_tasks'] ?? 0 }}</span>
                 </a>
@@ -1141,27 +1063,27 @@
             @endif
             <li>
                 <a href="{{ route('dashboard') }}#my-tasks" class="sidebar-link-btn">
-                    <span class="nav-icon">⚡</span>
+                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span></span>
                     <span class="nav-label-text">{{ __('My Tasks') }}</span>
                     <span class="sidebar-badge-pill">{{ $myTasks->count() }}</span>
                 </a>
             </li>
             <li>
                 <a href="{{ route('dashboard') }}#chat" class="sidebar-link-btn">
-                    <span class="nav-icon">💬</span>
+                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">chat</span></span>
                     <span class="nav-label-text">{{ __('Team Chat & DMs') }}</span>
                     <span class="sidebar-badge-pill">مباشر</span>
                 </a>
             </li>
             <li>
                 <a href="{{ route('dashboard') }}#timesheets" class="sidebar-link-btn">
-                    <span class="nav-icon">⏱️</span>
+                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span></span>
                     <span class="nav-label-text">{{ __('Timesheets & Time') }}</span>
                 </a>
             </li>
             <li>
                 <a href="{{ route('dashboard') }}#meetings" class="sidebar-link-btn">
-                    <span class="nav-icon">📅</span>
+                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span></span>
                     <span class="nav-label-text">{{ __('Meetings & Schedule') }}</span>
                     <span class="sidebar-badge-pill">{{ $upcomingProjectMeetings->count() }}</span>
                 </a>
@@ -1176,7 +1098,7 @@
             @if($membership->hasPermission('members.view') || $membership->hasPermission('members.manage'))
             <li>
                 <a href="{{ route('dashboard') }}#members" class="sidebar-link-btn">
-                    <span class="nav-icon">👥</span>
+                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">group</span></span>
                     <span class="nav-label-text">{{ __('Team Members') }}</span>
                     <span class="sidebar-badge-pill">{{ $stats['active_members'] ?? 0 }}</span>
                 </a>
@@ -1185,7 +1107,7 @@
             @if($membership->hasPermission('rooms.manage'))
             <li>
                 <a href="{{ route('dashboard') }}#rooms" class="sidebar-link-btn">
-                    <span class="nav-icon">🚪</span>
+                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span></span>
                     <span class="nav-label-text">{{ __('Meeting Rooms') }}</span>
                     <span class="sidebar-badge-pill">{{ $stats['total_rooms'] ?? 0 }}</span>
                 </a>
@@ -1194,7 +1116,7 @@
             @if($membership->hasPermission('departments.manage') || $membership->hasPermission('teams.manage'))
             <li>
                 <a href="{{ route('dashboard') }}#departments" class="sidebar-link-btn">
-                    <span class="nav-icon">🏛️</span>
+                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">account_balance</span></span>
                     <span class="nav-label-text">{{ __('Departments') }}</span>
                     <span class="sidebar-badge-pill">{{ $stats['total_departments'] ?? 0 }}</span>
                 </a>
@@ -1203,7 +1125,7 @@
             @if($membership->hasPermission('organizations.manage'))
             <li>
                 <a href="{{ route('dashboard') }}#settings" class="sidebar-link-btn">
-                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">settings</span></span>
                     <span class="nav-label-text">{{ __('Workspace Settings') }}</span>
                 </a>
             </li>
@@ -1211,10 +1133,10 @@
             @endif
 
             @if($user->is_superadmin ?? false)
-                <li class="nav-category-title" style="color: #E5B54F;">{{ __('Super Admin') }}</li>
+                <li class="nav-category-title" style="color: var(--ula-gold-400);">{{ __('Super Admin') }}</li>
                 <li>
-                    <a href="{{ route('superadmin.dashboard') }}" class="sidebar-link-btn" style="color: #E5B54F;">
-                        <span class="nav-icon">👑</span>
+                    <a href="{{ route('superadmin.dashboard') }}" class="sidebar-link-btn" style="color: var(--ula-gold-400);">
+                        <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">workspace_premium</span></span>
                         <span class="nav-label-text">{{ __('Super Admin Portal') }}</span>
                     </a>
                 </li>
@@ -1227,14 +1149,14 @@
                     {{ strtoupper(substr($user->name, 0, 2)) }}
                 </div>
                 <div class="user-info-text">
-                    <div style="font-size: 12px; font-weight: 800; color: #FFFDF6;">{{ $user->name }}</div>
+                    <div style="font-size: 12px; font-weight: 800; color: var(--ula-white);">{{ $user->name }}</div>
                     <div style="font-size: 10px; color: var(--ula-text-on-dark-muted);">{{ $membership->role->name ?? 'Member' }}</div>
                 </div>
             </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" style="background: transparent; border: none; color: var(--ula-text-on-dark-muted); cursor: pointer; font-size: 14px;" title="{{ __('Logout') }}">
-                    🚪
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span>
                 </button>
             </form>
         </div>
@@ -1247,13 +1169,13 @@
         <header class="hub-header-bar">
             <div style="display: flex; align-items: center; gap: 14px;">
                 <button onclick="toggleMobileSidebar()" class="tactile-btn btn-secondary" style="display: none; padding: 6px 10px; font-size: 14px;" id="btn-mobile-sidebar-toggle">
-                    ☰
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">menu</span>
                 </button>
 
                 <div class="breadcrumb-trail">
-                    <a href="{{ route('dashboard') }}#overview">🌿 {{ __('Workspace') }}</a>
+                    <a href="{{ route('dashboard') }}#overview"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">eco</span> {{ __('Workspace') }}</a>
                     <span class="breadcrumb-separator">/</span>
-                    <a href="{{ route('dashboard') }}#projects">📁 {{ __('Projects') }}</a>
+                    <a href="{{ route('dashboard') }}#projects"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> {{ __('Projects') }}</a>
                     <span class="breadcrumb-separator">/</span>
                     <span style="color: var(--ula-palm-900); font-weight: 900;">{{ $project->name }} ({{ $project->code }})</span>
                 </div>
@@ -1262,17 +1184,17 @@
             <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                 <!-- Language Switcher -->
                 <a href="{{ route('lang.switch', app()->getLocale() === 'ar' ? 'en' : 'ar') }}" class="tactile-btn btn-secondary" style="padding: 7px 12px; font-size: 12px;">
-                    🌐 {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">public</span> {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
                 </a>
 
                 <!-- Theme Toggle -->
                 <button onclick="toggleThemeMode()" class="tactile-btn btn-secondary" style="padding: 7px 12px; font-size: 12px;" title="{{ __('Toggle Dark / Light Mode') }}">
-                    <span class="theme-toggle-icon-label">🌙</span>
+                    <span class="theme-toggle-icon-label"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">dark_mode</span></span>
                 </button>
 
                 <!-- Office Shortcut -->
                 <a href="{{ route('office') }}" class="tactile-btn btn-primary" style="padding: 7px 14px; font-size: 12px;">
-                    🚀 {{ __('Enter Office') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">rocket_launch</span> {{ __('Enter Office') }}
                 </a>
             </div>
         </header>
@@ -1284,7 +1206,7 @@
                 <div style="background: linear-gradient(135deg, rgba(79, 155, 95, 0.15) 0%, rgba(255, 253, 246, 0.95) 100%); border: 1px solid var(--ula-palm-900); border-radius: var(--ula-radius-lg); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; box-shadow: var(--ula-shadow-xs);">
                     <div style="display: flex; align-items: center; gap: 14px;">
                         <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--ula-palm-900); color: white; display: flex; align-items: center; justify-content: center; font-size: 16px; box-shadow: var(--ula-shadow-xs);">
-                            ⏱️
+                            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span>
                         </div>
                         <div>
                             <div style="font-size: 11px; font-weight: 800; color: var(--ula-palm-900); text-transform: uppercase;">
@@ -1297,8 +1219,8 @@
                     </div>
                     <div style="display: flex; align-items: center; gap: 14px;">
                         <span id="hub-live-timer-clock" style="font-size: 20px; font-weight: 900; font-family: monospace; color: var(--ula-palm-900);">00:00:00</span>
-                        <button onclick="stopHubGlobalTimer()" class="tactile-btn" style="background: #FEE2E2; color: #B91C1C; border: 1px solid #FECACA; padding: 6px 14px; font-size: 12px;">
-                            ⏹ {{ __('Stop Timer') }}
+                        <button onclick="stopHubGlobalTimer()" class="tactile-btn" style="background: var(--ula-terracotta-200); color: var(--ula-terracotta-600); border: 1px solid var(--ula-terracotta-300); padding: 6px 14px; font-size: 12px;">
+                            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">stop_circle</span> {{ __('Stop Timer') }}
                         </button>
                     </div>
                 </div>
@@ -1319,7 +1241,7 @@
                                 {{ ucfirst($project->status) }}
                             </span>
                             <span class="badge-pill {{ $project->priority === 'urgent' ? 'badge-danger' : ($project->priority === 'high' ? 'badge-gold' : 'badge-neutral') }}">
-                                ⚡ {{ ucfirst($project->priority) }}
+                                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ ucfirst($project->priority) }}
                             </span>
                         </div>
 
@@ -1328,10 +1250,10 @@
                         </p>
 
                         <div style="display: flex; align-items: center; gap: 20px; font-size: 12px; color: var(--ula-text-muted); flex-wrap: wrap;">
-                            <span>👤 {{ __('Manager') }}: <strong style="color: var(--ula-text-primary);">{{ $project->manager->name ?? __('Unassigned') }}</strong></span>
-                            <span>🏛️ {{ __('Department') }}: <strong style="color: var(--ula-text-primary);">{{ $project->department->name ?? __('General') }}</strong></span>
-                            <span>📅 {{ __('Due Date') }}: <strong style="color: var(--ula-text-primary);">{{ $project->end_date ? $project->end_date->format('M d, Y') : __('No deadline') }}</strong></span>
-                            <span>👥 {{ __('Project Team') }}: <strong style="color: var(--ula-text-primary);">{{ $project->members->count() }} {{ __('Members') }}</strong></span>
+                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">person</span> {{ __('Manager') }}: <strong style="color: var(--ula-text-primary);">{{ $project->manager->name ?? __('Unassigned') }}</strong></span>
+                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">account_balance</span> {{ __('Department') }}: <strong style="color: var(--ula-text-primary);">{{ $project->department->name ?? __('General') }}</strong></span>
+                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Due Date') }}: <strong style="color: var(--ula-text-primary);">{{ $project->end_date ? $project->end_date->format('M d, Y') : __('No deadline') }}</strong></span>
+                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">group</span> {{ __('Project Team') }}: <strong style="color: var(--ula-text-primary);">{{ $project->members->count() }} {{ __('Members') }}</strong></span>
                         </div>
                     </div>
 
@@ -1341,10 +1263,10 @@
                             <span>+</span> {{ __('Create Task') }}
                         </button>
                         <button onclick="openManualTimeModal()" class="tactile-btn btn-secondary">
-                            <span>⏱️</span> {{ __('Log Manual Time Entry') }}
+                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span></span> {{ __('Log Manual Time Entry') }}
                         </button>
                         <button onclick="openScheduleProjectMeetingModal()" class="tactile-btn btn-secondary">
-                            <span>📅</span> {{ __('Schedule Project Meeting') }}
+                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span></span> {{ __('Schedule Project Meeting') }}
                         </button>
                     </div>
                 </div>
@@ -1356,7 +1278,7 @@
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Task Progress') }}</span>
-                        <div class="kpi-icon-box">📊</div>
+                        <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bar_chart</span></div>
                     </div>
                     <div class="kpi-value" style="color: var(--ula-palm-900);">{{ $kpis['progress_pct'] ?? 0 }}%</div>
                     <div style="width: 100%; background: var(--ula-surface-page-alt); height: 7px; border-radius: 9999px; overflow: hidden; margin-bottom: 6px;">
@@ -1365,7 +1287,7 @@
                     <div style="font-size: 11px; color: var(--ula-text-muted); display: flex; justify-content: space-between;">
                         <span>{{ $kpis['completed_tasks'] ?? 0 }} / {{ $kpis['total_tasks'] ?? 0 }} {{ __('done') }}</span>
                         @if(($kpis['overdue_tasks'] ?? 0) > 0)
-                            <span style="color: var(--ula-status-danger); font-weight: 800;">⚠️ {{ $kpis['overdue_tasks'] }} {{ __('overdue') }}</span>
+                            <span style="color: var(--ula-status-danger); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">warning</span> {{ $kpis['overdue_tasks'] }} {{ __('overdue') }}</span>
                         @endif
                     </div>
                 </div>
@@ -1374,7 +1296,7 @@
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Actual vs Planned') }}</span>
-                        <div class="kpi-icon-box">⏱️</div>
+                        <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span></div>
                     </div>
                     <div class="kpi-value">{{ $kpis['actual_hours'] ?? 0 }}h</div>
                     <div style="font-size: 11px; color: var(--ula-text-secondary); margin-bottom: 4px;">
@@ -1389,7 +1311,7 @@
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Budget & Cost') }}</span>
-                        <div class="kpi-icon-box">💰</div>
+                        <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">payments</span></div>
                     </div>
                     <div class="kpi-value">${{ number_format($kpis['labor_cost'] ?? 0, 2) }}</div>
                     <div style="font-size: 11px; color: var(--ula-text-secondary); margin-bottom: 4px;">
@@ -1404,13 +1326,13 @@
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Revenue & Margin') }}</span>
-                        <div class="kpi-icon-box">📈</div>
+                        <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">trending_up</span></div>
                     </div>
                     <div class="kpi-value" style="color: var(--ula-palm-900);">${{ number_format($kpis['billable_revenue'] ?? 0, 2) }}</div>
                     <div style="font-size: 11px; color: var(--ula-text-secondary); margin-bottom: 4px;">
                         {{ __('Gross Margin') }}: <strong>${{ number_format($kpis['gross_margin'] ?? 0, 2) }}</strong>
                     </div>
-                    <div style="font-size: 11px; color: #4F9B5F; font-weight: 800;">
+                    <div style="font-size: 11px; color: var(--ula-status-success); font-weight: 800;">
                         {{ $kpis['gross_margin_pct'] ?? 0 }}% {{ __('Margin Rate') }}
                     </div>
                 </div>
@@ -1419,14 +1341,14 @@
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Sprint Workload') }}</span>
-                        <div class="kpi-icon-box">⚡</div>
+                        <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span></div>
                     </div>
                     <div class="kpi-value">{{ ($kpis['in_progress_tasks'] ?? 0) + ($kpis['review_tasks'] ?? 0) }}</div>
                     <div style="font-size: 11px; color: var(--ula-text-secondary); margin-bottom: 4px;">
-                        ⚡ {{ $kpis['in_progress_tasks'] ?? 0 }} {{ __('in progress') }} • 🔍 {{ $kpis['review_tasks'] ?? 0 }} {{ __('in review') }}
+                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ $kpis['in_progress_tasks'] ?? 0 }} {{ __('in progress') }} • <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span> {{ $kpis['review_tasks'] ?? 0 }} {{ __('in review') }}
                     </div>
                     <div style="font-size: 11px; color: var(--ula-text-muted); font-weight: 700;">
-                        📌 {{ $kpis['backlog_tasks'] ?? 0 }} {{ __('in backlog/ready') }}
+                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">push_pin</span> {{ $kpis['backlog_tasks'] ?? 0 }} {{ __('in backlog/ready') }}
                     </div>
                 </div>
 
@@ -1434,11 +1356,11 @@
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Team Meetings') }}</span>
-                        <div class="kpi-icon-box">📅</div>
+                        <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span></div>
                     </div>
                     <div class="kpi-value">{{ $upcomingProjectMeetings->count() }}</div>
                     <div style="font-size: 11px; color: var(--ula-palm-900); margin-bottom: 4px; font-weight: 800;">
-                        🟢 {{ __('Ready for collaboration') }}
+                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> {{ __('Ready for collaboration') }}
                     </div>
                     <div style="font-size: 11px; color: var(--ula-text-muted);">
                         {{ $projectMeetings->count() }} {{ __('total sessions held') }}
@@ -1449,37 +1371,37 @@
             <!-- ── 5. CLICKUP-GRADE MULTI-VIEWS NAVIGATION BAR ── -->
             <div class="hub-tabs-nav">
                 <button onclick="switchHubSection('kanban')" id="hub-nav-btn-kanban" class="hub-tab-btn active">
-                    📌 {{ __('Kanban Board') }} (<span id="count-total-kanban">{{ $tasks->count() }}</span>)
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">push_pin</span> {{ __('Kanban Board') }} (<span id="count-total-kanban">{{ $tasks->count() }}</span>)
                 </button>
                 <button onclick="switchHubSection('tasks')" id="hub-nav-btn-tasks" class="hub-tab-btn">
-                    📋 {{ __('List View & Custom Fields') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">assignment</span> {{ __('List View & Custom Fields') }}
                 </button>
                 <button onclick="switchHubSection('gantt')" id="hub-nav-btn-gantt" class="hub-tab-btn">
-                    📊 {{ __('Gantt / Timeline') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bar_chart</span> {{ __('Gantt / Timeline') }}
                 </button>
                 <button onclick="switchHubSection('workload')" id="hub-nav-btn-workload" class="hub-tab-btn">
-                    📈 {{ __('Workload Matrix') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">trending_up</span> {{ __('Workload Matrix') }}
                 </button>
                 <button onclick="switchHubSection('docs')" id="hub-nav-btn-docs" class="hub-tab-btn">
-                    📚 {{ __('Docs & Wiki') }} ({{ $project->documents->count() }})
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">menu_book</span> {{ __('Docs & Wiki') }} ({{ $project->documents->count() }})
                 </button>
                 <button onclick="switchHubSection('goals')" id="hub-nav-btn-goals" class="hub-tab-btn">
-                    🎯 {{ __('Goals & Targets') }} ({{ $project->goals->count() }})
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">track_changes</span> {{ __('Goals & Targets') }} ({{ $project->goals->count() }})
                 </button>
                 <button onclick="switchHubSection('timelog')" id="hub-nav-btn-timelog" class="hub-tab-btn">
-                    ⏱️ {{ __('Time & Margin') }} ({{ $project->timeEntries->count() }})
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span> {{ __('Time & Margin') }} ({{ $project->timeEntries->count() }})
                 </button>
                 <button onclick="switchHubSection('meetings')" id="hub-nav-btn-meetings" class="hub-tab-btn">
-                    📅 {{ __('Meetings') }} ({{ $upcomingProjectMeetings->count() }})
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Meetings') }} ({{ $upcomingProjectMeetings->count() }})
                 </button>
                 <button onclick="switchHubSection('team')" id="hub-nav-btn-team" class="hub-tab-btn">
-                    👥 {{ __('Team Roster') }} ({{ $project->members->count() }})
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">group</span> {{ __('Team Roster') }} ({{ $project->members->count() }})
                 </button>
                 <button onclick="switchHubSection('files')" id="hub-nav-btn-files" class="hub-tab-btn">
-                    📁 {{ __('Files & Docs') }} (<span id="count-total-files">{{ $project->files->count() }}</span>)
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> {{ __('Files & Docs') }} (<span id="count-total-files">{{ $project->files->count() }}</span>)
                 </button>
                 <button onclick="switchHubSection('milestones')" id="hub-nav-btn-milestones" class="hub-tab-btn">
-                    🚩 {{ __('Roadmap') }} ({{ $project->milestones->count() }})
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ __('Roadmap') }} ({{ $project->milestones->count() }})
                 </button>
             </div>
 
@@ -1489,14 +1411,14 @@
             <div class="hub-filter-bar">
                 <!-- Search Input -->
                 <div style="position: relative; flex: 1; min-width: 200px;">
-                    <span style="position: absolute; inset-inline-start: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--ula-text-muted); pointer-events: none;">🔍</span>
+                    <span style="position: absolute; inset-inline-start: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--ula-text-muted); pointer-events: none;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span></span>
                     <input type="text" id="hub-task-search-input" oninput="filterHubTasks()" placeholder="{{ __('Search tasks by title, #number or tags...') }}" style="padding-inline-start: 32px; font-size: 12px; height: 38px; border-radius: var(--ula-radius-sm); width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); color: var(--ula-text-primary); outline: none;">
                 </div>
 
                 <!-- Assignee Filter -->
                 <div style="min-width: 140px;">
                     <select id="hub-filter-assignee" onchange="filterHubTasks()" class="custom-select-control" style="width: 100%;">
-                        <option value="">👤 {{ __('All Assignees') }}</option>
+                        <option value=""><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">person</span> {{ __('All Assignees') }}</option>
                         <option value="unassigned">— {{ __('Unassigned') }} —</option>
                         @foreach($allMembers as $am)
                             <option value="{{ $am->user_id }}">{{ $am->user->name }}</option>
@@ -1507,9 +1429,9 @@
                 <!-- Priority Filter -->
                 <div style="min-width: 130px;">
                     <select id="hub-filter-priority" onchange="filterHubTasks()" class="custom-select-control" style="width: 100%;">
-                        <option value="">⚡ {{ __('All Priorities') }}</option>
-                        <option value="urgent">🔥 {{ __('Urgent') }}</option>
-                        <option value="high">⚡ {{ __('High') }}</option>
+                        <option value=""><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('All Priorities') }}</option>
+                        <option value="urgent"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">local_fire_department</span> {{ __('Urgent') }}</option>
+                        <option value="high"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('High') }}</option>
                         <option value="medium">{{ __('Medium') }}</option>
                         <option value="low">{{ __('Low') }}</option>
                     </select>
@@ -1518,19 +1440,19 @@
                 <!-- Due Date Filter -->
                 <div style="min-width: 130px;">
                     <select id="hub-filter-due" onchange="filterHubTasks()" class="custom-select-control" style="width: 100%;">
-                        <option value="">📅 {{ __('All Due Dates') }}</option>
-                        <option value="overdue">🚨 {{ __('Overdue') }}</option>
-                        <option value="today">☀️ {{ __('Due Today') }}</option>
-                        <option value="this_week">🗓️ {{ __('Due This Week') }}</option>
-                        <option value="has_due">📌 {{ __('Has Due Date') }}</option>
-                        <option value="no_due">⏳ {{ __('No Due Date') }}</option>
+                        <option value=""><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('All Due Dates') }}</option>
+                        <option value="overdue"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">emergency</span> {{ __('Overdue') }}</option>
+                        <option value="today"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">light_mode</span> {{ __('Due Today') }}</option>
+                        <option value="this_week"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Due This Week') }}</option>
+                        <option value="has_due"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">push_pin</span> {{ __('Has Due Date') }}</option>
+                        <option value="no_due"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">hourglass_empty</span> {{ __('No Due Date') }}</option>
                     </select>
                 </div>
 
                 <!-- Milestone Filter -->
                 <div style="min-width: 140px;">
                     <select id="hub-filter-milestone" onchange="filterHubTasks()" class="custom-select-control" style="width: 100%;">
-                        <option value="">🚩 {{ __('All Milestones') }}</option>
+                        <option value=""><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ __('All Milestones') }}</option>
                         <option value="none">— {{ __('No Milestone') }} —</option>
                         @foreach($project->milestones as $pms)
                             <option value="{{ $pms->id }}">{{ $pms->name }}</option>
@@ -1540,7 +1462,7 @@
 
                 <!-- Clear Filters Button -->
                 <button type="button" onclick="clearHubTaskFilters()" id="hub-clear-filters-btn" class="tactile-btn btn-secondary" style="padding: 7px 12px; font-size: 11px; height: 38px; display: none; align-items: center; gap: 4px;">
-                    ✕ {{ __('Reset') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span> {{ __('Reset') }}
                 </button>
             </div>
 
@@ -1549,11 +1471,11 @@
                 <div class="kanban-grid">
                     @php
                         $columns = [
-                            'backlog' => ['title' => '📌 ' . __('Backlog'), 'color' => 'var(--ula-text-secondary)'],
-                            'ready' => ['title' => '🎯 ' . __('Ready'), 'color' => 'var(--ula-palm-500)'],
-                            'in_progress' => ['title' => '⚡ ' . __('In Progress'), 'color' => 'var(--ula-palm-900)'],
-                            'review' => ['title' => '🔍 ' . __('Review / QA'), 'color' => 'var(--ula-status-warning)'],
-                            'done' => ['title' => '🎉 ' . __('Done'), 'color' => 'var(--ula-palm-900)'],
+                            'backlog' => ['title' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">push_pin</span> ' . __('Backlog'), 'color' => 'var(--ula-text-secondary)'],
+                            'ready' => ['title' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">track_changes</span> ' . __('Ready'), 'color' => 'var(--ula-palm-500)'],
+                            'in_progress' => ['title' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> ' . __('In Progress'), 'color' => 'var(--ula-palm-900)'],
+                            'review' => ['title' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span> ' . __('Review / QA'), 'color' => 'var(--ula-status-warning)'],
+                            'done' => ['title' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">celebration</span> ' . __('Done'), 'color' => 'var(--ula-palm-900)'],
                         ];
                         $isProjectManager = ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || ($project && $project->manager_id === $user->id));
                     @endphp
@@ -1597,17 +1519,17 @@
                                                     </span>
                                                 @endif
                                                 @if($t->isRecurring())
-                                                    <span class="badge-pill" style="font-size: 9px; background: rgba(59,130,246,0.15); color: #2563EB; border: 1px solid rgba(59,130,246,0.3);" title="{{ __('Recurring :rule', ['rule' => $t->recurrence_rule]) }}">
-                                                        🔄 {{ ucfirst($t->recurrence_rule) }}
+                                                    <span class="badge-pill" style="font-size: 9px; background: rgba(214, 162, 58, 0.15); color: var(--ula-gold-400); border: 1px solid rgba(214, 162, 58, 0.3);" title="{{ __('Recurring :rule', ['rule' => $t->recurrence_rule]) }}">
+                                                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">refresh</span> {{ ucfirst($t->recurrence_rule) }}
                                                     </span>
                                                 @endif
                                             </div>
 
                                             <div class="task-card-actions">
                                                 @if($t->priority === 'urgent')
-                                                    <span class="badge-pill badge-danger">🔥 {{ __('Urgent') }}</span>
+                                                    <span class="badge-pill badge-danger"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">local_fire_department</span> {{ __('Urgent') }}</span>
                                                 @elseif($t->priority === 'high')
-                                                    <span class="badge-pill badge-gold">⚡ {{ __('High') }}</span>
+                                                    <span class="badge-pill badge-gold"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('High') }}</span>
                                                 @endif
 
                                                 <button type="button" onclick="event.stopPropagation(); openTaskContextMenu(event, '{{ $t->id }}', '{{ $project->id }}', '{{ addslashes($t->title) }}')" class="task-dots-btn" title="{{ __('More actions') }}">
@@ -1624,26 +1546,26 @@
                                         <!-- Milestone Badge (if task belongs to a milestone) -->
                                         @if($t->milestone)
                                             <div class="task-card-milestone" title="{{ __('Milestone: :name', ['name' => $t->milestone->name]) }}">
-                                                🚩 {{ $t->milestone->name }}
+                                                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ $t->milestone->name }}
                                             </div>
                                         @endif
 
                                         @if($t->approval_status === 'pending_approval')
-                                            <div style="background: rgba(214, 162, 58, 0.15); border: 1px solid rgba(214, 162, 58, 0.35); color: #D6A23A; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                                                <span>⏳ {{ __('Pending PM Approval') }}</span>
+                                            <div style="background: rgba(214, 162, 58, 0.15); border: 1px solid rgba(214, 162, 58, 0.35); color: var(--ula-gold-400); font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                                                <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">hourglass_empty</span> {{ __('Pending PM Approval') }}</span>
                                                 @if($isProjectManager)
-                                                    <button type="button" onclick="event.stopPropagation(); quickApproveHubTask('{{ $t->id }}')" class="tactile-btn" style="background: #4F9B5F; color: white; border: none; padding: 2px 6px; font-size: 9px; border-radius: 4px;">✓ {{ __('Approve') }}</button>
+                                                    <button type="button" onclick="event.stopPropagation(); quickApproveHubTask('{{ $t->id }}')" class="tactile-btn" style="background: var(--ula-status-success); color: white; border: none; padding: 2px 6px; font-size: 9px; border-radius: 4px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check</span> {{ __('Approve') }}</button>
                                                 @endif
                                             </div>
                                         @elseif($t->approval_status === 'rejected')
-                                            <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); color: #D96B5F; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 8px; margin-bottom: 8px;">
-                                                <span>⚠️ {{ __('Changes Requested') }}</span>
+                                            <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); color: var(--ula-status-danger); font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 8px; margin-bottom: 8px;">
+                                                <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">warning</span> {{ __('Changes Requested') }}</span>
                                             </div>
                                         @endif
 
                                         <!-- Metadata: Assignee & Due Date -->
                                         <div class="task-card-meta">
-                                            <span class="task-project-name">📁 {{ $project->name }}</span>
+                                            <span class="task-project-name"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> {{ $project->name }}</span>
                                             <div style="display: flex; align-items: center; gap: 6px;">
                                                 @if($t->assignee)
                                                     <div class="task-assignee-chip" title="{{ $t->assignee->name }}">
@@ -1655,7 +1577,7 @@
                                                 @endif
                                                 @if($t->due_date)
                                                     <span class="task-due-date {{ $t->due_date->isPast() && $t->status !== 'done' ? 'is-overdue' : '' }}">
-                                                        📅 {{ $t->due_date->format('M d') }}
+                                                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ $t->due_date->format('M d') }}
                                                     </span>
                                                 @endif
                                             </div>
@@ -1665,16 +1587,16 @@
                                         <div class="task-card-footer">
                                             <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;">
                                                 <select onclick="event.stopPropagation()" onchange="updateHubTaskStatusDirect('{{ $t->id }}', this.value)" class="card-status-select" style="max-width: 100%;">
-                                                    <option value="backlog" {{ $t->status === 'backlog' ? 'selected' : '' }}>📌 {{ __('Backlog') }}</option>
-                                                    <option value="ready" {{ $t->status === 'ready' ? 'selected' : '' }}>🎯 {{ __('Ready') }}</option>
-                                                    <option value="in_progress" {{ $t->status === 'in_progress' ? 'selected' : '' }}>⚡ {{ __('In Progress') }}</option>
-                                                    <option value="review" {{ $t->status === 'review' || $t->status === 'qa' ? 'selected' : '' }}>🔍 {{ __('Review') }}</option>
-                                                    <option value="done" {{ $t->status === 'done' ? 'selected' : '' }}>🎉 {{ __('Done') }}</option>
+                                                    <option value="backlog" {{ $t->status === 'backlog' ? 'selected' : '' }}><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">push_pin</span> {{ __('Backlog') }}</option>
+                                                    <option value="ready" {{ $t->status === 'ready' ? 'selected' : '' }}><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">track_changes</span> {{ __('Ready') }}</option>
+                                                    <option value="in_progress" {{ $t->status === 'in_progress' ? 'selected' : '' }}><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('In Progress') }}</option>
+                                                    <option value="review" {{ $t->status === 'review' || $t->status === 'qa' ? 'selected' : '' }}><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span> {{ __('Review') }}</option>
+                                                    <option value="done" {{ $t->status === 'done' ? 'selected' : '' }}><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">celebration</span> {{ __('Done') }}</option>
                                                 </select>
                                             </div>
 
                                             <button type="button" onclick="event.stopPropagation(); startHubTaskTimerDirect('{{ $project->id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($project->name) }}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-palm-900); border: 1px solid rgba(79, 155, 95, 0.3); padding: 3px 8px; font-size: 10.5px; border-radius: var(--ula-radius-pill); font-weight: 800; white-space: nowrap; flex-shrink: 0;" title="{{ __('Start Timer') }}">
-                                                ▶ {{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h
+                                                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">play_arrow</span> {{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h
                                             </button>
                                         </div>
                                     </div>
@@ -1694,7 +1616,7 @@
                 <div class="hub-card" style="padding: 0; overflow: hidden;">
                     <div style="padding: 18px 24px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                         <div>
-                            <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);">📋 {{ __('Project Task Inventory & Sprints') }} ({{ $tasks->count() }})</h3>
+                            <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">assignment</span> {{ __('Project Task Inventory & Sprints') }} ({{ $tasks->count() }})</h3>
                             <p style="font-size: 12px; color: var(--ula-text-muted); margin-top: 2px;">{{ __('Filter and inspect all deliverable tasks, checklist completion, and predecessor dependencies.') }}</p>
                         </div>
                         <button onclick="openNewTaskModal()" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px;">
@@ -1703,7 +1625,7 @@
                     </div>
 
                     <!-- ── BULK ACTION TOOLBAR (appears when tasks are selected) ── -->
-                    <div id="bulk-action-toolbar" style="display: none; padding: 10px 24px; background: linear-gradient(135deg, #1E3A2A 0%, #2A5D37 100%); border-bottom: 1px solid #42774C; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <div id="bulk-action-toolbar" style="display: none; padding: 10px 24px; background: var(--ula-gradient-accent); border-bottom: 1px solid var(--ula-palm-700); align-items: center; gap: 12px; flex-wrap: wrap;">
                         <span id="bulk-selected-count" style="font-size: 13px; font-weight: 900; color: #fff;">0 {{ __('selected') }}</span>
                         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                             <!-- Bulk Status -->
@@ -1725,12 +1647,12 @@
                                 <option value="null" style="color:#000;">{{ __('Unassign') }}</option>
                             </select>
                             <!-- Bulk Delete -->
-                            <button onclick="bulkDeleteTasks()" style="padding: 5px 12px; border-radius: 6px; background: rgba(239,68,68,0.25); border: 1px solid rgba(239,68,68,0.5); color: #FCA5A5; font-size: 11px; font-weight: 800; cursor: pointer;">
-                                🗑️ {{ __('Delete Selected') }}
+                            <button onclick="bulkDeleteTasks()" style="padding: 5px 12px; border-radius: 6px; background: rgba(239,68,68,0.25); border: 1px solid rgba(239,68,68,0.5); color: var(--ula-status-danger); font-size: 11px; font-weight: 800; cursor: pointer;">
+                                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">delete</span> {{ __('Delete Selected') }}
                             </button>
                         </div>
                         <button onclick="clearBulkSelection()" style="margin-inline-start: auto; padding: 5px 10px; border-radius: 6px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); font-size: 11px; cursor: pointer;">
-                            ✕ {{ __('Clear') }}
+                            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span> {{ __('Clear') }}
                         </button>
                     </div>
 
@@ -1743,7 +1665,7 @@
                                     </th>
                                     <th>#</th>
                                     <th>{{ __('Task Title') }}</th>
-                                    <th>🚩 {{ __('Milestone') }}</th>
+                                    <th><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ __('Milestone') }}</th>
                                     <th>{{ __('Status') }}</th>
                                     <th>{{ __('Priority') }}</th>
                                     <th>{{ __('Assignee') }}</th>
@@ -1772,12 +1694,12 @@
                                             <div style="font-weight: 800; color: var(--ula-text-primary); font-size: 13px; display: flex; align-items: center; gap: 6px;">
                                                 <span>{{ $t->title }}</span>
                                                 @if($t->isRecurring())
-                                                    <span class="badge-pill" style="font-size: 9px; background: rgba(59,130,246,0.15); color: #2563EB; border: 1px solid rgba(59,130,246,0.3);" title="{{ __('Recurring :rule', ['rule' => $t->recurrence_rule]) }}">
-                                                        🔄 {{ ucfirst($t->recurrence_rule) }}
+                                                    <span class="badge-pill" style="font-size: 9px; background: rgba(214, 162, 58, 0.15); color: var(--ula-gold-400); border: 1px solid rgba(214, 162, 58, 0.3);" title="{{ __('Recurring :rule', ['rule' => $t->recurrence_rule]) }}">
+                                                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">refresh</span> {{ ucfirst($t->recurrence_rule) }}
                                                     </span>
                                                 @endif
                                                 @if($t->checklistItems && $t->checklistItems->count() > 0)
-                                                    <span class="badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.15); color: #4F9B5F;">⊞ {{ $t->checklistItems->where('is_completed', true)->count() }}/{{ $t->checklistItems->count() }}</span>
+                                                    <span class="badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success);">⊞ {{ $t->checklistItems->where('is_completed', true)->count() }}/{{ $t->checklistItems->count() }}</span>
                                                 @endif
                                             </div>
                                             @if($t->description)
@@ -1787,7 +1709,7 @@
                                         <td>
                                             @if($t->milestone)
                                                 <span class="badge-pill" style="font-size: 10px; font-weight: 700; background: rgba(79, 155, 95, 0.12); color: var(--ula-palm-900);">
-                                                    🚩 {{ $t->milestone->name }}
+                                                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ $t->milestone->name }}
                                                 </span>
                                             @else
                                                 <span style="font-size: 11px; color: var(--ula-text-muted);">—</span>
@@ -1800,7 +1722,7 @@
                                         </td>
                                         <td>
                                             <span class="badge-pill {{ $t->priority === 'urgent' ? 'badge-danger' : ($t->priority === 'high' ? 'badge-gold' : 'badge-neutral') }}">
-                                                {{ $t->priority === 'urgent' ? '🚩 ' . __('Urgent') : ($t->priority === 'high' ? '⚡ ' . __('High') : ucfirst($t->priority)) }}
+                                                {!! $t->priority === 'urgent' ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> ' . __('Urgent') : ($t->priority === 'high' ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> ' . __('High') : ucfirst($t->priority)) !!}
                                             </span>
                                         </td>
                                         <td>
@@ -1822,7 +1744,7 @@
                                                 $checkTotal = $checks->count();
                                             @endphp
                                             @if($checkTotal > 0)
-                                                <span class="badge-pill badge-neutral" style="font-size: 10px;">☑️ {{ $checkDone }}/{{ $checkTotal }}</span>
+                                                <span class="badge-pill badge-neutral" style="font-size: 10px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check_box</span> {{ $checkDone }}/{{ $checkTotal }}</span>
                                             @else
                                                 <span style="font-size: 11px; color: var(--ula-text-muted);">—</span>
                                             @endif
@@ -1835,7 +1757,7 @@
                                         <td onclick="event.stopPropagation();">
                                             <div style="display: flex; gap: 6px;">
                                                 <button onclick="openTaskInspector('{{ $t->id }}')" class="tactile-btn btn-secondary" style="padding: 4px 10px; font-size: 11px;">
-                                                    🔍 {{ __('Inspect') }}
+                                                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span> {{ __('Inspect') }}
                                                 </button>
                                                 <button onclick="openTaskContextMenu(event, '{{ $t->id }}', '{{ $project->id }}', '{{ addslashes($t->title) }}')" class="tactile-btn btn-secondary" style="padding: 4px 8px; font-size: 11px;" title="{{ __('More Actions') }}">
                                                     •••
@@ -1846,7 +1768,7 @@
                                 @empty
                                     <tr>
                                         <td colspan="11" style="text-align: center; color: var(--ula-text-muted); padding: 40px;">
-                                            <div style="font-size: 32px; margin-bottom: 8px;">📋</div>
+                                            <div style="font-size: 32px; margin-bottom: 8px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">assignment</span></div>
                                             {{ __('No tasks created in this project yet.') }}
                                         </td>
                                     </tr>
@@ -1862,7 +1784,7 @@
                 <div class="hub-card" style="padding: 0; overflow: hidden;">
                     <div style="padding: 18px 24px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                         <div>
-                            <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);">⏱️ {{ __('Work Sessions & Time Tracking Log') }} ({{ $project->timeEntries->count() }})</h3>
+                            <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span> {{ __('Work Sessions & Time Tracking Log') }} ({{ $project->timeEntries->count() }})</h3>
                             <p style="font-size: 12px; color: var(--ula-text-muted); margin-top: 2px;">{{ __('Chronological presence log of all billable and non-billable labor recorded on this project.') }}</p>
                         </div>
                         <button onclick="openManualTimeModal()" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px;">
@@ -1922,7 +1844,7 @@
                                 @empty
                                 <tr>
                                     <td colspan="7" style="text-align: center; color: var(--ula-text-muted); padding: 40px;">
-                                        <div style="font-size: 32px; margin-bottom: 8px;">⏱️</div>
+                                        <div style="font-size: 32px; margin-bottom: 8px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span></div>
                                         {{ __('No time entries logged on this project yet.') }}
                                     </td>
                                 </tr>
@@ -1938,7 +1860,7 @@
                 <div class="hub-card" style="padding: 0; overflow: hidden;">
                     <div style="padding: 18px 24px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                         <div>
-                            <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);">📅 {{ __('Project Video Meetings & Standups') }} ({{ $projectMeetings->count() }})</h3>
+                            <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Project Video Meetings & Standups') }} ({{ $projectMeetings->count() }})</h3>
                             <p style="font-size: 12px; color: var(--ula-text-muted); margin-top: 2px;">{{ __('Scheduled collaboration rooms with instant automated team invitations and chime audio alerts.') }}</p>
                         </div>
                         <button onclick="openScheduleProjectMeetingModal()" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px;">
@@ -1986,7 +1908,7 @@
                                         {{ $m->duration_minutes ?? 30 }} {{ __('Minutes') }}
                                     </td>
                                     <td>
-                                        <strong style="color: var(--ula-palm-900); font-size: 12px;">🚪 {{ $m->room->name ?? 'Meeting Room' }}</strong>
+                                        <strong style="color: var(--ula-palm-900); font-size: 12px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span> {{ $m->room->name ?? 'Meeting Room' }}</strong>
                                     </td>
                                     <td>
                                         <span style="font-weight: 700; font-size: 12px;">{{ $m->creator->name ?? 'Admin' }}</span>
@@ -2007,9 +1929,9 @@
                                     </td>
                                     <td>
                                         @if($isLive)
-                                            <span class="badge-pill badge-danger" style="animation: pulse 1.5s infinite;">🔴 LIVE</span>
+                                            <span class="badge-pill badge-danger" style="animation: pulse 1.5s infinite;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> LIVE</span>
                                         @elseif($m->status === 'scheduled')
-                                            <span class="badge-pill badge-green">📅 {{ __('Scheduled') }}</span>
+                                            <span class="badge-pill badge-green"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Scheduled') }}</span>
                                         @elseif($m->status === 'ended')
                                             <span class="badge-pill badge-neutral">{{ __('Completed') }}</span>
                                         @else
@@ -2018,14 +1940,14 @@
                                     </td>
                                     <td>
                                         <a href="{{ route('office') }}" class="tactile-btn btn-primary" style="padding: 5px 12px; font-size: 11px; text-decoration: none;">
-                                            🚀 {{ __('Join') }}
+                                            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">rocket_launch</span> {{ __('Join') }}
                                         </a>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
                                     <td colspan="8" style="text-align: center; color: var(--ula-text-muted); padding: 40px;">
-                                        <div style="font-size: 32px; margin-bottom: 8px;">📅</div>
+                                        <div style="font-size: 32px; margin-bottom: 8px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span></div>
                                         {{ __('No meetings scheduled for this project yet.') }}
                                     </td>
                                 </tr>
@@ -2040,7 +1962,7 @@
             <div id="hub-section-team" class="hub-section-content" style="display: none;">
                 <div class="hub-card" style="padding: 0; overflow: hidden;">
                     <div style="padding: 18px 24px; border-bottom: 1px solid var(--ula-border-subtle);">
-                        <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);">👥 {{ __('Project Team Roster & Allocation') }} ({{ $project->members->count() }})</h3>
+                        <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">group</span> {{ __('Project Team Roster & Allocation') }} ({{ $project->members->count() }})</h3>
                         <p style="font-size: 12px; color: var(--ula-text-muted); margin-top: 2px;">{{ __('Assigned collaborators and their contributed hours and assigned task loads.') }}</p>
                     </div>
 
@@ -2089,7 +2011,7 @@
                                 @empty
                                 <tr>
                                     <td colspan="5" style="text-align: center; color: var(--ula-text-muted); padding: 40px;">
-                                        <div style="font-size: 32px; margin-bottom: 8px;">👥</div>
+                                        <div style="font-size: 32px; margin-bottom: 8px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">group</span></div>
                                         {{ __('No members assigned to this project yet.') }}
                                     </td>
                                 </tr>
@@ -2105,7 +2027,7 @@
                 <div class="hub-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
                         <div>
-                            <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);">🚩 {{ __('Phases & Delivery Milestones Roadmap') }} ({{ $project->milestones->count() }})</h3>
+                            <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ __('Phases & Delivery Milestones Roadmap') }} ({{ $project->milestones->count() }})</h3>
                             <p style="font-size: 12px; color: var(--ula-text-muted); margin-top: 2px;">{{ __('Track milestone deliverables, progress percentage, task completions, and delivery countdowns.') }}</p>
                         </div>
                         <button onclick="openNewMilestoneModal()" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px;">
@@ -2119,31 +2041,31 @@
                             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
                                 <div>
                                     <div style="display: flex; align-items: center; gap: 8px;">
-                                        <span style="font-size: 20px;">🚩</span>
+                                        <span style="font-size: 20px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span></span>
                                         <h4 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary); margin: 0;">{{ $ms->name }}</h4>
                                         <span class="badge-pill {{ $ms->status === 'completed' ? 'badge-green' : ($ms->due_date && $ms->due_date->isPast() ? 'badge-danger' : 'badge-gold') }}">
-                                            {{ $ms->status === 'completed' ? '✅ ' . __('Completed') : ($ms->due_date && $ms->due_date->isPast() ? '🚨 ' . __('Overdue') : '⏳ ' . __('In Progress')) }}
+                                            {!! $ms->status === 'completed' ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check_circle</span> ' . __('Completed') : ($ms->due_date && $ms->due_date->isPast() ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">emergency</span> ' . __('Overdue') : '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">hourglass_empty</span> ' . __('In Progress')) !!}
                                         </span>
                                     </div>
                                     <div style="font-size: 12px; color: var(--ula-text-muted); margin-top: 4px;">
-                                        📅 {{ $ms->due_date ? $ms->due_date->format('M d, Y') . ' (' . $ms->due_date->diffForHumans() . ')' : __('No target date set') }}
+                                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ $ms->due_date ? $ms->due_date->format('M d, Y') . ' (' . $ms->due_date->diffForHumans() . ')' : __('No target date set') }}
                                     </div>
                                 </div>
                                 
                                 <div style="display: flex; align-items: center; gap: 8px;">
                                     <span style="font-size: 22px; font-weight: 900; font-family: monospace; color: var(--ula-palm-900);">{{ $ms->progress_percentage }}%</span>
                                     <button type="button" onclick="quickToggleMilestoneStatus('{{ $ms->id }}', '{{ $ms->status === 'completed' ? 'pending' : 'completed' }}')" class="tactile-btn {{ $ms->status === 'completed' ? 'btn-secondary' : 'btn-primary' }}" style="padding: 5px 10px; font-size: 11px;">
-                                        {{ $ms->status === 'completed' ? '↺ ' . __('Reopen') : '✓ ' . __('Mark Completed') }}
+                                        {!! $ms->status === 'completed' ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">undo</span> ' . __('Reopen') : '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check</span> ' . __('Mark Completed') !!}
                                     </button>
-                                    <button type="button" onclick="deleteProjectMilestone('{{ $ms->id }}')" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.3); padding: 5px 8px; font-size: 11px;" title="{{ __('Delete Milestone') }}">
-                                        🗑️
+                                    <button type="button" onclick="deleteProjectMilestone('{{ $ms->id }}')" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.3); padding: 5px 8px; font-size: 11px;" title="{{ __('Delete Milestone') }}">
+                                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">delete</span>
                                     </button>
                                 </div>
                             </div>
 
                             <!-- Progress Bar -->
                             <div style="width: 100%; height: 8px; background: var(--ula-surface-card); border-radius: 9999px; overflow: hidden; margin-bottom: 12px; border: 1px solid var(--ula-border-subtle);">
-                                <div style="width: {{ $ms->progress_percentage }}%; height: 100%; background: linear-gradient(90deg, #42774C 0%, #2A5D37 100%); transition: width 0.3s ease;"></div>
+                                <div style="width: {{ $ms->progress_percentage }}%; height: 100%; background: linear-gradient(90deg, var(--ula-palm-500) 0%, var(--ula-palm-800) 100%); transition: width 0.3s ease;"></div>
                             </div>
 
                             <!-- Metric Badges -->
@@ -2152,7 +2074,7 @@
                                     ⊞ {{ $ms->completed_tasks_count }} / {{ $ms->tasks_count }} {{ __('Tasks Done') }}
                                 </span>
                                 <span class="badge-pill badge-neutral" style="font-size: 11px; font-weight: 700; color: var(--ula-palm-900);">
-                                    ⏱️ {{ $ms->actualHours() }}h {{ __('Hours Logged') }}
+                                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span> {{ $ms->actualHours() }}h {{ __('Hours Logged') }}
                                 </span>
                             </div>
 
@@ -2160,7 +2082,7 @@
                             @if($ms->tasks && $ms->tasks->count() > 0)
                             <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px;">
                                 <div style="font-size: 11px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase; margin-bottom: 2px;">
-                                    📋 {{ __('Assigned Tasks') }} ({{ $ms->tasks->count() }})
+                                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">assignment</span> {{ __('Assigned Tasks') }} ({{ $ms->tasks->count() }})
                                 </div>
                                 @foreach($ms->tasks as $mt)
                                 <div onclick="openTaskInspector('{{ $mt->id }}')" style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 4px 6px; border-radius: 4px; cursor: pointer; background: var(--ula-surface-page-alt);">
@@ -2183,7 +2105,7 @@
                         </div>
                         @empty
                         <div style="text-align: center; color: var(--ula-text-muted); padding: 40px;">
-                            <div style="font-size: 32px; margin-bottom: 8px;">🚩</div>
+                            <div style="font-size: 32px; margin-bottom: 8px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span></div>
                             <p style="font-size: 14px; font-weight: 700; color: var(--ula-text-primary); margin-bottom: 4px;">{{ __('No milestones defined for this project yet.') }}</p>
                             <p style="font-size: 12px; margin-bottom: 12px;">{{ __('Create project phases and delivery milestones to track high-level progress and release dates.') }}</p>
                             <button onclick="openNewMilestoneModal()" class="tactile-btn btn-primary" style="padding: 7px 16px; font-size: 12px;">+ {{ __('Create First Milestone') }}</button>
@@ -2199,7 +2121,7 @@
                     <!-- Gantt Header -->
                     <div style="padding: 16px 24px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                         <div>
-                            <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);">📊 {{ __('Interactive Gantt & Schedule Timeline') }}</h3>
+                            <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bar_chart</span> {{ __('Interactive Gantt & Schedule Timeline') }}</h3>
                             <p style="font-size: 12px; color: var(--ula-text-muted); margin-top: 2px;">{{ __('Real date-based timeline with dependency arrows. Drag bars to reschedule.') }}</p>
                         </div>
                         <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
@@ -2214,10 +2136,10 @@
 
                     <!-- Gantt Legend -->
                     <div style="padding: 8px 24px; display: flex; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid var(--ula-border-subtle); background: var(--ula-surface-page-alt);">
-                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #42774C; display: inline-block;"></span> {{ __('Done') }}</span>
-                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #2563EB; display: inline-block;"></span> {{ __('In Progress') }}</span>
-                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #D97706; display: inline-block;"></span> {{ __('Review/QA') }}</span>
-                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: #64748B; display: inline-block;"></span> {{ __('Backlog/Ready') }}</span>
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: var(--ula-palm-500); display: inline-block;"></span> {{ __('Done') }}</span>
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: var(--ula-gold-500); display: inline-block;"></span> {{ __('In Progress') }}</span>
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: var(--ula-terracotta-400); display: inline-block;"></span> {{ __('Review/QA') }}</span>
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: var(--ula-stone-400); display: inline-block;"></span> {{ __('Backlog/Ready') }}</span>
                         <span style="font-size: 11px; margin-inline-start: auto; color: var(--ula-text-muted);">↔ {{ __('Drag bars to reschedule') }}</span>
                     </div>
 
@@ -2225,7 +2147,7 @@
                     <div id="frappe-gantt-wrapper" style="overflow-x: auto; min-height: 300px; padding: 12px 0;">
                         <div id="frappe-gantt-container"></div>
                         <div id="gantt-empty-state" style="display: none; text-align: center; padding: 60px 20px; color: var(--ula-text-muted);">
-                            📊 {{ __('No tasks with dates found. Add start & due dates to tasks to see the Gantt chart.') }}
+                            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bar_chart</span> {{ __('No tasks with dates found. Add start & due dates to tasks to see the Gantt chart.') }}
                         </div>
                     </div>
                 </div>
@@ -2235,7 +2157,7 @@
                     <div id="gantt-popover-content" style="font-size: 13px;"></div>
                     <div style="margin-top: 10px; display: flex; gap: 8px;">
                         <button id="gantt-popover-open-btn" class="tactile-btn btn-primary" style="padding: 5px 12px; font-size: 11px; flex: 1;">{{ __('Open Task') }}</button>
-                        <button onclick="document.getElementById('gantt-task-popover').style.display='none'" class="tactile-btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">✕</button>
+                        <button onclick="document.getElementById('gantt-task-popover').style.display='none'" class="tactile-btn btn-secondary" style="padding: 5px 10px; font-size: 11px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span></button>
                     </div>
                 </div>
             </div>
@@ -2245,7 +2167,7 @@
                 <div class="hub-card" style="padding: 0; overflow: hidden;">
                     <div style="padding: 18px 24px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center;">
                         <div>
-                            <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);">📈 {{ __('Team Workload & Capacity Matrix') }}</h3>
+                            <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">trending_up</span> {{ __('Team Workload & Capacity Matrix') }}</h3>
                             <p style="font-size: 12px; color: var(--ula-text-muted); margin-top: 2px;">{{ __('Prevent employee burnout by balancing weekly hours against allocated tasks.') }}</p>
                         </div>
                     </div>
@@ -2289,11 +2211,11 @@
                                     </td>
                                     <td>
                                         @if($wm['status'] === 'overloaded')
-                                            <span class="badge-pill" style="background: #FEE2E2; color: #B91C1C; border: 1px solid #FECACA;">⚠️ {{ __('Overloaded') }}</span>
+                                            <span class="badge-pill" style="background: var(--ula-terracotta-200); color: var(--ula-terracotta-600); border: 1px solid var(--ula-terracotta-300);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">warning</span> {{ __('Overloaded') }}</span>
                                         @elseif($wm['status'] === 'optimal')
-                                            <span class="badge-pill badge-green">⚡ {{ __('Optimal') }}</span>
+                                            <span class="badge-pill badge-green"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('Optimal') }}</span>
                                         @else
-                                            <span class="badge-pill badge-neutral">🍃 {{ __('Available') }}</span>
+                                            <span class="badge-pill badge-neutral"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">eco</span> {{ __('Available') }}</span>
                                         @endif
                                     </td>
                                 </tr>
@@ -2315,7 +2237,7 @@
                 <div class="hub-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
                         <div>
-                            <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);">📚 {{ __('Project Docs, Specs & Knowledge Wiki') }}</h3>
+                            <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">menu_book</span> {{ __('Project Docs, Specs & Knowledge Wiki') }}</h3>
                             <p style="font-size: 12px; color: var(--ula-text-muted); margin-top: 2px;">{{ __('Centralized living documents, specifications, and team meeting minutes.') }}</p>
                         </div>
                         <button onclick="openNewDocModal()" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px;">
@@ -2327,7 +2249,7 @@
                         @forelse($project->documents as $doc)
                         <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 18px; box-shadow: var(--ula-shadow-xs); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                                <span style="font-size: 22px;">{{ $doc->icon ?? '📄' }}</span>
+                                <span style="font-size: 22px;">@if($doc->icon){{ $doc->icon }}@else<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">description</span>@endif</span>
                                 <span class="badge-pill badge-neutral">v{{ $doc->version }}</span>
                             </div>
                             <h4 style="font-size: 15px; font-weight: 900; color: var(--ula-text-primary); margin-bottom: 6px;">{{ $doc->title }}</h4>
@@ -2335,13 +2257,13 @@
                                 {{ Str::limit(strip_tags($doc->content), 90) ?: __('No preview content available.') }}
                             </p>
                             <div style="font-size: 11px; color: var(--ula-text-muted); display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--ula-border-subtle); padding-top: 8px;">
-                                <span>✍️ {{ $doc->author->name ?? 'Team' }}</span>
+                                <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">edit</span> {{ $doc->author->name ?? 'Team' }}</span>
                                 <span>{{ $doc->updated_at->diffForHumans() }}</span>
                             </div>
                         </div>
                         @empty
                         <div style="grid-column: 1 / -1; text-align: center; color: var(--ula-text-muted); padding: 40px;">
-                            <div style="font-size: 32px; margin-bottom: 8px;">📚</div>
+                            <div style="font-size: 32px; margin-bottom: 8px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">menu_book</span></div>
                             {{ __('No documents created yet in this project.') }}
                             <div style="margin-top: 10px;">
                                 <button onclick="openNewDocModal()" class="tactile-btn btn-primary" style="padding: 6px 14px; font-size: 12px;">+ {{ __('Create First Doc') }}</button>
@@ -2357,7 +2279,7 @@
                 <div class="hub-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
                         <div>
-                            <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);">🎯 {{ __('Strategic Goals & Measurable Targets') }} ({{ $project->goals->count() }})</h3>
+                            <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">track_changes</span> {{ __('Strategic Goals & Measurable Targets') }} ({{ $project->goals->count() }})</h3>
                             <p style="font-size: 12px; color: var(--ula-text-muted); margin-top: 2px;">{{ __('Real-time OKRs automatically tracked against completed tasks, milestone phases, and logged work hours.') }}</p>
                         </div>
                         <button onclick="openNewGoalModal()" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px;">
@@ -2371,10 +2293,10 @@
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
                                 <div>
                                     <div style="display: flex; align-items: center; gap: 8px;">
-                                        <span style="font-size: 20px;">🎯</span>
+                                        <span style="font-size: 20px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">track_changes</span></span>
                                         <h4 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary); margin: 0;">{{ $goal->name }}</h4>
                                         <span class="badge-pill {{ $goal->status === 'completed' ? 'badge-green' : ($goal->progress_percentage > 0 ? 'badge-gold' : 'badge-neutral') }}">
-                                            {{ $goal->status === 'completed' ? '✅ ' . __('Completed') : ($goal->progress_percentage > 0 ? '⚡ ' . __('In Progress') : '⏳ ' . __('Planned')) }}
+                                            {!! $goal->status === 'completed' ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check_circle</span> ' . __('Completed') : ($goal->progress_percentage > 0 ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> ' . __('In Progress') : '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">hourglass_empty</span> ' . __('Planned')) !!}
                                         </span>
                                     </div>
                                     @if($goal->description)
@@ -2388,7 +2310,7 @@
 
                             <!-- Progress Bar -->
                             <div style="width: 100%; height: 8px; background: var(--ula-surface-card); border-radius: 9999px; overflow: hidden; margin-bottom: 14px; border: 1px solid var(--ula-border-subtle);">
-                                <div style="width: {{ $goal->progress_percentage }}%; height: 100%; background: linear-gradient(90deg, #42774C 0%, #2A5D37 100%); transition: width 0.3s ease;"></div>
+                                <div style="width: {{ $goal->progress_percentage }}%; height: 100%; background: linear-gradient(90deg, var(--ula-palm-500) 0%, var(--ula-palm-800) 100%); transition: width 0.3s ease;"></div>
                             </div>
 
                             <!-- Auto-Calculated Targets Breakdown -->
@@ -2396,10 +2318,10 @@
                                 @forelse($goal->targets as $target)
                                 @php
                                     $targetIcon = match($target->target_type) {
-                                        'tasks' => '⚡',
-                                        'milestones' => '🚩',
-                                        'hours' => '⏱️',
-                                        default => '🎯'
+                                        'tasks' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span>',
+                                        'milestones' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span>',
+                                        'hours' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span>',
+                                        default => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">track_changes</span>'
                                     };
                                 @endphp
                                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; background: var(--ula-surface-card); padding: 8px 12px; border-radius: var(--ula-radius-sm); border: 1px solid var(--ula-border-subtle); flex-wrap: wrap; gap: 6px;">
@@ -2407,19 +2329,19 @@
                                         <span>{{ $targetIcon }}</span>
                                         <span>{{ $target->title }}</span>
                                         @if(in_array($target->target_type, ['tasks', 'milestones', 'hours']))
-                                            <span class="badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.12); color: var(--ula-palm-900);">⚡ {{ __('Auto-Tracked') }}</span>
+                                            <span class="badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.12); color: var(--ula-palm-900);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('Auto-Tracked') }}</span>
                                         @endif
                                     </span>
                                     <span style="font-weight: 800; color: var(--ula-palm-900); font-family: monospace; font-size: 12px;">
                                         {{ $target->current_value }} / {{ $target->target_value }} {{ $target->unit }}
                                         @if($target->is_completed)
-                                            <span style="color: #4F9B5F; margin-inline-start: 4px;">✓</span>
+                                            <span style="color: var(--ula-status-success); margin-inline-start: 4px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check</span></span>
                                         @endif
                                     </span>
                                 </div>
                                 @empty
                                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; background: var(--ula-surface-card); padding: 8px 12px; border-radius: var(--ula-radius-sm); border: 1px solid var(--ula-border-subtle);">
-                                    <span style="font-weight: 700; color: var(--ula-text-primary);">⚡ {{ __('Tasks Completed in Project') }}</span>
+                                    <span style="font-weight: 700; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('Tasks Completed in Project') }}</span>
                                     <span style="font-weight: 800; color: var(--ula-palm-900); font-family: monospace;">
                                         {{ $project->tasks()->where('status', 'done')->count() }} / {{ $project->tasks()->count() }} {{ __('Tasks') }}
                                     </span>
@@ -2429,7 +2351,7 @@
                         </div>
                         @empty
                         <div style="text-align: center; color: var(--ula-text-muted); padding: 40px;">
-                            <div style="font-size: 32px; margin-bottom: 8px;">🎯</div>
+                            <div style="font-size: 32px; margin-bottom: 8px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">track_changes</span></div>
                             <p style="font-size: 14px; font-weight: 700; color: var(--ula-text-primary); margin-bottom: 4px;">{{ __('No strategic goals set for this project yet.') }}</p>
                             <p style="font-size: 12px; margin-bottom: 12px;">{{ __('Define key deliverables, target KPIs, and measurable milestones to automatically track progress.') }}</p>
                             <button onclick="openNewGoalModal()" class="tactile-btn btn-primary" style="padding: 7px 16px; font-size: 12px;">+ {{ __('Create First Goal') }}</button>
@@ -2443,7 +2365,7 @@
                 <div class="hub-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
                         <div>
-                            <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);">📁 {{ __('Project Assets & File Repository') }}</h3>
+                            <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> {{ __('Project Assets & File Repository') }}</h3>
                             <p style="font-size: 12px; color: var(--ula-text-muted); margin-top: 2px;">{{ __('Centralized repository for design files, contracts, deliverables, and specifications.') }}</p>
                         </div>
                     </div>
@@ -2451,13 +2373,13 @@
                     <!-- File Upload Dropzone Form -->
                     <form id="hub-project-file-form" onsubmit="uploadProjectFileSubmit(event)" action="{{ route('projects.files.store', $project) }}" method="POST" enctype="multipart/form-data" style="background: var(--ula-surface-page-alt); border: 2px dashed var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 24px; text-align: center; margin-bottom: 24px; transition: border-color 0.2s;">
                         @csrf
-                        <div style="font-size: 32px; margin-bottom: 8px;">📤</div>
+                        <div style="font-size: 32px; margin-bottom: 8px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">upload</span></div>
                         <h4 style="font-size: 14px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 4px;">{{ __('Upload Files to Project') }}</h4>
                         <p style="font-size: 12px; color: var(--ula-text-muted); margin-bottom: 14px;">{{ __('Choose documents, images, archives or zip files (Max 50MB)') }}</p>
                         <div style="display: flex; justify-content: center; align-items: center; gap: 10px; max-width: 480px; margin: 0 auto; flex-wrap: wrap;">
                             <input type="file" name="file" id="hub-project-file-input" required class="form-input" style="font-size: 12px; flex: 1;">
                             <button type="submit" id="hub-project-file-btn" class="tactile-btn btn-primary" style="padding: 9px 18px; font-size: 12px;">
-                                🚀 {{ __('Upload File') }}
+                                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">rocket_launch</span> {{ __('Upload File') }}
                             </button>
                         </div>
                     </form>
@@ -2468,15 +2390,15 @@
                             @php
                                 $ext = strtolower(pathinfo($file->file_name, PATHINFO_EXTENSION));
                                 $icon = match($ext) {
-                                    'pdf' => '📕',
-                                    'png', 'jpg', 'jpeg', 'svg', 'gif', 'webp' => '🖼️',
-                                    'zip', 'rar', 'tar', 'gz', '7z' => '📦',
-                                    'doc', 'docx' => '📘',
-                                    'xls', 'xlsx', 'csv' => '📊',
-                                    'mp4', 'mov', 'avi' => '🎥',
-                                    'mp3', 'wav', 'ogg' => '🎵',
-                                    'php', 'js', 'json', 'html', 'css', 'py', 'ts' => '💻',
-                                    default => '📄'
+                                    'pdf' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">picture_as_pdf</span>',
+                                    'png', 'jpg', 'jpeg', 'svg', 'gif', 'webp' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">image</span>',
+                                    'zip', 'rar', 'tar', 'gz', '7z' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">inventory_2</span>',
+                                    'doc', 'docx' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">description</span>',
+                                    'xls', 'xlsx', 'csv' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bar_chart</span>',
+                                    'mp4', 'mov', 'avi' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">videocam</span>',
+                                    'mp3', 'wav', 'ogg' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">music_note</span>',
+                                    'php', 'js', 'json', 'html', 'css', 'py', 'ts' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">computer</span>',
+                                    default => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">description</span>'
                                 };
                                 $canDelete = ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || ($project && $project->manager_id === $user->id) || $file->user_id === $user->id);
                             @endphp
@@ -2493,7 +2415,7 @@
                                             {{ $file->formatted_size }} • {{ $file->created_at->format('M d, Y') }}
                                         </div>
                                         <div style="font-size: 11px; color: var(--ula-text-secondary); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
-                                            <span>👤</span>
+                                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">person</span></span>
                                             <strong>{{ $file->user ? $file->user->name : __('Team Member') }}</strong>
                                         </div>
                                     </div>
@@ -2501,14 +2423,14 @@
 
                                 <div style="display: flex; gap: 8px; border-top: 1px solid var(--ula-border-subtle); padding-top: 10px;">
                                     <a href="{{ $file->file_url }}" target="_blank" download class="tactile-btn btn-secondary" style="flex: 1; padding: 6px 12px; font-size: 11px; text-align: center; text-decoration: none; justify-content: center;">
-                                        ⬇ {{ __('Download') }}
+                                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">file_download</span> {{ __('Download') }}
                                     </a>
                                     @if($canDelete)
                                         <form action="{{ route('projects.files.destroy', [$project, $file]) }}" method="POST" onsubmit="return confirm('{{ __('Are you sure you want to delete this file?') }}')">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.3); padding: 6px 10px; font-size: 11px;" title="{{ __('Delete File') }}">
-                                                🗑️
+                                            <button type="submit" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.3); padding: 6px 10px; font-size: 11px;" title="{{ __('Delete File') }}">
+                                                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">delete</span>
                                             </button>
                                         </form>
                                     @endif
@@ -2516,7 +2438,7 @@
                             </div>
                         @empty
                             <div style="grid-column: 1 / -1; text-align: center; color: var(--ula-text-muted); padding: 40px;">
-                                <div style="font-size: 32px; margin-bottom: 8px;">📂</div>
+                                <div style="font-size: 32px; margin-bottom: 8px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder_open</span></div>
                                 {{ __('No files or assets uploaded to this project yet.') }}
                             </div>
                         @endforelse
@@ -2547,7 +2469,7 @@
                 document.body.classList.remove('dark-mode');
             }
             document.querySelectorAll('.theme-toggle-icon-label').forEach(el => {
-                el.textContent = (activeTheme === 'dark') ? '☀️' : '🌙';
+                el.innerHTML = (activeTheme === 'dark') ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">light_mode</span>' : '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">dark_mode</span>';
             });
             localStorage.setItem('vw_theme', activeTheme);
         }
@@ -2594,7 +2516,7 @@
             const form = e.target;
             const payload = {
                 title: form.title.value,
-                icon: form.icon.value || '📄',
+                icon: form.icon.value || '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">description</span>',
                 content: form.content.value,
                 is_pinned: form.is_pinned ? form.is_pinned.checked : false,
             };
@@ -2605,7 +2527,7 @@
                     body: JSON.stringify(payload)
                 });
                 if (res.ok) {
-                    showHubToast('📚 {{ __('Document created successfully!') }}');
+                    showHubToast('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">menu_book</span> {{ __('Document created successfully!') }}');
                     closeNewDocModal();
                     setTimeout(() => window.location.reload(), 500);
                 } else {
@@ -2622,13 +2544,16 @@
         let frappeGanttCurrentView = 'Week';
         let ganttCurrentPopoverTaskId = null;
 
+        // UlaSpace palette only (palm/gold/terracotta/stone) -- no blue/purple/
+        // slate exist in the design system, so 6 statuses are spread across
+        // shades within those families rather than borrowing generic hues.
         const GANTT_STATUS_COLORS = {
-            done:        '#42774C',
-            in_progress: '#2563EB',
-            review:      '#D97706',
-            qa:          '#7C3AED',
-            ready:       '#64748B',
-            backlog:     '#94A3B8',
+            done:        '#3c6b4c', // --ula-palm-500
+            in_progress: '#b98a37', // --ula-gold-500
+            review:      '#b46c34', // --ula-terracotta-400
+            qa:          '#7d451d', // --ula-terracotta-600
+            ready:       '#a49889', // --ula-stone-400
+            backlog:     '#c1b6a6', // --ula-stone-300
         };
 
         // Build Frappe Gantt task objects from PHP $ganttTasks
@@ -2728,12 +2653,12 @@
             const style = document.createElement('style');
             style.id = 'gantt-status-styles';
             style.textContent = `
-                .gantt .bar-wrapper.gantt-bar-done         .bar { fill: #42774C !important; }
-                .gantt .bar-wrapper.gantt-bar-in_progress  .bar { fill: #2563EB !important; }
-                .gantt .bar-wrapper.gantt-bar-review       .bar { fill: #D97706 !important; }
-                .gantt .bar-wrapper.gantt-bar-qa           .bar { fill: #7C3AED !important; }
-                .gantt .bar-wrapper.gantt-bar-ready        .bar { fill: #64748B !important; }
-                .gantt .bar-wrapper.gantt-bar-backlog      .bar { fill: #94A3B8 !important; }
+                .gantt .bar-wrapper.gantt-bar-done         .bar { fill: #3c6b4c !important; }
+                .gantt .bar-wrapper.gantt-bar-in_progress  .bar { fill: #b98a37 !important; }
+                .gantt .bar-wrapper.gantt-bar-review       .bar { fill: #b46c34 !important; }
+                .gantt .bar-wrapper.gantt-bar-qa           .bar { fill: #7d451d !important; }
+                .gantt .bar-wrapper.gantt-bar-ready        .bar { fill: #a49889 !important; }
+                .gantt .bar-wrapper.gantt-bar-backlog      .bar { fill: #c1b6a6 !important; }
                 .gantt .bar-label { font-size: 11px !important; font-weight: 800 !important; fill: #ffffff !important; }
             `;
             document.head.appendChild(style);
@@ -2760,8 +2685,7 @@
             const meta = task._meta || {};
             ganttCurrentPopoverTaskId = task.id;
 
-            const statusColors = { done: '#42774C', in_progress: '#2563EB', review: '#D97706', qa: '#7C3AED', ready: '#64748B', backlog: '#94A3B8' };
-            const color = statusColors[meta.status] || '#64748B';
+            const color = GANTT_STATUS_COLORS[meta.status] || GANTT_STATUS_COLORS.backlog;
 
             document.getElementById('gantt-popover-content').innerHTML = `
                 <div style="font-weight: 900; font-size: 13px; color: var(--ula-text-primary); margin-bottom: 8px; line-height: 1.4;">${task.name}</div>

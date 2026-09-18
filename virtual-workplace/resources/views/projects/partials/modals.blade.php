@@ -2,8 +2,8 @@
     <div id="new-task-modal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <h3 style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);">📝 {{ __('Create Task in') }} {{ $project->name }}</h3>
-                <button onclick="closeNewTaskModal()" class="modal-close">✕</button>
+                <h3 style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">edit_note</span> {{ __('Create Task in') }} {{ $project->name }}</h3>
+                <button onclick="closeNewTaskModal()" class="modal-close"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span></button>
             </div>
             <form id="new-task-form" onsubmit="createProjectTaskSubmit(event)" style="display: flex; flex-direction: column; gap: 14px;">
                 <input type="hidden" name="project_id" value="{{ $project->id }}">
@@ -43,23 +43,23 @@
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">🚩 {{ __('Milestone / Phase') }}</label>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ __('Milestone / Phase') }}</label>
                         <select name="milestone_id" class="form-input">
                             <option value="">— {{ __('No Milestone') }} —</option>
                             @foreach($project->milestones as $pms)
-                                <option value="{{ $pms->id }}">🚩 {{ $pms->name }}</option>
+                                <option value="{{ $pms->id }}"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ $pms->name }}</option>
                             @endforeach
                         </select>
                     </div>
                     <div>
-                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">🔄 {{ __('Repeat / Recurrence') }}</label>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">refresh</span> {{ __('Repeat / Recurrence') }}</label>
                         <select name="recurrence_rule" id="new-task-recurrence-rule" onchange="toggleRecurrenceDetails(this.value)" class="form-input">
                             <option value="">{{ __('No Repeat (One-time)') }}</option>
-                            <option value="daily">🔁 {{ __('Daily') }}</option>
-                            <option value="weekly">📅 {{ __('Weekly') }}</option>
-                            <option value="biweekly">🗓️ {{ __('Biweekly (Every 2 weeks)') }}</option>
-                            <option value="monthly">📆 {{ __('Monthly') }}</option>
-                            <option value="quarterly">📊 {{ __('Quarterly (Every 3 months)') }}</option>
+                            <option value="daily"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">repeat</span> {{ __('Daily') }}</option>
+                            <option value="weekly"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Weekly') }}</option>
+                            <option value="biweekly"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Biweekly (Every 2 weeks)') }}</option>
+                            <option value="monthly"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Monthly') }}</option>
+                            <option value="quarterly"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bar_chart</span> {{ __('Quarterly (Every 3 months)') }}</option>
                         </select>
                     </div>
                 </div>
@@ -81,7 +81,7 @@
                     <textarea name="description" rows="3" placeholder="Task requirements..." class="form-input" style="resize: vertical;"></textarea>
                 </div>
                 <button type="submit" class="tactile-btn btn-primary" style="margin-top: 8px; padding: 12px; font-size: 14px;">
-                    💾 {{ __('Create Task') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">save</span> {{ __('Create Task') }}
                 </button>
             </form>
         </div>
@@ -91,8 +91,8 @@
     <div id="manual-time-modal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <h3 style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);">✍️ {{ __('Log Manual Time Entry') }}</h3>
-                <button onclick="closeManualTimeModal()" class="modal-close">✕</button>
+                <h3 style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">edit</span> {{ __('Log Manual Time Entry') }}</h3>
+                <button onclick="closeManualTimeModal()" class="modal-close"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span></button>
             </div>
             <form id="manual-time-form" onsubmit="logProjectTimeSubmit(event)" style="display: flex; flex-direction: column; gap: 14px;">
                 <input type="hidden" name="project_id" value="{{ $project->id }}">
@@ -130,8 +130,8 @@
     <div id="schedule-meeting-modal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <h3 style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);">📅 {{ __('Schedule Project Meeting') }}</h3>
-                <button onclick="closeScheduleProjectMeetingModal()" class="modal-close">✕</button>
+                <h3 style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Schedule Project Meeting') }}</h3>
+                <button onclick="closeScheduleProjectMeetingModal()" class="modal-close"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span></button>
             </div>
             <form id="hub-schedule-meeting-form" onsubmit="scheduleProjectMeetingSubmit(event)" method="POST" action="{{ route('meetings.schedule') }}" style="display: flex; flex-direction: column; gap: 14px;">
                 @csrf
@@ -153,7 +153,7 @@
                         <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Meeting Room') }}</label>
                         <select name="room_id" class="form-input">
                             @foreach($rooms as $r)
-                                <option value="{{ $r->id }}">🚪 {{ $r->name }}</option>
+                                <option value="{{ $r->id }}"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span> {{ $r->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -177,10 +177,10 @@
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                         <label style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">
-                            👥 {{ __('Select Project Members to Attend') }}
+                            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">group</span> {{ __('Select Project Members to Attend') }}
                         </label>
                         <button type="button" onclick="toggleAllHubProjectAttendees()" style="background: none; border: none; font-size: 11px; font-weight: 800; color: var(--ula-palm-900); cursor: pointer;">
-                            ✓ {{ __('Select / Unselect All') }}
+                            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check</span> {{ __('Select / Unselect All') }}
                         </button>
                     </div>
                     <div style="max-height: 120px; overflow-y: auto; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 6px 10px; display: flex; flex-direction: column; gap: 4px;">
@@ -200,7 +200,7 @@
                 </div>
 
                 <button type="submit" id="hub-schedule-meeting-btn" class="tactile-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px;">
-                    🚀 {{ __('Schedule Meeting & Email Team') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">rocket_launch</span> {{ __('Schedule Meeting & Email Team') }}
                 </button>
             </form>
         </div>
@@ -213,46 +213,46 @@
                 <div>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span id="task-modal-code" class="badge-pill badge-neutral" style="font-family: monospace; font-size: 11px; font-weight: 900;">#1</span>
-                        <span id="task-modal-priority-badge" class="badge-pill badge-gold" style="font-size: 10px;">⚡ Normal</span>
+                        <span id="task-modal-priority-badge" class="badge-pill badge-gold" style="font-size: 10px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> Normal</span>
                     </div>
                     <h2 id="task-modal-title" style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary); margin-top: 4px;">Task Title</h2>
                 </div>
-                <button onclick="closeTaskInspector()" class="modal-close">✕</button>
+                <button onclick="closeTaskInspector()" class="modal-close"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span></button>
             </div>
 
             <!-- Quick Status Change, Milestone, & Timer Action -->
             <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-page-alt); padding: 8px 12px; border-radius: var(--ula-radius-sm); border: 1px solid var(--ula-border-subtle); flex-wrap: wrap; gap: 8px;">
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 12px; font-weight: 800; color: var(--ula-text-secondary);">⚡ {{ __('Status') }}:</span>
+                        <span style="font-size: 12px; font-weight: 800; color: var(--ula-text-secondary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('Status') }}:</span>
                         <select id="task-modal-status-select" onchange="updateCurrentTaskStatus(this.value)" class="form-input" style="padding: 4px 8px; font-size: 12px; width: auto; font-weight: 800;">
-                            <option value="backlog">📌 {{ __('Backlog') }}</option>
-                            <option value="ready">🎯 {{ __('Ready') }}</option>
-                            <option value="in_progress">⚡ {{ __('In Progress') }}</option>
-                            <option value="review">🔍 {{ __('Review / QA') }}</option>
-                            <option value="done">🎉 {{ __('Done') }}</option>
+                            <option value="backlog"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">push_pin</span> {{ __('Backlog') }}</option>
+                            <option value="ready"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">track_changes</span> {{ __('Ready') }}</option>
+                            <option value="in_progress"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('In Progress') }}</option>
+                            <option value="review"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span> {{ __('Review / QA') }}</option>
+                            <option value="done"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">celebration</span> {{ __('Done') }}</option>
                         </select>
                     </div>
 
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 12px; font-weight: 800; color: var(--ula-text-secondary);">🚩 {{ __('Milestone') }}:</span>
+                        <span style="font-size: 12px; font-weight: 800; color: var(--ula-text-secondary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ __('Milestone') }}:</span>
                         <select id="task-modal-milestone-select" onchange="updateCurrentTaskMilestone(this.value)" class="form-input" style="padding: 4px 8px; font-size: 12px; width: auto; font-weight: 700;">
                             <option value="">— {{ __('No Milestone') }} —</option>
                             @foreach($project->milestones as $pms)
-                                <option value="{{ $pms->id }}">🚩 {{ $pms->name }}</option>
+                                <option value="{{ $pms->id }}"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ $pms->name }}</option>
                             @endforeach
                         </select>
                     </div>
 
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 12px; font-weight: 800; color: var(--ula-text-secondary);">🔄 {{ __('Repeat') }}:</span>
+                        <span style="font-size: 12px; font-weight: 800; color: var(--ula-text-secondary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">refresh</span> {{ __('Repeat') }}:</span>
                         <select id="task-modal-recurrence-select" onchange="updateCurrentTaskRecurrence(this.value)" class="form-input" style="padding: 4px 8px; font-size: 12px; width: auto; font-weight: 700;">
                             <option value="">— {{ __('One-time') }} —</option>
-                            <option value="daily">🔁 {{ __('Daily') }}</option>
-                            <option value="weekly">📅 {{ __('Weekly') }}</option>
-                            <option value="biweekly">🗓️ {{ __('Biweekly') }}</option>
-                            <option value="monthly">📆 {{ __('Monthly') }}</option>
-                            <option value="quarterly">📊 {{ __('Quarterly') }}</option>
+                            <option value="daily"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">repeat</span> {{ __('Daily') }}</option>
+                            <option value="weekly"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Weekly') }}</option>
+                            <option value="biweekly"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Biweekly') }}</option>
+                            <option value="monthly"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Monthly') }}</option>
+                            <option value="quarterly"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bar_chart</span> {{ __('Quarterly') }}</option>
                         </select>
                     </div>
 
@@ -274,16 +274,16 @@
             <!-- Inspector Tab Navigation -->
             <div style="display: flex; gap: 4px; border-bottom: 1px solid var(--ula-border-subtle); margin-bottom: 14px;">
                 <button type="button" onclick="switchInspectorTab('overview')" id="task-tab-btn-overview" class="task-inspector-tab-btn active">
-                    📋 {{ __('Overview & Checklist') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">assignment</span> {{ __('Overview & Checklist') }}
                 </button>
                 <button type="button" onclick="switchInspectorTab('discussion')" id="task-tab-btn-discussion" class="task-inspector-tab-btn">
-                    💬 {{ __('Discussions') }} (<span id="task-modal-comments-badge">0</span>)
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">chat</span> {{ __('Discussions') }} (<span id="task-modal-comments-badge">0</span>)
                 </button>
                 <button type="button" onclick="switchInspectorTab('files')" id="task-tab-btn-files" class="task-inspector-tab-btn">
-                    📎 {{ __('Files') }} (<span id="task-hub-attachments-count">0</span>)
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">attach_file</span> {{ __('Files') }} (<span id="task-hub-attachments-count">0</span>)
                 </button>
                 <button type="button" onclick="switchInspectorTab('activity')" id="task-tab-btn-activity" class="task-inspector-tab-btn">
-                    📜 {{ __('Activity History') }} (<span id="task-modal-activity-badge">0</span>)
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">description</span> {{ __('Activity History') }} (<span id="task-modal-activity-badge">0</span>)
                 </button>
             </div>
 
@@ -338,7 +338,7 @@
                 <div id="task-tab-content-files" class="task-inspector-tab-pane" style="display: none;">
                     <form onsubmit="uploadHubTaskAttachmentSubmit(event)" style="background: var(--ula-surface-page-alt); border: 1px dashed var(--ula-border-subtle); border-radius: var(--ula-radius-sm); padding: 12px; text-align: center; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;">
                         <input type="file" id="hub-task-file-input" required class="form-input" style="font-size: 11px; max-width: 260px;">
-                        <button type="submit" class="tactile-btn btn-primary" style="padding: 6px 12px; font-size: 11px;">📤 {{ __('Upload') }}</button>
+                        <button type="submit" class="tactile-btn btn-primary" style="padding: 6px 12px; font-size: 11px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">upload</span> {{ __('Upload') }}</button>
                     </form>
                     <div id="task-hub-attachments-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px;"></div>
                 </div>
@@ -347,10 +347,10 @@
                 <div id="task-tab-content-activity" class="task-inspector-tab-pane" style="display: none;">
                     <div style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
                         <span style="font-size: 11px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;">
-                            📜 {{ __('Chronological Audit Trail & Mutation History') }}
+                            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">description</span> {{ __('Chronological Audit Trail & Mutation History') }}
                         </span>
                         <span style="font-size: 10px; color: var(--ula-palm-900); font-weight: 700;">
-                            🔒 {{ __('Tamper-proof Logged') }}
+                            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">lock</span> {{ __('Tamper-proof Logged') }}
                         </span>
                     </div>
                     <div id="task-activity-timeline-feed" style="display: flex; flex-direction: column; gap: 10px; padding: 4px;">
@@ -365,14 +365,14 @@
     <div id="new-doc-modal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <h3 style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);">📚 {{ __('Create Project Document / Wiki') }}</h3>
-                <button onclick="closeNewDocModal()" class="modal-close">✕</button>
+                <h3 style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">menu_book</span> {{ __('Create Project Document / Wiki') }}</h3>
+                <button onclick="closeNewDocModal()" class="modal-close"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span></button>
             </div>
             <form id="new-doc-form" onsubmit="createProjectDocSubmit(event)" style="display: flex; flex-direction: column; gap: 14px;">
                 <div style="display: grid; grid-template-columns: 60px 1fr; gap: 10px;">
                     <div>
                         <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Icon') }}</label>
-                        <input type="text" name="icon" value="📄" class="form-input" style="text-align: center; font-size: 16px;">
+                        <input type="text" name="icon" value="<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">description</span>" class="form-input" style="text-align: center; font-size: 16px;">
                     </div>
                     <div>
                         <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Document Title') }} *</label>
@@ -385,10 +385,10 @@
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <input type="checkbox" name="is_pinned" id="doc_pinned" style="accent-color: var(--ula-palm-900);">
-                    <label for="doc_pinned" style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary); cursor: pointer;">📌 {{ __('Pin to top of knowledge wiki') }}</label>
+                    <label for="doc_pinned" style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary); cursor: pointer;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">push_pin</span> {{ __('Pin to top of knowledge wiki') }}</label>
                 </div>
                 <button type="submit" class="tactile-btn btn-primary" style="margin-top: 8px; padding: 12px; font-size: 14px;">
-                    💾 {{ __('Publish Document') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">save</span> {{ __('Publish Document') }}
                 </button>
             </form>
         </div>
@@ -398,8 +398,8 @@
     <div id="new-goal-modal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <h3 style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);">🎯 {{ __('Create Strategic Project Goal') }}</h3>
-                <button onclick="closeNewGoalModal()" class="modal-close">✕</button>
+                <h3 style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">track_changes</span> {{ __('Create Strategic Project Goal') }}</h3>
+                <button onclick="closeNewGoalModal()" class="modal-close"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span></button>
             </div>
             <form id="new-goal-form" onsubmit="createProjectGoalSubmit(event)" style="display: flex; flex-direction: column; gap: 14px;">
                 <div>
@@ -407,12 +407,12 @@
                     <input type="text" name="name" required placeholder="e.g. Beta Launch & 100 User Onboarding" class="form-input">
                 </div>
                 <div>
-                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">⚡ {{ __('Key Metric & Auto-Tracking Engine') }} *</label>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('Key Metric & Auto-Tracking Engine') }} *</label>
                     <select name="target_type" id="goal-target-type-select" onchange="toggleGoalMetricFields(this.value)" class="form-input" style="font-weight: 700;">
-                        <option value="tasks">⚡ {{ __('Tasks Completion (Auto-calculated from done tasks)') }}</option>
-                        <option value="milestones">🚩 {{ __('Milestones Delivery (Auto-calculated from completed phases)') }}</option>
+                        <option value="tasks"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('Tasks Completion (Auto-calculated from done tasks)') }}</option>
+                        <option value="milestones"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ __('Milestones Delivery (Auto-calculated from completed phases)') }}</option>
                         <option value="hours">⏱️ {{ __('Hours Budget (Auto-calculated from logged timers)') }}</option>
-                        <option value="number">🎯 {{ __('Custom Numeric Target (Manual KPI)') }}</option>
+                        <option value="number"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">track_changes</span> {{ __('Custom Numeric Target (Manual KPI)') }}</option>
                     </select>
                 </div>
                 <div id="goal-custom-target-row" style="display: none; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -434,7 +434,7 @@
                     <input type="date" name="due_date" class="form-input">
                 </div>
                 <button type="submit" class="tactile-btn btn-primary" style="margin-top: 8px; padding: 12px; font-size: 14px;">
-                    🚀 {{ __('Set Strategic Goal') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">rocket_launch</span> {{ __('Set Strategic Goal') }}
                 </button>
             </form>
         </div>
@@ -444,8 +444,8 @@
     <div id="new-milestone-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 480px;">
             <div class="modal-header">
-                <h3 style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);">🚩 {{ __('Create Project Milestone / Phase') }}</h3>
-                <button onclick="closeNewMilestoneModal()" class="modal-close">✕</button>
+                <h3 style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ __('Create Project Milestone / Phase') }}</h3>
+                <button onclick="closeNewMilestoneModal()" class="modal-close"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span></button>
             </div>
             <form id="new-milestone-form" onsubmit="createProjectMilestoneSubmit(event)" style="display: flex; flex-direction: column; gap: 14px;">
                 <div>
@@ -457,17 +457,17 @@
                     <input type="date" name="due_date" class="form-input">
                 </div>
                 <button type="submit" class="tactile-btn btn-primary" style="margin-top: 8px; padding: 12px; font-size: 14px;">
-                    🚩 {{ __('Create Milestone') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ __('Create Milestone') }}
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- 🌟 CLICKUP-PARITY 3D TASK CONTEXT MENU 🌟 -->
+    <!-- <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">star</span> CLICKUP-PARITY 3D TASK CONTEXT MENU <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">star</span> -->
     <div id="task-context-menu" class="task-context-menu" onclick="event.stopPropagation();">
         <div class="ctx-quick-header">
             <button type="button" class="ctx-quick-btn" onclick="ctxActionCopyLink()" title="{{ __('Copy Task Link') }}">
-                🔗 {{ __('Link') }}
+                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">link</span> {{ __('Link') }}
             </button>
             <button type="button" class="ctx-quick-btn" onclick="ctxActionCopyId()" title="{{ __('Copy Task ID') }}">
                 # {{ __('ID') }}
@@ -478,7 +478,7 @@
         </div>
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionInspect()">
-            <span><span class="ctx-icon">🔍</span>{{ __('Inspect & Edit') }}</span>
+            <span><span class="ctx-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span></span>{{ __('Inspect & Edit') }}</span>
             <span style="font-size: 10px; color: var(--ula-text-muted); font-family: monospace;">↵</span>
         </a>
 
@@ -488,29 +488,29 @@
         </a>
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionDuplicate()">
-            <span><span class="ctx-icon">📋</span>{{ __('Duplicate Task') }}</span>
+            <span><span class="ctx-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">assignment</span></span>{{ __('Duplicate Task') }}</span>
         </a>
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionOpenMoveModal()">
-            <span><span class="ctx-icon">➡️</span>{{ __('Move to Project') }}</span>
+            <span><span class="ctx-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_forward</span></span>{{ __('Move to Project') }}</span>
             <span style="font-size: 11px; color: var(--ula-text-muted);">›</span>
         </a>
 
         <div class="ctx-divider"></div>
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionInspectCustomFields()">
-            <span><span class="ctx-icon">🏷️</span>{{ __('Custom Fields') }}</span>
+            <span><span class="ctx-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">label</span></span>{{ __('Custom Fields') }}</span>
         </a>
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionInspectDependencies()">
-            <span><span class="ctx-icon">🔗</span>{{ __('Dependencies') }}</span>
+            <span><span class="ctx-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">link</span></span>{{ __('Dependencies') }}</span>
         </a>
 
         <div class="ctx-divider"></div>
 
         <a href="javascript:void(0)" class="ctx-item danger" onclick="ctxActionDelete()">
-            <span><span class="ctx-icon">🗑️</span>{{ __('Delete Task') }}</span>
-            <span style="font-size: 10px; color: #D96B5F; font-family: monospace;">Del</span>
+            <span><span class="ctx-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">delete</span></span>{{ __('Delete Task') }}</span>
+            <span style="font-size: 10px; color: var(--ula-status-danger); font-family: monospace;">Del</span>
         </a>
     </div>
 
@@ -518,14 +518,14 @@
     <div id="move-task-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 420px;">
             <div class="modal-header">
-                <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);">➡️ {{ __('Move Task to Project') }}</h3>
-                <button type="button" onclick="closeMoveTaskModal()" class="modal-close">✕</button>
+                <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_forward</span> {{ __('Move Task to Project') }}</h3>
+                <button type="button" onclick="closeMoveTaskModal()" class="modal-close"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span></button>
             </div>
             <form onsubmit="submitMoveTask(event)" style="display: flex; flex-direction: column; gap: 14px; margin-top: 8px;">
                 <input type="hidden" id="move-task-id-input">
                 <div>
                     <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 6px; text-transform: uppercase;">
-                        📁 {{ __('Target Project') }}
+                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> {{ __('Target Project') }}
                     </label>
                     <select id="move-target-project-select" required class="form-input">
                         @foreach($allProjects as $p)
@@ -535,7 +535,7 @@
                 </div>
                 <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px;">
                     <button type="button" onclick="closeMoveTaskModal()" class="tactile-btn btn-secondary" style="padding: 8px 16px; font-size: 12px;">{{ __('Cancel') }}</button>
-                    <button type="submit" class="tactile-btn btn-primary" style="padding: 8px 18px; font-size: 12px;">➡️ {{ __('Move Task') }}</button>
+                    <button type="submit" class="tactile-btn btn-primary" style="padding: 8px 18px; font-size: 12px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_forward</span> {{ __('Move Task') }}</button>
                 </div>
             </form>
         </div>
