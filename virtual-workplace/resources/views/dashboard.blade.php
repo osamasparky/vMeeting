@@ -8,8 +8,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/ulaspace-tokens.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/ulaspace-dashboard.css') }}">
     <link rel="stylesheet" href="{{ asset('css/modern-design-system.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/ulaspace-dashboard.css') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" nonce="{{ $cspNonce ?? '' }}"></script>
     <style>
@@ -17,39 +17,14 @@
            ULASPACE DESIGN SYSTEM — WORKSPACE DASHBOARD
            ═══════════════════════════════════════════════════════════════ */
         :root {
-            /* Light Theme (Warm Ivory & Forest Green Baseline) */
-                        --bg-secondary: var(--ula-surface-card, #FFFFFF);
-                                                            
-            /* Core Green Identity */
-                        --brand-workspace: var(--ula-palm-800, #1B3223);
-                        --brand-soft-sage: #BFD4B8;
-                        --brand-secondary: var(--ula-palm-800, #1B3223);
-                        --brand-pine: var(--ula-palm-800, #1B3223);
-            --brand-ocean: var(--ula-palm-900, #142B24);
-                        --brand-green: var(--ula-palm-500, #3C6B4C);
-            --brand-lime: #719B73;
-                        --brand-orange: #b46c34;
-            --brand-coral: #D96B5F;
-            
-            /* Gradients & Accents */
-                        --ula-gradient-accent: linear-gradient(135deg, #142B24 0%, #1E412F 100%);
-            --accent-green: var(--ula-palm-500, #3C6B4C);
-            --accent-amber: var(--ula-gold-400, #D3A553);
-
-            /* Typography Colors */
-                                                
-            /* Borders */
-                                    --border-focus: var(--ula-palm-900, #142B24);
-
-            /* Status */
-                                                --status-info: var(--ula-palm-900, #142B24);
-
-            /* Shadows & Elevation */
-            --radius-xs: 6px;
-                                                            
-                                                                        --shadow-kpi-icon: var(--ula-shadow-sm);
-
-                    }
+            /* Only --ula-gradient-accent is actually referenced below; every
+               other declaration this block used to carry (--brand-*,
+               --bg-secondary, --accent-*, --border-focus, --status-info,
+               --radius-xs, --shadow-kpi-icon) had zero usages in this file --
+               dead weight left by the token sweep, some of it under the
+               retired --brand-* prefix. Removed rather than kept unused. */
+            --ula-gradient-accent: linear-gradient(135deg, var(--ula-palm-900) 0%, var(--ula-palm-700) 100%);
+        }
 
         [dir="rtl"], [lang="ar"] {
             --font-family: var(--ula-font-ar);
@@ -72,103 +47,71 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 🌌 Dark Theme Tokens */
+        /* Dark Theme Tokens */
         [data-theme="dark"], html.dark, body.dark-mode {
-                        --bg-secondary: var(--ula-palm-900, #142B24);
-                                                            
-            /* Core Green Accents */
-                        --brand-workspace: var(--ula-palm-700, #1E412F);
-                        --brand-soft-sage: #719B73;
-                        --brand-secondary: var(--ula-palm-700, #1E412F);
-                        --brand-pine: var(--ula-palm-700, #1E412F);
-            --brand-ocean: var(--ula-palm-500, #8baa94);
-                        --brand-green: var(--ula-palm-500, #8baa94);
-            --brand-lime: #7BC47F;
-                        --brand-orange: #e6c88b;
-            --brand-coral: #D96B5F;
-            
-            /* Gradients & Accents */
-                        --ula-gradient-accent: linear-gradient(135deg, #1E412F 0%, #3C6B4C 100%);
-            --accent-green: var(--ula-palm-500, #8baa94);
-            --accent-amber: #e6c88b;
-
-            /* Typography Colors */
-                                                
-            /* Borders */
-                                    --border-focus: var(--ula-palm-500, #8baa94);
-
-            /* Status */
-                                                --status-info: var(--ula-palm-500, #8baa94);
-
-            /* Shadows */
-                                                                    }
+            --ula-gradient-accent: linear-gradient(135deg, var(--ula-palm-700) 0%, var(--ula-palm-500) 100%);
+        }
 
         /* Dark Mode specific component refinements */
         [data-theme="dark"] .sidebar-accordion-header {
-            background: #15251B;
-            border-color: #26382B;
-            color: #F1F5EF;
+            background: var(--ula-palm-900);
+            border-color: var(--ula-border-subtle);
+            color: var(--ula-text-primary);
             box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.35);
         }
         [data-theme="dark"] .sidebar-accordion-header:hover {
-            background: #1D3325;
-            border-color: #4F9B5F;
-            color: #7BC47F;
+            background: var(--ula-palm-800);
+            border-color: var(--ula-palm-400);
+            color: var(--ula-palm-300);
         }
         [data-theme="dark"] .nav-tab-btn {
-            color: #9AA99D;
+            color: var(--ula-text-muted);
         }
         [data-theme="dark"] .nav-tab-btn:hover {
-            background: #15251B;
-            color: #F1F5EF;
-            border-color: #26382B;
+            background: var(--ula-palm-900);
+            color: var(--ula-text-primary);
+            border-color: var(--ula-border-subtle);
         }
         [data-theme="dark"] .nav-icon-tile {
-            background: #101C15;
-            border-color: #26382B;
-            color: #7BC47F;
+            background: var(--ula-palm-950);
+            border-color: var(--ula-border-subtle);
+            color: var(--ula-palm-300);
         }
         [data-theme="dark"] .nav-badge-pill {
-            background: #15251B;
-            color: #7BC47F;
-            border-color: #26382B;
+            background: var(--ula-palm-900);
+            color: var(--ula-palm-300);
+            border-color: var(--ula-border-subtle);
         }
         [data-theme="dark"] .go-premium-card {
-            background: linear-gradient(135deg, #1C180E 0%, #14120B 100%);
-            border-color: #3E3215;
+            background: linear-gradient(135deg, var(--ula-palm-950) 0%, var(--ula-black) 100%);
+            border-color: var(--ula-gold-600);
         }
         [data-theme="dark"] .go-premium-card div {
-            color: #E5C365 !important;
+            color: var(--ula-gold-300) !important;
         }
         [data-theme="dark"] .hero-welcome-card {
-            background: linear-gradient(135deg, #15251B 0%, #101C15 100%) !important;
-            border-color: #26382B !important;
+            background: linear-gradient(135deg, var(--ula-palm-900) 0%, var(--ula-palm-950) 100%) !important;
+            border-color: var(--ula-border-subtle) !important;
         }
-        [data-theme="dark"] .card {
-            background: #101C15;
-            border-color: #26382B;
-        }
-        [data-theme="dark"] .kpi-card {
-            background: #101C15;
-            border-color: #26382B;
-        }
+        /* .card already uses var(--ula-surface-card)/var(--ula-border-subtle),
+           both theme-aware, so no separate dark-mode override is needed. */
         [data-theme="dark"] .data-table thead th {
-            background: #15251B;
-            border-color: #26382B;
-            color: #9AA99D;
+            background: var(--ula-palm-900);
+            border-color: var(--ula-border-subtle);
+            color: var(--ula-text-muted);
         }
         [data-theme="dark"] .data-table tbody tr {
-            border-color: #26382B;
+            border-color: var(--ula-border-subtle);
         }
         [data-theme="dark"] .data-table tbody tr:hover {
-            background: #15251B;
+            background: var(--ula-palm-900);
         }
         [data-theme="dark"] .modal-card {
-            background: #101C15;
-            border-color: #26382B;
+            background: var(--ula-palm-950);
+            border-color: var(--ula-border-subtle);
         }
         [data-theme="dark"] .modal-header {
-            border-color: #26382B;
+            border-color: var(--ula-border-subtle);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
@@ -297,8 +240,8 @@
             inset-inline-start: calc(100% + 12px);
             top: 50%;
             transform: translateY(-50%);
-            background: #192D21;
-            color: #FFFDF6;
+            background: var(--ula-palm-900);
+            color: var(--ula-sand-100);
             padding: 6px 12px;
             border-radius: 8px;
             font-size: 11px;
@@ -333,7 +276,7 @@
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            color: #FFFDF6;
+            color: var(--ula-white);
             box-shadow: var(--ula-shadow-sm);
             flex-shrink: 0;
         }
@@ -379,7 +322,7 @@
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid #FFFDF6;
+            border: 2px solid var(--ula-white);
             box-shadow: 0 4px 12px rgba(36, 92, 58, 0.15);
         }
         .sidebar-profile-status {
@@ -389,8 +332,8 @@
             width: 13px;
             height: 13px;
             border-radius: 50%;
-            background: #4F9B5F;
-            border: 2px solid #FFFDF6;
+            background: var(--ula-status-success);
+            border: 2px solid var(--ula-white);
             box-shadow: 0 0 6px rgba(79, 155, 95, 0.6);
         }
 
@@ -467,7 +410,7 @@
             font-size: 13px;
             font-weight: 500;
             cursor: pointer;
-            text-align: {{ app()->getLocale() === 'ar' ? 'right' : 'left' }};
+            text-align: start;
             transition: all 0.15s ease;
             text-decoration: none;
             margin-bottom: 2px;
@@ -509,7 +452,7 @@
             background: var(--ula-surface-page-alt);
         }
         .org-settings-tabs-nav .org-subtab-btn.active {
-            color: #ffffff;
+            color: var(--ula-white);
             background: var(--ula-palm-900);
             box-shadow: 0 4px 14px rgba(36, 92, 58, 0.32);
         }
@@ -525,13 +468,13 @@
             width: 28px;
             height: 28px;
             border-radius: 9px;
-            background: #FFFDF6;
-            border: 1px solid #D5DED0;
+            background: var(--ula-sand-100);
+            border: 1px solid var(--ula-stone-200);
             display: inline-flex;
             align-items: center;
             justify-content: center;
             font-size: 14px;
-            color: #245C3A;
+            color: var(--ula-palm-500);
             box-shadow: 1px 1px 4px rgba(36, 92, 58, 0.08);
             flex-shrink: 0;
             transition: all 0.2s ease;
@@ -539,32 +482,32 @@
         .nav-tab-btn.active .nav-icon-tile {
             background: rgba(255, 255, 255, 0.22);
             border-color: rgba(255, 255, 255, 0.45);
-            color: #FFFFFF !important;
+            color: var(--ula-white) !important;
             box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4);
         }
 
         .nav-badge-pill {
-            background: #DCE7D4;
-            color: #245C3A;
+            background: var(--ula-tone-palm-bg);
+            color: var(--ula-tone-palm-fg);
             font-size: 10px;
             font-weight: 800;
             padding: 2px 7px;
             border-radius: 8px;
-            border: 1px solid #C8D8BE;
+            border: 1px solid var(--ula-border-subtle);
             box-shadow: inset 1px 1px 2px rgba(36, 92, 58, 0.08);
             transition: all 0.2s ease;
         }
         .nav-tab-btn.active .nav-badge-pill {
             background: rgba(255, 255, 255, 0.25);
-            color: #FFFFFF !important;
+            color: var(--ula-white) !important;
             border-color: rgba(255, 255, 255, 0.45);
         }
 
         /* Go Premium Gradient Card */
         .go-premium-card {
             margin-top: auto;
-            background: linear-gradient(145deg, #FFF6D8 0%, #FEF8E8 45%, #FFFDF6 100%);
-            border: 1px solid #EADCB2;
+            background: linear-gradient(145deg, var(--ula-gold-200) 0%, var(--ula-sand-50) 45%, var(--ula-sand-100) 100%);
+            border: 1px solid var(--ula-gold-200);
             border-radius: var(--ula-radius-lg);
             padding: 16px 14px;
             text-align: center;
@@ -683,7 +626,7 @@
             inset-inline-end: -3px;
             width: 16px;
             height: 16px;
-            background: #D96B5F;
+            background: var(--ula-status-danger);
             color: white;
             font-size: 9px;
             font-weight: 900;
@@ -788,23 +731,23 @@
             width: 50px;
             height: 50px;
             border-radius: 16px;
-            background: linear-gradient(145deg, #437E51 0%, #225433 100%);
-            border: 1px solid #1B4529;
-            box-shadow: 0 8px 20px rgba(34, 84, 51, 0.35), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.55), inset 0 -2px 4px rgba(0, 0, 0, 0.22);
+            background: linear-gradient(145deg, var(--ula-accent-default) 0%, var(--ula-palm-800) 100%);
+            border: 1px solid var(--ula-palm-800);
+            box-shadow: var(--ula-shadow-md), inset 0 1.5px 1.5px rgba(255, 255, 255, 0.55), inset 0 -2px 4px rgba(0, 0, 0, 0.22);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 22px;
             flex-shrink: 0;
-            color: #FFFFFF !important;
+            color: var(--ula-white) !important;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
             transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .icon-box-3d.green {
-            background: linear-gradient(145deg, #437E51 0%, #225433 100%);
-            color: #FFFFFF !important;
-            border-color: #1B4529;
+            background: linear-gradient(145deg, var(--ula-accent-default) 0%, var(--ula-palm-800) 100%);
+            color: var(--ula-white) !important;
+            border-color: var(--ula-palm-800);
         }
 
         /* ── KPI Stat Cards ── */
@@ -824,52 +767,10 @@
             .kpi-grid { grid-template-columns: 1fr; }
         }
 
-        .kpi-card {
-            background: var(--ula-surface-card);
-            border: 1px solid var(--ula-border-subtle);
-            border-radius: var(--ula-radius-xl);
-            padding: 18px 20px;
-            box-shadow: var(--ula-shadow-xs);
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        .kpi-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--ula-shadow-md);
-            border-color: var(--ula-palm-900);
-        }
-        .kpi-card:hover .icon-box-3d {
-            transform: scale(1.05);
-        }
-        .kpi-info {
-            flex: 1;
-            min-width: 0;
-        }
-        .kpi-title {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--ula-text-secondary);
-            letter-spacing: -0.1px;
-        }
-        .kpi-value {
-            font-size: 26px;
-            font-weight: 900;
-            color: var(--ula-text-primary);
-            line-height: 1.1;
-            margin: 2px 0 4px 0;
-        }
-        .kpi-sub {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--ula-palm-900);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
+        /* .kpi-card/.kpi-info/.kpi-title/.kpi-value/.kpi-sub/.kpi-header/
+           .kpi-icon-box/.kpi-trend intentionally NOT defined here — this
+           page loads ulaspace-dashboard.css, which owns the single shared
+           definition every page rendering .kpi-card markup uses. */
 
         /* ── Badges ── */
         .badge {
@@ -880,12 +781,10 @@
             font-weight: 800;
             letter-spacing: 0.2px;
         }
-        .badge-green, .badge-teal { background: #E8EFE2; color: #245C3A; border: 1px solid #D5DED0; }
-        .badge-purple { background: #F3E8FF; color: #7E22CE; border: 1px solid #E9D5FF; }
-        .badge-blue { background: #E8EFE2; color: #245C3A; border: 1px solid #D5DED0; }
-        .badge-amber { background: #FEF3C7; color: #B45309; border: 1px solid #FDE68A; }
-        .badge-crimson { background: #FEE2E2; color: #B91C1C; border: 1px solid #FECACA; }
-        .badge-gray { background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; }
+        .badge-green, .badge-teal, .badge-blue { background: var(--ula-tone-palm-bg); color: var(--ula-tone-palm-fg); border: 1px solid var(--ula-border-subtle); }
+        .badge-amber { background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg); border: 1px solid var(--ula-border-subtle); }
+        .badge-crimson { background: var(--ula-tone-terracotta-bg); color: var(--ula-tone-terracotta-fg); border: 1px solid var(--ula-border-subtle); }
+        .badge-gray { background: var(--ula-tone-stone-bg); color: var(--ula-tone-stone-fg); border: 1px solid var(--ula-border-subtle); }
 
         /* ── Data Tables ── */
         .data-table {
@@ -893,7 +792,7 @@
             border-collapse: separate;
             border-spacing: 0;
             font-size: 13px;
-            text-align: {{ app()->getLocale() === 'ar' ? 'right' : 'left' }};
+            text-align: start;
         }
         .data-table th {
             padding: 14px 16px;
@@ -1064,7 +963,7 @@
         }
         .ctx-item.danger:hover {
             background: rgba(217, 107, 95, 0.15);
-            color: #D96B5F;
+            color: var(--ula-status-danger);
             border-color: rgba(217, 107, 95, 0.3);
         }
         .ctx-divider {
@@ -1135,9 +1034,9 @@
             transition: all 0.2s;
         }
         .modal-close:hover {
-            background: #FEE2E2;
-            color: #B91C1C;
-            border-color: #FECACA;
+            background: var(--ula-terracotta-200);
+            color: var(--ula-terracotta-600);
+            border-color: var(--ula-terracotta-300);
         }
 
         /* ── Toast Notification System ── */
@@ -1193,8 +1092,8 @@
             position: absolute;
             top: -3px;
             inset-inline-end: -3px;
-            background: #EF4444;
-            color: #FFFFFF;
+            background: var(--ula-status-danger);
+            color: var(--ula-white);
             font-size: 10px;
             font-weight: 900;
             min-width: 18px;
@@ -1292,7 +1191,7 @@
 
         /* ── Live Timer Strip ── */
         .live-timer-strip {
-            background: linear-gradient(135deg, #E8EFE2, #FFFDF6);
+            background: linear-gradient(135deg, var(--ula-tone-palm-bg), var(--ula-sand-100));
             border: 1px solid var(--ula-palm-900);
             border-radius: var(--ula-radius-lg);
             padding: 12px 20px;
@@ -1308,8 +1207,8 @@
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            background: #4F9B5F;
-            box-shadow: 0 0 10px #4F9B5F;
+            background: var(--ula-status-success);
+            box-shadow: 0 0 10px var(--ula-status-success);
             animation: pulseDot 1.5s infinite;
         }
         @keyframes pulseDot {
@@ -1361,7 +1260,7 @@
                 @if($organization->logo_url)
                     <img id="sidebar-tenant-logo" src="{{ $organization->logo_url }}" alt="{{ $organization->name }}" style="width: 38px; height: 38px; border-radius: 12px; object-fit: cover; box-shadow: var(--ula-shadow-xs); flex-shrink: 0;">
                 @else
-                    <div id="sidebar-tenant-logo-icon" class="sidebar-logo-icon" style="background: var(--ula-palm-900, #142B24); width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 5px; flex-shrink: 0; box-shadow: var(--ula-shadow-sm);">
+                    <div id="sidebar-tenant-logo-icon" class="sidebar-logo-icon" style="background: var(--ula-palm-900); width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 5px; flex-shrink: 0; box-shadow: var(--ula-shadow-sm);">
                         <img src="{{ asset('images/ulaspace-icon.png') }}" alt="UlaSpace" style="width: 24px; height: auto; object-fit: contain;">
                     </div>
                 @endif
@@ -1403,7 +1302,7 @@
                         <span class="material-symbols-rounded text-[18px]">chat</span>
                         <span>{{ __('Team Chat & DMs') }}</span>
                     </span>
-                    <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F;">Live</span>
+                    <span class="nav-badge-pill">{{ __('مباشر') }}</span>
                 </button>
                 @if($membership->hasPermission('maps.manage'))
                 <a href="{{ route('editor') }}" class="nav-tab-btn" style="text-decoration: none;" data-tooltip="{{ __('Floor Map Editor') }}">
@@ -1603,7 +1502,7 @@
             @if($user->avatar_url)
                 <img id="sidebar-user-avatar" src="{{ $user->avatar_url }}" alt="{{ $user->name }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1px solid var(--ula-border-subtle);">
             @else
-                <div class="sidebar-avatar" style="width: 36px; height: 36px; border-radius: 50%; background: var(--ula-gradient-accent); color: #FFFDF6; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900;">{{ strtoupper(substr($user->name, 0, 2)) }}</div>
+                <div class="sidebar-avatar" style="width: 36px; height: 36px; border-radius: 50%; background: var(--ula-gradient-accent); color: var(--ula-white); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900;">{{ strtoupper(substr($user->name, 0, 2)) }}</div>
             @endif
             <div style="flex: 1; min-width: 0;">
                 <div style="font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ula-text-primary);">
@@ -1627,14 +1526,14 @@
     <main class="main-content">
 
         @if(session('superadmin_impersonator_id'))
-        <div style="background: var(--ula-palm-950, #0e1c17); border: 1px solid rgba(211, 165, 83, 0.5); border-radius: var(--ula-radius-lg, 14px); color: var(--ula-sand-100, #f9f6ef); padding: 12px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; box-shadow: var(--ula-shadow-sm);">
+        <div style="background: var(--ula-palm-950); border: 1px solid rgba(211, 165, 83, 0.5); border-radius: var(--ula-radius-lg); color: var(--ula-sand-100); padding: 12px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; box-shadow: var(--ula-shadow-sm);">
             <div style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600;">
-                <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-gold-400, #D3A553);">admin_panel_settings</span>
-                <span>{{ __('You are currently logged in as company:') }} <strong style="color: var(--ula-gold-400, #D3A553); text-decoration: underline;">{{ session('superadmin_impersonated_org_name') }}</strong> ({{ Auth::user()->name }})</span>
+                <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-gold-400);">admin_panel_settings</span>
+                <span>{{ __('You are currently logged in as company:') }} <strong style="color: var(--ula-gold-400); text-decoration: underline;">{{ session('superadmin_impersonated_org_name') }}</strong> ({{ Auth::user()->name }})</span>
             </div>
             <form method="POST" action="{{ route('impersonate.leave') }}" style="margin: 0; display: inline-flex;">
                 @csrf
-                <button type="submit" style="background: rgba(211, 165, 83, 0.15); color: var(--ula-sand-100, #f9f6ef); border: 1px solid var(--ula-gold-400, #D3A553); padding: 6px 14px; border-radius: var(--ula-radius-pill, 9999px); font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease;">
+                <button type="submit" style="background: rgba(211, 165, 83, 0.15); color: var(--ula-sand-100); border: 1px solid var(--ula-gold-400); padding: 6px 14px; border-radius: var(--ula-radius-pill); font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease;">
                     <span class="material-symbols-rounded" style="font-size: 16px;">logout</span>
                     <span>{{ __('Return to Super Admin') }}</span>
                 </button>
@@ -1643,14 +1542,14 @@
         @endif
 
         @if(session('org_impersonator_id'))
-        <div style="background: var(--ula-palm-900, #142B24); border: 1px solid rgba(78, 166, 111, 0.4); border-radius: var(--ula-radius-lg, 14px); color: var(--ula-sand-100, #f9f6ef); padding: 12px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; box-shadow: var(--ula-shadow-sm);">
+        <div style="background: var(--ula-palm-900); border: 1px solid rgba(78, 166, 111, 0.4); border-radius: var(--ula-radius-lg); color: var(--ula-sand-100); padding: 12px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; box-shadow: var(--ula-shadow-sm);">
             <div style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600;">
-                <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-palm-500, #8baa94);">switch_account</span>
-                <span>{{ __('You are currently logged in as team member:') }} <strong style="color: var(--ula-sand-200, #F4EDE1); text-decoration: underline;">{{ Auth::user()->name }}</strong> ({{ Auth::user()->email }})</span>
+                <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-palm-500, var(--ula-palm-300));">switch_account</span>
+                <span>{{ __('You are currently logged in as team member:') }} <strong style="color: var(--ula-sand-200); text-decoration: underline;">{{ Auth::user()->name }}</strong> ({{ Auth::user()->email }})</span>
             </div>
             <form method="POST" action="{{ route('organization.members.impersonate.leave') }}" style="margin: 0; display: inline-flex;">
                 @csrf
-                <button type="submit" style="background: rgba(78, 166, 111, 0.15); color: var(--ula-sand-100, #f9f6ef); border: 1px solid var(--ula-palm-500, #8baa94); padding: 6px 14px; border-radius: var(--ula-radius-pill, 9999px); font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease;">
+                <button type="submit" style="background: rgba(78, 166, 111, 0.15); color: var(--ula-sand-100); border: 1px solid var(--ula-palm-500, var(--ula-palm-300)); padding: 6px 14px; border-radius: var(--ula-radius-pill); font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease;">
                     <span class="material-symbols-rounded" style="font-size: 16px;">logout</span>
                     <span>{{ __('Leave Impersonation') }}</span>
                 </button>
@@ -1759,33 +1658,33 @@
         </div>
 
         @if(session('success'))
-        <div style="background: rgba(60, 107, 76, 0.12); border: 1px solid rgba(60, 107, 76, 0.3); color: var(--ula-status-success, #3C6B4C); border-radius: var(--ula-radius-md, 12px); padding: 12px 18px; margin-bottom: 20px; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--ula-shadow-sm);">
+        <div style="background: rgba(60, 107, 76, 0.12); border: 1px solid rgba(60, 107, 76, 0.3); color: var(--ula-status-success, var(--ula-palm-500)); border-radius: var(--ula-radius-md, 12px); padding: 12px 18px; margin-bottom: 20px; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--ula-shadow-sm);">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span class="material-symbols-rounded" style="font-size: 18px;">check_circle</span>
                 <span>{{ session('success') }}</span>
             </div>
-            <button onclick="this.parentElement.remove()" style="background: none; border: none; font-size: 16px; cursor: pointer; color: var(--ula-status-success, #3C6B4C); display: flex; align-items: center;">
+            <button onclick="this.parentElement.remove()" style="background: none; border: none; font-size: 16px; cursor: pointer; color: var(--ula-status-success, var(--ula-palm-500)); display: flex; align-items: center;">
                 <span class="material-symbols-rounded" style="font-size: 18px;">close</span>
             </button>
         </div>
         @endif
 
         @if(session('error'))
-        <div style="background: rgba(154, 88, 39, 0.12); border: 1px solid rgba(154, 88, 39, 0.3); color: var(--ula-status-danger, #9A5827); border-radius: var(--ula-radius-md, 12px); padding: 12px 18px; margin-bottom: 20px; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--ula-shadow-sm);">
+        <div style="background: rgba(154, 88, 39, 0.12); border: 1px solid rgba(154, 88, 39, 0.3); color: var(--ula-status-danger, var(--ula-terracotta-500)); border-radius: var(--ula-radius-md, 12px); padding: 12px 18px; margin-bottom: 20px; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--ula-shadow-sm);">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span class="material-symbols-rounded" style="font-size: 18px;">warning</span>
                 <span>{{ session('error') }}</span>
             </div>
-            <button onclick="this.parentElement.remove()" style="background: none; border: none; font-size: 16px; cursor: pointer; color: var(--ula-status-danger, #9A5827); display: flex; align-items: center;">
+            <button onclick="this.parentElement.remove()" style="background: none; border: none; font-size: 16px; cursor: pointer; color: var(--ula-status-danger, var(--ula-terracotta-500)); display: flex; align-items: center;">
                 <span class="material-symbols-rounded" style="font-size: 18px;">close</span>
             </button>
         </div>
         @endif
 
         @if($errors->any())
-        <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); color: #D96B5F; border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; font-weight: 800; font-size: 13px; box-shadow: var(--ula-shadow-xs);">
+        <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); color: var(--ula-status-danger); border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; font-weight: 800; font-size: 13px; box-shadow: var(--ula-shadow-xs);">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                <span>⚠️</span>
+                <span class="material-symbols-rounded" style="font-size: 18px;">warning</span>
                 <strong>{{ __('Please correct the following errors:') }}</strong>
             </div>
             <ul style="margin: 0; padding-inline-start: 20px; font-size: 12px; font-weight: 600;">
@@ -1814,8 +1713,8 @@
                 <div id="live-timer-clock" style="font-size: 22px; font-weight: 900; font-family: monospace; color: var(--ula-palm-900); letter-spacing: 1px;">
                     00:00:00
                 </div>
-                <button onclick="stopGlobalTimer()" class="tactile-btn" style="background: #FEE2E2; color: #B91C1C; border: 1px solid #FECACA; padding: 7px 14px; font-size: 12px;">
-                    ⏹ {{ __('Stop Timer') }}
+                <button onclick="stopGlobalTimer()" class="tactile-btn" style="background: var(--ula-terracotta-200); color: var(--ula-terracotta-600); border: 1px solid var(--ula-terracotta-300); padding: 7px 14px; font-size: 12px;">
+                    <span class="material-symbols-rounded" style="font-size: 13px; vertical-align: text-bottom;">stop_circle</span> {{ __('Stop Timer') }}
                 </button>
             </div>
         </div>

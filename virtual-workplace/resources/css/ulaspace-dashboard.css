@@ -437,3 +437,98 @@ body {
     justify-content: space-between;
     gap: 16px;
 }
+
+/* ── 5. KPI Cards ──
+   Single shared definition for every page rendering .kpi-card markup
+   (dashboard.blade.php's own tabs, projects/hub.blade.php, and any
+   future page). Do NOT redefine these locally in a page's own <style>
+   block -- this file is what every one of those pages already loads, so
+   a local copy only drifts out of sync with this one. This exact class
+   of bug (a page-local .kpi-card/.kpi-icon-box shadowing this shared
+   definition, or this shared definition itself going missing when
+   ulaspace-tokens.css/ulaspace-dashboard.css get regenerated) has
+   recurred more than once -- if you're re-adding this block a third
+   time, check why it keeps disappearing before just re-adding it again.
+   .kpi-grid itself stays page-local since column-count tuning is
+   legitimately per-page. */
+.kpi-card {
+    background: var(--ula-surface-card);
+    border: 1px solid var(--ula-border-subtle);
+    border-radius: var(--ula-radius-xl);
+    padding: 18px 20px;
+    box-shadow: var(--ula-shadow-xs);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+.kpi-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--ula-shadow-md);
+    border-color: var(--ula-border-strong);
+}
+.kpi-card:hover .icon-box-3d {
+    transform: scale(1.05);
+}
+.kpi-info {
+    flex: 1;
+    min-width: 0;
+}
+.kpi-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ula-text-secondary);
+    letter-spacing: -0.1px;
+}
+.kpi-value {
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--ula-text-primary);
+    line-height: 1.1;
+    margin: 2px 0 4px 0;
+}
+.kpi-sub {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ula-accent-default);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+/* Stacked KPI card variant used by several tabs (projects, billing, meetings,
+   timesheets, all-tasks) and the project hub: a kpi-header row (title + icon
+   chip) above the value, instead of the icon-beside-text layout above. */
+.kpi-card:has(.kpi-header) {
+    flex-direction: column;
+    align-items: stretch;
+}
+.kpi-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+.kpi-icon-box {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: linear-gradient(145deg, var(--ula-accent-default) 0%, var(--ula-palm-800) 100%);
+    border: 1px solid var(--ula-palm-800);
+    color: var(--ula-white) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    box-shadow: var(--ula-shadow-md), inset 0 1px 1px rgba(255, 255, 255, 0.45);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    flex-shrink: 0;
+}
+.kpi-trend {
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
