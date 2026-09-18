@@ -391,7 +391,7 @@
             </div>
 
             <!-- Hub Content Area (Scrollable) -->
-            <div style="flex: 1; overflow-y: auto; padding-right: 4px;">
+            <div style="flex: 1; overflow-y: auto; padding-inline-end: 4px;">
                 <!-- 1. Kanban View -->
                 <div id="hub-view-kanban" style="display: block;">
                     <div style="display: grid; grid-template-columns: repeat(5, minmax(200px, 1fr)); gap: 12px; align-items: start;">
@@ -565,7 +565,7 @@
             </div>
 
             <!-- Tab Contents -->
-            <div style="flex: 1; overflow-y: auto; padding-right: 4px;">
+            <div style="flex: 1; overflow-y: auto; padding-inline-end: 4px;">
                 <!-- 1. Details -->
                 <div id="task-inspector-details" style="display: block;">
                     <div style="margin-bottom: 14px;">

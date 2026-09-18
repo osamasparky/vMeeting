@@ -20,8 +20,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-        /* The old :root[data-theme] blocks here only ever declared
-           --brand-primary-hover (retired --brand- prefix), which nothing
+        /* The old :root[data-theme] blocks here only ever declared a
+           retired-prefix primary-hover variable, which nothing
            in this file references. Removed rather than kept unused. */
 
         * {
@@ -696,7 +696,7 @@
         <div class="nx-editor-screen">
             
             <!-- ── Top Map & Editor Toolbar (UlaSpace Figma Standard) ── -->
-            <header class="nx-map-toolbar" style="position: relative; top: 0; left: 0; right: 0; border-radius: 0; border-inline: none; border-block-start: none; background: rgba(14, 25, 19, 0.95); backdrop-filter: blur(24px); border-block-end: 1px solid rgba(237, 230, 217, 0.15); padding: 10px 16px; margin: 0; display: flex; align-items: center; justify-content: space-between; z-index: 100;">
+            <header class="nx-map-toolbar" style="position: relative; top: 0; inset-inline: 0; border-radius: 0; border-inline: none; border-block-start: none; background: rgba(14, 25, 19, 0.95); backdrop-filter: blur(24px); border-block-end: 1px solid rgba(237, 230, 217, 0.15); padding: 10px 16px; margin: 0; display: flex; align-items: center; justify-content: space-between; z-index: 100;">
                 
                 <!-- 1. Start Group (Top Right on RTL): Burger Menu + Brand Capsule + Branch Switcher + Version -->
                 <div class="nx-toolbar-group">
@@ -1372,7 +1372,7 @@
                         {{ __('اختر نمط الأرضية لتطبيقه فوراً كخلفية للمكتب بمقاس 1200×708 بكسل:') }}
                     </div>
 
-                    <div id="floors-catalog-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-height: calc(100vh - 360px); overflow-y: auto; padding-right: 4px;">
+                    <div id="floors-catalog-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-height: calc(100vh - 360px); overflow-y: auto; padding-inline-end: 4px;">
                         <!-- Injected via JavaScript -->
                     </div>
 

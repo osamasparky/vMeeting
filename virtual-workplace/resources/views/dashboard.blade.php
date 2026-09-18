@@ -18,11 +18,12 @@
            ═══════════════════════════════════════════════════════════════ */
         :root {
             /* Only --ula-gradient-accent is actually referenced below; every
-               other declaration this block used to carry (--brand-*,
-               --bg-secondary, --accent-*, --border-focus, --status-info,
-               --radius-xs, --shadow-kpi-icon) had zero usages in this file --
-               dead weight left by the token sweep, some of it under the
-               retired --brand-* prefix. Removed rather than kept unused. */
+               other declaration this block used to carry (the old
+               brand-prefixed variables, --bg-secondary, --accent-*,
+               --border-focus, --status-info, --radius-xs, --shadow-kpi-icon)
+               had zero usages in this file -- dead weight left by the token
+               sweep, some of it under a retired naming prefix. Removed
+               rather than kept unused. */
             --ula-gradient-accent: linear-gradient(135deg, var(--ula-palm-900) 0%, var(--ula-palm-700) 100%);
         }
 

@@ -23,8 +23,8 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-        /* The old :root[data-theme] blocks here only ever declared
-           --brand-primary-hover (retired --brand-* prefix), which nothing
+        /* The old :root[data-theme] blocks here only ever declared a
+           retired-prefix primary-hover variable, which nothing
            in this file references. Removed rather than kept unused. */
 
         * {
@@ -150,7 +150,7 @@
         #office-canvas {
             position: absolute;
             top: 0;
-            left: 0;
+            inset-inline-start: 0;
             display: block;
             width: 100%;
             height: 100%;
@@ -6744,7 +6744,7 @@
                 selfCard.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; gap:8px;"><div style="width:52px;height:52px;border-radius:50%;background:rgba(16,185,129,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#6EE7B7;">${init}</div><span style="font-size:11px;color:var(--ula-text-muted);">{{ __("Camera Off") }}</span></div>`;
             }
             const selfLabel = document.createElement('div');
-            selfLabel.style.cssText = 'position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; color: #6EE7B7;';
+            selfLabel.style.cssText = 'position: absolute; bottom: 8px; inset-inline-start: 8px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; color: #6EE7B7;';
             selfLabel.textContent = `${localAvatar.name} ({{ __("You") }}) ${micActive ? '🎙️' : '🔇'}`;
             selfCard.appendChild(selfLabel);
             selfCard.onclick = () => openUserSpotlight(localAvatar.id);
@@ -6807,7 +6807,7 @@
                     rCard.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; padding:10px;"><div style="width:52px;height:52px;border-radius:50%;background:rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--ula-accent-default);">${init}</div>${statusHtml}</div>`;
                 }
                 const rLabel = document.createElement('div');
-                rLabel.style.cssText = 'position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; color: #FFFFFF;';
+                rLabel.style.cssText = 'position: absolute; bottom: 8px; inset-inline-start: 8px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; color: #FFFFFF;';
                 rLabel.textContent = `${av.name} ${av.micActive ? '🎙️' : '🔇'}`;
                 rCard.appendChild(rLabel);
                 rCard.onclick = () => openUserSpotlight(av.id);

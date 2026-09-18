@@ -21,9 +21,6 @@
             --text-primary: var(--ula-text-primary);
             --text-secondary: var(--ula-text-secondary);
             --text-muted: var(--ula-text-muted);
-            --brand-primary: var(--ula-palm-900);
-            --brand-accent: var(--ula-accent-default);
-            --brand-emerald: var(--ula-palm-500);
             --status-success: var(--ula-status-success);
             --status-error: var(--ula-status-danger);
             --font-ar: var(--ula-font-ar);
@@ -217,7 +214,7 @@
 
         .form-input:focus {
             background: var(--bg-card);
-            border-color: var(--brand-accent);
+            border-color: var(--ula-accent-default);
             box-shadow: var(--ula-focus-ring);
         }
 
@@ -269,13 +266,13 @@
         .form-check-input {
             width: 16px;
             height: 16px;
-            accent-color: var(--brand-accent);
+            accent-color: var(--ula-accent-default);
             cursor: pointer;
             border-radius: 4px;
         }
 
         .form-link {
-            color: var(--brand-accent);
+            color: var(--ula-accent-default);
             font-size: 13px;
             text-decoration: none;
             font-weight: 700;
@@ -293,7 +290,7 @@
         }
 
         .auth-footer a {
-            color: var(--brand-accent);
+            color: var(--ula-accent-default);
             text-decoration: none;
             font-weight: 700;
         }
@@ -378,8 +375,8 @@
             transition: all 0.15s ease;
         }
         .lang-switch-btn:hover {
-            border-color: var(--brand-accent);
-            color: var(--brand-accent);
+            border-color: var(--ula-accent-default);
+            color: var(--ula-accent-default);
         }
 
         .spinner {

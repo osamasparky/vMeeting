@@ -288,7 +288,7 @@
             </div>
 
             <!-- Scrollable Content Area -->
-            <div style="flex: 1; overflow-y: auto; padding-right: 4px;">
+            <div style="flex: 1; overflow-y: auto; padding-inline-end: 4px;">
                 <!-- Tab 1: Overview & Checklist -->
                 <div id="task-tab-content-overview" class="task-inspector-tab-pane" style="display: block;">
                     <!-- Description -->

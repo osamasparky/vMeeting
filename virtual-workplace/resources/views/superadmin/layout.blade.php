@@ -19,8 +19,8 @@
         :root {
             /* Light Theme (Warm Ivory & Forest Palm Baseline) */
             /* The old blocks here also declared --bg-surface-hover,
-               --border-color-glow, --brand-pine/-green/-orange,
-               --status-info and --radius-xs -- all retired/unused
+               --border-color-glow, three retired-prefix pine/green/orange
+               variables, --status-info and --radius-xs -- all unused
                (zero references in this file). Removed; only
                --ula-gradient-accent is actually used (6x), and its
                dark-mode value below deliberately differs from the
