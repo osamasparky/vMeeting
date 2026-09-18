@@ -195,7 +195,7 @@
                 <label class="input-label">{{ __('Select Target Meeting Room') }}</label>
                 <select class="styled-input" id="invite-room-select">
                     @foreach($map->rooms as $r)
-                        <option value="{{ $r->id }}"><span class="material-symbols-rounded">apartment</span> {{ $r->name }} ({{ ucfirst($r->type) }})</option>
+                        <option value="{{ $r->id }}">{{ $r->name }} ({{ ucfirst($r->type) }})</option>
                     @endforeach
                 </select>
             </div>

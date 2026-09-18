@@ -1172,11 +1172,11 @@
                             <div>
                                 <label class="prop-label">{{ __('Layer & Elevation') }}</label>
                                 <select class="prop-input" id="prop-elevation" onchange="updateSelectedProp('elevation', parseInt(this.value))">
-                                    <option value="0"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">texture</span> {{ __('Ground / Rug') }}</option>
-                                    <option value="1"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">chair</span> {{ __('Default Furniture') }}</option>
-                                    <option value="2"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">business_center</span> {{ __('Desk / Table Surface') }}</option>
-                                    <option value="3"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">potted_plant</span> {{ __('Tall Plant / Partition') }}</option>
-                                    <option value="5"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">lightbulb</span> {{ __('Ceiling / Overhead') }}</option>
+                                    <option value="0">{{ __('Ground / Rug') }}</option>
+                                    <option value="1">{{ __('Default Furniture') }}</option>
+                                    <option value="2">{{ __('Desk / Table Surface') }}</option>
+                                    <option value="3">{{ __('Tall Plant / Partition') }}</option>
+                                    <option value="5">{{ __('Ceiling / Overhead') }}</option>
                                 </select>
                             </div>
                             <div>
@@ -1281,11 +1281,11 @@
                             <div>
                                 <label class="prop-label">{{ __('Room Type') }}</label>
                                 <select class="prop-input" id="prop-room-type" onchange="updateRoomProp('type', this.value)">
-                                    <option value="meeting"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">group</span> {{ __('Meeting Room') }}</option>
-                                    <option value="private"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">lock</span> {{ __('Private Office') }}</option>
-                                    <option value="focus"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">target</span> {{ __('Focus Pod') }}</option>
-                                    <option value="breakout"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">coffee</span> {{ __('Breakout Lounge') }}</option>
-                                    <option value="reception"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">room_service</span> {{ __('Reception Lobby') }}</option>
+                                    <option value="meeting">{{ __('Meeting Room') }}</option>
+                                    <option value="private">{{ __('Private Office') }}</option>
+                                    <option value="focus">{{ __('Focus Pod') }}</option>
+                                    <option value="breakout">{{ __('Breakout Lounge') }}</option>
+                                    <option value="reception">{{ __('Reception Lobby') }}</option>
                                 </select>
                             </div>
                             
@@ -1301,11 +1301,11 @@
                             <div>
                                 <label class="prop-label">{{ __('Door Placement') }}</label>
                                 <select class="prop-input" id="prop-room-door-side" onchange="updateRoomProp('doorSide', this.value)">
-                                    <option value="auto"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">star</span> {{ __('Auto Corridor') }}</option>
-                                    <option value="bottom"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_downward</span> {{ __('Bottom Wall') }}</option>
-                                    <option value="top"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_upward</span> {{ __('Top Wall') }}</option>
-                                    <option value="left"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_back</span> {{ __('Left Wall') }}</option>
-                                    <option value="right"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_forward</span> {{ __('Right Wall') }}</option>
+                                    <option value="auto">{{ __('Auto Corridor') }}</option>
+                                    <option value="bottom">{{ __('Bottom Wall') }}</option>
+                                    <option value="top">{{ __('Top Wall') }}</option>
+                                    <option value="left">{{ __('Left Wall') }}</option>
+                                    <option value="right">{{ __('Right Wall') }}</option>
                                 </select>
                             </div>
 

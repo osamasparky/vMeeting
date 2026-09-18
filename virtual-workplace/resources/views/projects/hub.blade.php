@@ -1418,7 +1418,7 @@
                 <!-- Assignee Filter -->
                 <div style="min-width: 140px;">
                     <select id="hub-filter-assignee" onchange="filterHubTasks()" class="custom-select-control" style="width: 100%;">
-                        <option value=""><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">person</span> {{ __('All Assignees') }}</option>
+                        <option value="">{{ __('All Assignees') }}</option>
                         <option value="unassigned">— {{ __('Unassigned') }} —</option>
                         @foreach($allMembers as $am)
                             <option value="{{ $am->user_id }}">{{ $am->user->name }}</option>
@@ -1429,9 +1429,9 @@
                 <!-- Priority Filter -->
                 <div style="min-width: 130px;">
                     <select id="hub-filter-priority" onchange="filterHubTasks()" class="custom-select-control" style="width: 100%;">
-                        <option value=""><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('All Priorities') }}</option>
-                        <option value="urgent"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">local_fire_department</span> {{ __('Urgent') }}</option>
-                        <option value="high"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('High') }}</option>
+                        <option value="">{{ __('All Priorities') }}</option>
+                        <option value="urgent">{{ __('Urgent') }}</option>
+                        <option value="high">{{ __('High') }}</option>
                         <option value="medium">{{ __('Medium') }}</option>
                         <option value="low">{{ __('Low') }}</option>
                     </select>
@@ -1440,19 +1440,19 @@
                 <!-- Due Date Filter -->
                 <div style="min-width: 130px;">
                     <select id="hub-filter-due" onchange="filterHubTasks()" class="custom-select-control" style="width: 100%;">
-                        <option value=""><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('All Due Dates') }}</option>
-                        <option value="overdue"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">emergency</span> {{ __('Overdue') }}</option>
-                        <option value="today"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">light_mode</span> {{ __('Due Today') }}</option>
-                        <option value="this_week"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Due This Week') }}</option>
-                        <option value="has_due"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">push_pin</span> {{ __('Has Due Date') }}</option>
-                        <option value="no_due"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">hourglass_empty</span> {{ __('No Due Date') }}</option>
+                        <option value="">{{ __('All Due Dates') }}</option>
+                        <option value="overdue">{{ __('Overdue') }}</option>
+                        <option value="today">{{ __('Due Today') }}</option>
+                        <option value="this_week">{{ __('Due This Week') }}</option>
+                        <option value="has_due">{{ __('Has Due Date') }}</option>
+                        <option value="no_due">{{ __('No Due Date') }}</option>
                     </select>
                 </div>
 
                 <!-- Milestone Filter -->
                 <div style="min-width: 140px;">
                     <select id="hub-filter-milestone" onchange="filterHubTasks()" class="custom-select-control" style="width: 100%;">
-                        <option value=""><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ __('All Milestones') }}</option>
+                        <option value="">{{ __('All Milestones') }}</option>
                         <option value="none">— {{ __('No Milestone') }} —</option>
                         @foreach($project->milestones as $pms)
                             <option value="{{ $pms->id }}">{{ $pms->name }}</option>
@@ -1587,11 +1587,11 @@
                                         <div class="task-card-footer">
                                             <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;">
                                                 <select onclick="event.stopPropagation()" onchange="updateHubTaskStatusDirect('{{ $t->id }}', this.value)" class="card-status-select" style="max-width: 100%;">
-                                                    <option value="backlog" {{ $t->status === 'backlog' ? 'selected' : '' }}><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">push_pin</span> {{ __('Backlog') }}</option>
-                                                    <option value="ready" {{ $t->status === 'ready' ? 'selected' : '' }}><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">track_changes</span> {{ __('Ready') }}</option>
-                                                    <option value="in_progress" {{ $t->status === 'in_progress' ? 'selected' : '' }}><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('In Progress') }}</option>
-                                                    <option value="review" {{ $t->status === 'review' || $t->status === 'qa' ? 'selected' : '' }}><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span> {{ __('Review') }}</option>
-                                                    <option value="done" {{ $t->status === 'done' ? 'selected' : '' }}><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">celebration</span> {{ __('Done') }}</option>
+                                                    <option value="backlog" {{ $t->status === 'backlog' ? 'selected' : '' }}>{{ __('Backlog') }}</option>
+                                                    <option value="ready" {{ $t->status === 'ready' ? 'selected' : '' }}>{{ __('Ready') }}</option>
+                                                    <option value="in_progress" {{ $t->status === 'in_progress' ? 'selected' : '' }}>{{ __('In Progress') }}</option>
+                                                    <option value="review" {{ $t->status === 'review' || $t->status === 'qa' ? 'selected' : '' }}>{{ __('Review') }}</option>
+                                                    <option value="done" {{ $t->status === 'done' ? 'selected' : '' }}>{{ __('Done') }}</option>
                                                 </select>
                                             </div>
 

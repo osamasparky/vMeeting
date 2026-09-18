@@ -47,7 +47,7 @@
                         <select name="milestone_id" class="form-input">
                             <option value="">— {{ __('No Milestone') }} —</option>
                             @foreach($project->milestones as $pms)
-                                <option value="{{ $pms->id }}"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ $pms->name }}</option>
+                                <option value="{{ $pms->id }}">{{ $pms->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -55,11 +55,11 @@
                         <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">refresh</span> {{ __('Repeat / Recurrence') }}</label>
                         <select name="recurrence_rule" id="new-task-recurrence-rule" onchange="toggleRecurrenceDetails(this.value)" class="form-input">
                             <option value="">{{ __('No Repeat (One-time)') }}</option>
-                            <option value="daily"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">repeat</span> {{ __('Daily') }}</option>
-                            <option value="weekly"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Weekly') }}</option>
-                            <option value="biweekly"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Biweekly (Every 2 weeks)') }}</option>
-                            <option value="monthly"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Monthly') }}</option>
-                            <option value="quarterly"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bar_chart</span> {{ __('Quarterly (Every 3 months)') }}</option>
+                            <option value="daily">{{ __('Daily') }}</option>
+                            <option value="weekly">{{ __('Weekly') }}</option>
+                            <option value="biweekly">{{ __('Biweekly (Every 2 weeks)') }}</option>
+                            <option value="monthly">{{ __('Monthly') }}</option>
+                            <option value="quarterly">{{ __('Quarterly (Every 3 months)') }}</option>
                         </select>
                     </div>
                 </div>
@@ -153,7 +153,7 @@
                         <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Meeting Room') }}</label>
                         <select name="room_id" class="form-input">
                             @foreach($rooms as $r)
-                                <option value="{{ $r->id }}"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span> {{ $r->name }}</option>
+                                <option value="{{ $r->id }}">{{ $r->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -226,11 +226,11 @@
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span style="font-size: 12px; font-weight: 800; color: var(--ula-text-secondary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('Status') }}:</span>
                         <select id="task-modal-status-select" onchange="updateCurrentTaskStatus(this.value)" class="form-input" style="padding: 4px 8px; font-size: 12px; width: auto; font-weight: 800;">
-                            <option value="backlog"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">push_pin</span> {{ __('Backlog') }}</option>
-                            <option value="ready"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">track_changes</span> {{ __('Ready') }}</option>
-                            <option value="in_progress"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('In Progress') }}</option>
-                            <option value="review"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span> {{ __('Review / QA') }}</option>
-                            <option value="done"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">celebration</span> {{ __('Done') }}</option>
+                            <option value="backlog">{{ __('Backlog') }}</option>
+                            <option value="ready">{{ __('Ready') }}</option>
+                            <option value="in_progress">{{ __('In Progress') }}</option>
+                            <option value="review">{{ __('Review / QA') }}</option>
+                            <option value="done">{{ __('Done') }}</option>
                         </select>
                     </div>
 
@@ -239,7 +239,7 @@
                         <select id="task-modal-milestone-select" onchange="updateCurrentTaskMilestone(this.value)" class="form-input" style="padding: 4px 8px; font-size: 12px; width: auto; font-weight: 700;">
                             <option value="">— {{ __('No Milestone') }} —</option>
                             @foreach($project->milestones as $pms)
-                                <option value="{{ $pms->id }}"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ $pms->name }}</option>
+                                <option value="{{ $pms->id }}">{{ $pms->name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -248,11 +248,11 @@
                         <span style="font-size: 12px; font-weight: 800; color: var(--ula-text-secondary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">refresh</span> {{ __('Repeat') }}:</span>
                         <select id="task-modal-recurrence-select" onchange="updateCurrentTaskRecurrence(this.value)" class="form-input" style="padding: 4px 8px; font-size: 12px; width: auto; font-weight: 700;">
                             <option value="">— {{ __('One-time') }} —</option>
-                            <option value="daily"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">repeat</span> {{ __('Daily') }}</option>
-                            <option value="weekly"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Weekly') }}</option>
-                            <option value="biweekly"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Biweekly') }}</option>
-                            <option value="monthly"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Monthly') }}</option>
-                            <option value="quarterly"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bar_chart</span> {{ __('Quarterly') }}</option>
+                            <option value="daily">{{ __('Daily') }}</option>
+                            <option value="weekly">{{ __('Weekly') }}</option>
+                            <option value="biweekly">{{ __('Biweekly') }}</option>
+                            <option value="monthly">{{ __('Monthly') }}</option>
+                            <option value="quarterly">{{ __('Quarterly') }}</option>
                         </select>
                     </div>
 
@@ -409,10 +409,10 @@
                 <div>
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('Key Metric & Auto-Tracking Engine') }} *</label>
                     <select name="target_type" id="goal-target-type-select" onchange="toggleGoalMetricFields(this.value)" class="form-input" style="font-weight: 700;">
-                        <option value="tasks"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('Tasks Completion (Auto-calculated from done tasks)') }}</option>
-                        <option value="milestones"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ __('Milestones Delivery (Auto-calculated from completed phases)') }}</option>
+                        <option value="tasks">{{ __('Tasks Completion (Auto-calculated from done tasks)') }}</option>
+                        <option value="milestones">{{ __('Milestones Delivery (Auto-calculated from completed phases)') }}</option>
                         <option value="hours">⏱️ {{ __('Hours Budget (Auto-calculated from logged timers)') }}</option>
-                        <option value="number"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">track_changes</span> {{ __('Custom Numeric Target (Manual KPI)') }}</option>
+                        <option value="number">{{ __('Custom Numeric Target (Manual KPI)') }}</option>
                     </select>
                 </div>
                 <div id="goal-custom-target-row" style="display: none; grid-template-columns: 1fr 1fr; gap: 10px;">
