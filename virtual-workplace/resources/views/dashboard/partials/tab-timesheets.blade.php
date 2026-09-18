@@ -85,8 +85,8 @@
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: 10px;">
-                <span class="nav-badge-pill" id="ts-online-count-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F; font-weight: var(--ula-weight-bold); font-size: 11px; font-family: var(--ula-font-mono); display: inline-flex; align-items: center; gap: 4px;">
-                    <span style="width: 6px; height: 6px; border-radius: 50%; background: #4F9B5F;"></span>
+                <span class="nav-badge-pill" id="ts-online-count-pill" style="background: rgba(79, 155, 95, 0.2); color: var(--ula-status-success); font-weight: var(--ula-weight-bold); font-size: 11px; font-family: var(--ula-font-mono); display: inline-flex; align-items: center; gap: 4px;">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--ula-status-success);"></span>
                     <span>0 {{ __('Online Now') }}</span>
                 </span>
                 <span class="nav-badge-pill" id="ts-total-members-pill" style="background: var(--ula-surface-page-alt); color: var(--ula-text-secondary); font-size: 11px; font-family: var(--ula-font-mono);">{{ count($members) }} {{ __('Total Team') }}</span>
@@ -140,12 +140,12 @@
         <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: var(--ula-space-5); box-shadow: var(--ula-shadow-xs);">
             <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-3);">
                 <span class="kpi-title" style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary);">{{ __('Productive Task Work') }}</span>
-                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(79, 155, 95, 0.12); color: #4F9B5F; display: flex; align-items: center; justify-content: center;">
+                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(79, 155, 95, 0.12); color: var(--ula-status-success); display: flex; align-items: center; justify-content: center;">
                     <span class="material-symbols-rounded" style="font-size: 18px;">schedule</span>
                 </div>
             </div>
-            <div class="kpi-value" id="ts-kpi-task-time" style="font-family: var(--ula-font-mono); font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: #4F9B5F;">00:00:00</div>
-            <div class="kpi-trend" style="color: #4F9B5F; font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
+            <div class="kpi-value" id="ts-kpi-task-time" style="font-family: var(--ula-font-mono); font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-status-success);">00:00:00</div>
+            <div class="kpi-trend" style="color: var(--ula-status-success); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 14px;">trending_up</span>
                 <span>{{ __('Logged against active tasks') }}</span>
             </div>
@@ -155,11 +155,11 @@
         <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: var(--ula-space-5); box-shadow: var(--ula-shadow-xs);">
             <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-3);">
                 <span class="kpi-title" style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary);">{{ __('Idle / Paused Time') }}</span>
-                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(214, 162, 58, 0.12); color: #D6A23A; display: flex; align-items: center; justify-content: center;">
+                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(214, 162, 58, 0.12); color: var(--ula-gold-400); display: flex; align-items: center; justify-content: center;">
                     <span class="material-symbols-rounded" style="font-size: 18px;">pause_circle</span>
                 </div>
             </div>
-            <div class="kpi-value" id="ts-kpi-idle-time" style="font-family: var(--ula-font-mono); font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: #D6A23A;">00:00:00</div>
+            <div class="kpi-value" id="ts-kpi-idle-time" style="font-family: var(--ula-font-mono); font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-gold-400);">00:00:00</div>
             <div class="kpi-trend" style="color: var(--ula-text-muted); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 14px;">hourglass_empty</span>
                 <span>{{ __('Inactivity stops excluded') }}</span>
@@ -170,11 +170,11 @@
         <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: var(--ula-space-5); box-shadow: var(--ula-shadow-xs);">
             <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-3);">
                 <span class="kpi-title" style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary);">{{ __('Productivity Ratio') }}</span>
-                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(59, 130, 246, 0.12); color: #3B82F6; display: flex; align-items: center; justify-content: center;">
+                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(185, 138, 55, 0.12); color: var(--ula-gold-500); display: flex; align-items: center; justify-content: center;">
                     <span class="material-symbols-rounded" style="font-size: 18px;">analytics</span>
                 </div>
             </div>
-            <div class="kpi-value" id="ts-kpi-ratio" style="font-family: var(--ula-font-mono); font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: #3B82F6;">0%</div>
+            <div class="kpi-value" id="ts-kpi-ratio" style="font-family: var(--ula-font-mono); font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-gold-500);">0%</div>
             <div class="kpi-trend" style="color: var(--ula-accent-default); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 14px;">bolt</span>
                 <span>{{ __('Task Time ÷ Office Time') }}</span>
@@ -190,14 +190,14 @@
                 <div>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span style="font-size: 11px; font-weight: 900; color: var(--ula-accent-default); text-transform: uppercase;">{{ __('Active Task Running in Office') }}</span>
-                        <span class="nav-badge-pill" id="ts-banner-project-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F; font-size: 10px;">Project</span>
+                        <span class="nav-badge-pill" id="ts-banner-project-pill" style="background: rgba(79, 155, 95, 0.2); color: var(--ula-status-success); font-size: 10px;">Project</span>
                     </div>
                     <h4 id="ts-banner-task-title" style="font-size: 15px; font-weight: 800; color: var(--ula-text-primary); margin: 2px 0 0 0;">Task Title</h4>
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: 14px;">
                 <div id="ts-banner-clock" style="font-size: 20px; font-weight: 900; font-family: var(--ula-font-mono); color: var(--ula-accent-default);">00:00:00</div>
-                <button type="button" onclick="stopGlobalTimer()" class="tactile-btn" style="background: #D96B5F; color: white; border: none; padding: 7px 14px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; border-radius: var(--ula-radius-md);">
+                <button type="button" onclick="stopGlobalTimer()" class="tactile-btn" style="background: var(--ula-status-danger); color: white; border: none; padding: 7px 14px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; border-radius: var(--ula-radius-md);">
                     <span class="material-symbols-rounded" style="font-size: 14px;">stop</span>
                     <span>{{ __('Stop Timer') }}</span>
                 </button>
@@ -211,7 +211,7 @@
     <div class="card" style="border-radius: var(--ula-radius-xl); overflow: hidden; padding: 0; margin-bottom: var(--ula-space-7); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs); background: var(--ula-surface-card);">
         <div style="padding: 18px 24px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-card);">
             <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(79, 155, 95, 0.15); color: #4F9B5F; display: flex; align-items: center; justify-content: center;">
+                <div style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success); display: flex; align-items: center; justify-content: center;">
                     <span class="material-symbols-rounded" style="font-size: 18px;">assignment</span>
                 </div>
                 <div>
@@ -219,7 +219,7 @@
                     <p style="font-size: 11px; color: var(--ula-text-secondary); margin: 2px 0 0 0;">{{ __('Detailed breakdown of all work orders, milestones, and task sessions completed on this date.') }}</p>
                 </div>
             </div>
-            <span class="nav-badge-pill" id="ts-tasks-count-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F; font-size: 11px; font-weight: 800; font-family: var(--ula-font-mono);">0 {{ __('Tasks') }}</span>
+            <span class="nav-badge-pill" id="ts-tasks-count-pill" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success); font-size: 11px; font-weight: 800; font-family: var(--ula-font-mono);">0 {{ __('Tasks') }}</span>
         </div>
         <div style="overflow-x: auto;">
             <table class="data-table" style="width: 100%; border-collapse: collapse;">
@@ -296,7 +296,7 @@
     <div class="card" style="border-radius: var(--ula-radius-xl); overflow: hidden; padding: 0; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs); background: var(--ula-surface-card);">
         <div style="padding: 18px 24px; border-bottom: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(214, 162, 58, 0.15); color: #D6A23A; display: flex; align-items: center; justify-content: center;">
+                <div style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(214, 162, 58, 0.15); color: var(--ula-gold-400); display: flex; align-items: center; justify-content: center;">
                     <span class="material-symbols-rounded" style="font-size: 18px;">fact_check</span>
                 </div>
                 <div>
@@ -326,17 +326,17 @@
                             <td style="padding: 14px 16px; color: var(--ula-accent-default); font-weight: var(--ula-weight-bold); font-family: var(--ula-font-mono); font-size: var(--ula-size-xs);">{{ $ts->billable_hours }}h</td>
                             <td style="padding: 14px 16px;">
                                 @if($ts->status === 'approved')
-                                    <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F; display: inline-flex; align-items: center; gap: 3px;">
+                                    <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success); display: inline-flex; align-items: center; gap: 3px;">
                                         <span class="material-symbols-rounded" style="font-size: 13px;">check_circle</span>
                                         <span>{{ __('Approved') }}</span>
                                     </span>
                                 @elseif($ts->status === 'submitted')
-                                    <span class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.15); color: #D6A23A; display: inline-flex; align-items: center; gap: 3px;">
+                                    <span class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.15); color: var(--ula-gold-400); display: inline-flex; align-items: center; gap: 3px;">
                                         <span class="material-symbols-rounded" style="font-size: 13px;">hourglass_top</span>
                                         <span>{{ __('Pending Review') }}</span>
                                     </span>
                                 @elseif($ts->status === 'rejected')
-                                    <span class="nav-badge-pill" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F; display: inline-flex; align-items: center; gap: 3px;">
+                                    <span class="nav-badge-pill" style="background: rgba(217, 107, 95, 0.15); color: var(--ula-status-danger); display: inline-flex; align-items: center; gap: 3px;">
                                         <span class="material-symbols-rounded" style="font-size: 13px;">cancel</span>
                                         <span>{{ __('Rejected') }}</span>
                                     </span>
@@ -351,7 +351,7 @@
                                             <span class="material-symbols-rounded" style="font-size: 13px;">check</span>
                                             <span>{{ __('Approve') }}</span>
                                         </button>
-                                        <button onclick="openRejectModal('{{ $ts->id }}')" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.3); padding: 4px 10px; font-size: 11px; display: inline-flex; align-items: center; gap: 2px; border-radius: var(--ula-radius-md);">
+                                        <button onclick="openRejectModal('{{ $ts->id }}')" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.3); padding: 4px 10px; font-size: 11px; display: inline-flex; align-items: center; gap: 2px; border-radius: var(--ula-radius-md);">
                                             <span class="material-symbols-rounded" style="font-size: 13px;">close</span>
                                             <span>{{ __('Reject') }}</span>
                                         </button>

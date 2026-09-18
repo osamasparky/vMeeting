@@ -22,8 +22,8 @@
                 'backlog' => ['title' => __('Backlog'), 'icon' => 'inventory_2', 'color' => 'var(--ula-text-secondary)', 'border' => 'var(--ula-border-subtle)'],
                 'ready' => ['title' => __('Ready'), 'icon' => 'adjust', 'color' => 'var(--ula-accent-default)', 'border' => 'var(--ula-accent-default)'],
                 'in_progress' => ['title' => __('In Progress'), 'icon' => 'bolt', 'color' => 'var(--ula-accent-press)', 'border' => 'var(--ula-accent-press)'],
-                'review' => ['title' => __('Review / QA'), 'icon' => 'pageview', 'color' => '#D6A23A', 'border' => '#D6A23A'],
-                'done' => ['title' => __('Done'), 'icon' => 'check_circle', 'color' => '#4F9B5F', 'border' => '#4F9B5F'],
+                'review' => ['title' => __('Review / QA'), 'icon' => 'pageview', 'color' => 'var(--ula-gold-400)', 'border' => 'var(--ula-gold-400)'],
+                'done' => ['title' => __('Done'), 'icon' => 'check_circle', 'color' => 'var(--ula-status-success)', 'border' => 'var(--ula-status-success)'],
             ];
         @endphp
 
@@ -92,20 +92,20 @@
                             </h4>
 
                             @if($t->approval_status === 'pending_approval')
-                                <div style="background: rgba(214, 162, 58, 0.15); border: 1px solid rgba(214, 162, 58, 0.35); color: #D6A23A; font-size: 10px; font-weight: var(--ula-weight-bold); padding: 4px 8px; border-radius: var(--ula-radius-sm); display: flex; align-items: center; justify-content: space-between;">
+                                <div style="background: rgba(214, 162, 58, 0.15); border: 1px solid rgba(214, 162, 58, 0.35); color: var(--ula-gold-400); font-size: 10px; font-weight: var(--ula-weight-bold); padding: 4px 8px; border-radius: var(--ula-radius-sm); display: flex; align-items: center; justify-content: space-between;">
                                     <span style="display: inline-flex; align-items: center; gap: 3px;">
                                         <span class="material-symbols-rounded" style="font-size: 12px;">hourglass_top</span>
                                         <span>{{ __('Pending PM Approval') }}</span>
                                     </span>
                                     @if($isManager)
-                                        <button type="button" onclick="event.stopPropagation(); quickApproveTask('{{ $t->id }}')" class="tactile-btn" style="background: #4F9B5F; color: white; padding: 2px 6px; font-size: 9px; border: none; border-radius: 4px; display: inline-flex; align-items: center; gap: 2px;">
+                                        <button type="button" onclick="event.stopPropagation(); quickApproveTask('{{ $t->id }}')" class="tactile-btn" style="background: var(--ula-status-success); color: var(--ula-white); padding: 2px 6px; font-size: 9px; border: none; border-radius: 4px; display: inline-flex; align-items: center; gap: 2px;">
                                             <span class="material-symbols-rounded" style="font-size: 11px;">check</span>
                                             <span>{{ __('Approve') }}</span>
                                         </button>
                                     @endif
                                 </div>
                             @elseif($t->approval_status === 'rejected')
-                                <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); color: #D96B5F; font-size: 10px; font-weight: var(--ula-weight-bold); padding: 4px 8px; border-radius: var(--ula-radius-sm); display: inline-flex; align-items: center; gap: 3px;">
+                                <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); color: var(--ula-status-danger); font-size: 10px; font-weight: var(--ula-weight-bold); padding: 4px 8px; border-radius: var(--ula-radius-sm); display: inline-flex; align-items: center; gap: 3px;">
                                     <span class="material-symbols-rounded" style="font-size: 12px;">warning</span>
                                     <span>{{ __('Changes Requested') }}</span>
                                 </div>

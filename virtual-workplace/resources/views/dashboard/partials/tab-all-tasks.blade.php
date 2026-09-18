@@ -44,12 +44,12 @@
         <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: var(--ula-space-5); box-shadow: var(--ula-shadow-xs);">
             <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-3);">
                 <span class="kpi-title" style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary);">{{ __('In Progress') }}</span>
-                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(59, 130, 246, 0.12); color: #3B82F6; display: flex; align-items: center; justify-content: center;">
+                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(185, 138, 55, 0.12); color: var(--ula-gold-500); display: flex; align-items: center; justify-content: center;">
                     <span class="material-symbols-rounded" style="font-size: 18px;">bolt</span>
                 </div>
             </div>
             <div class="kpi-value" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-family: var(--ula-font-mono);">{{ $tasks->where('status', 'in_progress')->count() }}</div>
-            <div class="kpi-trend" style="color: #3B82F6; font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
+            <div class="kpi-trend" style="color: var(--ula-gold-500); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 14px;">trending_up</span>
                 <span>{{ __('Active work execution') }}</span>
             </div>
@@ -58,12 +58,12 @@
         <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: var(--ula-space-5); box-shadow: var(--ula-shadow-xs);">
             <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-3);">
                 <span class="kpi-title" style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary);">{{ __('Under Review') }}</span>
-                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(214, 162, 58, 0.12); color: #D6A23A; display: flex; align-items: center; justify-content: center;">
+                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(214, 162, 58, 0.12); color: var(--ula-gold-400); display: flex; align-items: center; justify-content: center;">
                     <span class="material-symbols-rounded" style="font-size: 18px;">pageview</span>
                 </div>
             </div>
             <div class="kpi-value" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-family: var(--ula-font-mono);">{{ $tasks->whereIn('status', ['review', 'qa'])->count() }}</div>
-            <div class="kpi-trend" style="color: #D6A23A; font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
+            <div class="kpi-trend" style="color: var(--ula-gold-400); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 14px;">hourglass_top</span>
                 <span>{{ __('Pending QA / signoff') }}</span>
             </div>
@@ -72,12 +72,12 @@
         <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: var(--ula-space-5); box-shadow: var(--ula-shadow-xs);">
             <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-3);">
                 <span class="kpi-title" style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary);">{{ __('Completed') }}</span>
-                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(79, 155, 95, 0.12); color: #4F9B5F; display: flex; align-items: center; justify-content: center;">
+                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(79, 155, 95, 0.12); color: var(--ula-status-success); display: flex; align-items: center; justify-content: center;">
                     <span class="material-symbols-rounded" style="font-size: 18px;">check_circle</span>
                 </div>
             </div>
             <div class="kpi-value" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-family: var(--ula-font-mono);">{{ $tasks->where('status', 'done')->count() }}</div>
-            <div class="kpi-trend" style="color: #4F9B5F; font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
+            <div class="kpi-trend" style="color: var(--ula-status-success); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 14px;">verified</span>
                 <span>{{ __('Delivered features') }}</span>
             </div>
@@ -203,7 +203,7 @@
                                 <div style="font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); display: flex; align-items: center; gap: 6px; font-size: var(--ula-size-sm);">
                                     <span>{{ $t->title }}</span>
                                     @if($t->checklistItems && $t->checklistItems->count() > 0)
-                                        <span class="nav-badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.15); color: #4F9B5F; font-family: var(--ula-font-mono); display: inline-flex; align-items: center; gap: 2px;">
+                                        <span class="nav-badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success); font-family: var(--ula-font-mono); display: inline-flex; align-items: center; gap: 2px;">
                                             <span class="material-symbols-rounded" style="font-size: 10px;">check_box</span>
                                             <span>{{ $t->checklistItems->where('is_completed', true)->count() }}/{{ $t->checklistItems->count() }}</span>
                                         </span>
@@ -242,12 +242,12 @@
                             </td>
                             <td style="padding: 14px 16px;">
                                 @if($t->priority === 'urgent')
-                                    <span class="nav-badge-pill" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F; border-color: rgba(217, 107, 95, 0.3); display: inline-flex; align-items: center; gap: 2px;">
+                                    <span class="nav-badge-pill" style="background: rgba(217, 107, 95, 0.15); color: var(--ula-status-danger); border-color: rgba(217, 107, 95, 0.3); display: inline-flex; align-items: center; gap: 2px;">
                                         <span class="material-symbols-rounded" style="font-size: 12px;">local_fire_department</span>
                                         <span>{{ __('Urgent') }}</span>
                                     </span>
                                 @elseif($t->priority === 'high')
-                                    <span class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.15); color: #D6A23A; border-color: rgba(214, 162, 58, 0.3); display: inline-flex; align-items: center; gap: 2px;">
+                                    <span class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.15); color: var(--ula-gold-400); border-color: rgba(214, 162, 58, 0.3); display: inline-flex; align-items: center; gap: 2px;">
                                         <span class="material-symbols-rounded" style="font-size: 12px;">bolt</span>
                                         <span>{{ __('High') }}</span>
                                     </span>
@@ -262,9 +262,9 @@
                                 @php
                                     $isOverdue = $t->due_date && $t->due_date->isPast() && $t->status !== 'done';
                                 @endphp
-                                <span style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: {{ $isOverdue ? '#D96B5F' : 'var(--ula-text-secondary)' }}; font-family: var(--ula-font-mono);">
+                                <span style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: {{ $isOverdue ? 'var(--ula-status-danger)' : 'var(--ula-text-secondary)' }}; font-family: var(--ula-font-mono);">
                                     {{ $t->due_date ? $t->due_date->format('M d, Y') : '—' }}
-                                    @if($isOverdue) <span class="nav-badge-pill" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F; font-size: 9px;">{{ __('Overdue') }}</span> @endif
+                                    @if($isOverdue) <span class="nav-badge-pill" style="background: rgba(217, 107, 95, 0.15); color: var(--ula-status-danger); font-size: 9px;">{{ __('Overdue') }}</span> @endif
                                 </span>
                             </td>
                             <td style="padding: 14px 16px;">
@@ -306,8 +306,8 @@
                     'backlog' => ['title' => __('Backlog'), 'icon' => 'inventory_2', 'color' => 'var(--ula-text-secondary)', 'bg' => 'var(--ula-surface-page-alt)'],
                     'ready' => ['title' => __('Ready'), 'icon' => 'adjust', 'color' => 'var(--ula-accent-default)', 'bg' => 'var(--ula-surface-page-alt)'],
                     'in_progress' => ['title' => __('In Progress'), 'icon' => 'bolt', 'color' => 'var(--ula-accent-press)', 'bg' => 'var(--ula-surface-accent-soft)'],
-                    'review' => ['title' => __('Review / QA'), 'icon' => 'pageview', 'color' => '#D6A23A', 'bg' => 'rgba(214, 162, 58, 0.08)'],
-                    'done' => ['title' => __('Done'), 'icon' => 'check_circle', 'color' => '#4F9B5F', 'bg' => 'rgba(79, 155, 95, 0.12)'],
+                    'review' => ['title' => __('Review / QA'), 'icon' => 'pageview', 'color' => 'var(--ula-gold-400)', 'bg' => 'rgba(214, 162, 58, 0.08)'],
+                    'done' => ['title' => __('Done'), 'icon' => 'check_circle', 'color' => 'var(--ula-status-success)', 'bg' => 'rgba(79, 155, 95, 0.12)'],
                 ];
             @endphp
 
@@ -388,18 +388,18 @@
                             </h4>
 
                             @if($t->approval_status === 'pending_approval')
-                                <div style="background: rgba(214, 162, 58, 0.15); border: 1px solid rgba(214, 162, 58, 0.35); color: #D6A23A; font-size: 10px; font-weight: var(--ula-weight-bold); padding: 4px 8px; border-radius: var(--ula-radius-sm); display: flex; align-items: center; justify-content: space-between;">
+                                <div style="background: rgba(214, 162, 58, 0.15); border: 1px solid rgba(214, 162, 58, 0.35); color: var(--ula-gold-400); font-size: 10px; font-weight: var(--ula-weight-bold); padding: 4px 8px; border-radius: var(--ula-radius-sm); display: flex; align-items: center; justify-content: space-between;">
                                     <span style="display: inline-flex; align-items: center; gap: 3px;">
                                         <span class="material-symbols-rounded" style="font-size: 12px;">hourglass_top</span>
                                         <span>{{ __('Pending PM Approval') }}</span>
                                     </span>
-                                    <button type="button" onclick="event.stopPropagation(); quickApproveTask('{{ $t->id }}')" class="tactile-btn" style="background: #4F9B5F; color: white; padding: 2px 6px; font-size: 9px; border: none; border-radius: 4px; display: inline-flex; align-items: center; gap: 2px;">
+                                    <button type="button" onclick="event.stopPropagation(); quickApproveTask('{{ $t->id }}')" class="tactile-btn" style="background: var(--ula-status-success); color: white; padding: 2px 6px; font-size: 9px; border: none; border-radius: 4px; display: inline-flex; align-items: center; gap: 2px;">
                                         <span class="material-symbols-rounded" style="font-size: 11px;">check</span>
                                         <span>{{ __('Approve') }}</span>
                                     </button>
                                 </div>
                             @elseif($t->approval_status === 'rejected')
-                                <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); color: #D96B5F; font-size: 10px; font-weight: var(--ula-weight-bold); padding: 4px 8px; border-radius: var(--ula-radius-sm); display: inline-flex; align-items: center; gap: 3px;">
+                                <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); color: var(--ula-status-danger); font-size: 10px; font-weight: var(--ula-weight-bold); padding: 4px 8px; border-radius: var(--ula-radius-sm); display: inline-flex; align-items: center; gap: 3px;">
                                     <span class="material-symbols-rounded" style="font-size: 12px;">warning</span>
                                     <span>{{ __('Changes Requested') }}</span>
                                 </div>

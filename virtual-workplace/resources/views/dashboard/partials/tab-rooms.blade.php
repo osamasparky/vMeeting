@@ -122,10 +122,10 @@
 
                 <!-- Branch Filter Pills -->
                 <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-                    <button type="button" onclick="filterRoomsByBranch('all')" id="branch-pill-all" class="tactile-btn branch-filter-pill active" style="padding: 7px 14px; font-size: 12px; border-radius: 20px; border: 1px solid var(--ula-palm-900); background: var(--ula-palm-900); color: white; display: inline-flex; align-items: center; gap: 6px;">
+                    <button type="button" onclick="filterRoomsByBranch('all')" id="branch-pill-all" class="tactile-btn branch-filter-pill active" style="padding: 7px 14px; font-size: 12px; border-radius: 20px; border: 1px solid var(--ula-palm-900); background: var(--ula-palm-900); color: var(--ula-white); display: inline-flex; align-items: center; gap: 6px;">
                         <span class="material-symbols-rounded" style="font-size: 15px;">domain</span>
                         <span>{{ __('All Offices & Branches') }}</span>
-                        <span class="nav-badge-pill" style="background: rgba(255, 255, 255, 0.25); color: white; border-color: transparent; margin-inline-start: 4px; font-family: 'IBM Plex Mono', monospace;">{{ $rooms->count() }}</span>
+                        <span class="nav-badge-pill" style="background: rgba(255, 255, 255, 0.25); color: var(--ula-white); border-color: transparent; margin-inline-start: 4px; font-family: 'IBM Plex Mono', monospace;">{{ $rooms->count() }}</span>
                     </button>
 
                     @foreach($offices as $off)
@@ -169,7 +169,7 @@
 
                     <!-- View Switcher (Cards vs Table) -->
                     <div style="display: flex; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md); padding: 3px; box-shadow: var(--ula-shadow-sm);">
-                        <button type="button" onclick="switchRoomsViewMode('cards')" id="rooms-view-cards-btn" class="tactile-btn" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; background: var(--ula-palm-900); color: white; border: none; display: inline-flex; align-items: center; gap: 4px;" title="{{ __('Visual Spatial Cards Grid') }}">
+                        <button type="button" onclick="switchRoomsViewMode('cards')" id="rooms-view-cards-btn" class="tactile-btn" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; background: var(--ula-palm-900); color: var(--ula-white); border: none; display: inline-flex; align-items: center; gap: 4px;" title="{{ __('Visual Spatial Cards Grid') }}">
                             <span class="material-symbols-rounded" style="font-size: 15px;">view_module</span>
                             <span>{{ __('Cards Grid') }}</span>
                         </button>
@@ -195,7 +195,7 @@
                         <div style="padding: 18px 24px; background: var(--ula-sand-200); border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
                             <div style="display: flex; align-items: center; gap: 14px; min-width: 0;">
                                 <div class="icon-box-3d" style="width: 46px; height: 46px; border-radius: 14px; font-size: 22px; flex-shrink: 0; background: var(--ula-palm-900);">
-                                    <span class="material-symbols-rounded" style="color: white; font-size: 24px;">corporate_fare</span>
+                                    <span class="material-symbols-rounded" style="color: var(--ula-white); font-size: 24px;">corporate_fare</span>
                                 </div>
                                 <div>
                                     <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 2px;">
@@ -251,7 +251,7 @@
                                 <div class="rooms-grid-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
                                     @foreach($branchRooms as $r)
                                         @php
-                                            $roomColor = $r->color ?: '#142B24';
+                                            $roomColor = $r->color ?: 'var(--ula-palm-900)';
                                             $bounds = $r->bounds ?? ['x' => 0, 'y' => 0, 'width' => 10, 'height' => 10];
                                             $bx = $bounds['x'] ?? 0;
                                             $by = $bounds['y'] ?? 0;
@@ -403,7 +403,7 @@
                                                 <tr class="room-table-row" data-room-id="{{ $r->id }}" data-room-name="{{ strtolower($r->name) }}" data-office-name="{{ strtolower($off->name) }}" data-room-type="{{ $rType }}">
                                                     <td>
                                                         <div style="display: flex; align-items: center; gap: 8px;">
-                                                            <div style="width: 10px; height: 10px; border-radius: 50%; background: {{ $r->color ?: '#142B24' }}; flex-shrink: 0;"></div>
+                                                            <div style="width: 10px; height: 10px; border-radius: 50%; background: {{ $r->color ?: 'var(--ula-palm-900)' }}; flex-shrink: 0;"></div>
                                                             <strong style="color: var(--ula-text-primary); font-size: 13px; display: inline-flex; align-items: center; gap: 4px;">
                                                                 <span class="material-symbols-rounded" style="font-size: 15px;">meeting_room</span>
                                                                 <span>{{ $r->name }}</span>

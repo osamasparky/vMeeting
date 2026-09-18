@@ -92,9 +92,9 @@
                 <!-- Chat Conversation Top Header -->
                 <div style="height: 60px; padding: 0 20px; border-bottom: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
                     <div style="display: flex; align-items: center; gap: var(--ula-space-4); min-width: 0;">
-                        <div id="chat-active-avatar-box" style="position: relative; width: 38px; height: 38px; border-radius: var(--ula-radius-md); background: var(--ula-gradient-accent); display: flex; align-items: center; justify-content: center; font-weight: var(--ula-weight-bold); font-size: 14px; color: white; flex-shrink: 0; box-shadow: var(--ula-shadow-xs);">
+                        <div id="chat-active-avatar-box" style="position: relative; width: 38px; height: 38px; border-radius: var(--ula-radius-md); background: var(--ula-gradient-accent); display: flex; align-items: center; justify-content: center; font-weight: var(--ula-weight-bold); font-size: 14px; color: var(--ula-white); flex-shrink: 0; box-shadow: var(--ula-shadow-xs);">
                             <span id="chat-active-avatar-initials" style="font-family: var(--ula-font-mono);">AB</span>
-                            <div style="position: absolute; bottom: -2px; inset-inline-end: -2px; width: 10px; height: 10px; border-radius: 50%; background: #4F9B5F; border: 2px solid var(--ula-surface-card);" title="Online"></div>
+                            <div style="position: absolute; bottom: -2px; inset-inline-end: -2px; width: 10px; height: 10px; border-radius: 50%; background: var(--ula-status-success); border: 2px solid var(--ula-surface-card);" title="Online"></div>
                         </div>
                         <div style="min-width: 0;">
                             <div style="display: flex; align-items: center; gap: var(--ula-space-3);">

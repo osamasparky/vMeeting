@@ -5,7 +5,7 @@
         <!-- Left / RTL Start: Greeting & Actions -->
         <div style="flex: 1; min-width: 280px;">
             <div class="nx-hero-greeting-pill">
-                <span style="width: 8px; height: 8px; border-radius: 50%; background: #3C6B4C; display: inline-block;"></span>
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--ula-palm-500); display: inline-block;"></span>
                 <span>{{ __('Ready to Collaborate') }}</span>
                 <span style="color: var(--ula-text-muted);">·</span>
                 <span style="color: var(--ula-text-muted);">{{ $organization->name }}</span>
@@ -44,25 +44,25 @@
         <div class="nx-hero-date-card">
             <!-- User Avatar with Online status -->
             <div style="position: relative; cursor: pointer;" onclick="switchAdminTab('profile')" title="{{ __('View Profile') }}">
-                <div style="width: 52px; height: 52px; border-radius: 50%; border: 2px solid #FFFFFF; box-shadow: 0 2px 8px rgba(20,43,36,0.08); overflow: hidden; background: #F4EDE1; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: #142B24;">
+                <div style="width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--ula-white); box-shadow: 0 2px 8px rgba(20,43,36,0.08); overflow: hidden; background: var(--ula-sand-200); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--ula-palm-900);">
                     @if($user->avatar_url)
                         <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; object-fit: cover;">
                     @else
                         <span>{{ strtoupper(substr($user->name, 0, 2)) }}</span>
                     @endif
                 </div>
-                <div style="position: absolute; bottom: 0; inset-inline-end: 0; width: 13px; height: 13px; border-radius: 50%; background: #3C6B4C; border: 2px solid #FFFFFF;" title="{{ __('Online') }}"></div>
+                <div style="position: absolute; bottom: 0; inset-inline-end: 0; width: 13px; height: 13px; border-radius: 50%; background: var(--ula-palm-500); border: 2px solid var(--ula-white);" title="{{ __('Online') }}"></div>
             </div>
 
             <!-- Date Info Block -->
             <div style="display: flex; flex-direction: column; text-align: start;">
-                <span style="font-size: 11px; font-weight: 600; color: #D3A553; text-transform: uppercase; letter-spacing: 0.5px;">
+                <span style="font-size: 11px; font-weight: 600; color: var(--ula-gold-400); text-transform: uppercase; letter-spacing: 0.5px;">
                     {{ now()->locale(app()->getLocale())->translatedFormat('l') }}
                 </span>
-                <span style="font-size: 18px; font-weight: 300; color: #142B24; line-height: 1.2;">
+                <span style="font-size: 18px; font-weight: 300; color: var(--ula-palm-900); line-height: 1.2;">
                     {{ now()->format('d') }} {{ now()->locale(app()->getLocale())->translatedFormat('F') }}
                 </span>
-                <span style="font-size: 11px; color: #857a6c; font-family: 'IBM Plex Mono', monospace;">
+                <span style="font-size: 11px; color: var(--ula-stone-500); font-family: 'IBM Plex Mono', monospace;">
                     {{ now()->format('Y') }}
                 </span>
             </div>
@@ -196,11 +196,11 @@
             <div class="nx-panel-header">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <h3 class="nx-panel-title">{{ __('Today\'s Scheduled Meetings') }}</h3>
-                    <span style="font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 9999px; background: #E7F3EC; color: #3C6B4C;">
+                    <span style="font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 9999px; background: var(--ula-tone-palm-bg); color: var(--ula-palm-500);">
                         {{ $todayMeetings->count() }}
                     </span>
                 </div>
-                <button type="button" onclick="switchAdminTab('meetings')" style="background: none; border: none; font-size: 12px; font-weight: 600; color: #D3A553; cursor: pointer;">
+                <button type="button" onclick="switchAdminTab('meetings')" style="background: none; border: none; font-size: 12px; font-weight: 600; color: var(--ula-gold-400); cursor: pointer;">
                     {{ __('View All') }} →
                 </button>
             </div>
@@ -213,10 +213,10 @@
                                 {{ $meeting->scheduled_at ? $meeting->scheduled_at->format('h:i A') : __('Now') }}
                             </span>
                             <div style="display: flex; flex-direction: column; min-width: 0;">
-                                <span style="font-size: 13px; font-weight: 500; color: #142B24; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                <span style="font-size: 13px; font-weight: 500; color: var(--ula-palm-900); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                     {{ $meeting->title }}
                                 </span>
-                                <span style="font-size: 11px; color: #665d52;">
+                                <span style="font-size: 11px; color: var(--ula-stone-600);">
                                     {{ $meeting->room->name ?? ($meeting->project->name ?? __('General Room')) }}
                                 </span>
                             </div>
@@ -229,12 +229,12 @@
                         </div>
                     </div>
                 @empty
-                    <div style="padding: 24px 16px; text-align: center; border-radius: 12px; border: 1px dashed rgba(20,43,36,0.12); background: #FAF6F0;">
-                        <span class="material-symbols-rounded" style="font-size: 28px; color: #D3A553; display: block; margin-bottom: 6px;">calendar_month</span>
-                        <p style="font-size: 13px; font-weight: 500; color: #142B24; margin: 0 0 4px 0;">
+                    <div style="padding: 24px 16px; text-align: center; border-radius: 12px; border: 1px dashed rgba(20,43,36,0.12); background: var(--ula-sand-50);">
+                        <span class="material-symbols-rounded" style="font-size: 28px; color: var(--ula-gold-400); display: block; margin-bottom: 6px;">calendar_month</span>
+                        <p style="font-size: 13px; font-weight: 500; color: var(--ula-palm-900); margin: 0 0 4px 0;">
                             {{ __('No meetings scheduled for today') }}
                         </p>
-                        <p style="font-size: 11px; color: #857a6c; margin: 0 0 12px 0;">
+                        <p style="font-size: 11px; color: var(--ula-stone-500); margin: 0 0 12px 0;">
                             {{ __('All clear for today. You can schedule a new meeting anytime.') }}
                         </p>
                         <button type="button" onclick="openScheduleMeetingModal('general')" class="nx-btn-secondary" style="height: 34px; padding: 0 14px; font-size: 12px;">
@@ -264,34 +264,34 @@
                     size="default" 
                     label="{{ $occupancyPercent }}%" 
                     caption="{{ __('In Use') }}"
-                    accentColor="#142B24"
-                    trackColor="#F4EDE1"
+                    accentColor="var(--ula-palm-900)"
+                    trackColor="var(--ula-sand-200)"
                 />
 
                 <!-- Legend -->
                 <div class="nx-legend-list">
                     <div class="nx-legend-item">
                         <span style="display: flex; align-items: center;">
-                            <span class="nx-legend-dot" style="background: #3C6B4C;"></span>
+                            <span class="nx-legend-dot" style="background: var(--ula-palm-500);"></span>
                             <span>{{ __('Open Rooms') }}</span>
                         </span>
-                        <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: #142B24;">{{ $openRooms }}</span>
+                        <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--ula-palm-900);">{{ $openRooms }}</span>
                     </div>
 
                     <div class="nx-legend-item">
                         <span style="display: flex; align-items: center;">
-                            <span class="nx-legend-dot" style="background: #D3A553;"></span>
+                            <span class="nx-legend-dot" style="background: var(--ula-gold-400);"></span>
                             <span>{{ __('Locked Rooms') }}</span>
                         </span>
-                        <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: #142B24;">{{ $closedRooms }}</span>
+                        <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--ula-palm-900);">{{ $closedRooms }}</span>
                     </div>
 
                     <div class="nx-legend-item">
                         <span style="display: flex; align-items: center;">
-                            <span class="nx-legend-dot" style="background: #E8DECC;"></span>
+                            <span class="nx-legend-dot" style="background: var(--ula-sand-400);"></span>
                             <span>{{ __('Vacancy Rate') }}</span>
                         </span>
-                        <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 500; color: #857a6c;">{{ 100 - $occupancyPercent }}%</span>
+                        <span style="font-family: 'IBM Plex Mono', monospace; font-weight: 500; color: var(--ula-stone-500);">{{ 100 - $occupancyPercent }}%</span>
                     </div>
                 </div>
             </div>
@@ -301,14 +301,14 @@
     <!-- ── 4. Quote Banner Strip (Figma Spec) ── -->
     <div class="nx-quote-banner">
         <div style="display: flex; align-items: center; gap: 12px;">
-            <span class="material-symbols-rounded" style="font-size: 22px; color: #D3A553;">format_quote</span>
+            <span class="material-symbols-rounded" style="font-size: 22px; color: var(--ula-gold-400);">format_quote</span>
             <div style="display: flex; flex-direction: column;">
-                <span style="font-size: 13px; font-weight: 500; color: #142B24;">
+                <span style="font-size: 13px; font-weight: 500; color: var(--ula-palm-900);">
                     {{ __('Better spaces carve greater teams.') }}
                 </span>
             </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: #857a6c;">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--ula-stone-500);">
             <span>{{ __('UlaSpace Workplace') }}</span>
             <span>·</span>
             <span>ALULA</span>

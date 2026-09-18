@@ -11,7 +11,7 @@
             @if($auditLogs->count() > 0)
                 <form method="POST" action="{{ route('audit_logs.clear') }}" onsubmit="return confirm('{{ __('Are you sure you want to purge all audit logs?') }}');" style="display: inline; margin: 0;">
                     @csrf
-                    <button type="submit" class="tactile-btn" style="background: rgba(217, 107, 95, 0.12); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.25); padding: 10px 16px; font-size: var(--ula-size-sm); display: inline-flex; align-items: center; gap: var(--ula-space-3); border-radius: var(--ula-radius-lg);">
+                    <button type="submit" class="tactile-btn" style="background: rgba(217, 107, 95, 0.12); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.25); padding: 10px 16px; font-size: var(--ula-size-sm); display: inline-flex; align-items: center; gap: var(--ula-space-3); border-radius: var(--ula-radius-lg);">
                         <span class="material-symbols-rounded" style="font-size: 18px;">delete_sweep</span>
                         <span>{{ __('Clear All Logs') }}</span>
                     </button>

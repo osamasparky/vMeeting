@@ -38,7 +38,7 @@
                         <tr style="border-bottom: 1px solid var(--ula-border-subtle);">
                             <td style="padding: 14px 16px;">
                                 <div style="display: flex; align-items: center; gap: var(--ula-space-4);">
-                                    <div style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: var(--ula-gradient-accent); color: white; display: flex; align-items: center; justify-content: center; font-weight: var(--ula-weight-bold); font-size: 12px; font-family: var(--ula-font-mono); box-shadow: var(--ula-shadow-xs);">
+                                    <div style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: var(--ula-gradient-accent); color: var(--ula-white); display: flex; align-items: center; justify-content: center; font-weight: var(--ula-weight-bold); font-size: 12px; font-family: var(--ula-font-mono); box-shadow: var(--ula-shadow-xs);">
                                         {{ strtoupper(substr($m->user->name ?? 'M', 0, 2)) }}
                                     </div>
                                     <div>
@@ -53,11 +53,11 @@
                             <td style="padding: 14px 16px; font-weight: var(--ula-weight-bold); color: var(--ula-accent-default); font-family: var(--ula-font-mono); font-size: var(--ula-size-sm);">{{ $assignedHours }}h</td>
                             <td style="padding: 14px 16px; min-width: 180px;">
                                 <div style="display: flex; justify-content: space-between; font-size: var(--ula-size-xs); margin-bottom: 5px; font-weight: var(--ula-weight-bold); font-family: var(--ula-font-mono);">
-                                    <span style="color: {{ $utilization > 100 ? '#D96B5F' : ($utilization > 80 ? '#D6A23A' : 'var(--ula-accent-default)') }};">{{ $utilization }}%</span>
+                                    <span style="color: {{ $utilization > 100 ? 'var(--ula-status-danger)' : ($utilization > 80 ? 'var(--ula-gold-400)' : 'var(--ula-accent-default)') }};">{{ $utilization }}%</span>
                                     <span style="color: var(--ula-text-muted);">{{ $assignedHours }} / {{ $capacity }}h</span>
                                 </div>
                                 <div class="progress-bar-bg" style="background: var(--ula-surface-page-alt); height: 7px; border-radius: var(--ula-radius-pill); overflow: hidden; border: 1px solid var(--ula-border-subtle);">
-                                    <div class="progress-bar-fill" style="width: {{ min(100, $utilization) }}%; height: 100%; background: {{ $utilization > 100 ? '#D96B5F' : ($utilization > 80 ? '#D6A23A' : 'var(--ula-accent-default)') }}; border-radius: var(--ula-radius-pill);"></div>
+                                    <div class="progress-bar-fill" style="width: {{ min(100, $utilization) }}%; height: 100%; background: {{ $utilization > 100 ? 'var(--ula-status-danger)' : ($utilization > 80 ? 'var(--ula-gold-400)' : 'var(--ula-accent-default)') }}; border-radius: var(--ula-radius-pill);"></div>
                                 </div>
                             </td>
                         </tr>

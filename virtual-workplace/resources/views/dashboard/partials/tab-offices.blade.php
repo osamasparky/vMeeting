@@ -14,7 +14,7 @@
                 <span>{{ __('Add Office Branch') }}</span>
             </button>
             @else
-            <button onclick="switchAdminTab('billing')" class="tactile-btn" style="padding: 10px 18px; font-size: var(--ula-size-sm); background: linear-gradient(180deg, #D6A23A 0%, #B4831B 100%); color: white; border: 1px solid #996D12; display: inline-flex; align-items: center; gap: var(--ula-space-3);">
+            <button onclick="switchAdminTab('billing')" class="tactile-btn" style="padding: 10px 18px; font-size: var(--ula-size-sm); background: linear-gradient(180deg, var(--ula-gold-400) 0%, var(--ula-gold-500) 100%); color: var(--ula-white); border: 1px solid var(--ula-gold-600); display: inline-flex; align-items: center; gap: var(--ula-space-3);">
                 <span class="material-symbols-rounded" style="font-size: 18px;">workspace_premium</span>
                 <span>{{ __('Upgrade Plan for More Offices') }}</span>
             </button>
@@ -45,7 +45,7 @@
             <div>
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--ula-space-5);">
                     <div style="display: flex; align-items: center; gap: var(--ula-space-4);">
-                        <div style="width: 44px; height: 44px; border-radius: var(--ula-radius-lg); background: var(--ula-gradient-accent); color: white; display: flex; align-items: center; justify-content: center; box-shadow: var(--ula-shadow-xs);">
+                        <div style="width: 44px; height: 44px; border-radius: var(--ula-radius-lg); background: var(--ula-gradient-accent); color: var(--ula-white); display: flex; align-items: center; justify-content: center; box-shadow: var(--ula-shadow-xs);">
                             <span class="material-symbols-rounded" style="font-size: 24px;">apartment</span>
                         </div>
                         <div>
@@ -57,7 +57,7 @@
                         </div>
                     </div>
                     @if($off->is_default)
-                        <span class="badge-status" style="background: rgba(79, 155, 95, 0.15); color: #2E6B40; font-size: 11px; font-weight: var(--ula-weight-bold); display: inline-flex; align-items: center; gap: 2px; padding: 3px 8px; border-radius: var(--ula-radius-pill);">
+                        <span class="badge-status" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success); font-size: 11px; font-weight: var(--ula-weight-bold); display: inline-flex; align-items: center; gap: 2px; padding: 3px 8px; border-radius: var(--ula-radius-pill);">
                             <span class="material-symbols-rounded" style="font-size: 13px;">star</span>
                             <span>{{ __('Main HQ') }}</span>
                         </span>
@@ -100,7 +100,7 @@
                 <form method="POST" action="{{ route('offices.delete', $off->id) }}" onsubmit="return confirm('{{ __('Are you sure you want to permanently delete this office branch and its blueprint?') }}');" style="margin: 0;">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="tactile-btn" style="padding: 8px 12px; font-size: 12px; background: rgba(217, 107, 95, 0.12); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.25); display: inline-flex; align-items: center; justify-content: center; border-radius: var(--ula-radius-md);" title="{{ __('Delete Branch') }}">
+                    <button type="submit" class="tactile-btn" style="padding: 8px 12px; font-size: 12px; background: rgba(217, 107, 95, 0.12); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.25); display: inline-flex; align-items: center; justify-content: center; border-radius: var(--ula-radius-md);" title="{{ __('Delete Branch') }}">
                         <span class="material-symbols-rounded" style="font-size: 16px;">delete</span>
                     </button>
                 </form>

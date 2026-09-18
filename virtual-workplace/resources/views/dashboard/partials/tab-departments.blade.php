@@ -41,7 +41,7 @@
                             <form action="{{ route('departments.delete', $dept->id) }}" method="POST" onsubmit="return confirm('{{ __('Are you sure you want to delete this department?') }}');" style="display: inline; margin: 0;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="tactile-btn" style="background: rgba(217, 107, 95, 0.12); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.25); padding: 6px 10px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--ula-radius-md);" title="{{ __('Delete Department') }}">
+                                <button type="submit" class="tactile-btn" style="background: rgba(217, 107, 95, 0.12); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.25); padding: 6px 10px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--ula-radius-md);" title="{{ __('Delete Department') }}">
                                 <span class="material-symbols-rounded" style="font-size: 16px;">delete</span>
                                 </button>
                             </form>
