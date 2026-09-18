@@ -64,7 +64,7 @@
                     <textarea name="description" rows="2" placeholder="Brief project summary..." style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--ula-shadow-xs);"></textarea>
                 </div>
                 <button type="submit" class="tactile-btn btn-primary" style="margin-top: 8px; padding: 12px; font-size: 14px; justify-content: center; width: 100%;">
-                    🚀 {{ __('Create Project') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">rocket_launch</span> {{ __('Create Project') }}
                 </button>
             </form>
         </div>
@@ -74,7 +74,7 @@
     <div id="new-task-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 540px; border-radius: 20px; padding: 24px;">
             <div class="modal-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                <h3 class="modal-title" style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);">✅ {{ __('Create New Task') }}</h3>
+                <h3 class="modal-title" style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check_circle</span> {{ __('Create New Task') }}</h3>
                 <button onclick="closeNewTaskModal()" class="modal-close" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ula-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
             </div>
             <form id="new-task-form" onsubmit="createTaskSubmit(event)" style="display: flex; flex-direction: column; gap: 14px;">
@@ -82,7 +82,7 @@
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Project') }} *</label>
                     <select name="project_id" required style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         @foreach($projects as $p)
-                            <option value="{{ $p->id }}">📁 {{ $p->name }} ({{ $p->code }})</option>
+                            <option value="{{ $p->id }}">{{ $p->name }} ({{ $p->code }})</option>
                         @endforeach
                     </select>
                 </div>
@@ -131,7 +131,7 @@
     <div id="schedule-meeting-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 600px; border-radius: 20px; padding: 24px; max-height: 90vh; overflow-y: auto;">
             <div class="modal-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                <h3 class="modal-title" style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);">📅 {{ __('Schedule Meeting & Sync Attendees') }}</h3>
+                <h3 class="modal-title" style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Schedule Meeting & Sync Attendees') }}</h3>
                 <button onclick="closeScheduleMeetingModal()" class="modal-close" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ula-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
             </div>
 
@@ -144,11 +144,11 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: var(--ula-surface-page-alt); padding: 4px; border-radius: 12px; border: 1px solid var(--ula-border-subtle);">
                         <label id="lbl-scope-general" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer; background: var(--ula-surface-card); color: var(--ula-accent-default); box-shadow: var(--ula-shadow-xs);">
                             <input type="radio" name="scope" value="general" checked onchange="toggleMeetingScope('general')" style="display: none;">
-                            <span>🌐 {{ __('General Meeting') }}</span>
+                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">language</span> {{ __('General Meeting') }}</span>
                         </label>
                         <label id="lbl-scope-project" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 800; cursor: pointer; color: var(--ula-text-secondary);">
                             <input type="radio" name="scope" value="project" onchange="toggleMeetingScope('project')" style="display: none;">
-                            <span>📁 {{ __('Project Team Meeting') }}</span>
+                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> {{ __('Project Team Meeting') }}</span>
                         </label>
                     </div>
                 </div>
@@ -159,7 +159,7 @@
                     <select name="project_id" id="meeting-project-select" onchange="renderProjectAttendeesList(this.value)" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         <option value="">— {{ __('Select Project') }} —</option>
                         @foreach($projects as $p)
-                            <option value="{{ $p->id }}">📁 {{ $p->name }} ({{ $p->code }})</option>
+                            <option value="{{ $p->id }}">{{ $p->name }} ({{ $p->code }})</option>
                         @endforeach
                     </select>
                     
@@ -167,10 +167,10 @@
                     <div id="project-attendees-selection-box" style="margin-top: 10px; display: none;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                             <label style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">
-                                👥 {{ __('Select Project Members to Attend') }}
+                                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">group</span> {{ __('Select Project Members to Attend') }}
                             </label>
                             <button type="button" onclick="toggleAllProjectAttendees()" style="background: none; border: none; font-size: 11px; font-weight: 800; color: var(--ula-accent-default); cursor: pointer;">
-                                ✓ {{ __('Select / Unselect All') }}
+                                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check</span> {{ __('Select / Unselect All') }}
                             </button>
                         </div>
                         <div id="project-attendees-list" style="max-height: 140px; overflow-y: auto; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px;"></div>
@@ -195,7 +195,7 @@
                         <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Meeting Room') }}</label>
                         <select name="room_id" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             @foreach($rooms as $r)
-                                <option value="{{ $r->id }}">🚪 {{ $r->name }} ({{ ucfirst($r->type) }})</option>
+                                <option value="{{ $r->id }}">{{ $r->name }} ({{ ucfirst($r->type) }})</option>
                             @endforeach
                         </select>
                     </div>
@@ -222,7 +222,7 @@
                 <!-- General Attendees Selection (Shown when scope is general) -->
                 <div id="meeting-general-attendees-field">
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">
-                        👥 {{ __('Select Attendees to Invite') }}
+                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">group</span> {{ __('Select Attendees to Invite') }}
                     </label>
                     <div style="max-height: 140px; overflow-y: auto; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; gap: 6px;">
                         @foreach($members as $m)
@@ -241,12 +241,12 @@
                 </div>
 
                 <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 12px; padding: 12px; font-size: 11px; color: var(--ula-text-secondary); display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 18px;">🔔</span>
+                    <span style="font-size: 18px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">notifications</span></span>
                     <span>{{ __('Email invitations with direct Join links will be dispatched automatically, and all attendees will receive sound chime alerts before the session starts.') }}</span>
                 </div>
 
                 <button type="submit" class="tactile-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px; justify-content: center; width: 100%;">
-                    🚀 {{ __('Schedule Meeting & Dispatch Invitations') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">rocket_launch</span> {{ __('Schedule Meeting & Dispatch Invitations') }}
                 </button>
             </form>
         </div>
@@ -256,7 +256,7 @@
     <div id="manual-time-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 500px; border-radius: 20px; padding: 24px;">
             <div class="modal-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                <h3 class="modal-title" style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);">✍️ {{ __('Log Manual Time Entry') }}</h3>
+                <h3 class="modal-title" style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">edit</span> {{ __('Log Manual Time Entry') }}</h3>
                 <button onclick="closeManualTimeModal()" class="modal-close" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ula-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
             </div>
             <form id="manual-time-form" onsubmit="logManualTimeSubmit(event)" style="display: flex; flex-direction: column; gap: 14px;">
@@ -264,7 +264,7 @@
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Project') }} *</label>
                     <select name="project_id" required style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         @foreach($projects as $p)
-                            <option value="{{ $p->id }}">📁 {{ $p->name }}</option>
+                            <option value="{{ $p->id }}">{{ $p->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -283,7 +283,7 @@
                     <input type="text" name="description" placeholder="What did you work on?" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--ula-shadow-xs);">
                 </div>
                 <button type="submit" class="tactile-btn btn-primary" style="margin-top: 8px; padding: 12px; font-size: 14px; justify-content: center; width: 100%;">
-                    ⏱️ {{ __('Log Time') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span> {{ __('Log Time') }}
                 </button>
             </form>
         </div>
@@ -293,7 +293,7 @@
     <div id="reject-timesheet-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 480px; border-radius: 20px; padding: 24px;">
             <div class="modal-header" style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                <h3 class="modal-title" style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);">❌ {{ __('Reject Timesheet') }}</h3>
+                <h3 class="modal-title" style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">cancel</span> {{ __('Reject Timesheet') }}</h3>
                 <button onclick="closeRejectModal()" class="modal-close" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ula-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
             </div>
             <form onsubmit="rejectTimesheetSubmit(event)" style="display: flex; flex-direction: column; gap: 14px;">
@@ -301,8 +301,8 @@
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Feedback Reason for Employee') }} *</label>
                     <textarea id="reject-reason-input" required rows="3" placeholder="Please clarify the 6 hours logged on Friday..." style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--ula-shadow-xs);"></textarea>
                 </div>
-                <button type="submit" class="tactile-btn" style="margin-top: 8px; padding: 12px; font-size: 14px; justify-content: center; background: #D96B5F; color: white; width: 100%;">
-                    ❌ {{ __('Confirm Rejection & Send Feedback') }}
+                <button type="submit" class="tactile-btn" style="margin-top: 8px; padding: 12px; font-size: 14px; justify-content: center; background: var(--ula-status-danger); color: white; width: 100%;">
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">cancel</span> {{ __('Confirm Rejection & Send Feedback') }}
                 </button>
             </form>
         </div>
@@ -317,18 +317,18 @@
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap;">
                         <span id="hub-proj-code" class="nav-badge-pill" style="font-family: var(--ula-font-mono); font-size: 12px;">PRJ-01</span>
                         <h2 id="hub-proj-name" style="font-size: 20px; font-weight: 900; margin: 0; color: var(--ula-text-primary);">Project Name</h2>
-                        <span id="hub-proj-status" class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F;">Active</span>
-                        <span id="hub-proj-priority" class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.15); color: #D6A23A;">High</span>
+                        <span id="hub-proj-status" class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success);">Active</span>
+                        <span id="hub-proj-priority" class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.15); color: var(--ula-gold-400);">High</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 16px; font-size: 12px; color: var(--ula-text-muted); flex-wrap: wrap;">
-                        <span>👤 {{ __('Manager') }}: <strong id="hub-proj-manager" style="color: var(--ula-text-primary);">Name</strong></span>
+                        <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">person</span> {{ __('Manager') }}: <strong id="hub-proj-manager" style="color: var(--ula-text-primary);">Name</strong></span>
                         <span><span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-accent-default);">apartment</span> {{ __('Department') }}: <strong id="hub-proj-dept" style="color: var(--ula-text-primary);">Dept</strong></span>
-                        <span>📅 {{ __('Due Date') }}: <strong id="hub-proj-due" style="color: var(--ula-text-primary);">Date</strong></span>
+                        <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Due Date') }}: <strong id="hub-proj-due" style="color: var(--ula-text-primary);">Date</strong></span>
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <button onclick="scheduleMeetingForCurrentProject()" class="tactile-btn btn-secondary" style="padding: 8px 14px; font-size: 12px;">
-                        <span>📅</span> {{ __('Schedule Meeting') }}
+                        <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span></span> {{ __('Schedule Meeting') }}
                     </button>
                     <button onclick="openNewTaskForCurrentProject()" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px;">
                         <span>+</span> {{ __('Add Task') }}
@@ -343,7 +343,7 @@
                 <div class="kpi-card" style="padding: 14px;">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Progress') }}</span>
-                        <div class="kpi-icon-box">📊</div>
+                        <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bar_chart</span></div>
                     </div>
                     <div id="hub-kpi-progress-pct" class="kpi-value" style="font-size: 20px; color: var(--ula-accent-default);">0%</div>
                     <div id="hub-kpi-tasks-ratio" style="font-size: 11px; color: var(--ula-text-muted);">0 / 0 tasks done</div>
@@ -352,7 +352,7 @@
                 <div class="kpi-card" style="padding: 14px;">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Actual vs Planned') }}</span>
-                        <div class="kpi-icon-box">⏱️</div>
+                        <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span></div>
                     </div>
                     <div id="hub-kpi-hours" class="kpi-value" style="font-size: 20px; color: var(--ula-accent-default);">0 / 0 h</div>
                     <div id="hub-kpi-hours-var" style="font-size: 11px; color: var(--ula-text-muted);">Variance: 0h</div>
@@ -361,32 +361,32 @@
                 <div class="kpi-card" style="padding: 14px;">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Budget & Cost') }}</span>
-                        <div class="kpi-icon-box">💰</div>
+                        <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">payments</span></div>
                     </div>
                     <div id="hub-kpi-budget" class="kpi-value" style="font-size: 20px; color: var(--ula-accent-default);">$0 / $0</div>
-                    <div id="hub-kpi-margin" style="font-size: 11px; color: #4F9B5F;">Margin: $0 (0%)</div>
+                    <div id="hub-kpi-margin" style="font-size: 11px; color: var(--ula-status-success);">Margin: $0 (0%)</div>
                 </div>
                 <!-- Health & Overdue KPI -->
                 <div class="kpi-card" style="padding: 14px;">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Active & Overdue') }}</span>
-                        <div class="kpi-icon-box">⚡</div>
+                        <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span></div>
                     </div>
-                    <div id="hub-kpi-active-tasks" class="kpi-value" style="font-size: 20px; color: #D96B5F;">0 Active</div>
-                    <div id="hub-kpi-overdue-tasks" style="font-size: 11px; color: #D96B5F;">0 Overdue</div>
+                    <div id="hub-kpi-active-tasks" class="kpi-value" style="font-size: 20px; color: var(--ula-status-danger);">0 Active</div>
+                    <div id="hub-kpi-overdue-tasks" style="font-size: 11px; color: var(--ula-status-danger);">0 Overdue</div>
                 </div>
             </div>
 
             <!-- Hub Inner Navigation Tabs -->
             <div style="display: flex; gap: 8px; margin-bottom: 14px; background: var(--ula-surface-page-alt); padding: 4px; border-radius: var(--ula-radius-sm); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
                 <button onclick="switchHubTab('kanban')" id="hub-tab-btn-kanban" class="tactile-btn btn-primary" style="flex: 1; padding: 8px; font-size: 12px; justify-content: center;">
-                    📌 {{ __('Kanban Board') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">push_pin</span> {{ __('Kanban Board') }}
                 </button>
                 <button onclick="switchHubTab('tasks')" id="hub-tab-btn-tasks" class="tactile-btn btn-secondary" style="flex: 1; padding: 8px; font-size: 12px; justify-content: center; background: transparent; border: none; box-shadow: none; color: var(--ula-text-secondary);">
-                    📋 {{ __('Task Table') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">checklist</span> {{ __('Task Table') }}
                 </button>
                 <button onclick="switchHubTab('timelog')" id="hub-tab-btn-timelog" class="tactile-btn btn-secondary" style="flex: 1; padding: 8px; font-size: 12px; justify-content: center; background: transparent; border: none; box-shadow: none; color: var(--ula-text-secondary);">
-                    ⏱️ {{ __('Time Entries Log') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span> {{ __('Time Entries Log') }}
                 </button>
             </div>
 
@@ -398,7 +398,7 @@
                         <!-- Backlog -->
                         <div class="kanban-column" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 12px;">
                             <div class="kanban-col-header" style="color: var(--ula-text-secondary); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 800; font-size: 12px;">
-                                <span>📌 Backlog</span>
+                                <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">push_pin</span> Backlog</span>
                                 <span id="col-count-backlog" class="nav-badge-pill">0</span>
                             </div>
                             <div id="kanban-col-backlog" style="display: flex; flex-direction: column; gap: 8px;"></div>
@@ -406,7 +406,7 @@
                         <!-- Ready -->
                         <div class="kanban-column" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 12px;">
                             <div class="kanban-col-header" style="color: var(--ula-accent-press); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 800; font-size: 12px;">
-                                <span>🎯 Ready</span>
+                                <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">target</span> Ready</span>
                                 <span id="col-count-ready" class="nav-badge-pill">0</span>
                             </div>
                             <div id="kanban-col-ready" style="display: flex; flex-direction: column; gap: 8px;"></div>
@@ -414,24 +414,24 @@
                         <!-- In Progress -->
                         <div class="kanban-column" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 12px;">
                             <div class="kanban-col-header" style="color: var(--ula-accent-default); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 800; font-size: 12px;">
-                                <span>⚡ In Progress</span>
-                                <span id="col-count-in_progress" class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F;">0</span>
+                                <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> In Progress</span>
+                                <span id="col-count-in_progress" class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: var(--ula-status-success);">0</span>
                             </div>
                             <div id="kanban-col-in_progress" style="display: flex; flex-direction: column; gap: 8px;"></div>
                         </div>
                         <!-- Review / QA -->
                         <div class="kanban-column" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 12px;">
                             <div class="kanban-col-header" style="color: var(--ula-status-warning); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 800; font-size: 12px;">
-                                <span>🔍 Review / QA</span>
-                                <span id="col-count-review" class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.2); color: #D6A23A;">0</span>
+                                <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span> Review / QA</span>
+                                <span id="col-count-review" class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.2); color: var(--ula-gold-400);">0</span>
                             </div>
                             <div id="kanban-col-review" style="display: flex; flex-direction: column; gap: 8px;"></div>
                         </div>
                         <!-- Done -->
                         <div class="kanban-column" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 12px;">
                             <div class="kanban-col-header" style="color: var(--ula-accent-default); display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-weight: 800; font-size: 12px;">
-                                <span>🎉 Done</span>
-                                <span id="col-count-done" class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F;">0</span>
+                                <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">celebration</span> Done</span>
+                                <span id="col-count-done" class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: var(--ula-status-success);">0</span>
                             </div>
                             <div id="kanban-col-done" style="display: flex; flex-direction: column; gap: 8px;"></div>
                         </div>
@@ -491,13 +491,13 @@
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap;">
                         <span id="task-modal-code" class="nav-badge-pill" style="font-family: var(--ula-font-mono);">#1</span>
                         <h2 id="task-modal-title" style="font-size: 18px; font-weight: 900; margin: 0; color: var(--ula-text-primary);">Task Title</h2>
-                        <span id="task-modal-status-badge" class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F;">In Progress</span>
-                        <span id="task-modal-priority-badge" class="nav-badge-pill" style="background: rgba(217, 107, 95, 0.2); color: #D96B5F;">Urgent</span>
+                        <span id="task-modal-status-badge" class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: var(--ula-status-success);">In Progress</span>
+                        <span id="task-modal-priority-badge" class="nav-badge-pill" style="background: rgba(217, 107, 95, 0.2); color: var(--ula-status-danger);">Urgent</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--ula-text-muted); flex-wrap: wrap;">
-                        <span>📁 {{ __('Project') }}: <strong id="task-modal-project" style="color: var(--ula-text-primary);">Project Name</strong></span>
-                        <span onclick="if(window.currentModalTaskAssigneeMemberId) { closeTaskDetailsModal(); openMemberProfileModal(window.currentModalTaskAssigneeMemberId); }" style="cursor: pointer;" title="{{ __('Click to view member profile, tasks & hours') }}">👤 {{ __('Assignee') }}: <strong id="task-modal-assignee" style="color: var(--ula-accent-default); text-decoration: underline;">Assignee</strong></span>
-                        <span>📅 {{ __('Due Date') }}: <strong id="task-modal-due" style="color: var(--ula-text-primary);">Date</strong></span>
+                        <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> {{ __('Project') }}: <strong id="task-modal-project" style="color: var(--ula-text-primary);">Project Name</strong></span>
+                        <span onclick="if(window.currentModalTaskAssigneeMemberId) { closeTaskDetailsModal(); openMemberProfileModal(window.currentModalTaskAssigneeMemberId); }" style="cursor: pointer;" title="{{ __('Click to view member profile, tasks & hours') }}"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">person</span> {{ __('Assignee') }}: <strong id="task-modal-assignee" style="color: var(--ula-accent-default); text-decoration: underline;">Assignee</strong></span>
+                        <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Due Date') }}: <strong id="task-modal-due" style="color: var(--ula-text-primary);">Date</strong></span>
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 10px;">
@@ -512,17 +512,17 @@
             <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-page-alt); padding: 10px 16px; border-radius: var(--ula-radius-sm); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs); flex-wrap: wrap; gap: 10px;">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 12px; font-weight: 800; color: var(--ula-text-secondary);">⚡ {{ __('Status') }}:</span>
+                        <span style="font-size: 12px; font-weight: 800; color: var(--ula-text-secondary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('Status') }}:</span>
                         <select id="task-modal-status-select" onchange="updateCurrentTaskStatus(this.value)" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); color: var(--ula-text-primary); font-size: 12px; font-weight: 700; border-radius: 8px; padding: 5px 12px; outline: none;">
-                            <option value="backlog">📌 {{ __('Backlog') }}</option>
-                            <option value="ready">🎯 {{ __('Ready') }}</option>
-                            <option value="in_progress">⚡ {{ __('In Progress') }}</option>
-                            <option value="review">🔍 {{ __('In Review / QA') }}</option>
-                            <option value="done">🎉 {{ __('Done / Completed') }}</option>
+                            <option value="backlog">{{ __('Backlog') }}</option>
+                            <option value="ready">{{ __('Ready') }}</option>
+                            <option value="in_progress">{{ __('In Progress') }}</option>
+                            <option value="review">{{ __('In Review / QA') }}</option>
+                            <option value="done">{{ __('Done / Completed') }}</option>
                         </select>
                     </div>
                     <div style="font-size: 12px; font-family: var(--ula-font-mono); font-weight: 800; color: var(--ula-accent-default);">
-                        ⏱️ <span id="task-modal-hours">0h / 0h</span>
+                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span> <span id="task-modal-hours">0h / 0h</span>
                     </div>
                 </div>
 
@@ -536,30 +536,30 @@
             <!-- Sub-Tabs Segmented Control -->
             <div class="task-modal-segmented-bar" style="display: flex; gap: 4px; margin-bottom: 16px; background: var(--ula-surface-page-alt); padding: 4px; border-radius: 12px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs); overflow-x: auto;">
                 <button type="button" onclick="switchTaskInspectorTab('details')" id="task-tab-btn-details" class="tactile-btn btn-primary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px;">
-                    <span>📝</span>
+                    <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">edit_note</span></span>
                     <span>{{ __('Details') }}</span>
                 </button>
                 <button type="button" onclick="switchTaskInspectorTab('checklist')" id="task-tab-btn-checklist" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--ula-text-secondary);">
-                    <span>☑️</span>
+                    <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check_box</span></span>
                     <span>{{ __('Checklist') }}</span>
                     <span id="task-checklist-count" style="font-size: 10px; background: rgba(36, 92, 58, 0.15); color: var(--ula-accent-default); padding: 1px 7px; border-radius: 9999px; font-weight: 800; font-family: var(--ula-font-mono);">0</span>
                 </button>
                 <button type="button" onclick="switchTaskInspectorTab('attachments')" id="task-tab-btn-attachments" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--ula-text-secondary);">
-                    <span>📎</span>
+                    <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">attach_file</span></span>
                     <span>{{ __('Files') }}</span>
                     <span id="task-attachments-count" style="font-size: 10px; background: rgba(36, 92, 58, 0.15); color: var(--ula-accent-default); padding: 1px 7px; border-radius: 9999px; font-weight: 800; font-family: var(--ula-font-mono);">0</span>
                 </button>
                 <button type="button" onclick="switchTaskInspectorTab('comments')" id="task-tab-btn-comments" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--ula-text-secondary);">
-                    <span>💬</span>
+                    <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">chat_bubble</span></span>
                     <span>{{ __('Discussions') }}</span>
                     <span id="task-comments-count" style="font-size: 10px; background: rgba(36, 92, 58, 0.15); color: var(--ula-accent-default); padding: 1px 7px; border-radius: 9999px; font-weight: 800; font-family: var(--ula-font-mono);">0</span>
                 </button>
                 <button type="button" onclick="switchTaskInspectorTab('dependencies')" id="task-tab-btn-dependencies" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--ula-text-secondary);">
-                    <span>🔗</span>
+                    <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">link</span></span>
                     <span>{{ __('Dependencies') }}</span>
                 </button>
                 <button type="button" onclick="switchTaskInspectorTab('timelog')" id="task-tab-btn-timelog" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--ula-text-secondary);">
-                    <span>⏱️</span>
+                    <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span></span>
                     <span>{{ __('Time Log') }}</span>
                 </button>
             </div>
@@ -590,12 +590,12 @@
                 <!-- 3. Attachments & Files -->
                 <div id="task-inspector-attachments" style="display: none;">
                     <form onsubmit="uploadTaskAttachmentSubmit(event)" style="background: var(--ula-surface-page-alt); border: 1px dashed var(--ula-border-subtle); border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 14px;">
-                        <div style="font-size: 24px; margin-bottom: 6px;">📎</div>
+                        <div style="font-size: 24px; margin-bottom: 6px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">attach_file</span></div>
                         <div style="font-size: 12px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 8px;">{{ __('Upload Document or Attachment to Task') }}</div>
                         <div style="display: flex; justify-content: center; gap: 8px; align-items: center; max-width: 420px; margin: 0 auto;">
                             <input type="file" id="task-file-input" required style="font-size: 12px; color: var(--ula-text-primary);">
                             <button type="submit" class="tactile-btn btn-primary" style="padding: 6px 14px; font-size: 12px;">
-                                📤 {{ __('Upload') }}
+                                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">upload</span> {{ __('Upload') }}
                             </button>
                         </div>
                     </form>
@@ -621,7 +621,7 @@
                     <form onsubmit="addTaskCommentSubmit(event)" style="display: flex; gap: 8px;">
                         <input type="text" id="new-comment-body-input" required placeholder="{{ __('Write a comment or status update... Type @name to mention') }}" style="flex: 1; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 9px 12px; color: var(--ula-text-primary); outline: none; font-size: 12px; font-weight: 600; box-shadow: var(--ula-shadow-xs);">
                         <button type="submit" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px;">
-                            💬 {{ __('Post') }}
+                            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">chat_bubble</span> {{ __('Post') }}
                         </button>
                     </form>
                 </div>
@@ -629,7 +629,7 @@
                 <!-- 5. Dependencies -->
                 <div id="task-inspector-dependencies" style="display: none;">
                     <div style="background: var(--ula-surface-page-alt); padding: 14px; border-radius: 12px; margin-bottom: 14px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
-                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 6px;">🔗 {{ __('Add Predecessor / Blocker Task') }}</label>
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 6px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">link</span> {{ __('Add Predecessor / Blocker Task') }}</label>
                         <form onsubmit="addTaskDependencySubmit(event)" style="display: flex; gap: 8px;">
                             <select id="dependency-blocker-select" required style="flex: 1; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 8px 12px; color: var(--ula-text-primary); font-size: 12px; font-weight: 600;">
                                 <option value="">— {{ __('Select Blocker Task') }} —</option>
@@ -670,14 +670,14 @@
             
             <!-- Modal Hero Header -->
             <div style="background: linear-gradient(135deg, rgba(79, 155, 95, 0.12) 0%, rgba(36, 92, 58, 0.22) 100%); padding: 24px; border-bottom: 1px solid var(--ula-border-subtle); position: relative;">
-                <button onclick="closeMemberProfileModal()" style="position: absolute; top: 16px; inset-inline-end: 16px; width: 32px; height: 32px; border-radius: 50%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); color: var(--ula-text-secondary); font-size: 16px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--ula-shadow-xs); transition: all 0.2s;">✕</button>
+                <button onclick="closeMemberProfileModal()" style="position: absolute; top: 16px; inset-inline-end: 16px; width: 32px; height: 32px; border-radius: 50%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); color: var(--ula-text-secondary); font-size: 16px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--ula-shadow-xs); transition: all 0.2s;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span></button>
 
                 <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
                     <!-- Avatar -->
-                    <div id="mp-avatar-container" style="position: relative; width: 76px; height: 76px; border-radius: 20px; background: var(--ula-gradient-accent); border: 3px solid #FFFDF6; box-shadow: 0 10px 25px rgba(36, 92, 58, 0.25); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 900; color: white; flex-shrink: 0; overflow: hidden;">
+                    <div id="mp-avatar-container" style="position: relative; width: 76px; height: 76px; border-radius: 20px; background: var(--ula-gradient-accent); border: 3px solid var(--ula-accent-fg); box-shadow: 0 10px 25px rgba(36, 92, 58, 0.25); display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 900; color: white; flex-shrink: 0; overflow: hidden;">
                         <img id="mp-avatar-img" src="" alt="Avatar" style="width: 100%; height: 100%; object-fit: cover; display: none;">
                         <span id="mp-avatar-fallback">AB</span>
-                        <div style="position: absolute; bottom: -2px; inset-inline-end: -2px; width: 16px; height: 16px; border-radius: 50%; background: #4F9B5F; border: 3px solid #FFFDF6;" title="Online"></div>
+                        <div style="position: absolute; bottom: -2px; inset-inline-end: -2px; width: 16px; height: 16px; border-radius: 50%; background: var(--ula-status-success); border: 3px solid var(--ula-accent-fg);" title="Online"></div>
                     </div>
 
                     <!-- Details -->
@@ -685,21 +685,21 @@
                         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                             <h2 id="mp-user-name" style="font-size: 22px; font-weight: 900; color: var(--ula-text-primary); margin: 0;">Member Name</h2>
                             <span id="mp-user-nickname" class="nav-badge-pill" style="font-family: var(--ula-font-mono); font-size: 11px;">@nickname</span>
-                            <span id="mp-user-role" class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F; font-size: 11px;">Employee</span>
+                            <span id="mp-user-role" class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success); font-size: 11px;">Employee</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; font-size: 12px; color: var(--ula-text-secondary);">
                             <span id="mp-job-title" style="font-weight: 700; color: var(--ula-text-primary);">Senior Engineer</span>
                             <span>•</span>
                             <span id="mp-dept-team">Engineering Team</span>
                             <span>•</span>
-                            <span id="mp-work-mode" class="nav-badge-pill" style="font-size: 10px;">🏠 Remote</span>
+                            <span id="mp-work-mode" class="nav-badge-pill" style="font-size: 10px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">home</span> Remote</span>
                         </div>
                     </div>
 
                     <!-- Direct Chat Action -->
                     <div style="flex-shrink: 0;">
                         <button id="mp-chat-btn" onclick="openChatFromProfileModal()" class="tactile-btn btn-primary" style="padding: 10px 20px; font-size: 13px;">
-                            <span>💬</span> {{ __('Send Message') }}
+                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">chat_bubble</span></span> {{ __('Send Message') }}
                         </button>
                     </div>
                 </div>
@@ -708,13 +708,13 @@
             <!-- Profile Nav Tabs -->
             <div style="display: flex; border-bottom: 1px solid var(--ula-border-subtle); background: var(--ula-surface-page-alt); padding: 0 16px;">
                 <button onclick="switchMemberProfileTab('about')" id="mp-tab-btn-about" class="member-profile-tab-btn active" style="padding: 14px 18px; font-size: 13px; font-weight: 800; border: none; background: transparent; cursor: pointer; color: var(--ula-accent-default); border-bottom: 3px solid var(--ula-accent-default); transition: all 0.2s;">
-                    👤 {{ __('Profile & About') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">person</span> {{ __('Profile & About') }}
                 </button>
                 <button onclick="switchMemberProfileTab('tasks')" id="mp-tab-btn-tasks" class="member-profile-tab-btn" style="padding: 14px 18px; font-size: 13px; font-weight: 700; border: none; background: transparent; cursor: pointer; color: var(--ula-text-secondary); border-bottom: 3px solid transparent; transition: all 0.2s;">
-                    📋 {{ __('Assigned Tasks') }} <span id="mp-tasks-count-pill" class="nav-badge-pill" style="font-size: 10px; margin-inline-start: 4px;">0</span>
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">checklist</span> {{ __('Assigned Tasks') }} <span id="mp-tasks-count-pill" class="nav-badge-pill" style="font-size: 10px; margin-inline-start: 4px;">0</span>
                 </button>
                 <button onclick="switchMemberProfileTab('time')" id="mp-tab-btn-time" class="member-profile-tab-btn" style="padding: 14px 18px; font-size: 13px; font-weight: 700; border: none; background: transparent; cursor: pointer; color: var(--ula-text-secondary); border-bottom: 3px solid transparent; transition: all 0.2s;">
-                    ⏱️ {{ __('Work Time & Logs') }} <span id="mp-hours-count-pill" class="nav-badge-pill" style="font-size: 10px; margin-inline-start: 4px;">0h</span>
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span> {{ __('Work Time & Logs') }} <span id="mp-hours-count-pill" class="nav-badge-pill" style="font-size: 10px; margin-inline-start: 4px;">0h</span>
                 </button>
             </div>
 
@@ -727,39 +727,39 @@
                     <!-- Contact Cards Grid -->
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
                         <div style="background: var(--ula-surface-page-alt); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
-                            <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;">✉️ {{ __('Email Address') }}</div>
+                            <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">mail</span> {{ __('Email Address') }}</div>
                             <div id="mp-info-email" style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary); margin-top: 4px; word-break: break-all;">user@company.com</div>
                         </div>
                         <div style="background: var(--ula-surface-page-alt); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
-                            <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;">📱 {{ __('Phone') }}</div>
+                            <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">smartphone</span> {{ __('Phone') }}</div>
                             <div id="mp-info-phone" style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary); margin-top: 4px;">—</div>
                         </div>
                         <div style="background: var(--ula-surface-page-alt); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
-                            <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;">🎂 {{ __('Birthday') }}</div>
+                            <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">cake</span> {{ __('Birthday') }}</div>
                             <div id="mp-info-dob" style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary); margin-top: 4px;">—</div>
                         </div>
                         <div style="background: var(--ula-surface-page-alt); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
-                            <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;">📅 {{ __('Joined Workspace') }}</div>
+                            <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Joined Workspace') }}</div>
                             <div id="mp-info-joined" style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary); margin-top: 4px;">Jan 01, 2026</div>
                         </div>
                     </div>
 
                     <!-- Bio Section -->
                     <div style="background: var(--ula-surface-page-alt); padding: 16px; border-radius: 14px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
-                        <div style="font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 6px;">📝 {{ __('About / Biography') }}</div>
+                        <div style="font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 6px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">edit_note</span> {{ __('About / Biography') }}</div>
                         <div id="mp-info-bio" style="font-size: 13px; line-height: 1.6; color: var(--ula-text-primary); font-weight: 500;">No bio provided.</div>
                     </div>
 
                     <!-- Skills & Hobbies in 2 Columns -->
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                         <div style="background: var(--ula-surface-page-alt); padding: 16px; border-radius: 14px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
-                            <div style="font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 8px;">⚡ {{ __('Skills & Expertise') }}</div>
+                            <div style="font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 8px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('Skills & Expertise') }}</div>
                             <div id="mp-info-skills" style="display: flex; flex-wrap: wrap; gap: 6px;">
                                 <span style="font-size: 11px; color: var(--ula-text-muted);">—</span>
                             </div>
                         </div>
                         <div style="background: var(--ula-surface-page-alt); padding: 16px; border-radius: 14px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
-                            <div style="font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 8px;">🎯 {{ __('Hobbies & Interests') }}</div>
+                            <div style="font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 8px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">target</span> {{ __('Hobbies & Interests') }}</div>
                             <div id="mp-info-hobbies" style="display: flex; flex-wrap: wrap; gap: 6px;">
                                 <span style="font-size: 11px; color: var(--ula-text-muted);">—</span>
                             </div>
@@ -768,7 +768,7 @@
 
                     <!-- Social Media Links -->
                     <div style="background: var(--ula-surface-page-alt); padding: 16px; border-radius: 14px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
-                        <div style="font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 10px;">🌐 {{ __('Social Profiles & Portfolio') }}</div>
+                        <div style="font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 10px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">language</span> {{ __('Social Profiles & Portfolio') }}</div>
                         <div id="mp-info-socials" style="display: flex; gap: 10px; flex-wrap: wrap;">
                             <span style="font-size: 11px; color: var(--ula-text-muted);">—</span>
                         </div>
@@ -776,7 +776,7 @@
 
                     <!-- Notes -->
                     <div id="mp-notes-container" style="background: var(--ula-surface-page-alt); padding: 16px; border-radius: 14px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs); display: none;">
-                        <div style="font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 6px;">📌 {{ __('Work Preferences & Notes') }}</div>
+                        <div style="font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 6px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">push_pin</span> {{ __('Work Preferences & Notes') }}</div>
                         <div id="mp-info-notes" style="font-size: 12px; color: var(--ula-text-primary); line-height: 1.5;"></div>
                     </div>
 
@@ -801,7 +801,7 @@
                         </div>
                         <div class="kpi-card" style="margin-bottom: 0; padding: 14px;">
                             <div class="kpi-title" style="font-size: 11px;">{{ __('Completed') }}</div>
-                            <div id="mp-task-stat-done" class="kpi-value" style="font-size: 20px; color: #4F9B5F;">0</div>
+                            <div id="mp-task-stat-done" class="kpi-value" style="font-size: 20px; color: var(--ula-status-success);">0</div>
                         </div>
                     </div>
 
@@ -825,12 +825,12 @@
                                 <div id="mp-time-total-hours" class="kpi-value" style="font-size: 24px; color: var(--ula-accent-default);">0.0h</div>
                                 <div style="font-size: 10px; color: var(--ula-text-muted); margin-top: 2px;">{{ __('Tracked across all initiatives') }}</div>
                             </div>
-                            <div style="font-size: 32px;">⏱️</div>
+                            <div style="font-size: 32px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span></div>
                         </div>
 
                         <div id="mp-active-timer-box" class="kpi-card" style="margin-bottom: 0; padding: 16px; background: rgba(79, 155, 95, 0.1); border: 1px solid rgba(79, 155, 95, 0.3);">
-                            <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; color: #4F9B5F;">
-                                <span style="animation: pulse 1.5s infinite;">🟢</span> {{ __('Live Stopwatch Status') }}
+                            <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; color: var(--ula-status-success);">
+                                <span style="animation: pulse 1.5s infinite;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span></span> {{ __('Live Stopwatch Status') }}
                             </div>
                             <div id="mp-active-timer-text" style="font-size: 13px; font-weight: 800; color: var(--ula-text-primary); margin-top: 6px;">
                                 {{ __('No active timer running') }}
@@ -841,7 +841,7 @@
                     <!-- Time Entries History Table -->
                     <div class="card" style="margin-bottom: 0; padding: 0; overflow: hidden; border-radius: var(--ula-radius-lg);">
                         <div style="padding: 12px 16px; background: var(--ula-surface-page-alt); border-bottom: 1px solid var(--ula-border-subtle); font-size: 12px; font-weight: 800; color: var(--ula-text-primary);">
-                            ⏱️ {{ __('Recent Work Logs') }}
+                            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span> {{ __('Recent Work Logs') }}
                         </div>
                         <div style="overflow-x: auto;">
                             <table class="data-table">
@@ -874,17 +874,17 @@
     <div id="invite-modal" class="modal">
         <div class="modal-box">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 style="font-size: 18px; font-weight: 800; color: var(--ula-palm-900);">📨 {{ __('Invite & Guest Access') }}</h3>
-                <button onclick="closeInviteModal()" style="background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer;">✕</button>
+                <h3 style="font-size: 18px; font-weight: 800; color: var(--ula-palm-900);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">mail</span> {{ __('Invite & Guest Access') }}</h3>
+                <button onclick="closeInviteModal()" style="background: none; border: none; color: var(--ula-stone-400); font-size: 20px; cursor: pointer;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span></button>
             </div>
 
             <!-- Tabs -->
-            <div style="display: flex; gap: 8px; margin-bottom: 20px; background: #f1f5f9; padding: 4px; border-radius: 10px;">
+            <div style="display: flex; gap: 8px; margin-bottom: 20px; background: var(--ula-surface-page-alt); padding: 4px; border-radius: 10px;">
                 <button onclick="switchInviteTab('guest')" id="tab-guest-btn" style="flex: 1; padding: 8px; border-radius: 8px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; background: var(--ula-status-info); color: white;">
-                    🔗 {{ __('Guest Meeting Link') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">link</span> {{ __('Guest Meeting Link') }}
                 </button>
                 <button onclick="switchInviteTab('member')" id="tab-member-btn" style="flex: 1; padding: 8px; border-radius: 8px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; background: none; color: var(--ula-text-muted);">
-                    👤 {{ __('Team Member') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">person</span> {{ __('Team Member') }}
                 </button>
             </div>
 
@@ -910,12 +910,12 @@
                                     $floorName = $rFloor?->name ?? ($isDefaultBranch ? ($defaultOffice?->name ?? __('Main Office')) : __('Branch'));
                                 @endphp
                                 <option value="{{ $r->id }}" data-floor-id="{{ $rFloorId }}" data-floor-name="{{ $floorName }}" data-is-default="{{ $isDefaultBranch ? '1' : '0' }}">
-                                    🏢 {{ $r->name }} ({{ ucfirst($r->type) }}) — [{{ $floorName }}{{ $isDefaultBranch ? ' ⭐ ' . __('Current Branch') : '' }}]
+                                    {{ $r->name }} ({{ ucfirst($r->type) }}) — [{{ $floorName }}{{ $isDefaultBranch ? ' — ' . __('Current Branch') : '' }}]
                                 </option>
                             @endforeach
                         </select>
-                        <div id="invite-room-branch-warning" style="display: none; background: rgba(214, 162, 58, 0.15); border: 1px solid rgba(214, 162, 58, 0.4); border-radius: 8px; padding: 10px 12px; margin-top: 8px; font-size: 12px; color: #D6A23A; line-height: 1.4;">
-                            <span>⚠️ <strong>{{ __('Notice') }}:</strong></span>
+                        <div id="invite-room-branch-warning" style="display: none; background: rgba(214, 162, 58, 0.15); border: 1px solid rgba(214, 162, 58, 0.4); border-radius: 8px; padding: 10px 12px; margin-top: 8px; font-size: 12px; color: var(--ula-gold-400); line-height: 1.4;">
+                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">warning</span> <strong>{{ __('Notice') }}:</strong></span>
                             <span id="invite-room-warning-text">{{ __('This room belongs to a different office branch. Make sure you switch to this branch to meet your guest.') }}</span>
                         </div>
                     </div>
@@ -935,19 +935,19 @@
                         </select>
                     </div>
 
-                    <button onclick="generateGuestLink()" id="btn-generate-guest" style="margin-top: 6px; background: linear-gradient(135deg, #10b981, #059669); color: white; font-weight: 800; border: none; border-radius: 10px; padding: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);">
-                        <span>⚡</span> {{ __('Generate Instant Guest Link') }}
+                    <button onclick="generateGuestLink()" id="btn-generate-guest" style="margin-top: 6px; background: linear-gradient(135deg, var(--ula-status-success), var(--ula-status-success)); color: white; font-weight: 800; border: none; border-radius: 10px; padding: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.25);">
+                        <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span></span> {{ __('Generate Instant Guest Link') }}
                     </button>
 
                     <div id="guest-result-box" style="display: none; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 12px; margin-top: 10px;">
-                        <div style="font-size: 11px; font-weight: 800; color: #34d399; text-transform: uppercase; margin-bottom: 6px;">✅ Invitation Link Ready!</div>
+                        <div style="font-size: 11px; font-weight: 800; color: var(--ula-status-success); text-transform: uppercase; margin-bottom: 6px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check_circle</span> Invitation Link Ready!</div>
                         <input type="text" id="guest-link-output" readonly style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 6px; padding: 8px; color: var(--ula-status-info); font-size: 12px; font-family: var(--ula-font-mono); margin-bottom: 8px;">
                         <div style="display: flex; gap: 8px;">
                             <button type="button" onclick="copyModalGuestLink(this)" id="btn-copy-link" style="flex: 1; background: var(--ula-palm-900); color: white; font-weight: 700; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-size: 12px;">
-                                📋 {{ __('Copy Link') }}
+                                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">checklist</span> {{ __('Copy Link') }}
                             </button>
                             <a id="guest-open-link" href="#" target="_blank" style="background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); color: var(--ula-text-primary); font-weight: 700; text-decoration: none; border-radius: 6px; padding: 8px 12px; font-size: 12px; display: flex; align-items: center;">
-                                👁️ {{ __('Open') }}
+                                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">visibility</span> {{ __('Open') }}
                             </a>
                         </div>
                     </div>
@@ -1009,14 +1009,14 @@
                         <div>
                             <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Status') }}</label>
                             <select name="status" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
-                                <option value="active">🟢 {{ __('Active') }}</option>
-                                <option value="invited">✉️ {{ __('Invited') }}</option>
+                                <option value="active">{{ __('Active') }}</option>
+                                <option value="invited">{{ __('Invited') }}</option>
                             </select>
                         </div>
                     </div>
 
                     <button type="submit" class="header-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px; justify-content: center;">
-                        <span>👤</span> {{ __('Add Team Member') }}
+                        <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">person</span></span> {{ __('Add Team Member') }}
                     </button>
                 </form>
             </div>
@@ -1027,7 +1027,7 @@
     <div id="department-modal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <h3 class="modal-title" id="department-modal-title">🏛️ {{ __('New Department') }}</h3>
+                <h3 class="modal-title" id="department-modal-title"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">account_balance</span> {{ __('New Department') }}</h3>
                 <button onclick="closeDepartmentModal()" class="modal-close"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
             </div>
             <form id="department-form" method="POST" action="{{ route('departments.store') }}" style="display: flex; flex-direction: column; gap: 14px;">
@@ -1038,7 +1038,7 @@
                     <input type="text" name="name" id="department-name-input" required placeholder="e.g. Engineering & IT, Marketing, Sales" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
                 <button type="submit" class="header-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px; justify-content: center;">
-                    💾 <span id="department-form-btn-text">{{ __('Create Department') }}</span>
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">save</span> <span id="department-form-btn-text">{{ __('Create Department') }}</span>
                 </button>
             </form>
         </div>
@@ -1048,7 +1048,7 @@
     <div id="team-modal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <h3 class="modal-title" id="team-modal-title">👥 {{ __('New Sub-Team') }}</h3>
+                <h3 class="modal-title" id="team-modal-title"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">group</span> {{ __('New Sub-Team') }}</h3>
                 <button onclick="closeTeamModal()" class="modal-close"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
             </div>
             <form id="team-form" method="POST" action="{{ route('teams.store') }}" style="display: flex; flex-direction: column; gap: 14px;">
@@ -1068,7 +1068,7 @@
                     </select>
                 </div>
                 <button type="submit" class="header-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px; justify-content: center;">
-                    💾 <span id="team-form-btn-text">{{ __('Create Team') }}</span>
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">save</span> <span id="team-form-btn-text">{{ __('Create Team') }}</span>
                 </button>
             </form>
         </div>
@@ -1078,7 +1078,7 @@
     <div id="assign-modal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <h3 class="modal-title">⚙️ {{ __('Assign Department & Role') }}</h3>
+                <h3 class="modal-title"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">settings</span> {{ __('Assign Department & Role') }}</h3>
                 <button onclick="closeAssignModal()" class="modal-close"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
             </div>
             <form id="assign-form" method="POST" action="" style="display: flex; flex-direction: column; gap: 14px;">
@@ -1122,7 +1122,7 @@
                 </div>
 
                 <button type="submit" class="header-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px; justify-content: center;">
-                    💾 {{ __('Save Assignment') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">save</span> {{ __('Save Assignment') }}
                 </button>
             </form>
         </div>
@@ -1132,7 +1132,7 @@
     <div id="edit-member-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 520px; max-height: 90vh; overflow-y: auto;">
             <div class="modal-header">
-                <h3 class="modal-title">✏️ {{ __('Edit Team Member') }}</h3>
+                <h3 class="modal-title"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">edit</span> {{ __('Edit Team Member') }}</h3>
                 <button onclick="closeEditMemberModal()" class="modal-close"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
             </div>
             <form id="edit-member-form" method="POST" action="" style="display: flex; flex-direction: column; gap: 14px;">
@@ -1185,9 +1185,9 @@
                     <div>
                         <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Account Status') }} *</label>
                         <select name="status" id="edit-member-status-select" required style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
-                            <option value="active">🟢 {{ __('Active') }}</option>
-                            <option value="suspended">🔴 {{ __('Suspended') }}</option>
-                            <option value="invited">✉️ {{ __('Invited') }}</option>
+                            <option value="active">{{ __('Active') }}</option>
+                            <option value="suspended">{{ __('Suspended') }}</option>
+                            <option value="invited">{{ __('Invited') }}</option>
                         </select>
                     </div>
                 </div>
@@ -1195,7 +1195,7 @@
                 <!-- Granular Office Access Permissions -->
                 <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 12px;">
                     <label style="display: block; font-size: 12px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 4px;">
-                        🏢 {{ __('Allowed Offices') }}
+                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> {{ __('Allowed Offices') }}
                     </label>
                     <div style="font-size: 11px; color: var(--ula-text-muted); margin-bottom: 8px;">
                         {{ __('Select which branches this member can enter (Leave all unchecked for full company access).') }}
@@ -1204,7 +1204,7 @@
                         @foreach($offices as $off)
                         <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ula-text-primary); cursor: pointer;">
                             <input type="checkbox" name="allowed_offices[]" value="{{ $off->id }}" class="edit-member-office-cb" id="edit-office-{{ $off->id }}">
-                            <span>🏢 <strong>{{ $off->name }}</strong> ({{ $off->city_location ?: __('Primary') }})</span>
+                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> <strong>{{ $off->name }}</strong> ({{ $off->city_location ?: __('Primary') }})</span>
                         </label>
                         @endforeach
                     </div>
@@ -1213,7 +1213,7 @@
                 <!-- Granular Room Access Permissions -->
                 <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 12px;">
                     <label style="display: block; font-size: 12px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 4px;">
-                        🚪 {{ __('Allowed Rooms') }}
+                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span> {{ __('Allowed Rooms') }}
                     </label>
                     <div style="font-size: 11px; color: var(--ula-text-muted); margin-bottom: 8px;">
                         {{ __('Select specific private/conference rooms this user is allowed to access.') }}
@@ -1223,13 +1223,13 @@
                             @if($off->rooms->count() > 0)
                             <div style="border-bottom: 1px dashed var(--ula-border-subtle); padding-bottom: 4px; margin-bottom: 4px;">
                                 <div style="font-size: 11px; font-weight: 800; color: var(--ula-accent-default); margin-bottom: 4px;">
-                                    🏢 {{ $off->name }}:
+                                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> {{ $off->name }}:
                                 </div>
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
                                     @foreach($off->rooms as $rm)
                                     <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ula-text-primary); cursor: pointer;">
                                         <input type="checkbox" name="allowed_rooms[]" value="{{ $rm->id }}" class="edit-member-room-cb" id="edit-room-{{ $rm->id }}">
-                                        <span>🚪 {{ $rm->name }}</span>
+                                        <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span> {{ $rm->name }}</span>
                                     </label>
                                     @endforeach
                                 </div>
@@ -1240,7 +1240,7 @@
                 </div>
 
                 <button type="submit" class="header-btn btn-primary" style="margin-top: 8px; padding: 12px; font-size: 14px; justify-content: center;">
-                    💾 {{ __('Save Member Changes') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">save</span> {{ __('Save Member Changes') }}
                 </button>
             </form>
         </div>
@@ -1250,7 +1250,7 @@
     <div id="new-office-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 480px;">
             <div class="modal-header">
-                <h3 class="modal-title">🏢 {{ __('Add New Office Branch') }}</h3>
+                <h3 class="modal-title"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> {{ __('Add New Office Branch') }}</h3>
                 <button onclick="closeNewOfficeModal()" class="modal-close"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
             </div>
             <form method="POST" action="{{ route('offices.store') }}" style="display: flex; flex-direction: column; gap: 14px;">
@@ -1273,12 +1273,12 @@
                 <div>
                     <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--ula-text-primary); cursor: pointer;">
                         <input type="checkbox" name="is_default" value="1">
-                        <span>⭐ {{ __('Set as Primary / Default Office') }}</span>
+                        <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">star</span> {{ __('Set as Primary / Default Office') }}</span>
                     </label>
                 </div>
 
                 <button type="submit" class="header-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px; justify-content: center;">
-                    🏢 {{ __('Create Office Branch') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> {{ __('Create Office Branch') }}
                 </button>
             </form>
         </div>
@@ -1288,7 +1288,7 @@
     <div id="edit-office-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 480px;">
             <div class="modal-header">
-                <h3 class="modal-title">✏️ {{ __('Edit Office Branch') }}</h3>
+                <h3 class="modal-title"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">edit</span> {{ __('Edit Office Branch') }}</h3>
                 <button onclick="closeEditOfficeModal()" class="modal-close"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
             </div>
             <form id="edit-office-form" method="POST" action="" style="display: flex; flex-direction: column; gap: 14px;">
@@ -1312,12 +1312,12 @@
                 <div>
                     <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--ula-text-primary); cursor: pointer;">
                         <input type="checkbox" name="is_default" id="edit-office-default-input" value="1">
-                        <span>⭐ {{ __('Set as Primary / Default Office') }}</span>
+                        <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">star</span> {{ __('Set as Primary / Default Office') }}</span>
                     </label>
                 </div>
 
                 <button type="submit" class="header-btn btn-primary" style="margin-top: 6px; padding: 12px; font-size: 14px; justify-content: center;">
-                    💾 {{ __('Save Branch Details') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">save</span> {{ __('Save Branch Details') }}
                 </button>
             </form>
         </div>
@@ -1327,7 +1327,7 @@
     <div id="change-member-password-modal" class="modal-overlay">
         <div class="modal-card" style="max-width: 440px;">
             <div class="modal-header">
-                <h3 class="modal-title">🔑 {{ __('Reset Member Password') }}</h3>
+                <h3 class="modal-title"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">key</span> {{ __('Reset Member Password') }}</h3>
                 <button onclick="closeChangeMemberPasswordModal()" class="modal-close"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
             </div>
             <form id="change-member-password-form" method="POST" action="" style="display: flex; flex-direction: column; gap: 14px;">
@@ -1350,18 +1350,18 @@
                     <input type="password" name="password_confirmation" required minlength="8" placeholder="••••••••" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
 
-                <button type="submit" class="header-btn btn-primary" style="margin-top: 8px; padding: 12px; font-size: 14px; justify-content: center; background: linear-gradient(135deg, #D6A23A 0%, #B88628 100%);">
+                <button type="submit" class="header-btn btn-primary" style="margin-top: 8px; padding: 12px; font-size: 14px; justify-content: center; background: linear-gradient(135deg, var(--ula-gold-400) 0%, var(--ula-gold-600) 100%);">
                     <span class="material-symbols-rounded" style="font-size: 16px;">key</span> {{ __('Update Password') }}
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- 🌟 CLICKUP-PARITY 3D TASK CONTEXT MENU 🌟 -->
+    <!-- <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">star</span> CLICKUP-PARITY 3D TASK CONTEXT MENU <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">star</span> -->
     <div id="task-context-menu" class="task-context-menu" onclick="event.stopPropagation();">
         <div class="ctx-quick-header">
             <button type="button" class="ctx-quick-btn" onclick="ctxActionCopyLink()" title="{{ __('Copy Task Link') }}">
-                🔗 {{ __('Link') }}
+                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">link</span> {{ __('Link') }}
             </button>
             <button type="button" class="ctx-quick-btn" onclick="ctxActionCopyId()" title="{{ __('Copy Task ID') }}">
                 # {{ __('ID') }}
@@ -1372,39 +1372,39 @@
         </div>
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionInspect()">
-            <span><span class="ctx-icon">🔍</span>{{ __('Inspect & Edit') }}</span>
+            <span><span class="ctx-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span></span>{{ __('Inspect & Edit') }}</span>
             <span style="font-size: 10px; color: var(--ula-text-muted); font-family: var(--ula-font-mono);">↵</span>
         </a>
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionStartTimer()">
-            <span><span class="ctx-icon">⏱️</span>{{ __('Start Timer') }}</span>
+            <span><span class="ctx-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span></span>{{ __('Start Timer') }}</span>
             <span class="badge-pill badge-green" style="font-size: 9px;">▶ Live</span>
         </a>
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionDuplicate()">
-            <span><span class="ctx-icon">📋</span>{{ __('Duplicate Task') }}</span>
+            <span><span class="ctx-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">checklist</span></span>{{ __('Duplicate Task') }}</span>
         </a>
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionOpenMoveModal()">
-            <span><span class="ctx-icon">➡️</span>{{ __('Move to Project') }}</span>
+            <span><span class="ctx-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_forward</span></span>{{ __('Move to Project') }}</span>
             <span style="font-size: 11px; color: var(--ula-text-muted);">›</span>
         </a>
 
         <div class="ctx-divider"></div>
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionInspectCustomFields()">
-            <span><span class="ctx-icon">🏷️</span>{{ __('Custom Fields') }}</span>
+            <span><span class="ctx-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">label</span></span>{{ __('Custom Fields') }}</span>
         </a>
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionInspectDependencies()">
-            <span><span class="ctx-icon">🔗</span>{{ __('Dependencies') }}</span>
+            <span><span class="ctx-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">link</span></span>{{ __('Dependencies') }}</span>
         </a>
 
         <div class="ctx-divider"></div>
 
         <a href="javascript:void(0)" class="ctx-item danger" onclick="ctxActionDelete()">
-            <span><span class="ctx-icon">🗑️</span>{{ __('Delete Task') }}</span>
-            <span style="font-size: 10px; color: #D96B5F; font-family: var(--ula-font-mono);">Del</span>
+            <span><span class="ctx-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">delete</span></span>{{ __('Delete Task') }}</span>
+            <span style="font-size: 10px; color: var(--ula-status-danger); font-family: var(--ula-font-mono);">Del</span>
         </a>
     </div>
 
@@ -1412,14 +1412,14 @@
     <div id="move-task-modal" class="modal">
         <div class="modal-box" style="max-width: 420px;">
             <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);">➡️ {{ __('Move Task to Project') }}</h3>
-                <button type="button" onclick="closeMoveTaskModal()" style="background: none; border: none; font-size: 18px; color: var(--ula-text-muted); cursor: pointer;">✕</button>
+                <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_forward</span> {{ __('Move Task to Project') }}</h3>
+                <button type="button" onclick="closeMoveTaskModal()" style="background: none; border: none; font-size: 18px; color: var(--ula-text-muted); cursor: pointer;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span></button>
             </div>
             <form onsubmit="submitMoveTask(event)" style="display: flex; flex-direction: column; gap: 14px; margin-top: 14px;">
                 <input type="hidden" id="move-task-id-input">
                 <div>
                     <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 6px; text-transform: uppercase;">
-                        📁 {{ __('Target Project') }}
+                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> {{ __('Target Project') }}
                     </label>
                     <select id="move-target-project-select" required style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); font-size: 13px; font-weight: 600;">
                         @foreach($projects as $p)
@@ -1429,7 +1429,7 @@
                 </div>
                 <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px;">
                     <button type="button" onclick="closeMoveTaskModal()" class="tactile-btn btn-secondary" style="padding: 8px 16px; font-size: 12px;">{{ __('Cancel') }}</button>
-                    <button type="submit" class="tactile-btn btn-primary" style="padding: 8px 18px; font-size: 12px;">➡️ {{ __('Move Task') }}</button>
+                    <button type="submit" class="tactile-btn btn-primary" style="padding: 8px 18px; font-size: 12px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_forward</span> {{ __('Move Task') }}</button>
                 </div>
             </form>
         </div>
@@ -1454,7 +1454,7 @@
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <button type="button" onclick="inspectMemberTimesheetTab()" class="tactile-btn btn-primary" style="padding: 6px 14px; font-size: 11px;">
-                        ⏱️ {{ __('Open In Timesheets') }}
+                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span> {{ __('Open In Timesheets') }}
                     </button>
                     <button onclick="closeMemberProfileModal()" class="modal-close" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ula-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
                 </div>
@@ -1465,21 +1465,21 @@
                 <div class="kpi-card" style="padding: 12px;">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Today Office Time') }}</span>
-                        <div class="kpi-icon-box">🏢</div>
+                        <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span></div>
                     </div>
                     <div id="mp-kpi-office-time" class="kpi-value" style="font-size: 18px; font-family: var(--ula-font-mono); color: var(--ula-accent-default);">00:00:00</div>
                 </div>
                 <div class="kpi-card" style="padding: 12px;">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Today Task Time') }}</span>
-                        <div class="kpi-icon-box">⏱️</div>
+                        <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span></div>
                     </div>
-                    <div id="mp-kpi-task-time" class="kpi-value" style="font-size: 18px; font-family: var(--ula-font-mono); color: #4F9B5F;">00:00:00</div>
+                    <div id="mp-kpi-task-time" class="kpi-value" style="font-size: 18px; font-family: var(--ula-font-mono); color: var(--ula-status-success);">00:00:00</div>
                 </div>
                 <div class="kpi-card" style="padding: 12px;">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Current Location') }}</span>
-                        <div class="kpi-icon-box">📍</div>
+                        <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">location_on</span></div>
                     </div>
                     <div id="mp-kpi-location" class="kpi-value" style="font-size: 13px; font-weight: 800; color: var(--ula-text-primary);">Main Office</div>
                 </div>
@@ -1490,7 +1490,7 @@
                 <!-- Attendance Sessions Section -->
                 <div>
                     <h4 style="font-size: 13px; font-weight: 900; color: var(--ula-text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                        <span>🏢</span> {{ __('Today Attendance & Room Presence Sessions') }}
+                        <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span></span> {{ __('Today Attendance & Room Presence Sessions') }}
                     </h4>
                     <div style="border: 1px solid var(--ula-border-subtle); border-radius: 12px; overflow: hidden;">
                         <table class="data-table" style="font-size: 12px;">
@@ -1506,7 +1506,7 @@
                             <tbody id="mp-attendance-tbody">
                                 <tr>
                                     <td colspan="5" style="text-align: center; padding: 20px; color: var(--ula-text-muted);">
-                                        ⏳ {{ __('Loading member session details...') }}
+                                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">hourglass_empty</span> {{ __('Loading member session details...') }}
                                     </td>
                                 </tr>
                             </tbody>
@@ -1517,7 +1517,7 @@
                 <!-- Assigned Tasks Section -->
                 <div>
                     <h4 style="font-size: 13px; font-weight: 900; color: var(--ula-text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                        <span>📋</span> {{ __('Assigned Active Tasks & Work In Progress') }}
+                        <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">checklist</span></span> {{ __('Assigned Active Tasks & Work In Progress') }}
                     </h4>
                     <div style="border: 1px solid var(--ula-border-subtle); border-radius: 12px; overflow: hidden;">
                         <table class="data-table" style="font-size: 12px;">
@@ -1533,7 +1533,7 @@
                             <tbody id="mp-tasks-tbody">
                                 <tr>
                                     <td colspan="5" style="text-align: center; padding: 20px; color: var(--ula-text-muted);">
-                                        ⏳ {{ __('Loading tasks...') }}
+                                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">hourglass_empty</span> {{ __('Loading tasks...') }}
                                     </td>
                                 </tr>
                             </tbody>

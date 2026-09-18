@@ -31,7 +31,7 @@
             const current = document.documentElement.getAttribute('data-theme') || 'light';
             const next = current === 'dark' ? 'light' : 'dark';
             applyTheme(next);
-            showToastNotification(next === 'dark' ? '🌙 <strong>{{ __('Dark Spatial Workspace') }}</strong><br>{{ __('Deep calm green mode activated.') }}' : '☀️ <strong>{{ __('Light Natural Mode') }}</strong><br>{{ __('Warm ivory workspace activated.') }}');
+            showToastNotification(next === 'dark' ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">dark_mode</span> <strong>{{ __('Dark Spatial Workspace') }}</strong><br>{{ __('Deep calm green mode activated.') }}' : '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">light_mode</span> <strong>{{ __('Light Natural Mode') }}</strong><br>{{ __('Warm ivory workspace activated.') }}');
         }
 
         // Initialize saved theme on load
@@ -283,11 +283,11 @@
             const quickBtn = document.getElementById('quick-action-focus');
             
             if (isFocusModeActive) {
-                showToastNotification('🌿 <strong>{{ __('Focus Mode Activated') }}</strong><br>{{ __('Notifications muted. Ambient productivity session in progress.') }}');
+                showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">eco</span> <strong>{{ __('Focus Mode Activated') }}</strong><br>{{ __('Notifications muted. Ambient productivity session in progress.') }}');
                 if (bannerBtn) bannerBtn.textContent = '{{ __('Disable Focus Mode ✕') }}';
-                if (quickBtn) quickBtn.style.background = 'linear-gradient(180deg, #1E4E31 0%, #163823 100%)';
+                if (quickBtn) quickBtn.style.background = 'linear-gradient(180deg, var(--ula-palm-800) 0%, var(--ula-palm-900) 100%)';
             } else {
-                showToastNotification('🌿 {{ __('Focus Mode Disabled. Welcome back!') }}');
+                showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">eco</span> {{ __('Focus Mode Disabled. Welcome back!') }}');
                 if (bannerBtn) bannerBtn.textContent = '{{ __('Enable Focus Mode →') }}';
                 if (quickBtn) quickBtn.style.background = 'var(--ula-gradient-accent)';
             }
@@ -303,7 +303,7 @@
                     body: JSON.stringify({ status: isDone ? 'done' : 'in_progress' })
                 });
                 if (res.ok) {
-                    showToastNotification(isDone ? '✅ {{ __('Task completed!') }}' : '🔄 {{ __('Task reopened.') }}');
+                    showToastNotification(isDone ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check_circle</span> {{ __('Task completed!') }}' : '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">refresh</span> {{ __('Task reopened.') }}');
                 }
             } catch(e) {
                 console.error(e);
@@ -526,14 +526,14 @@
                 guestBtn.style.background = 'var(--ula-accent-default)';
                 guestBtn.style.color = 'white';
                 memberBtn.style.background = 'none';
-                memberBtn.style.color = '#94a3b8';
+                memberBtn.style.color = 'var(--ula-stone-400)';
             } else {
                 guestTab.style.display = 'none';
                 memberTab.style.display = 'block';
                 memberBtn.style.background = 'var(--ula-accent-default)';
                 memberBtn.style.color = 'white';
                 guestBtn.style.background = 'none';
-                guestBtn.style.color = '#94a3b8';
+                guestBtn.style.color = 'var(--ula-stone-400)';
             }
         }
 
@@ -640,7 +640,7 @@
                     playNotificationChime();
                     const newest = currentNotifications.find(n => !n.is_read) || currentNotifications[0];
                     if (newest) {
-                        showToastNotification(`${newest.icon || '🔔'} <strong>${newest.title}</strong><br><small style="color: var(--ula-text-muted);">${newest.body || ''}</small>`);
+                        showToastNotification(`${newest.icon || '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">notifications</span>'} <strong>${newest.title}</strong><br><small style="color: var(--ula-text-muted);">${newest.body || ''}</small>`);
                         triggerDesktopNotification(newest);
                     }
                 }
@@ -691,7 +691,7 @@
             if (filtered.length === 0) {
                 container.innerHTML = `
                     <div style="padding: 36px 18px; text-align: center; color: var(--ula-text-muted);">
-                        <div style="font-size: 32px; margin-bottom: 8px;">🎉</div>
+                        <div style="font-size: 32px; margin-bottom: 8px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">celebration</span></div>
                         <strong style="display: block; font-size: 13px; color: var(--ula-text-primary); margin-bottom: 4px;">{{ __('All caught up!') }}</strong>
                         <span style="font-size: 12px;">{{ __('No notifications in this category.') }}</span>
                     </div>
@@ -706,7 +706,7 @@
                 item.onclick = () => handleNotificationClick(n);
 
                 item.innerHTML = `
-                    <div class="notif-icon-box">${n.icon || '🔔'}</div>
+                    <div class="notif-icon-box">${n.icon || '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">notifications</span>'}</div>
                     <div style="flex: 1; min-width: 0;">
                         <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 2px;">
                             <strong style="font-size: 12px; color: var(--ula-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${n.title}</strong>
@@ -787,10 +787,10 @@
         function triggerCopySuccess(btn) {
             if (btn) {
                 const originalText = btn.innerHTML;
-                btn.innerHTML = '✅ {{ __('Copied!') }}';
-                btn.style.background = '#10b981';
-                btn.style.borderColor = '#10b981';
-                btn.style.color = '#ffffff';
+                btn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check_circle</span> {{ __('Copied!') }}';
+                btn.style.background = 'var(--ula-status-success)';
+                btn.style.borderColor = 'var(--ula-status-success)';
+                btn.style.color = 'var(--ula-white)';
                 btn.classList.remove('btn-copied-pulse');
                 void btn.offsetWidth; // Force CSS reflow to re-trigger pulse animation
                 btn.classList.add('btn-copied-pulse');
@@ -803,7 +803,7 @@
                     btn.classList.remove('btn-copied-pulse');
                 }, 2200);
             }
-            showToastNotification('📋 <strong>' + "{{ __('Link Copied!') }}" + '</strong> — ' + "{{ __('Guest meeting link copied to clipboard.') }}", 'success');
+            showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">checklist</span> <strong>' + "{{ __('Link Copied!') }}" + '</strong> — ' + "{{ __('Guest meeting link copied to clipboard.') }}", 'success');
         }
 
         function executeClipboardCopy(text) {
@@ -907,7 +907,7 @@
             }
 
             const btn = document.getElementById('btn-generate-guest');
-            btn.innerHTML = '<span>⏳</span> Generating...';
+            btn.innerHTML = '<span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">hourglass_empty</span></span> Generating...';
 
             try {
                 const res = await fetch(`/api/v1/organizations/${ORG_ID}/rooms/${roomId}/guest-invitations`, {
@@ -940,7 +940,7 @@
                 console.error(e);
                 alert('Error generating guest link: ' + (e.message || 'Network error'));
             } finally {
-                btn.innerHTML = '<span>⚡</span> Generate Instant Guest Link';
+                btn.innerHTML = '<span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span></span> Generate Instant Guest Link';
             }
         }
 
@@ -968,11 +968,11 @@
 
                 const data = await res.json();
                 statusBox.style.display = 'block';
-                statusBox.style.color = '#10b981';
+                statusBox.style.color = 'var(--ula-status-success)';
                 statusBox.textContent = `✅ ${data.message || 'Invitation sent successfully!'}`;
             } catch (e) {
                 statusBox.style.display = 'block';
-                statusBox.style.color = '#ef4444';
+                statusBox.style.color = 'var(--ula-status-danger)';
                 statusBox.textContent = '❌ Failed to send invitation.';
             }
         }
@@ -1368,8 +1368,8 @@
                         </div>
                         <div style="font-weight: 800; font-size: 13px; margin-bottom: 4px; color: var(--ula-text-primary);">${t.title}</div>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px; border-top: 1px solid var(--ula-border-subtle); padding-top: 6px; font-size: 11px;">
-                            <span style="color: var(--ula-text-muted);">👤 ${t.assignee ? t.assignee.name.split(' ')[0] : 'Unassigned'}</span>
-                            <button onclick="startTaskTimer('${p.id}', '${t.id}', '${t.title.replace(/'/g, "\\'")}', '${p.name.replace(/'/g, "\\'")}')" class="header-btn" style="background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 2px 6px; font-size: 10px;">
+                            <span style="color: var(--ula-text-muted);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">person</span> ${t.assignee ? t.assignee.name.split(' ')[0] : 'Unassigned'}</span>
+                            <button onclick="startTaskTimer('${p.id}', '${t.id}', '${t.title.replace(/'/g, "\\'")}', '${p.name.replace(/'/g, "\\'")}')" class="header-btn" style="background: rgba(16, 185, 129, 0.2); color: var(--ula-status-success); padding: 2px 6px; font-size: 10px;">
                                 ▶ Timer
                             </button>
                         </div>
@@ -1419,7 +1419,7 @@
                             <td>${new Date(e.started_at).toLocaleDateString()}</td>
                             <td style="font-weight: 700;">${e.user ? e.user.name : 'Member'}</td>
                             <td>${e.task ? e.task.title : '—'}</td>
-                            <td style="font-weight: 800; color: #34d399; font-family: monospace;">${hrs}h</td>
+                            <td style="font-weight: 800; color: var(--ula-status-success); font-family: monospace;">${hrs}h</td>
                             <td style="font-size: 11px; color: var(--ula-text-secondary);">${e.description || 'Work session'}</td>
                             <td><span class="badge badge-gray">${e.entry_type}</span></td>
                             <td><span class="badge ${e.status === 'approved' ? 'badge-green' : (e.status === 'submitted' ? 'badge-amber' : 'badge-gray')}">${e.status}</span></td>
@@ -1619,7 +1619,7 @@
                 if (!res.ok) {
                     throw new Error('Failed to update task');
                 }
-                showToastNotification('✅ ' + "{{ __('Task status updated successfully!') }}");
+                showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check_circle</span> ' + "{{ __('Task status updated successfully!') }}");
             } catch (err) {
                 console.error(err);
                 alert('Failed to save task status on server.');
@@ -1702,7 +1702,7 @@
                     alert('Error updating task status.');
                     return;
                 }
-                showToastNotification('✅ ' + "{{ __('Task status updated successfully!') }}");
+                showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check_circle</span> ' + "{{ __('Task status updated successfully!') }}");
             } catch (e) {
                 alert('Network error updating task.');
             }
@@ -1817,13 +1817,13 @@
             closeTaskContextMenu();
             const link = `${window.location.origin}/projects/hub/${activeCtxProjectId}?task=${activeCtxTaskId}`;
             executeClipboardCopy(link);
-            showToastNotification('📋 ' + "{{ __('Task link copied to clipboard!') }}");
+            showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">checklist</span> ' + "{{ __('Task link copied to clipboard!') }}");
         }
 
         function ctxActionCopyId() {
             closeTaskContextMenu();
             executeClipboardCopy('#' + activeCtxTaskId);
-            showToastNotification('📋 ' + "{{ __('Task ID copied to clipboard!') }}");
+            showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">checklist</span> ' + "{{ __('Task ID copied to clipboard!') }}");
         }
 
         function ctxActionOpenNewTab() {
@@ -1853,7 +1853,7 @@
                     alert('Error duplicating task.');
                     return;
                 }
-                showToastNotification('📋 ' + "{{ __('Task duplicated successfully!') }}");
+                showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">checklist</span> ' + "{{ __('Task duplicated successfully!') }}");
                 setTimeout(() => window.location.reload(), 600);
             } catch (err) {
                 alert('Network error duplicating task.');
@@ -1888,7 +1888,7 @@
                     return;
                 }
                 closeMoveTaskModal();
-                showToastNotification('➡️ ' + "{{ __('Task moved successfully!') }}");
+                showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_forward</span> ' + "{{ __('Task moved successfully!') }}");
                 setTimeout(() => window.location.reload(), 600);
             } catch (err) {
                 alert('Network error moving task.');
@@ -1924,7 +1924,7 @@
                 const row = document.querySelector(`.alltask-row[data-id="${activeCtxTaskId}"]`);
                 if (row) row.remove();
                 filterAllTasksTable();
-                showToastNotification('🗑️ ' + "{{ __('Task deleted.') }}");
+                showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">delete</span> ' + "{{ __('Task deleted.') }}");
             } catch (err) {
                 alert('Network error deleting task.');
             }
@@ -1932,7 +1932,7 @@
 
         function ctxActionPermissions() {
             closeTaskContextMenu();
-            showToastNotification('🔒 <strong>' + "{{ __('Sharing & Permissions') }}" + '</strong>: ' + "{{ __('Inherited from Project Role Settings') }}");
+            showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">lock</span> <strong>' + "{{ __('Sharing & Permissions') }}" + '</strong>: ' + "{{ __('Inherited from Project Role Settings') }}");
         }
 
         // ── TASK INSPECTOR / DETAILS DRAWER ──
@@ -2096,7 +2096,7 @@
                     return;
                 }
                 fileInput.value = '';
-                showToastNotification('📎 ' + "{{ __('Attachment uploaded successfully!') }}");
+                showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">attach_file</span> ' + "{{ __('Attachment uploaded successfully!') }}");
                 openTaskDetails(activeInspectorTaskId);
             } catch (err) {
                 alert('Network error uploading attachment.');
@@ -2115,7 +2115,7 @@
                     alert('Error deleting attachment.');
                     return;
                 }
-                showToastNotification('🗑️ ' + "{{ __('Attachment removed.') }}");
+                showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">delete</span> ' + "{{ __('Attachment removed.') }}");
                 openTaskDetails(activeInspectorTaskId);
             } catch (err) {
                 alert('Network error deleting attachment.');
@@ -2134,7 +2134,7 @@
                     alert(data.message || 'Error approving task.');
                     return;
                 }
-                showToastNotification('🎉 ' + "{{ __('Task approved and marked as Completed!') }}");
+                showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">celebration</span> ' + "{{ __('Task approved and marked as Completed!') }}");
                 if (activeInspectorTaskId === taskId) {
                     openTaskDetails(taskId);
                 } else {
@@ -2161,7 +2161,7 @@
                     alert(data.message || 'Error rejecting task.');
                     return;
                 }
-                showToastNotification('⚠️ ' + "{{ __('Task returned to in-progress with feedback.') }}");
+                showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">warning</span> ' + "{{ __('Task returned to in-progress with feedback.') }}");
                 if (activeInspectorTaskId === taskId) {
                     openTaskDetails(taskId);
                 } else {
@@ -2245,25 +2245,25 @@
                     appBanner.style.display = 'flex';
                     appBanner.style.background = 'rgba(214, 162, 58, 0.15)';
                     appBanner.style.border = '1px solid rgba(214, 162, 58, 0.35)';
-                    appBanner.style.color = '#D6A23A';
-                    appText.innerHTML = '<span>⏳</span> <span>{{ __("This task is submitted for completion and awaiting PM approval.") }}</span>';
+                    appBanner.style.color = 'var(--ula-gold-400)';
+                    appText.innerHTML = '<span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">hourglass_empty</span></span> <span>{{ __("This task is submitted for completion and awaiting PM approval.") }}</span>';
                     appActions.innerHTML = `
-                        <button type="button" onclick="quickApproveTask('${t.id}')" class="tactile-btn btn-primary" style="padding: 6px 14px; font-size: 11px;">✓ {{ __("Approve") }}</button>
-                        <button type="button" onclick="quickRejectTask('${t.id}')" class="tactile-btn" style="background: rgba(217, 107, 95, 0.2); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.3); padding: 6px 12px; font-size: 11px;">✕ {{ __("Request Changes") }}</button>
+                        <button type="button" onclick="quickApproveTask('${t.id}')" class="tactile-btn btn-primary" style="padding: 6px 14px; font-size: 11px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check</span> {{ __("Approve") }}</button>
+                        <button type="button" onclick="quickRejectTask('${t.id}')" class="tactile-btn" style="background: rgba(217, 107, 95, 0.2); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.3); padding: 6px 12px; font-size: 11px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span> {{ __("Request Changes") }}</button>
                     `;
                 } else if (t.approval_status === 'rejected') {
                     appBanner.style.display = 'flex';
                     appBanner.style.background = 'rgba(217, 107, 95, 0.15)';
                     appBanner.style.border = '1px solid rgba(217, 107, 95, 0.35)';
-                    appBanner.style.color = '#D96B5F';
-                    appText.innerHTML = `<span>⚠️</span> <span><strong>{{ __("Changes Requested:") }}</strong> ${t.rejection_reason || '{{ __("Please review feedback.") }}'}</span>`;
+                    appBanner.style.color = 'var(--ula-status-danger)';
+                    appText.innerHTML = `<span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">warning</span></span> <span><strong>{{ __("Changes Requested:") }}</strong> ${t.rejection_reason || '{{ __("Please review feedback.") }}'}</span>`;
                     appActions.innerHTML = '';
                 } else if (t.approval_status === 'approved') {
                     appBanner.style.display = 'flex';
                     appBanner.style.background = 'rgba(79, 155, 95, 0.15)';
                     appBanner.style.border = '1px solid rgba(79, 155, 95, 0.35)';
-                    appBanner.style.color = '#4F9B5F';
-                    appText.innerHTML = '<span>✅</span> <span>{{ __("Task approved and marked Done by Project Manager.") }}</span>';
+                    appBanner.style.color = 'var(--ula-status-success)';
+                    appText.innerHTML = '<span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check_circle</span></span> <span>{{ __("Task approved and marked Done by Project Manager.") }}</span>';
                     appActions.innerHTML = '';
                 } else {
                     appBanner.style.display = 'none';
@@ -2317,11 +2317,11 @@
                         card.style = 'background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; gap: 6px;';
                         const uploader = att.user ? att.user.name : '{{ __("Member") }}';
                         card.innerHTML = `
-                            <div style="font-weight: 800; font-size: 12px; color: var(--ula-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">📄 ${att.file_name}</div>
-                            <div style="font-size: 10px; color: var(--ula-text-muted);">👤 ${uploader} • ${(att.file_size / 1024).toFixed(1)} KB</div>
+                            <div style="font-weight: 800; font-size: 12px; color: var(--ula-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">description</span> ${att.file_name}</div>
+                            <div style="font-size: 10px; color: var(--ula-text-muted);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">person</span> ${uploader} • ${(att.file_size / 1024).toFixed(1)} KB</div>
                             <div style="display: flex; gap: 6px; margin-top: 4px;">
-                                <a href="${att.file_url || ('/uploads/tasks/' + t.id + '/' + att.file_name)}" target="_blank" download class="tactile-btn btn-secondary" style="flex: 1; padding: 4px 8px; font-size: 10px; text-align: center; text-decoration: none;">⬇ {{ __("Download") }}</a>
-                                <button type="button" onclick="deleteTaskAttachmentAction('${att.id}')" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.3); padding: 4px 8px; font-size: 10px;">🗑️</button>
+                                <a href="${att.file_url || ('/uploads/tasks/' + t.id + '/' + att.file_name)}" target="_blank" download class="tactile-btn btn-secondary" style="flex: 1; padding: 4px 8px; font-size: 10px; text-align: center; text-decoration: none;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_downward</span> {{ __("Download") }}</a>
+                                <button type="button" onclick="deleteTaskAttachmentAction('${att.id}')" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.3); padding: 4px 8px; font-size: 10px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">delete</span></button>
                             </div>
                         `;
                         attContainer.appendChild(card);
@@ -2345,7 +2345,7 @@
                         const time = new Date(c.created_at).toLocaleString();
                         box.innerHTML = `
                             <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11px;">
-                                <strong style="color: var(--ula-palm-900);">👤 ${author}</strong>
+                                <strong style="color: var(--ula-palm-900);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">person</span> ${author}</strong>
                                 <span style="color: var(--ula-text-muted);">${time}</span>
                             </div>
                             <div style="color: var(--ula-text-primary); line-height: 1.4;">${c.body || ''}</div>
@@ -2368,7 +2368,7 @@
                         item.style = 'background: var(--ula-surface-page-alt); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--ula-border-subtle); font-size: 12px; display: flex; justify-content: space-between; align-items: center;';
                         const depTask = d.depends_on_task || {};
                         item.innerHTML = `
-                            <span>🔒 <strong>{{ __("Depends On:") }}</strong> #${depTask.task_number || ''} ${depTask.title || '{{ __("Predecessor Task") }}'}</span>
+                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">lock</span> <strong>{{ __("Depends On:") }}</strong> #${depTask.task_number || ''} ${depTask.title || '{{ __("Predecessor Task") }}'}</span>
                             <span class="badge ${depTask.status === 'done' ? 'badge-green' : 'badge-crimson'}">${statusLabels[depTask.status] || (depTask.status || 'pending')}</span>
                         `;
                         depContainer.appendChild(item);
@@ -2520,7 +2520,7 @@
             const submitBtn = form.querySelector('button[type="submit"]');
             if (submitBtn) {
                 submitBtn.disabled = true;
-                submitBtn.innerHTML = '⏳ {{ __("Scheduling Meeting...") }}';
+                submitBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">hourglass_empty</span> {{ __("Scheduling Meeting...") }}';
             }
 
             const formData = new FormData(form);
@@ -2544,7 +2544,7 @@
 
                 const data = await res.json();
                 if (res.ok && data.success) {
-                    showToastNotification('📅 ' + data.message);
+                    showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> ' + data.message);
                     closeScheduleMeetingModal();
                     setTimeout(() => {
                         if (data.redirect_url) {
@@ -2558,7 +2558,7 @@
                     alert(data.message || 'Error scheduling meeting.');
                     if (submitBtn) {
                         submitBtn.disabled = false;
-                        submitBtn.innerHTML = '🚀 {{ __("Schedule Meeting & Dispatch Invitations") }}';
+                        submitBtn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">rocket_launch</span> {{ __("Schedule Meeting & Dispatch Invitations") }}';
                     }
                 }
             } catch (err) {
@@ -2591,19 +2591,19 @@
             if (!host || !fromAddr) {
                 resultBox.style.display = 'block';
                 resultBox.style.background = 'rgba(217, 107, 95, 0.15)';
-                resultBox.style.color = '#D96B5F';
+                resultBox.style.color = 'var(--ula-status-danger)';
                 resultBox.style.border = '1px solid rgba(217, 107, 95, 0.3)';
-                resultBox.innerHTML = '⚠️ {{ __('Please enter SMTP Host and Sender From Email address.') }}';
+                resultBox.innerHTML = '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">warning</span> {{ __('Please enter SMTP Host and Sender From Email address.') }}';
                 return;
             }
 
             btn.disabled = true;
-            btn.innerHTML = '⏳ {{ __('Testing Connection...') }}';
+            btn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">hourglass_empty</span> {{ __('Testing Connection...') }}';
             resultBox.style.display = 'block';
             resultBox.style.background = 'var(--ula-surface-page-alt)';
             resultBox.style.color = 'var(--ula-text-secondary)';
             resultBox.style.border = '1px solid var(--ula-border-subtle)';
-            resultBox.innerHTML = '🔄 {{ __('Connecting to mail server and sending test packet...') }}';
+            resultBox.innerHTML = '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">refresh</span> {{ __('Connecting to mail server and sending test packet...') }}';
 
             fetch("{{ route('organization.smtp.test') }}", {
                 method: 'POST',
@@ -2625,26 +2625,26 @@
             .then(res => res.json().then(data => ({ status: res.status, body: data })))
             .then(({ status, body }) => {
                 btn.disabled = false;
-                btn.innerHTML = '🧪 {{ __('Test SMTP Connection') }}';
+                btn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">science</span> {{ __('Test SMTP Connection') }}';
                 if (status === 200 && body.success) {
                     resultBox.style.background = 'rgba(79, 155, 95, 0.15)';
-                    resultBox.style.color = '#4F9B5F';
+                    resultBox.style.color = 'var(--ula-status-success)';
                     resultBox.style.border = '1px solid rgba(79, 155, 95, 0.35)';
-                    resultBox.innerHTML = `✅ <strong>${body.message}</strong>`;
+                    resultBox.innerHTML = `<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check_circle</span> <strong>${body.message}</strong>`;
                 } else {
                     resultBox.style.background = 'rgba(217, 107, 95, 0.15)';
-                    resultBox.style.color = '#D96B5F';
+                    resultBox.style.color = 'var(--ula-status-danger)';
                     resultBox.style.border = '1px solid rgba(217, 107, 95, 0.35)';
-                    resultBox.innerHTML = `❌ <strong>${body.message || 'SMTP Connection Error'}</strong>`;
+                    resultBox.innerHTML = `<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">cancel</span> <strong>${body.message || 'SMTP Connection Error'}</strong>`;
                 }
             })
             .catch(err => {
                 btn.disabled = false;
-                btn.innerHTML = '🧪 {{ __('Test SMTP Connection') }}';
+                btn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">science</span> {{ __('Test SMTP Connection') }}';
                 resultBox.style.background = 'rgba(217, 107, 95, 0.15)';
-                resultBox.style.color = '#D96B5F';
+                resultBox.style.color = 'var(--ula-status-danger)';
                 resultBox.style.border = '1px solid rgba(217, 107, 95, 0.35)';
-                resultBox.innerHTML = `❌ <strong>{{ __('Network error during SMTP test:') }} ${err.message}</strong>`;
+                resultBox.innerHTML = `<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">cancel</span> <strong>{{ __('Network error during SMTP test:') }} ${err.message}</strong>`;
             });
         }
 
@@ -2696,12 +2696,12 @@
                     const timeLabel = diffMins > 0 ? (Math.ceil(diffMins) + 'm') : '{{ __('is starting now!') }}';
                     const msg = `
                         <div style="display: flex; align-items: center; gap: 12px;">
-                            <span style="font-size: 24px;">🔔</span>
+                            <span style="font-size: 24px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">notifications</span></span>
                             <div style="flex: 1;">
                                 <div style="font-size: 13px; font-weight: 900; color: var(--ula-palm-900);">${m.title}</div>
-                                <div style="font-size: 11px; color: var(--ula-text-secondary);">${m.project_name ? '📁 ' + m.project_name + ' • ' : ''}🚪 ${m.room_name} (${timeLabel})</div>
+                                <div style="font-size: 11px; color: var(--ula-text-secondary);">${m.project_name ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> ' + m.project_name + ' • ' : ''}<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span> ${m.room_name} (${timeLabel})</div>
                             </div>
-                            <a href="{{ route('office') }}" class="tactile-btn btn-primary" style="padding: 5px 12px; font-size: 11px; text-decoration: none;">🚀 {{ __('Join') }}</a>
+                            <a href="{{ route('office') }}" class="tactile-btn btn-primary" style="padding: 5px 12px; font-size: 11px; text-decoration: none;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">rocket_launch</span> {{ __('Join') }}</a>
                         </div>
                     `;
                     showToastNotification(msg, 12000);
@@ -2737,7 +2737,7 @@
                 renderChatRoster(cachedChatChannels, cachedChatMembers);
 
                 if (isManual) {
-                    showToastNotification('💬 {{ __('Messages and channels updated.') }}');
+                    showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">chat_bubble</span> {{ __('Messages and channels updated.') }}');
                 }
 
                 // If currently viewing a chat, refresh its messages
@@ -2763,7 +2763,7 @@
                 } else {
                     channelsContainer.innerHTML = channels.map(c => {
                         const isActive = activeChatChannelId === c.id;
-                        const icon = c.type === 'announcement' ? '📢' : (c.type === 'room' ? '🚪' : '#');
+                        const icon = c.type === 'announcement' ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">campaign</span>' : (c.type === 'room' ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span>' : '#');
                         return `
                             <div onclick="selectChatChannel('${c.id}', '${escapeHtml(c.name)}', '${c.type}', null, null)"
                                  class="chat-roster-item"
@@ -2801,7 +2801,7 @@
                                  onmouseout="if(!${isSelected}) this.style.background='transparent'">
                                 <div style="position: relative; width: 34px; height: 34px; border-radius: 10px; background: var(--ula-gradient-accent); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; color: white; flex-shrink: 0; box-shadow: var(--ula-shadow-xs); overflow: hidden;">
                                     ${m.avatar_url ? `<img src="${m.avatar_url}" style="width:100%;height:100%;object-fit:cover;">` : initials}
-                                    <div style="position: absolute; bottom: -1px; inset-inline-end: -1px; width: 10px; height: 10px; border-radius: 50%; background: #4F9B5F; border: 2px solid var(--ula-surface-page-alt);" title="Online"></div>
+                                    <div style="position: absolute; bottom: -1px; inset-inline-end: -1px; width: 10px; height: 10px; border-radius: 50%; background: var(--ula-status-success); border: 2px solid var(--ula-surface-page-alt);" title="Online"></div>
                                 </div>
                                 <div style="flex: 1; min-width: 0;">
                                     <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -2847,7 +2847,7 @@
                 selectChatChannel(channel.id, targetUser.name, 'dm', targetUserId, activeChatMemberId);
             } catch (err) {
                 console.error(err);
-                showToastNotification('❌ ' + err.message);
+                showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">cancel</span> ' + err.message);
             }
         }
 
@@ -2953,7 +2953,7 @@
                             <div style="max-width: 70%; display: flex; flex-direction: column; align-items: ${isMine ? 'flex-end' : 'flex-start'};">
                                 ${!isMine ? `<span style="font-size: 10px; font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary); margin-bottom: 2px; margin-inline-start: 4px;">${escapeHtml(msg.sender.name)}</span>` : ''}
                                 
-                                <div style="padding: 10px 14px; border-radius: ${isMine ? '14px 14px 2px 14px' : '14px 14px 14px 2px'}; background: ${isMine ? 'var(--ula-gradient-accent)' : 'var(--ula-surface-card)'}; color: ${isMine ? '#FFFDF6' : 'var(--ula-text-primary)'}; border: 1px solid ${isMine ? 'transparent' : 'var(--ula-border-subtle)'}; box-shadow: var(--ula-shadow-xs); font-size: var(--ula-size-xs); line-height: 1.5; word-break: break-word;">
+                                <div style="padding: 10px 14px; border-radius: ${isMine ? '14px 14px 2px 14px' : '14px 14px 14px 2px'}; background: ${isMine ? 'var(--ula-gradient-accent)' : 'var(--ula-surface-card)'}; color: ${isMine ? 'var(--ula-accent-fg)' : 'var(--ula-text-primary)'}; border: 1px solid ${isMine ? 'transparent' : 'var(--ula-border-subtle)'}; box-shadow: var(--ula-shadow-xs); font-size: var(--ula-size-xs); line-height: 1.5; word-break: break-word;">
                                     ${escapeHtml(msg.body).replace(/\n/g, '<br>')}
                                 </div>
                                 
@@ -3000,7 +3000,7 @@
                 fetchChatMessages(activeChatChannelId, true);
                 loadChatConversations(false);
             } catch (err) {
-                showToastNotification('❌ ' + err.message);
+                showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">cancel</span> ' + err.message);
             }
         }
 
@@ -3086,7 +3086,7 @@
                 const skillsContainer = document.getElementById('mp-info-skills');
                 if (skillsContainer) {
                     if (p.skills && p.skills.length) {
-                        skillsContainer.innerHTML = p.skills.map(sk => `<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F; font-size: 11px; font-weight: 700;">⚡ ${escapeHtml(sk)}</span>`).join('');
+                        skillsContainer.innerHTML = p.skills.map(sk => `<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success); font-size: 11px; font-weight: 700;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> ${escapeHtml(sk)}</span>`).join('');
                     } else {
                         skillsContainer.innerHTML = `<span style="font-size: 11px; color: var(--ula-text-muted); font-style: italic;">— {{ __('No skills listed') }} —</span>`;
                     }
@@ -3096,7 +3096,7 @@
                 const hobbiesContainer = document.getElementById('mp-info-hobbies');
                 if (hobbiesContainer) {
                     if (p.hobbies && p.hobbies.length) {
-                        hobbiesContainer.innerHTML = p.hobbies.map(hb => `<span class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.15); color: #D6A23A; font-size: 11px; font-weight: 700;">🎯 ${escapeHtml(hb)}</span>`).join('');
+                        hobbiesContainer.innerHTML = p.hobbies.map(hb => `<span class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.15); color: var(--ula-gold-400); font-size: 11px; font-weight: 700;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">target</span> ${escapeHtml(hb)}</span>`).join('');
                     } else {
                         hobbiesContainer.innerHTML = `<span style="font-size: 11px; color: var(--ula-text-muted); font-style: italic;">— {{ __('No hobbies listed') }} —</span>`;
                     }
@@ -3107,10 +3107,10 @@
                 if (socialsContainer) {
                     const links = p.social_links || {};
                     const socialHtml = [];
-                    if (links.linkedin) socialHtml.push(`<a href="${links.linkedin}" target="_blank" class="tactile-btn btn-secondary" style="font-size: 11px; padding: 4px 10px; text-decoration: none;">💼 LinkedIn</a>`);
-                    if (links.github) socialHtml.push(`<a href="${links.github}" target="_blank" class="tactile-btn btn-secondary" style="font-size: 11px; padding: 4px 10px; text-decoration: none;">🐙 GitHub</a>`);
-                    if (links.twitter) socialHtml.push(`<a href="${links.twitter}" target="_blank" class="tactile-btn btn-secondary" style="font-size: 11px; padding: 4px 10px; text-decoration: none;">🐦 X (Twitter)</a>`);
-                    if (links.website) socialHtml.push(`<a href="${links.website}" target="_blank" class="tactile-btn btn-secondary" style="font-size: 11px; padding: 4px 10px; text-decoration: none;">🌐 Website</a>`);
+                    if (links.linkedin) socialHtml.push(`<a href="${links.linkedin}" target="_blank" class="tactile-btn btn-secondary" style="font-size: 11px; padding: 4px 10px; text-decoration: none;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">business_center</span> LinkedIn</a>`);
+                    if (links.github) socialHtml.push(`<a href="${links.github}" target="_blank" class="tactile-btn btn-secondary" style="font-size: 11px; padding: 4px 10px; text-decoration: none;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">code</span> GitHub</a>`);
+                    if (links.twitter) socialHtml.push(`<a href="${links.twitter}" target="_blank" class="tactile-btn btn-secondary" style="font-size: 11px; padding: 4px 10px; text-decoration: none;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">link</span> X (Twitter)</a>`);
+                    if (links.website) socialHtml.push(`<a href="${links.website}" target="_blank" class="tactile-btn btn-secondary" style="font-size: 11px; padding: 4px 10px; text-decoration: none;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">language</span> Website</a>`);
 
                     socialsContainer.innerHTML = socialHtml.length ? socialHtml.join('') : `<span style="font-size: 11px; color: var(--ula-text-muted); font-style: italic;">— {{ __('No social links attached') }} —</span>`;
                 }
@@ -3139,10 +3139,10 @@
                     } else {
                         tasksContainer.innerHTML = data.tasks.map(t => {
                             const priorityColors = {
-                                'urgent': 'background: rgba(217, 107, 95, 0.15); color: #D96B5F;',
-                                'high': 'background: rgba(214, 162, 58, 0.15); color: #D6A23A;',
-                                'normal': 'background: rgba(79, 155, 95, 0.15); color: #4F9B5F;',
-                                'low': 'background: rgba(148, 163, 184, 0.15); color: #64748B;'
+                                'urgent': 'background: rgba(217, 107, 95, 0.15); color: var(--ula-status-danger);',
+                                'high': 'background: rgba(214, 162, 58, 0.15); color: var(--ula-gold-400);',
+                                'normal': 'background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success);',
+                                'low': 'background: rgba(148, 163, 184, 0.15); color: var(--ula-stone-400);'
                             };
                             return `
                                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-radius: 12px; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs); gap: 12px; flex-wrap: wrap;">
@@ -3151,9 +3151,9 @@
                                         <div>
                                             <div style="font-weight: 800; font-size: 13px; color: var(--ula-text-primary);">${escapeHtml(t.title)}</div>
                                             <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px; font-size: 11px; color: var(--ula-text-secondary);">
-                                                <span>📁 ${escapeHtml(t.project ? t.project.name : 'General')}</span>
-                                                ${t.due_date ? `<span>• 📅 ${t.due_date} ${t.is_overdue ? '<span style="color:#D96B5F;font-weight:800;">({{ __('Overdue') }})</span>' : ''}</span>` : ''}
-                                                ${t.checklist_count ? `<span>• ☑️ ${t.checklist_done}/${t.checklist_count}</span>` : ''}
+                                                <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> ${escapeHtml(t.project ? t.project.name : 'General')}</span>
+                                                ${t.due_date ? `<span>• <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> ${t.due_date} ${t.is_overdue ? '<span style="color:var(--ula-status-danger);font-weight:800;">({{ __('Overdue') }})</span>' : ''}</span>` : ''}
+                                                ${t.checklist_count ? `<span>• <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check_box</span> ${t.checklist_done}/${t.checklist_count}</span>` : ''}
                                             </div>
                                         </div>
                                     </div>
@@ -3173,7 +3173,7 @@
 
                 const timerText = document.getElementById('mp-active-timer-text');
                 if (s.active_timer) {
-                    timerText.innerHTML = `<strong>⏱️ ${s.active_timer.project_name || 'Project'}</strong>: ${s.active_timer.task_title || 'Work Session'}`;
+                    timerText.innerHTML = `<strong><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span> ${s.active_timer.project_name || 'Project'}</strong>: ${s.active_timer.task_title || 'Work Session'}`;
                 } else {
                     timerText.textContent = '{{ __('No active timer running') }}';
                 }
@@ -3186,9 +3186,9 @@
                         tbody.innerHTML = data.time_entries.map(te => `
                             <tr>
                                 <td style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary);">${te.date}</td>
-                                <td style="font-size: 12px; font-weight: 700; color: var(--ula-palm-900);">📁 ${escapeHtml(te.project_name)}</td>
+                                <td style="font-size: 12px; font-weight: 700; color: var(--ula-palm-900);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> ${escapeHtml(te.project_name)}</td>
                                 <td style="font-size: 12px; color: var(--ula-text-secondary);">${escapeHtml(te.task_title)}</td>
-                                <td><span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F; font-weight: 800;">${te.duration_hours}h</span></td>
+                                <td><span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success); font-weight: 800;">${te.duration_hours}h</span></td>
                                 <td style="font-size: 11px; color: var(--ula-text-muted);">${escapeHtml(te.description)}</td>
                             </tr>
                         `).join('');
@@ -3197,7 +3197,7 @@
 
             } catch (err) {
                 console.error(err);
-                showToastNotification('❌ ' + err.message);
+                showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">cancel</span> ' + err.message);
             }
         }
 
@@ -3242,7 +3242,7 @@
                 resultBox.style.display = 'block';
                 resultBox.style.background = 'rgba(239, 68, 68, 0.15)';
                 resultBox.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-                resultBox.style.color = '#EF4444';
+                resultBox.style.color = 'var(--ula-status-danger)';
                 resultBox.innerText = '{{ __("Please enter an OpenAI API key first.") }}';
                 return;
             }
@@ -3250,7 +3250,7 @@
             resultBox.style.display = 'block';
             resultBox.style.background = 'rgba(59, 130, 246, 0.15)';
             resultBox.style.border = '1px solid rgba(59, 130, 246, 0.3)';
-            resultBox.style.color = '#3B82F6';
+            resultBox.style.color = 'var(--ula-accent-default)';
             resultBox.innerText = '⚡ {{ __("Testing OpenAI API key connectivity...") }}';
             if (btn) btn.disabled = true;
 
@@ -3268,18 +3268,18 @@
                 if (res.ok && data.success) {
                     resultBox.style.background = 'rgba(16, 185, 129, 0.15)';
                     resultBox.style.border = '1px solid rgba(16, 185, 129, 0.3)';
-                    resultBox.style.color = '#10B981';
+                    resultBox.style.color = 'var(--ula-status-success)';
                     resultBox.innerText = data.message || '{{ __("✅ Key is valid and active!") }}';
                 } else {
                     resultBox.style.background = 'rgba(239, 68, 68, 0.15)';
                     resultBox.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-                    resultBox.style.color = '#EF4444';
+                    resultBox.style.color = 'var(--ula-status-danger)';
                     resultBox.innerText = '❌ ' + (data.message || '{{ __("Connection failed.") }}');
                 }
             } catch (e) {
                 resultBox.style.background = 'rgba(239, 68, 68, 0.15)';
                 resultBox.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-                resultBox.style.color = '#EF4444';
+                resultBox.style.color = 'var(--ula-status-danger)';
                 resultBox.innerText = '❌ Network error: ' + e.message;
             } finally {
                 if (btn) btn.disabled = false;
@@ -3418,7 +3418,7 @@
                         tasksTbody.innerHTML = `
                             <tr>
                                 <td colspan="7" style="text-align: center; padding: 36px; color: var(--ula-text-muted);">
-                                    <div style="font-size: 28px; margin-bottom: 6px;">📋</div>
+                                    <div style="font-size: 28px; margin-bottom: 6px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">checklist</span></div>
                                     {{ __('No task work sessions recorded on this date.') }}
                                 </td>
                             </tr>
@@ -3427,15 +3427,15 @@
                         tasksTbody.innerHTML = taskEntries.map(te => {
                             let statusBadge = '';
                             if (te.status === 'approved') {
-                                statusBadge = '<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F;">🔒 {{ __('Approved') }}</span>';
+                                statusBadge = '<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">lock</span> {{ __('Approved') }}</span>';
                             } else if (te.status === 'in_progress') {
-                                statusBadge = '<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F; font-weight: 800;">⚡ {{ __('In Progress') }}</span>';
+                                statusBadge = '<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: var(--ula-status-success); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('In Progress') }}</span>';
                             } else {
-                                statusBadge = '<span class="nav-badge-pill" style="background: var(--ula-surface-page-alt); color: var(--ula-text-secondary);">✓ {{ __('Completed') }}</span>';
+                                statusBadge = '<span class="nav-badge-pill" style="background: var(--ula-surface-page-alt); color: var(--ula-text-secondary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check</span> {{ __('Completed') }}</span>';
                             }
 
                             const billableBadge = te.is_billable
-                                ? '<span class="nav-badge-pill" style="background: rgba(36, 92, 58, 0.15); color: var(--ula-palm-900); font-weight: 800;">💎 {{ __('Billable') }}</span>'
+                                ? '<span class="nav-badge-pill" style="background: rgba(36, 92, 58, 0.15); color: var(--ula-palm-900); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">diamond</span> {{ __('Billable') }}</span>'
                                 : '<span class="nav-badge-pill" style="color: var(--ula-text-muted);">{{ __('Standard') }}</span>';
 
                             const empInitials = (te.user_name || 'U').substring(0, 2).toUpperCase();
@@ -3457,10 +3457,10 @@
                                         ${te.description ? `<div style="font-size: 11px; color: var(--ula-text-muted); margin-top: 2px;">${escapeHtml(te.description)}</div>` : ''}
                                     </td>
                                     <td>
-                                        <span class="nav-badge-pill" style="font-weight: 700; color: var(--ula-palm-900);">📁 ${escapeHtml(te.project_name || 'General')}</span>
+                                        <span class="nav-badge-pill" style="font-weight: 700; color: var(--ula-palm-900);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> ${escapeHtml(te.project_name || 'General')}</span>
                                     </td>
                                     <td style="font-family: monospace; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">
-                                        ${te.started_at || '—'} ➔ ${te.ended_at || '—'}
+                                        ${te.started_at || '—'} <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_forward</span> ${te.ended_at || '—'}
                                     </td>
                                     <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--ula-palm-900);">
                                         ${te.duration_formatted || '00m'}
@@ -3487,7 +3487,7 @@
                         attTbody.innerHTML = `
                             <tr>
                                 <td colspan="6" style="text-align: center; padding: 36px; color: var(--ula-text-muted);">
-                                    <div style="font-size: 28px; margin-bottom: 6px;">🏢</div>
+                                    <div style="font-size: 28px; margin-bottom: 6px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span></div>
                                     {{ __('No virtual office presence recorded on this date.') }}
                                 </td>
                             </tr>
@@ -3496,11 +3496,11 @@
                         attTbody.innerHTML = attSessions.map(s => {
                             let statusPill = '';
                             if (s.status === 'active') {
-                                statusPill = '<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F; font-weight: 800;">🟢 {{ __('In Office (Live)') }}</span>';
+                                statusPill = '<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: var(--ula-status-success); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> {{ __('In Office (Live)') }}</span>';
                             } else if (s.status === 'idle_paused') {
-                                statusPill = '<span class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.2); color: #D6A23A; font-weight: 800;">⏸️ {{ __('Idle Paused') }}</span>';
+                                statusPill = '<span class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.2); color: var(--ula-gold-400); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">pause_circle</span> {{ __('Idle Paused') }}</span>';
                             } else {
-                                statusPill = '<span class="nav-badge-pill" style="background: var(--ula-surface-page-alt); color: var(--ula-text-muted);">⚪ {{ __('Completed') }}</span>';
+                                statusPill = '<span class="nav-badge-pill" style="background: var(--ula-surface-page-alt); color: var(--ula-text-muted);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> {{ __('Completed') }}</span>';
                             }
 
                             const empInitials = (s.user_name || 'U').substring(0, 2).toUpperCase();
@@ -3519,18 +3519,18 @@
                                     <td>${empCell}</td>
                                     <td>
                                         <div style="display: flex; align-items: center; gap: 8px;">
-                                            <span style="font-size: 16px;">📍</span>
+                                            <span style="font-size: 16px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">location_on</span></span>
                                             <div>
                                                 <div style="font-weight: 800; color: var(--ula-text-primary);">${escapeHtml(s.branch_name || 'Main Office')}</div>
-                                                <div style="font-size: 11px; color: var(--ula-text-muted);">🚪 ${escapeHtml(s.room_name || 'General Space')}</div>
+                                                <div style="font-size: 11px; color: var(--ula-text-muted);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span> ${escapeHtml(s.room_name || 'General Space')}</div>
                                             </div>
                                         </div>
                                     </td>
                                     <td style="font-family: monospace; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">
-                                        🟢 ${s.check_in || '—'}
+                                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> ${s.check_in || '—'}
                                     </td>
                                     <td style="font-family: monospace; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">
-                                        🔴 ${s.check_out || '{{ __('Still in Office') }}'}
+                                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> ${s.check_out || '{{ __('Still in Office') }}'}
                                     </td>
                                     <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--ula-palm-900);">
                                         ${s.duration_formatted || '00m'}
@@ -3562,7 +3562,7 @@
                 if (!res.ok) return;
 
                 const data = await res.json();
-                if (onlinePill) onlinePill.innerHTML = `🟢 ${data.online_count} {{ __('Online Now') }}`;
+                if (onlinePill) onlinePill.innerHTML = `<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> ${data.online_count} {{ __('Online Now') }}`;
                 if (totalPill) totalPill.innerHTML = `${data.total_count} {{ __('Total Team') }}`;
 
                 const roster = data.roster || [];
@@ -3580,16 +3580,16 @@
                 tbody.innerHTML = roster.map(m => {
                     const initials = (m.name || 'U').substring(0, 2).toUpperCase();
                     const statusBadge = m.is_online
-                        ? '<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F; font-weight: 800;">🟢 {{ __("Online (In Office)") }}</span>'
-                        : '<span class="nav-badge-pill" style="background: var(--ula-surface-page-alt); color: var(--ula-text-muted);">⚪ {{ __("Offline") }}</span>';
+                        ? '<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: var(--ula-status-success); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> {{ __("Online (In Office)") }}</span>'
+                        : '<span class="nav-badge-pill" style="background: var(--ula-surface-page-alt); color: var(--ula-text-muted);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> {{ __("Offline") }}</span>';
 
                     let activeTaskLabel = '—';
                     if (m.active_task) {
-                        activeTaskLabel = `<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F; font-weight: 800; font-size: 11px;">⏱️ ${escapeHtml(m.active_task.task_title)} (${escapeHtml(m.active_task.project_name)})</span>`;
+                        activeTaskLabel = `<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success); font-weight: 800; font-size: 11px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span> ${escapeHtml(m.active_task.task_title)} (${escapeHtml(m.active_task.project_name)})</span>`;
                     }
 
                     const officeLoc = m.is_online
-                        ? `<div style="font-weight: 800; color: var(--ula-palm-900);">${escapeHtml(m.office_name)}</div><div style="font-size: 10px; color: var(--ula-text-muted);">🚪 ${escapeHtml(m.room_name)}</div>`
+                        ? `<div style="font-weight: 800; color: var(--ula-palm-900);">${escapeHtml(m.office_name)}</div><div style="font-size: 10px; color: var(--ula-text-muted);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span> ${escapeHtml(m.room_name)}</div>`
                         : `<span style="color: var(--ula-text-muted);">—</span>`;
 
                     return `
@@ -3603,7 +3603,7 @@
                                     <div>
                                         <div style="font-weight: 800; color: var(--ula-palm-900); display: flex; align-items: center; gap: 4px;">
                                             <span>${escapeHtml(m.name)}</span>
-                                            <span style="font-size: 10px; opacity: 0.7;">👁️</span>
+                                            <span style="font-size: 10px; opacity: 0.7;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">visibility</span></span>
                                         </div>
                                         <div style="font-size: 11px; color: var(--ula-text-muted);">${escapeHtml(m.job_title || m.role_name)}</div>
                                     </div>
@@ -3614,17 +3614,17 @@
                             <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--ula-palm-900);">
                                 ${m.total_office_formatted}
                             </td>
-                            <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: #4F9B5F;">
+                            <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--ula-status-success);">
                                 ${m.total_task_formatted}
                             </td>
                             <td>${activeTaskLabel}</td>
                             <td>
                                 <div style="display: flex; gap: 6px;">
                                     <button type="button" onclick="openMemberProfileModal('${m.user_id}')" class="tactile-btn btn-secondary" style="padding: 4px 8px; font-size: 11px;" title="{{ __('View Sessions') }}">
-                                        🔍 {{ __('Sessions') }}
+                                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span> {{ __('Sessions') }}
                                     </button>
                                     <button type="button" onclick="selectMemberInTimesheet('${m.user_id}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-palm-900); border: 1px solid rgba(79, 155, 95, 0.3); padding: 4px 8px; font-size: 11px;" title="{{ __('Filter Timesheet') }}">
-                                        ⏱️ {{ __('Timesheet') }}
+                                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span> {{ __('Timesheet') }}
                                     </button>
                                 </div>
                             </td>
@@ -3667,8 +3667,8 @@
             const attTbody = document.getElementById('mp-attendance-tbody');
             const tasksTbody = document.getElementById('mp-tasks-tbody');
 
-            if (attTbody) attTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--ula-text-muted);">⏳ {{ __('Loading sessions...') }}</td></tr>`;
-            if (tasksTbody) tasksTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--ula-text-muted);">⏳ {{ __('Loading tasks...') }}</td></tr>`;
+            if (attTbody) attTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--ula-text-muted);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">hourglass_empty</span> {{ __('Loading sessions...') }}</td></tr>`;
+            if (tasksTbody) tasksTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--ula-text-muted);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">hourglass_empty</span> {{ __('Loading tasks...') }}</td></tr>`;
 
             try {
                 // 1. Fetch user profile + activity
@@ -3703,10 +3703,10 @@
                             tasksTbody.innerHTML = tasks.map(t => `
                                 <tr>
                                     <td style="font-weight: 800; color: var(--ula-text-primary);">${escapeHtml(t.title)}</td>
-                                    <td><span class="nav-badge-pill">📁 ${escapeHtml(t.project_name)}</span></td>
+                                    <td><span class="nav-badge-pill"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> ${escapeHtml(t.project_name)}</span></td>
                                     <td style="font-size: 11px; color: var(--ula-text-muted);">${t.due_date || '—'}</td>
                                     <td><span class="nav-badge-pill" style="font-size: 10px;">${t.priority}</span></td>
-                                    <td><span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: #4F9B5F;">${t.status}</span></td>
+                                    <td><span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success);">${t.status}</span></td>
                                 </tr>
                             `).join('');
                         }
@@ -3729,17 +3729,17 @@
                         } else {
                             attTbody.innerHTML = sessions.map(s => {
                                 const stPill = s.status === 'active'
-                                    ? '<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: #4F9B5F; font-weight: 800;">🟢 {{ __("Live") }}</span>'
-                                    : '<span class="nav-badge-pill" style="color: var(--ula-text-muted);">⚪ {{ __("Completed") }}</span>';
+                                    ? '<span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: var(--ula-status-success); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> {{ __("Live") }}</span>'
+                                    : '<span class="nav-badge-pill" style="color: var(--ula-text-muted);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> {{ __("Completed") }}</span>';
 
                                 return `
                                     <tr>
                                         <td>
                                             <div style="font-weight: 800; color: var(--ula-text-primary);">${escapeHtml(s.branch_name || 'Main Office')}</div>
-                                            <div style="font-size: 11px; color: var(--ula-text-muted);">🚪 ${escapeHtml(s.room_name || 'General Space')}</div>
+                                            <div style="font-size: 11px; color: var(--ula-text-muted);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span> ${escapeHtml(s.room_name || 'General Space')}</div>
                                         </td>
-                                        <td style="font-family: monospace; font-size: 11px; color: var(--ula-text-secondary);">🟢 ${s.check_in || '—'}</td>
-                                        <td style="font-family: monospace; font-size: 11px; color: var(--ula-text-secondary);">🔴 ${s.check_out || '{{ __("Still in Office") }}'}</td>
+                                        <td style="font-family: monospace; font-size: 11px; color: var(--ula-text-secondary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> ${s.check_in || '—'}</td>
+                                        <td style="font-family: monospace; font-size: 11px; color: var(--ula-text-secondary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> ${s.check_out || '{{ __("Still in Office") }}'}</td>
                                         <td style="font-family: monospace; font-weight: 900; color: var(--ula-palm-900);">${s.duration_formatted || '00m'}</td>
                                         <td>${stPill}</td>
                                     </tr>
