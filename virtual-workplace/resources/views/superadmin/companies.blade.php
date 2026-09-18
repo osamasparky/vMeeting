@@ -4,7 +4,7 @@
 @section('page_title', __('Companies'))
 
 @section('content')
-<div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); box-shadow: var(--ula-shadow-sm); overflow: hidden;">
+<div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); box-shadow: var(--ula-shadow-sm); overflow: hidden;">
     <div class="panel-header" style="padding: 20px 24px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
         <div class="panel-title" style="display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 800; color: var(--ula-text-primary);">
             <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 22px;">domain</span>
@@ -19,15 +19,15 @@
                     name="search"
                     value="{{ request('search') }}"
                     placeholder="{{ __('Search by name or slug...') }}"
-                    style="background: var(--ula-surface-page-alt, #F4EDE1); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-pill, 9999px); padding: 8px 14px; padding-inline-start: 36px; color: var(--ula-text-primary); font-size: 13px; outline: none; width: 240px; font-weight: 500;"
+                    style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-pill); padding: 8px 14px; padding-inline-start: 36px; color: var(--ula-text-primary); font-size: 13px; outline: none; width: 240px; font-weight: 500;"
                 >
             </div>
-            <button type="submit" class="tactile-btn btn-primary" style="padding: 8px 18px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 6px;">
+            <button type="submit" class="tactile-btn btn-primary" style="padding: 8px 18px; font-size: 12px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 6px;">
                 <span class="material-symbols-rounded" style="font-size: 15px;">search</span>
                 <span>{{ __('Search') }}</span>
             </button>
             @if(request('search'))
-                <a href="{{ route('superadmin.companies') }}" class="tactile-btn btn-secondary" style="padding: 8px 12px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center;" title="{{ __('Clear search') }}">
+                <a href="{{ route('superadmin.companies') }}" class="tactile-btn btn-secondary" style="padding: 8px 12px; font-size: 12px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center;" title="{{ __('Clear search') }}">
                     <span class="material-symbols-rounded" style="font-size: 15px;">close</span>
                 </a>
             @endif
@@ -162,7 +162,7 @@
 
 <!-- Change Plan Modal -->
 <div id="changePlanModal" class="modal-overlay">
-    <div class="modal-card" style="border-radius: var(--ula-radius-xl, 20px); padding: 26px; max-width: 480px; width: 100%;">
+    <div class="modal-card" style="border-radius: var(--ula-radius-xl); padding: 26px; max-width: 480px; width: 100%;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 22px;">diamond</span>

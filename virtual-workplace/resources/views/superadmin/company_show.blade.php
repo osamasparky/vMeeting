@@ -15,7 +15,7 @@
 @endphp
 
 <!-- Company Header Card -->
-<div class="panel-card" style="margin-bottom: 24px; padding: 24px; border-radius: var(--ula-radius-xl, 20px); background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-sm);">
+<div class="panel-card" style="margin-bottom: 24px; padding: 24px; border-radius: var(--ula-radius-xl); background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-sm);">
     <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
         <!-- Left: Logo & Details -->
         <div style="display: flex; align-items: center; gap: 18px;">
@@ -59,20 +59,20 @@
             <!-- Impersonate / Login as Company -->
             <form method="POST" action="{{ route('superadmin.companies.impersonate', $organization) }}" style="margin: 0;">
                 @csrf
-                <button type="submit" class="tactile-btn btn-primary" style="padding: 9px 18px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 6px;" title="{{ __('Log in to this company dashboard directly as administrator') }}">
+                <button type="submit" class="tactile-btn btn-primary" style="padding: 9px 18px; font-size: 12px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 6px;" title="{{ __('Log in to this company dashboard directly as administrator') }}">
                     <span class="material-symbols-rounded" style="font-size: 16px;">bolt</span>
                     <span>{{ __('Login as Company') }}</span>
                 </button>
             </form>
 
             <!-- Change Plan Button -->
-            <button onclick="openChangePlanModal()" class="tactile-btn btn-secondary" style="padding: 9px 14px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 4px;">
+            <button onclick="openChangePlanModal()" class="tactile-btn btn-secondary" style="padding: 9px 14px; font-size: 12px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 15px;">diamond</span>
                 <span>{{ __('Change Plan') }}</span>
             </button>
 
             <!-- Edit Details Button -->
-            <button onclick="openEditCompanyModal()" class="tactile-btn btn-secondary" style="padding: 9px 14px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 4px;">
+            <button onclick="openEditCompanyModal()" class="tactile-btn btn-secondary" style="padding: 9px 14px; font-size: 12px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 15px;">edit</span>
                 <span>{{ __('Edit Details') }}</span>
             </button>
@@ -80,14 +80,14 @@
             <!-- Toggle Suspend Button -->
             <form method="POST" action="{{ route('superadmin.companies.toggle', $organization) }}" style="margin: 0;">
                 @csrf
-                <button type="submit" class="tactile-btn" style="padding: 9px 14px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 4px; color: {{ $isSuspended ? 'var(--ula-status-success)' : 'var(--ula-status-danger)' }}; border: 1px solid var(--ula-border-subtle);">
+                <button type="submit" class="tactile-btn" style="padding: 9px 14px; font-size: 12px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 4px; color: {{ $isSuspended ? 'var(--ula-status-success)' : 'var(--ula-status-danger)' }}; border: 1px solid var(--ula-border-subtle);">
                     <span class="material-symbols-rounded" style="font-size: 15px;">{{ $isSuspended ? 'play_arrow' : 'pause' }}</span>
                     <span>{{ $isSuspended ? __('Activate') : __('Suspend') }}</span>
                 </button>
             </form>
 
             <!-- Delete Company Button -->
-            <button onclick="openDeleteCompanyModal()" class="tactile-btn" style="padding: 9px 14px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 4px; background: rgba(217, 107, 95, 0.12); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.3);">
+            <button onclick="openDeleteCompanyModal()" class="tactile-btn" style="padding: 9px 14px; font-size: 12px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 4px; background: rgba(217, 107, 95, 0.12); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.3);">
                 <span class="material-symbols-rounded" style="font-size: 15px;">delete</span>
                 <span>{{ __('Delete') }}</span>
             </button>
@@ -98,7 +98,7 @@
 <!-- Metrics Stat Grid -->
 <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
     <!-- Stat 1: Members -->
-    <div class="metric-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); padding: 18px 20px; box-shadow: var(--ula-shadow-sm);">
+    <div class="metric-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm);">
         <div class="metric-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <span class="metric-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Members & Capacity') }}</span>
             <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-palm-900);">group</span>
@@ -114,7 +114,7 @@
     </div>
 
     <!-- Stat 2: Departments & Teams -->
-    <div class="metric-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); padding: 18px 20px; box-shadow: var(--ula-shadow-sm);">
+    <div class="metric-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm);">
         <div class="metric-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <span class="metric-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Organization Structure') }}</span>
             <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-palm-800);">corporate_fare</span>
@@ -128,7 +128,7 @@
     </div>
 
     <!-- Stat 3: Workspace & Rooms -->
-    <div class="metric-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); padding: 18px 20px; box-shadow: var(--ula-shadow-sm);">
+    <div class="metric-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm);">
         <div class="metric-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <span class="metric-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Meeting Rooms & Spaces') }}</span>
             <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-highlight-default);">meeting_room</span>
@@ -142,7 +142,7 @@
     </div>
 
     <!-- Stat 4: Projects & Tasks -->
-    <div class="metric-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); padding: 18px 20px; box-shadow: var(--ula-shadow-sm);">
+    <div class="metric-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm);">
         <div class="metric-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <span class="metric-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Projects & Tasks') }}</span>
             <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-status-success);">task_alt</span>
@@ -186,7 +186,7 @@
 
 <!-- TAB 1: MEMBERS & STAFF -->
 <div id="tab-content-members" class="tab-pane" style="display: block;">
-    <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); overflow: hidden; box-shadow: var(--ula-shadow-sm);">
+    <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); overflow: hidden; box-shadow: var(--ula-shadow-sm);">
         <div class="panel-header" style="padding: 18px 24px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center;">
             <div class="panel-title" style="font-size: 15px; font-weight: 800; color: var(--ula-text-primary); display: flex; align-items: center; gap: 8px;">
                 <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 20px;">group</span>
@@ -200,7 +200,7 @@
         <div class="data-table-container" style="overflow-x: auto;">
             <table class="data-table" style="width: 100%; border-collapse: collapse; text-align: start;">
                 <thead>
-                    <tr style="background: var(--ula-surface-page-alt, #F4EDE1); border-bottom: 1px solid var(--ula-border-subtle);">
+                    <tr style="background: var(--ula-surface-page-alt); border-bottom: 1px solid var(--ula-border-subtle);">
                         <th style="padding: 12px 20px; font-size: 11px; font-weight: 700; color: var(--ula-text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: start;">{{ __('User') }}</th>
                         <th style="padding: 12px 20px; font-size: 11px; font-weight: 700; color: var(--ula-text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: start;">{{ __('Role') }}</th>
                         <th style="padding: 12px 20px; font-size: 11px; font-weight: 700; color: var(--ula-text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: start;">{{ __('Department / Team') }}</th>
@@ -276,7 +276,7 @@
 
 <!-- TAB 2: DEPARTMENTS & TEAMS -->
 <div id="tab-content-departments" class="tab-pane" style="display: none;">
-    <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); padding: 24px; box-shadow: var(--ula-shadow-sm);">
+    <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 24px; box-shadow: var(--ula-shadow-sm);">
         <div class="panel-header" style="margin-bottom: 20px; border-bottom: 1px solid var(--ula-border-subtle); padding-bottom: 14px;">
             <div class="panel-title" style="font-size: 15px; font-weight: 800; color: var(--ula-text-primary); display: flex; align-items: center; gap: 8px;">
                 <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 20px;">corporate_fare</span>
@@ -286,7 +286,7 @@
 
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
             @forelse($organization->departments as $dept)
-            <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg, 16px); padding: 18px;">
+            <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 18px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-palm-900);">corporate_fare</span>
@@ -325,7 +325,7 @@
 
 <!-- TAB 3: ROOMS & OFFICE BLUEPRINT -->
 <div id="tab-content-rooms" class="tab-pane" style="display: none;">
-    <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); padding: 24px; box-shadow: var(--ula-shadow-sm);">
+    <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 24px; box-shadow: var(--ula-shadow-sm);">
         <div class="panel-header" style="margin-bottom: 20px; border-bottom: 1px solid var(--ula-border-subtle); padding-bottom: 14px;">
             <div class="panel-title" style="font-size: 15px; font-weight: 800; color: var(--ula-text-primary); display: flex; align-items: center; gap: 8px;">
                 <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 20px;">meeting_room</span>
@@ -335,7 +335,7 @@
 
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
             @forelse($organization->rooms as $room)
-            <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg, 16px); padding: 18px;">
+            <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 18px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                     <strong style="font-size: 14px; color: var(--ula-text-primary); display: flex; align-items: center; gap: 6px;">
                         <span class="material-symbols-rounded" style="font-size: 18px; color: var(--ula-highlight-default);">meeting_room</span>
@@ -363,20 +363,20 @@
 
 <!-- TAB 4: PLAN & RESOURCE QUOTAS -->
 <div id="tab-content-plan" class="tab-pane" style="display: none;">
-    <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); padding: 24px; box-shadow: var(--ula-shadow-sm);">
+    <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 24px; box-shadow: var(--ula-shadow-sm);">
         <div class="panel-header" style="margin-bottom: 20px; border-bottom: 1px solid var(--ula-border-subtle); padding-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
             <div class="panel-title" style="font-size: 15px; font-weight: 800; color: var(--ula-text-primary); display: flex; align-items: center; gap: 8px;">
                 <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 20px;">diamond</span>
                 <span>{{ __('Subscription Tier & Feature Entitlements') }}</span>
             </div>
-            <button onclick="openChangePlanModal()" class="tactile-btn btn-primary" style="padding: 7px 16px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 4px;">
+            <button onclick="openChangePlanModal()" class="tactile-btn btn-primary" style="padding: 7px 16px; font-size: 12px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 14px;">diamond</span>
                 <span>{{ __('Change Plan') }}</span>
             </button>
         </div>
 
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-            <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg, 16px); padding: 22px;">
+            <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 22px;">
                 <h4 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 800; color: var(--ula-text-primary);">{{ $plan?->name ?? 'Free Tier' }}</h4>
                 <div style="font-size: 28px; font-weight: 800; color: var(--ula-palm-900); margin-bottom: 12px; font-family: 'IBM Plex Mono', monospace;">
                     ${{ number_format($plan?->price ?? 0, 2) }} <span style="font-size: 14px; color: var(--ula-text-muted); font-weight: 600; font-family: var(--ula-font-family);">/ {{ $plan?->billing_interval ?? 'month' }}</span>
@@ -391,7 +391,7 @@
                 </div>
             </div>
 
-            <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg, 16px); padding: 22px;">
+            <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 22px;">
                 <h4 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 800; color: var(--ula-text-primary);">{{ __('Company System Settings') }}</h4>
                 <div style="display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: var(--ula-text-secondary);">
                     <div><strong>Timezone:</strong> {{ $organization->timezone ?: 'UTC' }}</div>
@@ -406,13 +406,13 @@
 
 <!-- TAB 5: BANK PAYMENTS & SUBSCRIPTION REQUESTS -->
 <div id="tab-content-payments" class="tab-pane" style="display: none;">
-    <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); overflow: hidden; box-shadow: var(--ula-shadow-sm);">
+    <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); overflow: hidden; box-shadow: var(--ula-shadow-sm);">
         <div class="panel-header" style="padding: 18px 24px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <div class="panel-title" style="font-size: 15px; font-weight: 800; color: var(--ula-text-primary); display: flex; align-items: center; gap: 8px;">
                 <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 20px;">payments</span>
                 <span>{{ __('Bank Transfer Payments & Upgrade Requests') }}</span>
             </div>
-            <a href="{{ route('superadmin.subscriptions') }}" class="tactile-btn btn-secondary" style="padding: 6px 14px; font-size: 11px; border-radius: var(--ula-radius-pill, 9999px); text-decoration: none;">
+            <a href="{{ route('superadmin.subscriptions') }}" class="tactile-btn btn-secondary" style="padding: 6px 14px; font-size: 11px; border-radius: var(--ula-radius-pill); text-decoration: none;">
                 {{ __('All System Subscriptions') }} →
             </a>
         </div>
@@ -420,7 +420,7 @@
         <div class="data-table-container" style="overflow-x: auto;">
             <table class="data-table" style="width: 100%; border-collapse: collapse; text-align: start;">
                 <thead>
-                    <tr style="background: var(--ula-surface-page-alt, #F4EDE1); border-bottom: 1px solid var(--ula-border-subtle);">
+                    <tr style="background: var(--ula-surface-page-alt); border-bottom: 1px solid var(--ula-border-subtle);">
                         <th style="padding: 12px 18px; font-size: 11px; font-weight: 700; color: var(--ula-text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: start;">{{ __('Requested Plan') }}</th>
                         <th style="padding: 12px 18px; font-size: 11px; font-weight: 700; color: var(--ula-text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: start;">{{ __('Amount') }}</th>
                         <th style="padding: 12px 18px; font-size: 11px; font-weight: 700; color: var(--ula-text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: start;">{{ __('Bank & Sender') }}</th>
@@ -486,7 +486,7 @@
                                         @csrf
                                         <input type="hidden" name="admin_notes" value="Rejected from company profile">
                                         <button type="submit" class="tactile-btn" style="padding: 4px 8px; font-size: 11px; color: var(--ula-status-danger); border-color: rgba(217,107,95,0.3);">
-                                            ✕
+                                            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span>
                                         </button>
                                     </form>
                                 </div>
@@ -510,7 +510,7 @@
 
 <!-- TAB 6: AUDIT LOGS -->
 <div id="tab-content-audit" class="tab-pane" style="display: none;">
-    <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); overflow: hidden; box-shadow: var(--ula-shadow-sm);">
+    <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); overflow: hidden; box-shadow: var(--ula-shadow-sm);">
         <div class="panel-header" style="padding: 18px 24px; border-bottom: 1px solid var(--ula-border-subtle);">
             <div class="panel-title" style="font-size: 15px; font-weight: 800; color: var(--ula-text-primary); display: flex; align-items: center; gap: 8px;">
                 <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 20px;">history</span>
@@ -521,7 +521,7 @@
         <div class="data-table-container" style="overflow-x: auto;">
             <table class="data-table" style="width: 100%; border-collapse: collapse; text-align: start;">
                 <thead>
-                    <tr style="background: var(--ula-surface-page-alt, #F4EDE1); border-bottom: 1px solid var(--ula-border-subtle);">
+                    <tr style="background: var(--ula-surface-page-alt); border-bottom: 1px solid var(--ula-border-subtle);">
                         <th style="padding: 12px 20px; font-size: 11px; font-weight: 700; color: var(--ula-text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: start;">{{ __('Event') }}</th>
                         <th style="padding: 12px 20px; font-size: 11px; font-weight: 700; color: var(--ula-text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: start;">{{ __('Actor / User') }}</th>
                         <th style="padding: 12px 20px; font-size: 11px; font-weight: 700; color: var(--ula-text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: start;">{{ __('IP Address') }}</th>
@@ -559,7 +559,7 @@
 
 <!-- 1. Change Plan Modal -->
 <div id="changePlanModal" class="modal-overlay">
-    <div class="modal-card" style="border-radius: var(--ula-radius-xl, 20px); padding: 26px; max-width: 480px; width: 100%;">
+    <div class="modal-card" style="border-radius: var(--ula-radius-xl); padding: 26px; max-width: 480px; width: 100%;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 22px;">diamond</span>
@@ -598,7 +598,7 @@
 
 <!-- 2. Edit Company Details Modal -->
 <div id="editCompanyModal" class="modal-overlay">
-    <div class="modal-card" style="border-radius: var(--ula-radius-xl, 20px); padding: 26px; max-width: 520px; width: 100%;">
+    <div class="modal-card" style="border-radius: var(--ula-radius-xl); padding: 26px; max-width: 520px; width: 100%;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 22px;">edit</span>
@@ -660,7 +660,7 @@
 
 <!-- 3. Delete Company Modal -->
 <div id="deleteCompanyModal" class="modal-overlay">
-    <div class="modal-card" style="border-radius: var(--ula-radius-xl, 20px); padding: 26px; max-width: 460px; width: 100%;">
+    <div class="modal-card" style="border-radius: var(--ula-radius-xl); padding: 26px; max-width: 460px; width: 100%;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span class="material-symbols-rounded" style="color: var(--ula-status-danger); font-size: 22px;">warning</span>
@@ -680,7 +680,7 @@
             @method('DELETE')
             <div style="display: flex; justify-content: flex-end; gap: 10px;">
                 <button type="button" onclick="closeDeleteCompanyModal()" class="tactile-btn btn-secondary">{{ __('Cancel') }}</button>
-                <button type="submit" class="tactile-btn" style="background: var(--ula-status-danger); color: white; border: none; padding: 8px 18px; border-radius: var(--ula-radius-pill, 9999px); font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+                <button type="submit" class="tactile-btn" style="background: var(--ula-status-danger); color: white; border: none; padding: 8px 18px; border-radius: var(--ula-radius-pill); font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
                     <span class="material-symbols-rounded" style="font-size: 16px;">delete_forever</span>
                     <span>{{ __('Delete Permanently') }}</span>
                 </button>
@@ -697,7 +697,7 @@
         background: transparent;
         color: var(--ula-text-muted);
         border: none;
-        border-radius: var(--ula-radius-pill, 9999px);
+        border-radius: var(--ula-radius-pill);
         font-weight: 700;
         cursor: pointer;
         transition: all 0.2s ease;

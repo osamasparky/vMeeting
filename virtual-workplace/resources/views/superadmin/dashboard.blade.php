@@ -8,7 +8,7 @@
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
     <div>
         <h2 style="font-size: 22px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
-            <span class="material-symbols-rounded" style="color: var(--ula-palm-700, #1E412F); font-size: 26px;">analytics</span>
+            <span class="material-symbols-rounded" style="color: var(--ula-palm-700); font-size: 26px;">analytics</span>
             <span>{{ __('Platform Overview & SaaS Metrics') }}</span>
         </h2>
         <p style="font-size: 13px; color: var(--ula-text-secondary);">
@@ -31,7 +31,7 @@
 <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; margin-bottom: 20px;">
     <!-- Total Companies -->
     <div class="kpi-card" style="border-radius: var(--ula-radius-xl); padding: 22px; position: relative; overflow: hidden;">
-        <div class="kpi-icon" style="background: rgba(30, 65, 47, 0.12); color: var(--ula-palm-900); font-size: 22px; display: flex; align-items: center; justify-content: center;">
+        <div class="kpi-icon" style="background: rgba(30, 65, 47, 0.12); color: var(--ula-status-success); font-size: 22px; display: flex; align-items: center; justify-content: center;">
             <span class="material-symbols-rounded">domain</span>
         </div>
         <div class="kpi-info" style="flex: 1;">
@@ -78,13 +78,13 @@
 
     <!-- Active Subscriptions -->
     <div class="kpi-card" style="border-radius: var(--ula-radius-xl); padding: 22px; position: relative; overflow: hidden;">
-        <div class="kpi-icon" style="background: rgba(211, 165, 83, 0.15); color: #D3A553; font-size: 22px; display: flex; align-items: center; justify-content: center;">
+        <div class="kpi-icon" style="background: rgba(211, 165, 83, 0.15); color: var(--ula-gold-400); font-size: 22px; display: flex; align-items: center; justify-content: center;">
             <span class="material-symbols-rounded">workspace_premium</span>
         </div>
         <div class="kpi-info" style="flex: 1;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3>{{ __('Paid Subscriptions') }}</h3>
-                <span class="nav-badge-pill" style="font-size: 10px; color: #D3A553; font-family: var(--ula-font-mono);">
+                <span class="nav-badge-pill" style="font-size: 10px; color: var(--ula-gold-400); font-family: var(--ula-font-mono);">
                     {{ $stats['conversion_rate'] }}% {{ __('Paid') }}
                 </span>
             </div>
@@ -97,7 +97,7 @@
 
     <!-- Monthly Recurring Revenue (MRR) -->
     <div class="kpi-card" style="border-radius: var(--ula-radius-xl); padding: 22px; position: relative; overflow: hidden; border-inline-start: 4px solid var(--ula-palm-900);">
-        <div class="kpi-icon" style="background: rgba(30, 65, 47, 0.15); color: var(--ula-palm-900); font-size: 22px; display: flex; align-items: center; justify-content: center;">
+        <div class="kpi-icon" style="background: rgba(30, 65, 47, 0.15); color: var(--ula-status-success); font-size: 22px; display: flex; align-items: center; justify-content: center;">
             <span class="material-symbols-rounded">payments</span>
         </div>
         <div class="kpi-info" style="flex: 1;">
@@ -167,7 +167,7 @@
         <div>
             <div class="panel-header" style="margin-bottom: 16px; padding-bottom: 12px;">
                 <div class="panel-title" style="display: flex; align-items: center; gap: 8px;">
-                    <span class="material-symbols-rounded" style="color: #D3A553;">workspace_premium</span>
+                    <span class="material-symbols-rounded" style="color: var(--ula-gold-400);">workspace_premium</span>
                     <span>{{ __('Plan Tiers Distribution') }}</span>
                 </div>
                 <a href="{{ route('superadmin.plans') }}" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 11px; text-decoration: none;">
@@ -183,7 +183,7 @@
                 <div>
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 13px;">
                         <span style="font-weight: 700; color: var(--ula-text-primary); display: inline-flex; align-items: center; gap: 6px;">
-                            <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-palm-700, #1E412F);">verified</span>
+                            <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-palm-700);">verified</span>
                             <span>{{ $plan->name }} (<span style="font-family: var(--ula-font-mono);">${{ number_format($plan->price, 0) }}/mo</span>)</span>
                         </span>
                         <div style="display: flex; align-items: center; gap: 6px;">
@@ -247,13 +247,13 @@
 
 <!-- Pending Subscription Approvals Alert Panel -->
 @if(isset($pendingSubscriptionRequests) && $pendingSubscriptionRequests->count() > 0)
-<div class="panel-card" style="border: 2px solid #D3A553; background: var(--ula-surface-card); margin-bottom: 28px;">
+<div class="panel-card" style="border: 2px solid var(--ula-gold-400); background: var(--ula-surface-card); margin-bottom: 28px;">
     <div class="panel-header" style="border-bottom: 1px solid rgba(211, 165, 83, 0.3); padding-bottom: 14px; margin-bottom: 16px;">
-        <div class="panel-title" style="color: #D3A553; display: flex; align-items: center; gap: 8px;">
+        <div class="panel-title" style="color: var(--ula-gold-400); display: flex; align-items: center; gap: 8px;">
             <span class="material-symbols-rounded">hourglass_top</span>
             <span>{{ __('Pending Subscription Approvals') }} ({{ $stats['pending_subscriptions_count'] ?? $pendingSubscriptionRequests->count() }})</span>
         </div>
-        <a href="{{ route('superadmin.subscriptions', ['status' => 'pending']) }}" class="tactile-btn" style="font-size: 12px; padding: 6px 14px; background: #D3A553; color: white; border: 1px solid #B4831B; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+        <a href="{{ route('superadmin.subscriptions', ['status' => 'pending']) }}" class="tactile-btn" style="font-size: 12px; padding: 6px 14px; background: var(--ula-gold-400); color: white; border: 1px solid var(--ula-gold-500); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
             <span>{{ __('Review All Requests') }}</span>
             <span class="material-symbols-rounded" style="font-size: 14px;">arrow_forward</span>
         </a>

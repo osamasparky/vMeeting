@@ -7,7 +7,7 @@
 <div style="display: flex; flex-direction: column; gap: 24px;">
 
     <!-- Top Action Bar -->
-    <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); padding: 22px 28px; box-shadow: var(--ula-shadow-sm);">
+    <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 22px 28px; box-shadow: var(--ula-shadow-sm);">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
             <div>
                 <h3 style="font-size: 18px; font-weight: 800; color: var(--ula-text-primary); margin: 0; display: flex; align-items: center; gap: 8px;">
@@ -19,7 +19,7 @@
                 </p>
             </div>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button type="button" onclick="openAddPhraseModal()" class="tactile-btn btn-primary" style="padding: 9px 18px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 6px;">
+                <button type="button" onclick="openAddPhraseModal()" class="tactile-btn btn-primary" style="padding: 9px 18px; font-size: 12px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 6px;">
                     <span class="material-symbols-rounded" style="font-size: 16px;">add</span>
                     <span>{{ __('Add New Phrase') }}</span>
                 </button>
@@ -35,15 +35,15 @@
                     name="search"
                     value="{{ $search }}"
                     placeholder="{{ __('Search keys, Arabic translations or English text...') }}"
-                    style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-pill, 9999px); padding: 10px 16px; padding-inline-start: 40px; color: var(--ula-text-primary); outline: none; font-size: 13px;"
+                    style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-pill); padding: 10px 16px; padding-inline-start: 40px; color: var(--ula-text-primary); outline: none; font-size: 13px;"
                 >
             </div>
-            <button type="submit" class="tactile-btn btn-secondary" style="padding: 10px 20px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 6px;">
+            <button type="submit" class="tactile-btn btn-secondary" style="padding: 10px 20px; font-size: 12px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 6px;">
                 <span class="material-symbols-rounded" style="font-size: 15px;">search</span>
                 <span>{{ __('Search') }}</span>
             </button>
             @if($search)
-                <a href="{{ route('superadmin.translations') }}" class="tactile-btn" style="padding: 10px 16px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); background: rgba(217, 107, 95, 0.12); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.3); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
+                <a href="{{ route('superadmin.translations') }}" class="tactile-btn" style="padding: 10px 16px; font-size: 12px; border-radius: var(--ula-radius-pill); background: rgba(217, 107, 95, 0.12); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.3); text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
                     <span class="material-symbols-rounded" style="font-size: 15px;">close</span>
                     <span>{{ __('Clear Filter') }}</span>
                 </a>
@@ -60,13 +60,13 @@
     <form method="POST" action="{{ route('superadmin.translations.update') }}" id="translations-form">
         @csrf
 
-        <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); padding: 0; overflow: hidden; box-shadow: var(--ula-shadow-sm);">
-            <div style="padding: 18px 24px; background: var(--ula-surface-page-alt, #F4EDE1); border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 0; overflow: hidden; box-shadow: var(--ula-shadow-sm);">
+            <div style="padding: 18px 24px; background: var(--ula-surface-page-alt); border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                 <div style="font-weight: 800; font-size: 13px; color: var(--ula-text-primary); display: flex; align-items: center; gap: 8px;">
                     <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 18px;">translate</span>
                     <span>{{ __('Bilingual Translation Table (Arabic ⇄ English)') }}</span>
                 </div>
-                <button type="submit" class="tactile-btn btn-primary" style="padding: 9px 24px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 6px;">
+                <button type="submit" class="tactile-btn btn-primary" style="padding: 9px 24px; font-size: 12px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 6px;">
                     <span class="material-symbols-rounded" style="font-size: 16px;">save</span>
                     <span>{{ __('Save All Changes') }}</span>
                 </button>
@@ -133,21 +133,21 @@
             </div>
 
             <!-- Bottom Pagination and Save Button -->
-            <div style="padding: 18px 24px; background: var(--ula-surface-page-alt, #F4EDE1); border-top: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+            <div style="padding: 18px 24px; background: var(--ula-surface-page-alt); border-top: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
                 <div style="display: flex; gap: 6px;">
                     @if($page > 1)
-                        <a href="{{ route('superadmin.translations', array_merge(request()->query(), ['page' => $page - 1])) }}" class="tactile-btn btn-secondary" style="padding: 8px 14px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); text-decoration: none;">
+                        <a href="{{ route('superadmin.translations', array_merge(request()->query(), ['page' => $page - 1])) }}" class="tactile-btn btn-secondary" style="padding: 8px 14px; font-size: 12px; border-radius: var(--ula-radius-pill); text-decoration: none;">
                             {{ app()->getLocale() === 'ar' ? 'السابق ◀' : '◀ Previous' }}
                         </a>
                     @endif
                     @if($page < $totalPages)
-                        <a href="{{ route('superadmin.translations', array_merge(request()->query(), ['page' => $page + 1])) }}" class="tactile-btn btn-secondary" style="padding: 8px 14px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); text-decoration: none;">
+                        <a href="{{ route('superadmin.translations', array_merge(request()->query(), ['page' => $page + 1])) }}" class="tactile-btn btn-secondary" style="padding: 8px 14px; font-size: 12px; border-radius: var(--ula-radius-pill); text-decoration: none;">
                             {{ app()->getLocale() === 'ar' ? '▶ التالي' : 'Next ▶' }}
                         </a>
                     @endif
                 </div>
 
-                <button type="submit" class="tactile-btn btn-primary" style="padding: 9px 24px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 6px;">
+                <button type="submit" class="tactile-btn btn-primary" style="padding: 9px 24px; font-size: 12px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 6px;">
                     <span class="material-symbols-rounded" style="font-size: 16px;">save</span>
                     <span>{{ __('Save All Changes') }}</span>
                 </button>
@@ -158,7 +158,7 @@
 
 <!-- Modal: Add New Phrase -->
 <div id="add-phrase-modal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(20, 43, 36, 0.45); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
-    <div class="modal-card" style="max-width: 520px; width: 95%; border-radius: var(--ula-radius-xl, 20px); padding: 28px;">
+    <div class="modal-card" style="max-width: 520px; width: 95%; border-radius: var(--ula-radius-xl); padding: 28px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--ula-border-subtle); padding-bottom: 14px;">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 22px;">add_circle</span>

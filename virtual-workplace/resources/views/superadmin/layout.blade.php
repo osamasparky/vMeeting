@@ -18,38 +18,19 @@
            ═══════════════════════════════════════════════════════════════ */
         :root {
             /* Light Theme (Warm Ivory & Forest Palm Baseline) */
-                                                --bg-surface-hover: var(--ula-sand-200, #F4EDE1);
-                                                            --border-color-glow: rgba(211, 165, 83, 0.35);
-
-                                                
-                                                                        --brand-pine: var(--ula-palm-800, #1B3223);
-                        --brand-green: var(--ula-palm-500, #3C6B4C);
-            --brand-orange: #b46c34;
-
-                                                --status-info: var(--ula-palm-900, #142B24);
-
-                                                                        
-            --ula-gradient-accent: linear-gradient(135deg, #142B24 0%, #1E412F 100%);
-            --radius-xs: 6px;
-                                                
-                                                        }
-
-        [dir="rtl"], [lang="ar"] {
-                    }
+            /* The old blocks here also declared --bg-surface-hover,
+               --border-color-glow, --brand-pine/-green/-orange,
+               --status-info and --radius-xs -- all retired/unused
+               (zero references in this file). Removed; only
+               --ula-gradient-accent is actually used (6x), and its
+               dark-mode value below deliberately differs from the
+               shared ulaspace-tokens.css default for contrast, so
+               it's kept as an intentional per-page override. */
+            --ula-gradient-accent: linear-gradient(135deg, var(--ula-palm-900) 0%, var(--ula-palm-700) 100%);
+        }
 
         [data-theme="dark"], html.dark, body.dark-mode {
-                                                --bg-surface-hover: #1b3223;
-                                                            --border-color-glow: rgba(211, 165, 83, 0.35);
-
-                                                
-                                                                        --brand-pine: var(--ula-palm-700, #1E412F);
-                        --brand-green: var(--ula-palm-500, #8baa94);
-            --brand-orange: #e6c88b;
-
-                                                --status-info: var(--ula-palm-500, #8baa94);
-
-                                                                        
-            --ula-gradient-accent: linear-gradient(135deg, #1E412F 0%, #3C6B4C 100%);
+            --ula-gradient-accent: linear-gradient(135deg, var(--ula-palm-700) 0%, var(--ula-palm-500) 100%);
         }
 
         * {
@@ -124,8 +105,8 @@
             inset-inline-start: calc(100% + 12px);
             top: 50%;
             transform: translateY(-50%);
-            background: #192D21;
-            color: #FFFDF6;
+            background: var(--ula-palm-900);
+            color: var(--ula-accent-fg);
             padding: 6px 12px;
             border-radius: 8px;
             font-size: 11px;
@@ -160,7 +141,7 @@
             align-items: center;
             justify-content: center;
             font-size: 22px;
-            color: white;
+            color: var(--ula-white);
             box-shadow: var(--ula-shadow-sm);
             flex-shrink: 0;
         }
@@ -177,7 +158,7 @@
             padding: 3px 8px;
             border-radius: 20px;
             background: rgba(79, 155, 95, 0.15);
-            color: #4F9B5F;
+            color: var(--ula-status-success);
             border: 1px solid rgba(79, 155, 95, 0.3);
             text-transform: uppercase;
             margin-top: 3px;
@@ -219,9 +200,9 @@
             transform: translateX({{ app()->getLocale() === 'ar' ? '-4px' : '4px' }});
         }
         .nav-item.active {
-            color: #FFFDF6;
+            color: var(--ula-accent-fg);
             background: var(--ula-gradient-accent);
-            border-color: #1E4E31;
+            border-color: var(--ula-palm-800);
             box-shadow: var(--ula-shadow-sm);
         }
         .nav-item-icon {
@@ -238,7 +219,7 @@
         }
         .nav-item.active .nav-item-icon {
             background: rgba(255, 255, 255, 0.2);
-            color: white;
+            color: var(--ula-white);
         }
 
         .admin-sidebar-footer {
@@ -341,7 +322,7 @@
 
         .btn-return-app {
             background: var(--ula-gradient-accent);
-            color: #FFFDF6;
+            color: var(--ula-accent-fg);
             padding: 9px 18px;
             border-radius: 12px;
             font-size: 12px;
@@ -350,7 +331,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            border: 1px solid #1E4E31;
+            border: 1px solid var(--ula-palm-800);
             box-shadow: var(--ula-shadow-sm);
             transition: all 0.2s;
         }
@@ -389,8 +370,8 @@
         }
         .tactile-btn.btn-primary, .btn-action.btn-primary {
             background: var(--ula-gradient-accent);
-            color: #FFFDF6;
-            border: 1px solid #1E4E31;
+            color: var(--ula-accent-fg);
+            border: 1px solid var(--ula-palm-800);
             box-shadow: var(--ula-shadow-sm);
         }
         .tactile-btn.btn-outline, .btn-action.btn-outline {
@@ -529,27 +510,27 @@
         }
         .badge-active, .badge-green, .badge-live {
             background: rgba(79, 155, 95, 0.18) !important;
-            color: #3C6B4C !important;
+            color: var(--ula-palm-500) !important;
             border-color: rgba(79, 155, 95, 0.35) !important;
         }
         [data-theme="dark"] .badge-active, [data-theme="dark"] .badge-green, [data-theme="dark"] .badge-live {
-            color: #8baa94 !important;
+            color: var(--ula-palm-300) !important;
         }
         .badge-suspended, .badge-danger, .badge-red {
             background: rgba(217, 107, 95, 0.18) !important;
-            color: #9A5827 !important;
+            color: var(--ula-terracotta-500) !important;
             border-color: rgba(217, 107, 95, 0.35) !important;
         }
         [data-theme="dark"] .badge-suspended, [data-theme="dark"] .badge-danger, [data-theme="dark"] .badge-red {
-            color: #d99a6c !important;
+            color: var(--ula-terracotta-300) !important;
         }
         .badge-amber, .badge-warning {
             background: rgba(211, 165, 83, 0.18) !important;
-            color: #B46C34 !important;
+            color: var(--ula-terracotta-400) !important;
             border-color: rgba(211, 165, 83, 0.35) !important;
         }
         [data-theme="dark"] .badge-amber, [data-theme="dark"] .badge-warning {
-            color: #e6c88b !important;
+            color: var(--ula-gold-300) !important;
         }
         .badge-plan, .badge-teal, .badge-blue {
             background: rgba(20, 43, 36, 0.12) !important;
@@ -558,7 +539,7 @@
         }
         [data-theme="dark"] .badge-plan, [data-theme="dark"] .badge-teal, [data-theme="dark"] .badge-blue {
             background: rgba(78, 166, 111, 0.2) !important;
-            color: #8baa94 !important;
+            color: var(--ula-palm-300) !important;
             border-color: rgba(78, 166, 111, 0.35) !important;
         }
 
@@ -659,8 +640,8 @@
         }
         .sa-tab-btn.active, .sa-tab-btn.active-tab, .tab-nav-btn.active, .tab-nav-btn.active-tab {
             background: var(--ula-gradient-accent) !important;
-            color: #FFFDF6 !important;
-            border-color: #1E4E31 !important;
+            color: var(--ula-accent-fg) !important;
+            border-color: var(--ula-palm-800) !important;
             box-shadow: var(--ula-shadow-sm);
         }
 
@@ -696,12 +677,12 @@
         .alert-success {
             background: rgba(79, 155, 95, 0.15);
             border: 1px solid rgba(79, 155, 95, 0.35);
-            color: #4F9B5F;
+            color: var(--ula-status-success);
         }
         .alert-error {
             background: rgba(217, 107, 95, 0.15);
             border: 1px solid rgba(217, 107, 95, 0.35);
-            color: #D96B5F;
+            color: var(--ula-status-danger);
         }
 
         /* ── Modals ── */
@@ -773,7 +754,7 @@
     <aside class="admin-sidebar" id="adminSidebar">
         <div class="admin-brand">
             <div style="display: flex; align-items: center; gap: 12px; min-width: 0;">
-                <div class="admin-brand-icon" style="background: var(--ula-palm-900, #142B24); border-radius: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; padding: 4px; box-shadow: var(--ula-shadow-sm);">
+                <div class="admin-brand-icon" style="background: var(--ula-palm-900); border-radius: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; padding: 4px; box-shadow: var(--ula-shadow-sm);">
                     <img src="{{ asset('images/ulaspace-icon.png') }}" alt="UlaSpace" style="width: 22px; height: auto; object-fit: contain;">
                 </div>
                 <div class="admin-brand-text">
@@ -815,7 +796,7 @@
                     <span>{{ __('Subscription Requests') }}</span>
                 </div>
                 @if($sidebarPendingSubs > 0)
-                    <span style="background: var(--ula-status-warning, #D3A553); color: white; font-size: 10px; font-weight: 900; padding: 2px 7px; border-radius: 9999px;">{{ $sidebarPendingSubs }}</span>
+                    <span style="background: var(--ula-status-warning); color: var(--ula-white); font-size: 10px; font-weight: 900; padding: 2px 7px; border-radius: 9999px;">{{ $sidebarPendingSubs }}</span>
                 @endif
             </a>
             <a href="{{ route('superadmin.furniture') }}" class="nav-item {{ request()->routeIs('superadmin.furniture*') ? 'active' : '' }}" data-tooltip="{{ __('Furniture & Assets') }}">
@@ -862,7 +843,7 @@
             <div class="nav-category-title">{{ __('Session') }}</div>
             <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0;">
                 @csrf
-                <button type="submit" class="nav-item" style="width: 100%; border: none; background: none; text-align: start; cursor: pointer; color: var(--ula-status-danger, #9A5827);" data-tooltip="{{ __('Logout') }}">
+                <button type="submit" class="nav-item" style="width: 100%; border: none; background: none; text-align: start; cursor: pointer; color: var(--ula-status-danger);" data-tooltip="{{ __('Logout') }}">
                     <span class="nav-item-icon"><span class="material-symbols-rounded">logout</span></span>
                     <span>{{ __('Logout') }}</span>
                 </button>
@@ -914,7 +895,7 @@
                     @if(auth()->user()?->avatar_url)
                         <img src="{{ auth()->user()->avatar_url }}" alt="{{ auth()->user()->name }}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: cover;">
                     @else
-                        <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--ula-gradient-accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900;">
+                        <div style="width: 28px; height: 28px; border-radius: 50%; background: var(--ula-gradient-accent); color: var(--ula-white); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900;">
                             {{ strtoupper(substr(auth()->user()?->name ?? 'SA', 0, 2)) }}
                         </div>
                     @endif
@@ -924,7 +905,7 @@
                 <!-- Super Admin Logout Header Button -->
                 <form method="POST" action="{{ route('logout') }}" style="display: inline; margin: 0;">
                     @csrf
-                    <button type="submit" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: var(--ula-status-danger, #9A5827); border: 1px solid rgba(217, 107, 95, 0.35); padding: 7px 14px; font-size: 12px; font-weight: 800; cursor: pointer; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px;" title="{{ __('Logout') }}">
+                    <button type="submit" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.35); padding: 7px 14px; font-size: 12px; font-weight: 800; cursor: pointer; border-radius: 12px; display: inline-flex; align-items: center; gap: 6px;" title="{{ __('Logout') }}">
                         <span class="material-symbols-rounded" style="font-size: 16px;">logout</span>
                         <span>{{ __('Logout') }}</span>
                     </button>

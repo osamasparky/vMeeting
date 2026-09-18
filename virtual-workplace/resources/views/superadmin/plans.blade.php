@@ -14,7 +14,7 @@
             {{ __('Configure seat capacity tiers, room limits, and recurring pricing for companies') }}
         </p>
     </div>
-    <button onclick="openCreatePlanModal()" class="tactile-btn btn-primary" style="padding: 10px 20px; font-size: 13px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 6px;">
+    <button onclick="openCreatePlanModal()" class="tactile-btn btn-primary" style="padding: 10px 20px; font-size: 13px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 6px;">
         <span class="material-symbols-rounded" style="font-size: 18px;">add_circle</span>
         <span>{{ __('Create New Plan') }}</span>
     </button>
@@ -23,7 +23,7 @@
 <!-- Plan Cards Grid -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 32px;">
     @foreach($plans as $plan)
-    <div class="panel-card" style="position: relative; display: flex; flex-direction: column; justify-content: space-between; border-radius: var(--ula-radius-xl, 20px); padding: 24px; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-top: 4px solid var(--ula-palm-900); box-shadow: var(--ula-shadow-sm);">
+    <div class="panel-card" style="position: relative; display: flex; flex-direction: column; justify-content: space-between; border-radius: var(--ula-radius-xl); padding: 24px; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-top: 4px solid var(--ula-palm-900); box-shadow: var(--ula-shadow-sm);">
         <div>
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
                 <div>
@@ -45,7 +45,7 @@
                 @endif
             </div>
 
-            <div style="margin: 16px 0; padding: 16px; background: var(--ula-surface-page-alt, #F4EDE1); border-radius: var(--ula-radius-md, 12px); border: 1px solid var(--ula-border-subtle);">
+            <div style="margin: 16px 0; padding: 16px; background: var(--ula-surface-page-alt); border-radius: var(--ula-radius-md); border: 1px solid var(--ula-border-subtle);">
                 <div style="font-size: 28px; font-weight: 800; color: var(--ula-palm-900); font-family: 'IBM Plex Mono', monospace;">
                     ${{ number_format($plan->price, 2) }}
                     <span style="font-size: 13px; font-weight: 600; color: var(--ula-text-muted); font-family: var(--ula-font-family);">/mo</span>
@@ -116,7 +116,7 @@
 
 <!-- Plan Modal (Create & Edit) -->
 <div id="planModal" class="modal-overlay">
-    <div class="modal-card" style="border-radius: var(--ula-radius-xl, 20px); padding: 28px; max-width: 540px; width: 100%;">
+    <div class="modal-card" style="border-radius: var(--ula-radius-xl); padding: 28px; max-width: 540px; width: 100%;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 22px;">diamond</span>

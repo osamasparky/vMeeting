@@ -20,9 +20,9 @@
         <div style="display: flex; gap: 10px; align-items: center;">
             <div style="position: relative; display: flex; align-items: center;">
                 <span class="material-symbols-rounded" style="position: absolute; inset-inline-start: 12px; font-size: 16px; color: var(--ula-text-muted); pointer-events: none;">search</span>
-                <input type="text" id="matrix-search-input" onkeyup="filterMatrixRows()" placeholder="{{ __('Filter permissions...') }}" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-pill, 9999px); padding: 8px 14px; padding-inline-start: 36px; font-size: 12px; color: var(--ula-text-primary); width: 220px; outline: none;">
+                <input type="text" id="matrix-search-input" onkeyup="filterMatrixRows()" placeholder="{{ __('Filter permissions...') }}" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-pill); padding: 8px 14px; padding-inline-start: 36px; font-size: 12px; color: var(--ula-text-primary); width: 220px; outline: none;">
             </div>
-            <button type="submit" class="tactile-btn btn-primary" style="padding: 9px 20px; font-size: 13px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 6px;">
+            <button type="submit" class="tactile-btn btn-primary" style="padding: 9px 20px; font-size: 13px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 6px;">
                 <span class="material-symbols-rounded" style="font-size: 16px;">save</span>
                 <span>{{ __('Save Permission Matrix') }}</span>
             </button>
@@ -30,7 +30,7 @@
     </div>
 
     @if(session('success'))
-        <div style="background: rgba(60, 107, 76, 0.12); border: 1px solid rgba(60, 107, 76, 0.35); color: var(--ula-status-success); padding: 14px 18px; border-radius: var(--ula-radius-md, 12px); margin-bottom: 20px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+        <div style="background: rgba(60, 107, 76, 0.12); border: 1px solid rgba(60, 107, 76, 0.35); color: var(--ula-status-success); padding: 14px 18px; border-radius: var(--ula-radius-md); margin-bottom: 20px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
             <span class="material-symbols-rounded" style="font-size: 18px;">check_circle</span>
             <span>{{ session('success') }}</span>
         </div>
@@ -55,7 +55,7 @@
     @endphp
 
     @foreach($permissions as $group => $groupPerms)
-    <div class="panel-card matrix-group-card" style="margin-bottom: 24px; border-radius: var(--ula-radius-xl, 20px); padding: 22px; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-sm);">
+    <div class="panel-card matrix-group-card" style="margin-bottom: 24px; border-radius: var(--ula-radius-xl); padding: 22px; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-sm);">
         <div class="panel-header" style="margin-bottom: 14px; padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--ula-border-subtle);">
             <div class="panel-title" style="font-size: 15px; color: var(--ula-palm-900); display: flex; align-items: center; gap: 8px; font-weight: 800;">
                 <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 20px;">{{ $groupIcons[$group] ?? 'folder' }}</span>
@@ -71,7 +71,7 @@
         <div class="data-table-container" style="overflow-x: auto;">
             <table class="data-table" style="width: 100%; border-collapse: collapse; text-align: start;">
                 <thead>
-                    <tr style="background: var(--ula-surface-page-alt, #F4EDE1); border-bottom: 1px solid var(--ula-border-subtle);">
+                    <tr style="background: var(--ula-surface-page-alt); border-bottom: 1px solid var(--ula-border-subtle);">
                         <th style="padding: 10px 16px; font-size: 11px; font-weight: 700; color: var(--ula-text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: start; width: 340px;">{{ __('Permission & Key') }}</th>
                         @foreach($roles as $role)
                         <th style="padding: 10px 16px; font-size: 11px; font-weight: 700; color: var(--ula-text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: center; min-width: 120px;">
@@ -113,7 +113,7 @@
     @endforeach
 
     <div style="display: flex; justify-content: flex-end; margin-top: 16px; margin-bottom: 40px;">
-        <button type="submit" class="tactile-btn btn-primary" style="padding: 12px 28px; font-size: 13px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 8px;">
+        <button type="submit" class="tactile-btn btn-primary" style="padding: 12px 28px; font-size: 13px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 8px;">
             <span class="material-symbols-rounded" style="font-size: 18px;">save</span>
             <span>{{ __('Save Permission Matrix') }}</span>
         </button>

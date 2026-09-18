@@ -18,7 +18,7 @@
 
 <!-- KPI Cards Grid -->
 <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
-    <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-inline-start: 4px solid var(--ula-status-warning);">
+    <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-inline-start: 4px solid var(--ula-status-warning);">
         <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <span class="kpi-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Pending Approvals') }}</span>
             <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-status-warning);">hourglass_top</span>
@@ -27,7 +27,7 @@
         <div class="kpi-subtext" style="font-size: 11px; color: var(--ula-text-muted); margin-top: 4px;">{{ __('Awaiting SuperAdmin review') }}</div>
     </div>
 
-    <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-inline-start: 4px solid var(--ula-status-success);">
+    <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-inline-start: 4px solid var(--ula-status-success);">
         <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <span class="kpi-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Approved Subscriptions') }}</span>
             <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-status-success);">check_circle</span>
@@ -36,7 +36,7 @@
         <div class="kpi-subtext" style="font-size: 11px; color: var(--ula-text-muted); margin-top: 4px;">{{ __('Active & plan provisioned') }}</div>
     </div>
 
-    <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-inline-start: 4px solid var(--ula-status-danger);">
+    <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-inline-start: 4px solid var(--ula-status-danger);">
         <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <span class="kpi-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Rejected Requests') }}</span>
             <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-status-danger);">cancel</span>
@@ -45,7 +45,7 @@
         <div class="kpi-subtext" style="font-size: 11px; color: var(--ula-text-muted); margin-top: 4px;">{{ __('Declined due to invalid slip') }}</div>
     </div>
 
-    <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-inline-start: 4px solid var(--ula-palm-900);">
+    <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-inline-start: 4px solid var(--ula-palm-900);">
         <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <span class="kpi-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Total Requests') }}</span>
             <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-palm-900);">receipt_long</span>
@@ -56,21 +56,21 @@
 </div>
 
 <!-- Filter Bar & Search -->
-<div class="card" style="padding: 16px 20px; margin-bottom: 20px; border-radius: var(--ula-radius-lg, 16px); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; box-shadow: var(--ula-shadow-sm);">
+<div class="card" style="padding: 16px 20px; margin-bottom: 20px; border-radius: var(--ula-radius-lg); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; box-shadow: var(--ula-shadow-sm);">
     <!-- Status Filter Pills -->
     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-        <a href="{{ route('superadmin.subscriptions', ['status' => 'all', 'search' => $search]) }}" class="nav-badge-pill" style="text-decoration: none; padding: 6px 14px; border-radius: var(--ula-radius-pill, 9999px); font-size: 12px; font-weight: 600; {{ $statusFilter === 'all' ? 'background: var(--ula-palm-900); color: white;' : 'background: var(--ula-surface-page-alt); color: var(--ula-text-secondary);' }}">
+        <a href="{{ route('superadmin.subscriptions', ['status' => 'all', 'search' => $search]) }}" class="nav-badge-pill" style="text-decoration: none; padding: 6px 14px; border-radius: var(--ula-radius-pill); font-size: 12px; font-weight: 600; {{ $statusFilter === 'all' ? 'background: var(--ula-palm-900); color: white;' : 'background: var(--ula-surface-page-alt); color: var(--ula-text-secondary);' }}">
             {{ __('All') }} ({{ $stats['total'] }})
         </a>
-        <a href="{{ route('superadmin.subscriptions', ['status' => 'pending', 'search' => $search]) }}" class="nav-badge-pill" style="text-decoration: none; padding: 6px 14px; border-radius: var(--ula-radius-pill, 9999px); font-size: 12px; font-weight: 600; {{ $statusFilter === 'pending' ? 'background: var(--ula-gold-500); color: white;' : 'background: rgba(211,165,83,0.12); color: var(--ula-gold-600);' }}">
+        <a href="{{ route('superadmin.subscriptions', ['status' => 'pending', 'search' => $search]) }}" class="nav-badge-pill" style="text-decoration: none; padding: 6px 14px; border-radius: var(--ula-radius-pill); font-size: 12px; font-weight: 600; {{ $statusFilter === 'pending' ? 'background: var(--ula-gold-500); color: white;' : 'background: rgba(211,165,83,0.12); color: var(--ula-gold-600);' }}">
             <span class="material-symbols-rounded" style="font-size: 13px; vertical-align: middle;">hourglass_top</span>
             <span>{{ __('Pending') }} ({{ $stats['pending'] }})</span>
         </a>
-        <a href="{{ route('superadmin.subscriptions', ['status' => 'approved', 'search' => $search]) }}" class="nav-badge-pill" style="text-decoration: none; padding: 6px 14px; border-radius: var(--ula-radius-pill, 9999px); font-size: 12px; font-weight: 600; {{ $statusFilter === 'approved' ? 'background: var(--ula-status-success); color: white;' : 'background: rgba(60,107,76,0.12); color: var(--ula-status-success);' }}">
+        <a href="{{ route('superadmin.subscriptions', ['status' => 'approved', 'search' => $search]) }}" class="nav-badge-pill" style="text-decoration: none; padding: 6px 14px; border-radius: var(--ula-radius-pill); font-size: 12px; font-weight: 600; {{ $statusFilter === 'approved' ? 'background: var(--ula-status-success); color: white;' : 'background: rgba(60,107,76,0.12); color: var(--ula-status-success);' }}">
             <span class="material-symbols-rounded" style="font-size: 13px; vertical-align: middle;">check_circle</span>
             <span>{{ __('Approved') }} ({{ $stats['approved'] }})</span>
         </a>
-        <a href="{{ route('superadmin.subscriptions', ['status' => 'rejected', 'search' => $search]) }}" class="nav-badge-pill" style="text-decoration: none; padding: 6px 14px; border-radius: var(--ula-radius-pill, 9999px); font-size: 12px; font-weight: 600; {{ $statusFilter === 'rejected' ? 'background: var(--ula-status-danger); color: white;' : 'background: rgba(217,107,95,0.12); color: var(--ula-status-danger);' }}">
+        <a href="{{ route('superadmin.subscriptions', ['status' => 'rejected', 'search' => $search]) }}" class="nav-badge-pill" style="text-decoration: none; padding: 6px 14px; border-radius: var(--ula-radius-pill); font-size: 12px; font-weight: 600; {{ $statusFilter === 'rejected' ? 'background: var(--ula-status-danger); color: white;' : 'background: rgba(217,107,95,0.12); color: var(--ula-status-danger);' }}">
             <span class="material-symbols-rounded" style="font-size: 13px; vertical-align: middle;">cancel</span>
             <span>{{ __('Rejected') }} ({{ $stats['rejected'] }})</span>
         </a>
@@ -84,17 +84,17 @@
             <input
                 type="text"
                 name="search"
-                style="min-width: 240px; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-pill, 9999px); padding: 8px 14px; padding-inline-start: 36px; color: var(--ula-text-primary); font-size: 13px; outline: none;"
+                style="min-width: 240px; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-pill); padding: 8px 14px; padding-inline-start: 36px; color: var(--ula-text-primary); font-size: 13px; outline: none;"
                 placeholder="{{ __('Search by company, sender, ref #...') }}"
                 value="{{ $search }}"
             >
         </div>
-        <button type="submit" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 6px;">
+        <button type="submit" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 6px;">
             <span class="material-symbols-rounded" style="font-size: 15px;">search</span>
             <span>{{ __('Search') }}</span>
         </button>
         @if($search)
-            <a href="{{ route('superadmin.subscriptions', ['status' => $statusFilter]) }}" class="tactile-btn btn-secondary" style="padding: 8px 12px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center;">
+            <a href="{{ route('superadmin.subscriptions', ['status' => $statusFilter]) }}" class="tactile-btn btn-secondary" style="padding: 8px 12px; font-size: 12px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center;">
                 <span class="material-symbols-rounded" style="font-size: 15px;">close</span>
             </a>
         @endif
@@ -102,11 +102,11 @@
 </div>
 
 <!-- Requests Table Card -->
-<div class="card" style="padding: 0; overflow: hidden; border-radius: var(--ula-radius-xl, 20px); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-sm);">
+<div class="card" style="padding: 0; overflow: hidden; border-radius: var(--ula-radius-xl); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-sm);">
     <div style="overflow-x: auto;">
         <table style="width: 100%; border-collapse: collapse; text-align: start; font-size: 13px;">
             <thead>
-                <tr style="background: var(--ula-surface-page-alt, #F4EDE1); border-bottom: 1px solid var(--ula-border-subtle); color: var(--ula-text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                <tr style="background: var(--ula-surface-page-alt); border-bottom: 1px solid var(--ula-border-subtle); color: var(--ula-text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
                     <th style="padding: 14px 20px; text-align: start;">{{ __('Company / Organization') }}</th>
                     <th style="padding: 14px 20px; text-align: start;">{{ __('Target Plan') }}</th>
                     <th style="padding: 14px 20px; text-align: start;">{{ __('Amount & Cycle') }}</th>
@@ -288,7 +288,7 @@
 
 <!-- APPROVE SUBSCRIPTION MODAL -->
 <div id="approveModal" class="modal-overlay">
-    <div class="modal-card" style="border-radius: var(--ula-radius-xl, 20px); padding: 26px; max-width: 480px; width: 100%;">
+    <div class="modal-card" style="border-radius: var(--ula-radius-xl); padding: 26px; max-width: 480px; width: 100%;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span class="material-symbols-rounded" style="color: var(--ula-status-success); font-size: 22px;">verified</span>
@@ -346,7 +346,7 @@
 
 <!-- REJECT SUBSCRIPTION MODAL -->
 <div id="rejectModal" class="modal-overlay">
-    <div class="modal-card" style="border-radius: var(--ula-radius-xl, 20px); padding: 26px; max-width: 480px; width: 100%;">
+    <div class="modal-card" style="border-radius: var(--ula-radius-xl); padding: 26px; max-width: 480px; width: 100%;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span class="material-symbols-rounded" style="color: var(--ula-status-danger); font-size: 22px;">cancel</span>
@@ -384,7 +384,7 @@
                 <button type="button" onclick="closeModal('rejectModal')" class="tactile-btn btn-secondary">
                     {{ __('Cancel') }}
                 </button>
-                <button type="submit" class="tactile-btn" style="background: var(--ula-status-danger); color: white; border: none; padding: 8px 18px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 6px; font-weight: 700;">
+                <button type="submit" class="tactile-btn" style="background: var(--ula-status-danger); color: white; border: none; padding: 8px 18px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 6px; font-weight: 700;">
                     <span class="material-symbols-rounded" style="font-size: 16px;">cancel</span>
                     <span>{{ __('Reject Request') }}</span>
                 </button>
@@ -395,7 +395,7 @@
 
 <!-- VIEW DETAILS MODAL -->
 <div id="detailsModal" class="modal-overlay">
-    <div class="modal-card" style="border-radius: var(--ula-radius-xl, 20px); padding: 26px; max-width: 500px; width: 100%;">
+    <div class="modal-card" style="border-radius: var(--ula-radius-xl); padding: 26px; max-width: 500px; width: 100%;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 22px;">receipt_long</span>

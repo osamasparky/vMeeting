@@ -10,7 +10,7 @@
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 16px;">
     <div>
         <h2 style="font-size: 20px; font-weight: 900; color: var(--ula-text-primary); margin: 0 0 4px 0;">
-            🏢 {{ __('Subscription Plan Office Blueprints') }}
+            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> {{ __('Subscription Plan Office Blueprints') }}
         </h2>
         <p style="font-size: 13px; color: var(--ula-text-muted); margin: 0;">
             {{ __('Configure and design dedicated default office floorplans and rooms for each subscription plan tier.') }}
@@ -18,11 +18,11 @@
     </div>
 
     <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-        <button type="button" onclick="openSyncModal()" class="tactile-btn" style="background: rgba(37, 99, 235, 0.15); border-color: rgba(59, 130, 246, 0.35); color: #93C5FD; font-size: 13px;">
-            🔄 {{ __('Sync Office to Companies') }}
+        <button type="button" onclick="openSyncModal()" class="tactile-btn" style="background: rgba(37, 99, 235, 0.15); border-color: rgba(59, 130, 246, 0.35); color: var(--ula-accent-default); font-size: 13px;">
+            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">sync</span> {{ __('Sync Office to Companies') }}
         </button>
         <button type="button" onclick="saveAllRoomsToServer()" class="tactile-btn btn-primary" style="font-size: 13px; box-shadow: 0 4px 14px rgba(36, 92, 58, 0.4);">
-            💾 {{ __('Save Rooms for :plan', ['plan' => $selectedPlan ? $selectedPlan->name : 'Plan']) }}
+            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">save</span> {{ __('Save Rooms for :plan', ['plan' => $selectedPlan ? $selectedPlan->name : 'Plan']) }}
         </button>
     </div>
 </div>
@@ -38,7 +38,7 @@
         <a href="{{ route('superadmin.template', ['plan' => $p->slug]) }}" 
            class="tactile-btn" 
            style="flex: 1; min-width: 170px; padding: 10px 16px; font-size: 13px; font-weight: 800; text-decoration: none; justify-content: center; border: {{ $isActivePlan ? '2px solid var(--ula-palm-900)' : '1px solid transparent' }}; background: {{ $isActivePlan ? 'var(--ula-gradient-accent)' : 'transparent' }}; color: {{ $isActivePlan ? 'white' : 'var(--ula-text-secondary)' }}; box-shadow: {{ $isActivePlan ? '0 4px 14px rgba(36, 92, 58, 0.3)' : 'none' }};">
-            @if($p->slug === 'free') 🟢 @elseif($p->slug === 'starter') ⚡ @elseif($p->slug === 'business') 💎 @else 👑 @endif
+            @if($p->slug === 'free') <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> @elseif($p->slug === 'starter') <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> @elseif($p->slug === 'business') <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">diamond</span> @else <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">workspace_premium</span> @endif
             <span>{{ $p->name }}</span>
             <span style="font-size: 11px; background: {{ $isActivePlan ? 'rgba(255,255,255,0.25)' : 'var(--ula-surface-raised)' }}; padding: 2px 8px; border-radius: 999px; margin-inline-start: 6px;">
                 {{ $tierRoomsCount }} {{ __('Rooms') }}
@@ -53,42 +53,42 @@
 <div style="display: grid; grid-template-columns: 1fr 360px; gap: 20px; margin-bottom: 24px;">
 
     <!-- Left: Interactive Canvas Viewport -->
-    <div class="panel-card" style="padding: 0; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; background: #07120C; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
+    <div class="panel-card" style="padding: 0; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; background: var(--ula-palm-950); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
         
         <!-- Canvas Studio Toolbar -->
         <div style="padding: 12px 18px; background: var(--ula-surface-page-alt); border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <!-- Left: Tool Selector -->
             <div style="display: flex; gap: 6px; align-items: center; background: var(--ula-surface-page); padding: 4px; border-radius: 12px; border: 1px solid var(--ula-border-subtle);">
                 <button type="button" id="tool-btn-select" onclick="setDrawTool('select')" class="tactile-btn" style="padding: 6px 14px; font-size: 12px; border: none; background: var(--ula-gradient-accent); color: white;">
-                    <span>🖱️</span> <span>{{ __('Select & Move') }}</span>
+                    <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">mouse</span></span> <span>{{ __('Select & Move') }}</span>
                 </button>
                 <button type="button" id="tool-btn-draw" onclick="setDrawTool('draw')" class="tactile-btn" style="padding: 6px 14px; font-size: 12px; border: none; background: transparent; color: var(--ula-text-secondary);">
-                    <span>✏️</span> <span>{{ __('Draw Room') }}</span>
+                    <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">edit</span></span> <span>{{ __('Draw Room') }}</span>
                 </button>
             </div>
 
             <!-- Center: Blueprint Status -->
             <div style="font-size: 12px; font-weight: 800; color: var(--ula-palm-900); display: flex; align-items: center; gap: 8px;">
-                <span>📐 {{ $template->width }}x{{ $template->height }} Grid</span>
+                <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">architecture</span> {{ $template->width }}x{{ $template->height }} Grid</span>
                 <span style="color: var(--ula-text-muted);">•</span>
                 <span id="canvas-rooms-count">{{ count($template->rooms_data ?: []) }} {{ __('Rooms Configured') }}</span>
             </div>
 
             <!-- Right: Zoom & Reset Controls -->
             <div style="display: flex; gap: 6px; align-items: center;">
-                <button type="button" onclick="adjustZoom(-0.15)" class="tactile-btn btn-secondary" style="padding: 6px 10px; font-size: 12px;" title="Zoom Out">🔍−</button>
-                <button type="button" onclick="adjustZoom(0.15)" class="tactile-btn btn-secondary" style="padding: 6px 10px; font-size: 12px;" title="Zoom In">🔍+</button>
-                <button type="button" onclick="resetCanvasView()" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" title="Fit / Reset View">🎯 {{ __('Fit') }}</button>
+                <button type="button" onclick="adjustZoom(-0.15)" class="tactile-btn btn-secondary" style="padding: 6px 10px; font-size: 12px;" title="Zoom Out"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">zoom_out</span>−</button>
+                <button type="button" onclick="adjustZoom(0.15)" class="tactile-btn btn-secondary" style="padding: 6px 10px; font-size: 12px;" title="Zoom In"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">zoom_in</span>+</button>
+                <button type="button" onclick="resetCanvasView()" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" title="Fit / Reset View"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">target</span> {{ __('Fit') }}</button>
             </div>
         </div>
 
         <!-- Canvas Workspace Container -->
-        <div id="canvas-viewport" style="position: relative; width: 100%; height: 560px; overflow: hidden; background: radial-gradient(circle at center, #0e1e16 0%, #060e0a 100%); cursor: default;">
+        <div id="canvas-viewport" style="position: relative; width: 100%; height: 560px; overflow: hidden; background: radial-gradient(circle at center, var(--ula-palm-950) 0%, var(--ula-black) 100%); cursor: default;">
             <canvas id="designer-canvas" style="display: block; width: 100%; height: 100%;"></canvas>
 
             <!-- Floating Prompt Hint -->
-            <div id="draw-hint-overlay" style="position: absolute; bottom: 14px; inset-inline-start: 14px; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.15); padding: 8px 14px; border-radius: 12px; font-size: 11px; color: #F8FAFC; display: flex; align-items: center; gap: 8px; pointer-events: none; transition: all 0.2s;">
-                <span id="draw-hint-icon">💡</span>
+            <div id="draw-hint-overlay" style="position: absolute; bottom: 14px; inset-inline-start: 14px; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.15); padding: 8px 14px; border-radius: 12px; font-size: 11px; color: var(--ula-white); display: flex; align-items: center; gap: 8px; pointer-events: none; transition: all 0.2s;">
+                <span id="draw-hint-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">lightbulb</span></span>
                 <span id="draw-hint-text">{{ __('Click on any room to select and rename it, or switch to "Draw Room" to create a new room box.') }}</span>
             </div>
         </div>
@@ -96,14 +96,14 @@
         <!-- Bottom Blueprint Upload Footer -->
         <div style="padding: 12px 18px; background: var(--ula-surface-page-alt); border-top: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
             <div style="font-size: 12px; color: var(--ula-text-secondary);">
-                <span>🖼️ <strong>{{ __('Floorplan Artwork') }}:</strong> {{ basename($template->background_image_url ?: 'office_floorplan.jpg') }}</span>
+                <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">image</span> <strong>{{ __('Floorplan Artwork') }}:</strong> {{ basename($template->background_image_url ?: 'office_floorplan.jpg') }}</span>
             </div>
             <form method="POST" action="{{ route('superadmin.template.background') }}" enctype="multipart/form-data" style="margin: 0; display: flex; gap: 8px;">
                 @csrf
                 <input type="hidden" name="template_id" value="{{ $template->id }}">
                 <input type="file" name="background" id="template_bg_input" accept="image/jpeg,image/png,image/webp,image/jpg" style="display:none;" onchange="this.form.submit()">
                 <button type="button" onclick="document.getElementById('template_bg_input').click()" class="tactile-btn btn-secondary" style="font-size: 11px; padding: 6px 12px;">
-                    📁 {{ __('Change Background Floorplan') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> {{ __('Change Background Floorplan') }}
                 </button>
             </form>
         </div>
@@ -116,14 +116,14 @@
         <div class="panel-card" style="padding: 22px; border-radius: 20px;">
             <div class="panel-header" style="margin-bottom: 16px;">
                 <div class="panel-title">
-                    <span>✏️</span>
+                    <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">edit</span></span>
                     <span id="inspector-header-title">{{ __('Room Inspector & Rename') }}</span>
                 </div>
             </div>
 
             <!-- Empty State when no room is selected -->
             <div id="inspector-empty" style="text-align: center; padding: 30px 10px; color: var(--ula-text-muted);">
-                <div style="font-size: 38px; margin-bottom: 10px;">🚪</div>
+                <div style="font-size: 38px; margin-bottom: 10px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span></div>
                 <strong style="display: block; font-size: 13px; color: var(--ula-text-primary); margin-bottom: 4px;">{{ __('No Room Selected') }}</strong>
                 <p style="font-size: 12px; margin: 0; line-height: 1.5;">
                     {{ __('Click on any room on the blueprint or click "Draw Room" to create and configure a new room.') }}
@@ -136,7 +136,7 @@
                 <!-- 1. Room Name (Rename) -->
                 <div>
                     <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-palm-900); margin-bottom: 6px;">
-                        🏷️ {{ __('Room Name') }}
+                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">label</span> {{ __('Room Name') }}
                     </label>
                     <input type="text" id="insp-name" oninput="updateSelectedRoomProp('name', this.value)" placeholder="e.g. Executive Board Room" style="width: 100%; background: var(--ula-surface-page-alt); border: 2px solid var(--ula-palm-900); border-radius: 10px; padding: 10px 12px; color: var(--ula-text-primary); font-size: 13px; font-weight: 800; outline: none; box-shadow: var(--ula-shadow-xs);">
                 </div>
@@ -156,9 +156,9 @@
                     <div>
                         <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Access Privacy') }}</label>
                         <select id="insp-access" onchange="updateSelectedRoomProp('access_mode', this.value)" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 8px; color: var(--ula-text-primary); font-size: 11px; font-weight: 700; outline: none;">
-                            <option value="public">🟢 Public (Open)</option>
-                            <option value="knock">✊ Knock to Enter</option>
-                            <option value="locked">🔒 Locked by Default</option>
+                            <option value="public">Public (Open)</option>
+                            <option value="knock">Knock to Enter</option>
+                            <option value="locked">Locked by Default</option>
                         </select>
                     </div>
                 </div>
@@ -179,13 +179,13 @@
                 <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px;">
                     <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 11px; font-weight: 700; color: var(--ula-text-primary);">
                         <input type="checkbox" id="insp-isolation" onchange="updateSelectedRoomIsolation(this.checked)" style="width: 16px; height: 16px;">
-                        <span>🎙️ {{ __('Acoustic Sound Isolation') }}</span>
+                        <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">mic</span> {{ __('Acoustic Sound Isolation') }}</span>
                     </label>
                 </div>
 
                 <!-- 5. Grid Bounds (X, Y, W, H) -->
                 <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px;">
-                    <span style="display: block; font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase; margin-bottom: 6px;">📐 {{ __('Grid Tile Bounds') }}</span>
+                    <span style="display: block; font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase; margin-bottom: 6px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">architecture</span> {{ __('Grid Tile Bounds') }}</span>
                     <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
                         <div>
                             <label style="font-size: 9px; color: var(--ula-text-muted);">X</label>
@@ -207,8 +207,8 @@
                 </div>
 
                 <!-- 6. Delete Room Button -->
-                <button type="button" onclick="deleteCurrentSelectedRoom()" class="tactile-btn" style="width: 100%; justify-content: center; background: rgba(217, 107, 95, 0.15); border-color: rgba(217, 107, 95, 0.35); color: #D96B5F; font-size: 12px; padding: 8px;">
-                    🗑️ {{ __('Delete this Room') }}
+                <button type="button" onclick="deleteCurrentSelectedRoom()" class="tactile-btn" style="width: 100%; justify-content: center; background: rgba(217, 107, 95, 0.15); border-color: rgba(217, 107, 95, 0.35); color: var(--ula-status-danger); font-size: 12px; padding: 8px;">
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">delete</span> {{ __('Delete this Room') }}
                 </button>
             </div>
         </div>
@@ -217,7 +217,7 @@
         <div class="panel-card" style="padding: 20px; border-radius: 20px;">
             <div class="panel-header" style="margin-bottom: 12px;">
                 <div class="panel-title">
-                    <span>⚙️</span>
+                    <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">settings</span></span>
                     <span>{{ __('Grid Dimensions') }}</span>
                 </div>
             </div>
@@ -239,7 +239,7 @@
                 <input type="hidden" name="tile_size" value="{{ $template->tile_size }}">
 
                 <button type="submit" class="tactile-btn btn-secondary" style="width: 100%; justify-content: center; padding: 8px; font-size: 11px;">
-                    💾 {{ __('Update Grid Size') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">save</span> {{ __('Update Grid Size') }}
                 </button>
             </form>
         </div>
@@ -252,11 +252,11 @@
 <div class="panel-card" style="border-radius: 20px; padding: 24px;">
     <div class="panel-header" style="margin-bottom: 16px;">
         <div class="panel-title">
-            <span>📋</span>
+            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">checklist</span></span>
             <span>{{ __('All Preconfigured Default Rooms Roster') }}</span>
         </div>
         <button type="button" onclick="setDrawTool('draw')" class="tactile-btn btn-primary" style="font-size: 12px; padding: 6px 14px;">
-            ✏️ {{ __('Draw Another Room') }}
+            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">edit</span> {{ __('Draw Another Room') }}
         </button>
     </div>
 
@@ -285,8 +285,8 @@
 <div id="syncModal" class="modal-overlay">
     <div class="modal-card" style="border-radius: 24px; padding: 26px; max-width: 520px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h3 style="font-size: 17px; font-weight: 900; color: var(--ula-text-primary);">🔄 {{ __('Sync Office Template to Companies') }}</h3>
-            <button onclick="closeSyncModal()" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ula-text-primary); font-weight: 800;">✕</button>
+            <h3 style="font-size: 17px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">sync</span> {{ __('Sync Office Template to Companies') }}</h3>
+            <button onclick="closeSyncModal()" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ula-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span></button>
         </div>
 
         <p style="font-size: 13px; color: var(--ula-text-secondary); line-height: 1.6; margin-bottom: 16px;">
@@ -300,7 +300,7 @@
             <!-- Sync Scope Selection -->
             <div style="margin-bottom: 16px;">
                 <label style="display: block; font-size: 12px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 8px;">
-                    🎯 {{ __('Target Organizations') }}
+                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">target</span> {{ __('Target Organizations') }}
                 </label>
                 <div style="display: flex; flex-direction: column; gap: 8px;">
                     <label style="display: flex; align-items: center; gap: 10px; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); padding: 10px 14px; border-radius: 12px; cursor: pointer;">
@@ -321,13 +321,13 @@
             <div style="background: rgba(214, 162, 58, 0.1); border: 1px solid rgba(214, 162, 58, 0.3); border-radius: 12px; padding: 14px; margin-bottom: 20px;">
                 <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 12px; font-weight: 700; color: var(--ula-text-primary);">
                     <input type="checkbox" name="overwrite_rooms" value="1" checked style="margin-top: 2px;">
-                    <span>⚠️ {{ __('Overwrite and apply these exact rooms & boundaries') }}</span>
+                    <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">warning</span> {{ __('Overwrite and apply these exact rooms & boundaries') }}</span>
                 </label>
             </div>
 
             <div style="display: flex; justify-content: flex-end; gap: 10px;">
                 <button type="button" onclick="closeSyncModal()" class="tactile-btn btn-secondary">{{ __('Cancel') }}</button>
-                <button type="submit" class="tactile-btn btn-primary">🚀 {{ __('Execute Sync Now') }}</button>
+                <button type="submit" class="tactile-btn btn-primary"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">rocket_launch</span> {{ __('Execute Sync Now') }}</button>
             </div>
         </form>
     </div>
@@ -665,10 +665,10 @@
                 <td><span class="badge-status badge-active" style="font-size: 11px;">${r.access_mode || 'public'}</span></td>
                 <td><strong>${r.capacity || 8}</strong> <span style="font-size: 11px; color: var(--ula-text-muted);">{{ __('seats') }}</span></td>
                 <td><code style="background: var(--ula-surface-page-alt); padding: 4px 8px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-palm-900);">X:${b.x}, Y:${b.y} (${b.width}x${b.height})</code></td>
-                <td>${isIsolated ? '<span class="badge-status badge-active" style="font-size: 11px;">🎙️ {{ __("Acoustic") }}</span>' : '<span class="badge-status" style="font-size: 11px; background: rgba(59, 130, 246, 0.15); color: #60A5FA;">🔊 {{ __("Open") }}</span>'}</td>
+                <td>${isIsolated ? '<span class="badge-status badge-active" style="font-size: 11px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">mic</span> {{ __("Acoustic") }}</span>' : '<span class="badge-status" style="font-size: 11px; background: rgba(59, 130, 246, 0.15); color: var(--ula-accent-default);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">volume_up</span> {{ __("Open") }}</span>'}</td>
                 <td>
                     <button type="button" onclick="event.stopPropagation(); selectRoom(${idx});" class="tactile-btn btn-secondary" style="padding: 4px 8px; font-size: 11px;">
-                        ✏️ {{ __('Edit & Rename') }}
+                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">edit</span> {{ __('Edit & Rename') }}
                     </button>
                 </td>
             `;
@@ -813,7 +813,7 @@
         const btn = document.querySelector('button[onclick="saveAllRoomsToServer()"]');
         const origText = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = '⏳ {{ __("Saving...") }}';
+        btn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">hourglass_empty</span> {{ __("Saving...") }}';
 
         try {
             const res = await fetch("{{ route('superadmin.template.rooms.bulk') }}", {

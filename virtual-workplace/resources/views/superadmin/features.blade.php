@@ -20,17 +20,17 @@
     </div>
 
     @if(session('success'))
-        <div style="background: rgba(60, 107, 76, 0.12); border: 1px solid rgba(60, 107, 76, 0.35); color: var(--ula-status-success); padding: 14px 18px; border-radius: var(--ula-radius-md, 12px); font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+        <div style="background: rgba(60, 107, 76, 0.12); border: 1px solid rgba(60, 107, 76, 0.35); color: var(--ula-status-success); padding: 14px 18px; border-radius: var(--ula-radius-md); font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
             <span class="material-symbols-rounded" style="font-size: 18px;">check_circle</span>
             <span>{{ session('success') }}</span>
         </div>
     @endif
 
-    <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); padding: 24px; box-shadow: var(--ula-shadow-sm);">
+    <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 24px; box-shadow: var(--ula-shadow-sm);">
         <div class="data-table-container" style="overflow-x: auto;">
             <table class="data-table" style="width: 100%; border-collapse: collapse; text-align: start;">
                 <thead>
-                    <tr style="background: var(--ula-surface-page-alt, #F4EDE1); border-bottom: 1px solid var(--ula-border-subtle);">
+                    <tr style="background: var(--ula-surface-page-alt); border-bottom: 1px solid var(--ula-border-subtle);">
                         <th style="padding: 12px 18px; font-size: 11px; font-weight: 700; color: var(--ula-text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: start;">{{ __('Feature Name') }}</th>
                         <th style="padding: 12px 18px; font-size: 11px; font-weight: 700; color: var(--ula-text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: start;">{{ __('Key & Category') }}</th>
                         <th style="padding: 12px 18px; font-size: 11px; font-weight: 700; color: var(--ula-text-muted); text-transform: uppercase; letter-spacing: 0.5px; text-align: start;">{{ __('Description') }}</th>
@@ -78,7 +78,7 @@
                             <td style="padding: 14px 18px; text-align: center;">
                                 <form method="POST" action="{{ route('superadmin.features.toggle', $flag) }}" style="margin: 0;">
                                     @csrf
-                                    <button type="submit" class="tactile-btn" style="padding: 6px 14px; font-size: 11px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 4px; {{ $flag->is_enabled ? 'background: rgba(217, 107, 95, 0.12); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.3);' : 'background: rgba(60, 107, 76, 0.12); color: var(--ula-status-success); border: 1px solid rgba(60, 107, 76, 0.3);' }}">
+                                    <button type="submit" class="tactile-btn" style="padding: 6px 14px; font-size: 11px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 4px; {{ $flag->is_enabled ? 'background: rgba(217, 107, 95, 0.12); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.3);' : 'background: rgba(60, 107, 76, 0.12); color: var(--ula-status-success); border: 1px solid rgba(60, 107, 76, 0.3);' }}">
                                         <span class="material-symbols-rounded" style="font-size: 14px;">{{ $flag->is_enabled ? 'toggle_off' : 'toggle_on' }}</span>
                                         <span>{{ $flag->is_enabled ? __('Disable') : __('Enable') }}</span>
                                     </button>

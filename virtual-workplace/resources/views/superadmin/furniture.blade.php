@@ -6,7 +6,7 @@
 @section('content')
     <!-- KPI Summary Strip -->
     <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
-        <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-top: 4px solid var(--ula-palm-900);">
+        <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-top: 4px solid var(--ula-palm-900);">
             <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <span class="kpi-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Total Assets') }}</span>
                 <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-palm-900);">chair</span>
@@ -14,7 +14,7 @@
             <div class="kpi-value" style="font-size: 26px; font-weight: 800; color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">{{ $stats['total_items'] }}</div>
         </div>
 
-        <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-top: 4px solid var(--ula-status-success);">
+        <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-top: 4px solid var(--ula-status-success);">
             <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <span class="kpi-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Categories') }}</span>
                 <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-status-success);">category</span>
@@ -22,7 +22,7 @@
             <div class="kpi-value" style="font-size: 26px; font-weight: 800; color: var(--ula-status-success); font-family: 'IBM Plex Mono', monospace;">{{ $stats['total_categories'] }}</div>
         </div>
 
-        <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-top: 4px solid var(--ula-gold-500);">
+        <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-top: 4px solid var(--ula-gold-500);">
             <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <span class="kpi-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Custom Uploads') }}</span>
                 <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-gold-500);">image</span>
@@ -35,11 +35,11 @@
     <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px;">
         <!-- Category Filter Pills -->
         <div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
-            <a href="{{ route('superadmin.furniture') }}" class="nav-badge-pill" style="text-decoration: none; padding: 7px 16px; border-radius: var(--ula-radius-pill, 9999px); font-size: 12px; font-weight: 600; {{ !$selectedCategoryId ? 'background: var(--ula-palm-900); color: white;' : 'background: var(--ula-surface-card); color: var(--ula-text-secondary); border: 1px solid var(--ula-border-subtle);' }}">
+            <a href="{{ route('superadmin.furniture') }}" class="nav-badge-pill" style="text-decoration: none; padding: 7px 16px; border-radius: var(--ula-radius-pill); font-size: 12px; font-weight: 600; {{ !$selectedCategoryId ? 'background: var(--ula-palm-900); color: white;' : 'background: var(--ula-surface-card); color: var(--ula-text-secondary); border: 1px solid var(--ula-border-subtle);' }}">
                 <span>{{ __('All Categories') }}</span>
             </a>
             @foreach($categories as $cat)
-                <a href="{{ route('superadmin.furniture', ['category_id' => $cat->id]) }}" class="nav-badge-pill" style="text-decoration: none; padding: 7px 16px; border-radius: var(--ula-radius-pill, 9999px); font-size: 12px; font-weight: 600; {{ $selectedCategoryId == $cat->id ? 'background: var(--ula-palm-900); color: white;' : 'background: var(--ula-surface-card); color: var(--ula-text-secondary); border: 1px solid var(--ula-border-subtle);' }}">
+                <a href="{{ route('superadmin.furniture', ['category_id' => $cat->id]) }}" class="nav-badge-pill" style="text-decoration: none; padding: 7px 16px; border-radius: var(--ula-radius-pill); font-size: 12px; font-weight: 600; {{ $selectedCategoryId == $cat->id ? 'background: var(--ula-palm-900); color: white;' : 'background: var(--ula-surface-card); color: var(--ula-text-secondary); border: 1px solid var(--ula-border-subtle);' }}">
                     <span>{{ $cat->name }} ({{ $cat->items_count }})</span>
                 </a>
             @endforeach
@@ -47,11 +47,11 @@
 
         <!-- Action Buttons -->
         <div style="display: flex; gap: 10px;">
-            <button onclick="openCategoryModal()" class="tactile-btn btn-secondary" style="padding: 9px 16px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 6px;">
+            <button onclick="openCategoryModal()" class="tactile-btn btn-secondary" style="padding: 9px 16px; font-size: 12px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 6px;">
                 <span class="material-symbols-rounded" style="font-size: 16px;">add</span>
                 <span>{{ __('New Category') }}</span>
             </button>
-            <button onclick="openItemModal()" class="tactile-btn btn-primary" style="padding: 9px 18px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 6px;">
+            <button onclick="openItemModal()" class="tactile-btn btn-primary" style="padding: 9px 18px; font-size: 12px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 6px;">
                 <span class="material-symbols-rounded" style="font-size: 16px;">upload</span>
                 <span>{{ __('Upload Furniture Item') }}</span>
             </button>
@@ -59,7 +59,7 @@
     </div>
 
     <!-- Furniture Items Grid -->
-    <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); box-shadow: var(--ula-shadow-sm); margin-bottom: 30px; overflow: hidden;">
+    <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); box-shadow: var(--ula-shadow-sm); margin-bottom: 30px; overflow: hidden;">
         <div class="panel-header" style="padding: 20px 24px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
             <div>
                 <h2 class="panel-title" style="font-size: 16px; font-weight: 800; color: var(--ula-text-primary); margin: 0; display: flex; align-items: center; gap: 8px;">
@@ -75,9 +75,9 @@
                 @endif
                 <div style="position: relative; display: flex; align-items: center;">
                     <span class="material-symbols-rounded" style="position: absolute; inset-inline-start: 12px; font-size: 16px; color: var(--ula-text-muted); pointer-events: none;">search</span>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="{{ __('Search furniture name...') }}" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-pill, 9999px); padding: 8px 14px; padding-inline-start: 36px; font-size: 12px; color: var(--ula-text-primary); outline: none; width: 220px;">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="{{ __('Search furniture name...') }}" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-pill); padding: 8px 14px; padding-inline-start: 36px; font-size: 12px; color: var(--ula-text-primary); outline: none; width: 220px;">
                 </div>
-                <button type="submit" class="tactile-btn btn-secondary" style="padding: 8px 14px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center;">
+                <button type="submit" class="tactile-btn btn-secondary" style="padding: 8px 14px; font-size: 12px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center;">
                     <span class="material-symbols-rounded" style="font-size: 15px;">search</span>
                 </button>
             </form>
@@ -86,10 +86,10 @@
         <div style="padding: 24px;">
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px;">
                 @forelse($items as $item)
-                    <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg, 16px); padding: 14px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--ula-shadow-sm); transition: transform 0.2s ease, box-shadow 0.2s ease; position: relative;">
+                    <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 14px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--ula-shadow-sm); transition: transform 0.2s ease, box-shadow 0.2s ease; position: relative;">
                         <div>
                             <!-- Image / Thumbnail Preview -->
-                            <div style="height: 100px; background: var(--ula-surface-page-alt, #F4EDE1); border-radius: 12px; border: 1px solid var(--ula-border-subtle); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; overflow: hidden; position: relative;">
+                            <div style="height: 100px; background: var(--ula-surface-page-alt); border-radius: 12px; border: 1px solid var(--ula-border-subtle); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; overflow: hidden; position: relative;">
                                 @if($item->image_url)
                                     <img src="{{ $item->image_url }}" alt="{{ $item->name }}" style="max-height: 85px; max-width: 85%; object-fit: contain;">
                                 @else
@@ -142,7 +142,7 @@
                         <span class="material-symbols-rounded" style="font-size: 36px; display: block; margin-bottom: 8px; opacity: 0.5;">chair</span>
                         <h4 style="font-size: 15px; font-weight: 700; color: var(--ula-text-primary); margin-bottom: 4px;">{{ __('No furniture items found') }}</h4>
                         <p style="font-size: 12px; color: var(--ula-text-muted); margin-bottom: 14px;">{{ __('Upload pictures and configure furniture assets to appear in the Floor Map Editor.') }}</p>
-                        <button onclick="openItemModal()" class="tactile-btn btn-primary" style="padding: 8px 18px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 6px;">
+                        <button onclick="openItemModal()" class="tactile-btn btn-primary" style="padding: 8px 18px; font-size: 12px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 6px;">
                             <span class="material-symbols-rounded" style="font-size: 16px;">add</span>
                             <span>{{ __('Upload First Item') }}</span>
                         </button>
@@ -160,7 +160,7 @@
     </div>
 
     <!-- Categories Management Table -->
-    <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl, 20px); box-shadow: var(--ula-shadow-sm); overflow: hidden;">
+    <div class="panel-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); box-shadow: var(--ula-shadow-sm); overflow: hidden;">
         <div class="panel-header" style="padding: 20px 24px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
             <div>
                 <h2 class="panel-title" style="font-size: 16px; font-weight: 800; color: var(--ula-text-primary); margin: 0; display: flex; align-items: center; gap: 8px;">
@@ -169,7 +169,7 @@
                 </h2>
                 <p class="panel-subtitle" style="font-size: 12px; color: var(--ula-text-secondary); margin: 2px 0 0 0;">{{ __('Organize furniture accordions in the customization drawer.') }}</p>
             </div>
-            <button onclick="openCategoryModal()" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px; border-radius: var(--ula-radius-pill, 9999px); display: inline-flex; align-items: center; gap: 6px;">
+            <button onclick="openCategoryModal()" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 6px;">
                 <span class="material-symbols-rounded" style="font-size: 16px;">add</span>
                 <span>{{ __('New Category') }}</span>
             </button>
@@ -216,7 +216,7 @@
 
     <!-- Modal 1: Upload / Edit Furniture Item -->
     <div id="item-modal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(20, 43, 36, 0.45); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; padding: 20px; overflow-y: auto;">
-        <div class="modal-card" style="border-radius: var(--ula-radius-xl, 20px); padding: 28px; width: 100%; max-width: 580px; position: relative; margin: auto;">
+        <div class="modal-card" style="border-radius: var(--ula-radius-xl); padding: 28px; width: 100%; max-width: 580px; position: relative; margin: auto;">
             
             <!-- Modal Header -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--ula-border-subtle); padding-bottom: 14px;">
@@ -344,7 +344,7 @@
 
     <!-- Modal 2: Create / Edit Category -->
     <div id="category-modal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(20, 43, 36, 0.45); backdrop-filter: blur(8px); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
-        <div class="modal-card" style="border-radius: var(--ula-radius-xl, 20px); padding: 28px; width: 100%; max-width: 440px; position: relative;">
+        <div class="modal-card" style="border-radius: var(--ula-radius-xl); padding: 28px; width: 100%; max-width: 440px; position: relative;">
             
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--ula-border-subtle); padding-bottom: 14px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
