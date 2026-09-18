@@ -68,7 +68,7 @@
             </div>
 
             <!-- Center: Blueprint Status -->
-            <div style="font-size: 12px; font-weight: 800; color: var(--ula-palm-900); display: flex; align-items: center; gap: 8px;">
+            <div style="font-size: 12px; font-weight: 800; color: var(--ula-text-primary); display: flex; align-items: center; gap: 8px;">
                 <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">architecture</span> {{ $template->width }}x{{ $template->height }} Grid</span>
                 <span style="color: var(--ula-text-muted);">•</span>
                 <span id="canvas-rooms-count">{{ count($template->rooms_data ?: []) }} {{ __('Rooms Configured') }}</span>
@@ -135,7 +135,7 @@
                 
                 <!-- 1. Room Name (Rename) -->
                 <div>
-                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-palm-900); margin-bottom: 6px;">
+                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 6px;">
                         <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">label</span> {{ __('Room Name') }}
                     </label>
                     <input type="text" id="insp-name" oninput="updateSelectedRoomProp('name', this.value)" placeholder="e.g. Executive Board Room" style="width: 100%; background: var(--ula-surface-page-alt); border: 2px solid var(--ula-palm-900); border-radius: 10px; padding: 10px 12px; color: var(--ula-text-primary); font-size: 13px; font-weight: 800; outline: none; box-shadow: var(--ula-shadow-xs);">
@@ -664,7 +664,7 @@
                 <td><span class="badge-status badge-plan" style="font-size: 11px; text-transform: uppercase;">${r.type || 'meeting'}</span></td>
                 <td><span class="badge-status badge-active" style="font-size: 11px;">${r.access_mode || 'public'}</span></td>
                 <td><strong>${r.capacity || 8}</strong> <span style="font-size: 11px; color: var(--ula-text-muted);">{{ __('seats') }}</span></td>
-                <td><code style="background: var(--ula-surface-page-alt); padding: 4px 8px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-palm-900);">X:${b.x}, Y:${b.y} (${b.width}x${b.height})</code></td>
+                <td><code style="background: var(--ula-surface-page-alt); padding: 4px 8px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-text-primary);">X:${b.x}, Y:${b.y} (${b.width}x${b.height})</code></td>
                 <td>${isIsolated ? '<span class="badge-status badge-active" style="font-size: 11px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">mic</span> {{ __("Acoustic") }}</span>' : '<span class="badge-status" style="font-size: 11px; background: rgba(59, 130, 246, 0.15); color: var(--ula-accent-default);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">volume_up</span> {{ __("Open") }}</span>'}</td>
                 <td>
                     <button type="button" onclick="event.stopPropagation(); selectRoom(${idx});" class="tactile-btn btn-secondary" style="padding: 4px 8px; font-size: 11px;">

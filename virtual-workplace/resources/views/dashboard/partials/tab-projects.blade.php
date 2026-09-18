@@ -147,7 +147,7 @@
                                 </div>
                             </td>
                             <td style="font-size: 12px; font-weight: 500; font-family: 'IBM Plex Mono', monospace;">{{ $p->due_date ? $p->due_date->format('M d, Y') : '—' }}</td>
-                            <td style="font-weight: 700; color: var(--ula-palm-900); font-family: 'IBM Plex Mono', monospace;">${{ number_format($p->budget_amount ?? 0, 0) }}</td>
+                            <td style="font-weight: 700; color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">${{ number_format($p->budget_amount ?? 0, 0) }}</td>
                             <td>
                                 @if($canOpenHub)
                                     <x-btn variant="primary" size="sm" href="{{ route('projects.hub', $p->id) }}" onclick="event.stopPropagation();" icon="analytics">

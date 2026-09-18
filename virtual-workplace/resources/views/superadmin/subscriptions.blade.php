@@ -48,7 +48,7 @@
     <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-inline-start: 4px solid var(--ula-palm-900);">
         <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <span class="kpi-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Total Requests') }}</span>
-            <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-palm-900);">receipt_long</span>
+            <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-text-primary);">receipt_long</span>
         </div>
         <div class="kpi-value" style="font-size: 26px; font-weight: 800; color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">{{ $stats['total'] }}</div>
         <div class="kpi-subtext" style="font-size: 11px; color: var(--ula-text-muted); margin-top: 4px;">{{ __('All time wire transfer requests') }}</div>
@@ -122,8 +122,8 @@
                     <!-- Company Info -->
                     <td style="padding: 16px 20px;">
                         @if($req->organization)
-                            <a href="{{ route('superadmin.companies.show', $req->organization_id) }}" style="font-weight: 700; color: var(--ula-palm-900); text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 8px;">
-                                <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(20,43,36,0.08); display: flex; align-items: center; justify-content: center; color: var(--ula-palm-900); font-size: 12px; font-weight: 700;">
+                            <a href="{{ route('superadmin.companies.show', $req->organization_id) }}" style="font-weight: 700; color: var(--ula-text-primary); text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 8px;">
+                                <div style="width: 28px; height: 28px; border-radius: 8px; background: rgba(20,43,36,0.08); display: flex; align-items: center; justify-content: center; color: var(--ula-text-primary); font-size: 12px; font-weight: 700;">
                                     {{ strtoupper(substr($req->organization->name, 0, 2)) }}
                                 </div>
                                 <span>{{ $req->organization->name }}</span>
@@ -152,7 +152,7 @@
                         <div style="font-weight: 800; color: var(--ula-text-primary); font-size: 14px; font-family: 'IBM Plex Mono', monospace;">
                             {{ number_format($req->amount, 2) }} <span style="font-size: 11px; font-weight: 600; color: var(--ula-text-secondary);">{{ $req->currency }}</span>
                         </div>
-                        <div style="font-size: 11px; color: var(--ula-palm-900); font-weight: 700;">
+                        <div style="font-size: 11px; color: var(--ula-text-primary); font-weight: 700;">
                             {{ $req->billing_cycle === 'yearly' ? __('Yearly') : __('Monthly') }}
                         </div>
                     </td>
@@ -166,7 +166,7 @@
                         <div style="font-size: 11px; color: var(--ula-text-secondary); margin-top: 2px;">
                             <strong>{{ __('Sender') }}:</strong> {{ $req->sender_name }}
                         </div>
-                        <div style="font-size: 11px; font-family: 'IBM Plex Mono', monospace; color: var(--ula-palm-900); font-weight: 700; margin-top: 2px;">
+                        <div style="font-size: 11px; font-family: 'IBM Plex Mono', monospace; color: var(--ula-text-primary); font-weight: 700; margin-top: 2px;">
                             #{{ $req->transfer_reference }}
                         </div>
                         <div style="font-size: 10px; color: var(--ula-text-muted); margin-top: 2px; font-family: 'IBM Plex Mono', monospace;">
@@ -308,7 +308,7 @@
         <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 12px; padding: 14px; margin-bottom: 18px;">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;">
                 <div><span style="color: var(--ula-text-muted);">{{ __('Company') }}:</span> <strong id="approveOrgName" style="color: var(--ula-text-primary);">—</strong></div>
-                <div><span style="color: var(--ula-text-muted);">{{ __('Target Plan') }}:</span> <strong id="approvePlanName" style="color: var(--ula-palm-900);">—</strong></div>
+                <div><span style="color: var(--ula-text-muted);">{{ __('Target Plan') }}:</span> <strong id="approvePlanName" style="color: var(--ula-text-primary);">—</strong></div>
                 <div><span style="color: var(--ula-text-muted);">{{ __('Amount') }}:</span> <strong id="approveAmount" style="color: var(--ula-text-primary);">—</strong></div>
                 <div><span style="color: var(--ula-text-muted);">{{ __('Action') }}:</span> <strong style="color: var(--ula-status-success);">{{ __('Instant Activation') }}</strong></div>
             </div>
@@ -415,7 +415,7 @@
             </div>
             <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--ula-border-subtle);">
                 <span style="color: var(--ula-text-muted);">{{ __('Plan') }}:</span>
-                <strong id="detPlan" style="color: var(--ula-palm-900);"></strong>
+                <strong id="detPlan" style="color: var(--ula-text-primary);"></strong>
             </div>
             <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--ula-border-subtle);">
                 <span style="color: var(--ula-text-muted);">{{ __('Amount') }}:</span>
@@ -431,7 +431,7 @@
             </div>
             <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--ula-border-subtle);">
                 <span style="color: var(--ula-text-muted);">{{ __('Reference #') }}:</span>
-                <span id="detRef" style="font-family: 'IBM Plex Mono', monospace; font-weight: 700; color: var(--ula-palm-900);"></span>
+                <span id="detRef" style="font-family: 'IBM Plex Mono', monospace; font-weight: 700; color: var(--ula-text-primary);"></span>
             </div>
             <div style="display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid var(--ula-border-subtle);">
                 <span style="color: var(--ula-text-muted);">{{ __('Status') }}:</span>

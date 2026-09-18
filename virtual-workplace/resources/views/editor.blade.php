@@ -239,7 +239,7 @@
         }
         .act-btn-secondary:hover {
             border-color: var(--ula-palm-900);
-            color: var(--ula-palm-900);
+            color: var(--ula-text-primary);
         }
 
         /* Floating View Nav Overlay */
@@ -275,7 +275,7 @@
         }
         .view-btn:hover {
             border-color: var(--ula-palm-900);
-            color: var(--ula-palm-900);
+            color: var(--ula-text-primary);
             transform: scale(1.05);
         }
 
@@ -927,7 +927,7 @@
                             $totalCatalogCount = $furnitureCategories->sum(function($c) { return $c->items->count(); }) + 12;
                         @endphp
                         <span id="catalog-count-label" style="font-weight: 700; color: var(--ula-status-success);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">auto_awesome</span> {{ $totalCatalogCount }} {{ __('Items Available') }}</span>
-                        <button type="button" onclick="expandAllCategories()" style="background:none; border:none; color:var(--ula-palm-900); font-size:11px; font-weight:800; cursor:pointer; text-decoration: underline;">
+                        <button type="button" onclick="expandAllCategories()" style="background:none; border:none; color: var(--ula-text-primary); font-size:11px; font-weight:800; cursor:pointer; text-decoration: underline;">
                             {{ __('Toggle All') }}
                         </button>
                     </div>
@@ -1181,7 +1181,7 @@
                             </div>
                             <div>
                                 <label class="prop-label">{{ __('Interaction') }}</label>
-                                <div id="prop-interaction-badge" style="font-size: 11px; font-weight: 700; color: var(--ula-palm-900); padding: 4px 8px; background: rgba(16,185,129,0.1); border-radius: 6px; display: inline-block;">NONE</div>
+                                <div id="prop-interaction-badge" style="font-size: 11px; font-weight: 700; color: var(--ula-text-primary); padding: 4px 8px; background: rgba(16,185,129,0.1); border-radius: 6px; display: inline-block;">NONE</div>
                             </div>
 
                             <!-- <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> 1. Company Logo / Branding Inspector Box -->
@@ -1313,7 +1313,7 @@
                                 <label class="prop-label">{{ __('Door Position on Wall') }}</label>
                                 <div style="display: flex; align-items: center; gap: 8px;">
                                     <input type="range" class="prop-input" id="prop-room-door-offset" min="15" max="85" value="50" step="5" oninput="updateRoomProp('doorOffset', this.value / 100); document.getElementById('door-offset-val').textContent = this.value + '%';">
-                                    <span id="door-offset-val" style="font-size: 11px; font-weight: 800; color: var(--ula-palm-900); min-width: 32px;">50%</span>
+                                    <span id="door-offset-val" style="font-size: 11px; font-weight: 800; color: var(--ula-text-primary); min-width: 32px;">50%</span>
                                 </div>
                             </div>
 
@@ -3356,7 +3356,7 @@
                 <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
                     <div>
                         <span style="font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--ula-text-muted); display: block;">{{ __('Active Subscription Tier') }}</span>
-                        <strong style="font-size: 14px; color: var(--ula-palm-900);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">star</span> {{ $plan->name ?? 'Standard Plan' }}</strong>
+                        <strong style="font-size: 14px; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">star</span> {{ $plan->name ?? 'Standard Plan' }}</strong>
                     </div>
                     <div style="display: flex; gap: 16px; align-items: center;">
                         <div style="text-align: center;">

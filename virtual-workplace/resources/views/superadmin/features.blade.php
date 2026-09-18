@@ -50,10 +50,10 @@
                                 </span>
                             </td>
                             <td style="padding: 14px 18px;">
-                                <span style="font-size: 11px; font-family: 'IBM Plex Mono', monospace; font-weight: 700; color: var(--ula-palm-900); display: block;">
+                                <span style="font-size: 11px; font-family: 'IBM Plex Mono', monospace; font-weight: 700; color: var(--ula-text-primary); display: block;">
                                     {{ $flag->flag_key }}
                                 </span>
-                                <span class="nav-badge-pill" style="font-size: 10px; padding: 2px 6px; background: rgba(20,43,36,0.06); color: var(--ula-palm-900);">
+                                <span class="nav-badge-pill" style="font-size: 10px; padding: 2px 6px; background: rgba(20,43,36,0.06); color: var(--ula-text-primary);">
                                     {{ ucfirst($flag->category) }}
                                 </span>
                             </td>

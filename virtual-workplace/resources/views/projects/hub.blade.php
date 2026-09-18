@@ -246,7 +246,7 @@
         }
 
         .breadcrumb-trail a:hover {
-            color: var(--ula-palm-900);
+            color: var(--ula-text-primary);
         }
 
         .breadcrumb-separator {
@@ -404,7 +404,7 @@
 
         .hub-tab-btn.active {
             background: var(--ula-surface-card);
-            color: var(--ula-palm-900);
+            color: var(--ula-text-primary);
             box-shadow: var(--ula-shadow-xs);
         }
 
@@ -548,7 +548,7 @@
         }
         .ctx-quick-btn:hover {
             background: rgba(36, 92, 58, 0.12);
-            color: var(--ula-palm-900);
+            color: var(--ula-text-primary);
             border-color: var(--ula-palm-900);
             transform: translateY(-1px);
         }
@@ -568,7 +568,7 @@
         }
         .ctx-item:hover {
             background: var(--ula-surface-page-alt);
-            color: var(--ula-palm-900);
+            color: var(--ula-text-primary);
             border-color: var(--ula-border-subtle);
             transform: translateX({{ app()->getLocale() === 'ar' ? '-2px' : '2px' }});
         }
@@ -957,7 +957,7 @@
             color: var(--ula-text-primary);
         }
         .task-inspector-tab-btn.active {
-            color: var(--ula-palm-900);
+            color: var(--ula-text-primary);
             border-bottom-color: var(--ula-palm-900);
             background: rgba(79, 155, 95, 0.08);
             border-radius: 6px 6px 0 0;
@@ -1175,7 +1175,7 @@
                     <span class="breadcrumb-separator">/</span>
                     <a href="{{ route('dashboard') }}#projects"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> {{ __('Projects') }}</a>
                     <span class="breadcrumb-separator">/</span>
-                    <span style="color: var(--ula-palm-900); font-weight: 900;">{{ $project->name }} ({{ $project->code }})</span>
+                    <span style="color: var(--ula-text-primary); font-weight: 900;">{{ $project->name }} ({{ $project->code }})</span>
                 </div>
             </div>
 
@@ -1207,7 +1207,7 @@
                             <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span>
                         </div>
                         <div>
-                            <div style="font-size: 11px; font-weight: 800; color: var(--ula-palm-900); text-transform: uppercase;">
+                            <div style="font-size: 11px; font-weight: 800; color: var(--ula-text-primary); text-transform: uppercase;">
                                 {{ __('Active Timer Running') }} • {{ $activeTimer->project->name ?? 'Project' }}
                             </div>
                             <div style="font-size: 14px; font-weight: 800; color: var(--ula-text-primary);">
@@ -1216,7 +1216,7 @@
                         </div>
                     </div>
                     <div style="display: flex; align-items: center; gap: 14px;">
-                        <span id="hub-live-timer-clock" style="font-size: 20px; font-weight: 900; font-family: monospace; color: var(--ula-palm-900);">00:00:00</span>
+                        <span id="hub-live-timer-clock" style="font-size: 20px; font-weight: 900; font-family: monospace; color: var(--ula-text-primary);">00:00:00</span>
                         <button onclick="stopHubGlobalTimer()" class="tactile-btn" style="background: var(--ula-terracotta-200); color: var(--ula-terracotta-600); border: 1px solid var(--ula-terracotta-300); padding: 6px 14px; font-size: 12px;">
                             <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">stop_circle</span> {{ __('Stop Timer') }}
                         </button>
@@ -1278,7 +1278,7 @@
                         <span class="kpi-title">{{ __('Task Progress') }}</span>
                         <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bar_chart</span></div>
                     </div>
-                    <div class="kpi-value" style="color: var(--ula-palm-900);">{{ $kpis['progress_pct'] ?? 0 }}%</div>
+                    <div class="kpi-value" style="color: var(--ula-text-primary);">{{ $kpis['progress_pct'] ?? 0 }}%</div>
                     <div style="width: 100%; background: var(--ula-surface-page-alt); height: 7px; border-radius: 9999px; overflow: hidden; margin-bottom: 6px;">
                         <div style="width: {{ $kpis['progress_pct'] ?? 0 }}%; height: 100%; background: var(--ula-palm-900); border-radius: 9999px;"></div>
                     </div>
@@ -1326,7 +1326,7 @@
                         <span class="kpi-title">{{ __('Revenue & Margin') }}</span>
                         <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">trending_up</span></div>
                     </div>
-                    <div class="kpi-value" style="color: var(--ula-palm-900);">${{ number_format($kpis['billable_revenue'] ?? 0, 2) }}</div>
+                    <div class="kpi-value" style="color: var(--ula-text-primary);">${{ number_format($kpis['billable_revenue'] ?? 0, 2) }}</div>
                     <div style="font-size: 11px; color: var(--ula-text-secondary); margin-bottom: 4px;">
                         {{ __('Gross Margin') }}: <strong>${{ number_format($kpis['gross_margin'] ?? 0, 2) }}</strong>
                     </div>
@@ -1357,7 +1357,7 @@
                         <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span></div>
                     </div>
                     <div class="kpi-value">{{ $upcomingProjectMeetings->count() }}</div>
-                    <div style="font-size: 11px; color: var(--ula-palm-900); margin-bottom: 4px; font-weight: 800;">
+                    <div style="font-size: 11px; color: var(--ula-text-primary); margin-bottom: 4px; font-weight: 800;">
                         <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> {{ __('Ready for collaboration') }}
                     </div>
                     <div style="font-size: 11px; color: var(--ula-text-muted);">
@@ -1593,7 +1593,7 @@
                                                 </select>
                                             </div>
 
-                                            <button type="button" onclick="event.stopPropagation(); startHubTaskTimerDirect('{{ $project->id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($project->name) }}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-palm-900); border: 1px solid rgba(79, 155, 95, 0.3); padding: 3px 8px; font-size: 10.5px; border-radius: var(--ula-radius-pill); font-weight: 800; white-space: nowrap; flex-shrink: 0;" title="{{ __('Start Timer') }}">
+                                            <button type="button" onclick="event.stopPropagation(); startHubTaskTimerDirect('{{ $project->id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($project->name) }}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-text-primary); border: 1px solid rgba(79, 155, 95, 0.3); padding: 3px 8px; font-size: 10.5px; border-radius: var(--ula-radius-pill); font-weight: 800; white-space: nowrap; flex-shrink: 0;" title="{{ __('Start Timer') }}">
                                                 <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">play_arrow</span> {{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h
                                             </button>
                                         </div>
@@ -1706,7 +1706,7 @@
                                         </td>
                                         <td>
                                             @if($t->milestone)
-                                                <span class="badge-pill" style="font-size: 10px; font-weight: 700; background: rgba(79, 155, 95, 0.12); color: var(--ula-palm-900);">
+                                                <span class="badge-pill" style="font-size: 10px; font-weight: 700; background: rgba(79, 155, 95, 0.12); color: var(--ula-text-primary);">
                                                     <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ $t->milestone->name }}
                                                 </span>
                                             @else
@@ -1732,7 +1732,7 @@
                                             </div>
                                         </td>
                                         <td style="font-family: monospace; font-weight: 800;">
-                                            <span style="color: var(--ula-palm-900);">{{ $t->actual_hours ?? 0 }}h</span>
+                                            <span style="color: var(--ula-text-primary);">{{ $t->actual_hours ?? 0 }}h</span>
                                             <span style="color: var(--ula-text-muted);">/ {{ $t->estimated_hours ?? 0 }}h</span>
                                         </td>
                                         <td>
@@ -1822,7 +1822,7 @@
                                             {{ $te->task ? '#' . $te->task->task_number . ' ' . $te->task->title : __('General Project Work') }}
                                         </span>
                                     </td>
-                                    <td style="font-family: monospace; font-weight: 900; color: var(--ula-palm-900); font-size: 14px;">
+                                    <td style="font-family: monospace; font-weight: 900; color: var(--ula-text-primary); font-size: 14px;">
                                         {{ number_format($te->duration_seconds / 3600, 2) }}h
                                     </td>
                                     <td style="font-size: 12px; color: var(--ula-text-secondary);">
@@ -1906,7 +1906,7 @@
                                         {{ $m->duration_minutes ?? 30 }} {{ __('Minutes') }}
                                     </td>
                                     <td>
-                                        <strong style="color: var(--ula-palm-900); font-size: 12px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span> {{ $m->room->name ?? 'Meeting Room' }}</strong>
+                                        <strong style="color: var(--ula-text-primary); font-size: 12px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span> {{ $m->room->name ?? 'Meeting Room' }}</strong>
                                     </td>
                                     <td>
                                         <span style="font-weight: 700; font-size: 12px;">{{ $m->creator->name ?? 'Admin' }}</span>
@@ -1999,7 +1999,7 @@
                                     <td style="font-weight: 800;">
                                         {{ $memberTasksCount }} {{ __('Tasks') }}
                                     </td>
-                                    <td style="font-family: monospace; font-weight: 900; color: var(--ula-palm-900); font-size: 14px;">
+                                    <td style="font-family: monospace; font-weight: 900; color: var(--ula-text-primary); font-size: 14px;">
                                         {{ number_format($memberHours, 1) }}h
                                     </td>
                                     <td style="font-family: monospace; font-weight: 700; color: var(--ula-text-secondary);">
@@ -2051,7 +2051,7 @@
                                 </div>
                                 
                                 <div style="display: flex; align-items: center; gap: 8px;">
-                                    <span style="font-size: 22px; font-weight: 900; font-family: monospace; color: var(--ula-palm-900);">{{ $ms->progress_percentage }}%</span>
+                                    <span style="font-size: 22px; font-weight: 900; font-family: monospace; color: var(--ula-text-primary);">{{ $ms->progress_percentage }}%</span>
                                     <button type="button" onclick="quickToggleMilestoneStatus('{{ $ms->id }}', '{{ $ms->status === 'completed' ? 'pending' : 'completed' }}')" class="tactile-btn {{ $ms->status === 'completed' ? 'btn-secondary' : 'btn-primary' }}" style="padding: 5px 10px; font-size: 11px;">
                                         {!! $ms->status === 'completed' ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">undo</span> ' . __('Reopen') : '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check</span> ' . __('Mark Completed') !!}
                                     </button>
@@ -2071,7 +2071,7 @@
                                 <span class="badge-pill badge-neutral" style="font-size: 11px; font-weight: 700;">
                                     ⊞ {{ $ms->completed_tasks_count }} / {{ $ms->tasks_count }} {{ __('Tasks Done') }}
                                 </span>
-                                <span class="badge-pill badge-neutral" style="font-size: 11px; font-weight: 700; color: var(--ula-palm-900);">
+                                <span class="badge-pill badge-neutral" style="font-size: 11px; font-weight: 700; color: var(--ula-text-primary);">
                                     <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span> {{ $ms->actualHours() }}h {{ __('Hours Logged') }}
                                 </span>
                             </div>
@@ -2197,7 +2197,7 @@
                                         </div>
                                     </td>
                                     <td style="font-weight: 800;">{{ $wm['tasks_count'] }} {{ __('Tasks') }}</td>
-                                    <td style="font-weight: 800; color: var(--ula-palm-900);">{{ number_format($wm['assigned_hours'], 1) }}h</td>
+                                    <td style="font-weight: 800; color: var(--ula-text-primary);">{{ number_format($wm['assigned_hours'], 1) }}h</td>
                                     <td style="color: var(--ula-text-muted);">{{ $wm['capacity'] }}h / {{ __('week') }}</td>
                                     <td>
                                         <div style="display: flex; align-items: center; gap: 8px;">
@@ -2302,7 +2302,7 @@
                                     @endif
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 10px;">
-                                    <span style="font-size: 22px; font-weight: 900; font-family: monospace; color: var(--ula-palm-900);">{{ $goal->progress_percentage }}%</span>
+                                    <span style="font-size: 22px; font-weight: 900; font-family: monospace; color: var(--ula-text-primary);">{{ $goal->progress_percentage }}%</span>
                                 </div>
                             </div>
 
@@ -2327,10 +2327,10 @@
                                         <span>{{ $targetIcon }}</span>
                                         <span>{{ $target->title }}</span>
                                         @if(in_array($target->target_type, ['tasks', 'milestones', 'hours']))
-                                            <span class="badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.12); color: var(--ula-palm-900);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('Auto-Tracked') }}</span>
+                                            <span class="badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.12); color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('Auto-Tracked') }}</span>
                                         @endif
                                     </span>
-                                    <span style="font-weight: 800; color: var(--ula-palm-900); font-family: monospace; font-size: 12px;">
+                                    <span style="font-weight: 800; color: var(--ula-text-primary); font-family: monospace; font-size: 12px;">
                                         {{ $target->current_value }} / {{ $target->target_value }} {{ $target->unit }}
                                         @if($target->is_completed)
                                             <span style="color: var(--ula-status-success); margin-inline-start: 4px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check</span></span>
@@ -2340,7 +2340,7 @@
                                 @empty
                                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; background: var(--ula-surface-card); padding: 8px 12px; border-radius: var(--ula-radius-sm); border: 1px solid var(--ula-border-subtle);">
                                     <span style="font-weight: 700; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('Tasks Completed in Project') }}</span>
-                                    <span style="font-weight: 800; color: var(--ula-palm-900); font-family: monospace;">
+                                    <span style="font-weight: 800; color: var(--ula-text-primary); font-family: monospace;">
                                         {{ $project->tasks()->where('status', 'done')->count() }} / {{ $project->tasks()->count() }} {{ __('Tasks') }}
                                     </span>
                                 </div>
@@ -3857,7 +3857,7 @@
                         box.style = 'background: var(--ula-surface-page-alt); padding: 8px 12px; border-radius: 8px; font-size: 12px; border: 1px solid var(--ula-border-subtle);';
                         box.innerHTML = `
                             <div style="display: flex; justify-content: space-between; margin-bottom: 2px; font-weight: 800; font-size: 11px;">
-                                <span style="color: var(--ula-palm-900);">👤 ${c.user ? c.user.name : 'Member'}</span>
+                                <span style="color: var(--ula-text-primary);">👤 ${c.user ? c.user.name : 'Member'}</span>
                                 <span style="color: var(--ula-text-muted);">${new Date(c.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                             </div>
                             <div style="color: var(--ula-text-primary); line-height: 1.4;">${c.body}</div>

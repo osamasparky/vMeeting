@@ -534,7 +534,7 @@
         }
         .badge-plan, .badge-teal, .badge-blue {
             background: rgba(20, 43, 36, 0.12) !important;
-            color: var(--ula-palm-900) !important;
+            color: var(--ula-text-primary) !important;
             border-color: rgba(20, 43, 36, 0.25) !important;
         }
         [data-theme="dark"] .badge-plan, [data-theme="dark"] .badge-teal, [data-theme="dark"] .badge-blue {

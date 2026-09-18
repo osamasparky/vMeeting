@@ -179,7 +179,7 @@
                         <label style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">
                             <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">group</span> {{ __('Select Project Members to Attend') }}
                         </label>
-                        <button type="button" onclick="toggleAllHubProjectAttendees()" style="background: none; border: none; font-size: 11px; font-weight: 800; color: var(--ula-palm-900); cursor: pointer;">
+                        <button type="button" onclick="toggleAllHubProjectAttendees()" style="background: none; border: none; font-size: 11px; font-weight: 800; color: var(--ula-text-primary); cursor: pointer;">
                             <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check</span> {{ __('Select / Unselect All') }}
                         </button>
                     </div>
@@ -257,7 +257,7 @@
                     </div>
 
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <span id="task-modal-hours-pill" style="font-family: monospace; font-size: 11px; font-weight: 800; color: var(--ula-palm-900);">0h / 0h</span>
+                        <span id="task-modal-hours-pill" style="font-family: monospace; font-size: 11px; font-weight: 800; color: var(--ula-text-primary);">0h / 0h</span>
                         <button id="task-modal-timer-btn" onclick="toggleTaskTimerAction()" class="tactile-btn btn-secondary" style="padding: 5px 12px; font-size: 11px;">
                             ⏱️ {{ __('Start Timer') }}
                         </button>
@@ -321,7 +321,7 @@
                         <span style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted);">@ {{ __('Mention') }}:</span>
                         @foreach($allMembers->take(6) as $chipMember)
                             @if($chipMember->user_id !== $user->id)
-                                <button type="button" onclick="insertHubMentionHandle('{{ $chipMember->user->name }}')" class="badge-pill" style="cursor: pointer; font-size: 10px; border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-page-alt); color: var(--ula-palm-900);" title="{{ __('Mention :name', ['name' => $chipMember->user->name]) }}">
+                                <button type="button" onclick="insertHubMentionHandle('{{ $chipMember->user->name }}')" class="badge-pill" style="cursor: pointer; font-size: 10px; border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-page-alt); color: var(--ula-text-primary);" title="{{ __('Mention :name', ['name' => $chipMember->user->name]) }}">
                                     @<span>{{ $chipMember->user->name }}</span>
                                 </button>
                             @endif
@@ -349,7 +349,7 @@
                         <span style="font-size: 11px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;">
                             <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">description</span> {{ __('Chronological Audit Trail & Mutation History') }}
                         </span>
-                        <span style="font-size: 10px; color: var(--ula-palm-900); font-weight: 700;">
+                        <span style="font-size: 10px; color: var(--ula-text-primary); font-weight: 700;">
                             <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">lock</span> {{ __('Tamper-proof Logged') }}
                         </span>
                     </div>

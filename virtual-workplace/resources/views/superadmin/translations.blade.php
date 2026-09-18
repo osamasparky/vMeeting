@@ -87,7 +87,7 @@
                             <tr style="border-bottom: 1px solid var(--ula-border-subtle); transition: background 0.15s ease;">
                                 <td style="padding: 12px 20px; vertical-align: top;">
                                     <input type="hidden" name="keys[]" value="{{ $item['key'] }}">
-                                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 700; color: var(--ula-palm-900); word-break: break-all; max-width: 320px; line-height: 1.4;">
+                                    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 700; color: var(--ula-text-primary); word-break: break-all; max-width: 320px; line-height: 1.4;">
                                         {{ $item['key'] }}
                                     </div>
                                 </td>

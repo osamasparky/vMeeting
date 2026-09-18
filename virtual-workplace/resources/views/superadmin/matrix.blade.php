@@ -57,10 +57,10 @@
     @foreach($permissions as $group => $groupPerms)
     <div class="panel-card matrix-group-card" style="margin-bottom: 24px; border-radius: var(--ula-radius-xl); padding: 22px; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-sm);">
         <div class="panel-header" style="margin-bottom: 14px; padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--ula-border-subtle);">
-            <div class="panel-title" style="font-size: 15px; color: var(--ula-palm-900); display: flex; align-items: center; gap: 8px; font-weight: 800;">
+            <div class="panel-title" style="font-size: 15px; color: var(--ula-text-primary); display: flex; align-items: center; gap: 8px; font-weight: 800;">
                 <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 20px;">{{ $groupIcons[$group] ?? 'folder' }}</span>
                 <span>{{ $group }} {{ __('Permissions') }}</span>
-                <span class="nav-badge-pill" style="font-size: 11px; padding: 2px 8px; background: rgba(20,43,36,0.06); color: var(--ula-palm-900); font-family: 'IBM Plex Mono', monospace;">{{ $groupPerms->count() }}</span>
+                <span class="nav-badge-pill" style="font-size: 11px; padding: 2px 8px; background: rgba(20,43,36,0.06); color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">{{ $groupPerms->count() }}</span>
             </div>
             <button type="button" onclick="toggleGroupAll('{{ Str::slug($group) }}')" class="tactile-btn btn-secondary" style="padding: 4px 10px; font-size: 11px; display: inline-flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 13px;">check_box</span>
@@ -85,7 +85,7 @@
                     @foreach($groupPerms as $perm)
                     <tr class="matrix-perm-row" data-perm-key="{{ strtolower($perm->key) }}" data-perm-desc="{{ strtolower($perm->description) }}" style="border-bottom: 1px solid var(--ula-border-subtle); transition: background 0.15s ease;">
                         <td style="padding: 12px 16px;">
-                            <div style="font-weight: 700; color: var(--ula-palm-900); font-size: 12px; font-family: 'IBM Plex Mono', monospace;">{{ $perm->key }}</div>
+                            <div style="font-weight: 700; color: var(--ula-text-primary); font-size: 12px; font-family: 'IBM Plex Mono', monospace;">{{ $perm->key }}</div>
                             <div style="font-size: 11px; color: var(--ula-text-secondary); margin-top: 2px;">{{ $perm->description }}</div>
                         </td>
                         @foreach($roles as $role)

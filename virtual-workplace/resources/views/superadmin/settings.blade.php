@@ -74,7 +74,7 @@
                             type="text"
                             name="ws_url"
                             value="{{ $globalSettings['ws_url'] ?? 'ws://127.0.0.1:8080' }}"
-                            style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 12px 14px; color: var(--ula-palm-900); outline: none; font-size: 13px; font-family: 'IBM Plex Mono', monospace; font-weight: 700;"
+                            style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 12px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-family: 'IBM Plex Mono', monospace; font-weight: 700;"
                         >
                     </div>
 
@@ -187,7 +187,7 @@
                         @foreach($banks as $index => $b)
                             <div class="bank-account-card" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 18px; position: relative;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                                    <strong style="font-size: 13px; color: var(--ula-palm-900); display: flex; align-items: center; gap: 6px;">
+                                    <strong style="font-size: 13px; color: var(--ula-text-primary); display: flex; align-items: center; gap: 6px;">
                                         <span class="material-symbols-rounded" style="font-size: 16px;">account_balance</span>
                                         <span>{{ __('Bank Account #:num', ['num' => $index + 1]) }}</span>
                                     </strong>
@@ -447,7 +447,7 @@
         card.style = 'background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 18px; position: relative;';
         card.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <strong style="font-size: 13px; color: var(--ula-palm-900); display: flex; align-items: center; gap: 6px;">
+                <strong style="font-size: 13px; color: var(--ula-text-primary); display: flex; align-items: center; gap: 6px;">
                     <span class="material-symbols-rounded" style="font-size: 16px;">account_balance</span>
                     <span>{{ __('Bank Account') }} #${count}</span>
                 </strong>

@@ -102,7 +102,7 @@
 
             <div style="background: var(--ula-surface-page-alt); padding: 16px 20px; border-radius: var(--ula-radius-md); border: 1px solid var(--ula-border-subtle);">
                 <span style="font-size: 11px; color: var(--ula-text-muted); text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 4px;">Disk Free Space</span>
-                <strong style="font-size: 14px; color: var(--ula-palm-900); font-family: 'IBM Plex Mono', monospace;">{{ ($freeBytes = @disk_free_space(base_path())) ? round($freeBytes / 1073741824, 1) . ' GB Available' : ($health['storage']['free_space'] ?? 'Available') }}</strong>
+                <strong style="font-size: 14px; color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">{{ ($freeBytes = @disk_free_space(base_path())) ? round($freeBytes / 1073741824, 1) . ' GB Available' : ($health['storage']['free_space'] ?? 'Available') }}</strong>
             </div>
 
             <div style="background: var(--ula-surface-page-alt); padding: 16px 20px; border-radius: var(--ula-radius-md); border: 1px solid var(--ula-border-subtle);">

@@ -2345,7 +2345,7 @@
                         const time = new Date(c.created_at).toLocaleString();
                         box.innerHTML = `
                             <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11px;">
-                                <strong style="color: var(--ula-palm-900);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">person</span> ${author}</strong>
+                                <strong style="color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">person</span> ${author}</strong>
                                 <span style="color: var(--ula-text-muted);">${time}</span>
                             </div>
                             <div style="color: var(--ula-text-primary); line-height: 1.4;">${c.body || ''}</div>
@@ -2390,7 +2390,7 @@
                         tr.innerHTML = `
                             <td>${new Date(e.started_at).toLocaleDateString()}</td>
                             <td style="font-weight: 700;">${e.user ? e.user.name : '{{ __("Member") }}'}</td>
-                            <td style="font-weight: 800; color: var(--ula-palm-900); font-family: monospace;">${hrs} {{ __("h") }}</td>
+                            <td style="font-weight: 800; color: var(--ula-text-primary); font-family: monospace;">${hrs} {{ __("h") }}</td>
                             <td style="font-size: 11px;">${e.description || '{{ __("Work session") }}'}</td>
                             <td><span class="badge ${e.status === 'approved' ? 'badge-green' : 'badge-gray'}">${e.status === 'approved' ? '{{ __("Approved") }}' : '{{ __("Pending") }}'}</span></td>
                         `;
@@ -2698,7 +2698,7 @@
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <span style="font-size: 24px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">notifications</span></span>
                             <div style="flex: 1;">
-                                <div style="font-size: 13px; font-weight: 900; color: var(--ula-palm-900);">${m.title}</div>
+                                <div style="font-size: 13px; font-weight: 900; color: var(--ula-text-primary);">${m.title}</div>
                                 <div style="font-size: 11px; color: var(--ula-text-secondary);">${m.project_name ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> ' + m.project_name + ' • ' : ''}<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span> ${m.room_name} (${timeLabel})</div>
                             </div>
                             <a href="{{ route('office') }}" class="tactile-btn btn-primary" style="padding: 5px 12px; font-size: 11px; text-decoration: none;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">rocket_launch</span> {{ __('Join') }}</a>
@@ -2772,7 +2772,7 @@
                                  onmouseover="if(!${isActive}) this.style.background='var(--ula-surface-card)'"
                                  onmouseout="if(!${isActive}) this.style.background='transparent'">
                                 <div style="display: flex; align-items: center; gap: 8px; min-width: 0;">
-                                    <span style="font-weight: 900; color: var(--ula-palm-900); font-size: 13px;">${icon}</span>
+                                    <span style="font-weight: 900; color: var(--ula-text-primary); font-size: 13px;">${icon}</span>
                                     <span style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${c.name}</span>
                                 </div>
                                 ${c.last_message ? `<span style="font-size: 10px; color: var(--ula-text-muted);">${c.last_message.created_at}</span>` : ''}
@@ -3186,7 +3186,7 @@
                         tbody.innerHTML = data.time_entries.map(te => `
                             <tr>
                                 <td style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary);">${te.date}</td>
-                                <td style="font-size: 12px; font-weight: 700; color: var(--ula-palm-900);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> ${escapeHtml(te.project_name)}</td>
+                                <td style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> ${escapeHtml(te.project_name)}</td>
                                 <td style="font-size: 12px; color: var(--ula-text-secondary);">${escapeHtml(te.task_title)}</td>
                                 <td><span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success); font-weight: 800;">${te.duration_hours}h</span></td>
                                 <td style="font-size: 11px; color: var(--ula-text-muted);">${escapeHtml(te.description)}</td>
@@ -3435,7 +3435,7 @@
                             }
 
                             const billableBadge = te.is_billable
-                                ? '<span class="nav-badge-pill" style="background: rgba(36, 92, 58, 0.15); color: var(--ula-palm-900); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">diamond</span> {{ __('Billable') }}</span>'
+                                ? '<span class="nav-badge-pill" style="background: rgba(36, 92, 58, 0.15); color: var(--ula-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">diamond</span> {{ __('Billable') }}</span>'
                                 : '<span class="nav-badge-pill" style="color: var(--ula-text-muted);">{{ __('Standard') }}</span>';
 
                             const empInitials = (te.user_name || 'U').substring(0, 2).toUpperCase();
@@ -3445,7 +3445,7 @@
                                         ? `<img src="${te.user_avatar}" style="width: 26px; height: 26px; border-radius: 8px; object-fit: cover;">`
                                         : `<div style="width: 26px; height: 26px; border-radius: 8px; background: var(--ula-gradient-accent); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 10px;">${empInitials}</div>`
                                     }
-                                    <span style="font-weight: 800; color: var(--ula-palm-900); font-size: 12px;">${escapeHtml(te.user_name || 'Member')}</span>
+                                    <span style="font-weight: 800; color: var(--ula-text-primary); font-size: 12px;">${escapeHtml(te.user_name || 'Member')}</span>
                                 </div>
                             `;
 
@@ -3457,12 +3457,12 @@
                                         ${te.description ? `<div style="font-size: 11px; color: var(--ula-text-muted); margin-top: 2px;">${escapeHtml(te.description)}</div>` : ''}
                                     </td>
                                     <td>
-                                        <span class="nav-badge-pill" style="font-weight: 700; color: var(--ula-palm-900);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> ${escapeHtml(te.project_name || 'General')}</span>
+                                        <span class="nav-badge-pill" style="font-weight: 700; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> ${escapeHtml(te.project_name || 'General')}</span>
                                     </td>
                                     <td style="font-family: monospace; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">
                                         ${te.started_at || '—'} <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_forward</span> ${te.ended_at || '—'}
                                     </td>
-                                    <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--ula-palm-900);">
+                                    <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--ula-text-primary);">
                                         ${te.duration_formatted || '00m'}
                                     </td>
                                     <td>${billableBadge}</td>
@@ -3510,7 +3510,7 @@
                                         ? `<img src="${s.user_avatar}" style="width: 26px; height: 26px; border-radius: 8px; object-fit: cover;">`
                                         : `<div style="width: 26px; height: 26px; border-radius: 8px; background: var(--ula-gradient-accent); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 10px;">${empInitials}</div>`
                                     }
-                                    <span style="font-weight: 800; color: var(--ula-palm-900); font-size: 12px;">${escapeHtml(s.user_name || 'Member')}</span>
+                                    <span style="font-weight: 800; color: var(--ula-text-primary); font-size: 12px;">${escapeHtml(s.user_name || 'Member')}</span>
                                 </div>
                             `;
 
@@ -3532,7 +3532,7 @@
                                     <td style="font-family: monospace; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">
                                         <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> ${s.check_out || '{{ __('Still in Office') }}'}
                                     </td>
-                                    <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--ula-palm-900);">
+                                    <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--ula-text-primary);">
                                         ${s.duration_formatted || '00m'}
                                     </td>
                                     <td>${statusPill}</td>
@@ -3589,7 +3589,7 @@
                     }
 
                     const officeLoc = m.is_online
-                        ? `<div style="font-weight: 800; color: var(--ula-palm-900);">${escapeHtml(m.office_name)}</div><div style="font-size: 10px; color: var(--ula-text-muted);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span> ${escapeHtml(m.room_name)}</div>`
+                        ? `<div style="font-weight: 800; color: var(--ula-text-primary);">${escapeHtml(m.office_name)}</div><div style="font-size: 10px; color: var(--ula-text-muted);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span> ${escapeHtml(m.room_name)}</div>`
                         : `<span style="color: var(--ula-text-muted);">—</span>`;
 
                     return `
@@ -3601,7 +3601,7 @@
                                         : `<div style="width: 32px; height: 32px; border-radius: 10px; background: var(--ula-gradient-accent); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px;">${initials}</div>`
                                     }
                                     <div>
-                                        <div style="font-weight: 800; color: var(--ula-palm-900); display: flex; align-items: center; gap: 4px;">
+                                        <div style="font-weight: 800; color: var(--ula-text-primary); display: flex; align-items: center; gap: 4px;">
                                             <span>${escapeHtml(m.name)}</span>
                                             <span style="font-size: 10px; opacity: 0.7;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">visibility</span></span>
                                         </div>
@@ -3611,7 +3611,7 @@
                             </td>
                             <td>${statusBadge}</td>
                             <td>${officeLoc}</td>
-                            <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--ula-palm-900);">
+                            <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--ula-text-primary);">
                                 ${m.total_office_formatted}
                             </td>
                             <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--ula-status-success);">
@@ -3623,7 +3623,7 @@
                                     <button type="button" onclick="openMemberProfileModal('${m.user_id}')" class="tactile-btn btn-secondary" style="padding: 4px 8px; font-size: 11px;" title="{{ __('View Sessions') }}">
                                         <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span> {{ __('Sessions') }}
                                     </button>
-                                    <button type="button" onclick="selectMemberInTimesheet('${m.user_id}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-palm-900); border: 1px solid rgba(79, 155, 95, 0.3); padding: 4px 8px; font-size: 11px;" title="{{ __('Filter Timesheet') }}">
+                                    <button type="button" onclick="selectMemberInTimesheet('${m.user_id}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-text-primary); border: 1px solid rgba(79, 155, 95, 0.3); padding: 4px 8px; font-size: 11px;" title="{{ __('Filter Timesheet') }}">
                                         <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span> {{ __('Timesheet') }}
                                     </button>
                                 </div>
@@ -3740,7 +3740,7 @@
                                         </td>
                                         <td style="font-family: monospace; font-size: 11px; color: var(--ula-text-secondary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> ${s.check_in || '—'}</td>
                                         <td style="font-family: monospace; font-size: 11px; color: var(--ula-text-secondary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> ${s.check_out || '{{ __("Still in Office") }}'}</td>
-                                        <td style="font-family: monospace; font-weight: 900; color: var(--ula-palm-900);">${s.duration_formatted || '00m'}</td>
+                                        <td style="font-family: monospace; font-weight: 900; color: var(--ula-text-primary);">${s.duration_formatted || '00m'}</td>
                                         <td>${stPill}</td>
                                     </tr>
                                 `;

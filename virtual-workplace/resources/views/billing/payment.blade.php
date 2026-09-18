@@ -5,11 +5,11 @@
 @section('content')
 <div style="position: absolute; top: 20px; inset-inline-end: 24px; z-index: 10; display: flex; gap: 10px; align-items: center;">
     @if(app()->getLocale() === 'ar')
-        <a href="{{ route('lang.switch', 'en') }}" class="lang-switch-btn" style="background: var(--ula-white); border: 1px solid var(--ula-border-subtle); color: var(--ula-palm-900); padding: 7px 14px; border-radius: 8px; font-size: 13px; text-decoration: none; font-weight: 800; box-shadow: var(--ula-shadow-xs);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">language</span> English</a>
+        <a href="{{ route('lang.switch', 'en') }}" class="lang-switch-btn" style="background: var(--ula-white); border: 1px solid var(--ula-border-subtle); color: var(--ula-text-primary); padding: 7px 14px; border-radius: 8px; font-size: 13px; text-decoration: none; font-weight: 800; box-shadow: var(--ula-shadow-xs);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">language</span> English</a>
     @else
-        <a href="{{ route('lang.switch', 'ar') }}" class="lang-switch-btn" style="background: var(--ula-white); border: 1px solid var(--ula-border-subtle); color: var(--ula-palm-900); padding: 7px 14px; border-radius: 8px; font-size: 13px; text-decoration: none; font-weight: 800; box-shadow: var(--ula-shadow-xs);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">language</span> العربية</a>
+        <a href="{{ route('lang.switch', 'ar') }}" class="lang-switch-btn" style="background: var(--ula-white); border: 1px solid var(--ula-border-subtle); color: var(--ula-text-primary); padding: 7px 14px; border-radius: 8px; font-size: 13px; text-decoration: none; font-weight: 800; box-shadow: var(--ula-shadow-xs);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">language</span> العربية</a>
     @endif
-    <a href="{{ route('dashboard') }}" style="background: rgba(36, 92, 58, 0.1); border: 1px solid var(--ula-border-subtle); color: var(--ula-palm-900); padding: 7px 14px; border-radius: 8px; font-size: 13px; text-decoration: none; font-weight: 800;">
+    <a href="{{ route('dashboard') }}" style="background: rgba(36, 92, 58, 0.1); border: 1px solid var(--ula-border-subtle); color: var(--ula-text-primary); padding: 7px 14px; border-radius: 8px; font-size: 13px; text-decoration: none; font-weight: 800;">
         <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">home</span> {{ __('Return to Dashboard') }}
     </a>
 </div>
@@ -24,7 +24,7 @@
         <span style="color: var(--ula-border-subtle); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_forward</span></span>
         <div style="display: flex; align-items: center; gap: 8px;">
             <span style="width: 28px; height: 28px; border-radius: 50%; background: var(--ula-gradient-accent); color: var(--ula-white); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; box-shadow: 0 4px 10px rgba(36,92,58,0.3);">2</span>
-            <span style="font-size: 14px; font-weight: 900; color: var(--ula-palm-900);">2. {{ __('Bank Transfer Payment') }}</span>
+            <span style="font-size: 14px; font-weight: 900; color: var(--ula-text-primary);">2. {{ __('Bank Transfer Payment') }}</span>
         </div>
         <span style="color: var(--ula-border-subtle); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_forward</span></span>
         <div style="display: flex; align-items: center; gap: 8px; opacity: 0.5;">
@@ -34,7 +34,7 @@
     </div>
 
     @if(session('info'))
-        <div style="background: rgba(36, 92, 58, 0.12); border: 1px solid rgba(36, 92, 58, 0.3); border-radius: 12px; padding: 14px 20px; margin-bottom: 20px; font-size: 14px; font-weight: 800; color: var(--ula-palm-900); display: flex; align-items: center; gap: 10px;">
+        <div style="background: rgba(36, 92, 58, 0.12); border: 1px solid rgba(36, 92, 58, 0.3); border-radius: 12px; padding: 14px 20px; margin-bottom: 20px; font-size: 14px; font-weight: 800; color: var(--ula-text-primary); display: flex; align-items: center; gap: 10px;">
             <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">info</span></span> {{ session('info') }}
         </div>
     @endif
@@ -74,10 +74,10 @@
                 <div style="position: absolute; top: -12px; inset-inline-end: 20px; background: var(--ula-palm-900); color: var(--ula-white); padding: 4px 14px; border-radius: 9999px; font-size: 11px; font-weight: 900; text-transform: uppercase;">
                     <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">star</span> {{ __('Target Subscription') }}
                 </div>
-                <div style="font-size: 11px; font-weight: 900; color: var(--ula-palm-900); text-transform: uppercase; margin-bottom: 4px;">{{ $plan->slug }}</div>
+                <div style="font-size: 11px; font-weight: 900; color: var(--ula-text-primary); text-transform: uppercase; margin-bottom: 4px;">{{ $plan->slug }}</div>
                 <h2 style="font-size: 24px; font-weight: 900; color: var(--ula-text-primary); margin-bottom: 8px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">diamond</span> {{ $plan->name }} {{ __('Plan') }}</h2>
                 <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--ula-border-subtle);">
-                    <span style="font-size: 32px; font-weight: 900; color: var(--ula-palm-900);">
+                    <span style="font-size: 32px; font-weight: 900; color: var(--ula-text-primary);">
                         {{ number_format($priceSAR, 2) }} <span style="font-size: 15px; font-weight: 800; color: var(--ula-text-secondary);">{{ __('SAR') }}</span>
                     </span>
                     <span style="font-size: 13px; font-weight: 700; color: var(--ula-text-muted);">
@@ -100,7 +100,7 @@
                     </div>
                     <div style="background: var(--ula-surface-page-alt); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--ula-border-subtle);">
                         <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('Activation') }}</div>
-                        <div style="font-size: 14px; font-weight: 900; color: var(--ula-palm-900);">{{ __('Instant SuperAdmin Review') }}</div>
+                        <div style="font-size: 14px; font-weight: 900; color: var(--ula-text-primary);">{{ __('Instant SuperAdmin Review') }}</div>
                     </div>
                 </div>
 
@@ -108,7 +108,7 @@
                 <div style="display: flex; flex-wrap: wrap; gap: 6px;">
                     @if(is_array($plan->features))
                         @foreach($plan->features as $feature)
-                            <span style="background: rgba(36, 92, 58, 0.1); border: 1px solid rgba(36, 92, 58, 0.2); color: var(--ula-palm-900); padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 800;">
+                            <span style="background: rgba(36, 92, 58, 0.1); border: 1px solid rgba(36, 92, 58, 0.2); color: var(--ula-text-primary); padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 800;">
                                 <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check</span> {{ str_replace('_', ' ', $feature) }}
                             </span>
                         @endforeach
@@ -133,7 +133,7 @@
                         <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">warning</span> {{ __('Important: Include Transfer Reference in Memo') }}
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: center; background: var(--ula-white); border: 1px dashed var(--ula-gold-300); padding: 8px 12px; border-radius: 8px;">
-                        <span style="font-family: monospace; font-size: 14px; font-weight: 900; color: var(--ula-palm-900);" id="refCodeText">{{ $referenceCode }}</span>
+                        <span style="font-family: monospace; font-size: 14px; font-weight: 900; color: var(--ula-text-primary);" id="refCodeText">{{ $referenceCode }}</span>
                         <button type="button" onclick="copyToClipboard('{{ $referenceCode }}', this)" style="background: var(--ula-palm-800); color: var(--ula-white); border: none; padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer;">
                             <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">content_copy</span> {{ __('Copy Code') }}
                         </button>
@@ -149,7 +149,7 @@
                     <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 12px; padding: 16px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                             <strong style="font-size: 14px; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">account_balance</span> {{ $bank['bank_name'] }}</strong>
-                            <span style="font-size: 10px; font-weight: 800; background: rgba(36,92,58,0.1); color: var(--ula-palm-900); padding: 2px 8px; border-radius: 6px;">{{ $bank['badge'] }}</span>
+                            <span style="font-size: 10px; font-weight: 800; background: rgba(36,92,58,0.1); color: var(--ula-text-primary); padding: 2px 8px; border-radius: 6px;">{{ $bank['badge'] }}</span>
                         </div>
                         <div style="font-size: 12px; color: var(--ula-text-secondary); margin-bottom: 6px;">
                             <strong>{{ __('Beneficiary') }}:</strong> {{ app()->getLocale() === 'ar' ? $bank['account_name'] : $bank['account_name_en'] }}
@@ -157,7 +157,7 @@
                         <div style="margin-bottom: 6px;">
                             <div style="font-size: 11px; color: var(--ula-text-muted); font-weight: 700;">IBAN:</div>
                             <div style="display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); padding: 6px 10px; border-radius: 6px; margin-top: 2px;">
-                                <span style="font-family: monospace; font-size: 12px; font-weight: 800; color: var(--ula-palm-900); letter-spacing: 0.5px;">{{ $bank['iban'] }}</span>
+                                <span style="font-family: monospace; font-size: 12px; font-weight: 800; color: var(--ula-text-primary); letter-spacing: 0.5px;">{{ $bank['iban'] }}</span>
                                 <button type="button" onclick="copyToClipboard('{{ $bank['iban'] }}', this)" style="background: none; border: 1px solid var(--ula-border-subtle); padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; cursor: pointer; color: var(--ula-text-primary);">
                                     <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">content_copy</span> {{ __('Copy') }}
                                 </button>
@@ -179,19 +179,19 @@
                         <div style="display: flex; flex-direction: column; gap: 8px; font-size: 12px;">
                             @if(!empty($paymentSettings['instapay_handle']))
                                 <div style="display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-page-alt); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--ula-border-subtle);">
-                                    <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> <strong>Instapay IPA:</strong> <code style="color: var(--ula-palm-900); font-weight: 800;">{{ $paymentSettings['instapay_handle'] }}</code></span>
+                                    <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> <strong>Instapay IPA:</strong> <code style="color: var(--ula-text-primary); font-weight: 800;">{{ $paymentSettings['instapay_handle'] }}</code></span>
                                     <button type="button" onclick="copyToClipboard('{{ $paymentSettings['instapay_handle'] }}', this)" style="background: none; border: 1px solid var(--ula-border-subtle); padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">content_copy</span> {{ __('Copy') }}</button>
                                 </div>
                             @endif
                             @if(!empty($paymentSettings['stc_pay_phone']))
                                 <div style="display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-page-alt); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--ula-border-subtle);">
-                                    <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">favorite</span> <strong>STC Pay:</strong> <code style="color: var(--ula-palm-900); font-weight: 800;">{{ $paymentSettings['stc_pay_phone'] }}</code></span>
+                                    <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">favorite</span> <strong>STC Pay:</strong> <code style="color: var(--ula-text-primary); font-weight: 800;">{{ $paymentSettings['stc_pay_phone'] }}</code></span>
                                     <button type="button" onclick="copyToClipboard('{{ $paymentSettings['stc_pay_phone'] }}', this)" style="background: none; border: 1px solid var(--ula-border-subtle); padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">content_copy</span> {{ __('Copy') }}</button>
                                 </div>
                             @endif
                             @if(!empty($paymentSettings['vodafone_cash_phone']))
                                 <div style="display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-page-alt); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--ula-border-subtle);">
-                                    <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> <strong>Vodafone Cash:</strong> <code style="color: var(--ula-palm-900); font-weight: 800;">{{ $paymentSettings['vodafone_cash_phone'] }}</code></span>
+                                    <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> <strong>Vodafone Cash:</strong> <code style="color: var(--ula-text-primary); font-weight: 800;">{{ $paymentSettings['vodafone_cash_phone'] }}</code></span>
                                     <button type="button" onclick="copyToClipboard('{{ $paymentSettings['vodafone_cash_phone'] }}', this)" style="background: none; border: 1px solid var(--ula-border-subtle); padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">content_copy</span> {{ __('Copy') }}</button>
                                 </div>
                             @endif
@@ -241,7 +241,7 @@
                     </div>
                     <div style="text-align: end;">
                         <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;">{{ __('Target Plan') }}</div>
-                        <div style="font-size: 14px; font-weight: 900; color: var(--ula-palm-900);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">diamond</span> {{ $plan->name }}</div>
+                        <div style="font-size: 14px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">diamond</span> {{ $plan->name }}</div>
                     </div>
                 </div>
 

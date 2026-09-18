@@ -101,7 +101,7 @@
     <div class="metric-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm);">
         <div class="metric-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <span class="metric-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Members & Capacity') }}</span>
-            <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-palm-900);">group</span>
+            <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-text-primary);">group</span>
         </div>
         <div class="metric-value" style="font-size: 24px; font-weight: 800; color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">
             {{ $memberCount }} <span style="font-size: 14px; color: var(--ula-text-muted); font-weight: 600;">/ {{ $isUnlimited ? '∞' : $seatLimit }}</span>
@@ -228,7 +228,7 @@
                             </div>
                         </td>
                         <td style="padding: 14px 20px;">
-                            <span class="nav-badge-pill" style="font-size: 11px; padding: 2px 8px; background: rgba(20,43,36,0.06); color: var(--ula-palm-900); font-weight: 600;">
+                            <span class="nav-badge-pill" style="font-size: 11px; padding: 2px 8px; background: rgba(20,43,36,0.06); color: var(--ula-text-primary); font-weight: 600;">
                                 {{ $m->role?->name ?? 'Member' }}
                             </span>
                         </td>
@@ -289,10 +289,10 @@
             <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 18px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-palm-900);">corporate_fare</span>
+                        <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-text-primary);">corporate_fare</span>
                         <strong style="font-size: 14px; color: var(--ula-text-primary);">{{ $dept->name }}</strong>
                     </div>
-                    <span class="nav-badge-pill" style="font-size: 11px; padding: 2px 8px; background: rgba(20,43,36,0.06); color: var(--ula-palm-900); font-family: 'IBM Plex Mono', monospace;">
+                    <span class="nav-badge-pill" style="font-size: 11px; padding: 2px 8px; background: rgba(20,43,36,0.06); color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">
                         {{ $dept->userProfiles->count() }} {{ __('Staff') }}
                     </span>
                 </div>
@@ -378,7 +378,7 @@
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
             <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 22px;">
                 <h4 style="margin: 0 0 12px 0; font-size: 16px; font-weight: 800; color: var(--ula-text-primary);">{{ $plan?->name ?? 'Free Tier' }}</h4>
-                <div style="font-size: 28px; font-weight: 800; color: var(--ula-palm-900); margin-bottom: 12px; font-family: 'IBM Plex Mono', monospace;">
+                <div style="font-size: 28px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 12px; font-family: 'IBM Plex Mono', monospace;">
                     ${{ number_format($plan?->price ?? 0, 2) }} <span style="font-size: 14px; color: var(--ula-text-muted); font-weight: 600; font-family: var(--ula-font-family);">/ {{ $plan?->billing_interval ?? 'month' }}</span>
                 </div>
                 <p style="font-size: 13px; color: var(--ula-text-secondary); line-height: 1.5; margin: 0 0 16px 0;">
@@ -446,7 +446,7 @@
                             <div style="font-size: 11px; color: var(--ula-text-muted);">{{ $req->sender_name }}</div>
                         </td>
                         <td style="padding: 14px 18px;">
-                            <code style="font-family: 'IBM Plex Mono', monospace; font-weight: 700; color: var(--ula-palm-900);">#{{ $req->transfer_reference }}</code>
+                            <code style="font-family: 'IBM Plex Mono', monospace; font-weight: 700; color: var(--ula-text-primary);">#{{ $req->transfer_reference }}</code>
                         </td>
                         <td style="padding: 14px 18px;">
                             @if($req->receipt_path)

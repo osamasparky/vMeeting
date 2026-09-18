@@ -874,7 +874,7 @@
     <div id="invite-modal" class="modal">
         <div class="modal-box">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 style="font-size: 18px; font-weight: 800; color: var(--ula-palm-900);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">mail</span> {{ __('Invite & Guest Access') }}</h3>
+                <h3 style="font-size: 18px; font-weight: 800; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">mail</span> {{ __('Invite & Guest Access') }}</h3>
                 <button onclick="closeInviteModal()" style="background: none; border: none; color: var(--ula-stone-400); font-size: 20px; cursor: pointer;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span></button>
             </div>
 

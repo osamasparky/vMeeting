@@ -9,7 +9,7 @@
         <div class="panel-title" style="display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 800; color: var(--ula-text-primary);">
             <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 22px;">domain</span>
             <span>{{ __('Registered Companies') }}</span>
-            <span class="nav-badge-pill" style="font-size: 11px; padding: 2px 8px; background: rgba(20,43,36,0.06); color: var(--ula-palm-900); font-family: 'IBM Plex Mono', monospace;">{{ $companies->total() }}</span>
+            <span class="nav-badge-pill" style="font-size: 11px; padding: 2px 8px; background: rgba(20,43,36,0.06); color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">{{ $companies->total() }}</span>
         </div>
         <form method="GET" action="{{ route('superadmin.companies') }}" style="display: flex; gap: 8px; margin: 0;">
             <div style="position: relative; display: flex; align-items: center;">
@@ -59,8 +59,8 @@
                 <tr style="border-bottom: 1px solid var(--ula-border-subtle); transition: background 0.15s ease;">
                     <td style="padding: 14px 20px;">
                         <a href="{{ route('superadmin.companies.show', $comp) }}" style="text-decoration: none; display: block;" title="{{ __('View Full Company Profile') }}">
-                            <strong style="color: var(--ula-palm-900); font-size: 14px; display: inline-flex; align-items: center; gap: 8px;">
-                                <div style="width: 30px; height: 30px; border-radius: 8px; background: rgba(20,43,36,0.08); display: flex; align-items: center; justify-content: center; color: var(--ula-palm-900); font-size: 13px; font-weight: 700;">
+                            <strong style="color: var(--ula-text-primary); font-size: 14px; display: inline-flex; align-items: center; gap: 8px;">
+                                <div style="width: 30px; height: 30px; border-radius: 8px; background: rgba(20,43,36,0.08); display: flex; align-items: center; justify-content: center; color: var(--ula-text-primary); font-size: 13px; font-weight: 700;">
                                     {{ strtoupper(substr($comp->name, 0, 2)) }}
                                 </div>
                                 <span>{{ $comp->name }}</span>

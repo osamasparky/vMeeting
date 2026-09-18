@@ -128,7 +128,7 @@
         }
         .action-link-btn:hover {
             border-color: var(--ula-palm-900);
-            color: var(--ula-palm-900);
+            color: var(--ula-text-primary);
             transform: translateY(-1px);
         }
         .action-link-btn.btn-danger {
@@ -197,7 +197,7 @@
         }
         .dock-btn:hover {
             border-color: var(--ula-palm-900);
-            color: var(--ula-palm-900);
+            color: var(--ula-text-primary);
             transform: translateY(-2px);
         }
         .dock-btn.active {
@@ -484,7 +484,7 @@
             justify-content: space-between;
             font-size: 10px;
             font-weight: 800;
-            color: var(--ula-palm-900);
+            color: var(--ula-text-primary);
         }
         .chat-input-bar {
             padding: 10px 12px;
@@ -6416,7 +6416,7 @@
                     <div class="task-card-item ${isRunning ? 'running' : ''}" id="office-task-${t.id}" style="${isDone ? 'opacity: 0.75;' : ''}">
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
                             <div style="min-width: 0;">
-                                <div style="font-size: 10px; font-weight: 800; color: var(--ula-palm-900); margin-bottom: 2px;">
+                                <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 2px;">
                                     📁 ${escapeHtml(t.project_name || 'General')}
                                 </div>
                                 <div style="font-size: 13px; font-weight: 800; color: var(--ula-text-primary); line-height: 1.3; ${isDone ? 'text-decoration: line-through;' : ''}">

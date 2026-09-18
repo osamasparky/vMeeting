@@ -122,7 +122,7 @@
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--ula-border-subtle);">
             <div>
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                    <span style="font-size: 11px; font-weight: 700; color: var(--ula-palm-900); text-transform: uppercase; letter-spacing: 0.5px;">{{ __('Current Plan') }}</span>
+                    <span style="font-size: 11px; font-weight: 700; color: var(--ula-text-primary); text-transform: uppercase; letter-spacing: 0.5px;">{{ __('Current Plan') }}</span>
                     <x-badge variant="live">{{ ucfirst($status) }}</x-badge>
                     @if($isAnyExceeded)
                         <x-badge variant="attention">{{ __('Limit Exceeded') }}</x-badge>
@@ -130,7 +130,7 @@
                 </div>
                 <h2 style="font-size: 26px; font-weight: 800; color: var(--ula-text-primary); margin: 4px 0;">{{ $currentPlan->name ?? __('Free Tier') }}</h2>
                 <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 6px;">
-                    <span style="font-size: 24px; font-weight: 800; color: var(--ula-palm-900); font-family: 'IBM Plex Mono', monospace;">
+                    <span style="font-size: 24px; font-weight: 800; color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">
                         {{ number_format($priceSAR, 2) }} <span style="font-size: 14px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('SAR') }}</span>
                     </span>
                     <span style="font-size: 13px; font-weight: 500; color: var(--ula-text-muted); font-family: 'IBM Plex Mono', monospace;">
@@ -154,7 +154,7 @@
                         <span class="material-symbols-rounded" style="font-size: 12px;">event_repeat</span>
                         <span>{{ __('Renewal / End Date') }}</span>
                     </div>
-                    <div style="font-size: 13px; font-weight: 700; color: var(--ula-palm-900); font-family: 'IBM Plex Mono', monospace;">{{ $endDate ? $endDate->format('Y-m-d') : '—' }}</div>
+                    <div style="font-size: 13px; font-weight: 700; color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">{{ $endDate ? $endDate->format('Y-m-d') : '—' }}</div>
                 </div>
             </div>
         </div>
@@ -267,7 +267,7 @@
                     </div>
                 @endif
                 <div>
-                    <div style="font-size: 12px; font-weight: 700; color: var(--ula-palm-900); text-transform: uppercase; margin-bottom: 6px;">{{ $p->slug }}</div>
+                    <div style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary); text-transform: uppercase; margin-bottom: 6px;">{{ $p->slug }}</div>
                     <h4 style="font-size: 20px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 10px;">{{ $p->name }}</h4>
                     <div style="margin-bottom: 16px;">
                         <span style="font-size: 28px; font-weight: 800; color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">

@@ -1491,7 +1491,7 @@
 
         @if($user->isSuperAdmin())
         <div style="margin-top: 8px;">
-            <a href="{{ route('superadmin.dashboard') }}" class="nav-tab-btn" data-tooltip="{{ __('Super Admin Portal') }}" style="background: rgba(36, 92, 58, 0.1); color: var(--ula-palm-900); border: 1px solid rgba(36, 92, 58, 0.25); text-decoration: none;">
+            <a href="{{ route('superadmin.dashboard') }}" class="nav-tab-btn" data-tooltip="{{ __('Super Admin Portal') }}" style="background: rgba(36, 92, 58, 0.1); color: var(--ula-text-primary); border: 1px solid rgba(36, 92, 58, 0.25); text-decoration: none;">
                 <span class="material-symbols-rounded text-[18px]">bolt</span>
                 <strong>{{ __('Super Admin Portal') }}</strong>
             </a>
@@ -1702,7 +1702,7 @@
                 <div class="timer-pulse-dot"></div>
                 <div>
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--ula-palm-900); letter-spacing: 0.5px;">{{ __('Active Timer Running') }}</span>
+                        <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--ula-text-primary); letter-spacing: 0.5px;">{{ __('Active Timer Running') }}</span>
                         <span id="timer-project-tag" class="badge badge-green" style="font-size: 10px;">{{ $activeTimer->project->name ?? 'Project' }}</span>
                     </div>
                     <div id="timer-task-title" style="font-size: 14px; font-weight: 800; color: var(--ula-text-primary);">
@@ -1711,7 +1711,7 @@
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: 16px;">
-                <div id="live-timer-clock" style="font-size: 22px; font-weight: 900; font-family: monospace; color: var(--ula-palm-900); letter-spacing: 1px;">
+                <div id="live-timer-clock" style="font-size: 22px; font-weight: 900; font-family: monospace; color: var(--ula-text-primary); letter-spacing: 1px;">
                     00:00:00
                 </div>
                 <button onclick="stopGlobalTimer()" class="tactile-btn" style="background: var(--ula-terracotta-200); color: var(--ula-terracotta-600); border: 1px solid var(--ula-terracotta-300); padding: 7px 14px; font-size: 12px;">

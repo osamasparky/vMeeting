@@ -31,7 +31,7 @@
                 <div class="kpi-card" style="padding: 16px 18px;">
                     <div class="kpi-info">
                         <div class="kpi-title">{{ __('Total Configured Rooms') }}</div>
-                        <div class="kpi-value" style="color: var(--ula-palm-900);">{{ $rooms->count() }}</div>
+                        <div class="kpi-value" style="color: var(--ula-text-primary);">{{ $rooms->count() }}</div>
                         <div class="kpi-sub" style="font-size: 11px; color: var(--ula-text-secondary); display: flex; align-items: center; gap: 4px;">
                             <span class="material-symbols-rounded" style="font-size: 14px;">domain</span>
                             <span>{{ __('Across all office branches') }}</span>
@@ -114,7 +114,7 @@
                     </div>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span style="font-size: 12px; color: var(--ula-text-muted);">{{ __('Showing:') }}</span>
-                        <span id="rooms-visible-count-badge" class="nav-badge-pill" style="font-weight: 700; background: var(--ula-sand-200); color: var(--ula-palm-900); font-family: 'IBM Plex Mono', monospace;">
+                        <span id="rooms-visible-count-badge" class="nav-badge-pill" style="font-weight: 700; background: var(--ula-sand-200); color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">
                             {{ $rooms->count() }} {{ __('Rooms') }}
                         </span>
                     </div>
@@ -313,7 +313,7 @@
                                                             <span class="material-symbols-rounded" style="font-size: 13px;">corporate_fare</span>
                                                             <span>{{ __('Office Branch:') }}</span>
                                                         </span>
-                                                        <strong style="color: var(--ula-palm-900); font-weight: 700;">{{ $off->name }}</strong>
+                                                        <strong style="color: var(--ula-text-primary); font-weight: 700;">{{ $off->name }}</strong>
                                                     </div>
                                                     <!-- Map Blueprint Name -->
                                                     <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -411,7 +411,7 @@
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <strong style="color: var(--ula-palm-900); display: inline-flex; align-items: center; gap: 4px;">
+                                                        <strong style="color: var(--ula-text-primary); display: inline-flex; align-items: center; gap: 4px;">
                                                             <span class="material-symbols-rounded" style="font-size: 14px;">corporate_fare</span>
                                                             <span>{{ $off->name }}</span>
                                                         </strong>

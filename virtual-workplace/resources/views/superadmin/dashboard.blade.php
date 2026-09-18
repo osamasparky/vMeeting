@@ -37,7 +37,7 @@
         <div class="kpi-info" style="flex: 1;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3>{{ __('Total Companies') }}</h3>
-                <span class="nav-badge-pill" style="font-size: 10px; color: var(--ula-palm-900); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
+                <span class="nav-badge-pill" style="font-size: 10px; color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                     +{{ $stats['new_companies_month'] }} {{ __('this mo') }}
                 </span>
             </div>
@@ -65,7 +65,7 @@
         <div class="kpi-info" style="flex: 1;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3>{{ __('Total Users') }}</h3>
-                <span class="nav-badge-pill" style="font-size: 10px; color: var(--ula-palm-900); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
+                <span class="nav-badge-pill" style="font-size: 10px; color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                     +{{ $stats['new_users_month'] }} {{ __('new') }}
                 </span>
             </div>
@@ -103,11 +103,11 @@
         <div class="kpi-info" style="flex: 1;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3>{{ __('Estimated MRR') }}</h3>
-                <span class="nav-badge-pill" style="font-size: 10px; color: var(--ula-palm-900); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
+                <span class="nav-badge-pill" style="font-size: 10px; color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                     ${{ number_format($stats['estimated_arr'], 0) }} {{ __('ARR') }}
                 </span>
             </div>
-            <div class="kpi-value" style="margin: 4px 0; color: var(--ula-palm-900); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
+            <div class="kpi-value" style="margin: 4px 0; color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                 ${{ number_format($stats['estimated_mrr'], 2) }}
             </div>
             <div style="font-size: 11px; color: var(--ula-text-secondary); font-weight: 700;">
@@ -187,7 +187,7 @@
                             <span>{{ $plan->name }} (<span style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">${{ number_format($plan->price, 0) }}/mo</span>)</span>
                         </span>
                         <div style="display: flex; align-items: center; gap: 6px;">
-                            <span style="font-weight: 800; color: var(--ula-palm-900); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $plan->organizations_count }}</span>
+                            <span style="font-weight: 800; color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $plan->organizations_count }}</span>
                             <span style="font-size: 11px; color: var(--ula-text-muted); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">({{ $percentage }}%)</span>
                         </div>
                     </div>
@@ -201,7 +201,7 @@
 
         <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; font-size: 12px;">
             <span style="color: var(--ula-text-secondary); font-weight: 600;">{{ __('Total Active Tenants') }}:</span>
-            <strong style="color: var(--ula-palm-900); font-size: 14px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['total_companies'] }} {{ __('Organizations') }}</strong>
+            <strong style="color: var(--ula-text-primary); font-size: 14px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['total_companies'] }} {{ __('Organizations') }}</strong>
         </div>
     </div>
 
@@ -209,7 +209,7 @@
     <div class="panel-card" style="margin-bottom: 0;">
         <div class="panel-header" style="margin-bottom: 16px; padding-bottom: 12px;">
             <div class="panel-title" style="display: flex; align-items: center; gap: 8px;">
-                <span class="material-symbols-rounded" style="color: var(--ula-palm-900);">security</span>
+                <span class="material-symbols-rounded" style="color: var(--ula-text-primary);">security</span>
                 <span>{{ __('Live Security & Audit Trail') }}</span>
             </div>
             <span class="nav-badge-pill" style="font-size: 10px;">{{ __('Latest Events') }}</span>
@@ -219,7 +219,7 @@
             @forelse($recentAuditLogs as $log)
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--ula-surface-page-alt); border-radius: var(--ula-radius-sm); border: 1px solid var(--ula-border-subtle); font-size: 12px;">
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <span class="material-symbols-rounded" style="font-size: 18px; color: var(--ula-palm-900);">bolt</span>
+                    <span class="material-symbols-rounded" style="font-size: 18px; color: var(--ula-text-primary);">bolt</span>
                     <div>
                         <div style="font-weight: 700; color: var(--ula-text-primary);">
                             {{ $log->actor?->name ?? 'System' }}
@@ -299,7 +299,7 @@
                             <span class="material-symbols-rounded" style="font-size: 14px; color: var(--ula-text-secondary);">account_balance</span>
                             <span>{{ $pReq->bank_name }}</span>
                         </div>
-                        <div style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: 11px; color: var(--ula-palm-900); font-weight: 700;">#{{ $pReq->transfer_reference }}</div>
+                        <div style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: 11px; color: var(--ula-text-primary); font-weight: 700;">#{{ $pReq->transfer_reference }}</div>
                     </td>
                     <td>
                         @if($pReq->receipt_path)
@@ -332,7 +332,7 @@
 <div class="panel-card">
     <div class="panel-header">
         <div class="panel-title" style="display: flex; align-items: center; gap: 8px;">
-            <span class="material-symbols-rounded" style="color: var(--ula-palm-900);">domain</span>
+            <span class="material-symbols-rounded" style="color: var(--ula-text-primary);">domain</span>
             <span>{{ __('Recent Registered Organizations') }}</span>
         </div>
         <a href="{{ route('superadmin.companies') }}" class="tactile-btn btn-primary" style="font-size: 12px; padding: 8px 16px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">

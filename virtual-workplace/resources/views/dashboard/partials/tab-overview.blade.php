@@ -44,7 +44,7 @@
         <div class="nx-hero-date-card">
             <!-- User Avatar with Online status -->
             <div style="position: relative; cursor: pointer;" onclick="switchAdminTab('profile')" title="{{ __('View Profile') }}">
-                <div style="width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--ula-white); box-shadow: 0 2px 8px rgba(20,43,36,0.08); overflow: hidden; background: var(--ula-sand-200); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--ula-palm-900);">
+                <div style="width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--ula-white); box-shadow: 0 2px 8px rgba(20,43,36,0.08); overflow: hidden; background: var(--ula-sand-200); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--ula-text-primary);">
                     @if($user->avatar_url)
                         <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; object-fit: cover;">
                     @else
@@ -231,7 +231,7 @@
                 @empty
                     <div style="padding: 24px 16px; text-align: center; border-radius: 12px; border: 1px dashed rgba(20,43,36,0.12); background: var(--ula-sand-50);">
                         <span class="material-symbols-rounded" style="font-size: 28px; color: var(--ula-gold-400); display: block; margin-bottom: 6px;">calendar_month</span>
-                        <p style="font-size: 13px; font-weight: 500; color: var(--ula-palm-900); margin: 0 0 4px 0;">
+                        <p style="font-size: 13px; font-weight: 500; color: var(--ula-text-primary); margin: 0 0 4px 0;">
                             {{ __('No meetings scheduled for today') }}
                         </p>
                         <p style="font-size: 11px; color: var(--ula-stone-500); margin: 0 0 12px 0;">

@@ -46,7 +46,7 @@
             </div>
 
             <div style="margin: 16px 0; padding: 16px; background: var(--ula-surface-page-alt); border-radius: var(--ula-radius-md); border: 1px solid var(--ula-border-subtle);">
-                <div style="font-size: 28px; font-weight: 800; color: var(--ula-palm-900); font-family: 'IBM Plex Mono', monospace;">
+                <div style="font-size: 28px; font-weight: 800; color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">
                     ${{ number_format($plan->price, 2) }}
                     <span style="font-size: 13px; font-weight: 600; color: var(--ula-text-muted); font-family: var(--ula-font-family);">/mo</span>
                 </div>
@@ -86,7 +86,7 @@
                         <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-text-muted);">apartment</span>
                         <span>{{ __('Active Companies') }}:</span>
                     </span>
-                    <strong style="color: var(--ula-palm-900); font-family: 'IBM Plex Mono', monospace;">{{ $plan->organizations_count }}</strong>
+                    <strong style="color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">{{ $plan->organizations_count }}</strong>
                 </div>
             </div>
         </div>

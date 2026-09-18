@@ -50,7 +50,7 @@
                                         {{ strtoupper(substr($m->user->name, 0, 2)) }}
                                     </div>
                                     <div>
-                                        <div style="color: var(--ula-palm-900); font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 4px;">
+                                        <div style="color: var(--ula-text-primary); font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 4px;">
                                             <span>{{ $m->user->name }}</span>
                                             <span class="material-symbols-rounded" style="font-size: 13px; opacity: 0.6;">visibility</span>
                                         </div>

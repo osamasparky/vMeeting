@@ -69,7 +69,7 @@
                 <!-- Overall Status Banner -->
                 <div id="diag-overall-box" style="padding: 12px 16px; border-radius: 12px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(52, 211, 153, 0.3); display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                        <div style="font-size: 10px; font-weight: 800; color: var(--ula-palm-900); text-transform: uppercase;">{{ __('Overall Connection Quality') }}</div>
+                        <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-primary); text-transform: uppercase;">{{ __('Overall Connection Quality') }}</div>
                         <div id="diag-overall-text" style="font-size: 16px; font-weight: 900; color: var(--ula-status-success);">{{ __('Excellent') }}</div>
                     </div>
                     <span id="diag-overall-badge" style="font-size: 24px;"><span class="material-symbols-rounded" style="font-size: 14px;">circle</span></span>
@@ -116,7 +116,7 @@
         <div class="modal-card" style="max-width: 650px; padding: 20px;">
             <div class="modal-header">
                 <div class="modal-title" style="display: flex; align-items: center; gap: 12px;">
-                    <div id="spotlight-avatar-box" style="width: 42px; height: 42px; border-radius: 12px; overflow: hidden; background: var(--ula-surface-card); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; color: var(--ula-palm-900); border: 2px solid var(--ula-border-subtle);">
+                    <div id="spotlight-avatar-box" style="width: 42px; height: 42px; border-radius: 12px; overflow: hidden; background: var(--ula-surface-card); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; color: var(--ula-text-primary); border: 2px solid var(--ula-border-subtle);">
                     </div>
                     <div>
                         <div id="spotlight-user-name" style="font-size: 16px; font-weight: 800; color: var(--ula-text-primary);"></div>
@@ -150,7 +150,7 @@
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <span style="font-size: 22px;">⏱️</span>
                         <div>
-                            <div style="font-size: 10px; font-weight: 800; color: var(--ula-palm-900); text-transform: uppercase; letter-spacing: 0.5px;">{{ __('Currently Working On:') }}</div>
+                            <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-primary); text-transform: uppercase; letter-spacing: 0.5px;">{{ __('Currently Working On:') }}</div>
                             <div id="spotlight-timer-task" style="font-size: 13px; font-weight: 800; color: var(--ula-text-primary);"></div>
                         </div>
                     </div>
@@ -386,7 +386,7 @@
         <!-- Active Running Task Hero Card -->
         <div id="office-active-timer-hero" style="display: none; padding: 14px 16px; background: rgba(16, 185, 129, 0.12); border-bottom: 1px solid rgba(52, 211, 153, 0.3);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <span style="font-size: 10px; font-weight: 800; color: var(--ula-palm-900); text-transform: uppercase; display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 10px; font-weight: 800; color: var(--ula-text-primary); text-transform: uppercase; display: flex; align-items: center; gap: 4px;">
                     <span class="live-dot" style="width: 6px; height: 6px;"></span>
                     {{ __('Active Task Timer') }}
                 </span>

@@ -94,7 +94,7 @@
                         <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px; text-transform: uppercase;">
                             {{ __('Workspace URL Slug') }}
                         </label>
-                        <input type="text" value="{{ $organization->slug }}" readonly style="width: 100%; background: var(--ula-sand-200); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 11px 14px; color: var(--ula-palm-900); font-size: 13px; font-family: 'IBM Plex Mono', monospace; font-weight: 600;">
+                        <input type="text" value="{{ $organization->slug }}" readonly style="width: 100%; background: var(--ula-sand-200); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 11px 14px; color: var(--ula-text-primary); font-size: 13px; font-family: 'IBM Plex Mono', monospace; font-weight: 600;">
                         <span style="display: block; font-size: 10px; color: var(--ula-text-muted); margin-top: 4px;">{{ __('Used for organization identification across the workspace.') }}</span>
                     </div>
 
@@ -334,7 +334,7 @@
                         </div>
                         <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                             <input type="checkbox" name="attendance_auto_enabled" value="1" {{ ($attendancePolicy['auto_attendance_enabled'] ?? true) ? 'checked' : '' }} style="width: 18px; height: 18px; accent-color: var(--ula-palm-900);">
-                            <span style="font-size: 12px; font-weight: 700; color: var(--ula-palm-900);">{{ __('Enabled') }}</span>
+                            <span style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary);">{{ __('Enabled') }}</span>
                         </label>
                     </div>
 

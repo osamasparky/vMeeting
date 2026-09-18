@@ -9,7 +9,7 @@
         <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-top: 4px solid var(--ula-palm-900);">
             <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <span class="kpi-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Total Assets') }}</span>
-                <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-palm-900);">chair</span>
+                <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-text-primary);">chair</span>
             </div>
             <div class="kpi-value" style="font-size: 26px; font-weight: 800; color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">{{ $stats['total_items'] }}</div>
         </div>
@@ -106,7 +106,7 @@
                                 {{ $item->name }}
                             </h4>
                             <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
-                                <span class="nav-badge-pill" style="font-size: 10px; padding: 2px 6px; background: rgba(20,43,36,0.06); color: var(--ula-palm-900);">{{ $item->category->name ?? 'Furniture' }}</span>
+                                <span class="nav-badge-pill" style="font-size: 10px; padding: 2px 6px; background: rgba(20,43,36,0.06); color: var(--ula-text-primary);">{{ $item->category->name ?? 'Furniture' }}</span>
                                 <span class="badge-status {{ $item->collision ? 'badge-suspended' : 'badge-active' }}" style="font-size: 10px; padding: 2px 6px; border-radius: 4px;">
                                     {{ $item->collision ? __('Solid') : __('Walkable') }}
                                 </span>
@@ -190,7 +190,7 @@
                         <tr style="border-bottom: 1px solid var(--ula-border-subtle); transition: background 0.15s ease;">
                             <td style="padding: 12px 16px;"><strong style="color: var(--ula-text-primary); font-size: 13px;">{{ $cat->name }}</strong></td>
                             <td style="padding: 12px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ula-text-muted);">{{ $cat->slug }}</td>
-                            <td style="padding: 12px 16px;"><span class="nav-badge-pill" style="font-size: 11px; padding: 2px 8px; background: rgba(20,43,36,0.06); color: var(--ula-palm-900); font-family: 'IBM Plex Mono', monospace;">{{ $cat->items_count }} {{ __('Items') }}</span></td>
+                            <td style="padding: 12px 16px;"><span class="nav-badge-pill" style="font-size: 11px; padding: 2px 8px; background: rgba(20,43,36,0.06); color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">{{ $cat->items_count }} {{ __('Items') }}</span></td>
                             <td style="padding: 12px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--ula-text-secondary);">{{ $cat->order }}</td>
                             <td style="padding: 12px 16px; text-align: end;">
                                 <div style="display: inline-flex; gap: 6px;">
@@ -282,7 +282,7 @@
                             <div style="padding: 8px; background: var(--ula-surface-card); border-radius: 10px; border: 1px solid var(--ula-border-subtle); display: inline-flex; align-items: center; justify-content: center; min-width: 100px; min-height: 80px;">
                                 <img id="image-preview-img" src="#" alt="Preview" style="max-height: 80px; max-width: 160px; object-fit: contain;">
                             </div>
-                            <span style="font-size: 11px; font-weight: 600; color: var(--ula-palm-900);">
+                            <span style="font-size: 11px; font-weight: 600; color: var(--ula-text-primary);">
                                 {{ __('Click to change image') }}
                             </span>
                         </div>
@@ -293,7 +293,7 @@
                 <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 14px; padding: 14px 16px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                         <span style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary);">{{ __('Floor Grid Footprint') }}</span>
-                        <span id="grid-dimensions-badge" style="font-size: 11px; font-weight: 700; color: var(--ula-palm-900); font-family: 'IBM Plex Mono', monospace;">
+                        <span id="grid-dimensions-badge" style="font-size: 11px; font-weight: 700; color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">
                             1 × 1 Tiles (32 × 32 px)
                         </span>
                     </div>
