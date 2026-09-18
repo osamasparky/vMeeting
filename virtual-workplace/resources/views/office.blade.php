@@ -23,19 +23,9 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-        :root[data-theme="dark"], :root {
-                        --brand-primary-hover: var(--ula-palm-700, #1e412f);
-                                                
-                                                                                    
-                                    
-                                }
-
-        :root[data-theme="light"] {
-                        --brand-primary-hover: #047857;
-                                                
-                                                                                    
-                                    
-                                }
+        /* The old :root[data-theme] blocks here only ever declared
+           --brand-primary-hover (retired --brand-* prefix), which nothing
+           in this file references. Removed rather than kept unused. */
 
         * {
             margin: 0;
@@ -45,7 +35,8 @@
         }
 
         body {
-            font-family: 'Cairo', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            /* No font-family here: [dir="rtl"]/[dir="ltr"] in the shared
+               ulaspace-tokens.css already set it on <html>, and it inherits. */
             background: var(--ula-surface-page);
             color: var(--ula-text-primary);
             height: 100vh;
@@ -111,9 +102,9 @@
         }
 
         .guest-badge {
-            background: rgba(59, 130, 246, 0.22);
-            border: 1px solid #3B82F6;
-            color: #93C5FD;
+            background: var(--ula-tone-gold-bg);
+            border: 1px solid var(--ula-gold-400);
+            color: var(--ula-tone-gold-fg);
             font-size: 10px;
             font-weight: 800;
             padding: 2px 8px;
@@ -141,9 +132,9 @@
             transform: translateY(-1px);
         }
         .action-link-btn.btn-danger {
-            background: rgba(239, 68, 68, 0.15);
-            border-color: rgba(239, 68, 68, 0.35);
-            color: #F87171;
+            background: rgba(154, 88, 39, 0.15);
+            border-color: rgba(154, 88, 39, 0.35);
+            color: var(--ula-status-danger);
         }
 
         /* ── Canvas Viewport ── */
@@ -210,15 +201,15 @@
             transform: translateY(-2px);
         }
         .dock-btn.active {
-            background: rgba(16, 185, 129, 0.18);
+            background: rgba(60, 107, 76, 0.18);
             border-color: var(--ula-palm-900);
-            color: #34D399;
-            box-shadow: 0 0 14px rgba(16, 185, 129, 0.3);
+            color: var(--ula-status-success);
+            box-shadow: 0 0 14px rgba(60, 107, 76, 0.3);
         }
         .dock-btn.muted {
-            background: rgba(239, 68, 68, 0.14);
-            border-color: rgba(239, 68, 68, 0.35);
-            color: #F87171;
+            background: rgba(154, 88, 39, 0.14);
+            border-color: rgba(154, 88, 39, 0.35);
+            color: var(--ula-status-danger);
         }
 
         .dock-divider {
@@ -343,7 +334,7 @@
             gap: 6px;
             font-size: 11px;
             font-weight: 800;
-            color: #F8FAFC;
+            color: var(--ula-white);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -351,10 +342,10 @@
         .live-dot {
             width: 8px;
             height: 8px;
-            background: #10B981;
+            background: var(--ula-status-success);
             border-radius: 50%;
             display: inline-block;
-            box-shadow: 0 0 8px #10B981;
+            box-shadow: 0 0 8px var(--ula-status-success);
             animation: pulseDot 1.5s infinite;
         }
         @keyframes pulseDot {
@@ -369,7 +360,7 @@
         .v-btn {
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.12);
-            color: #F8FAFC;
+            color: var(--ula-white);
             width: 24px;
             height: 24px;
             border-radius: 6px;
@@ -383,7 +374,7 @@
         .v-btn:hover {
             background: var(--ula-palm-900);
             border-color: var(--ula-palm-900);
-            color: white;
+            color: var(--ula-white);
             transform: translateY(-1px);
         }
         .v-btn.active {
@@ -543,7 +534,7 @@
         }
         .more-menu-item:hover {
             background: rgba(255, 255, 255, 0.1);
-            color: #6EE7B7;
+            color: var(--ula-status-success);
             transform: translateX(3px);
         }
 
@@ -577,13 +568,13 @@
             transition: all 0.2s ease;
         }
         .task-card-item:hover {
-            border-color: rgba(52, 211, 153, 0.4);
+            border-color: rgba(60, 107, 76, 0.4);
             transform: translateY(-1px);
         }
         .task-card-item.running {
-            background: rgba(16, 185, 129, 0.14);
-            border-color: #10B981;
-            box-shadow: 0 0 16px rgba(16, 185, 129, 0.25);
+            background: rgba(60, 107, 76, 0.14);
+            border-color: var(--ula-status-success);
+            box-shadow: 0 0 16px rgba(60, 107, 76, 0.25);
         }
 
         .dock-timer-pill {
@@ -592,14 +583,14 @@
             gap: 8px;
             padding: 6px 14px;
             border-radius: 9999px;
-            background: rgba(16, 185, 129, 0.92);
+            background: rgba(60, 107, 76, 0.92);
             backdrop-filter: blur(14px);
             border: 1px solid rgba(255, 255, 255, 0.35);
-            color: #FFFFFF;
+            color: var(--ula-white);
             font-size: 11px;
             font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.45);
+            box-shadow: 0 6px 20px rgba(60, 107, 76, 0.45);
             transition: all 0.2s ease;
             animation: pulseGlow 2s infinite alternate;
         }
@@ -821,7 +812,7 @@
 
                         <!-- Menu Actions -->
                         @if(empty($user->is_guest))
-                        <a href="{{ route('dashboard') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #f9f6ef; font-size: 12px; font-weight: 600; transition: background 0.15s ease;">
+                        <a href="{{ route('dashboard') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--ula-sand-100); font-size: 12px; font-weight: 600; transition: background 0.15s ease;">
                             <span class="material-symbols-rounded" style="font-size: 18px; color: var(--ula-highlight-default);">dashboard</span>
                             <span>{{ __('Dashboard') }}</span>
                         </a>
@@ -830,7 +821,7 @@
                         @if(session('superadmin_impersonator_id'))
                         <form method="POST" action="{{ route('impersonate.leave') }}" style="margin: 0;">
                             @csrf
-                            <button type="submit" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #93C5FD; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                            <button type="submit" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: var(--ula-accent-default); font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                                 <span class="material-symbols-rounded" style="font-size: 18px;">shield</span>
                                 <span>{{ __('Return to Super Admin') }}</span>
                             </button>
@@ -838,40 +829,40 @@
                         @endif
 
                         @if(!empty($user) && in_array($user->role ?? 'member', ['superadmin', 'company_admin', 'manager', 'admin']))
-                        <label class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; color: #F59E0B; font-size: 12px; font-weight: 600; cursor: pointer; margin: 0;">
-                            <span class="material-symbols-rounded" style="font-size: 18px; color: #F59E0B;">upload_file</span>
+                        <label class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; color: var(--ula-gold-500); font-size: 12px; font-weight: 600; cursor: pointer; margin: 0;">
+                            <span class="material-symbols-rounded" style="font-size: 18px; color: var(--ula-gold-500);">upload_file</span>
                             <span>{{ __('Upload Floor Image') }}</span>
                             <input type="file" accept="image/*" style="display:none;" onchange="uploadOfficeFloorImage(this); closeOfficeMainMenu();">
                         </label>
 
-                        <a href="{{ route('editor') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #86EFAC; font-size: 12px; font-weight: 600;">
+                        <a href="{{ route('editor') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--ula-status-success); font-size: 12px; font-weight: 600;">
                             <span class="material-symbols-rounded" style="font-size: 18px;">draw</span>
                             <span>{{ __('Map Editor') }}</span>
                         </a>
                         @endif
 
-                        <button type="button" onclick="openDiagnosticsModal(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #f9f6ef; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                        <button type="button" onclick="openDiagnosticsModal(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: var(--ula-sand-100); font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                             <span class="material-symbols-rounded" style="font-size: 18px;">network_check</span>
                             <span>{{ __('Diagnostics') }}</span>
                         </button>
 
-                        <button type="button" onclick="toggleChatDrawer(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #f9f6ef; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                        <button type="button" onclick="toggleChatDrawer(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: var(--ula-sand-100); font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                             <span class="material-symbols-rounded" style="font-size: 18px;">chat</span>
                             <span>{{ __('Chat & Notes') }}</span>
                         </button>
 
-                        <button type="button" onclick="toggleAppTheme(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: #f9f6ef; font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                        <button type="button" onclick="toggleAppTheme(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: var(--ula-sand-100); font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                             <span class="material-symbols-rounded" style="font-size: 18px;">light_mode</span>
                             <span>{{ __('Toggle Theme') }}</span>
                         </button>
 
                         @if(app()->getLocale() === 'ar')
-                            <a href="{{ route('lang.switch', 'en') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #f9f6ef; font-size: 12px; font-weight: 600;">
+                            <a href="{{ route('lang.switch', 'en') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--ula-sand-100); font-size: 12px; font-weight: 600;">
                                 <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
                                 <span>English</span>
                             </a>
                         @else
-                            <a href="{{ route('lang.switch', 'ar') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: #f9f6ef; font-size: 12px; font-weight: 600;">
+                            <a href="{{ route('lang.switch', 'ar') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--ula-sand-100); font-size: 12px; font-weight: 600;">
                                 <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
                                 <span>العربية</span>
                             </a>
@@ -902,25 +893,25 @@
                     </button>
                     <div id="office-switcher-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); inset-inline-start: 0; min-width: 250px; background: rgba(14, 25, 19, 0.98); backdrop-filter: blur(18px); border: 1px solid rgba(237, 230, 217, 0.20); border-radius: 14px; box-shadow: 0 16px 36px rgba(0,0,0,0.65); padding: 6px; z-index: 100000;">
                         <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 4px;">
-                            🏢 {{ __('Office Branches') }}
+                            <span class="material-symbols-rounded" style="font-size: 12px; vertical-align: text-bottom;">apartment</span> {{ __('Office Branches') }}
                         </div>
                         @foreach($userAllowedOffices as $off)
                         @php
                             $offMap = $off->activeMap ?: $off->maps->first();
                             $offMapId = $offMap ? $offMap->id : '';
                         @endphp
-                        <a href="{{ route('office', ['office' => $off->id]) }}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: {{ $off->id === $floor->id ? '#86EFAC' : '#E2E8F0' }}; background: {{ $off->id === $floor->id ? 'rgba(36, 92, 58, 0.45)' : 'transparent' }}; font-weight: 700; font-size: 12px; transition: background 0.15s ease;">
+                        <a href="{{ route('office', ['office' => $off->id]) }}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: {{ $off->id === $floor->id ? 'var(--ula-status-success)' : 'var(--ula-white)' }}; background: {{ $off->id === $floor->id ? 'rgba(36, 92, 58, 0.45)' : 'transparent' }}; font-weight: 700; font-size: 12px; transition: background 0.15s ease;">
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <span class="material-symbols-rounded" style="font-size: 16px;">apartment</span>
                                 <span>{{ $off->name }}</span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 6px;">
-                                <span class="branch-occupants-badge" data-map-id="{{ $offMapId }}" style="font-size: 10px; padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.05); color: #94A3B8; font-weight: 700;">
-                                    <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: {{ $off->id === $floor->id ? '#10B981' : '#64748B' }}; margin-inline-end: 4px;"></span>
+                                <span class="branch-occupants-badge" data-map-id="{{ $offMapId }}" style="font-size: 10px; padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--ula-stone-400); font-weight: 700;">
+                                    <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: {{ $off->id === $floor->id ? 'var(--ula-status-success)' : 'var(--ula-stone-400)' }}; margin-inline-end: 4px;"></span>
                                     {{ $off->id === $floor->id ? __('Current') : __('0 active') }}
                                 </span>
                                 @if($off->id === $floor->id)
-                                    <span style="font-size: 10px; color: #86EFAC;">●</span>
+                                    <span style="font-size: 10px; color: var(--ula-status-success);">●</span>
                                 @endif
                             </div>
                         </a>
@@ -931,14 +922,14 @@
 
                 @if(!empty($user->is_guest))
                     <span class="nx-toolbar-btn btn-accent guest-access-pill" style="font-weight: 700;" title="{{ __('Guest Access') }}">
-                        🛡️ {{ __('Guest Access') }} ({{ $user->name }})
+                        <span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom;">shield</span> {{ __('Guest Access') }} ({{ $user->name }})
                     </span>
                 @endif
             </div>
 
             <!-- 2. Center: Active Room Scrim Capsule (Room Name, Room Files, Door Lock) -->
             <div class="nx-map-room-label" id="room-status-pill" style="display: none;">
-                <span id="current-room-name" style="font-weight: 600; font-size: 12px; color: #FFFFFF; display: flex; align-items: center; gap: 6px;">
+                <span id="current-room-name" style="font-weight: 600; font-size: 12px; color: var(--ula-white); display: flex; align-items: center; gap: 6px;">
                     <span class="material-symbols-rounded" style="font-size: 18px;">meeting_room</span>
                     <span>{{ __('Meeting Room') }}</span>
                 </span>
@@ -960,7 +951,7 @@
             <div class="nx-toolbar-group">
                 <!-- Live Office Attendance Timer -->
                 @if(empty($user->is_guest))
-                <div id="office-attendance-timer-pill" class="nx-toolbar-btn" style="background: rgba(60, 107, 76, 0.25); border-color: rgba(60, 107, 76, 0.5); color: #86EFAC; font-weight: 600; cursor: pointer;" onclick="openMyTaskDrawer()" title="{{ __('Your active time in the virtual office today') }}">
+                <div id="office-attendance-timer-pill" class="nx-toolbar-btn" style="background: rgba(60, 107, 76, 0.25); border-color: rgba(60, 107, 76, 0.5); color: var(--ula-status-success); font-weight: 600; cursor: pointer;" onclick="openMyTaskDrawer()" title="{{ __('Your active time in the virtual office today') }}">
                     <span class="nx-presence-dot"></span>
                     <span class="material-symbols-rounded" style="font-size: 16px;">schedule</span>
                     <span id="office-attendance-clock" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">00:00:00</span>
@@ -997,7 +988,7 @@
             <span class="material-symbols-rounded">aspect_ratio</span>
         </button>
         <button type="button" class="nx-viewport-ctrl-btn" onclick="locateMe()" title="{{ __('Locate Me') }}">
-            <span class="material-symbols-rounded" style="color: #34D399;">location_on</span>
+            <span class="material-symbols-rounded" style="color: var(--ula-status-success);">location_on</span>
         </button>
         <button type="button" class="nx-viewport-ctrl-btn" onclick="zoomOut()" title="{{ __('Zoom Out') }}">
             <span class="material-symbols-rounded">zoom_out</span>
@@ -1007,11 +998,11 @@
     <!-- ── Floating Local Self Camera PiP ── -->
     <div class="local-cam-card" id="local-video-card" style="display: none;">
         <div class="local-cam-header">
-            <span style="font-size: 10px; font-weight: 800; color: #F8FAFC; display: flex; align-items: center; gap: 4px;">
+            <span style="font-size: 10px; font-weight: 800; color: var(--ula-white); display: flex; align-items: center; gap: 4px;">
                 <span class="live-dot" style="width: 6px; height: 6px;"></span>
-                📹 {{ $user->name ?? __('You') }}
+                <span class="material-symbols-rounded" style="font-size: 12px;">videocam</span> {{ $user->name ?? __('You') }}
             </span>
-            <button onclick="toggleCamera()" style="background:none; border:none; color:var(--ula-text-muted); cursor:pointer; font-size:12px; line-height: 1;" title="{{ __('Stop Camera') }}">✕</button>
+            <button onclick="toggleCamera()" style="background:none; border:none; color:var(--ula-text-muted); cursor:pointer; font-size:12px; line-height: 1;" title="{{ __('Stop Camera') }}"><span class="material-symbols-rounded" style="font-size: 14px;">close</span></button>
         </div>
         <div class="local-cam-viewport">
             <video id="local-video-elem" autoplay playsinline muted></video>
@@ -1026,29 +1017,29 @@
     <!-- ── Sliding Chat & File Sharing Drawer ── -->
     <div class="chat-drawer" id="chat-drawer">
         <div class="chat-header">
-            <strong style="font-size: 13px; display: flex; align-items: center; gap: 6px;">💬 {{ __('Office & Room Chat') }}</strong>
+            <strong style="font-size: 13px; display: flex; align-items: center; gap: 6px;"><span class="material-symbols-rounded" style="font-size: 16px;">chat</span> {{ __('Office & Room Chat') }}</strong>
             <div style="display: flex; align-items: center; gap: 6px;">
-                <button onclick="focusActiveScreenShare()" class="action-link-btn" id="btn-chat-focus-screen" style="display: none; padding: 3px 8px; font-size: 10px; color: #34D399; border-color: rgba(52, 211, 153, 0.4);" title="{{ __('View Screen Share') }}">
-                    🖥️ {{ __('Screen') }}
+                <button onclick="focusActiveScreenShare()" class="action-link-btn" id="btn-chat-focus-screen" style="display: none; padding: 3px 8px; font-size: 10px; color: var(--ula-status-success); border-color: rgba(60, 107, 76, 0.4);" title="{{ __('View Screen Share') }}">
+                    <span class="material-symbols-rounded" style="font-size: 13px;">screen_share</span> {{ __('Screen') }}
                 </button>
-                <button onclick="toggleChatDrawer()" style="background:none; border:none; color:var(--ula-text-muted); font-size:16px; cursor:pointer;">✕</button>
+                <button onclick="toggleChatDrawer()" style="background:none; border:none; color:var(--ula-text-muted); font-size:16px; cursor:pointer;"><span class="material-symbols-rounded" style="font-size: 16px;">close</span></button>
             </div>
         </div>
         <div class="chat-tabs">
-            <div class="chat-tab active" id="chat-tab-room" onclick="switchChatScope('room')">🏢 {{ __('Room Chat') }}</div>
-            <div class="chat-tab" id="chat-tab-global" onclick="switchChatScope('global')">🌐 {{ __('Global Chat') }}</div>
+            <div class="chat-tab active" id="chat-tab-room" onclick="switchChatScope('room')"><span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom;">apartment</span> {{ __('Room Chat') }}</div>
+            <div class="chat-tab" id="chat-tab-global" onclick="switchChatScope('global')"><span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom;">public</span> {{ __('Global Chat') }}</div>
         </div>
         <div class="chat-messages" id="chat-messages-container">
             <div class="msg-bubble">
-                <div class="msg-meta"><span>🤖 {{ __('Smart Assistant') }}</span> <span>{{ date('H:i') }}</span></div>
+                <div class="msg-meta"><span><span class="material-symbols-rounded" style="font-size: 12px; vertical-align: text-bottom;">smart_toy</span> {{ __('Smart Assistant') }}</span> <span>{{ date('H:i') }}</span></div>
                 <span>{{ __('Welcome to your virtual workplace! Use chat to communicate and share notes with your team.') }}</span>
             </div>
         </div>
         <div class="chat-input-bar">
             <input type="file" id="chat-file-input" style="display:none;" onchange="handleChatFileUpload(this)">
-            <button onclick="document.getElementById('chat-file-input').click()" class="action-link-btn" style="padding: 6px 8px;" title="{{ __('Attach File') }}">📎</button>
+            <button onclick="document.getElementById('chat-file-input').click()" class="action-link-btn" style="padding: 6px 8px;" title="{{ __('Attach File') }}"><span class="material-symbols-rounded" style="font-size: 15px;">attach_file</span></button>
             <input type="text" id="chat-msg-input" placeholder="{{ __('Type your message here...') }}" class="styled-input" style="padding: 8px 10px; font-size: 12px;" onkeydown="if(event.key==='Enter') sendChatMessage()">
-            <button onclick="sendChatMessage()" class="action-link-btn" style="background: var(--ula-palm-900); color: white; padding: 6px 12px;">➤</button>
+            <button onclick="sendChatMessage()" class="action-link-btn" style="background: var(--ula-palm-900); color: var(--ula-white); padding: 6px 12px;"><span class="material-symbols-rounded" style="font-size: 15px;">send</span></button>
         </div>
     </div>
 
@@ -1127,16 +1118,16 @@
     <!-- ── Floating More Tools & Settings Popover Menu ── -->
     <div id="floating-more-popover" style="display: none; position: absolute; bottom: 85px; left: 65%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.96); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.18); border-radius: 18px; padding: 8px; flex-direction: column; gap: 4px; box-shadow: 0 16px 36px rgba(0,0,0,0.6); z-index: 100000; min-width: 220px;">
         <button class="more-menu-item" onclick="toggleCameraGalleryModal(); closeMoreMenu();">
-            <span>🎥</span> <span>{{ __('Live Camera Grid') }}</span>
+            <span class="material-symbols-rounded" style="font-size: 18px;">grid_view</span> <span>{{ __('Live Camera Grid') }}</span>
         </button>
         <button class="more-menu-item" onclick="openRecordingsGallery(); closeMoreMenu();">
-            <span>📼</span> <span>{{ __('Recordings Library') }}</span>
+            <span class="material-symbols-rounded" style="font-size: 18px;">video_library</span> <span>{{ __('Recordings Library') }}</span>
         </button>
     </div>
 
     <!-- ── Floating In-World Contextual Prompts & Menus ── -->
-    <div id="furniture-sit-prompt" style="display: none; position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); background: rgba(14, 25, 19, 0.94); backdrop-filter: blur(20px); border: 1px solid rgba(211, 165, 83, 0.45); border-radius: 24px; padding: 6px 18px; color: var(--ula-sand-100, #f9f6ef); font-size: 12px; font-weight: 700; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5); z-index: 9999; pointer-events: none; transition: opacity 0.2s ease;">
-        <span id="furniture-sit-prompt-text">🪑 {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> {{ __('to Sit at Desk') }}</span>
+    <div id="furniture-sit-prompt" style="display: none; position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); background: rgba(14, 25, 19, 0.94); backdrop-filter: blur(20px); border: 1px solid rgba(211, 165, 83, 0.45); border-radius: 24px; padding: 6px 18px; color: var(--ula-sand-100, var(--ula-sand-100)); font-size: 12px; font-weight: 700; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5); z-index: 9999; pointer-events: none; transition: opacity 0.2s ease;">
+        <span id="furniture-sit-prompt-text"><span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom;">chair</span> {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-gold-400);">E</kbd> {{ __('to Sit at Desk') }}</span>
     </div>
 
     <div id="floating-reaction-popover" style="display: none; position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.96); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.18); border-radius: 32px; padding: 6px 14px; align-items: center; gap: 8px; box-shadow: 0 16px 36px rgba(0,0,0,0.6); z-index: 100000;">
@@ -1500,11 +1491,11 @@
             if (!el) {
                 el = document.createElement('div');
                 el.id = 'fit-map-debug-overlay';
-                el.style.cssText = 'position:fixed;top:70px;inset-inline-start:16px;background:rgba(11,20,16,0.92);backdrop-filter:blur(16px);border:1px solid rgba(211,165,83,0.5);border-radius:12px;padding:10px 14px;color:#f9f6ef;font-family:IBM Plex Mono,monospace;font-size:11px;z-index:99999;pointer-events:none;line-height:1.5;box-shadow:0 12px 30px rgba(0,0,0,0.7);';
+                el.style.cssText = 'position:fixed;top:70px;inset-inline-start:16px;background:rgba(11,20,16,0.92);backdrop-filter:blur(16px);border:1px solid rgba(211,165,83,0.5);border-radius:12px;padding:10px 14px;color:var(--ula-sand-100);font-family:IBM Plex Mono,monospace;font-size:11px;z-index:99999;pointer-events:none;line-height:1.5;box-shadow:0 12px 30px rgba(0,0,0,0.7);';
                 document.body.appendChild(el);
             }
             el.innerHTML = `
-                <div style="color:#D3A553;font-weight:700;margin-bottom:4px;border-bottom:1px solid rgba(211,165,83,0.3);padding-bottom:2px;">
+                <div style="color:var(--ula-gold-400);font-weight:700;margin-bottom:4px;border-bottom:1px solid rgba(211,165,83,0.3);padding-bottom:2px;">
                     📐 FIT TO CANVAS RUNTIME INSPECTION
                 </div>
                 <div><b>Viewport / Canvas:</b> ${info['canvas.clientWidth']} × ${info['canvas.clientHeight']} (Rect: ${info['canvas.getBoundingClientRect().width']} × ${info['canvas.getBoundingClientRect().height']})</div>
@@ -2117,19 +2108,19 @@
                 if (found) {
                     promptEl.style.display = 'block';
                     if (found.interaction_type === 'drink') {
-                        promptEl.innerHTML = `<span>☕ ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> ${__('to Grab Drink')}</span>`;
+                        promptEl.innerHTML = `<span>☕ ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-gold-400);">E</kbd> ${__('to Grab Drink')}</span>`;
                     } else if (found.interaction_type === 'whiteboard') {
-                        promptEl.innerHTML = `<span>📋 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> ${__('to Open Whiteboard')}</span>`;
+                        promptEl.innerHTML = `<span>📋 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-gold-400);">E</kbd> ${__('to Open Whiteboard')}</span>`;
                     } else if (found.interaction_type === 'youtube') {
-                        promptEl.innerHTML = `<span>📺 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> ${__('to Watch Stream')}</span>`;
+                        promptEl.innerHTML = `<span>📺 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-gold-400);">E</kbd> ${__('to Watch Stream')}</span>`;
                     } else if (found.interaction_type === 'soundEffect') {
-                        promptEl.innerHTML = `<span>🔔 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> ${__('to Ring Bell')}</span>`;
+                        promptEl.innerHTML = `<span>🔔 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-gold-400);">E</kbd> ${__('to Ring Bell')}</span>`;
                     } else if (found.interaction_type === 'instrument' || found.interaction_type === 'staticMusic') {
-                        promptEl.innerHTML = `<span>🎹 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> ${__('to Play Music')}</span>`;
+                        promptEl.innerHTML = `<span>🎹 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-gold-400);">E</kbd> ${__('to Play Music')}</span>`;
                     } else if (found.interaction_type === 'stickyNote') {
-                        promptEl.innerHTML = `<span>📝 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> ${__('to Read Note')}</span>`;
+                        promptEl.innerHTML = `<span>📝 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-gold-400);">E</kbd> ${__('to Read Note')}</span>`;
                     } else {
-                        promptEl.innerHTML = `<span>🪑 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: #D3A553;">E</kbd> ${__('to Sit at Desk')}</span>`;
+                        promptEl.innerHTML = `<span>🪑 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-gold-400);">E</kbd> ${__('to Sit at Desk')}</span>`;
                     }
                 } else {
                     promptEl.style.display = 'none';
@@ -3211,7 +3202,7 @@
                             card.style.color = '#0C4A6E';
                         } else {
                             card.style.background = '#FEF3C7';
-                            card.style.borderColor = '#F59E0B';
+                            card.style.borderColor = 'var(--ula-gold-500)';
                             card.style.color = '#78350F';
                         }
                     }
@@ -3829,7 +3820,7 @@
                     // 1. Floor Threshold Plate (Warm Brass transition strip)
                     ctx.fillStyle = isLocked ? 'rgba(239, 68, 68, 0.30)' : 'rgba(211, 165, 83, 0.32)';
                     ctx.fillRect(-halfW - 2, -5, door.width + 4, 10);
-                    ctx.strokeStyle = isLocked ? '#EF4444' : '#D3A553';
+                    ctx.strokeStyle = isLocked ? '#EF4444' : 'var(--ula-gold-400)';
                     ctx.lineWidth = 1.2;
                     ctx.strokeRect(-halfW - 2, -5, door.width + 4, 10);
 
@@ -3839,7 +3830,7 @@
                     // Left Post
                     ctx.fillStyle = isLocked ? '#7F1D1D' : '#0B1C13';
                     ctx.fillRect(-halfW - jambW, -jambD / 2, jambW, jambD);
-                    ctx.fillStyle = isLocked ? '#DC2626' : '#D3A553';
+                    ctx.fillStyle = isLocked ? '#DC2626' : 'var(--ula-gold-400)';
                     ctx.fillRect(-halfW - jambW, -jambD / 2 - 2, jambW, 3);
                     ctx.strokeStyle = 'rgba(237, 230, 217, 0.3)';
                     ctx.strokeRect(-halfW - jambW, -jambD / 2, jambW, jambD);
@@ -3847,7 +3838,7 @@
                     // Right Post
                     ctx.fillStyle = isLocked ? '#7F1D1D' : '#0B1C13';
                     ctx.fillRect(halfW, -jambD / 2, jambW, jambD);
-                    ctx.fillStyle = isLocked ? '#DC2626' : '#D3A553';
+                    ctx.fillStyle = isLocked ? '#DC2626' : 'var(--ula-gold-400)';
                     ctx.fillRect(halfW, -jambD / 2 - 2, jambW, 3);
                     ctx.strokeRect(halfW, -jambD / 2, jambW, jambD);
 
@@ -3882,7 +3873,7 @@
                     ctx.fill();
 
                     ctx.shadowColor = 'transparent';
-                    ctx.strokeStyle = isLocked ? '#FCA5A5' : (openProg > 0.4 ? '#86EFAC' : '#D3A553');
+                    ctx.strokeStyle = isLocked ? '#FCA5A5' : (openProg > 0.4 ? 'var(--ula-status-success)' : 'var(--ula-gold-400)');
                     ctx.lineWidth = 1.2;
                     if (ctx.roundRect) ctx.roundRect(0, -doorThick / 2, leafW, doorThick, 2);
                     else ctx.rect(0, -doorThick / 2, leafW, doorThick);
@@ -4187,7 +4178,7 @@
             ctx.restore();
 
             // 5. Circular Avatar Border Ring
-            ctx.strokeStyle = isSelf ? '#86EFAC' : (isCamOn ? '#60A5FA' : 'rgba(237, 230, 217, 0.50)');
+            ctx.strokeStyle = isSelf ? 'var(--ula-status-success)' : (isCamOn ? '#60A5FA' : 'rgba(237, 230, 217, 0.50)');
             ctx.lineWidth = isSelf ? 2.5 : 1.8;
             ctx.beginPath();
             ctx.arc(x, y, radius, 0, Math.PI * 2);
@@ -4247,7 +4238,7 @@
             else ctx.rect(x - nameW / 2, badgeY, nameW, badgeH);
             ctx.stroke();
 
-            ctx.fillStyle = isSitting ? '#FFFFFF' : (isSelf ? '#86EFAC' : '#f9f6ef');
+            ctx.fillStyle = isSitting ? '#FFFFFF' : (isSelf ? 'var(--ula-status-success)' : 'var(--ula-sand-100)');
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(displayName, x, badgeY + (badgeH / 2));
@@ -4827,7 +4818,7 @@
                 const count = counts[mapId] || 0;
                 if (count > 0) {
                     badge.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #10B981; margin-inline-end: 4px;"></span>${count} {{ __("active") }}`;
-                    badge.style.color = '#86EFAC';
+                    badge.style.color = 'var(--ula-status-success)';
                     badge.style.background = 'rgba(16, 185, 129, 0.18)';
                 } else {
                     badge.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #64748B; margin-inline-end: 4px;"></span>0 {{ __("active") }}`;
@@ -6079,7 +6070,7 @@
                                 <span style="font-size: 20px;">${avGender === 'female' ? '👩' : '👨'}</span>
                                 <div>
                                     <strong style="font-size: 13px; color: var(--ula-text-primary); display: block;">
-                                        ${av.name} ${av.isGuest ? '<span style="font-size: 10px; color: #F59E0B; font-weight: 800;">(Guest)</span>' : ''}
+                                        ${av.name} ${av.isGuest ? '<span style="font-size: 10px; color: var(--ula-gold-500); font-weight: 800;">(Guest)</span>' : ''}
                                     </strong>
                                     <span style="font-size: 11px; color: var(--ula-text-secondary);">🏢 ${r ? r.name : '{{ __("Open Floor") }}'}</span>
                                 </div>
@@ -6594,7 +6585,7 @@
                 if (myRoom) {
                     headerHint = `<div style="text-align: center; padding: 4px 8px; margin-bottom: 8px; font-size: 10px; font-weight: 800; color: #34D399; background: rgba(16, 185, 129, 0.12); border-radius: 6px;">🏢 {{ __("Acoustic Room Channel:") }} ${escapeHtml(myRoom.name)}</div>`;
                 } else {
-                    headerHint = `<div style="text-align: center; padding: 4px 8px; margin-bottom: 8px; font-size: 10px; font-weight: 800; color: #F59E0B; background: rgba(245, 158, 11, 0.12); border-radius: 6px;">🚪 {{ __("Hallway / Open Space (Enter a room to chat with room occupants)") }}</div>`;
+                    headerHint = `<div style="text-align: center; padding: 4px 8px; margin-bottom: 8px; font-size: 10px; font-weight: 800; color: var(--ula-gold-500); background: rgba(245, 158, 11, 0.12); border-radius: 6px;">🚪 {{ __("Hallway / Open Space (Enter a room to chat with room occupants)") }}</div>`;
                 }
             } else {
                 headerHint = `<div style="text-align: center; padding: 4px 8px; margin-bottom: 8px; font-size: 10px; font-weight: 800; color: #60A5FA; background: rgba(59, 130, 246, 0.12); border-radius: 6px;">🌐 {{ __("Company-Wide General Office Channel") }}</div>`;
@@ -6813,7 +6804,7 @@
                     } else {
                         statusHtml = `<span style="font-size:11px; color:var(--ula-text-muted);">${av.camActive ? '🟢 {{ __("Camera Active") }}' : '{{ __("Camera Off") }}'}</span>`;
                     }
-                    rCard.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; padding:10px;"><div style="width:52px;height:52px;border-radius:50%;background:rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#93C5FD;">${init}</div>${statusHtml}</div>`;
+                    rCard.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; padding:10px;"><div style="width:52px;height:52px;border-radius:50%;background:rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--ula-accent-default);">${init}</div>${statusHtml}</div>`;
                 }
                 const rLabel = document.createElement('div');
                 rLabel.style.cssText = 'position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; color: #FFFFFF;';
@@ -6991,7 +6982,7 @@
                 const dot = document.getElementById('webrtc-quality-dot');
                 const text = document.getElementById('webrtc-quality-text');
                 if (dot && text) {
-                    dot.style.background = quality === 'excellent' ? '#10B981' : (quality === 'good' || quality === 'fair' ? '#F59E0B' : '#EF4444');
+                    dot.style.background = quality === 'excellent' ? '#10B981' : (quality === 'good' || quality === 'fair' ? 'var(--ula-gold-500)' : '#EF4444');
                     text.textContent = quality === 'excellent' ? '{{ __("Excellent") }}' : (quality === 'good' ? '{{ __("Good") }}' : quality.toUpperCase());
                 }
             });
