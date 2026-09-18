@@ -372,7 +372,7 @@
                 <div style="display: grid; grid-template-columns: 60px 1fr; gap: 10px;">
                     <div>
                         <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Icon') }}</label>
-                        <input type="text" name="icon" value="<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">description</span>" class="form-input" style="text-align: center; font-size: 16px;">
+                        <input type="text" name="icon" value="📄" class="form-input" style="text-align: center; font-size: 16px;">
                     </div>
                     <div>
                         <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Document Title') }} *</label>
