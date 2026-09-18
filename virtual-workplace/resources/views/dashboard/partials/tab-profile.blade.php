@@ -13,7 +13,7 @@
             <!-- Avatar with Stylized Camera Badge -->
             <div style="position: relative; width: 92px; height: 92px; border-radius: var(--ula-radius-xl, 24px); overflow: hidden; box-shadow: var(--ula-shadow-md); border: 2.5px solid var(--ula-palm-700, var(--ula-palm-700)); background: var(--ula-palm-900, var(--ula-palm-900)); flex-shrink: 0;">
                 <img id="user-profile-preview-avatar" src="{{ $user->avatar_url ? $user->avatar_url : '' }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; object-fit: cover; {{ $user->avatar_url ? '' : 'display: none;' }}">
-                <div id="user-profile-avatar-fallback" style="width: 100%; height: 100%; display: {{ $user->avatar_url ? 'none' : 'flex' }}; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; color: var(--ula-sand-100, var(--ula-sand-100)); font-family: var(--ula-font-mono);">
+                <div id="user-profile-avatar-fallback" style="width: 100%; height: 100%; display: {{ $user->avatar_url ? 'none' : 'flex' }}; align-items: center; justify-content: center; font-size: 32px; font-weight: 800; color: var(--ula-sand-100, var(--ula-sand-100)); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                     {{ strtoupper(substr($user->name, 0, 2)) }}
                 </div>
             </div>
@@ -23,7 +23,7 @@
                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                     <h2 style="font-size: 22px; font-weight: 800; color: var(--ula-text-primary); margin: 0;">{{ $user->name }}</h2>
                     @if($user->nickname)
-                        <span class="nav-badge-pill" style="font-size: 12px; font-family: var(--ula-font-mono); dir: ltr;">{{ '@' . $user->nickname }}</span>
+                        <span class="nav-badge-pill" style="font-size: 12px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; dir: ltr;">{{ '@' . $user->nickname }}</span>
                     @endif
                     <span class="nav-badge-pill" style="background: rgba(30, 65, 47, 0.1); color: var(--ula-palm-700, var(--ula-palm-700)); font-size: 11px; font-weight: 700;">
                         {{ $membership->role->name ?? __('Member') }}
@@ -42,7 +42,7 @@
                     <span style="color: var(--ula-border-subtle);">•</span>
                     <span style="display: flex; align-items: center; gap: 5px;">
                         <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-text-muted);">mail</span>
-                        <span style="font-family: var(--ula-font-mono);">{{ $user->email }}</span>
+                        <span style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $user->email }}</span>
                     </span>
                 </div>
             </div>
@@ -92,7 +92,7 @@
                         <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-text-muted);">alternate_email</span>
                         <span>{{ __('Nickname / Display Handle') }}</span>
                     </label>
-                    <input type="text" name="nickname" value="{{ old('nickname', $user->nickname) }}" placeholder="e.g. sparky, alex_dev" class="form-input" style="width: 100%; background: var(--ula-sand-100, var(--ula-sand-100)); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md, 12px); padding: 10px 14px; color: var(--ula-palm-800, var(--ula-palm-800)); font-size: 13px; font-weight: 700; font-family: var(--ula-font-mono); outline: none; text-align: start; dir: ltr;">
+                    <input type="text" name="nickname" value="{{ old('nickname', $user->nickname) }}" placeholder="e.g. sparky, alex_dev" class="form-input" style="width: 100%; background: var(--ula-sand-100, var(--ula-sand-100)); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md, 12px); padding: 10px 14px; color: var(--ula-palm-800, var(--ula-palm-800)); font-size: 13px; font-weight: 700; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; outline: none; text-align: start; dir: ltr;">
                 </div>
 
                 <!-- Email -->
@@ -101,7 +101,7 @@
                         <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-text-muted);">mail</span>
                         <span>{{ __('Email Address') }}</span> <span style="color: var(--ula-status-danger, var(--ula-terracotta-500));">*</span>
                     </label>
-                    <input type="email" name="email" required value="{{ old('email', $user->email) }}" class="form-input" style="width: 100%; background: var(--ula-sand-100, var(--ula-sand-100)); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md, 12px); padding: 10px 14px; color: var(--ula-text-primary); font-size: 13px; font-weight: 600; font-family: var(--ula-font-mono); outline: none; text-align: start;">
+                    <input type="email" name="email" required value="{{ old('email', $user->email) }}" class="form-input" style="width: 100%; background: var(--ula-sand-100, var(--ula-sand-100)); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md, 12px); padding: 10px 14px; color: var(--ula-text-primary); font-size: 13px; font-weight: 600; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; outline: none; text-align: start;">
                 </div>
 
                 <!-- Date of Birth & Phone -->
@@ -111,14 +111,14 @@
                             <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-text-muted);">calendar_today</span>
                             <span>{{ __('Date of Birth') }}</span>
                         </label>
-                        <input type="date" name="date_of_birth" value="{{ old('date_of_birth', $myProfile->date_of_birth ? $myProfile->date_of_birth->format('Y-m-d') : '') }}" class="form-input" style="width: 100%; background: var(--ula-sand-100, var(--ula-sand-100)); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md, 12px); padding: 10px 14px; color: var(--ula-text-primary); font-size: 12px; font-weight: 600; font-family: var(--ula-font-mono); outline: none; text-align: start;">
+                        <input type="date" name="date_of_birth" value="{{ old('date_of_birth', $myProfile->date_of_birth ? $myProfile->date_of_birth->format('Y-m-d') : '') }}" class="form-input" style="width: 100%; background: var(--ula-sand-100, var(--ula-sand-100)); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md, 12px); padding: 10px 14px; color: var(--ula-text-primary); font-size: 12px; font-weight: 600; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; outline: none; text-align: start;">
                     </div>
                     <div>
                         <label style="display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">
                             <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-text-muted);">phone</span>
                             <span>{{ __('Phone Number') }}</span>
                         </label>
-                        <input type="text" name="phone" value="{{ old('phone', $myProfile->phone) }}" placeholder="+966 50 123 4567" class="form-input" style="width: 100%; background: var(--ula-sand-100, var(--ula-sand-100)); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md, 12px); padding: 10px 14px; color: var(--ula-text-primary); font-size: 12px; font-weight: 600; font-family: var(--ula-font-mono); outline: none; text-align: start; dir: ltr;">
+                        <input type="text" name="phone" value="{{ old('phone', $myProfile->phone) }}" placeholder="+966 50 123 4567" class="form-input" style="width: 100%; background: var(--ula-sand-100, var(--ula-sand-100)); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md, 12px); padding: 10px 14px; color: var(--ula-text-primary); font-size: 12px; font-weight: 600; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; outline: none; text-align: start; dir: ltr;">
                     </div>
                 </div>
 
@@ -213,19 +213,19 @@
                         <div style="display: flex; flex-direction: column; gap: 10px;">
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <span style="min-width: 70px; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">LinkedIn</span>
-                                <input type="url" name="linkedin" value="{{ old('linkedin', $social['linkedin'] ?? '') }}" placeholder="https://linkedin.com/in/username" class="form-input" style="flex: 1; background: var(--ula-sand-100, var(--ula-sand-100)); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md, 12px); padding: 8px 12px; color: var(--ula-text-primary); font-size: 12px; font-family: var(--ula-font-mono); outline: none; text-align: start; dir: ltr;">
+                                <input type="url" name="linkedin" value="{{ old('linkedin', $social['linkedin'] ?? '') }}" placeholder="https://linkedin.com/in/username" class="form-input" style="flex: 1; background: var(--ula-sand-100, var(--ula-sand-100)); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md, 12px); padding: 8px 12px; color: var(--ula-text-primary); font-size: 12px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; outline: none; text-align: start; dir: ltr;">
                             </div>
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <span style="min-width: 70px; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">GitHub</span>
-                                <input type="url" name="github" value="{{ old('github', $social['github'] ?? '') }}" placeholder="https://github.com/username" class="form-input" style="flex: 1; background: var(--ula-sand-100, var(--ula-sand-100)); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md, 12px); padding: 8px 12px; color: var(--ula-text-primary); font-size: 12px; font-family: var(--ula-font-mono); outline: none; text-align: start; dir: ltr;">
+                                <input type="url" name="github" value="{{ old('github', $social['github'] ?? '') }}" placeholder="https://github.com/username" class="form-input" style="flex: 1; background: var(--ula-sand-100, var(--ula-sand-100)); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md, 12px); padding: 8px 12px; color: var(--ula-text-primary); font-size: 12px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; outline: none; text-align: start; dir: ltr;">
                             </div>
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <span style="min-width: 70px; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">X (Twitter)</span>
-                                <input type="url" name="twitter" value="{{ old('twitter', $social['twitter'] ?? '') }}" placeholder="https://x.com/username" class="form-input" style="flex: 1; background: var(--ula-sand-100, var(--ula-sand-100)); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md, 12px); padding: 8px 12px; color: var(--ula-text-primary); font-size: 12px; font-family: var(--ula-font-mono); outline: none; text-align: start; dir: ltr;">
+                                <input type="url" name="twitter" value="{{ old('twitter', $social['twitter'] ?? '') }}" placeholder="https://x.com/username" class="form-input" style="flex: 1; background: var(--ula-sand-100, var(--ula-sand-100)); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md, 12px); padding: 8px 12px; color: var(--ula-text-primary); font-size: 12px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; outline: none; text-align: start; dir: ltr;">
                             </div>
                             <div style="display: flex; align-items: center; gap: 10px;">
                                 <span style="min-width: 70px; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">Website</span>
-                                <input type="url" name="website" value="{{ old('website', $social['website'] ?? '') }}" placeholder="https://mywebsite.com" class="form-input" style="flex: 1; background: var(--ula-sand-100, var(--ula-sand-100)); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md, 12px); padding: 8px 12px; color: var(--ula-text-primary); font-size: 12px; font-family: var(--ula-font-mono); outline: none; text-align: start; dir: ltr;">
+                                <input type="url" name="website" value="{{ old('website', $social['website'] ?? '') }}" placeholder="https://mywebsite.com" class="form-input" style="flex: 1; background: var(--ula-sand-100, var(--ula-sand-100)); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md, 12px); padding: 8px 12px; color: var(--ula-text-primary); font-size: 12px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; outline: none; text-align: start; dir: ltr;">
                             </div>
                         </div>
                     </div>

@@ -31,7 +31,7 @@
             <button type="button" onclick="shiftTimesheetDate(-1)" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center;" title="{{ __('Previous Day') }}">
                 <span class="material-symbols-rounded" style="font-size: 14px;">chevron_left</span>
             </button>
-            <input type="date" id="ts-filter-date" value="{{ date('Y-m-d') }}" onchange="handleTimesheetDateChange(this.value)" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md); padding: 6px 12px; color: var(--ula-text-primary); font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); font-family: var(--ula-font-mono); outline: none; box-shadow: var(--ula-shadow-xs);">
+            <input type="date" id="ts-filter-date" value="{{ date('Y-m-d') }}" onchange="handleTimesheetDateChange(this.value)" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md); padding: 6px 12px; color: var(--ula-text-primary); font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; outline: none; box-shadow: var(--ula-shadow-xs);">
             <button type="button" onclick="setTimesheetToday()" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold);">{{ __('Today') }}</button>
             <button type="button" onclick="shiftTimesheetDate(1)" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center;" title="{{ __('Next Day') }}">
                 <span class="material-symbols-rounded" style="font-size: 14px;">chevron_right</span>
@@ -85,11 +85,11 @@
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: 10px;">
-                <span class="nav-badge-pill" id="ts-online-count-pill" style="background: rgba(79, 155, 95, 0.2); color: var(--ula-status-success); font-weight: var(--ula-weight-bold); font-size: 11px; font-family: var(--ula-font-mono); display: inline-flex; align-items: center; gap: 4px;">
+                <span class="nav-badge-pill" id="ts-online-count-pill" style="background: rgba(79, 155, 95, 0.2); color: var(--ula-status-success); font-weight: var(--ula-weight-bold); font-size: 11px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; display: inline-flex; align-items: center; gap: 4px;">
                     <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--ula-status-success);"></span>
                     <span>0 {{ __('Online Now') }}</span>
                 </span>
-                <span class="nav-badge-pill" id="ts-total-members-pill" style="background: var(--ula-surface-page-alt); color: var(--ula-text-secondary); font-size: 11px; font-family: var(--ula-font-mono);">{{ count($members) }} {{ __('Total Team') }}</span>
+                <span class="nav-badge-pill" id="ts-total-members-pill" style="background: var(--ula-surface-page-alt); color: var(--ula-text-secondary); font-size: 11px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ count($members) }} {{ __('Total Team') }}</span>
             </div>
         </div>
         <div style="overflow-x: auto;">
@@ -129,7 +129,7 @@
                     <span class="material-symbols-rounded" style="font-size: 18px;">apartment</span>
                 </div>
             </div>
-            <div class="kpi-value" id="ts-kpi-office-time" style="font-family: var(--ula-font-mono); font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary);">00:00:00</div>
+            <div class="kpi-value" id="ts-kpi-office-time" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary);">00:00:00</div>
             <div class="kpi-trend" style="color: var(--ula-accent-default); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 14px;">check_circle</span>
                 <span>{{ __('Automated presence tracking') }}</span>
@@ -144,7 +144,7 @@
                     <span class="material-symbols-rounded" style="font-size: 18px;">schedule</span>
                 </div>
             </div>
-            <div class="kpi-value" id="ts-kpi-task-time" style="font-family: var(--ula-font-mono); font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-status-success);">00:00:00</div>
+            <div class="kpi-value" id="ts-kpi-task-time" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-status-success);">00:00:00</div>
             <div class="kpi-trend" style="color: var(--ula-status-success); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 14px;">trending_up</span>
                 <span>{{ __('Logged against active tasks') }}</span>
@@ -159,7 +159,7 @@
                     <span class="material-symbols-rounded" style="font-size: 18px;">pause_circle</span>
                 </div>
             </div>
-            <div class="kpi-value" id="ts-kpi-idle-time" style="font-family: var(--ula-font-mono); font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-gold-400);">00:00:00</div>
+            <div class="kpi-value" id="ts-kpi-idle-time" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-gold-400);">00:00:00</div>
             <div class="kpi-trend" style="color: var(--ula-text-muted); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 14px;">hourglass_empty</span>
                 <span>{{ __('Inactivity stops excluded') }}</span>
@@ -174,7 +174,7 @@
                     <span class="material-symbols-rounded" style="font-size: 18px;">analytics</span>
                 </div>
             </div>
-            <div class="kpi-value" id="ts-kpi-ratio" style="font-family: var(--ula-font-mono); font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-gold-500);">0%</div>
+            <div class="kpi-value" id="ts-kpi-ratio" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-gold-500);">0%</div>
             <div class="kpi-trend" style="color: var(--ula-accent-default); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 14px;">bolt</span>
                 <span>{{ __('Task Time ÷ Office Time') }}</span>
@@ -196,7 +196,7 @@
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: 14px;">
-                <div id="ts-banner-clock" style="font-size: 20px; font-weight: 900; font-family: var(--ula-font-mono); color: var(--ula-accent-default);">00:00:00</div>
+                <div id="ts-banner-clock" style="font-size: 20px; font-weight: 900; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; color: var(--ula-accent-default);">00:00:00</div>
                 <button type="button" onclick="stopGlobalTimer()" class="tactile-btn" style="background: var(--ula-status-danger); color: white; border: none; padding: 7px 14px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px; border-radius: var(--ula-radius-md);">
                     <span class="material-symbols-rounded" style="font-size: 14px;">stop</span>
                     <span>{{ __('Stop Timer') }}</span>
@@ -219,7 +219,7 @@
                     <p style="font-size: 11px; color: var(--ula-text-secondary); margin: 2px 0 0 0;">{{ __('Detailed breakdown of all work orders, milestones, and task sessions completed on this date.') }}</p>
                 </div>
             </div>
-            <span class="nav-badge-pill" id="ts-tasks-count-pill" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success); font-size: 11px; font-weight: 800; font-family: var(--ula-font-mono);">0 {{ __('Tasks') }}</span>
+            <span class="nav-badge-pill" id="ts-tasks-count-pill" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success); font-size: 11px; font-weight: 800; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">0 {{ __('Tasks') }}</span>
         </div>
         <div style="overflow-x: auto;">
             <table class="data-table" style="width: 100%; border-collapse: collapse;">
@@ -262,7 +262,7 @@
                     <p style="font-size: 11px; color: var(--ula-text-secondary); margin: 2px 0 0 0;">{{ __('Recorded 3D office presence sessions, check-ins, idle pauses, and branch room presence.') }}</p>
                 </div>
             </div>
-            <span class="nav-badge-pill" id="ts-attendance-count-pill" style="background: var(--ula-surface-accent-soft); color: var(--ula-accent-default); font-size: 11px; font-weight: 800; font-family: var(--ula-font-mono);">0 {{ __('Sessions') }}</span>
+            <span class="nav-badge-pill" id="ts-attendance-count-pill" style="background: var(--ula-surface-accent-soft); color: var(--ula-accent-default); font-size: 11px; font-weight: 800; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">0 {{ __('Sessions') }}</span>
         </div>
         <div style="overflow-x: auto;">
             <table class="data-table" style="width: 100%; border-collapse: collapse;">
@@ -321,9 +321,9 @@
                     @forelse($allTimesheets as $ts)
                         <tr style="border-bottom: 1px solid var(--ula-border-subtle);">
                             <td style="padding: 14px 16px; font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-size: var(--ula-size-sm);">{{ $ts->user->name ?? 'Member' }}</td>
-                            <td style="padding: 14px 16px; font-size: var(--ula-size-xs); color: var(--ula-text-secondary); font-family: var(--ula-font-mono);">{{ $ts->period_start->format('M d') }} — {{ $ts->period_end->format('M d, Y') }}</td>
-                            <td style="padding: 14px 16px; font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-family: var(--ula-font-mono); font-size: var(--ula-size-xs);">{{ $ts->total_hours }}h</td>
-                            <td style="padding: 14px 16px; color: var(--ula-accent-default); font-weight: var(--ula-weight-bold); font-family: var(--ula-font-mono); font-size: var(--ula-size-xs);">{{ $ts->billable_hours }}h</td>
+                            <td style="padding: 14px 16px; font-size: var(--ula-size-xs); color: var(--ula-text-secondary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $ts->period_start->format('M d') }} — {{ $ts->period_end->format('M d, Y') }}</td>
+                            <td style="padding: 14px 16px; font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: var(--ula-size-xs);">{{ $ts->total_hours }}h</td>
+                            <td style="padding: 14px 16px; color: var(--ula-accent-default); font-weight: var(--ula-weight-bold); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: var(--ula-size-xs);">{{ $ts->billable_hours }}h</td>
                             <td style="padding: 14px 16px;">
                                 @if($ts->status === 'approved')
                                     <span class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success); display: inline-flex; align-items: center; gap: 3px;">

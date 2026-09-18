@@ -31,7 +31,7 @@
                             </div>
                             <div>
                                 <h3 style="font-size: var(--ula-size-body); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); margin-bottom: 2px;">{{ $dept->name }}</h3>
-                                <span style="font-size: var(--ula-size-xs); color: var(--ula-text-muted); font-weight: var(--ula-weight-semibold); font-family: var(--ula-font-mono);">{{ $dept->teams->count() }} {{ __('Teams') }} • {{ $deptMembers->count() }} {{ __('Members') }}</span>
+                                <span style="font-size: var(--ula-size-xs); color: var(--ula-text-muted); font-weight: var(--ula-weight-semibold); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $dept->teams->count() }} {{ __('Teams') }} • {{ $deptMembers->count() }} {{ __('Members') }}</span>
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: var(--ula-space-3);">
@@ -87,7 +87,7 @@
                                 @endphp
                                 <div style="display: flex; align-items: center; justify-content: space-between; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); padding: 8px 12px; border-radius: var(--ula-radius-md);">
                                     <div style="display: flex; align-items: center; gap: var(--ula-space-3);">
-                                        <div style="width: 28px; height: 28px; border-radius: var(--ula-radius-sm); background: var(--ula-gradient-accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: var(--ula-weight-bold); font-family: var(--ula-font-mono); box-shadow: var(--ula-shadow-xs);">
+                                        <div style="width: 28px; height: 28px; border-radius: var(--ula-radius-sm); background: var(--ula-gradient-accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: var(--ula-weight-bold); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; box-shadow: var(--ula-shadow-xs);">
                                             {{ strtoupper(substr($dm->user->name, 0, 2)) }}
                                         </div>
                                         <div>

@@ -2957,7 +2957,7 @@
                                     ${escapeHtml(msg.body).replace(/\n/g, '<br>')}
                                 </div>
                                 
-                                <span style="font-size: 9px; color: var(--ula-text-muted); margin-top: 3px; margin-inline-start: 4px; margin-inline-end: 4px; font-family: var(--ula-font-mono);">
+                                <span style="font-size: 9px; color: var(--ula-text-muted); margin-top: 3px; margin-inline-start: 4px; margin-inline-end: 4px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                                     ${msg.created_at}
                                 </span>
                             </div>

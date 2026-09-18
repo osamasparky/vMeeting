@@ -51,7 +51,7 @@
             @endif
             <span>{{ $tabLabel }}</span>
             @if($tabBadge)
-                <span class="px-1.5 py-0.5 text-[10px] font-[family-name:var(--ula-font-mono)] rounded-full {{ $isActive ? 'bg-[var(--ula-alpha-ivory-18)] text-[var(--ula-accent-fg)]' : 'bg-[var(--ula-surface-sunken)] text-[var(--ula-text-secondary)]' }}">
+                <span class="px-1.5 py-0.5 text-[10px] font-[family-name:var(--ula-font-mono)] rounded-full [direction:ltr] [unicode-bidi:isolate] {{ $isActive ? 'bg-[var(--ula-alpha-ivory-18)] text-[var(--ula-accent-fg)]' : 'bg-[var(--ula-surface-sunken)] text-[var(--ula-text-secondary)]' }}">
                     {{ $tabBadge }}
                 </span>
             @endif

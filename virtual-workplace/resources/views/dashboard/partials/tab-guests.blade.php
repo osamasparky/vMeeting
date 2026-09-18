@@ -29,7 +29,7 @@
             <h3 style="font-size: var(--ula-size-body); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); display: flex; align-items: center; gap: var(--ula-space-3); margin: 0;">
                 <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-accent-default);">share</span>
                 <span>{{ __('Active & Recent Guest Invitations') }}</span>
-                <span class="nav-badge-pill" style="font-family: var(--ula-font-mono);">{{ $guestInvitations->count() }}</span>
+                <span class="nav-badge-pill" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $guestInvitations->count() }}</span>
             </h3>
         </div>
         <div style="overflow-x: auto;">
@@ -58,11 +58,11 @@
                                     <span>{{ $inv->room->name ?? __('Main Conference') }}</span>
                                 </div>
                             </td>
-                            <td style="padding: 14px 16px; font-size: var(--ula-size-xs); color: var(--ula-text-muted); font-family: var(--ula-font-mono);">
+                            <td style="padding: 14px 16px; font-size: var(--ula-size-xs); color: var(--ula-text-muted); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                                 {{ $inv->expires_at ? $inv->expires_at->diffForHumans() : __('Never') }}
                             </td>
                             <td style="padding: 14px 16px;">
-                                <code style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); padding: 4px 10px; border-radius: var(--ula-radius-sm); font-size: 11px; color: var(--ula-accent-default); font-family: var(--ula-font-mono); box-shadow: var(--ula-shadow-xs);">
+                                <code style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); padding: 4px 10px; border-radius: var(--ula-radius-sm); font-size: 11px; color: var(--ula-accent-default); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; box-shadow: var(--ula-shadow-xs);">
                                     /guest/join/{{ substr($inv->token, 0, 16) }}...
                                 </code>
                             </td>

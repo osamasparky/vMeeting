@@ -37,7 +37,7 @@
                         <span class="material-symbols-rounded" style="font-size: 16px; color: {{ $colMeta['color'] }};">{{ $colMeta['icon'] }}</span>
                         <span>{{ $colMeta['title'] }}</span>
                     </h3>
-                    <span class="nav-badge-pill" id="mytasks-kanban-cnt-{{ $colKey }}" style="font-weight: var(--ula-weight-bold); font-family: var(--ula-font-mono);">{{ $colTasks->count() }}</span>
+                    <span class="nav-badge-pill" id="mytasks-kanban-cnt-{{ $colKey }}" style="font-weight: var(--ula-weight-bold); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $colTasks->count() }}</span>
                 </div>
 
                 <div class="kanban-cards-container" id="mytasks-kanban-col-{{ $colKey }}" data-status="{{ $colKey }}" style="display: flex; flex-direction: column; gap: 10px; flex: 1; min-height: 120px;">
@@ -60,7 +60,7 @@
                                         {{ $t->project->code ?? 'PRJ' }}-#{{ $t->task_number ?? 1 }}
                                     </span>
                                     @if($t->checklistItems && $t->checklistItems->count() > 0)
-                                        <span class="badge-pill badge-green" style="font-size: 9.5px; font-family: var(--ula-font-mono); display: inline-flex; align-items: center; gap: 2px;" title="{{ __('Checklist Progress') }}">
+                                        <span class="badge-pill badge-green" style="font-size: 9.5px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; display: inline-flex; align-items: center; gap: 2px;" title="{{ __('Checklist Progress') }}">
                                             <span class="material-symbols-rounded" style="font-size: 11px;">check_box</span>
                                             <span>{{ $t->checklistItems->where('is_completed', true)->count() }}/{{ $t->checklistItems->count() }}</span>
                                         </span>
@@ -118,7 +118,7 @@
                                     <span>{{ $t->project->name ?? 'General' }}</span>
                                 </span>
                                 @if($t->due_date)
-                                    <span class="task-due-date {{ $t->due_date->isPast() && $t->status !== 'done' ? 'is-overdue' : '' }}" style="display: inline-flex; align-items: center; gap: 3px; font-family: var(--ula-font-mono);">
+                                    <span class="task-due-date {{ $t->due_date->isPast() && $t->status !== 'done' ? 'is-overdue' : '' }}" style="display: inline-flex; align-items: center; gap: 3px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                                         <span class="material-symbols-rounded" style="font-size: 12px;">calendar_today</span>
                                         <span>{{ $t->due_date->format('M d') }}</span>
                                     </span>
@@ -137,7 +137,7 @@
                                     </select>
                                 </div>
 
-                                <button type="button" onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="tactile-btn" style="background: var(--ula-surface-accent-soft); color: var(--ula-accent-default); border: 1px solid var(--ula-border-subtle); padding: 3px 8px; font-size: 10.5px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 2px; font-family: var(--ula-font-mono);" title="{{ __('Start Timer') }}">
+                                <button type="button" onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="tactile-btn" style="background: var(--ula-surface-accent-soft); color: var(--ula-accent-default); border: 1px solid var(--ula-border-subtle); padding: 3px 8px; font-size: 10.5px; border-radius: var(--ula-radius-pill); display: inline-flex; align-items: center; gap: 2px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;" title="{{ __('Start Timer') }}">
                                     <span class="material-symbols-rounded" style="font-size: 12px;">play_arrow</span>
                                     <span>{{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h</span>
                                 </button>

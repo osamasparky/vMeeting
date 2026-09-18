@@ -37,11 +37,11 @@
         <div class="kpi-info" style="flex: 1;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3>{{ __('Total Companies') }}</h3>
-                <span class="nav-badge-pill" style="font-size: 10px; color: var(--ula-palm-900); font-family: var(--ula-font-mono);">
+                <span class="nav-badge-pill" style="font-size: 10px; color: var(--ula-palm-900); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                     +{{ $stats['new_companies_month'] }} {{ __('this mo') }}
                 </span>
             </div>
-            <div class="kpi-value" style="margin: 4px 0; font-family: var(--ula-font-mono);">{{ $stats['total_companies'] }}</div>
+            <div class="kpi-value" style="margin: 4px 0; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['total_companies'] }}</div>
             <div style="font-size: 11px; color: var(--ula-text-muted); display: flex; gap: 8px;">
                 <span style="color: var(--ula-status-success); font-weight: 700; display: inline-flex; align-items: center; gap: 3px;">
                     <span class="material-symbols-rounded" style="font-size: 14px;">check_circle</span>
@@ -65,13 +65,13 @@
         <div class="kpi-info" style="flex: 1;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3>{{ __('Total Users') }}</h3>
-                <span class="nav-badge-pill" style="font-size: 10px; color: var(--ula-palm-900); font-family: var(--ula-font-mono);">
+                <span class="nav-badge-pill" style="font-size: 10px; color: var(--ula-palm-900); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                     +{{ $stats['new_users_month'] }} {{ __('new') }}
                 </span>
             </div>
-            <div class="kpi-value" style="margin: 4px 0; font-family: var(--ula-font-mono);">{{ $stats['total_users'] }}</div>
+            <div class="kpi-value" style="margin: 4px 0; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['total_users'] }}</div>
             <div style="font-size: 11px; color: var(--ula-text-muted); font-weight: 700;">
-                <span style="font-family: var(--ula-font-mono);">{{ $stats['total_companies'] > 0 ? round($stats['total_users'] / $stats['total_companies'], 1) : 0 }}</span> {{ __('avg users / tenant') }}
+                <span style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['total_companies'] > 0 ? round($stats['total_users'] / $stats['total_companies'], 1) : 0 }}</span> {{ __('avg users / tenant') }}
             </div>
         </div>
     </div>
@@ -84,13 +84,13 @@
         <div class="kpi-info" style="flex: 1;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3>{{ __('Paid Subscriptions') }}</h3>
-                <span class="nav-badge-pill" style="font-size: 10px; color: var(--ula-gold-400); font-family: var(--ula-font-mono);">
+                <span class="nav-badge-pill" style="font-size: 10px; color: var(--ula-gold-400); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                     {{ $stats['conversion_rate'] }}% {{ __('Paid') }}
                 </span>
             </div>
-            <div class="kpi-value" style="margin: 4px 0; font-family: var(--ula-font-mono);">{{ $stats['active_subscriptions'] }}</div>
+            <div class="kpi-value" style="margin: 4px 0; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['active_subscriptions'] }}</div>
             <div style="font-size: 11px; color: var(--ula-text-muted); font-weight: 700;">
-                <span style="font-family: var(--ula-font-mono);">{{ $stats['total_companies'] - $stats['active_subscriptions'] }}</span> {{ __('Free / Starter tier') }}
+                <span style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['total_companies'] - $stats['active_subscriptions'] }}</span> {{ __('Free / Starter tier') }}
             </div>
         </div>
     </div>
@@ -103,15 +103,15 @@
         <div class="kpi-info" style="flex: 1;">
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h3>{{ __('Estimated MRR') }}</h3>
-                <span class="nav-badge-pill" style="font-size: 10px; color: var(--ula-palm-900); font-family: var(--ula-font-mono);">
+                <span class="nav-badge-pill" style="font-size: 10px; color: var(--ula-palm-900); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                     ${{ number_format($stats['estimated_arr'], 0) }} {{ __('ARR') }}
                 </span>
             </div>
-            <div class="kpi-value" style="margin: 4px 0; color: var(--ula-palm-900); font-family: var(--ula-font-mono);">
+            <div class="kpi-value" style="margin: 4px 0; color: var(--ula-palm-900); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                 ${{ number_format($stats['estimated_mrr'], 2) }}
             </div>
             <div style="font-size: 11px; color: var(--ula-text-secondary); font-weight: 700;">
-                ≈ <span style="font-family: var(--ula-font-mono);">{{ number_format($stats['estimated_mrr_sar'], 2) }}</span> SAR / {{ __('month') }}
+                ≈ <span style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ number_format($stats['estimated_mrr_sar'], 2) }}</span> SAR / {{ __('month') }}
             </div>
         </div>
     </div>
@@ -125,7 +125,7 @@
         </div>
         <div class="kpi-info">
             <h3 style="font-size: 11px;">{{ __('Meeting Rooms') }}</h3>
-            <div class="kpi-value" style="font-size: 19px; font-family: var(--ula-font-mono);">{{ $stats['total_rooms'] }}</div>
+            <div class="kpi-value" style="font-size: 19px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['total_rooms'] }}</div>
         </div>
     </div>
 
@@ -135,7 +135,7 @@
         </div>
         <div class="kpi-info">
             <h3 style="font-size: 11px;">{{ __('Total Projects') }}</h3>
-            <div class="kpi-value" style="font-size: 19px; font-family: var(--ula-font-mono);">{{ $stats['total_projects'] }}</div>
+            <div class="kpi-value" style="font-size: 19px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['total_projects'] }}</div>
         </div>
     </div>
 
@@ -145,7 +145,7 @@
         </div>
         <div class="kpi-info">
             <h3 style="font-size: 11px;">{{ __('Logged Hours') }}</h3>
-            <div class="kpi-value" style="font-size: 19px; font-family: var(--ula-font-mono);">{{ $stats['total_logged_hours'] }}h</div>
+            <div class="kpi-value" style="font-size: 19px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['total_logged_hours'] }}h</div>
         </div>
     </div>
 
@@ -155,7 +155,7 @@
         </div>
         <div class="kpi-info">
             <h3 style="font-size: 11px;">{{ __('Audit Events') }}</h3>
-            <div class="kpi-value" style="font-size: 19px; font-family: var(--ula-font-mono);">{{ $stats['total_audit_events'] }}</div>
+            <div class="kpi-value" style="font-size: 19px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['total_audit_events'] }}</div>
         </div>
     </div>
 </div>
@@ -184,11 +184,11 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 13px;">
                         <span style="font-weight: 700; color: var(--ula-text-primary); display: inline-flex; align-items: center; gap: 6px;">
                             <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-palm-700);">verified</span>
-                            <span>{{ $plan->name }} (<span style="font-family: var(--ula-font-mono);">${{ number_format($plan->price, 0) }}/mo</span>)</span>
+                            <span>{{ $plan->name }} (<span style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">${{ number_format($plan->price, 0) }}/mo</span>)</span>
                         </span>
                         <div style="display: flex; align-items: center; gap: 6px;">
-                            <span style="font-weight: 800; color: var(--ula-palm-900); font-family: var(--ula-font-mono);">{{ $plan->organizations_count }}</span>
-                            <span style="font-size: 11px; color: var(--ula-text-muted); font-family: var(--ula-font-mono);">({{ $percentage }}%)</span>
+                            <span style="font-weight: 800; color: var(--ula-palm-900); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $plan->organizations_count }}</span>
+                            <span style="font-size: 11px; color: var(--ula-text-muted); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">({{ $percentage }}%)</span>
                         </div>
                     </div>
                     <div style="width: 100%; height: 8px; background: var(--ula-surface-page-alt); border-radius: 9999px; overflow: hidden; border: 1px solid var(--ula-border-subtle);">
@@ -201,7 +201,7 @@
 
         <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; font-size: 12px;">
             <span style="color: var(--ula-text-secondary); font-weight: 600;">{{ __('Total Active Tenants') }}:</span>
-            <strong style="color: var(--ula-palm-900); font-size: 14px; font-family: var(--ula-font-mono);">{{ $stats['total_companies'] }} {{ __('Organizations') }}</strong>
+            <strong style="color: var(--ula-palm-900); font-size: 14px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['total_companies'] }} {{ __('Organizations') }}</strong>
         </div>
     </div>
 
@@ -232,7 +232,7 @@
                         </div>
                     </div>
                 </div>
-                <div style="font-size: 10px; color: var(--ula-text-muted); font-weight: 600; font-family: var(--ula-font-mono);">
+                <div style="font-size: 10px; color: var(--ula-text-muted); font-weight: 600; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                     {{ $log->created_at?->diffForHumans() }}
                 </div>
             </div>
@@ -292,14 +292,14 @@
                         </span>
                     </td>
                     <td>
-                        <strong style="font-family: var(--ula-font-mono);">{{ number_format($pReq->amount, 2) }} {{ $pReq->currency }}</strong>
+                        <strong style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ number_format($pReq->amount, 2) }} {{ $pReq->currency }}</strong>
                     </td>
                     <td>
                         <div style="display: flex; align-items: center; gap: 4px;">
                             <span class="material-symbols-rounded" style="font-size: 14px; color: var(--ula-text-secondary);">account_balance</span>
                             <span>{{ $pReq->bank_name }}</span>
                         </div>
-                        <div style="font-family: var(--ula-font-mono); font-size: 11px; color: var(--ula-palm-900); font-weight: 700;">#{{ $pReq->transfer_reference }}</div>
+                        <div style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: 11px; color: var(--ula-palm-900); font-weight: 700;">#{{ $pReq->transfer_reference }}</div>
                     </td>
                     <td>
                         @if($pReq->receipt_path)
@@ -311,7 +311,7 @@
                             <span style="color: var(--ula-text-muted); font-size: 11px;">—</span>
                         @endif
                     </td>
-                    <td style="font-size: 11px; color: var(--ula-text-muted); font-family: var(--ula-font-mono);">
+                    <td style="font-size: 11px; color: var(--ula-text-muted); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                         {{ $pReq->created_at->diffForHumans() }}
                     </td>
                     <td>
@@ -366,7 +366,7 @@
                 <tr>
                     <td>
                         <strong style="color: var(--ula-text-primary); font-size: 14px;">{{ $comp->name }}</strong>
-                        <div style="font-size: 11px; color: var(--ula-text-muted); font-family: var(--ula-font-mono);">{{ $comp->slug }}</div>
+                        <div style="font-size: 11px; color: var(--ula-text-muted); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $comp->slug }}</div>
                     </td>
                     <td>
                         <div style="font-weight: 700; color: var(--ula-text-primary);">{{ $owner?->name ?? 'Administrator' }}</div>
@@ -375,16 +375,16 @@
                     <td>
                         <span class="badge-status badge-plan" style="display: inline-flex; align-items: center; gap: 4px;">
                             <span class="material-symbols-rounded" style="font-size: 14px;">workspace_premium</span>
-                            <span>{{ $comp->plan?->name ?? 'Free' }} (<span style="font-family: var(--ula-font-mono);">${{ number_format($comp->plan?->price ?? 0, 2) }}/mo</span>)</span>
+                            <span>{{ $comp->plan?->name ?? 'Free' }} (<span style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">${{ number_format($comp->plan?->price ?? 0, 2) }}/mo</span>)</span>
                         </span>
                     </td>
                     <td>
-                        <div style="font-weight: 700; font-family: var(--ula-font-mono); color: {{ !$isUnlimited && $memberCount >= $seatLimit ? 'var(--ula-status-danger)' : 'var(--ula-palm-900)' }};">
+                        <div style="font-weight: 700; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; color: {{ !$isUnlimited && $memberCount >= $seatLimit ? 'var(--ula-status-danger)' : 'var(--ula-palm-900)' }};">
                             {{ $memberCount }} / {{ $isUnlimited ? '∞' : $seatLimit }} {{ __('Seats') }}
                         </div>
                     </td>
                     <td>
-                        <span style="font-weight: 700; color: var(--ula-text-secondary); font-family: var(--ula-font-mono);">{{ $comp->rooms->count() }} {{ __('Rooms') }}</span>
+                        <span style="font-weight: 700; color: var(--ula-text-secondary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $comp->rooms->count() }} {{ __('Rooms') }}</span>
                     </td>
                     <td>
                         @if($isSuspended)

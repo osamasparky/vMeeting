@@ -315,7 +315,7 @@
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; border-bottom: 1px solid var(--ula-border-subtle); padding-bottom: 14px;">
                 <div>
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap;">
-                        <span id="hub-proj-code" class="nav-badge-pill" style="font-family: var(--ula-font-mono); font-size: 12px;">PRJ-01</span>
+                        <span id="hub-proj-code" class="nav-badge-pill" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: 12px;">PRJ-01</span>
                         <h2 id="hub-proj-name" style="font-size: 20px; font-weight: 900; margin: 0; color: var(--ula-text-primary);">Project Name</h2>
                         <span id="hub-proj-status" class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success);">Active</span>
                         <span id="hub-proj-priority" class="nav-badge-pill" style="background: rgba(214, 162, 58, 0.15); color: var(--ula-gold-400);">High</span>
@@ -489,7 +489,7 @@
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; border-bottom: 1px solid var(--ula-border-subtle); padding-bottom: 12px; flex-wrap: wrap; gap: 10px;">
                 <div>
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px; flex-wrap: wrap;">
-                        <span id="task-modal-code" class="nav-badge-pill" style="font-family: var(--ula-font-mono);">#1</span>
+                        <span id="task-modal-code" class="nav-badge-pill" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">#1</span>
                         <h2 id="task-modal-title" style="font-size: 18px; font-weight: 900; margin: 0; color: var(--ula-text-primary);">Task Title</h2>
                         <span id="task-modal-status-badge" class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.2); color: var(--ula-status-success);">In Progress</span>
                         <span id="task-modal-priority-badge" class="nav-badge-pill" style="background: rgba(217, 107, 95, 0.2); color: var(--ula-status-danger);">Urgent</span>
@@ -521,7 +521,7 @@
                             <option value="done">{{ __('Done / Completed') }}</option>
                         </select>
                     </div>
-                    <div style="font-size: 12px; font-family: var(--ula-font-mono); font-weight: 800; color: var(--ula-accent-default);">
+                    <div style="font-size: 12px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-weight: 800; color: var(--ula-accent-default);">
                         <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span> <span id="task-modal-hours">0h / 0h</span>
                     </div>
                 </div>
@@ -542,17 +542,17 @@
                 <button type="button" onclick="switchTaskInspectorTab('checklist')" id="task-tab-btn-checklist" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--ula-text-secondary);">
                     <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check_box</span></span>
                     <span>{{ __('Checklist') }}</span>
-                    <span id="task-checklist-count" style="font-size: 10px; background: rgba(36, 92, 58, 0.15); color: var(--ula-accent-default); padding: 1px 7px; border-radius: 9999px; font-weight: 800; font-family: var(--ula-font-mono);">0</span>
+                    <span id="task-checklist-count" style="font-size: 10px; background: rgba(36, 92, 58, 0.15); color: var(--ula-accent-default); padding: 1px 7px; border-radius: 9999px; font-weight: 800; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">0</span>
                 </button>
                 <button type="button" onclick="switchTaskInspectorTab('attachments')" id="task-tab-btn-attachments" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--ula-text-secondary);">
                     <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">attach_file</span></span>
                     <span>{{ __('Files') }}</span>
-                    <span id="task-attachments-count" style="font-size: 10px; background: rgba(36, 92, 58, 0.15); color: var(--ula-accent-default); padding: 1px 7px; border-radius: 9999px; font-weight: 800; font-family: var(--ula-font-mono);">0</span>
+                    <span id="task-attachments-count" style="font-size: 10px; background: rgba(36, 92, 58, 0.15); color: var(--ula-accent-default); padding: 1px 7px; border-radius: 9999px; font-weight: 800; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">0</span>
                 </button>
                 <button type="button" onclick="switchTaskInspectorTab('comments')" id="task-tab-btn-comments" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--ula-text-secondary);">
                     <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">chat_bubble</span></span>
                     <span>{{ __('Discussions') }}</span>
-                    <span id="task-comments-count" style="font-size: 10px; background: rgba(36, 92, 58, 0.15); color: var(--ula-accent-default); padding: 1px 7px; border-radius: 9999px; font-weight: 800; font-family: var(--ula-font-mono);">0</span>
+                    <span id="task-comments-count" style="font-size: 10px; background: rgba(36, 92, 58, 0.15); color: var(--ula-accent-default); padding: 1px 7px; border-radius: 9999px; font-weight: 800; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">0</span>
                 </button>
                 <button type="button" onclick="switchTaskInspectorTab('dependencies')" id="task-tab-btn-dependencies" class="tactile-btn btn-secondary" style="flex: 1; min-width: 80px; padding: 8px 10px; font-size: 12px; justify-content: center; gap: 6px; background: transparent; border: none; box-shadow: none; color: var(--ula-text-secondary);">
                     <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">link</span></span>
@@ -684,7 +684,7 @@
                     <div style="flex: 1; min-width: 200px;">
                         <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                             <h2 id="mp-user-name" style="font-size: 22px; font-weight: 900; color: var(--ula-text-primary); margin: 0;">Member Name</h2>
-                            <span id="mp-user-nickname" class="nav-badge-pill" style="font-family: var(--ula-font-mono); font-size: 11px;">@nickname</span>
+                            <span id="mp-user-nickname" class="nav-badge-pill" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: 11px;">@nickname</span>
                             <span id="mp-user-role" class="nav-badge-pill" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success); font-size: 11px;">Employee</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; font-size: 12px; color: var(--ula-text-secondary);">
@@ -941,7 +941,7 @@
 
                     <div id="guest-result-box" style="display: none; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 12px; margin-top: 10px;">
                         <div style="font-size: 11px; font-weight: 800; color: var(--ula-status-success); text-transform: uppercase; margin-bottom: 6px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check_circle</span> Invitation Link Ready!</div>
-                        <input type="text" id="guest-link-output" readonly style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 6px; padding: 8px; color: var(--ula-status-info); font-size: 12px; font-family: var(--ula-font-mono); margin-bottom: 8px;">
+                        <input type="text" id="guest-link-output" readonly style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 6px; padding: 8px; color: var(--ula-status-info); font-size: 12px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; margin-bottom: 8px;">
                         <div style="display: flex; gap: 8px;">
                             <button type="button" onclick="copyModalGuestLink(this)" id="btn-copy-link" style="flex: 1; background: var(--ula-palm-900); color: white; font-weight: 700; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-size: 12px;">
                                 <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">checklist</span> {{ __('Copy Link') }}
@@ -1373,7 +1373,7 @@
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionInspect()">
             <span><span class="ctx-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span></span>{{ __('Inspect & Edit') }}</span>
-            <span style="font-size: 10px; color: var(--ula-text-muted); font-family: var(--ula-font-mono);">↵</span>
+            <span style="font-size: 10px; color: var(--ula-text-muted); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">↵</span>
         </a>
 
         <a href="javascript:void(0)" class="ctx-item" onclick="ctxActionStartTimer()">
@@ -1404,7 +1404,7 @@
 
         <a href="javascript:void(0)" class="ctx-item danger" onclick="ctxActionDelete()">
             <span><span class="ctx-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">delete</span></span>{{ __('Delete Task') }}</span>
-            <span style="font-size: 10px; color: var(--ula-status-danger); font-family: var(--ula-font-mono);">Del</span>
+            <span style="font-size: 10px; color: var(--ula-status-danger); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">Del</span>
         </a>
     </div>
 
@@ -1467,14 +1467,14 @@
                         <span class="kpi-title">{{ __('Today Office Time') }}</span>
                         <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span></div>
                     </div>
-                    <div id="mp-kpi-office-time" class="kpi-value" style="font-size: 18px; font-family: var(--ula-font-mono); color: var(--ula-accent-default);">00:00:00</div>
+                    <div id="mp-kpi-office-time" class="kpi-value" style="font-size: 18px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; color: var(--ula-accent-default);">00:00:00</div>
                 </div>
                 <div class="kpi-card" style="padding: 12px;">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Today Task Time') }}</span>
                         <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span></div>
                     </div>
-                    <div id="mp-kpi-task-time" class="kpi-value" style="font-size: 18px; font-family: var(--ula-font-mono); color: var(--ula-status-success);">00:00:00</div>
+                    <div id="mp-kpi-task-time" class="kpi-value" style="font-size: 18px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; color: var(--ula-status-success);">00:00:00</div>
                 </div>
                 <div class="kpi-card" style="padding: 12px;">
                     <div class="kpi-header">

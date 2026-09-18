@@ -851,7 +851,7 @@
         </nav>
 
         <div class="admin-sidebar-footer">
-            <span style="font-family: var(--ula-font-mono); font-size: 11px;">UlaSpace 2.0</span>
+            <span style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: 11px;">UlaSpace 2.0</span>
             <button onclick="toggleSuperAdminTheme()" class="theme-toggle-btn" style="padding: 4px 8px; font-size: 16px; display: inline-flex; align-items: center; justify-content: center;">
                 <span class="material-symbols-rounded" id="superadmin-theme-icon" style="font-size: 16px;">dark_mode</span>
             </button>

@@ -226,7 +226,7 @@
                         </div>
                         <span class="ula-headline-group" style="align-items: flex-end;">
                             <span class="ula-headline-ar" style="font-size: 11px; color: var(--ula-text-on-dark);"><span style="direction: ltr; unicode-bidi: isolate">18</span> عضواً متصلاً</span>
-                            <span class="ula-headline-en" style="font-size: 9px; color: var(--ula-text-on-dark-muted); font-family: var(--ula-font-mono);">18 Active Members</span>
+                            <span class="ula-headline-en" style="font-size: 9px; color: var(--ula-text-on-dark-muted); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">18 Active Members</span>
                         </span>
                     </div>
 
@@ -483,7 +483,7 @@
                     </div>
 
                     <div class="mb-5" style="direction: ltr; unicode-bidi: isolate;">
-                        <span class="text-[28px] font-bold text-[var(--ula-text-primary)]" style="font-family: var(--ula-font-mono);">${{ number_format($plan->price, 0) }}</span>
+                        <span class="text-[28px] font-bold text-[var(--ula-text-primary)]" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">${{ number_format($plan->price, 0) }}</span>
                         <span class="text-[13px] text-[var(--ula-text-muted)]">/mo</span>
                     </div>
 

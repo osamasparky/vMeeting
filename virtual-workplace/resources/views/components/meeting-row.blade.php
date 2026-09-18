@@ -48,7 +48,7 @@
     <!-- Start: Time & Details -->
     <div class="flex items-center gap-3.5 min-w-0">
         <!-- Timestamp in Mono -->
-        <span class="font-[family-name:var(--ula-font-mono)] text-[12px] font-normal text-[var(--ula-text-muted)] shrink-0 min-w-[64px]">
+        <span class="font-[family-name:var(--ula-font-mono)] text-[12px] font-normal text-[var(--ula-text-muted)] shrink-0 min-w-[64px] [direction:ltr] [unicode-bidi:isolate]">
             {{ $time }}
         </span>
 

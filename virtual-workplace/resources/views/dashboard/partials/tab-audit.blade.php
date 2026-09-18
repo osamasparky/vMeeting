@@ -25,7 +25,7 @@
             <h3 style="font-size: var(--ula-size-body); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); display: flex; align-items: center; gap: var(--ula-space-3); margin: 0;">
                 <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-accent-default);">security</span>
                 <span>{{ __('Security Activity Trail') }}</span>
-                <span class="nav-badge-pill" style="font-family: var(--ula-font-mono);">{{ $auditLogs->count() }}</span>
+                <span class="nav-badge-pill" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $auditLogs->count() }}</span>
             </h3>
         </div>
         <div style="overflow-x: auto;">
@@ -46,9 +46,9 @@
                                 <span class="nav-badge-pill" style="background: var(--ula-surface-accent-soft); color: var(--ula-accent-default); font-weight: var(--ula-weight-bold); font-size: 11px;">{{ $log->action }}</span>
                             </td>
                             <td style="padding: 14px 16px; font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-size: var(--ula-size-sm);">{{ class_basename($log->auditable_type) }}</td>
-                            <td style="padding: 14px 16px; font-family: var(--ula-font-mono); font-size: var(--ula-size-xs); color: var(--ula-text-primary);">{{ substr($log->user_id ?? 'System', 0, 8) }}</td>
-                            <td style="padding: 14px 16px; font-family: var(--ula-font-mono); font-size: var(--ula-size-xs); color: var(--ula-text-muted);">{{ $log->ip_address ?? '127.0.0.1' }}</td>
-                            <td style="padding: 14px 16px; font-size: var(--ula-size-xs); color: var(--ula-text-muted); font-family: var(--ula-font-mono);">{{ $log->created_at->format('Y-m-d H:i:s') }}</td>
+                            <td style="padding: 14px 16px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: var(--ula-size-xs); color: var(--ula-text-primary);">{{ substr($log->user_id ?? 'System', 0, 8) }}</td>
+                            <td style="padding: 14px 16px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: var(--ula-size-xs); color: var(--ula-text-muted);">{{ $log->ip_address ?? '127.0.0.1' }}</td>
+                            <td style="padding: 14px 16px; font-size: var(--ula-size-xs); color: var(--ula-text-muted); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $log->created_at->format('Y-m-d H:i:s') }}</td>
                         </tr>
                     @empty
                         <tr>

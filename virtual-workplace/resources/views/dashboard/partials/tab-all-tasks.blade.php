@@ -34,7 +34,7 @@
                     <span class="material-symbols-rounded" style="font-size: 18px;">assignment</span>
                 </div>
             </div>
-            <div class="kpi-value" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-family: var(--ula-font-mono);">{{ $tasks->count() }}</div>
+            <div class="kpi-value" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $tasks->count() }}</div>
             <div class="kpi-trend" style="color: var(--ula-accent-default); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 14px;">folder</span>
                 <span>{{ __('Across active projects') }}</span>
@@ -48,7 +48,7 @@
                     <span class="material-symbols-rounded" style="font-size: 18px;">bolt</span>
                 </div>
             </div>
-            <div class="kpi-value" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-family: var(--ula-font-mono);">{{ $tasks->where('status', 'in_progress')->count() }}</div>
+            <div class="kpi-value" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $tasks->where('status', 'in_progress')->count() }}</div>
             <div class="kpi-trend" style="color: var(--ula-gold-500); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 14px;">trending_up</span>
                 <span>{{ __('Active work execution') }}</span>
@@ -62,7 +62,7 @@
                     <span class="material-symbols-rounded" style="font-size: 18px;">pageview</span>
                 </div>
             </div>
-            <div class="kpi-value" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-family: var(--ula-font-mono);">{{ $tasks->whereIn('status', ['review', 'qa'])->count() }}</div>
+            <div class="kpi-value" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $tasks->whereIn('status', ['review', 'qa'])->count() }}</div>
             <div class="kpi-trend" style="color: var(--ula-gold-400); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 14px;">hourglass_top</span>
                 <span>{{ __('Pending QA / signoff') }}</span>
@@ -76,7 +76,7 @@
                     <span class="material-symbols-rounded" style="font-size: 18px;">check_circle</span>
                 </div>
             </div>
-            <div class="kpi-value" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-family: var(--ula-font-mono);">{{ $tasks->where('status', 'done')->count() }}</div>
+            <div class="kpi-value" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $tasks->where('status', 'done')->count() }}</div>
             <div class="kpi-trend" style="color: var(--ula-status-success); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 14px;">verified</span>
                 <span>{{ __('Delivered features') }}</span>
@@ -90,7 +90,7 @@
                     <span class="material-symbols-rounded" style="font-size: 18px;">schedule</span>
                 </div>
             </div>
-            <div class="kpi-value" style="font-size: var(--ula-size-body-lg); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-family: var(--ula-font-mono);">{{ $tasks->sum('estimated_hours') }}h / {{ round($projects->sum(fn($p) => $p->actualHours()), 1) }}h</div>
+            <div class="kpi-value" style="font-size: var(--ula-size-body-lg); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $tasks->sum('estimated_hours') }}h / {{ round($projects->sum(fn($p) => $p->actualHours()), 1) }}h</div>
             <div class="kpi-trend" style="color: var(--ula-accent-default); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 14px;">analytics</span>
                 <span>{{ __('Planned vs Tracked') }}</span>
@@ -168,7 +168,7 @@
             <h3 style="font-size: var(--ula-size-body); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); display: flex; align-items: center; gap: var(--ula-space-3); margin: 0;">
                 <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-accent-default);">table_rows</span>
                 <span>{{ __('All Organization Tasks') }}</span>
-                <span class="nav-badge-pill" style="font-family: var(--ula-font-mono);"><span id="alltasks-filtered-count">{{ $tasks->count() }}</span></span>
+                <span class="nav-badge-pill" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;"><span id="alltasks-filtered-count">{{ $tasks->count() }}</span></span>
             </h3>
         </div>
         <div style="overflow-x: auto;">
@@ -198,12 +198,12 @@
                             onclick="openTaskDetails('{{ $t->id }}')"
                             oncontextmenu="event.preventDefault(); event.stopPropagation(); openTaskContextMenu(event, '{{ $t->id }}', '{{ $t->project_id }}', '{{ addslashes($t->title) }}')"
                             style="border-bottom: 1px solid var(--ula-border-subtle); cursor: pointer;">
-                            <td style="padding: 14px 16px;"><span class="nav-badge-pill" style="font-family: var(--ula-font-mono);">#{{ $t->task_number ?? 1 }}</span></td>
+                            <td style="padding: 14px 16px;"><span class="nav-badge-pill" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">#{{ $t->task_number ?? 1 }}</span></td>
                             <td style="padding: 14px 16px;">
                                 <div style="font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); display: flex; align-items: center; gap: 6px; font-size: var(--ula-size-sm);">
                                     <span>{{ $t->title }}</span>
                                     @if($t->checklistItems && $t->checklistItems->count() > 0)
-                                        <span class="nav-badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success); font-family: var(--ula-font-mono); display: inline-flex; align-items: center; gap: 2px;">
+                                        <span class="nav-badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; display: inline-flex; align-items: center; gap: 2px;">
                                             <span class="material-symbols-rounded" style="font-size: 10px;">check_box</span>
                                             <span>{{ $t->checklistItems->where('is_completed', true)->count() }}/{{ $t->checklistItems->count() }}</span>
                                         </span>
@@ -222,7 +222,7 @@
                             <td style="padding: 14px 16px;">
                                 @if($t->assignee)
                                     <div style="display: flex; align-items: center; gap: var(--ula-space-3);">
-                                        <div style="width: 26px; height: 26px; border-radius: var(--ula-radius-sm); background: var(--ula-gradient-accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: var(--ula-weight-bold); font-family: var(--ula-font-mono); box-shadow: var(--ula-shadow-xs);">
+                                        <div style="width: 26px; height: 26px; border-radius: var(--ula-radius-sm); background: var(--ula-gradient-accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: var(--ula-weight-bold); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; box-shadow: var(--ula-shadow-xs);">
                                             {{ strtoupper(substr($t->assignee->name, 0, 2)) }}
                                         </div>
                                         <span style="font-weight: 600; font-size: var(--ula-size-xs); color: var(--ula-text-primary);">{{ $t->assignee->name }}</span>
@@ -255,14 +255,14 @@
                                     <span class="nav-badge-pill">{{ ucfirst($t->priority) }}</span>
                                 @endif
                             </td>
-                            <td style="padding: 14px 16px; font-family: var(--ula-font-mono); font-weight: var(--ula-weight-bold); font-size: var(--ula-size-xs); color: var(--ula-text-primary);">
+                            <td style="padding: 14px 16px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-weight: var(--ula-weight-bold); font-size: var(--ula-size-xs); color: var(--ula-text-primary);">
                                 {{ $t->estimated_hours ?? 0 }}h / {{ $t->actualHours() }}h
                             </td>
                             <td style="padding: 14px 16px;">
                                 @php
                                     $isOverdue = $t->due_date && $t->due_date->isPast() && $t->status !== 'done';
                                 @endphp
-                                <span style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: {{ $isOverdue ? 'var(--ula-status-danger)' : 'var(--ula-text-secondary)' }}; font-family: var(--ula-font-mono);">
+                                <span style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: {{ $isOverdue ? 'var(--ula-status-danger)' : 'var(--ula-text-secondary)' }}; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                                     {{ $t->due_date ? $t->due_date->format('M d, Y') : '—' }}
                                     @if($isOverdue) <span class="nav-badge-pill" style="background: rgba(217, 107, 95, 0.15); color: var(--ula-status-danger); font-size: 9px;">{{ __('Overdue') }}</span> @endif
                                 </span>
@@ -324,7 +324,7 @@
                         <span class="material-symbols-rounded" style="font-size: 16px; color: {{ $colMeta['color'] }};">{{ $colMeta['icon'] }}</span>
                         <span>{{ $colMeta['title'] }}</span>
                     </span>
-                    <span class="nav-badge-pill" id="global-kanban-cnt-{{ $statusKey }}" style="font-family: var(--ula-font-mono); font-weight: var(--ula-weight-bold);">
+                    <span class="nav-badge-pill" id="global-kanban-cnt-{{ $statusKey }}" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-weight: var(--ula-weight-bold);">
                         {{ $statusKey === 'review' ? $tasks->whereIn('status', ['review', 'qa'])->count() : $tasks->where('status', $statusKey)->count() }}
                     </span>
                 </div>
@@ -356,7 +356,7 @@
                                         {{ $t->project->code ?? 'PRJ' }}-#{{ $t->task_number ?? 1 }}
                                     </span>
                                     @if($t->checklistItems && $t->checklistItems->count() > 0)
-                                        <span class="badge-pill badge-green" style="font-size: 9.5px; font-family: var(--ula-font-mono); display: inline-flex; align-items: center; gap: 2px;" title="{{ __('Checklist Progress') }}">
+                                        <span class="badge-pill badge-green" style="font-size: 9.5px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; display: inline-flex; align-items: center; gap: 2px;" title="{{ __('Checklist Progress') }}">
                                             <span class="material-symbols-rounded" style="font-size: 11px;">check_box</span>
                                             <span>{{ $t->checklistItems->where('is_completed', true)->count() }}/{{ $t->checklistItems->count() }}</span>
                                         </span>
@@ -414,14 +414,14 @@
                                 <div style="display: flex; align-items: center; gap: 6px;">
                                     @if($t->assignee)
                                         <div class="task-assignee-chip" title="{{ $t->assignee->name }}">
-                                            <div class="task-avatar-circle" style="font-family: var(--ula-font-mono);">
+                                            <div class="task-avatar-circle" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                                                 {{ strtoupper(substr($t->assignee->name, 0, 2)) }}
                                             </div>
                                             <span style="max-width: 65px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ explode(' ', $t->assignee->name)[0] }}</span>
                                         </div>
                                     @endif
                                     @if($t->due_date)
-                                        <span class="task-due-date {{ $t->due_date->isPast() && $t->status !== 'done' ? 'is-overdue' : '' }}" style="display: inline-flex; align-items: center; gap: 3px; font-family: var(--ula-font-mono);">
+                                        <span class="task-due-date {{ $t->due_date->isPast() && $t->status !== 'done' ? 'is-overdue' : '' }}" style="display: inline-flex; align-items: center; gap: 3px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                                             <span class="material-symbols-rounded" style="font-size: 12px;">calendar_today</span>
                                             <span>{{ $t->due_date->format('M d') }}</span>
                                         </span>
@@ -441,7 +441,7 @@
                                     </select>
                                 </div>
 
-                                <button type="button" onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="tactile-btn" style="background: var(--ula-surface-accent-soft); color: var(--ula-accent-default); border: 1px solid var(--ula-border-subtle); padding: 3px 8px; font-size: 10.5px; border-radius: var(--ula-radius-pill); white-space: nowrap; flex-shrink: 0; display: inline-flex; align-items: center; gap: 2px; font-family: var(--ula-font-mono);" title="{{ __('Start Timer') }}">
+                                <button type="button" onclick="event.stopPropagation(); startTaskTimer('{{ $t->project_id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($t->project->name ?? 'Project') }}')" class="tactile-btn" style="background: var(--ula-surface-accent-soft); color: var(--ula-accent-default); border: 1px solid var(--ula-border-subtle); padding: 3px 8px; font-size: 10.5px; border-radius: var(--ula-radius-pill); white-space: nowrap; flex-shrink: 0; display: inline-flex; align-items: center; gap: 2px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;" title="{{ __('Start Timer') }}">
                                     <span class="material-symbols-rounded" style="font-size: 12px;">play_arrow</span>
                                     <span>{{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h</span>
                                 </button>

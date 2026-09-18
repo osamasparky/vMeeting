@@ -49,7 +49,7 @@
 
         @if($shortcut)
             <div class="absolute inset-y-0 end-0 flex items-center pe-3 pointer-events-none">
-                <span class="px-1.5 py-0.5 text-[11px] font-[family-name:var(--ula-font-mono)] rounded-[var(--ula-radius-xs)] bg-[var(--ula-surface-sunken)] text-[var(--ula-text-muted)] border border-[var(--ula-border-subtle)]">
+                <span class="px-1.5 py-0.5 text-[11px] font-[family-name:var(--ula-font-mono)] rounded-[var(--ula-radius-xs)] bg-[var(--ula-surface-sunken)] text-[var(--ula-text-muted)] border border-[var(--ula-border-subtle)] [direction:ltr] [unicode-bidi:isolate]">
                     {{ $shortcut }}
                 </span>
             </div>
