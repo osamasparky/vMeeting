@@ -12,27 +12,27 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: var(--ula-surface-page, #0E1612);
-            color: var(--ula-text-primary, #E8F5E9);
+            background: var(--ula-surface-page);
+            color: var(--ula-text-primary);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: {{ app()->getLocale() === 'ar' ? "var(--ula-font-ar, 'IBM Plex Sans Arabic', sans-serif)" : "var(--ula-font-en, 'IBM Plex Sans', sans-serif)" }};
+            font-family: {{ app()->getLocale() === 'ar' ? "var(--ula-font-ar)" : "var(--ula-font-en)" }};
             background-image: 
                 radial-gradient(circle at 20% 20%, rgba(79, 155, 95, 0.15) 0%, transparent 45%),
                 radial-gradient(circle at 80% 80%, rgba(36, 92, 58, 0.25) 0%, transparent 45%);
-            padding: var(--ula-space-6, 20px);
+            padding: var(--ula-space-6);
         }
 
         .lobby-card {
-            background: var(--ula-surface-card, #15221B);
-            border: 1px solid var(--ula-border-subtle, rgba(255, 255, 255, 0.1));
-            border-radius: var(--ula-radius-xl, 24px);
-            padding: var(--ula-space-9, 40px);
+            background: var(--ula-surface-card);
+            border: 1px solid var(--ula-border-subtle);
+            border-radius: var(--ula-radius-xl);
+            padding: var(--ula-space-9);
             width: 100%;
             max-width: 480px;
-            box-shadow: var(--ula-shadow-xl, 0 25px 50px -12px rgba(0, 0, 0, 0.6));
+            box-shadow: var(--ula-shadow-xl);
             backdrop-filter: blur(20px);
             text-align: center;
         }
@@ -40,56 +40,56 @@
         .brand-icon {
             width: 64px;
             height: 64px;
-            background: var(--ula-gradient-accent, linear-gradient(135deg, #4F9B5F, #245C3A));
-            border-radius: var(--ula-radius-xl, 18px);
+            background: var(--ula-gradient-accent);
+            border-radius: var(--ula-radius-xl);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            margin-bottom: var(--ula-space-6, 20px);
+            color: var(--ula-white);
+            margin-bottom: var(--ula-space-6);
             box-shadow: var(--ula-shadow-xs);
         }
 
         .title {
-            font-size: var(--ula-size-h3, 24px);
-            font-weight: var(--ula-weight-bold, 900);
-            margin-bottom: var(--ula-space-3, 8px);
-            color: var(--ula-text-primary, #E8F5E9);
+            font-size: var(--ula-size-h3);
+            font-weight: var(--ula-weight-bold);
+            margin-bottom: var(--ula-space-3);
+            color: var(--ula-text-primary);
         }
 
         .subtitle {
-            font-size: var(--ula-size-sm, 14px);
-            color: var(--ula-text-secondary, #A5D6A7);
-            margin-bottom: var(--ula-space-7, 24px);
+            font-size: var(--ula-size-sm);
+            color: var(--ula-text-secondary);
+            margin-bottom: var(--ula-space-7);
             line-height: 1.6;
         }
 
         .room-badge {
             display: inline-flex;
             align-items: center;
-            gap: var(--ula-space-3, 8px);
-            background: var(--ula-surface-accent-soft, rgba(79, 155, 95, 0.15));
-            border: 1px solid var(--ula-border-subtle, rgba(79, 155, 95, 0.3));
-            color: var(--ula-accent-default, #4F9B5F);
+            gap: var(--ula-space-3);
+            background: var(--ula-surface-accent-soft);
+            border: 1px solid var(--ula-border-subtle);
+            color: var(--ula-accent-default);
             padding: 8px 16px;
-            border-radius: var(--ula-radius-pill, 9999px);
-            font-size: var(--ula-size-xs, 12px);
-            font-weight: var(--ula-weight-bold, 700);
-            margin-bottom: var(--ula-space-7, 24px);
+            border-radius: var(--ula-radius-pill);
+            font-size: var(--ula-size-xs);
+            font-weight: var(--ula-weight-bold);
+            margin-bottom: var(--ula-space-7);
         }
 
         .form-group {
             text-align: start;
-            margin-bottom: var(--ula-space-6, 20px);
+            margin-bottom: var(--ula-space-6);
         }
 
         .form-label {
             display: flex;
             align-items: center;
             gap: 4px;
-            font-size: var(--ula-size-xs, 12px);
-            font-weight: var(--ula-weight-bold, 700);
-            color: var(--ula-text-secondary, #A5D6A7);
+            font-size: var(--ula-size-xs);
+            font-weight: var(--ula-weight-bold);
+            color: var(--ula-text-secondary);
             margin-bottom: 8px;
             text-transform: uppercase;
             letter-spacing: 0.04em;
@@ -97,36 +97,36 @@
 
         .form-input {
             width: 100%;
-            background: var(--ula-surface-page-alt, rgba(255, 255, 255, 0.05));
-            border: 1px solid var(--ula-border-subtle, rgba(255, 255, 255, 0.1));
-            border-radius: var(--ula-radius-lg, 12px);
+            background: var(--ula-surface-page-alt);
+            border: 1px solid var(--ula-border-subtle);
+            border-radius: var(--ula-radius-lg);
             padding: 14px 16px;
-            color: var(--ula-text-primary, #E8F5E9);
-            font-size: var(--ula-size-sm, 14px);
+            color: var(--ula-text-primary);
+            font-size: var(--ula-size-sm);
             outline: none;
             transition: all 0.2s;
             box-shadow: var(--ula-shadow-xs);
         }
 
         .form-input:focus {
-            border-color: var(--ula-accent-default, #4F9B5F);
+            border-color: var(--ula-accent-default);
             background: rgba(255, 255, 255, 0.08);
         }
 
         .join-btn {
             width: 100%;
-            background: var(--ula-gradient-accent, linear-gradient(135deg, #4F9B5F, #245C3A));
-            color: white;
+            background: var(--ula-gradient-accent);
+            color: var(--ula-white);
             border: none;
-            border-radius: var(--ula-radius-lg, 12px);
+            border-radius: var(--ula-radius-lg);
             padding: 14px;
-            font-size: var(--ula-size-sm, 14px);
-            font-weight: var(--ula-weight-bold, 700);
+            font-size: var(--ula-size-sm);
+            font-weight: var(--ula-weight-bold);
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: var(--ula-space-3, 8px);
+            gap: var(--ula-space-3);
             transition: all 0.2s;
             box-shadow: var(--ula-shadow-xs);
             text-decoration: none;
@@ -140,10 +140,10 @@
         .error-card {
             background: rgba(217, 107, 95, 0.15);
             border: 1px solid rgba(217, 107, 95, 0.35);
-            color: #D96B5F;
+            color: var(--ula-status-danger);
             padding: 16px;
-            border-radius: var(--ula-radius-lg, 12px);
-            font-size: var(--ula-size-xs, 12px);
+            border-radius: var(--ula-radius-lg);
+            font-size: var(--ula-size-xs);
             margin-bottom: 20px;
             line-height: 1.5;
         }
@@ -152,7 +152,7 @@
 <body>
 
     <div class="lobby-card">
-        <div class="brand-icon" style="background: var(--ula-palm-900, #142B24); width: 64px; height: 64px; border-radius: var(--ula-radius-xl, 18px); display: inline-flex; align-items: center; justify-content: center; padding: 12px; margin-bottom: 20px; box-shadow: var(--ula-shadow-md);">
+        <div class="brand-icon" style="background: var(--ula-palm-900); width: 64px; height: 64px; border-radius: var(--ula-radius-xl); display: inline-flex; align-items: center; justify-content: center; padding: 12px; margin-bottom: 20px; box-shadow: var(--ula-shadow-md);">
             <img src="{{ asset('images/ulaspace-icon.png') }}" alt="UlaSpace" style="width: 36px; height: auto; object-fit: contain;">
         </div>
 
