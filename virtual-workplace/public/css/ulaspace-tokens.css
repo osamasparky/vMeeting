@@ -516,23 +516,37 @@
 }
 
 /* --- BASE -------------------------------------------------------------- */
-body {
-  margin: 0;
-  padding: 0;
-  background-color: var(--ula-surface-page);
-  color: var(--ula-text-primary);
-  /* No font-family here on purpose: [dir="rtl"]/[dir="ltr"] above set it on
-     <html>, and font-family inherits. Setting it again here with the static,
-     always-Arabic --ula-font-family would override that switch for every
-     page's English/LTR mode. */
-  font-size: var(--ula-size-body);
-  line-height: var(--ula-lh-body);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+/* Layered (unlike the rest of this file) so Tailwind utility classes --
+   which Tailwind puts in @layer utilities -- can actually override these
+   defaults. An unlayered rule beats every layered one regardless of
+   specificity, so before this these two rules silently won over any
+   text-[...]/bg-[...] utility applied to an <a>, even a single-class one:
+   e.g. <x-btn href="..."> rendering as <a> with text-[var(--ula-text-on-
+   cta)] had its color overridden back to var(--ula-text-link) here. That
+   token is theme-aware and flips to a light gold in dark mode, while the
+   button's own background (--ula-control-cta-on-dark) is a fixed light
+   sand regardless of theme -- so in dark mode specifically this produced
+   light-on-light, near-invisible button text (found on the landing page's
+   "Book a Demo" nav button). */
+@layer base {
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--ula-surface-page);
+    color: var(--ula-text-primary);
+    /* No font-family here on purpose: [dir="rtl"]/[dir="ltr"] above set it on
+       <html>, and font-family inherits. Setting it again here with the static,
+       always-Arabic --ula-font-family would override that switch for every
+       page's English/LTR mode. */
+    font-size: var(--ula-size-body);
+    line-height: var(--ula-lh-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-a { color: var(--ula-text-link); text-decoration: none; }
-a:hover { color: var(--ula-text-link-hover); text-decoration: underline; }
+  a { color: var(--ula-text-link); text-decoration: none; }
+  a:hover { color: var(--ula-text-link-hover); text-decoration: underline; }
+}
 
 :where(button, a, input, select, textarea, [tabindex]):focus-visible {
   outline: none;
