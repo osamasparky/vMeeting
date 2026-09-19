@@ -1484,7 +1484,7 @@
                         @endphp
                         <div class="kanban-column" id="kanban-column-{{ $colKey }}">
                             <div class="kanban-col-header" style="color: {{ $colMeta['color'] }};">
-                                <span>{{ $colMeta['title'] }}</span>
+                                <span>{!! $colMeta['title'] !!}</span>
                                 <span class="badge-pill badge-neutral" id="kanban-count-{{ $colKey }}">{{ $colTasks->count() }}</span>
                             </div>
 
@@ -2324,7 +2324,7 @@
                                 @endphp
                                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; background: var(--ula-surface-card); padding: 8px 12px; border-radius: var(--ula-radius-sm); border: 1px solid var(--ula-border-subtle); flex-wrap: wrap; gap: 6px;">
                                     <span style="font-weight: 700; color: var(--ula-text-primary); display: flex; align-items: center; gap: 6px;">
-                                        <span>{{ $targetIcon }}</span>
+                                        <span>{!! $targetIcon !!}</span>
                                         <span>{{ $target->title }}</span>
                                         @if(in_array($target->target_type, ['tasks', 'milestones', 'hours']))
                                             <span class="badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.12); color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('Auto-Tracked') }}</span>
@@ -2403,7 +2403,7 @@
                             <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 16px; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; box-shadow: var(--ula-shadow-xs);">
                                 <div style="display: flex; gap: 12px; align-items: flex-start;">
                                     <div style="font-size: 28px; width: 44px; height: 44px; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                        {{ $icon }}
+                                        {!! $icon !!}
                                     </div>
                                     <div style="flex: 1; min-width: 0;">
                                         <div style="font-weight: 800; font-size: 13px; color: var(--ula-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ $file->file_name }}">
