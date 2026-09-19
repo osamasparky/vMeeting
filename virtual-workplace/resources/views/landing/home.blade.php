@@ -76,11 +76,19 @@
         border-radius: var(--ula-radius-lg);
         overflow: hidden;
         border: 1px solid rgba(237, 230, 217, 0.2);
-        box-shadow: var(--ula-shadow-lg);
+        box-shadow: var(--ula-shadow-lg), 0 0 0 1px rgba(211, 165, 83, 0.08), 0 24px 60px -20px rgba(211, 165, 83, 0.25);
         background: var(--ula-palm-950);
         min-height: 360px;
         display: flex;
         flex-direction: column;
+    }
+
+    .nx-hero-preview::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(120% 90% at 100% 0%, rgba(211, 165, 83, 0.10) 0%, transparent 55%);
     }
 
     /* ── Features Section ── */
@@ -103,6 +111,8 @@
     }
 
     .nx-feature-card {
+        position: relative;
+        overflow: hidden;
         background: var(--ula-surface-card);
         border: 1px solid var(--ula-border-subtle);
         border-radius: var(--ula-radius-lg);
@@ -114,22 +124,44 @@
         justify-content: space-between;
     }
 
+    .nx-feature-card::before {
+        content: "";
+        position: absolute;
+        inset-block-start: 0;
+        inset-inline: 0;
+        height: 3px;
+        background: var(--ula-highlight-default);
+        transform: scaleX(0);
+        transform-origin: center;
+        transition: transform var(--ula-duration-base) var(--ula-ease-in-out);
+    }
+
     .nx-feature-card:hover {
-        transform: translateY(-3px);
+        transform: translateY(-4px);
         border-color: var(--ula-border-strong);
         box-shadow: var(--ula-shadow-md);
     }
 
+    .nx-feature-card:hover::before {
+        transform: scaleX(1);
+    }
+
     .nx-feature-icon-box {
-        width: 52px;
-        height: 52px;
+        width: 56px;
+        height: 56px;
         border-radius: var(--ula-radius-md);
-        background: var(--ula-sand-200);
-        color: var(--ula-highlight-default);
+        background: var(--ula-tone-gold-bg);
+        border: 1px solid var(--ula-border-subtle);
+        color: var(--ula-tone-gold-fg);
         display: flex;
         align-items: center;
         justify-content: center;
         margin-bottom: 24px;
+        transition: transform var(--ula-duration-base) var(--ula-ease-in-out);
+    }
+
+    .nx-feature-card:hover .nx-feature-icon-box {
+        transform: scale(1.06) rotate(-2deg);
     }
 
     /* ── Heritage Identity Quote Section ── */
