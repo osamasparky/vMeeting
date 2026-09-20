@@ -1,149 +1,22 @@
     <script nonce="{{ $cspNonce ?? '' }}">
+        // Translated strings for public/js/dashboard/theme-sidebar.js's
+        // toggleThemeMode() toast (falls back to English if unset).
+        window.ThemeI18N = {
+            darkActivatedTitle: @json(__('Dark Spatial Workspace')),
+            darkActivatedBody: @json(__('Deep calm green mode activated.')),
+            lightActivatedTitle: @json(__('Light Natural Mode')),
+            lightActivatedBody: @json(__('Warm ivory workspace activated.')),
+        };
+    </script>
+    <script src="/js/dashboard/theme-sidebar.js" nonce="{{ $cspNonce ?? '' }}"></script>
+    <script nonce="{{ $cspNonce ?? '' }}">
+        window.ApiClientI18N = { sessionExpired: @json(__('Session expired. The page will reload now.')) };
+    </script>
+    <script src="/js/shared/api-client.js" nonce="{{ $cspNonce ?? '' }}"></script>
+    <script nonce="{{ $cspNonce ?? '' }}">
         const ORG_ID = "{{ $organization->id }}";
         const CSRF_TOKEN = "{{ csrf_token() }}";
         const ALL_TEAMS = @json($teams);
-
-        // ── Theme Manager (Light / Dark / System) ──
-        function applyTheme(theme) {
-            let activeTheme = theme;
-            if (theme === 'system') {
-                const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                activeTheme = prefersDark ? 'dark' : 'light';
-            }
-            
-            document.documentElement.setAttribute('data-theme', activeTheme);
-            if (activeTheme === 'dark') {
-                document.documentElement.classList.add('dark');
-                document.body.classList.add('dark-mode');
-            } else {
-                document.documentElement.classList.remove('dark');
-                document.body.classList.remove('dark-mode');
-            }
-            
-            const isDark = activeTheme === 'dark';
-            document.querySelectorAll('.theme-toggle-icon-label').forEach(el => {
-                el.textContent = isDark ? '☀️' : '🌙';
-            });
-            localStorage.setItem('vw_theme', theme);
-        }
-
-        function toggleThemeMode() {
-            const current = document.documentElement.getAttribute('data-theme') || 'light';
-            const next = current === 'dark' ? 'light' : 'dark';
-            applyTheme(next);
-            showToastNotification(next === 'dark' ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">dark_mode</span> <strong>{{ __('Dark Spatial Workspace') }}</strong><br>{{ __('Deep calm green mode activated.') }}' : '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">light_mode</span> <strong>{{ __('Light Natural Mode') }}</strong><br>{{ __('Warm ivory workspace activated.') }}');
-        }
-
-        // Initialize saved theme on load
-        (function() {
-            const savedTheme = localStorage.getItem('vw_theme') || 'light';
-            applyTheme(savedTheme);
-        })();
-
-        function toggleSidebarCollapse() {
-            const sidebar = document.getElementById('dashboardSidebar');
-            const mainContent = document.querySelector('.main-content');
-            const toggleBtn = document.querySelector('.sidebar-toggle-btn');
-            const isRtl = document.documentElement.dir === 'rtl' || '{{ app()->getLocale() }}' === 'ar';
-
-            if (sidebar) sidebar.classList.toggle('sidebar-collapsed');
-            if (mainContent) mainContent.classList.toggle('sidebar-collapsed');
-            const isCollapsed = sidebar && sidebar.classList.contains('sidebar-collapsed');
-            localStorage.setItem('vw_sidebar_collapsed', isCollapsed ? '1' : '0');
-
-            if (toggleBtn) {
-                if (isRtl) {
-                    toggleBtn.textContent = isCollapsed ? '▶' : '◀';
-                } else {
-                    toggleBtn.textContent = isCollapsed ? '◀' : '▶';
-                }
-            }
-        }
-
-        // Mobile drawer toggle
-        function toggleDashboardSidebar() {
-            const sidebar = document.getElementById('dashboardSidebar');
-            if (sidebar) {
-                sidebar.classList.toggle('open');
-            }
-        }
-
-        // Restore sidebar state on load
-        if (localStorage.getItem('vw_sidebar_collapsed') === '1') {
-            document.addEventListener('DOMContentLoaded', () => {
-                const sidebar = document.getElementById('dashboardSidebar');
-                const mainContent = document.querySelector('.main-content');
-                const toggleBtn = document.querySelector('.sidebar-toggle-btn');
-                const isRtl = document.documentElement.dir === 'rtl' || '{{ app()->getLocale() }}' === 'ar';
-
-                if (sidebar) sidebar.classList.add('sidebar-collapsed');
-                if (mainContent) mainContent.classList.add('sidebar-collapsed');
-                if (toggleBtn) {
-                    if (isRtl) {
-                        toggleBtn.textContent = '▶';
-                    } else {
-                        toggleBtn.textContent = '◀';
-                    }
-                }
-            });
-        }
-
-        function toggleSidebarSection(sectionId) {
-            const targetSec = document.getElementById(sectionId);
-            if (!targetSec) return;
-
-            const willOpen = targetSec.classList.contains('collapsed');
-
-            // Close all other accordions (Single active accordion)
-            document.querySelectorAll('.sidebar-accordion').forEach(sec => {
-                sec.classList.add('collapsed');
-            });
-
-            // If it was collapsed, now open it
-            if (willOpen) {
-                targetSec.classList.remove('collapsed');
-            }
-        }
-
-        function previewCompanyLogo(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const previewImg = document.getElementById('logo-preview-img');
-                    const placeholder = document.getElementById('logo-preview-placeholder');
-                    if (previewImg) {
-                        previewImg.src = e.target.result;
-                        previewImg.style.display = 'block';
-                    }
-                    if (placeholder) {
-                        placeholder.style.display = 'none';
-                    }
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function previewUserAvatar(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const previewImg = document.getElementById('user-profile-preview-avatar');
-                    const fallback = document.getElementById('user-profile-avatar-fallback');
-                    const sidebarAvatar = document.getElementById('sidebar-user-avatar');
-                    if (previewImg) {
-                        previewImg.src = e.target.result;
-                        previewImg.style.display = 'block';
-                    }
-                    if (fallback) {
-                        fallback.style.display = 'none';
-                    }
-                    if (sidebarAvatar) {
-                        sidebarAvatar.src = e.target.result;
-                    }
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
 
         function switchAdminTab(tabName, updateHash = true) {
             tabName = (tabName || 'overview').toLowerCase().trim();
@@ -723,13 +596,7 @@
         async function handleNotificationClick(notif) {
             if (!notif.is_read) {
                 try {
-                    await fetch(`/api/notifications/${notif.id}/read`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        }
-                    });
+                    await apiFetch(`/api/notifications/${notif.id}/read`, { method: 'POST' });
                     notif.is_read = true;
                     fetchUserNotifications();
                 } catch (e) {}
@@ -742,13 +609,7 @@
 
         async function markAllNotificationsAsRead() {
             try {
-                await fetch('/api/notifications/read-all', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    }
-                });
+                await apiFetch('/api/notifications/read-all', { method: 'POST' });
                 currentNotifications.forEach(n => n.is_read = true);
                 fetchUserNotifications();
             } catch (e) {}
@@ -757,13 +618,7 @@
         async function clearAllNotificationsFromServer() {
             if (!confirm('{{ __("Clear all notifications?") }}')) return;
             try {
-                await fetch('/api/notifications/clear', {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    }
-                });
+                await apiFetch('/api/notifications/clear', { method: 'DELETE' });
                 currentNotifications = [];
                 fetchUserNotifications();
             } catch (e) {}

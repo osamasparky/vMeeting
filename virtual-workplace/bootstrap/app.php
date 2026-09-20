@@ -8,6 +8,7 @@ use App\Http\Middleware\SuperAdminMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -26,6 +27,10 @@ return Application::configure(basePath: dirname(__DIR__))
             SecurityHeadersMiddleware::class,
         ]);
 
+        // Default per-user/IP limit for every /api route; see the 'api'
+        // limiter in AppServiceProvider.
+        $middleware->throttleApi('api');
+
         $middleware->alias([
             'org.member' => EnsureOrganizationMember::class,
             'permission' => EnsurePermission::class,
@@ -40,5 +45,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Every /api route answers errors as JSON (401/403/404/422/429),
+        // whether or not the client remembered an Accept header — instead
+        // of redirecting API callers to the HTML login page.
+        $exceptions->shouldRenderJsonWhen(
+            fn (Request $request, \Throwable $e) => $request->is('api/*') || $request->expectsJson()
+        );
     })->create();

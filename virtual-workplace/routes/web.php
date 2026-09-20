@@ -52,12 +52,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/password', [AuthController::class, 'updatePassword'])->name('profile.password.update');
     Route::get('/office', [OfficeController::class, 'office'])->name('office');
     Route::get('/editor', [OfficeController::class, 'editor'])->name('editor');
-    Route::post('/editor/maps/{map}/background', [OfficeController::class, 'uploadMapBackground'])->name('editor.maps.background');
+    Route::post('/editor/maps/{map}/background', [OfficeController::class, 'uploadMapBackground'])->middleware('throttle:uploads')->name('editor.maps.background');
     Route::delete('/editor/maps/{map}/background', [OfficeController::class, 'deleteMapBackground'])->name('editor.maps.background.delete');
     Route::post('/editor/maps/{map}/save', [OfficeController::class, 'saveEditorMap'])->name('editor.maps.save');
     Route::post('/editor/maps/{map}/clear', [OfficeController::class, 'clearEditorMap'])->name('editor.maps.clear');
     Route::post('/editor/maps/{map}/publish', [OfficeController::class, 'publishEditorMap'])->name('editor.maps.publish');
-    Route::post('/editor/upload-object-image', [OfficeController::class, 'uploadObjectImage'])->name('editor.upload_object_image');
+    Route::post('/editor/upload-object-image', [OfficeController::class, 'uploadObjectImage'])->middleware('throttle:uploads')->name('editor.upload_object_image');
     Route::post('/editor/rooms', [OfficeController::class, 'saveEditorRoom'])->name('editor.rooms.store');
     Route::match(['post', 'patch', 'put'], '/editor/rooms/{room}', [OfficeController::class, 'updateEditorRoom'])->name('editor.rooms.update');
     Route::delete('/editor/rooms/{room}', [OfficeController::class, 'deleteEditorRoom'])->name('editor.rooms.destroy');
@@ -67,7 +67,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/offices', [OfficeController::class, 'storeOffice'])->name('offices.store');
     Route::put('/offices/{floor}', [OfficeController::class, 'updateOffice'])->name('offices.update');
     Route::delete('/offices/{floor}', [OfficeController::class, 'deleteOffice'])->name('offices.delete');
-    Route::post('/organization/ai-map/generate', [OfficeController::class, 'generateAiOffice'])->name('organization.ai_map.generate');
+    Route::post('/organization/ai-map/generate', [OfficeController::class, 'generateAiOffice'])->middleware('throttle:expensive')->name('organization.ai_map.generate');
 
     // Departments & Teams Management
     Route::post('/departments', [OrganizationSettingsController::class, 'storeDepartment'])->name('departments.store');
@@ -78,13 +78,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/teams/{team}', [OrganizationSettingsController::class, 'deleteTeam'])->name('teams.delete');
 
     // Organization Attendance & Policies
-    Route::post('/organization/smtp-test', [OrganizationSettingsController::class, 'testSmtpConnection'])->name('organization.smtp.test');
-    Route::post('/organization/ai-test', [OrganizationSettingsController::class, 'testOrgAiConnection'])->name('organization.ai.test');
+    Route::post('/organization/smtp-test', [OrganizationSettingsController::class, 'testSmtpConnection'])->middleware('throttle:expensive')->name('organization.smtp.test');
+    Route::post('/organization/ai-test', [OrganizationSettingsController::class, 'testOrgAiConnection'])->middleware('throttle:expensive')->name('organization.ai.test');
 
     // Projects & Files Storage
-    Route::post('/projects/{project}/files', [ProjectHubController::class, 'storeFile'])->name('projects.files.store');
+    Route::post('/projects/{project}/files', [ProjectHubController::class, 'storeFile'])->middleware('throttle:uploads')->name('projects.files.store');
     Route::delete('/projects/{project}/files/{file}', [ProjectHubController::class, 'destroyFile'])->name('projects.files.destroy');
-    Route::post('/tasks/{task}/attachments', [ProjectHubController::class, 'uploadTaskAttachment'])->name('tasks.attachments.store');
+    Route::post('/tasks/{task}/attachments', [ProjectHubController::class, 'uploadTaskAttachment'])->middleware('throttle:uploads')->name('tasks.attachments.store');
     Route::delete('/tasks/{task}/attachments/{attachment}', [ProjectHubController::class, 'deleteTaskAttachment'])->name('tasks.attachments.destroy');
 
     // Task Comments & Mentions
@@ -106,7 +106,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/chat/conversations', [ChatController::class, 'webConversations'])->name('chat.conversations');
     Route::get('/chat/dm/{targetUser}', [ChatController::class, 'webGetOrCreateDm'])->name('chat.dm');
     Route::get('/chat/channels/{channel}/messages', [ChatController::class, 'webListMessages'])->name('chat.messages.list');
-    Route::post('/chat/channels/{channel}/messages', [ChatController::class, 'webSendMessage'])->name('chat.messages.send');
+    Route::post('/chat/channels/{channel}/messages', [ChatController::class, 'webSendMessage'])->middleware('throttle:chat')->name('chat.messages.send');
 
     // Bulk Clear Routes
     Route::post('/organization/guest-invitations/clear', [GuestAccessController::class, 'clearGuestInvitations'])->name('guest_invitations.clear');
@@ -116,8 +116,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/meetings/schedule', fn () => redirect('/dashboard#meetings'))->name('meetings.schedule.get');
     Route::post('/meetings/schedule', [DashboardController::class, 'storeScheduledMeeting'])->name('meetings.schedule');
     Route::post('/meetings/{meeting}/cancel', [DashboardController::class, 'cancelMeeting'])->name('meetings.cancel');
-    Route::post('/organization/smtp/test', [OrganizationSettingsController::class, 'testSmtpConnection'])->name('organization.smtp.test.custom');
-    Route::post('/organization/ai/test', [OrganizationSettingsController::class, 'testOrgAiConnection'])->name('organization.ai.test.custom');
+    Route::post('/organization/smtp/test', [OrganizationSettingsController::class, 'testSmtpConnection'])->middleware('throttle:expensive')->name('organization.smtp.test.custom');
+    Route::post('/organization/ai/test', [OrganizationSettingsController::class, 'testOrgAiConnection'])->middleware('throttle:expensive')->name('organization.ai.test.custom');
 
     // Organization Member Impersonation
     Route::post('/organization/members/{member}/impersonate', [AuthController::class, 'impersonateMember'])->name('organization.members.impersonate');
@@ -139,17 +139,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/notifications/{id}/read', [DashboardController::class, 'markNotificationRead'])->name('notifications.read');
     Route::post('/api/notifications/read-all', [DashboardController::class, 'markAllNotificationsRead'])->name('notifications.read_all');
     Route::delete('/api/notifications/clear', [DashboardController::class, 'clearAllNotifications'])->name('notifications.clear');
-    Route::post('/api/notifications/wave', [OfficeController::class, 'sendDirectWave'])->name('notifications.wave');
-    Route::post('/api/notifications/knock', [OfficeController::class, 'sendDoorKnock'])->name('notifications.knock');
+    Route::post('/api/notifications/wave', [OfficeController::class, 'sendDirectWave'])->middleware('throttle:notifications')->name('notifications.wave');
+    Route::post('/api/notifications/knock', [OfficeController::class, 'sendDoorKnock'])->middleware('throttle:notifications')->name('notifications.knock');
 });
 
 // Hybrid Workplace & Media Plane Routes (Accessible by Authenticated Members and Invited Guests)
-Route::post('/organizations/{organization}/rooms/{room}/livekit-token', [MeetingController::class, 'getLiveKitToken'])->name('web.rooms.livekit_token');
-Route::get('/organizations/{organization}/webrtc/diagnostics-config', [MeetingController::class, 'getDiagnosticsConfig'])->name('web.webrtc.diagnostics');
-Route::get('/organizations/{organization}/rooms/{room}/files', [OfficeController::class, 'listRoomFiles'])->name('room_files.index');
-Route::post('/organizations/{organization}/rooms/{room}/files', [OfficeController::class, 'uploadRoomFile'])->name('room_files.store');
-Route::delete('/organizations/{organization}/rooms/{room}/files/{file}', [OfficeController::class, 'deleteRoomFile'])->name('room_files.destroy');
-Route::post('/organizations/{organization}/chat/upload', [DashboardController::class, 'uploadChatAttachment'])->name('chat.upload');
+Route::post('/organizations/{organization}/rooms/{room}/livekit-token', [MeetingController::class, 'getLiveKitToken'])->middleware('throttle:public')->name('web.rooms.livekit_token');
+Route::get('/organizations/{organization}/webrtc/diagnostics-config', [MeetingController::class, 'getDiagnosticsConfig'])->middleware('throttle:public')->name('web.webrtc.diagnostics');
+Route::get('/organizations/{organization}/rooms/{room}/files', [OfficeController::class, 'listRoomFiles'])->middleware('throttle:public')->name('room_files.index');
+Route::post('/organizations/{organization}/rooms/{room}/files', [OfficeController::class, 'uploadRoomFile'])->middleware('throttle:uploads')->name('room_files.store');
+Route::delete('/organizations/{organization}/rooms/{room}/files/{file}', [OfficeController::class, 'deleteRoomFile'])->middleware('throttle:public')->name('room_files.destroy');
+Route::post('/organizations/{organization}/chat/upload', [DashboardController::class, 'uploadChatAttachment'])->middleware('throttle:uploads')->name('chat.upload');
 Route::post('/api/office/attendance/log', [AttendanceController::class, 'logRoomAttendance'])->name('office.attendance.log');
 Route::get('/api/office/attendance/summary', [AttendanceController::class, 'getAttendanceSummary'])->name('office.attendance.summary');
 Route::get('/api/office/team-presence-overview', [AttendanceController::class, 'getTeamPresenceOverview'])->name('office.team_presence.overview');
@@ -161,7 +161,7 @@ Route::post('/api/office/task-timer/stop', [AttendanceController::class, 'stopOf
 Route::post('/api/office/tasks/{taskId}/status', [AttendanceController::class, 'updateOfficeTaskStatus'])->name('office.tasks.status');
 
 // Guest Access Routes (Public / Unauthenticated)
-Route::get('/guest/join/{token}', [GuestAccessController::class, 'guestJoin'])->name('guest.join');
+Route::get('/guest/join/{token}', [GuestAccessController::class, 'guestJoin'])->middleware('throttle:guest-token')->name('guest.join');
 Route::post('/guest/join/{token}', [GuestAccessController::class, 'guestEnter'])->middleware('throttle:10,1')->name('guest.enter');
 
 // Super Admin Portal Routes

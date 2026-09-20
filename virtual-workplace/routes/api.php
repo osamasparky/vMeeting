@@ -129,7 +129,7 @@ Route::prefix('v1')->group(function () {
                 Route::post('/maps/{map}/publish', [WorkspaceController::class, 'publishMap'])
                     ->middleware('permission:organizations.manage');
                 Route::post('/maps/{map}/background', [WorkspaceController::class, 'uploadBackground'])
-                    ->middleware('permission:organizations.manage');
+                    ->middleware(['permission:organizations.manage', 'throttle:uploads']);
                 Route::get('/maps/{map}/versions', [WorkspaceController::class, 'getMapVersions']);
 
                 // Workspace: Rooms & Zones & Objects
@@ -152,7 +152,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/channels', [ChatController::class, 'listChannels']);
                 Route::get('/users/{targetUser}/dm', [ChatController::class, 'getOrCreateDm']);
                 Route::get('/channels/{channel}/messages', [ChatController::class, 'listMessages']);
-                Route::post('/channels/{channel}/messages', [ChatController::class, 'sendMessage']);
+                Route::post('/channels/{channel}/messages', [ChatController::class, 'sendMessage'])->middleware('throttle:chat');
 
                 // ── Meetings & LiveKit Domain ──
                 Route::get('/meetings', [MeetingController::class, 'listMeetings']);
@@ -316,9 +316,9 @@ Route::prefix('v1')->group(function () {
                 Route::post('/billing/checkout', [BillingApiController::class, 'checkout']);
 
                 // ── Spatial Interactions & Knock / Wave / Ring Domain ──
-                Route::post('/interactions/knock', [SpatialInteractionsApiController::class, 'knock']);
-                Route::post('/interactions/wave', [SpatialInteractionsApiController::class, 'wave']);
-                Route::post('/interactions/ring', [SpatialInteractionsApiController::class, 'ring']);
+                Route::post('/interactions/knock', [SpatialInteractionsApiController::class, 'knock'])->middleware('throttle:notifications');
+                Route::post('/interactions/wave', [SpatialInteractionsApiController::class, 'wave'])->middleware('throttle:notifications');
+                Route::post('/interactions/ring', [SpatialInteractionsApiController::class, 'ring'])->middleware('throttle:notifications');
 
                 // ── WebRTC & LiveKit Meetings Domain ──
                 Route::get('/meetings', [MeetingController::class, 'listMeetings']);
@@ -342,5 +342,5 @@ Route::prefix('v1')->group(function () {
     });
 
     // ── Public Guest Verification ──
-    Route::get('/guest-invitations/{token}', [GuestController::class, 'verifyToken']);
+    Route::get('/guest-invitations/{token}', [GuestController::class, 'verifyToken'])->middleware('throttle:guest-token');
 });
