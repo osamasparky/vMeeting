@@ -14,6 +14,7 @@ use Database\Seeders\PlansSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -277,10 +278,10 @@ class CollaborationTest extends TestCase
         // would otherwise pollute the query-count comparison below.
         $this->getJson('/chat/conversations');
 
-        \Illuminate\Support\Facades\DB::enableQueryLog();
-        \Illuminate\Support\Facades\DB::flushQueryLog();
+        DB::enableQueryLog();
+        DB::flushQueryLog();
         $this->getJson('/chat/conversations')->assertStatus(200);
-        $queryCountWithFewMembers = count(\Illuminate\Support\Facades\DB::getQueryLog());
+        $queryCountWithFewMembers = count(DB::getQueryLog());
 
         // Add five more active members with their own DM channels; a
         // per-member Channel lookup (the N+1 this test guards against)
@@ -298,10 +299,10 @@ class CollaborationTest extends TestCase
             $this->postJson("/chat/channels/{$extraDm}/messages", ['body' => "Hi from {$i}"]);
         }
 
-        \Illuminate\Support\Facades\DB::flushQueryLog();
+        DB::flushQueryLog();
         $response = $this->getJson('/chat/conversations');
         $response->assertStatus(200);
-        $queryCountWithManyMembers = count(\Illuminate\Support\Facades\DB::getQueryLog());
+        $queryCountWithManyMembers = count(DB::getQueryLog());
 
         $this->assertSame(
             $queryCountWithFewMembers,

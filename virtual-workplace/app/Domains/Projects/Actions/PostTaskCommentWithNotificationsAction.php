@@ -9,9 +9,9 @@ use App\Domains\Projects\Models\TaskComment;
 use Illuminate\Support\Str;
 
 /**
- * Posts a task comment and layers on the web UI's richer behavior:
- * @mention parsing (notifying mentioned org members) and notifying the
- * task's assignee. Built on the plain AddTaskCommentAction so the base
+ * Posts a task comment and layers on the web UI's richer behavior: parsing
+ * mentions (notifying the mentioned org members) and notifying the task's
+ * assignee. Built on the plain AddTaskCommentAction so the base
  * create-a-comment behavior isn't duplicated.
  *
  * Note: the API's TaskController::addComment currently uses

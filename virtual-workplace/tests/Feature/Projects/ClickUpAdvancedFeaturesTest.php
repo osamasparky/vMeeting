@@ -4,6 +4,8 @@ namespace Tests\Feature\Projects;
 
 use App\Domains\Identity\Models\User;
 use App\Domains\Projects\Models\Project;
+use App\Domains\Projects\Models\ProjectGoal;
+use App\Domains\Projects\Models\ProjectGoalTarget;
 use App\Domains\Projects\Models\Task;
 use App\Domains\Tenancy\Actions\CreateOrganizationAction;
 use App\Domains\Tenancy\Models\Organization;
@@ -11,6 +13,7 @@ use App\Domains\Tenancy\Models\OrganizationMember;
 use Database\Seeders\PlansSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class ClickUpAdvancedFeaturesTest extends TestCase
@@ -198,7 +201,7 @@ class ClickUpAdvancedFeaturesTest extends TestCase
         Task::create(['organization_id' => $this->org->id, 'project_id' => $this->project->id, 'title' => 'B', 'task_number' => 2, 'status' => 'done', 'reporter_id' => $this->user->id]);
         Task::create(['organization_id' => $this->org->id, 'project_id' => $this->project->id, 'title' => 'C', 'task_number' => 3, 'status' => 'in_progress', 'reporter_id' => $this->user->id]);
 
-        $goal = \App\Domains\Projects\Models\ProjectGoal::create([
+        $goal = ProjectGoal::create([
             'organization_id' => $this->org->id,
             'project_id' => $this->project->id,
             'owner_id' => $this->user->id,
@@ -209,7 +212,7 @@ class ClickUpAdvancedFeaturesTest extends TestCase
         // "derive from the project's task counts") — this is exactly the
         // shape that used to fire two fresh COUNT queries per target.
         for ($i = 0; $i < 4; $i++) {
-            \App\Domains\Projects\Models\ProjectGoalTarget::create([
+            ProjectGoalTarget::create([
                 'goal_id' => $goal->id,
                 'title' => "Auto target {$i}",
                 'target_type' => 'tasks',
@@ -219,10 +222,10 @@ class ClickUpAdvancedFeaturesTest extends TestCase
             ]);
         }
 
-        \Illuminate\Support\Facades\DB::enableQueryLog();
-        \Illuminate\Support\Facades\DB::flushQueryLog();
+        DB::enableQueryLog();
+        DB::flushQueryLog();
         $goal->recalculateProgress();
-        $queryCountWithFourTargets = count(\Illuminate\Support\Facades\DB::getQueryLog());
+        $queryCountWithFourTargets = count(DB::getQueryLog());
 
         // Correctness: 2/3 tasks done -> 66.67%, in_progress (not complete).
         $goal->refresh();
@@ -236,7 +239,7 @@ class ClickUpAdvancedFeaturesTest extends TestCase
         // Add four more identical auto targets — a per-target query (the
         // N+1 this guards against) would make the query count grow with it.
         for ($i = 4; $i < 8; $i++) {
-            \App\Domains\Projects\Models\ProjectGoalTarget::create([
+            ProjectGoalTarget::create([
                 'goal_id' => $goal->id,
                 'title' => "Auto target {$i}",
                 'target_type' => 'tasks',
@@ -246,9 +249,9 @@ class ClickUpAdvancedFeaturesTest extends TestCase
             ]);
         }
 
-        \Illuminate\Support\Facades\DB::flushQueryLog();
+        DB::flushQueryLog();
         $goal->recalculateProgress();
-        $queryCountWithEightTargets = count(\Illuminate\Support\Facades\DB::getQueryLog());
+        $queryCountWithEightTargets = count(DB::getQueryLog());
 
         // Each target still needs its own save() (a genuine per-row write,
         // not an N+1), so exact equality isn't the right bar. What this

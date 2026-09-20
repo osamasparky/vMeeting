@@ -9,8 +9,8 @@ use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Domains\Tenancy\Models\OrganizationSetting;
 use App\Domains\Workspace\Models\Floor;
 use App\Domains\Workspace\Models\FurnitureItem;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Given an already-access-checked floor, builds everything the `office`

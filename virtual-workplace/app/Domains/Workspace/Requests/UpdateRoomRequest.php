@@ -2,6 +2,7 @@
 
 namespace App\Domains\Workspace\Requests;
 
+use App\Domains\Workspace\Models\Room;
 use App\Domains\Workspace\Requests\Concerns\ValidatesRoomSpacing;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -41,7 +42,7 @@ class UpdateRoomRequest extends FormRequest
                 return;
             }
 
-            /** @var \App\Domains\Workspace\Models\Room $room */
+            /** @var Room $room */
             $room = $this->route('room');
             $this->validateRoomSpacing($validator, $room?->map_id, $room?->id, $this->input('bounds'));
         });

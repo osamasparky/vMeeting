@@ -2,11 +2,13 @@
 
 namespace Tests\Feature;
 
+use App\Domains\Administration\Models\Role;
 use App\Domains\Identity\Models\User;
 use App\Domains\People\Models\Department;
 use App\Domains\People\Models\Team;
 use App\Domains\Tenancy\Actions\CreateOrganizationAction;
 use App\Domains\Tenancy\Models\Organization;
+use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Domains\Tenancy\Models\Plan;
 use Database\Seeders\PlansSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -112,7 +114,7 @@ class OrganizationSettingsControllerTest extends TestCase
 
     public function test_a_member_can_be_invited_with_profile_and_office_access(): void
     {
-        $employeeRole = \App\Domains\Administration\Models\Role::where('slug', 'employee')->whereNull('organization_id')->firstOrFail();
+        $employeeRole = Role::where('slug', 'employee')->whereNull('organization_id')->firstOrFail();
 
         $response = $this->actingAs($this->admin)->post('/organization/members/create', [
             'name' => 'New Hire',
@@ -143,7 +145,7 @@ class OrganizationSettingsControllerTest extends TestCase
 
     public function test_member_profile_details_returns_stats_and_profile(): void
     {
-        $member = \App\Domains\Tenancy\Models\OrganizationMember::where('organization_id', $this->organization->id)
+        $member = OrganizationMember::where('organization_id', $this->organization->id)
             ->where('user_id', $this->admin->id)
             ->firstOrFail();
 

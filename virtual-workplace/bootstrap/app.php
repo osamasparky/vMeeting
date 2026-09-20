@@ -49,6 +49,6 @@ return Application::configure(basePath: dirname(__DIR__))
         // whether or not the client remembered an Accept header — instead
         // of redirecting API callers to the HTML login page.
         $exceptions->shouldRenderJsonWhen(
-            fn (Request $request, \Throwable $e) => $request->is('api/*') || $request->expectsJson()
+            fn (Request $request, Throwable $e) => $request->is('api/*') || $request->expectsJson()
         );
     })->create();

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Domains\Identity\Models\User;
+use App\Domains\Tenancy\Models\Plan;
 use Database\Seeders\PlansSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -67,7 +68,7 @@ class AuthTest extends TestCase
 
     public function test_web_signup_form_with_a_paid_plan_redirects_to_payment(): void
     {
-        $starter = \App\Domains\Tenancy\Models\Plan::where('slug', 'starter')->firstOrFail();
+        $starter = Plan::where('slug', 'starter')->firstOrFail();
 
         $response = $this->post('/register', [
             'name' => 'Omar Founder',
