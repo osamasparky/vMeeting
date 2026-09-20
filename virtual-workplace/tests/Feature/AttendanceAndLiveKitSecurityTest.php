@@ -151,6 +151,53 @@ class AttendanceAndLiveKitSecurityTest extends TestCase
             ]);
     }
 
+    public function test_team_presence_overview_reports_online_member_with_room(): void
+    {
+        $this->actingAs($this->user);
+
+        $this->postJson('/api/office/attendance/log', [
+            'room_id' => $this->room->id,
+            'action' => 'enter',
+        ])->assertOk();
+
+        $response = $this->getJson('/api/office/team-presence-overview');
+
+        $response->assertOk()
+            ->assertJsonStructure(['success', 'online_count', 'total_count', 'roster'])
+            ->assertJsonPath('online_count', 1);
+
+        $roster = $response->json('roster');
+        $this->assertCount(1, $roster);
+        $this->assertSame($this->user->id, $roster[0]['user_id']);
+        $this->assertTrue($roster[0]['is_online']);
+        $this->assertSame('Executive Boardroom', $roster[0]['room_name']);
+    }
+
+    public function test_member_activity_shows_full_detail_to_an_authenticated_viewer(): void
+    {
+        $this->actingAs($this->user);
+
+        $response = $this->getJson("/api/members/{$this->user->id}/activity");
+
+        $response->assertOk()
+            ->assertJsonPath('is_guest_viewer', false)
+            ->assertJsonPath('user.email', $this->user->email);
+    }
+
+    public function test_member_activity_hides_tasks_and_timer_from_an_unauthenticated_guest_viewer(): void
+    {
+        // No actingAs(): this route is intentionally reachable by invited
+        // guests without a session, per routes/web.php's "Hybrid Workplace"
+        // section — the privacy rule lives in the controller, not a gate.
+        $response = $this->getJson("/api/members/{$this->user->id}/activity?organization_id={$this->organization->id}");
+
+        $response->assertOk()
+            ->assertJsonPath('is_guest_viewer', true)
+            ->assertJsonPath('user.email', null)
+            ->assertJsonPath('active_timer', null)
+            ->assertJsonCount(0, 'tasks');
+    }
+
     public function test_livekit_token_service_generates_valid_signed_token(): void
     {
         $tokenService = app(LiveKitTokenService::class);

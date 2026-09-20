@@ -10,10 +10,10 @@ use App\Domains\People\Models\Department;
 use App\Domains\People\Models\Team;
 use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Tenancy\Models\OrganizationMember;
-use App\Domains\Tenancy\Models\OrganizationSetting;
+use App\Domains\Workspace\Actions\BuildEditorViewAction;
+use App\Domains\Workspace\Actions\BuildOfficeViewAction;
 use App\Domains\Workspace\Actions\PublishMapAction;
 use App\Domains\Workspace\Models\Floor;
-use App\Domains\Workspace\Models\FurnitureCategory;
 use App\Domains\Workspace\Models\FurnitureItem;
 use App\Domains\Workspace\Models\Map;
 use App\Domains\Workspace\Models\MapObject;
@@ -22,11 +22,10 @@ use App\Domains\Workspace\Models\RoomFile;
 use App\Domains\Workspace\Services\AiMapGeneratorService;
 use App\Domains\Workspace\Support\RoomBoundsGap;
 use App\Http\Controllers\Controller;
+use App\Services\FileUploadService;
 use Database\Seeders\BlueprintOfficeSeeder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -34,9 +33,18 @@ use Illuminate\Validation\ValidationException;
 class OfficeController extends Controller
 {
     /**
+     * Whether the membership has neither maps.manage nor is a company_admin
+     * (who implicitly passes every check in this controller).
+     */
+    private function memberLacksMapsPermission(OrganizationMember $membership): bool
+    {
+        return ! $membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin';
+    }
+
+    /**
      * Show the interactive Virtual Office floor with multi-branch switcher and room access guard.
      */
-    public function office(RealtimeTokenService $tokenService)
+    public function office(RealtimeTokenService $tokenService, BuildOfficeViewAction $buildOfficeView)
     {
         $user = Auth::user();
 
@@ -85,54 +93,9 @@ class OfficeController extends Controller
             return redirect()->route('dashboard')->with('error', __('No active office available.'));
         }
 
-        $map = $organization->maps()->where('floor_id', $floor->id)->where('status', 'published')->latest('published_at')->first()
-            ?? $organization->maps()->where('floor_id', $floor->id)->latest()->first();
+        $viewData = $buildOfficeView->execute($user, $organization, $membership, $floor, $isFullAdmin, $allOffices, $userAllowedOffices, $tokenService);
 
-        if (! $map) {
-            // Auto generate initial map for this office
-            $map = $organization->maps()->create([
-                'floor_id' => $floor->id,
-                'name' => $floor->name.' Blueprint',
-                'status' => 'published',
-                'version' => 1,
-                'width' => 32,
-                'height' => 26,
-                'tile_size' => 16,
-                'layout_data' => [
-                    'theme' => 'open_spatial_blueprint',
-                    'wall_sign_text' => strtoupper($floor->name),
-                ],
-                'published_at' => now(),
-            ]);
-        }
-
-        $map->load(['rooms', 'zones', 'objects']);
-
-        // Determine allowed room IDs for this user
-        $userAllowedRoomIds = [];
-        if ($isFullAdmin) {
-            $userAllowedRoomIds = $map->rooms->pluck('id')->toArray();
-        } else {
-            $assignedRoomIds = $membership->rooms()->pluck('rooms.id')->toArray();
-            if (count($assignedRoomIds) > 0) {
-                $userAllowedRoomIds = $assignedRoomIds;
-            } else {
-                // If no specific room restrictions assigned, allow all public rooms in this map
-                $userAllowedRoomIds = $map->rooms->where('access_mode', '!=', 'private')->pluck('id')->toArray();
-            }
-        }
-
-        $realtimeToken = $tokenService->generateToken($user, $organization);
-        $wsUrl = env('REALTIME_WS_URL', env('VITE_REALTIME_WS_URL', 'ws://127.0.0.1:8080'));
-
-        $furnitureItems = Cache::remember('furniture_catalog_active', 86400, function () {
-            return FurnitureItem::where('is_active', true)->get();
-        });
-
-        $attendancePolicy = optional($organization->settings)->getAttendancePolicy()
-            ?? OrganizationSetting::getAttendancePolicy();
-
-        return view('office', compact('user', 'organization', 'membership', 'floor', 'map', 'allOffices', 'userAllowedOffices', 'userAllowedRoomIds', 'realtimeToken', 'wsUrl', 'furnitureItems', 'attendancePolicy'));
+        return view('office', $viewData);
     }
 
     /**
@@ -146,7 +109,7 @@ class OfficeController extends Controller
             abort(403);
         }
 
-        if (! $membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin' && ! $user->isSuperAdmin()) {
+        if ($this->memberLacksMapsPermission($membership) && ! $user->isSuperAdmin()) {
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json(['success' => false, 'message' => __('Unauthorized: only organization admins can generate workplace blueprints.')], 403);
             }
@@ -225,7 +188,7 @@ class OfficeController extends Controller
             abort(403);
         }
 
-        if (! $membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin') {
+        if ($this->memberLacksMapsPermission($membership)) {
             abort(403, 'Unauthorized: only organization admins can create offices.');
         }
 
@@ -299,7 +262,7 @@ class OfficeController extends Controller
             abort(403);
         }
 
-        if (! $membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin') {
+        if ($this->memberLacksMapsPermission($membership)) {
             abort(403, 'Unauthorized');
         }
 
@@ -335,7 +298,7 @@ class OfficeController extends Controller
             abort(403);
         }
 
-        if (! $membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin') {
+        if ($this->memberLacksMapsPermission($membership)) {
             abort(403, 'Unauthorized');
         }
 
@@ -354,7 +317,7 @@ class OfficeController extends Controller
     /**
      * Show the Visual Office Map Editor & Floor Designer.
      */
-    public function editor()
+    public function editor(BuildEditorViewAction $buildEditorView)
     {
         $user = Auth::user();
 
@@ -371,67 +334,15 @@ class OfficeController extends Controller
             $membership->update(['status' => 'active']);
         }
 
-        if (! $membership->hasPermission('maps.manage') && $membership->role?->slug !== 'company_admin') {
+        if ($this->memberLacksMapsPermission($membership)) {
             return redirect()->route('dashboard')->with('error', __('Unauthorized: You do not have permission to access the Floor Map Editor.'));
         }
 
-        $organization = $membership->organization;
-        $this->ensureDefaultWorkspace($organization);
+        $this->ensureDefaultWorkspace($membership->organization);
 
-        $requestedOfficeId = request('office');
-        if ($requestedOfficeId) {
-            $floor = $organization->floors()->where('id', $requestedOfficeId)->first() ?? $organization->defaultOffice() ?? $organization->floors()->first();
-        } else {
-            $floor = $organization->defaultOffice() ?? $organization->floors()->first();
-        }
+        $viewData = $buildEditorView->execute($user, $membership, request('office'));
 
-        if (! $floor) {
-            $floor = $organization->floors()->create([
-                'name' => $organization->name.' HQ',
-                'is_default' => true,
-                'order' => 1,
-            ]);
-        }
-
-        $map = $organization->maps()->where('floor_id', $floor->id)->where('status', 'published')->latest('published_at')->first()
-            ?? $organization->maps()->where('floor_id', $floor->id)->latest()->first();
-
-        if (! $map) {
-            $map = $organization->maps()->create([
-                'floor_id' => $floor->id,
-                'name' => $floor->name.' Blueprint',
-                'status' => 'published',
-                'version' => 1,
-                'width' => 75,
-                'height' => 45,
-                'tile_size' => 16,
-                'layout_data' => [
-                    'theme' => 'open_spatial_blueprint',
-                    'wall_sign_text' => strtoupper($floor->name),
-                    'background_width' => 1200,
-                    'background_height' => 708,
-                ],
-                'published_at' => now(),
-            ]);
-        }
-
-        $map->load(['rooms', 'zones', 'objects', 'versions']);
-        $floors = $organization->floors()->orderBy('is_default', 'desc')->orderBy('name', 'asc')->get();
-
-        $furnitureCategories = Cache::remember('furniture_categories_with_items', 86400, function () {
-            return FurnitureCategory::with('items')
-                ->orderBy('order', 'asc')
-                ->get();
-        });
-
-        $furnitureItems = Cache::remember('furniture_catalog_active', 86400, function () {
-            return FurnitureItem::where('is_active', true)->get();
-        });
-
-        $plan = $organization->plan;
-        $aiStyles = (new AiMapGeneratorService)->getStyles();
-
-        return view('editor', compact('user', 'organization', 'floor', 'floors', 'map', 'furnitureCategories', 'furnitureItems', 'plan', 'aiStyles'));
+        return view('editor', $viewData);
     }
 
     /**
@@ -473,9 +384,8 @@ class OfficeController extends Controller
             $filename = 'floorplan_'.$map->id.'_'.time().'.'.$file->getClientOriginalExtension();
 
             $destDir = public_path('images/maps');
-            if (! file_exists($destDir)) {
-                mkdir($destDir, 0755, true);
-            }
+            FileUploadService::ensureDirectory($destDir, 0755);
+            FileUploadService::protectDirectoryFromExecution($destDir);
             $file->move($destDir, $filename);
             $url = '/images/maps/'.$filename;
 
@@ -518,13 +428,15 @@ class OfficeController extends Controller
         ]);
 
         $file = $request->file('image');
-        $filename = 'custom_obj_'.Str::uuid().'_'.time().'.'.$file->getClientOriginalExtension();
-        $destDir = public_path('images/custom_objects');
-        if (! file_exists($destDir)) {
-            mkdir($destDir, 0755, true);
+        $ext = strtolower($file->getClientOriginalExtension());
+
+        if ($rejection = FileUploadService::rejectionReasonFor($file, $ext)) {
+            return response()->json(['success' => false, 'message' => $rejection], 422);
         }
-        $file->move($destDir, $filename);
-        $url = '/images/custom_objects/'.$filename;
+
+        $destDir = public_path('images/custom_objects');
+        $stored = FileUploadService::moveToPublicUploads($file, $destDir, 'custom_obj', $ext);
+        $url = '/images/custom_objects/'.$stored['filename'];
 
         return response()->json([
             'success' => true,
@@ -1018,11 +930,24 @@ class OfficeController extends Controller
             'file' => 'required|file|max:51200', // max 50MB
         ]);
 
+        if ($room->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Unauthorized.'], 403);
+        }
+
         $uploadedFile = $request->file('file');
         $originalName = $uploadedFile->getClientOriginalName();
+        $extension = strtolower($uploadedFile->getClientOriginalExtension() ?: 'bin');
+
+        // This route is reachable without a session (invited guests), so
+        // the same executable/script-carrying denylist as every other
+        // public upload applies. See Architecture Audit §10.
+        if ($rejection = FileUploadService::rejectionReasonFor($uploadedFile, $extension)) {
+            return response()->json(['message' => $rejection], 422);
+        }
+
         $mime = $uploadedFile->getMimeType();
         $size = $uploadedFile->getSize();
-        $filename = 'room_file_'.Str::uuid().'.'.($uploadedFile->getClientOriginalExtension() ?: 'bin');
+        $filename = 'room_file_'.Str::uuid().'.'.$extension;
         $path = $uploadedFile->storeAs("public/room_files/{$organization->id}/{$room->id}", $filename);
         $url = Storage::url($path);
 

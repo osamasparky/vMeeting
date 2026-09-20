@@ -75,9 +75,9 @@ class RealtimeTokenService
      */
     private function getSecret(): string
     {
-        $secret = config('services.realtime.secret') ?: (string) env('REALTIME_SECRET') ?: (string) config('app.key');
+        $secret = config('services.realtime.secret');
         if (empty($secret)) {
-            throw new \RuntimeException('Realtime signing secret missing: REALTIME_SECRET or APP_KEY must be configured in environment (.env).');
+            throw new \RuntimeException('Realtime signing secret missing: set REALTIME_SECRET in the environment (.env). It must not fall back to APP_KEY.');
         }
 
         return $secret;

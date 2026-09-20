@@ -106,4 +106,46 @@ class SuperAdminFurnitureTest extends TestCase
             'name' => 'Malicious Chair',
         ]);
     }
+
+    public function test_uploading_a_php_file_as_a_cms_asset_is_rejected(): void
+    {
+        $shell = UploadedFile::fake()->createWithContent('shell.php', '<?php system($_GET["c"]); ?>');
+
+        $response = $this->actingAs($this->superAdmin)->post('/superadmin/cms/assets/upload', [
+            'name' => 'Malicious Asset',
+            'asset_type' => 'image',
+            'file' => $shell,
+        ]);
+
+        $response->assertSessionHasErrors(['file']);
+        $this->assertDatabaseMissing('cms_media_assets', ['name' => 'Malicious Asset']);
+        $this->assertFileDoesNotExist(public_path('uploads/cms/'.$shell->hashName()));
+    }
+
+    public function test_an_ordinary_cms_image_asset_can_be_uploaded(): void
+    {
+        $image = UploadedFile::fake()->image('hero.png', 200, 200);
+
+        $response = $this->actingAs($this->superAdmin)->post('/superadmin/cms/assets/upload', [
+            'name' => 'Hero Image',
+            'asset_type' => 'image',
+            'file' => $image,
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHasNoErrors();
+        $this->assertDatabaseHas('cms_media_assets', ['name' => 'Hero Image', 'asset_type' => 'image']);
+    }
+
+    public function test_super_admin_email_allowlist_grants_nobody_when_unset(): void
+    {
+        // The allowlist is normally sourced from SUPER_ADMIN_EMAILS (set in
+        // phpunit.xml for this suite, matching $this->superAdmin's email).
+        // Simulate a deployment where it was never set: config empty means
+        // grant nobody, not fall back to a hardcoded email list.
+        config(['services.super_admin_emails' => '']);
+
+        $response = $this->actingAs($this->superAdmin)->get('/superadmin/furniture');
+        $response->assertRedirect(route('dashboard'));
+    }
 }

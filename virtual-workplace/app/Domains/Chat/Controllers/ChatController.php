@@ -168,6 +168,24 @@ class ChatController extends Controller
                 ];
             });
 
+        // Resolve all of the current user's DM channels in this organization
+        // in one query, keyed by the other participant's user id — avoids
+        // firing a separate Channel lookup per member below (was N+1).
+        $dmChannelsByOtherUserId = Channel::where('organization_id', $organization->id)
+            ->where('type', 'dm')
+            ->whereHas('members', function ($q) use ($user) {
+                $q->where('users.id', $user->id);
+            })
+            ->with(['members:id', 'messages' => function ($q) {
+                $q->latest()->take(1);
+            }])
+            ->get()
+            ->mapWithKeys(function ($dmChannel) use ($user) {
+                $otherUserId = $dmChannel->members->firstWhere('id', '!=', $user->id)?->id;
+
+                return $otherUserId ? [$otherUserId => $dmChannel] : [];
+            });
+
         // Fetch company members for direct messaging
         $members = OrganizationMember::where('organization_id', $organization->id)
             ->where('status', 'active')
@@ -175,25 +193,12 @@ class ChatController extends Controller
                 $q->where('organization_id', $organization->id);
             }, 'role'])
             ->get()
-            ->map(function ($m) use ($user, $organization) {
+            ->map(function ($m) use ($user, $dmChannelsByOtherUserId) {
                 $u = $m->user;
                 $profile = $u->profiles->first();
                 $isSelf = $u->id === $user->id;
 
-                // Check DM channel
-                $dmChannel = Channel::where('organization_id', $organization->id)
-                    ->where('type', 'dm')
-                    ->whereHas('members', function ($q) use ($user) {
-                        $q->where('users.id', $user->id);
-                    })
-                    ->whereHas('members', function ($q) use ($u) {
-                        $q->where('users.id', $u->id);
-                    })
-                    ->with(['messages' => function ($q) {
-                        $q->latest()->take(1);
-                    }])
-                    ->first();
-
+                $dmChannel = $dmChannelsByOtherUserId->get($u->id);
                 $lastMsg = $dmChannel?->messages->first();
 
                 return [

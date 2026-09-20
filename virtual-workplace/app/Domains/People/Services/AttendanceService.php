@@ -5,8 +5,10 @@ namespace App\Domains\People\Services;
 use App\Domains\Identity\Models\User;
 use App\Domains\People\Models\AttendanceSession;
 use App\Domains\Projects\Models\ActiveTimer;
+use App\Domains\Projects\Models\Task;
 use App\Domains\Projects\Models\TimeEntry;
 use App\Domains\Tenancy\Models\Organization;
+use App\Domains\Tenancy\Models\OrganizationMember;
 use Carbon\Carbon;
 
 class AttendanceService
@@ -424,6 +426,215 @@ class AttendanceService
             'active_timer' => $activeTaskTimer,
             'task_entries' => $formattedTaskEntries,
             'attendance_sessions' => $formattedAttendanceSessions,
+        ];
+    }
+
+    /**
+     * Build the in-office "user spotlight" activity card for a member: their
+     * current active task/timer and assigned tasks, with a strict privacy
+     * rule that guest viewers never see internal task/timer detail.
+     */
+    public function getMemberActivitySnapshot(User $targetUser, ?OrganizationMember $targetMembership, ?string $effectiveOrgId, bool $isGuest): array
+    {
+        $activeTimerData = null;
+        $tasks = collect([]);
+
+        if (! $isGuest && $effectiveOrgId) {
+            $activeTimer = ActiveTimer::where('organization_id', $effectiveOrgId)
+                ->where('user_id', $targetUser->id)
+                ->with(['project', 'task'])
+                ->first();
+
+            if ($activeTimer) {
+                $activeTimerData = [
+                    'id' => $activeTimer->id,
+                    'project_name' => $activeTimer->project?->name ?? 'General Work',
+                    'task_title' => $activeTimer->task ? ('#'.$activeTimer->task->task_number.' '.$activeTimer->task->title) : 'Focused Work Session',
+                    'task_number' => $activeTimer->task?->task_number ?? '',
+                    'started_at' => $activeTimer->started_at?->toIso8601String(),
+                    'duration_seconds' => $activeTimer->elapsedSeconds(),
+                ];
+            } else {
+                $openEntry = TimeEntry::where('user_id', $targetUser->id)
+                    ->where('organization_id', $effectiveOrgId)
+                    ->whereNull('ended_at')
+                    ->with(['task', 'project'])
+                    ->latest('started_at')
+                    ->first();
+                if ($openEntry) {
+                    $activeTimerData = [
+                        'id' => $openEntry->id,
+                        'project_name' => $openEntry->project?->name ?? 'General Work',
+                        'task_title' => $openEntry->task?->title ?? ($openEntry->description ?? 'Focused Work Session'),
+                        'task_number' => $openEntry->task?->task_number ?? '',
+                        'started_at' => $openEntry->started_at?->toIso8601String(),
+                        'duration_seconds' => $openEntry->started_at ? now()->diffInSeconds($openEntry->started_at) : 0,
+                    ];
+                }
+            }
+
+            $tasks = Task::where('organization_id', $effectiveOrgId)
+                ->where('assignee_id', $targetUser->id)
+                ->whereNotIn('status', ['done', 'completed', 'cancelled'])
+                ->with(['project'])
+                ->orderBy('priority', 'desc')
+                ->orderBy('due_date', 'asc')
+                ->take(15)
+                ->get();
+        }
+
+        $deptName = '';
+        if ($targetUser->profile) {
+            if (is_object($targetUser->profile->department)) {
+                $deptName = $targetUser->profile->department->name ?? '';
+            } elseif (is_string($targetUser->profile->department)) {
+                $deptName = $targetUser->profile->department;
+            }
+        }
+
+        $teamName = '';
+        if ($targetUser->profile) {
+            if (is_object($targetUser->profile->team)) {
+                $teamName = $targetUser->profile->team->name ?? '';
+            } elseif (is_string($targetUser->profile->team)) {
+                $teamName = $targetUser->profile->team;
+            }
+        }
+
+        return [
+            'user' => [
+                'id' => $targetUser->id,
+                'name' => $targetUser->name,
+                'email' => $isGuest ? null : $targetUser->email,
+                'avatar_url' => $targetUser->avatar_url,
+                'role_name' => $targetMembership?->role?->name ?? 'Member',
+                'job_title' => $targetMembership?->job_title ?? $targetUser->profile?->job_title ?? __('Team Member'),
+                'department' => $deptName,
+                'team' => $teamName,
+                'status' => $targetMembership?->status ?? 'active',
+            ],
+            'is_guest_viewer' => $isGuest,
+            'active_timer' => $activeTimerData,
+            'tasks' => $tasks->map(function ($t) {
+                return [
+                    'id' => $t->id,
+                    'title' => $t->title,
+                    'task_number' => $t->task_number,
+                    'status' => $t->status,
+                    'priority' => $t->priority ?? 'medium',
+                    'project_name' => $t->project?->name ?? 'Main',
+                    'due_date' => $t->due_date ? $t->due_date->format('Y-m-d') : null,
+                ];
+            }),
+        ];
+    }
+
+    /**
+     * Build the live team-presence roster: who's online, where, and their
+     * office + task time totals for today, across the whole organization.
+     */
+    public function getTeamPresenceOverview(Organization $organization): array
+    {
+        $this->cleanupStaleSessions();
+
+        $startOfDay = now()->startOfDay();
+        $endOfDay = now()->endOfDay();
+
+        $members = $organization->members()
+            ->whereHas('user', function ($q) {
+                $q->where('is_super_admin', false);
+            })
+            ->with(['user.profiles', 'role'])
+            ->get();
+
+        $activeSessions = AttendanceSession::where('organization_id', $organization->id)
+            ->where('status', 'active')
+            ->whereNull('ended_at')
+            ->with(['room', 'room.floor', 'room.map'])
+            ->get()
+            ->keyBy('user_id');
+
+        $todaySessions = AttendanceSession::where('organization_id', $organization->id)
+            ->whereBetween('started_at', [$startOfDay, $endOfDay])
+            ->get()
+            ->groupBy('user_id');
+
+        $todayTaskEntries = TimeEntry::where('organization_id', $organization->id)
+            ->where(function ($q) use ($startOfDay, $endOfDay) {
+                $q->whereBetween('started_at', [$startOfDay, $endOfDay])
+                    ->orWhereBetween('created_at', [$startOfDay, $endOfDay]);
+            })
+            ->get()
+            ->groupBy('user_id');
+
+        $activeTimers = ActiveTimer::where('organization_id', $organization->id)
+            ->with(['project:id,name', 'task:id,title,task_number'])
+            ->get()
+            ->keyBy('user_id');
+
+        $roster = $members->map(function ($m) use ($activeSessions, $todaySessions, $todayTaskEntries, $activeTimers) {
+            $u = $m->user;
+            if (! $u) {
+                return null;
+            }
+
+            $activeSession = $activeSessions->get($u->id);
+            $isOnline = (bool) $activeSession;
+            $userTodaySessions = $todaySessions->get($u->id, collect());
+            $userTodayTasks = $todayTaskEntries->get($u->id, collect());
+            $activeTimer = $activeTimers->get($u->id);
+
+            $totalOfficeSec = $userTodaySessions->sum(function ($s) {
+                if ($s->isActive()) {
+                    return max($s->duration_seconds ?? 0, now()->diffInSeconds($s->started_at));
+                }
+
+                return $s->duration_seconds ?? 0;
+            });
+
+            $totalTaskSec = $userTodayTasks->sum(function ($te) {
+                if (! $te->ended_at && $te->started_at) {
+                    return max(0, now()->diffInSeconds($te->started_at));
+                }
+
+                return $te->duration_seconds ?? 0;
+            });
+
+            if ($activeTimer) {
+                $totalTaskSec += $activeTimer->elapsedSeconds();
+            }
+
+            $currentRoom = $activeSession?->room?->name ?? ($isOnline ? 'Open Space' : null);
+            $currentOffice = $activeSession?->room?->floor?->name ?? ($activeSession?->room?->map?->floor?->name ?? ($isOnline ? 'Main Office' : 'Offline'));
+
+            return [
+                'user_id' => $u->id,
+                'member_id' => $m->id,
+                'name' => $u->name,
+                'nickname' => $u->nickname,
+                'email' => $u->email,
+                'avatar_url' => $u->avatar_url,
+                'role_name' => $m->role?->name ?? 'Member',
+                'job_title' => $m->job_title ?? ($u->profiles?->first()?->job_title ?? ''),
+                'is_online' => $isOnline,
+                'office_name' => $currentOffice,
+                'room_name' => $currentRoom,
+                'total_office_seconds' => $totalOfficeSec,
+                'total_office_formatted' => sprintf('%02d:%02d:%02d', floor($totalOfficeSec / 3600), floor(($totalOfficeSec % 3600) / 60), $totalOfficeSec % 60),
+                'total_task_seconds' => $totalTaskSec,
+                'total_task_formatted' => sprintf('%02d:%02d:%02d', floor($totalTaskSec / 3600), floor(($totalTaskSec % 3600) / 60), $totalTaskSec % 60),
+                'active_task' => $activeTimer ? [
+                    'task_title' => $activeTimer->task?->title ?? 'Work Session',
+                    'project_name' => $activeTimer->project?->name ?? 'General',
+                    'elapsed_seconds' => $activeTimer->elapsedSeconds(),
+                ] : null,
+            ];
+        })->filter()->values();
+
+        return [
+            'online_count' => $roster->where('is_online', true)->count(),
+            'total_count' => $roster->count(),
+            'roster' => $roster,
         ];
     }
 }

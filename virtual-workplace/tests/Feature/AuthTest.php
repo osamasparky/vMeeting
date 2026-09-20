@@ -49,6 +49,40 @@ class AuthTest extends TestCase
         $this->assertDatabaseHas('organizations', ['name' => 'Sara Labs']);
     }
 
+    public function test_web_signup_form_creates_user_and_organization_on_the_free_plan(): void
+    {
+        $response = $this->post('/register', [
+            'name' => 'Layla Founder',
+            'email' => 'layla@example.com',
+            'password' => 'SecurePass123!',
+            'password_confirmation' => 'SecurePass123!',
+            'organization_name' => 'Layla Co',
+        ]);
+
+        $response->assertRedirect(route('dashboard'));
+        $this->assertAuthenticated();
+        $this->assertDatabaseHas('users', ['email' => 'layla@example.com']);
+        $this->assertDatabaseHas('organizations', ['name' => 'Layla Co']);
+    }
+
+    public function test_web_signup_form_with_a_paid_plan_redirects_to_payment(): void
+    {
+        $starter = \App\Domains\Tenancy\Models\Plan::where('slug', 'starter')->firstOrFail();
+
+        $response = $this->post('/register', [
+            'name' => 'Omar Founder',
+            'email' => 'omar@example.com',
+            'password' => 'SecurePass123!',
+            'password_confirmation' => 'SecurePass123!',
+            'organization_name' => 'Omar Co',
+            'plan_id' => $starter->id,
+        ]);
+
+        $response->assertRedirect(route('subscription.payment', ['plan' => $starter->id]));
+        $this->assertAuthenticated();
+        $this->assertDatabaseHas('organizations', ['name' => 'Omar Co']);
+    }
+
     public function test_user_can_login_and_fetch_me(): void
     {
         $user = User::factory()->create([

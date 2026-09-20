@@ -190,6 +190,79 @@ class ClickUpAdvancedFeaturesTest extends TestCase
             ->assertJsonPath('goal.status', 'completed');
     }
 
+    public function test_goal_recalculation_does_not_repeat_task_counts_per_auto_target(): void
+    {
+        // Three tasks, two done — the count every auto 'tasks' target below
+        // should converge on.
+        Task::create(['organization_id' => $this->org->id, 'project_id' => $this->project->id, 'title' => 'A', 'task_number' => 1, 'status' => 'done', 'reporter_id' => $this->user->id]);
+        Task::create(['organization_id' => $this->org->id, 'project_id' => $this->project->id, 'title' => 'B', 'task_number' => 2, 'status' => 'done', 'reporter_id' => $this->user->id]);
+        Task::create(['organization_id' => $this->org->id, 'project_id' => $this->project->id, 'title' => 'C', 'task_number' => 3, 'status' => 'in_progress', 'reporter_id' => $this->user->id]);
+
+        $goal = \App\Domains\Projects\Models\ProjectGoal::create([
+            'organization_id' => $this->org->id,
+            'project_id' => $this->project->id,
+            'owner_id' => $this->user->id,
+            'name' => 'Auto Task Tracking Goal',
+        ]);
+
+        // Four auto-computed 'tasks' targets (target_value <= 0 means
+        // "derive from the project's task counts") — this is exactly the
+        // shape that used to fire two fresh COUNT queries per target.
+        for ($i = 0; $i < 4; $i++) {
+            \App\Domains\Projects\Models\ProjectGoalTarget::create([
+                'goal_id' => $goal->id,
+                'title' => "Auto target {$i}",
+                'target_type' => 'tasks',
+                'start_value' => 0,
+                'target_value' => 0,
+                'current_value' => 0,
+            ]);
+        }
+
+        \Illuminate\Support\Facades\DB::enableQueryLog();
+        \Illuminate\Support\Facades\DB::flushQueryLog();
+        $goal->recalculateProgress();
+        $queryCountWithFourTargets = count(\Illuminate\Support\Facades\DB::getQueryLog());
+
+        // Correctness: 2/3 tasks done -> 66.67%, in_progress (not complete).
+        $goal->refresh();
+        $this->assertEquals(66.67, (float) $goal->progress_percentage);
+        $this->assertSame('in_progress', $goal->status);
+        $goal->targets->each(function ($target) {
+            $this->assertEquals(3, (float) $target->target_value);
+            $this->assertEquals(2, (float) $target->current_value);
+        });
+
+        // Add four more identical auto targets — a per-target query (the
+        // N+1 this guards against) would make the query count grow with it.
+        for ($i = 4; $i < 8; $i++) {
+            \App\Domains\Projects\Models\ProjectGoalTarget::create([
+                'goal_id' => $goal->id,
+                'title' => "Auto target {$i}",
+                'target_type' => 'tasks',
+                'start_value' => 0,
+                'target_value' => 0,
+                'current_value' => 0,
+            ]);
+        }
+
+        \Illuminate\Support\Facades\DB::flushQueryLog();
+        $goal->recalculateProgress();
+        $queryCountWithEightTargets = count(\Illuminate\Support\Facades\DB::getQueryLog());
+
+        // Each target still needs its own save() (a genuine per-row write,
+        // not an N+1), so exact equality isn't the right bar. What this
+        // guards against is the *count* queries scaling with target count:
+        // pre-fix, doubling the targets would have roughly doubled the
+        // query count (2 fresh COUNT queries per target); post-fix it
+        // should grow by only ~1 query per extra target (its own save).
+        $this->assertLessThan(
+            $queryCountWithFourTargets * 1.5,
+            $queryCountWithEightTargets,
+            'recalculateProgress() query count grew roughly in proportion to target count — the task-count queries look like they are re-running per target again.'
+        );
+    }
+
     public function test_gantt_and_workload_matrix_endpoints(): void
     {
         // 1. Create tasks with estimated hours

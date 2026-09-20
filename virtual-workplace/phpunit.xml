@@ -35,5 +35,6 @@
         <env name="LIVEKIT_API_KEY" value="devkey"/>
         <env name="LIVEKIT_API_SECRET" value="secret_livekit_key_virtual_workplace_2026"/>
         <env name="REALTIME_SECRET" value="test_realtime_secret_key"/>
+        <env name="SUPER_ADMIN_EMAILS" value="info@meemdtt.com"/>
     </php>
 </phpunit>

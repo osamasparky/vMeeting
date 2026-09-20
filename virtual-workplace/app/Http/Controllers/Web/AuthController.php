@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Web;
 
-use App\Domains\Identity\Actions\CreateOrganizationAction;
-use App\Domains\Identity\Models\User;
 use App\Domains\People\Models\UserProfile;
+use App\Domains\Tenancy\Actions\RegisterUserWithOrganizationAction;
 use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Domains\Tenancy\Models\Plan;
+use App\Domains\Tenancy\Requests\RegisterWithOrganizationRequest;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -76,50 +76,15 @@ class AuthController extends Controller
     /**
      * Handle registration form submission.
      */
-    public function register(Request $request, CreateOrganizationAction $createOrgAction)
+    public function register(RegisterWithOrganizationRequest $request, RegisterUserWithOrganizationAction $registerWithOrganization)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'organization_name' => ['required', 'string', 'max:255'],
-            'plan_id' => ['nullable', 'exists:plans,id'],
-            'plan_slug' => ['nullable', 'string'],
-        ]);
+        $result = $registerWithOrganization->execute($request->validated());
 
-        // Create user
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-        ]);
+        Auth::login($result['user']);
 
-        // Find requested plan
-        $selectedPlan = null;
-        if (! empty($validated['plan_id'])) {
-            $selectedPlan = Plan::find($validated['plan_id']);
-        } elseif (! empty($validated['plan_slug'])) {
-            $selectedPlan = Plan::where('slug', $validated['plan_slug'])->first();
-        }
-
-        // Create organization with user as admin (initially with selected plan if free, or base plan)
-        $freePlan = Plan::where('slug', 'free')->first() ?? Plan::where('price', 0)->first() ?? Plan::first();
-        $isPaidPlan = $selectedPlan && (float) $selectedPlan->price > 0;
-
-        $createOrgAction->execute(
-            [
-                'name' => $validated['organization_name'],
-                'plan_id' => $isPaidPlan ? $freePlan?->id : ($selectedPlan?->id ?? $freePlan?->id),
-            ],
-            $user
-        );
-
-        // Log in
-        Auth::login($user);
-
-        if ($isPaidPlan && $selectedPlan) {
-            return redirect()->route('subscription.payment', ['plan' => $selectedPlan->id])
-                ->with('info', "مرحباً بك في Virtual Workplace! يرجى إتمام التحويل البنكي لتفعيل اشتراك باقة ({$selectedPlan->name}).");
+        if ($result['isPaidPlan'] && $result['selectedPlan']) {
+            return redirect()->route('subscription.payment', ['plan' => $result['selectedPlan']->id])
+                ->with('info', "مرحباً بك في Virtual Workplace! يرجى إتمام التحويل البنكي لتفعيل اشتراك باقة ({$result['selectedPlan']->name}).");
         }
 
         return redirect()->route('dashboard');

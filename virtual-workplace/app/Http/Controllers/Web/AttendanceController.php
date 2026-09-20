@@ -4,13 +4,11 @@ namespace App\Http\Controllers\Web;
 
 use App\Domains\Administration\Models\AuditLog;
 use App\Domains\Identity\Models\User;
-use App\Domains\People\Models\AttendanceSession;
 use App\Domains\People\Services\AttendanceService;
 use App\Domains\Projects\Actions\StartTimerAction;
 use App\Domains\Projects\Actions\StopTimerAction;
 use App\Domains\Projects\Models\ActiveTimer;
 use App\Domains\Projects\Models\Task;
-use App\Domains\Projects\Models\TimeEntry;
 use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -19,12 +17,22 @@ use Illuminate\Support\Facades\Auth;
 class AttendanceController extends Controller
 {
     /**
+     * Resolve the authenticated user's organization membership, or null.
+     * Shared by every endpoint below except memberActivity(), which also
+     * has to support unauthenticated guest viewers.
+     */
+    private function currentMembership(): ?OrganizationMember
+    {
+        return OrganizationMember::where('user_id', Auth::id())->first();
+    }
+
+    /**
      * Log Room and Floor presence intervals for time & attendance tracking.
      */
     public function logRoomAttendance(Request $request, AttendanceService $attendanceService)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        $membership = $this->currentMembership();
         if (! $membership) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
@@ -78,7 +86,7 @@ class AttendanceController extends Controller
     public function getDailyTimesheetsReport(Request $request, AttendanceService $attendanceService)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        $membership = $this->currentMembership();
         if (! $membership) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
@@ -112,7 +120,7 @@ class AttendanceController extends Controller
     public function getOfficeTasksAndTimer(Request $request)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        $membership = $this->currentMembership();
         if (! $membership) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
@@ -176,7 +184,7 @@ class AttendanceController extends Controller
     public function startOfficeTaskTimer(Request $request, StartTimerAction $action)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        $membership = $this->currentMembership();
         if (! $membership) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
@@ -217,7 +225,7 @@ class AttendanceController extends Controller
     public function stopOfficeTaskTimer(Request $request, StopTimerAction $action)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        $membership = $this->currentMembership();
         if (! $membership) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
@@ -237,7 +245,7 @@ class AttendanceController extends Controller
     public function updateOfficeTaskStatus(Request $request, string $taskId)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        $membership = $this->currentMembership();
         if (! $membership) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
@@ -270,7 +278,7 @@ class AttendanceController extends Controller
     public function getAttendanceSummary(Request $request, AttendanceService $attendanceService)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        $membership = $this->currentMembership();
         if (! $membership) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
@@ -284,7 +292,7 @@ class AttendanceController extends Controller
     /**
      * Get member live activity for in-office user spotlight card (supports guest viewers with privacy protection).
      */
-    public function memberActivity(Request $request, string $userId)
+    public function memberActivity(Request $request, string $userId, AttendanceService $attendanceService)
     {
         $viewer = Auth::user();
         $isGuest = empty($viewer);
@@ -319,101 +327,9 @@ class AttendanceController extends Controller
 
         $effectiveOrgId = $targetMembership ? $targetMembership->organization_id : $orgId;
 
-        // Privacy rule: Guests are NEVER permitted to inspect team tasks or internal active timers
-        $activeTimerData = null;
-        $tasks = collect([]);
-
-        if (! $isGuest && $effectiveOrgId) {
-            // First check ActiveTimer
-            $activeTimer = ActiveTimer::where('organization_id', $effectiveOrgId)
-                ->where('user_id', $targetUser->id)
-                ->with(['project', 'task'])
-                ->first();
-
-            if ($activeTimer) {
-                $activeTimerData = [
-                    'id' => $activeTimer->id,
-                    'project_name' => $activeTimer->project?->name ?? 'General Work',
-                    'task_title' => $activeTimer->task ? ('#'.$activeTimer->task->task_number.' '.$activeTimer->task->title) : 'Focused Work Session',
-                    'task_number' => $activeTimer->task?->task_number ?? '',
-                    'started_at' => $activeTimer->started_at?->toIso8601String(),
-                    'duration_seconds' => $activeTimer->elapsedSeconds(),
-                ];
-            } else {
-                // Fallback to open TimeEntry
-                $openEntry = TimeEntry::where('user_id', $targetUser->id)
-                    ->where('organization_id', $effectiveOrgId)
-                    ->whereNull('ended_at')
-                    ->with(['task', 'project'])
-                    ->latest('started_at')
-                    ->first();
-                if ($openEntry) {
-                    $activeTimerData = [
-                        'id' => $openEntry->id,
-                        'project_name' => $openEntry->project?->name ?? 'General Work',
-                        'task_title' => $openEntry->task?->title ?? ($openEntry->description ?? 'Focused Work Session'),
-                        'task_number' => $openEntry->task?->task_number ?? '',
-                        'started_at' => $openEntry->started_at?->toIso8601String(),
-                        'duration_seconds' => $openEntry->started_at ? now()->diffInSeconds($openEntry->started_at) : 0,
-                    ];
-                }
-            }
-
-            // Tasks assigned to this user
-            $tasks = Task::where('organization_id', $effectiveOrgId)
-                ->where('assignee_id', $targetUser->id)
-                ->whereNotIn('status', ['done', 'completed', 'cancelled'])
-                ->with(['project'])
-                ->orderBy('priority', 'desc')
-                ->orderBy('due_date', 'asc')
-                ->take(15)
-                ->get();
-        }
-
-        $deptName = '';
-        if ($targetUser->profile) {
-            if (is_object($targetUser->profile->department)) {
-                $deptName = $targetUser->profile->department->name ?? '';
-            } elseif (is_string($targetUser->profile->department)) {
-                $deptName = $targetUser->profile->department;
-            }
-        }
-
-        $teamName = '';
-        if ($targetUser->profile) {
-            if (is_object($targetUser->profile->team)) {
-                $teamName = $targetUser->profile->team->name ?? '';
-            } elseif (is_string($targetUser->profile->team)) {
-                $teamName = $targetUser->profile->team;
-            }
-        }
-
-        return response()->json([
-            'user' => [
-                'id' => $targetUser->id,
-                'name' => $targetUser->name,
-                'email' => $isGuest ? null : $targetUser->email,
-                'avatar_url' => $targetUser->avatar_url,
-                'role_name' => $targetMembership?->role?->name ?? 'Member',
-                'job_title' => $targetMembership?->job_title ?? $targetUser->profile?->job_title ?? __('Team Member'),
-                'department' => $deptName,
-                'team' => $teamName,
-                'status' => $targetMembership?->status ?? 'active',
-            ],
-            'is_guest_viewer' => $isGuest,
-            'active_timer' => $activeTimerData,
-            'tasks' => $tasks->map(function ($t) {
-                return [
-                    'id' => $t->id,
-                    'title' => $t->title,
-                    'task_number' => $t->task_number,
-                    'status' => $t->status,
-                    'priority' => $t->priority ?? 'medium',
-                    'project_name' => $t->project?->name ?? 'Main',
-                    'due_date' => $t->due_date ? $t->due_date->format('Y-m-d') : null,
-                ];
-            }),
-        ]);
+        return response()->json(
+            $attendanceService->getMemberActivitySnapshot($targetUser, $targetMembership, $effectiveOrgId, $isGuest)
+        );
     }
 
     /**
@@ -421,121 +337,14 @@ class AttendanceController extends Controller
      */
     public function getTeamPresenceOverview(Request $request, AttendanceService $attendanceService)
     {
-        $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        $membership = $this->currentMembership();
         if (! $membership) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $organization = $membership->organization;
-        $attendanceService->cleanupStaleSessions();
-
-        $startOfDay = now()->startOfDay();
-        $endOfDay = now()->endOfDay();
-
-        // 1. Get all members of the organization (excluding platform super admins)
-        $members = $organization->members()
-            ->whereHas('user', function ($q) {
-                $q->where('is_super_admin', false);
-            })
-            ->with(['user.profiles', 'role'])
-            ->get();
-
-        // 2. Active office sessions right now
-        $activeSessions = AttendanceSession::where('organization_id', $organization->id)
-            ->where('status', 'active')
-            ->whereNull('ended_at')
-            ->with(['room', 'room.floor', 'room.map'])
-            ->get()
-            ->keyBy('user_id');
-
-        // 3. All today's attendance sessions for sum
-        $todaySessions = AttendanceSession::where('organization_id', $organization->id)
-            ->whereBetween('started_at', [$startOfDay, $endOfDay])
-            ->get()
-            ->groupBy('user_id');
-
-        // 4. All today's task entries
-        $todayTaskEntries = TimeEntry::where('organization_id', $organization->id)
-            ->where(function ($q) use ($startOfDay, $endOfDay) {
-                $q->whereBetween('started_at', [$startOfDay, $endOfDay])
-                    ->orWhereBetween('created_at', [$startOfDay, $endOfDay]);
-            })
-            ->get()
-            ->groupBy('user_id');
-
-        // 5. Active Task Timers
-        $activeTimers = ActiveTimer::where('organization_id', $organization->id)
-            ->with(['project:id,name', 'task:id,title,task_number'])
-            ->get()
-            ->keyBy('user_id');
-
-        $roster = $members->map(function ($m) use ($activeSessions, $todaySessions, $todayTaskEntries, $activeTimers) {
-            $u = $m->user;
-            if (! $u) {
-                return null;
-            }
-
-            $activeSession = $activeSessions->get($u->id);
-            $isOnline = (bool) $activeSession;
-            $userTodaySessions = $todaySessions->get($u->id, collect());
-            $userTodayTasks = $todayTaskEntries->get($u->id, collect());
-            $activeTimer = $activeTimers->get($u->id);
-
-            // Calculate total office seconds today
-            $totalOfficeSec = $userTodaySessions->sum(function ($s) {
-                if ($s->isActive()) {
-                    return max($s->duration_seconds ?? 0, now()->diffInSeconds($s->started_at));
-                }
-
-                return $s->duration_seconds ?? 0;
-            });
-
-            // Calculate total task seconds today
-            $totalTaskSec = $userTodayTasks->sum(function ($te) {
-                if (! $te->ended_at && $te->started_at) {
-                    return max(0, now()->diffInSeconds($te->started_at));
-                }
-
-                return $te->duration_seconds ?? 0;
-            });
-
-            if ($activeTimer) {
-                $totalTaskSec += $activeTimer->elapsedSeconds();
-            }
-
-            $currentRoom = $activeSession?->room?->name ?? ($isOnline ? 'Open Space' : null);
-            $currentOffice = $activeSession?->room?->floor?->name ?? ($activeSession?->room?->map?->floor?->name ?? ($isOnline ? 'Main Office' : 'Offline'));
-
-            return [
-                'user_id' => $u->id,
-                'member_id' => $m->id,
-                'name' => $u->name,
-                'nickname' => $u->nickname,
-                'email' => $u->email,
-                'avatar_url' => $u->avatar_url,
-                'role_name' => $m->role?->name ?? 'Member',
-                'job_title' => $m->job_title ?? ($u->profiles?->first()?->job_title ?? ''),
-                'is_online' => $isOnline,
-                'office_name' => $currentOffice,
-                'room_name' => $currentRoom,
-                'total_office_seconds' => $totalOfficeSec,
-                'total_office_formatted' => sprintf('%02d:%02d:%02d', floor($totalOfficeSec / 3600), floor(($totalOfficeSec % 3600) / 60), $totalOfficeSec % 60),
-                'total_task_seconds' => $totalTaskSec,
-                'total_task_formatted' => sprintf('%02d:%02d:%02d', floor($totalTaskSec / 3600), floor(($totalTaskSec % 3600) / 60), $totalTaskSec % 60),
-                'active_task' => $activeTimer ? [
-                    'task_title' => $activeTimer->task?->title ?? 'Work Session',
-                    'project_name' => $activeTimer->project?->name ?? 'General',
-                    'elapsed_seconds' => $activeTimer->elapsedSeconds(),
-                ] : null,
-            ];
-        })->filter()->values();
-
-        return response()->json([
-            'success' => true,
-            'online_count' => $roster->where('is_online', true)->count(),
-            'total_count' => $roster->count(),
-            'roster' => $roster,
-        ]);
+        return response()->json(array_merge(
+            ['success' => true],
+            $attendanceService->getTeamPresenceOverview($membership->organization)
+        ));
     }
 }

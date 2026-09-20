@@ -11,6 +11,20 @@ use Illuminate\Support\Str;
 class FileUploadService
 {
     /**
+     * Extensions that must never be accepted into a public upload directory,
+     * regardless of the caller's own allowlist: server-executable types and
+     * markup types capable of carrying an embedded script (HTML/SVG XSS).
+     * Mirrors the check already applied to furniture image uploads in
+     * SuperAdminController, generalized so any upload path can reuse it.
+     */
+    public const DANGEROUS_EXTENSIONS = [
+        'php', 'php3', 'php4', 'php5', 'php7', 'phtml', 'pht', 'phar',
+        'exe', 'sh', 'bat', 'cmd', 'com', 'cgi', 'pl', 'py', 'rb',
+        'jar', 'msi', 'dll', 'scr', 'vbs', 'ps1',
+        'html', 'htm', 'js', 'mjs', 'xhtml',
+    ];
+
+    /**
      * Ensure a target directory exists with secure permissions (0755).
      *
      * @param  string  $path  Absolute or relative filesystem directory path
@@ -23,6 +37,68 @@ class FileUploadService
         }
 
         return $path;
+    }
+
+    /**
+     * Write an .htaccess to a public upload directory denying script
+     * execution, if one isn't already present. Safe to call repeatedly.
+     */
+    public static function protectDirectoryFromExecution(string $path): void
+    {
+        $marker = rtrim($path, '/\\').DIRECTORY_SEPARATOR.'.htaccess';
+        if (! File::exists($marker)) {
+            @file_put_contents(
+                $marker,
+                "<Files *.php>\n    Order Deny,Allow\n    Deny from all\n</Files>\nOptions -ExecCGI\n"
+            );
+        }
+    }
+
+    /**
+     * Reject a file that is dangerous to serve from a public upload
+     * directory: a server-executable extension, or (for SVG specifically)
+     * markup containing an embedded script/event-handler. Returns an error
+     * string to show the user, or null if the file is safe to accept.
+     */
+    public static function rejectionReasonFor(UploadedFile $file, string $extension): ?string
+    {
+        if (in_array($extension, self::DANGEROUS_EXTENSIONS, true)) {
+            return __('For security, files with the ":ext" extension cannot be uploaded.', ['ext' => $extension]);
+        }
+
+        if ($extension === 'svg') {
+            $content = @file_get_contents($file->getRealPath()) ?: '';
+            if (preg_match('/<script|javascript:|onload=|onerror=|onclick=|<foreignObject/i', $content)) {
+                return __('This SVG file contains unsafe embedded scripts or attributes.');
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Move an uploaded file into a protected public uploads directory with a
+     * randomized, collision-resistant filename. Used by upload endpoints
+     * that serve files as plain static links from the public webroot
+     * (project/task attachments) rather than through Storage::disk().
+     *
+     * @return array{filename: string, path: string, size: int}
+     */
+    public static function moveToPublicUploads(UploadedFile $file, string $destDir, string $filenamePrefix, string $extension): array
+    {
+        self::ensureDirectory($destDir, 0755);
+        self::protectDirectoryFromExecution($destDir);
+
+        $filename = $filenamePrefix.'_'.time().'_'.Str::random(6).'.'.$extension;
+        $file->move($destDir, $filename);
+
+        $fullPath = rtrim($destDir, '/\\').'/'.$filename;
+
+        return [
+            'filename' => $filename,
+            'path' => $fullPath,
+            'size' => file_exists($fullPath) ? filesize($fullPath) : $file->getSize(),
+        ];
     }
 
     /**

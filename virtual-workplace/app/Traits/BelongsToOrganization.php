@@ -3,19 +3,23 @@
 namespace App\Traits;
 
 use App\Domains\Tenancy\Models\Organization;
+use App\Domains\Tenancy\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Trait BelongsToOrganization
  *
- * Provides organization relationship, creation context assignment,
- * and explicit scoping helper (scopeForOrganization) for multi-tenant models.
+ * Provides organization relationship, creation context assignment, an
+ * explicit scoping helper (scopeForOrganization), and — when
+ * config('tenancy.enforce_global_scope') is enabled — an automatic
+ * TenantScope global scope. See Architecture Audit §7/§15, ADR-002.
  */
 trait BelongsToOrganization
 {
     /**
-     * Boot the trait — auto-set organization_id upon model creation from request route if present.
+     * Boot the trait — auto-set organization_id upon model creation from
+     * request route if present, and register the (flag-gated) tenant scope.
      */
     protected static function bootBelongsToOrganization(): void
     {
@@ -26,6 +30,8 @@ trait BelongsToOrganization
                 $model->organization_id = $org instanceof Organization ? $org->id : $org;
             }
         });
+
+        static::addGlobalScope(new TenantScope);
     }
 
     /**
@@ -37,10 +43,23 @@ trait BelongsToOrganization
     }
 
     /**
-     * Scope query to a specific organization.
+     * Scope query to a specific organization. Still works exactly as before,
+     * regardless of whether the global scope is enabled.
      */
     public function scopeForOrganization(Builder $query, string $organizationId): Builder
     {
-        return $query->where('organization_id', $organizationId);
+        return $query->where($query->getModel()->qualifyColumn('organization_id'), $organizationId);
+    }
+
+    /**
+     * Explicit, named escape hatch: run a query without the automatic
+     * TenantScope, for the rare legitimate case where a query inside an
+     * org-scoped request genuinely needs to see other tenants' rows (e.g.
+     * checking a slug is globally unique). A no-op when the global scope
+     * isn't registered (i.e. the feature flag is off).
+     */
+    public function scopeWithoutTenantScope(Builder $query): Builder
+    {
+        return $query->withoutGlobalScope(TenantScope::class);
     }
 }

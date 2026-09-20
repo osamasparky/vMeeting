@@ -57,11 +57,17 @@ class ProjectGoal extends Model
         /** @var Collection<int, ProjectGoalTarget> $targets */
         $targets = $this->targets()->get();
         if ($targets->isEmpty()) {
-            $totalTasks = $project->tasks()->count();
-            $doneTasks = $project->tasks()->where('status', 'done')->count();
+            [$totalTasks, $doneTasks] = $this->taskCounts($project);
             $this->progress_percentage = $totalTasks > 0 ? (float) round(($doneTasks / $totalTasks) * 100, 2) : 0.0;
         } else {
             $totalProgress = 0;
+            // Cached lazily so a goal with several auto-computed 'tasks' (or
+            // 'milestones') targets counts the project's tasks/milestones
+            // once per recalculateProgress() call, not once per target —
+            // $project doesn't change across this loop. See Architecture
+            // Audit §11/§15.
+            $taskCounts = null;
+            $milestoneCounts = null;
             /** @var ProjectGoalTarget $target */
             foreach ($targets as $target) {
                 $targetVal = (float) $target->target_value;
@@ -69,8 +75,8 @@ class ProjectGoal extends Model
                 $startVal = (float) $target->start_value;
 
                 if ($target->target_type === 'tasks' && $targetVal <= 0) {
-                    $totalTasks = $project->tasks()->count();
-                    $doneTasks = $project->tasks()->where('status', 'done')->count();
+                    $taskCounts ??= $this->taskCounts($project);
+                    [$totalTasks, $doneTasks] = $taskCounts;
                     $target->target_value = max(1, $totalTasks);
                     $target->current_value = $doneTasks;
                     $target->unit = $target->unit ?: 'Tasks';
@@ -79,8 +85,8 @@ class ProjectGoal extends Model
                     $ratio = $totalTasks > 0 ? min(1.0, $doneTasks / $totalTasks) : 0.0;
                     $totalProgress += $ratio;
                 } elseif ($target->target_type === 'milestones' && $targetVal <= 0) {
-                    $totalMilestones = $project->milestones()->count();
-                    $completedMilestones = $project->milestones()->where('status', 'completed')->count();
+                    $milestoneCounts ??= $this->milestoneCounts($project);
+                    [$totalMilestones, $completedMilestones] = $milestoneCounts;
                     $target->target_value = max(1, $totalMilestones);
                     $target->current_value = $completedMilestones;
                     $target->unit = $target->unit ?: 'Milestones';
@@ -114,5 +120,21 @@ class ProjectGoal extends Model
             $this->status = 'in_progress';
         }
         $this->save();
+    }
+
+    /**
+     * @return array{0: int, 1: int} [totalTasks, doneTasks]
+     */
+    private function taskCounts(Project $project): array
+    {
+        return [$project->tasks()->count(), $project->tasks()->where('status', 'done')->count()];
+    }
+
+    /**
+     * @return array{0: int, 1: int} [totalMilestones, completedMilestones]
+     */
+    private function milestoneCounts(Project $project): array
+    {
+        return [$project->milestones()->count(), $project->milestones()->where('status', 'completed')->count()];
     }
 }

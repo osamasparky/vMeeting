@@ -178,8 +178,11 @@ class User extends Authenticatable
             return true;
         }
 
-        $superAdminEmails = array_filter(array_map('trim', explode(',', env('SUPER_ADMIN_EMAILS', 'admin@nextspace.munazzah.com,info@meemdtt.com'))));
-        if (in_array($this->email, $superAdminEmails, true)) {
+        // Fails closed on purpose: an unset SUPER_ADMIN_EMAILS grants nobody,
+        // rather than falling back to a hardcoded email list. See
+        // config/services.php.
+        $superAdminEmails = array_filter(array_map('trim', explode(',', (string) config('services.super_admin_emails'))));
+        if ($superAdminEmails && in_array($this->email, $superAdminEmails, true)) {
             return true;
         }
 

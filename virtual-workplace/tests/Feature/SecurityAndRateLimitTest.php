@@ -73,4 +73,19 @@ class SecurityAndRateLimitTest extends TestCase
         $this->assertEquals('Sara Al-Ghamdi', $payload['name']);
         $this->assertGreaterThan(time(), $payload['exp']);
     }
+
+    public function test_realtime_token_service_refuses_to_sign_with_no_secret_configured(): void
+    {
+        // No fallback to APP_KEY on purpose (see RealtimeTokenService::getSecret) --
+        // an unset REALTIME_SECRET must fail loudly, not silently sign tokens
+        // with the app's core encryption key.
+        config(['services.realtime.secret' => '']);
+
+        $user = User::factory()->create();
+        $action = app(CreateOrganizationAction::class);
+        $org = $action->execute(['name' => 'No Secret Co'], $user);
+
+        $this->expectException(\RuntimeException::class);
+        app(RealtimeTokenService::class)->generateToken($user, $org);
+    }
 }

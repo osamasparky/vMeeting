@@ -262,6 +262,59 @@ class CollaborationTest extends TestCase
             ->assertJsonPath('messages.0.body', 'Hello team from the web interface!');
     }
 
+    public function test_web_chat_conversations_query_count_does_not_scale_with_member_count(): void
+    {
+        $this->actingAs($this->user);
+
+        // Give the existing DM a message so its last_message/dm_channel_id
+        // resolution is actually exercised, not just an empty-case no-op.
+        $dmResp = $this->getJson("/chat/dm/{$this->colleague->id}");
+        $channelId = $dmResp->json('channel.id');
+        $this->postJson("/chat/channels/{$channelId}/messages", ['body' => 'Hey there!']);
+
+        // Warm-up call: webConversations() lazily firstOrCreate()s the
+        // general/announcements channels on first access (2 inserts), which
+        // would otherwise pollute the query-count comparison below.
+        $this->getJson('/chat/conversations');
+
+        \Illuminate\Support\Facades\DB::enableQueryLog();
+        \Illuminate\Support\Facades\DB::flushQueryLog();
+        $this->getJson('/chat/conversations')->assertStatus(200);
+        $queryCountWithFewMembers = count(\Illuminate\Support\Facades\DB::getQueryLog());
+
+        // Add five more active members with their own DM channels; a
+        // per-member Channel lookup (the N+1 this test guards against)
+        // would make the query count grow with this.
+        $memberRole = Role::where('name', 'Employee')->first();
+        for ($i = 0; $i < 5; $i++) {
+            $extra = User::factory()->create(['email' => "extra{$i}@acme.test"]);
+            $this->organization->members()->create([
+                'user_id' => $extra->id,
+                'role_id' => $memberRole->id,
+                'status' => 'active',
+                'joined_at' => now(),
+            ]);
+            $extraDm = $this->getJson("/chat/dm/{$extra->id}")->json('channel.id');
+            $this->postJson("/chat/channels/{$extraDm}/messages", ['body' => "Hi from {$i}"]);
+        }
+
+        \Illuminate\Support\Facades\DB::flushQueryLog();
+        $response = $this->getJson('/chat/conversations');
+        $response->assertStatus(200);
+        $queryCountWithManyMembers = count(\Illuminate\Support\Facades\DB::getQueryLog());
+
+        $this->assertSame(
+            $queryCountWithFewMembers,
+            $queryCountWithManyMembers,
+            'webConversations() query count should not grow with the number of organization members.'
+        );
+
+        // Correctness: the colleague's DM channel and last message resolve.
+        $colleagueEntry = collect($response->json('members'))->firstWhere('user_id', $this->colleague->id);
+        $this->assertSame($channelId, $colleagueEntry['dm_channel_id']);
+        $this->assertSame('Hey there!', $colleagueEntry['last_message']['body']);
+    }
+
     public function test_can_fetch_team_member_profile_details(): void
     {
         $this->actingAs($this->user);

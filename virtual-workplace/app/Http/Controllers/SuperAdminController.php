@@ -29,6 +29,7 @@ use App\Domains\Workspace\Models\Room;
 use App\Domains\Workspace\Requests\StoreFurnitureCategoryRequest;
 use App\Domains\Workspace\Requests\StoreFurnitureItemRequest;
 use App\Domains\Workspace\Support\RoomBoundsGap;
+use App\Services\FileUploadService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
@@ -330,7 +331,11 @@ class SuperAdminController extends Controller
         $organization->maps()->delete();
         $organization->floors()->delete();
         $organization->projects()->delete();
-        $organization->delete();
+        // Organization now has SoftDeletes (see architecture-audit ADR-007);
+        // forceDelete() here keeps this endpoint's own advertised behavior
+        // ("permanently") unchanged. A plain delete() elsewhere in the app --
+        // accidental or from a future bug -- is recoverable instead.
+        $organization->forceDelete();
 
         AuditLog::create([
             'organization_id' => null,
@@ -1023,9 +1028,8 @@ class SuperAdminController extends Controller
 
         $file = $request->file('image');
         $dest = public_path('images');
-        if (! file_exists($dest)) {
-            mkdir($dest, 0755, true);
-        }
+        FileUploadService::ensureDirectory($dest, 0755);
+        FileUploadService::protectDirectoryFromExecution($dest);
 
         // Copy to both default locations so all views pick it up immediately
         $file->move($dest, 'office_floorplan.jpg');
@@ -1126,28 +1130,11 @@ class SuperAdminController extends Controller
         $imageUrl = $validated['image_url'] ?? null;
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $extension = strtolower($file->guessExtension() ?: 'png');
-            if (! in_array($extension, ['png', 'webp', 'jpg', 'jpeg', 'svg'])) {
-                return back()->withErrors(['image' => 'Invalid image format. Allowed formats: PNG, WebP, JPG, SVG.']);
+            [$uploadedUrl, $error] = $this->storeFurnitureImage($request->file('image'));
+            if ($error) {
+                return back()->withErrors(['image' => $error]);
             }
-
-            // If SVG, check for dangerous tags
-            if ($extension === 'svg') {
-                $content = file_get_contents($file->getRealPath());
-                if (preg_match('/<script|javascript:|onload=|onerror=|onclick=|<foreignObject/i', $content)) {
-                    return back()->withErrors(['image' => 'The SVG file contains unsafe embedded scripts or attributes.']);
-                }
-            }
-
-            $filename = 'furn_'.Str::random(24).'.'.$extension;
-            $destinationPath = public_path('uploads/furniture');
-            if (! file_exists($destinationPath)) {
-                mkdir($destinationPath, 0755, true);
-                @file_put_contents($destinationPath.'/.htaccess', "<Files *.php>\n    Order Deny,Allow\n    Deny from all\n</Files>\nOptions -ExecCGI\n");
-            }
-            $file->move($destinationPath, $filename);
-            $imageUrl = '/uploads/furniture/'.$filename;
+            $imageUrl = $uploadedUrl;
         }
 
         $colorsArr = ! empty($validated['colors'])
@@ -1182,27 +1169,11 @@ class SuperAdminController extends Controller
         $imageUrl = $item->image_url;
 
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $extension = strtolower($file->guessExtension() ?: 'png');
-            if (! in_array($extension, ['png', 'webp', 'jpg', 'jpeg', 'svg'])) {
-                return back()->withErrors(['image' => 'Invalid image format. Allowed formats: PNG, WebP, JPG, SVG.']);
+            [$uploadedUrl, $error] = $this->storeFurnitureImage($request->file('image'));
+            if ($error) {
+                return back()->withErrors(['image' => $error]);
             }
-
-            if ($extension === 'svg') {
-                $content = file_get_contents($file->getRealPath());
-                if (preg_match('/<script|javascript:|onload=|onerror=|onclick=|<foreignObject/i', $content)) {
-                    return back()->withErrors(['image' => 'The SVG file contains unsafe embedded scripts or attributes.']);
-                }
-            }
-
-            $filename = 'furn_'.Str::random(24).'.'.$extension;
-            $destinationPath = public_path('uploads/furniture');
-            if (! file_exists($destinationPath)) {
-                mkdir($destinationPath, 0755, true);
-                @file_put_contents($destinationPath.'/.htaccess', "<Files *.php>\n    Order Deny,Allow\n    Deny from all\n</Files>\nOptions -ExecCGI\n");
-            }
-            $file->move($destinationPath, $filename);
-            $imageUrl = '/uploads/furniture/'.$filename;
+            $imageUrl = $uploadedUrl;
         } elseif (! empty($validated['image_url'])) {
             $imageUrl = $validated['image_url'];
         }
@@ -1247,6 +1218,30 @@ class SuperAdminController extends Controller
     {
         Cache::forget('furniture_catalog_active');
         Cache::forget('furniture_categories_with_items');
+    }
+
+    /**
+     * Validate and store a furniture item's uploaded image (PNG/WebP/JPG/SVG,
+     * with SVG content scanned for embedded scripts). Returns
+     * [url, null] on success or [null, errorMessage] on rejection.
+     *
+     * @return array{0: ?string, 1: ?string}
+     */
+    private function storeFurnitureImage($file): array
+    {
+        $extension = strtolower($file->guessExtension() ?: 'png');
+        if (! in_array($extension, ['png', 'webp', 'jpg', 'jpeg', 'svg'], true)) {
+            return [null, 'Invalid image format. Allowed formats: PNG, WebP, JPG, SVG.'];
+        }
+
+        if ($rejection = FileUploadService::rejectionReasonFor($file, $extension)) {
+            return [null, $rejection];
+        }
+
+        $destinationPath = public_path('uploads/furniture');
+        $stored = FileUploadService::moveToPublicUploads($file, $destinationPath, 'furn', $extension);
+
+        return ['/uploads/furniture/'.$stored['filename'], null];
     }
 
     /**
@@ -1474,9 +1469,8 @@ class SuperAdminController extends Controller
         $filename = 'template_floorplan_'.($template->plan_slug ?: 'default').'_'.time().'.'.$file->getClientOriginalExtension();
 
         $destDir = public_path('images/maps');
-        if (! file_exists($destDir)) {
-            mkdir($destDir, 0755, true);
-        }
+        FileUploadService::ensureDirectory($destDir, 0755);
+        FileUploadService::protectDirectoryFromExecution($destDir);
         $file->move($destDir, $filename);
         $url = '/images/maps/'.$filename;
 
@@ -1665,16 +1659,15 @@ class SuperAdminController extends Controller
         ]);
 
         $file = $request->file('file');
-        $extension = $file->getClientOriginalExtension();
-        $filename = 'asset_'.Str::random(12).'_'.time().'.'.$extension;
+        $extension = strtolower($file->getClientOriginalExtension());
 
-        $destDir = public_path('uploads/cms');
-        if (! file_exists($destDir)) {
-            mkdir($destDir, 0755, true);
+        if ($rejection = FileUploadService::rejectionReasonFor($file, $extension)) {
+            return back()->withErrors(['file' => $rejection]);
         }
 
-        $file->move($destDir, $filename);
-        $filePath = '/uploads/cms/'.$filename;
+        $destDir = public_path('uploads/cms');
+        $stored = FileUploadService::moveToPublicUploads($file, $destDir, 'asset', $extension);
+        $filePath = '/uploads/cms/'.$stored['filename'];
 
         CmsMediaAsset::create([
             'name' => $request->input('name'),
