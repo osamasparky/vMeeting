@@ -5,6 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', __('Super Admin Portal')) — Virtual Workplace</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script>
+        (function() {
+            const saved = localStorage.getItem('vw_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+            if (saved === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
@@ -960,9 +971,16 @@
         }
 
         function toggleSuperAdminTheme() {
-            const current = document.documentElement.getAttribute('data-theme') || 'dark';
+            const current = document.documentElement.getAttribute('data-theme') || (document.documentElement.classList.contains('dark') ? 'dark' : 'light');
             const next = current === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', next);
+            if (next === 'dark') {
+                document.documentElement.classList.add('dark');
+                if (document.body) document.body.classList.add('dark-mode');
+            } else {
+                document.documentElement.classList.remove('dark');
+                if (document.body) document.body.classList.remove('dark-mode');
+            }
             localStorage.setItem('vw_theme', next);
             updateThemeIcons(next);
         }
@@ -979,6 +997,13 @@
         (function() {
             const saved = localStorage.getItem('vw_theme') || 'dark';
             document.documentElement.setAttribute('data-theme', saved);
+            if (saved === 'dark') {
+                document.documentElement.classList.add('dark');
+                if (document.body) document.body.classList.add('dark-mode');
+            } else {
+                document.documentElement.classList.remove('dark');
+                if (document.body) document.body.classList.remove('dark-mode');
+            }
             updateThemeIcons(saved);
 
             const isCollapsed = localStorage.getItem('vw_superadmin_sidebar_collapsed') === '1';

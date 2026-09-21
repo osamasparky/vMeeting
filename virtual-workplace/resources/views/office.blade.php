@@ -1,9 +1,20 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" data-theme="dark">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script>
+        (function() {
+            const saved = localStorage.getItem('vw_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', saved);
+            if (saved === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -6989,10 +7000,22 @@
         }
 
         function toggleAppTheme() {
-            const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+            const cur = document.documentElement.getAttribute('data-theme') || (document.documentElement.classList.contains('dark') ? 'dark' : 'light');
             const next = cur === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', next);
-            document.getElementById('theme-icon').textContent = next === 'dark' ? '☀️' : '🌙';
+            if (next === 'dark') {
+                document.documentElement.classList.add('dark');
+                if (document.body) document.body.classList.add('dark-mode');
+            } else {
+                document.documentElement.classList.remove('dark');
+                if (document.body) document.body.classList.remove('dark-mode');
+            }
+            localStorage.setItem('vw_theme', next);
+            const themeIcon = document.getElementById('theme-icon');
+            if (themeIcon) {
+                themeIcon.textContent = next === 'dark' ? 'light_mode' : 'dark_mode';
+            }
+            showToast(next === 'dark' ? '{{ __("Dark theme activated") }}' : '{{ __("Light theme activated") }}', 'info');
         }
 
         function showToast(msg, customType = null) {

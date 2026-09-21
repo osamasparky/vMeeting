@@ -832,13 +832,42 @@
             }
         }
 
-        function toggleGlobalTheme() {
-            const current = document.documentElement.getAttribute('data-theme') || 'dark';
+        function toggleThemeMode() {
+            const current = document.documentElement.getAttribute('data-theme') || (document.documentElement.classList.contains('dark') ? 'dark' : 'light');
             const next = current === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', next);
+            if (next === 'dark') {
+                document.documentElement.classList.add('dark');
+                if (document.body) document.body.classList.add('dark-mode');
+            } else {
+                document.documentElement.classList.remove('dark');
+                if (document.body) document.body.classList.remove('dark-mode');
+            }
             localStorage.setItem('vw_theme', next);
-            document.getElementById('theme-icon').textContent = next === 'dark' ? '🌙' : '☀️';
+
+            const btnIcon = document.querySelector('#theme-toggle-btn .material-symbols-rounded');
+            if (btnIcon) btnIcon.textContent = next === 'dark' ? 'light_mode' : 'dark_mode';
+
+            const themeIcon = document.getElementById('theme-icon');
+            if (themeIcon) themeIcon.textContent = next === 'dark' ? '🌙' : '☀️';
+
+            if (typeof showToast === 'function') {
+                showToast(next === 'dark' ? '{{ __("Dark theme activated") }}' : '{{ __("Light theme activated") }}', 'info');
+            }
         }
+
+        function toggleGlobalTheme() {
+            toggleThemeMode();
+        }
+
+        // Initialize dashboard theme icon on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const saved = localStorage.getItem('vw_theme') || 'light';
+            const btnIcon = document.querySelector('#theme-toggle-btn .material-symbols-rounded');
+            if (btnIcon) btnIcon.textContent = saved === 'dark' ? 'light_mode' : 'dark_mode';
+            const themeIcon = document.getElementById('theme-icon');
+            if (themeIcon) themeIcon.textContent = saved === 'dark' ? '🌙' : '☀️';
+        });
 
         // ── PROJECT MANAGEMENT CLIENT CONTROLLERS ──
         let activeTimerSeconds = {{ $activeTimer ? $activeTimer->elapsedSeconds() : 0 }};

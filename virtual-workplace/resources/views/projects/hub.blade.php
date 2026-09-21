@@ -1,10 +1,21 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" data-theme="light">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $project->name }} ({{ $project->code }}) — {{ __('Project Hub') }} | {{ $organization->name }}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script>
+        (function() {
+            const saved = localStorage.getItem('vw_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', saved);
+            if (saved === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
 
     <!-- Typography: IBM Plex Sans Arabic & IBM Plex Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2262,8 +2273,10 @@
             const activeTheme = (theme === 'dark') ? 'dark' : 'light';
             document.documentElement.setAttribute('data-theme', activeTheme);
             if (activeTheme === 'dark') {
+                document.documentElement.classList.add('dark');
                 document.body.classList.add('dark-mode');
             } else {
+                document.documentElement.classList.remove('dark');
                 document.body.classList.remove('dark-mode');
             }
             document.querySelectorAll('.theme-toggle-icon-label').forEach(el => {

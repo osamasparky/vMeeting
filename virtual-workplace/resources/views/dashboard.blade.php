@@ -4,6 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script>
+        (function() {
+            const saved = localStorage.getItem('vw_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', saved);
+            if (saved === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
     <title>{{ $organization->name }} — Workspace Admin Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1630,7 +1641,7 @@
                     </div>
                 </div>
 
-                <x-icon-btn icon="dark_mode" onclick="toggleThemeMode()" title="{{ __('Toggle Dark / Light Mode') }}" size="md" variant="subtle" />
+                <x-icon-btn id="theme-toggle-btn" icon="dark_mode" onclick="toggleThemeMode()" title="{{ __('Toggle Dark / Light Mode') }}" size="md" variant="subtle" />
 
                 <!-- Language Switcher -->
                 @if(app()->getLocale() === 'ar')
