@@ -490,9 +490,9 @@
                 <!-- Top Row: Badges & Controls -->
                 <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
                     <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                        <span id="task-modal-code" class="nav-badge-pill" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-weight: 800;">#1</span>
+                        <span id="task-modal-code" class="task-code-badge" style="font-size: 12px; padding: 4px 10px;">#1</span>
                         <span id="task-modal-status-badge" class="ula-badge ula-badge--live ula-badge--sm">In Progress</span>
-                        <span id="task-modal-priority-badge" class="ula-badge ula-badge--attention ula-badge--sm">Urgent</span>
+                        <span id="task-modal-priority-badge" class="ula-badge ula-badge--attention ula-badge--sm">Medium</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <button id="task-modal-timer-btn" class="ula-btn ula-btn--secondary ula-btn--sm" type="button">
@@ -522,6 +522,14 @@
                         <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-gold-500);">calendar_month</span>
                         <span>{{ __('Due Date') }}: <strong id="task-modal-due">Date</strong></span>
                     </span>
+                    <span id="task-modal-milestone-chip" class="task-modal-chip" style="display: none;">
+                        <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-palm-600);">flag</span>
+                        <span>{{ __('Milestone') }}: <strong id="task-modal-milestone">—</strong></span>
+                    </span>
+                    <span id="task-modal-recurrence-chip" class="task-modal-chip" style="display: none;">
+                        <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-accent-default);">refresh</span>
+                        <span>{{ __('Repeat') }}: <strong id="task-modal-recurrence">—</strong></span>
+                    </span>
                 </div>
             </div>
 
@@ -535,13 +543,13 @@
                             <option value="backlog">{{ __('Backlog') }}</option>
                             <option value="ready">{{ __('Ready') }}</option>
                             <option value="in_progress">{{ __('In Progress') }}</option>
-                            <option value="review">{{ __('In Review / QA') }}</option>
-                            <option value="done">{{ __('Done / Completed') }}</option>
+                            <option value="review">{{ __('Review / QA') }}</option>
+                            <option value="done">{{ __('Done') }}</option>
                         </select>
                     </div>
                     <div class="task-modal-chip" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-weight: 800; color: var(--ula-palm-900);">
                         <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-status-success);">timer</span>
-                        <span id="task-modal-hours">0h / 0h</span>
+                        <span id="task-modal-hours">0.00h / 0.00h</span>
                     </div>
                 </div>
 
@@ -576,10 +584,12 @@
                 <button type="button" onclick="switchTaskInspectorTab('dependencies')" id="task-tab-btn-dependencies" class="task-modal-tab-btn">
                     <span class="material-symbols-rounded" style="font-size: 17px;">link</span>
                     <span>{{ __('Dependencies') }}</span>
+                    <span id="task-dependencies-count" class="task-modal-tab-count">0</span>
                 </button>
                 <button type="button" onclick="switchTaskInspectorTab('timelog')" id="task-tab-btn-timelog" class="task-modal-tab-btn">
                     <span class="material-symbols-rounded" style="font-size: 17px;">timer</span>
                     <span>{{ __('Time Log') }}</span>
+                    <span id="task-timelog-count" class="task-modal-tab-count">0</span>
                 </button>
             </div>
 
@@ -670,18 +680,20 @@
 
                 <!-- 6. Time Log -->
                 <div id="task-inspector-timelog" style="display: none;">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>{{ __('Date') }}</th>
-                                <th>{{ __('Member') }}</th>
-                                <th>{{ __('Duration') }}</th>
-                                <th>{{ __('Description') }}</th>
-                                <th>{{ __('Status') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody id="task-modal-timelog-body"></tbody>
-                    </table>
+                    <div style="overflow-x: auto; border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); background: var(--ula-surface-card);">
+                        <table class="data-table" style="margin-bottom: 0;">
+                            <thead>
+                                <tr>
+                                    <th>{{ __('Date') }}</th>
+                                    <th>{{ __('Member') }}</th>
+                                    <th>{{ __('Duration') }}</th>
+                                    <th>{{ __('Description') }}</th>
+                                    <th>{{ __('Status') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody id="task-modal-timelog-body"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

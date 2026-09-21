@@ -3533,228 +3533,169 @@
             initSortableKanban();
         });
 
-        // Task Inspector
+        // ── TASK INSPECTOR / DETAILS DRAWER (UNIFIED) ──
+        let activeInspectorTaskId = null;
+        let activeInspectedTaskId = null; // compatibility alias
+        let currentInspectorTask = null;
+
+        function openTaskDetails(taskId) {
+            return openTaskInspector(taskId);
+        }
+
         async function openTaskInspector(taskId) {
+            activeInspectorTaskId = taskId;
             activeInspectedTaskId = taskId;
-            switchInspectorTab('overview');
+            switchTaskInspectorTab('details');
             const modal = document.getElementById('task-details-modal');
-            modal.style.display = 'flex';
+            if (modal) modal.style.display = 'flex';
 
             try {
                 const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${taskId}`, {
-                    headers: { 'Accept': 'application/json' }
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'same-origin'
                 });
-                if (!res.ok) return;
+                if (!res.ok) {
+                    showHubToast('Error loading task details.');
+                    return;
+                }
                 const data = await res.json();
-                const t = data.task || data;
-                const activities = data.activity || [];
-
-                document.getElementById('task-modal-code').textContent = '#' + (t.task_number || '');
-                document.getElementById('task-modal-title').textContent = t.title || '';
-                document.getElementById('task-modal-description').textContent = t.description || '—';
-                
-                const priorityBadge = document.getElementById('task-modal-priority-badge');
-                if (priorityBadge) {
-                    priorityBadge.textContent = '⚡ ' + (t.priority || 'Normal').toUpperCase();
-                }
-
-                const hoursPill = document.getElementById('task-modal-hours-pill');
-                if (hoursPill) {
-                    hoursPill.textContent = `${t.actual_hours || 0}h / ${t.estimated_hours || 0}h`;
-                }
-
-                const statusSelect = document.getElementById('task-modal-status-select');
-                if (statusSelect) {
-                    statusSelect.value = t.status || 'backlog';
-                    const canEdit = {{ ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || ($project && $project->manager_id === $user->id)) ? 'true' : 'false' }} || (t.assignee_id == '{{ $user->id }}') || (t.creator_id == '{{ $user->id }}');
-                    statusSelect.disabled = !canEdit;
-                    statusSelect.title = canEdit ? '' : '{{ __('Only assigned member or manager can edit') }}';
-                }
-
-                const msSelect = document.getElementById('task-modal-milestone-select');
-                if (msSelect) {
-                    msSelect.value = t.milestone_id || '';
-                }
-
-                const recSelect = document.getElementById('task-modal-recurrence-select');
-                if (recSelect) {
-                    recSelect.value = t.recurrence_rule || '';
-                }
-
-                // Approval Banner handling
-                const appBanner = document.getElementById('task-modal-hub-approval-banner');
-                const appText = document.getElementById('task-modal-hub-approval-text');
-                const appActions = document.getElementById('task-modal-hub-approval-actions');
-                const isProjectManager = {{ ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || ($project && $project->manager_id === $user->id)) ? 'true' : 'false' }};
-
-                if (appBanner && appText && appActions) {
-                    if (t.approval_status === 'pending_approval') {
-                        appBanner.style.display = 'flex';
-                        appBanner.style.background = 'rgba(214, 162, 58, 0.15)';
-                        appBanner.style.border = '1px solid rgba(214, 162, 58, 0.35)';
-                        appBanner.style.color = '#D6A23A';
-                        appText.innerHTML = '<span>⏳</span> <span>{{ __("This task is submitted for completion and awaiting PM approval.") }}</span>';
-                        if (isProjectManager) {
-                            appActions.innerHTML = `
-                                <button type="button" onclick="quickApproveHubTask('${t.id}')" class="tactile-btn btn-primary" style="padding: 4px 10px; font-size: 11px;">✓ {{ __("Approve") }}</button>
-                                <button type="button" onclick="quickRejectHubTask('${t.id}')" class="tactile-btn" style="background: rgba(217, 107, 95, 0.2); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.3); padding: 4px 10px; font-size: 11px;">✕ {{ __("Request Changes") }}</button>
-                            `;
-                        } else {
-                            appActions.innerHTML = '';
-                        }
-                    } else if (t.approval_status === 'rejected') {
-                        appBanner.style.display = 'flex';
-                        appBanner.style.background = 'rgba(217, 107, 95, 0.15)';
-                        appBanner.style.border = '1px solid rgba(217, 107, 95, 0.35)';
-                        appBanner.style.color = '#D96B5F';
-                        appText.innerHTML = `<span>⚠️</span> <span><strong>{{ __("Changes Requested:") }}</strong> ${t.rejection_reason || 'Please review feedback.'}</span>`;
-                        appActions.innerHTML = '';
-                    } else if (t.approval_status === 'approved') {
-                        appBanner.style.display = 'flex';
-                        appBanner.style.background = 'rgba(79, 155, 95, 0.15)';
-                        appBanner.style.border = '1px solid rgba(79, 155, 95, 0.35)';
-                        appBanner.style.color = '#4F9B5F';
-                        appText.innerHTML = '<span>✅</span> <span>{{ __("Task approved and marked Done by Project Manager.") }}</span>';
-                        appActions.innerHTML = '';
-                    } else {
-                        appBanner.style.display = 'none';
-                    }
-                }
-
-                // Render Attachments
-                const attCount = document.getElementById('task-hub-attachments-count');
-                const filesBadge = document.getElementById('task-modal-files-badge');
-                const attCont = document.getElementById('task-hub-attachments-container');
-                const attachments = t.attachments || [];
-                if (attCount) attCount.textContent = attachments.length;
-                if (filesBadge) filesBadge.textContent = attachments.length;
-                if (attCont) {
-                    attCont.innerHTML = '';
-                    if (attachments.length === 0) {
-                        attCont.innerHTML = '<div style="font-size: 11px; color: var(--ula-text-muted); padding: 6px; grid-column: 1/-1;">{{ __("No files attached to this task.") }}</div>';
-                    } else {
-                        attachments.forEach(att => {
-                            const card = document.createElement('div');
-                            card.style = 'background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; justify-content: space-between; gap: 4px;';
-                            card.innerHTML = `
-                                <div style="font-weight: 700; font-size: 11px; color: var(--ula-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">📄 ${att.file_name}</div>
-                                <div style="font-size: 10px; color: var(--ula-text-muted);">${(att.file_size / 1024).toFixed(1)} KB</div>
-                                <div style="display: flex; gap: 4px; margin-top: 4px;">
-                                    <a href="${att.file_url || ('/uploads/tasks/' + t.id + '/' + att.file_name)}" target="_blank" download class="tactile-btn btn-secondary" style="flex: 1; padding: 3px 6px; font-size: 10px; text-align: center; text-decoration: none;">⬇</a>
-                                    <button type="button" onclick="deleteHubTaskAttachmentAction('${att.id}')" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.3); padding: 3px 6px; font-size: 10px;">🗑️</button>
-                                </div>
-                            `;
-                            attCont.appendChild(card);
-                        });
-                    }
-                }
-
-                // Render checklist
-                const checkCont = document.getElementById('task-checklist-container');
-                checkCont.innerHTML = '';
-                (t.checklist_items || []).forEach(ci => {
-                    const item = document.createElement('label');
-                    item.style = 'display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; background: var(--ula-surface-page-alt); padding: 6px 10px; border-radius: 6px;';
-                    item.innerHTML = `
-                        <input type="checkbox" ${ci.is_completed ? 'checked' : ''} onchange="toggleChecklistItem('${t.id}', '${ci.id}', this.checked)" style="accent-color: var(--ula-palm-900);">
-                        <span style="${ci.is_completed ? 'text-decoration: line-through; opacity: 0.6;' : ''}">${ci.title}</span>
-                    `;
-                    checkCont.appendChild(item);
-                });
-
-                // Render comments
-                const commCountBadge = document.getElementById('task-modal-comments-badge');
-                const commCont = document.getElementById('task-comments-feed');
-                const comments = t.comments || [];
-                if (commCountBadge) commCountBadge.textContent = comments.length;
-                commCont.innerHTML = '';
-                if (comments.length === 0) {
-                    commCont.innerHTML = '<div style="text-align: center; color: var(--ula-text-muted); font-size: 11px; padding: 12px;">{{ __("No discussion comments yet. Be the first to post!") }}</div>';
-                } else {
-                    comments.forEach(c => {
-                        const box = document.createElement('div');
-                        box.style = 'background: var(--ula-surface-page-alt); padding: 8px 12px; border-radius: 8px; font-size: 12px; border: 1px solid var(--ula-border-subtle);';
-                        box.innerHTML = `
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 2px; font-weight: 800; font-size: 11px;">
-                                <span style="color: var(--ula-text-primary);">👤 ${c.user ? c.user.name : 'Member'}</span>
-                                <span style="color: var(--ula-text-muted);">${new Date(c.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                            </div>
-                            <div style="color: var(--ula-text-primary); line-height: 1.4;">${c.body}</div>
-                        `;
-                        commCont.appendChild(box);
-                    });
-                }
-
-                // Render Activity & Audit Timeline Feed
-                const activityBadge = document.getElementById('task-modal-activity-badge');
-                const activityFeed = document.getElementById('task-activity-timeline-feed');
-                if (activityBadge) activityBadge.textContent = activities.length;
-                if (activityFeed) {
-                    activityFeed.innerHTML = '';
-                    if (activities.length === 0) {
-                        activityFeed.innerHTML = '<div style="text-align: center; color: var(--ula-text-muted); font-size: 11px; padding: 20px;">📜 {{ __("No audit entries recorded yet.") }}</div>';
-                    } else {
-                        activities.forEach(act => {
-                            const item = document.createElement('div');
-                            item.className = 'activity-timeline-item';
-                            
-                            const actorName = act.actor ? act.actor.name : 'System';
-                            const initials = actorName.slice(0, 2).toUpperCase();
-                            const meta = act.metadata || {};
-                            
-                            let changeSummary = `<strong>${actorName}</strong> ${act.action} this task.`;
-                            if (act.action === 'created') {
-                                changeSummary = `✨ <strong>${actorName}</strong> created this task.`;
-                            } else if (act.action === 'updated') {
-                                const changes = [];
-                                if (meta.status) changes.push(`status to <span class="badge-pill badge-neutral" style="font-size: 9px;">${meta.status}</span>`);
-                                if (meta.priority) changes.push(`priority to <strong>${meta.priority}</strong>`);
-                                if (meta.due_date) changes.push(`due date to <strong>${meta.due_date}</strong>`);
-                                if (meta.assignee_id) changes.push(`reassigned task`);
-                                if (meta.title) changes.push(`updated title`);
-                                if (meta.approval_status) changes.push(`approval status to <strong>${meta.approval_status}</strong>`);
-                                
-                                changeSummary = `✏️ <strong>${actorName}</strong> updated ` + (changes.length ? changes.join(', ') : 'task details.');
-                            } else if (act.action === 'deleted') {
-                                changeSummary = `🗑️ <strong>${actorName}</strong> deleted task item.`;
-                            }
-
-                            item.innerHTML = `
-                                <div class="activity-avatar">${initials}</div>
-                                <div class="activity-content-box">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;">
-                                        <div style="font-size: 12px; color: var(--ula-text-primary);">${changeSummary}</div>
-                                        <span style="font-size: 10px; color: var(--ula-text-muted); white-space: nowrap; margin-inline-start: 8px;">${act.relative_time || ''}</span>
-                                    </div>
-                                </div>
-                            `;
-                            activityFeed.appendChild(item);
-                        });
-                    }
-                }
-
+                currentInspectorTask = data.task || data;
+                renderHubTaskDetails(currentInspectorTask);
             } catch (e) {
                 console.error(e);
+                showHubToast('Network error loading task details.');
             }
         }
 
-        function insertHubMentionHandle(name) {
-            const input = document.getElementById('new-comment-input');
+        function closeTaskDetailsModal() {
+            const modal = document.getElementById('task-details-modal');
+            if (modal) modal.style.display = 'none';
+            activeInspectorTaskId = null;
+            activeInspectedTaskId = null;
+            currentInspectorTask = null;
+        }
+
+        function closeTaskInspector() {
+            closeTaskDetailsModal();
+        }
+
+        function switchTaskInspectorTab(tab) {
+            ['details', 'checklist', 'attachments', 'comments', 'dependencies', 'timelog'].forEach(t => {
+                const view = document.getElementById(`task-inspector-${t}`);
+                const btn = document.getElementById(`task-tab-btn-${t}`);
+                if (view) view.style.display = (t === tab) ? 'block' : 'none';
+                if (btn) {
+                    if (t === tab) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                }
+            });
+        }
+
+        async function updateCurrentTaskStatus(newStatus) {
+            if (!activeInspectorTaskId) return;
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${activeInspectorTaskId}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ status: newStatus })
+                });
+                if (!res.ok) {
+                    showHubToast('Error updating status.');
+                    return;
+                }
+                openTaskInspector(activeInspectorTaskId);
+            } catch (e) {
+                showHubToast('Network error updating status.');
+            }
+        }
+
+        async function addTaskChecklistItem(e) {
+            e.preventDefault();
+            const input = document.getElementById('new-checklist-title-input');
+            const title = input ? input.value.trim() : '';
+            if (!title || !activeInspectorTaskId) return;
+
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${activeInspectorTaskId}/checklist`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ title: title })
+                });
+                if (!res.ok) {
+                    showHubToast('Error adding checklist item.');
+                    return;
+                }
+                if (input) input.value = '';
+                openTaskInspector(activeInspectorTaskId);
+            } catch (err) {
+                showHubToast('Network error adding checklist item.');
+            }
+        }
+
+        async function toggleTaskChecklistItem(itemId) {
+            if (!activeInspectorTaskId) return;
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${activeInspectorTaskId}/checklist/${itemId}/toggle`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin'
+                });
+                if (!res.ok) {
+                    showHubToast('Error toggling checklist item.');
+                    return;
+                }
+                openTaskInspector(activeInspectorTaskId);
+            } catch (err) {
+                showHubToast('Network error toggling checklist item.');
+            }
+        }
+
+        async function addTaskCommentSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('new-comment-body-input');
+            const body = input ? input.value.trim() : '';
+            if (!body || !activeInspectorTaskId) return;
+
+            try {
+                const res = await fetch(`/tasks/${activeInspectorTaskId}/comments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ body: body })
+                });
+                if (!res.ok) {
+                    showHubToast('Error posting comment.');
+                    return;
+                }
+                if (input) input.value = '';
+                openTaskInspector(activeInspectorTaskId);
+            } catch (err) {
+                showHubToast('Network error posting comment.');
+            }
+        }
+
+        function insertMentionHandle(name) {
+            const input = document.getElementById('new-comment-body-input');
             if (!input) return;
             input.value += (input.value ? ' ' : '') + '@' + name + ' ';
             input.focus();
         }
 
-        async function uploadHubTaskAttachmentSubmit(e) {
+        async function uploadTaskAttachmentSubmit(e) {
             e.preventDefault();
-            const fileInput = document.getElementById('hub-task-file-input');
-            if (!fileInput || !fileInput.files.length || !activeInspectedTaskId) return;
+            const fileInput = document.getElementById('task-file-input');
+            if (!fileInput || !fileInput.files.length || !activeInspectorTaskId) return;
 
             const formData = new FormData();
             formData.append('file', fileInput.files[0]);
 
             try {
-                const res = await fetch(`/tasks/${activeInspectedTaskId}/attachments`, {
+                const res = await fetch(`/tasks/${activeInspectorTaskId}/attachments`, {
                     method: 'POST',
                     headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
                     credentials: 'same-origin',
@@ -3762,37 +3703,37 @@
                 });
                 const data = await res.json();
                 if (!res.ok) {
-                    alert(data.message || 'Error uploading file.');
+                    showHubToast(data.message || 'Error uploading file.');
                     return;
                 }
                 fileInput.value = '';
                 showHubToast('📎 ' + "{{ __('Attachment uploaded successfully!') }}");
-                openTaskInspector(activeInspectedTaskId);
+                openTaskInspector(activeInspectorTaskId);
             } catch (err) {
-                alert('Network error uploading attachment.');
+                showHubToast('Network error uploading attachment.');
             }
         }
 
-        async function deleteHubTaskAttachmentAction(attachmentId) {
+        async function deleteTaskAttachmentAction(attachmentId) {
             if (!confirm('{{ __("Are you sure you want to delete this attachment?") }}')) return;
             try {
-                const res = await fetch(`/tasks/${activeInspectedTaskId}/attachments/${attachmentId}`, {
+                const res = await fetch(`/tasks/${activeInspectorTaskId}/attachments/${attachmentId}`, {
                     method: 'DELETE',
                     headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
                     credentials: 'same-origin'
                 });
                 if (!res.ok) {
-                    alert('Error deleting attachment.');
+                    showHubToast('Error deleting attachment.');
                     return;
                 }
                 showHubToast('🗑️ ' + "{{ __('Attachment removed.') }}");
-                openTaskInspector(activeInspectedTaskId);
+                openTaskInspector(activeInspectorTaskId);
             } catch (err) {
-                alert('Network error deleting attachment.');
+                showHubToast('Network error deleting attachment.');
             }
         }
 
-        async function quickApproveHubTask(taskId) {
+        async function quickApproveTask(taskId) {
             try {
                 const res = await fetch(`/tasks/${taskId}/approve`, {
                     method: 'POST',
@@ -3801,18 +3742,22 @@
                 });
                 const data = await res.json();
                 if (!res.ok) {
-                    alert(data.message || 'Error approving task.');
+                    showHubToast(data.message || 'Error approving task.');
                     return;
                 }
-                showHubToast('🎉 ' + "{{ __('Task approved and marked Done!') }}");
-                setTimeout(() => window.location.reload(), 400);
+                showHubToast('🎉 ' + "{{ __('Task approved and marked as Completed!') }}");
+                if (activeInspectorTaskId === taskId) {
+                    openTaskInspector(taskId);
+                } else {
+                    window.location.reload();
+                }
             } catch (err) {
-                alert('Network error approving task.');
+                showHubToast('Network error approving task.');
             }
         }
 
-        async function quickRejectHubTask(taskId) {
-            const reason = prompt('{{ __("Please enter reason or required changes:") }}');
+        async function quickRejectTask(taskId) {
+            const reason = prompt('{{ __("Please enter a note / feedback on required changes:") }}');
             if (!reason) return;
 
             try {
@@ -3824,97 +3769,320 @@
                 });
                 const data = await res.json();
                 if (!res.ok) {
-                    alert(data.message || 'Error requesting changes.');
+                    showHubToast(data.message || 'Error rejecting task.');
                     return;
                 }
-                showHubToast('⚠️ ' + "{{ __('Task sent back for changes.') }}");
-                setTimeout(() => window.location.reload(), 400);
-            } catch (err) {
-                alert('Network error requesting changes.');
-            }
-        }
-
-        async function startHubTaskTimerDirect(projectId, taskId, taskTitle, projectName) {
-            try {
-                const res = await fetch(`/api/v1/organizations/${ORG_ID}/time-entries/timer/start`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
-                    body: JSON.stringify({
-                        project_id: projectId,
-                        task_id: taskId,
-                        description: `${taskTitle} (${projectName})`
-                    })
-                });
-                if (res.ok) {
-                    showHubToast('⏱️ {{ __('Timer started successfully!') }}');
-                    setTimeout(() => window.location.reload(), 400);
+                showHubToast('⚠️ ' + "{{ __('Task returned to in-progress with feedback.') }}");
+                if (activeInspectorTaskId === taskId) {
+                    openTaskInspector(taskId);
                 } else {
-                    const err = await res.json();
-                    showHubToast(err.message || 'Error starting timer.');
+                    window.location.reload();
                 }
-            } catch (e) {
-                showHubToast('Network error starting timer.');
+            } catch (err) {
+                showHubToast('Network error requesting changes.');
             }
         }
 
-        function closeTaskInspector() {
-            document.getElementById('task-details-modal').style.display = 'none';
-            activeInspectedTaskId = null;
-        }
-
-        async function updateCurrentTaskStatus(newStatus) {
-            if (!activeInspectedTaskId) return;
-            await updateTaskStatusFast(activeInspectedTaskId, newStatus);
-        }
-
-        async function toggleChecklistItem(taskId, itemId, checked) {
-            try {
-                await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${taskId}/checklist/${itemId}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
-                    body: JSON.stringify({ is_completed: checked })
-                });
-            } catch (e) {}
-        }
-
-        async function addTaskChecklistItem(e) {
+        async function addTaskDependencySubmit(e) {
             e.preventDefault();
-            if (!activeInspectedTaskId) return;
-            const input = document.getElementById('new-checklist-item-input');
-            const title = input.value.trim();
-            if (!title) return;
+            const select = document.getElementById('dependency-blocker-select');
+            const blockerId = select ? select.value : '';
+            if (!blockerId || !activeInspectorTaskId) return;
 
             try {
-                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${activeInspectedTaskId}/checklist`, {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${activeInspectorTaskId}/dependencies`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
-                    body: JSON.stringify({ title })
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ depends_on_task_id: blockerId })
                 });
-                if (res.ok) {
-                    input.value = '';
-                    openTaskInspector(activeInspectedTaskId);
+                const data = await res.json();
+                if (!res.ok) {
+                    showHubToast(data.message || 'Error adding dependency.');
+                    return;
                 }
-            } catch (e) {}
+                select.value = '';
+                showHubToast('🔗 ' + "{{ __('Dependency linked successfully!') }}");
+                openTaskInspector(activeInspectorTaskId);
+            } catch (err) {
+                showHubToast('Network error linking dependency.');
+            }
         }
 
-        async function addTaskComment(e) {
-            e.preventDefault();
-            if (!activeInspectedTaskId) return;
-            const input = document.getElementById('new-comment-input');
-            const body = input.value.trim();
-            if (!body) return;
-
+        async function removeTaskDependency(depId) {
+            if (!confirm('{{ __("Are you sure you want to remove this dependency?") }}')) return;
             try {
-                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${activeInspectedTaskId}/comments`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
-                    body: JSON.stringify({ body })
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${activeInspectorTaskId}/dependencies/${depId}`, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+                    credentials: 'same-origin'
                 });
-                if (res.ok) {
-                    input.value = '';
-                    openTaskInspector(activeInspectedTaskId);
+                if (!res.ok) {
+                    showHubToast('Error removing dependency.');
+                    return;
                 }
-            } catch (e) {}
+                showHubToast('🔗 ' + "{{ __('Dependency removed.') }}");
+                openTaskInspector(activeInspectorTaskId);
+            } catch (err) {
+                showHubToast('Network error removing dependency.');
+            }
+        }
+
+        function renderHubTaskDetails(t) {
+            const statusLabels = {
+                'backlog': '{{ __("Backlog") }}',
+                'ready': '{{ __("Ready") }}',
+                'in_progress': '{{ __("In Progress") }}',
+                'review': '{{ __("In Review / QA") }}',
+                'done': '{{ __("Done") }}'
+            };
+            const priorityLabels = {
+                'low': '{{ __("Low") }}',
+                'medium': '{{ __("Medium") }}',
+                'high': '{{ __("High") }}',
+                'urgent': '{{ __("Urgent") }}'
+            };
+
+            // Header
+            document.getElementById('task-modal-code').textContent = `#${t.task_number || 1}`;
+            document.getElementById('task-modal-title').textContent = t.title || '';
+
+            const statusBadge = document.getElementById('task-modal-status-badge');
+            if (statusBadge) {
+                statusBadge.textContent = statusLabels[t.status] || (t.status || 'backlog');
+                statusBadge.className = 'ula-badge ula-badge--sm ' + (
+                    t.status === 'done' || t.status === 'in_progress' ? 'ula-badge--live' :
+                    (t.status === 'review' ? 'ula-badge--scheduled' :
+                    (t.status === 'ready' ? 'ula-badge--default' : 'ula-badge--cancelled'))
+                );
+            }
+
+            const priorityBadge = document.getElementById('task-modal-priority-badge');
+            if (priorityBadge) {
+                priorityBadge.textContent = priorityLabels[t.priority] || (t.priority || 'medium');
+                priorityBadge.className = 'ula-badge ula-badge--sm ' + (
+                    t.priority === 'urgent' ? 'ula-badge--attention' :
+                    (t.priority === 'high' ? 'ula-badge--scheduled' :
+                    (t.priority === 'low' ? 'ula-badge--cancelled' : 'ula-badge--default'))
+                );
+            }
+
+            document.getElementById('task-modal-project').textContent = t.project ? t.project.name : '{{ __("General") }}';
+            document.getElementById('task-modal-assignee').textContent = t.assignee ? t.assignee.name : '{{ __("Unassigned") }}';
+            document.getElementById('task-modal-due').textContent = t.due_date ? new Date(t.due_date).toLocaleDateString() : '—';
+            
+            // Milestone Chip
+            const msChip = document.getElementById('task-modal-milestone-chip');
+            const msText = document.getElementById('task-modal-milestone');
+            if (msChip && msText) {
+                if (t.milestone && t.milestone.title) {
+                    msText.textContent = t.milestone.title;
+                    msChip.style.display = 'inline-flex';
+                } else {
+                    msChip.style.display = 'none';
+                }
+            }
+
+            // Recurrence Chip
+            const recChip = document.getElementById('task-modal-recurrence-chip');
+            const recText = document.getElementById('task-modal-recurrence');
+            if (recChip && recText) {
+                if (t.recurrence_rule && t.recurrence_rule !== 'none') {
+                    const recLabels = {
+                        'daily': '{{ __("Daily") }}',
+                        'weekly': '{{ __("Weekly") }}',
+                        'monthly': '{{ __("Monthly") }}'
+                    };
+                    recText.textContent = recLabels[t.recurrence_rule] || t.recurrence_rule;
+                    recChip.style.display = 'inline-flex';
+                } else {
+                    recChip.style.display = 'none';
+                }
+            }
+
+            const statusSelect = document.getElementById('task-modal-status-select');
+            if (statusSelect) {
+                statusSelect.value = t.status || 'backlog';
+            }
+            document.getElementById('task-modal-description').textContent = t.description || '{{ __("No description provided.") }}';
+            document.getElementById('task-modal-hours').textContent = `${t.estimated_hours || 0} {{ __("Estimated Hours") }} / ${t.actual_hours || 0} {{ __("Logged Hours") }}`;
+
+            // Approval Banner logic
+            const appBanner = document.getElementById('task-modal-approval-banner');
+            const appText = document.getElementById('task-modal-approval-text');
+            const appActions = document.getElementById('task-modal-approval-actions');
+            if (appBanner && appText && appActions) {
+                if (t.approval_status === 'pending_approval') {
+                    appBanner.style.display = 'flex';
+                    appBanner.style.background = 'rgba(214, 162, 58, 0.15)';
+                    appBanner.style.border = '1px solid rgba(214, 162, 58, 0.35)';
+                    appBanner.style.color = 'var(--ula-gold-400)';
+                    appText.innerHTML = '<span><span class="material-symbols-rounded" style="font-size: 1.1em; vertical-align: text-bottom;">hourglass_empty</span></span> <span>{{ __("This task is submitted for completion and awaiting PM approval.") }}</span>';
+                    appActions.innerHTML = `
+                        <button type="button" onclick="quickApproveTask('${t.id}')" class="ula-btn ula-btn--primary ula-btn--sm"><span class="material-symbols-rounded ula-btn__icon">check</span> {{ __("Approve") }}</button>
+                        <button type="button" onclick="quickRejectTask('${t.id}')" class="ula-btn ula-btn--danger ula-btn--sm"><span class="material-symbols-rounded ula-btn__icon">close</span> {{ __("Request Changes") }}</button>
+                    `;
+                } else if (t.approval_status === 'rejected') {
+                    appBanner.style.display = 'flex';
+                    appBanner.style.background = 'rgba(217, 107, 95, 0.15)';
+                    appBanner.style.border = '1px solid rgba(217, 107, 95, 0.35)';
+                    appBanner.style.color = 'var(--ula-status-danger)';
+                    appText.innerHTML = `<span><span class="material-symbols-rounded" style="font-size: 1.1em; vertical-align: text-bottom;">warning</span></span> <span><strong>{{ __("Changes Requested:") }}</strong> ${t.rejection_reason || '{{ __("Please review feedback.") }}'}</span>`;
+                    appActions.innerHTML = '';
+                } else if (t.approval_status === 'approved') {
+                    appBanner.style.display = 'flex';
+                    appBanner.style.background = 'rgba(79, 155, 95, 0.15)';
+                    appBanner.style.border = '1px solid rgba(79, 155, 95, 0.35)';
+                    appBanner.style.color = 'var(--ula-status-success)';
+                    appText.innerHTML = '<span><span class="material-symbols-rounded" style="font-size: 1.1em; vertical-align: text-bottom;">check_circle</span></span> <span>{{ __("Task approved and marked Done by Project Manager.") }}</span>';
+                    appActions.innerHTML = '';
+                } else {
+                    appBanner.style.display = 'none';
+                }
+            }
+
+            // Timer Button
+            const timerBtn = document.getElementById('task-modal-timer-btn');
+            if (timerBtn) {
+                const pId = t.project_id || '{{ $project->id ?? "" }}';
+                const pName = t.project ? t.project.name : '{{ $project->name ?? "Project" }}';
+                timerBtn.onclick = () => startHubTaskTimerDirect(pId, t.id, t.title, pName);
+            }
+
+            // Checklist
+            const items = t.checklist_items || [];
+            const checkCountEl = document.getElementById('task-checklist-count');
+            if (checkCountEl) checkCountEl.textContent = items.length;
+            const checkContainer = document.getElementById('task-checklist-items-container');
+            if (checkContainer) {
+                checkContainer.innerHTML = '';
+                if (items.length === 0) {
+                    checkContainer.innerHTML = '<div style="font-size: 12.5px; color: var(--ula-text-muted); padding: 12px; background: var(--ula-surface-page-alt); border-radius: 10px; text-align: center;">{{ __("No checklist items yet. Add sub-items above.") }}</div>';
+                } else {
+                    items.forEach(item => {
+                        const div = document.createElement('div');
+                        div.style = 'display: flex; align-items: center; justify-content: space-between; background: var(--ula-surface-page-alt); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--ula-border-subtle); gap: 10px;';
+                        div.innerHTML = `
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--ula-text-primary); text-decoration: ${item.is_completed ? 'line-through' : 'none'}; opacity: ${item.is_completed ? 0.6 : 1};">
+                                <input type="checkbox" onchange="toggleTaskChecklistItem('${item.id}')" ${item.is_completed ? 'checked' : ''} style="width: 17px; height: 17px; accent-color: var(--ula-palm-900);">
+                                <span>${item.title}</span>
+                            </label>
+                            <span class="ula-badge ula-badge--sm ${item.is_completed ? 'ula-badge--live' : 'ula-badge--default'}">${item.is_completed ? '{{ __("Done") }}' : '{{ __("Pending") }}'}</span>
+                        `;
+                        checkContainer.appendChild(div);
+                    });
+                }
+            }
+
+            // Attachments
+            const attachments = t.attachments || [];
+            const attCountEl = document.getElementById('task-attachments-count');
+            if (attCountEl) attCountEl.textContent = attachments.length;
+            const attContainer = document.getElementById('task-attachments-list-container');
+            if (attContainer) {
+                attContainer.innerHTML = '';
+                if (attachments.length === 0) {
+                    attContainer.innerHTML = '<div style="font-size: 12.5px; color: var(--ula-text-muted); padding: 14px; background: var(--ula-surface-page-alt); border-radius: 10px; text-align: center; grid-column: 1 / -1;">{{ __("No files attached to this task.") }}</div>';
+                } else {
+                    attachments.forEach(att => {
+                        const card = document.createElement('div');
+                        card.style = 'background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; box-shadow: var(--ula-shadow-xs);';
+                        const uploader = att.user ? att.user.name : '{{ __("Member") }}';
+                        card.innerHTML = `
+                            <div style="font-weight: 700; font-size: 12.5px; color: var(--ula-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><span class="material-symbols-rounded" style="font-size: 16px; vertical-align: text-bottom; color: var(--ula-palm-700);">description</span> ${att.file_name}</div>
+                            <div style="font-size: 11px; color: var(--ula-text-muted);"><span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom;">person</span> ${uploader} • ${(att.file_size / 1024).toFixed(1)} KB</div>
+                            <div style="display: flex; gap: 6px; margin-top: 4px;">
+                                <a href="${att.file_url || ('/uploads/tasks/' + t.id + '/' + att.file_name)}" target="_blank" download class="ula-btn ula-btn--secondary ula-btn--sm" style="flex: 1; height: 32px; min-height: 32px; font-size: 11px;"><span class="material-symbols-rounded ula-btn__icon">download</span> {{ __("Download") }}</a>
+                                <button type="button" onclick="deleteTaskAttachmentAction('${att.id}')" class="ula-icon-btn ula-icon-btn--danger ula-icon-btn--sm" style="width: 32px; height: 32px; min-width: 32px;"><span class="material-symbols-rounded">delete</span></button>
+                            </div>
+                        `;
+                        attContainer.appendChild(card);
+                    });
+                }
+            }
+
+            // Comments
+            const comments = t.comments || [];
+            const commCountEl = document.getElementById('task-comments-count');
+            if (commCountEl) commCountEl.textContent = comments.length;
+            const commContainer = document.getElementById('task-comments-feed');
+            if (commContainer) {
+                commContainer.innerHTML = '';
+                if (comments.length === 0) {
+                    commContainer.innerHTML = '<div style="font-size: 12.5px; color: var(--ula-text-muted); padding: 14px; background: var(--ula-surface-page-alt); border-radius: 10px; text-align: center;">{{ __("No discussions or comments yet.") }}</div>';
+                } else {
+                    comments.forEach(c => {
+                        const box = document.createElement('div');
+                        box.style = 'background: var(--ula-surface-page-alt); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--ula-border-subtle); font-size: 12.5px;';
+                        const author = c.user ? c.user.name : '{{ __("Member") }}';
+                        const time = new Date(c.created_at).toLocaleString();
+                        box.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 11.5px;">
+                                <strong style="color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom; color: var(--ula-palm-700);">person</span> ${author}</strong>
+                                <span style="color: var(--ula-text-muted); font-family: var(--ula-font-mono); font-size: 10.5px;">${time}</span>
+                            </div>
+                            <div style="color: var(--ula-text-primary); line-height: 1.5;">${c.body || ''}</div>
+                        `;
+                        commContainer.appendChild(box);
+                    });
+                }
+            }
+
+            // Dependencies
+            const deps = t.dependencies || [];
+            const depCountEl = document.getElementById('task-dependencies-count');
+            if (depCountEl) depCountEl.textContent = deps.length;
+            const depContainer = document.getElementById('task-dependencies-container');
+            if (depContainer) {
+                depContainer.innerHTML = '';
+                if (deps.length === 0) {
+                    depContainer.innerHTML = '<div style="font-size: 12.5px; color: var(--ula-text-muted); padding: 14px; background: var(--ula-surface-page-alt); border-radius: 10px; text-align: center;">{{ __("No blocker dependencies. This task can be started immediately.") }}</div>';
+                } else {
+                    deps.forEach(d => {
+                        const item = document.createElement('div');
+                        item.style = 'background: var(--ula-surface-page-alt); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--ula-border-subtle); font-size: 12.5px; display: flex; justify-content: space-between; align-items: center; gap: 10px;';
+                        const depTask = d.depends_on_task || {};
+                        item.innerHTML = `
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-gold-500);">lock</span>
+                                <span><strong>{{ __("Depends On:") }}</strong> #${depTask.task_number || ''} ${depTask.title || '{{ __("Predecessor Task") }}'}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="ula-badge ula-badge--sm ${depTask.status === 'done' ? 'ula-badge--live' : 'ula-badge--attention'}">${statusLabels[depTask.status] || (depTask.status || 'pending')}</span>
+                                <button type="button" onclick="removeTaskDependency('${d.id}')" class="ula-icon-btn ula-icon-btn--danger ula-icon-btn--sm" style="width: 28px; height: 28px; min-width: 28px;" title="{{ __('Remove Dependency') }}">
+                                    <span class="material-symbols-rounded" style="font-size: 14px;">close</span>
+                                </button>
+                            </div>
+                        `;
+                        depContainer.appendChild(item);
+                    });
+                }
+            }
+
+            // Time Log
+            const entries = t.time_entries || [];
+            const timeCountEl = document.getElementById('task-timelog-count');
+            if (timeCountEl) timeCountEl.textContent = entries.length;
+            const timeBody = document.getElementById('task-modal-timelog-body');
+            if (timeBody) {
+                timeBody.innerHTML = '';
+                if (entries.length === 0) {
+                    timeBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: var(--ula-text-muted);">{{ __("No time tracked on this task yet.") }}</td></tr>';
+                } else {
+                    entries.forEach(e => {
+                        const tr = document.createElement('tr');
+                        const hrs = (e.duration_seconds / 3600).toFixed(2);
+                        tr.innerHTML = `
+                            <td style="font-family: var(--ula-font-mono); font-size: 12px;">${new Date(e.started_at).toLocaleDateString()}</td>
+                            <td style="font-weight: 700;">${e.user ? e.user.name : '{{ __("Member") }}'}</td>
+                            <td style="font-weight: 800; color: var(--ula-text-primary); font-family: var(--ula-font-mono);">${hrs} {{ __("h") }}</td>
+                            <td style="font-size: 12px;">${e.description || '{{ __("Work session") }}'}</td>
+                            <td><span class="ula-badge ula-badge--sm ${e.status === 'approved' ? 'ula-badge--live' : 'ula-badge--default'}">${e.status === 'approved' ? '{{ __("Approved") }}' : '{{ __("Pending") }}'}</span></td>
+                        `;
+                        timeBody.appendChild(tr);
+                    });
+                }
+            }
         }
 
         async function stopHubGlobalTimer() {

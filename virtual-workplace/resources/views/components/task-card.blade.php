@@ -27,10 +27,20 @@
 @endphp
 
 @if($context === 'mytasks')
-    <div class="kanban-task-card" 
+    <div class="kanban-task-card global-kanban-card" 
          id="mytasks-card-{{ $task->id }}" 
+         draggable="true" 
+         ondragstart="handleGlobalDragStart(event, '{{ $task->id }}')" 
+         ondragend="handleGlobalDragEnd(event)"
          data-id="{{ $task->id }}" 
+         data-task-id="{{ $task->id }}"
+         data-title="{{ strtolower($task->title) }}"
+         data-project-id="{{ $task->project_id }}"
          data-status="{{ $task->status }}" 
+         data-priority="{{ $task->priority ?? 'medium' }}"
+         data-assignee-id="{{ $task->assignee_id ?? '' }}"
+         data-milestone-id="{{ $task->milestone_id ?? '' }}"
+         data-due="{{ $task->due_date ? $task->due_date->format('Y-m-d') : '' }}"
          oncontextmenu="event.preventDefault(); event.stopPropagation(); openTaskContextMenu(event, '{{ $task->id }}', '{{ $task->project_id }}', '{{ addslashes($task->title) }}')"
          onclick="openTaskDetails('{{ $task->id }}')">
 @elseif($context === 'alltasks')
@@ -39,25 +49,32 @@
          draggable="true" 
          ondragstart="handleGlobalDragStart(event, '{{ $task->id }}')" 
          ondragend="handleGlobalDragEnd(event)"
-         oncontextmenu="event.preventDefault(); event.stopPropagation(); openTaskContextMenu(event, '{{ $task->id }}', '{{ $task->project_id }}', '{{ addslashes($task->title) }}')"
          data-id="{{ $task->id }}"
+         data-task-id="{{ $task->id }}"
          data-title="{{ strtolower($task->title) }}"
          data-project-id="{{ $task->project_id }}"
          data-status="{{ $task->status }}"
-         data-priority="{{ $task->priority }}"
-         data-assignee-id="{{ $task->assignee_id }}"
+         data-priority="{{ $task->priority ?? 'medium' }}"
+         data-assignee-id="{{ $task->assignee_id ?? '' }}"
+         data-milestone-id="{{ $task->milestone_id ?? '' }}"
+         data-due="{{ $task->due_date ? $task->due_date->format('Y-m-d') : '' }}"
+         oncontextmenu="event.preventDefault(); event.stopPropagation(); openTaskContextMenu(event, '{{ $task->id }}', '{{ $task->project_id }}', '{{ addslashes($task->title) }}')"
          onclick="openTaskDetails('{{ $task->id }}')">
 @else
-    <div class="kanban-task-card kanban-card" 
+    <div class="kanban-task-card global-kanban-card kanban-card" 
          id="task-card-{{ $task->id }}"
+         data-id="{{ $task->id }}"
          data-task-id="{{ $task->id }}"
+         data-title="{{ strtolower($task->title) }} #{{ $task->task_number }}"
+         data-project-id="{{ $p->id ?? $task->project_id }}"
          data-status="{{ $task->status }}"
          data-assignee="{{ $task->assignee_id ?? 'unassigned' }}"
+         data-assignee-id="{{ $task->assignee_id ?? '' }}"
          data-priority="{{ $task->priority ?? 'medium' }}"
          data-milestone="{{ $task->milestone_id ?? 'none' }}"
+         data-milestone-id="{{ $task->milestone_id ?? '' }}"
          data-due="{{ $task->due_date ? $task->due_date->format('Y-m-d') : '' }}"
-         data-title="{{ strtolower($task->title) }} #{{ $task->task_number }}"
-         onclick="openTaskInspector('{{ $task->id }}')"
+         onclick="openTaskDetails('{{ $task->id }}')"
          oncontextmenu="event.preventDefault(); event.stopPropagation(); openTaskContextMenu(event, '{{ $task->id }}', '{{ $p->id ?? $task->project_id }}', '{{ addslashes($task->title) }}')">
 @endif
 

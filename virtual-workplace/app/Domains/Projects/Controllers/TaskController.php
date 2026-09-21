@@ -14,6 +14,7 @@ use App\Domains\Projects\Models\Project;
 use App\Domains\Projects\Models\Task;
 use App\Domains\Projects\Models\TaskChecklistItem;
 use App\Domains\Projects\Models\TaskCustomFieldValue;
+use App\Domains\Projects\Models\TaskDependency;
 use App\Domains\Projects\Requests\AssignTaskRequest;
 use App\Domains\Projects\Requests\StoreTaskRequest;
 use App\Domains\Projects\Requests\UpdateTaskRequest;
@@ -440,6 +441,28 @@ class TaskController extends Controller
         } catch (\InvalidArgumentException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
+    }
+
+    /**
+     * Remove a dependency relationship.
+     */
+    public function removeDependency(
+        Organization $organization,
+        Task $task,
+        string $dependencyId
+    ): JsonResponse {
+        if ($task->organization_id !== $organization->id) {
+            return response()->json(['message' => 'Task not found.'], 404);
+        }
+
+        $this->authorizeTaskEdit($organization, $task);
+
+        $dep = TaskDependency::where('task_id', $task->id)->where('id', $dependencyId)->first();
+        if ($dep) {
+            $dep->delete();
+        }
+
+        return response()->json(['message' => 'Dependency removed successfully.']);
     }
 
     /**

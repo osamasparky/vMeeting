@@ -2144,6 +2144,25 @@
             }
         }
 
+        async function removeTaskDependency(depId) {
+            if (!confirm('{{ __("Are you sure you want to remove this dependency?") }}')) return;
+            try {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${activeInspectorTaskId}/dependencies/${depId}`, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
+                    credentials: 'same-origin'
+                });
+                if (!res.ok) {
+                    alert('Error removing dependency.');
+                    return;
+                }
+                showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">link_off</span> ' + "{{ __('Dependency removed.') }}");
+                openTaskDetails(activeInspectorTaskId);
+            } catch (err) {
+                alert('Network error removing dependency.');
+            }
+        }
+
         function renderTaskDetails(t) {
             const statusLabels = {
                 'backlog': '{{ __("Backlog") }}',
@@ -2197,6 +2216,36 @@
             }
 
             document.getElementById('task-modal-due').textContent = t.due_date ? new Date(t.due_date).toLocaleDateString() : '—';
+            
+            // Milestone Chip
+            const msChip = document.getElementById('task-modal-milestone-chip');
+            const msText = document.getElementById('task-modal-milestone');
+            if (msChip && msText) {
+                if (t.milestone && t.milestone.title) {
+                    msText.textContent = t.milestone.title;
+                    msChip.style.display = 'inline-flex';
+                } else {
+                    msChip.style.display = 'none';
+                }
+            }
+
+            // Recurrence Chip
+            const recChip = document.getElementById('task-modal-recurrence-chip');
+            const recText = document.getElementById('task-modal-recurrence');
+            if (recChip && recText) {
+                if (t.recurrence_rule && t.recurrence_rule !== 'none') {
+                    const recLabels = {
+                        'daily': '{{ __("Daily") }}',
+                        'weekly': '{{ __("Weekly") }}',
+                        'monthly': '{{ __("Monthly") }}'
+                    };
+                    recText.textContent = recLabels[t.recurrence_rule] || t.recurrence_rule;
+                    recChip.style.display = 'inline-flex';
+                } else {
+                    recChip.style.display = 'none';
+                }
+            }
+
             document.getElementById('task-modal-status-select').value = t.status || 'backlog';
             document.getElementById('task-modal-description').textContent = t.description || '{{ __("No description provided.") }}';
             document.getElementById('task-modal-hours').textContent = `${t.estimated_hours || 0} {{ __("Estimated Hours") }} / ${t.actual_hours || 0} {{ __("Logged Hours") }}`;
@@ -2245,7 +2294,8 @@
 
             // Checklist
             const items = t.checklist_items || [];
-            document.getElementById('task-checklist-count').textContent = items.length;
+            const checkCountEl = document.getElementById('task-checklist-count');
+            if (checkCountEl) checkCountEl.textContent = items.length;
             const checkContainer = document.getElementById('task-checklist-items-container');
             if (checkContainer) {
                 checkContainer.innerHTML = '';
@@ -2296,7 +2346,8 @@
 
             // Comments
             const comments = t.comments || [];
-            document.getElementById('task-comments-count').textContent = comments.length;
+            const commCountEl = document.getElementById('task-comments-count');
+            if (commCountEl) commCountEl.textContent = comments.length;
             const commContainer = document.getElementById('task-comments-feed');
             if (commContainer) {
                 commContainer.innerHTML = '';
@@ -2322,6 +2373,8 @@
 
             // Dependencies
             const deps = t.dependencies || [];
+            const depCountEl = document.getElementById('task-dependencies-count');
+            if (depCountEl) depCountEl.textContent = deps.length;
             const depContainer = document.getElementById('task-dependencies-container');
             if (depContainer) {
                 depContainer.innerHTML = '';
@@ -2333,8 +2386,16 @@
                         item.style = 'background: var(--ula-surface-page-alt); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--ula-border-subtle); font-size: 12.5px; display: flex; justify-content: space-between; align-items: center; gap: 10px;';
                         const depTask = d.depends_on_task || {};
                         item.innerHTML = `
-                            <span><span class="material-symbols-rounded" style="font-size: 15px; vertical-align: text-bottom; color: var(--ula-gold-500);">lock</span> <strong>{{ __("Depends On:") }}</strong> #${depTask.task_number || ''} ${depTask.title || '{{ __("Predecessor Task") }}'}</span>
-                            <span class="ula-badge ula-badge--sm ${depTask.status === 'done' ? 'ula-badge--live' : 'ula-badge--attention'}">${statusLabels[depTask.status] || (depTask.status || 'pending')}</span>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-gold-500);">lock</span>
+                                <span><strong>{{ __("Depends On:") }}</strong> #${depTask.task_number || ''} ${depTask.title || '{{ __("Predecessor Task") }}'}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="ula-badge ula-badge--sm ${depTask.status === 'done' ? 'ula-badge--live' : 'ula-badge--attention'}">${statusLabels[depTask.status] || (depTask.status || 'pending')}</span>
+                                <button type="button" onclick="removeTaskDependency('${d.id}')" class="ula-icon-btn ula-icon-btn--danger ula-icon-btn--sm" style="width: 28px; height: 28px; min-width: 28px;" title="{{ __('Remove Dependency') }}">
+                                    <span class="material-symbols-rounded" style="font-size: 14px;">close</span>
+                                </button>
+                            </div>
                         `;
                         depContainer.appendChild(item);
                     });
@@ -2342,10 +2403,12 @@
             }
 
             // Time Log
+            const entries = t.time_entries || [];
+            const timeCountEl = document.getElementById('task-timelog-count');
+            if (timeCountEl) timeCountEl.textContent = entries.length;
             const timeBody = document.getElementById('task-modal-timelog-body');
             if (timeBody) {
                 timeBody.innerHTML = '';
-                const entries = t.time_entries || [];
                 if (entries.length === 0) {
                     timeBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: var(--ula-text-muted);">{{ __("No time tracked on this task yet.") }}</td></tr>';
                 } else {
@@ -2358,8 +2421,6 @@
                             <td style="font-weight: 800; color: var(--ula-text-primary); font-family: var(--ula-font-mono);">${hrs} {{ __("h") }}</td>
                             <td style="font-size: 12px;">${e.description || '{{ __("Work session") }}'}</td>
                             <td><span class="ula-badge ula-badge--sm ${e.status === 'approved' ? 'ula-badge--live' : 'ula-badge--default'}">${e.status === 'approved' ? '{{ __("Approved") }}' : '{{ __("Pending") }}'}</span></td>
-                        `;
-                        timeBody.appendChild(tr);
                     });
                 }
             }

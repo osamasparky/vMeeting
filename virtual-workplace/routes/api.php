@@ -259,6 +259,8 @@ Route::prefix('v1')->group(function () {
                     ->middleware('permission:tasks.view');
                 Route::post('/tasks/{task}/dependencies', [TaskController::class, 'addDependency'])
                     ->middleware('permission:tasks.edit');
+                Route::delete('/tasks/{task}/dependencies/{dependency}', [TaskController::class, 'removeDependency'])
+                    ->middleware('permission:tasks.edit');
                 Route::post('/tasks/{task}/duplicate', [TaskController::class, 'duplicate'])
                     ->middleware('permission:tasks.create');
                 Route::post('/tasks/{task}/move', [TaskController::class, 'move'])
