@@ -1428,6 +1428,68 @@
             if (col) col.classList.remove('drag-over');
         }
 
+        // ── LIVE COUNTERS & KPI SYNCHRONIZER ──
+        function syncTaskCountersAndKPIs() {
+            // 1. My Tasks column counts & empty hints
+            ['backlog', 'ready', 'in_progress', 'review', 'done'].forEach(st => {
+                const col = document.getElementById(`mytasks-kanban-col-${st}`);
+                const badge = document.getElementById(`mytasks-kanban-cnt-${st}`);
+                if (col && badge) {
+                    const cnt = col.querySelectorAll('.kanban-task-card').length;
+                    badge.textContent = cnt;
+                    const existingHint = col.querySelector('.mytasks-empty-hint');
+                    if (cnt === 0 && !existingHint) {
+                        const hint = document.createElement('div');
+                        hint.className = 'mytasks-empty-hint';
+                        hint.id = `mytasks-empty-${st}`;
+                        hint.style.cssText = 'text-align: center; padding: 18px 8px; color: var(--ula-text-muted); font-size: 11px; border: 1px dashed var(--ula-border-subtle); border-radius: var(--ula-radius-sm);';
+                        hint.textContent = "{{ __('No tasks in this stage.') }}";
+                        col.appendChild(hint);
+                    } else if (cnt > 0 && existingHint) {
+                        existingHint.remove();
+                    }
+                }
+            });
+
+            // 2. Global All Tasks Kanban column counts & empty hints
+            ['backlog', 'ready', 'in_progress', 'review', 'done'].forEach(st => {
+                const col = document.getElementById(`global-kanban-col-${st}`);
+                const badge = document.getElementById(`global-kanban-cnt-${st}`);
+                if (col && badge) {
+                    const cnt = col.querySelectorAll('.global-kanban-card').length;
+                    badge.textContent = cnt;
+                    const existingHint = col.querySelector('.kanban-empty-hint');
+                    if (cnt === 0 && !existingHint) {
+                        const hint = document.createElement('div');
+                        hint.className = 'kanban-empty-hint';
+                        hint.style.cssText = 'text-align: center; padding: 26px 12px; color: var(--ula-text-muted); font-size: var(--ula-size-xs); border: 1px dashed var(--ula-border-subtle); border-radius: var(--ula-radius-md); background: var(--ula-surface-card);';
+                        hint.textContent = "{{ __('No tasks in this stage.') }}";
+                        col.appendChild(hint);
+                    } else if (cnt > 0 && existingHint) {
+                        existingHint.remove();
+                    }
+                }
+            });
+
+            // 3. All Tasks KPI Counters
+            const inProgressCnt = document.querySelectorAll('.global-kanban-card[data-status="in_progress"]').length;
+            const reviewCnt = document.querySelectorAll('.global-kanban-card[data-status="review"], .global-kanban-card[data-status="qa"]').length;
+            const doneCnt = document.querySelectorAll('.global-kanban-card[data-status="done"]').length;
+
+            const kpiInProg = document.getElementById('alltasks-kpi-in-progress');
+            const kpiReview = document.getElementById('alltasks-kpi-review');
+            const kpiDone = document.getElementById('alltasks-kpi-done');
+
+            if (kpiInProg) kpiInProg.textContent = inProgressCnt;
+            if (kpiReview) kpiReview.textContent = reviewCnt;
+            if (kpiDone) kpiDone.textContent = doneCnt;
+
+            // 4. Update sidebar my tasks pill
+            const myNonDoneCount = document.querySelectorAll('#tab-my-tasks .kanban-task-card:not([data-status="done"])').length;
+            const myNavBadge = document.querySelector('#nav-btn-my-tasks .nav-badge-pill');
+            if (myNavBadge) myNavBadge.textContent = myNonDoneCount;
+        }
+
         async function handleGlobalDrop(e, targetStatus) {
             e.preventDefault();
             const col = e.currentTarget;
@@ -1451,6 +1513,7 @@
             }
 
             card.dataset.status = targetStatus;
+            card.setAttribute('data-status', targetStatus);
             const cardSelect = card.querySelector('select');
             if (cardSelect) cardSelect.value = targetStatus;
 
@@ -1462,7 +1525,23 @@
                 if (rowSelect) rowSelect.value = targetStatus;
             }
 
+            // Sync My Tasks card if present
+            const myCard = document.getElementById(`mytasks-card-${taskId}`);
+            if (myCard) {
+                const targetMyCol = document.getElementById(`mytasks-kanban-col-${targetStatus}`);
+                if (targetMyCol) {
+                    const emptyHint = targetMyCol.querySelector('.mytasks-empty-hint');
+                    if (emptyHint) emptyHint.remove();
+                    targetMyCol.appendChild(myCard);
+                }
+                myCard.dataset.status = targetStatus;
+                myCard.setAttribute('data-status', targetStatus);
+                const mySelect = myCard.querySelector('select');
+                if (mySelect) mySelect.value = targetStatus;
+            }
+
             filterAllTasksTable();
+            syncTaskCountersAndKPIs();
 
             try {
                 const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${taskId}/status`, {
@@ -1496,29 +1575,6 @@
                 myCard.setAttribute('data-status', newStatus);
                 const mySelect = myCard.querySelector('select');
                 if (mySelect) mySelect.value = newStatus;
-
-                // Update My Tasks column count badges
-                ['backlog', 'ready', 'in_progress', 'review', 'done'].forEach(st => {
-                    const col = document.getElementById(`mytasks-kanban-col-${st}`);
-                    const badge = document.getElementById(`mytasks-kanban-cnt-${st}`);
-                    if (col && badge) {
-                        const cnt = col.querySelectorAll('.kanban-task-card').length;
-                        badge.textContent = cnt;
-                        if (cnt === 0 && !col.querySelector('.mytasks-empty-hint')) {
-                            const hint = document.createElement('div');
-                            hint.className = 'mytasks-empty-hint';
-                            hint.id = `mytasks-empty-${st}`;
-                            hint.style.cssText = 'text-align: center; padding: 18px 8px; color: var(--ula-text-muted); font-size: 11px; border: 1px dashed var(--ula-border-subtle); border-radius: var(--ula-radius-sm);';
-                            hint.textContent = "{{ __('No tasks in this stage.') }}";
-                            col.appendChild(hint);
-                        }
-                    }
-                });
-
-                // Update My Tasks Nav Badge in sidebar
-                const myNonDoneCount = document.querySelectorAll('#tab-my-tasks .kanban-task-card:not([data-status="done"])').length;
-                const myNavBadge = document.querySelector('#nav-btn-my-tasks .nav-badge-pill');
-                if (myNavBadge) myNavBadge.textContent = myNonDoneCount;
             }
 
             // 2. Optimistically update All Tasks Global Kanban card
@@ -1545,6 +1601,7 @@
             }
 
             filterAllTasksTable();
+            syncTaskCountersAndKPIs();
 
             try {
                 const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${taskId}/status`, {
@@ -1633,21 +1690,26 @@
 
             menu.style.display = 'flex';
 
-            // Calculate coordinate positioning
-            let x = e.clientX || (e.target ? e.target.getBoundingClientRect().left : 200);
-            let y = e.clientY || (e.target ? e.target.getBoundingClientRect().bottom : 200);
+            let x = e.clientX || 200;
+            let y = e.clientY || 200;
+
+            if (e.currentTarget && typeof e.currentTarget.getBoundingClientRect === 'function') {
+                const rect = e.currentTarget.getBoundingClientRect();
+                x = rect.left;
+                y = rect.bottom + 6;
+            }
 
             const menuWidth = 250;
-            const menuHeight = 330;
+            const menuHeight = 340;
 
-            if (x + menuWidth > window.innerWidth - 10) {
-                x = window.innerWidth - menuWidth - 14;
+            if (x + menuWidth > window.innerWidth - 12) {
+                x = window.innerWidth - menuWidth - 12;
             }
-            if (y + menuHeight > window.innerHeight - 10) {
-                y = window.innerHeight - menuHeight - 14;
+            if (y + menuHeight > window.innerHeight - 12) {
+                y = window.innerHeight - menuHeight - 12;
             }
-            if (x < 10) x = 10;
-            if (y < 10) y = 10;
+            if (x < 12) x = 12;
+            if (y < 12) y = 12;
 
             menu.style.left = x + 'px';
             menu.style.top = y + 'px';
@@ -1670,7 +1732,7 @@
 
         function ctxActionCopyLink() {
             closeTaskContextMenu();
-            const link = `${window.location.origin}/projects/hub/${activeCtxProjectId}?task=${activeCtxTaskId}`;
+            const link = `${window.location.origin}/projects/${activeCtxProjectId}?task=${activeCtxTaskId}`;
             executeClipboardCopy(link);
             showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">checklist</span> ' + "{{ __('Task link copied to clipboard!') }}");
         }
@@ -1683,7 +1745,7 @@
 
         function ctxActionOpenNewTab() {
             closeTaskContextMenu();
-            window.open(`/projects/hub/${activeCtxProjectId}?task=${activeCtxTaskId}`, '_blank');
+            window.open(`/projects/${activeCtxProjectId}?task=${activeCtxTaskId}`, '_blank');
         }
 
         function ctxActionInspect() {
@@ -1829,11 +1891,11 @@
                 const btn = document.getElementById(`task-tab-btn-${t}`);
                 if (view) view.style.display = (t === tab) ? 'block' : 'none';
                 if (btn) {
-                    btn.className = (t === tab) ? 'tactile-btn btn-primary' : 'tactile-btn btn-secondary';
-                    btn.style.background = (t === tab) ? '' : 'transparent';
-                    btn.style.border = (t === tab) ? '' : 'none';
-                    btn.style.boxShadow = (t === tab) ? '' : 'none';
-                    btn.style.color = (t === tab) ? '' : 'var(--ula-text-secondary)';
+                    if (t === tab) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
                 }
             });
         }
@@ -2071,8 +2133,27 @@
             // Header
             document.getElementById('task-modal-code').textContent = `#${t.task_number || 1}`;
             document.getElementById('task-modal-title').textContent = t.title;
-            document.getElementById('task-modal-status-badge').textContent = statusLabels[t.status] || (t.status || 'backlog');
-            document.getElementById('task-modal-priority-badge').textContent = priorityLabels[t.priority] || (t.priority || 'medium');
+
+            const statusBadge = document.getElementById('task-modal-status-badge');
+            if (statusBadge) {
+                statusBadge.textContent = statusLabels[t.status] || (t.status || 'backlog');
+                statusBadge.className = 'ula-badge ula-badge--sm ' + (
+                    t.status === 'done' || t.status === 'in_progress' ? 'ula-badge--live' :
+                    (t.status === 'review' ? 'ula-badge--scheduled' :
+                    (t.status === 'ready' ? 'ula-badge--default' : 'ula-badge--cancelled'))
+                );
+            }
+
+            const priorityBadge = document.getElementById('task-modal-priority-badge');
+            if (priorityBadge) {
+                priorityBadge.textContent = priorityLabels[t.priority] || (t.priority || 'medium');
+                priorityBadge.className = 'ula-badge ula-badge--sm ' + (
+                    t.priority === 'urgent' ? 'ula-badge--attention' :
+                    (t.priority === 'high' ? 'ula-badge--scheduled' :
+                    (t.priority === 'low' ? 'ula-badge--cancelled' : 'ula-badge--default'))
+                );
+            }
+
             document.getElementById('task-modal-project').textContent = t.project ? t.project.name : '{{ __("General") }}';
             document.getElementById('task-modal-assignee').textContent = t.assignee ? t.assignee.name : '{{ __("Unassigned") }}';
             
@@ -2101,24 +2182,24 @@
                     appBanner.style.background = 'rgba(214, 162, 58, 0.15)';
                     appBanner.style.border = '1px solid rgba(214, 162, 58, 0.35)';
                     appBanner.style.color = 'var(--ula-gold-400)';
-                    appText.innerHTML = '<span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">hourglass_empty</span></span> <span>{{ __("This task is submitted for completion and awaiting PM approval.") }}</span>';
+                    appText.innerHTML = '<span><span class="material-symbols-rounded" style="font-size: 1.1em; vertical-align: text-bottom;">hourglass_empty</span></span> <span>{{ __("This task is submitted for completion and awaiting PM approval.") }}</span>';
                     appActions.innerHTML = `
-                        <button type="button" onclick="quickApproveTask('${t.id}')" class="tactile-btn btn-primary" style="padding: 6px 14px; font-size: 11px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check</span> {{ __("Approve") }}</button>
-                        <button type="button" onclick="quickRejectTask('${t.id}')" class="tactile-btn" style="background: rgba(217, 107, 95, 0.2); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.3); padding: 6px 12px; font-size: 11px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span> {{ __("Request Changes") }}</button>
+                        <button type="button" onclick="quickApproveTask('${t.id}')" class="ula-btn ula-btn--primary ula-btn--sm"><span class="material-symbols-rounded ula-btn__icon">check</span> {{ __("Approve") }}</button>
+                        <button type="button" onclick="quickRejectTask('${t.id}')" class="ula-btn ula-btn--danger ula-btn--sm"><span class="material-symbols-rounded ula-btn__icon">close</span> {{ __("Request Changes") }}</button>
                     `;
                 } else if (t.approval_status === 'rejected') {
                     appBanner.style.display = 'flex';
                     appBanner.style.background = 'rgba(217, 107, 95, 0.15)';
                     appBanner.style.border = '1px solid rgba(217, 107, 95, 0.35)';
                     appBanner.style.color = 'var(--ula-status-danger)';
-                    appText.innerHTML = `<span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">warning</span></span> <span><strong>{{ __("Changes Requested:") }}</strong> ${t.rejection_reason || '{{ __("Please review feedback.") }}'}</span>`;
+                    appText.innerHTML = `<span><span class="material-symbols-rounded" style="font-size: 1.1em; vertical-align: text-bottom;">warning</span></span> <span><strong>{{ __("Changes Requested:") }}</strong> ${t.rejection_reason || '{{ __("Please review feedback.") }}'}</span>`;
                     appActions.innerHTML = '';
                 } else if (t.approval_status === 'approved') {
                     appBanner.style.display = 'flex';
                     appBanner.style.background = 'rgba(79, 155, 95, 0.15)';
                     appBanner.style.border = '1px solid rgba(79, 155, 95, 0.35)';
                     appBanner.style.color = 'var(--ula-status-success)';
-                    appText.innerHTML = '<span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check_circle</span></span> <span>{{ __("Task approved and marked Done by Project Manager.") }}</span>';
+                    appText.innerHTML = '<span><span class="material-symbols-rounded" style="font-size: 1.1em; vertical-align: text-bottom;">check_circle</span></span> <span>{{ __("Task approved and marked Done by Project Manager.") }}</span>';
                     appActions.innerHTML = '';
                 } else {
                     appBanner.style.display = 'none';
@@ -2140,17 +2221,17 @@
             if (checkContainer) {
                 checkContainer.innerHTML = '';
                 if (items.length === 0) {
-                    checkContainer.innerHTML = '<div style="font-size: 12px; color: var(--ula-text-muted); padding: 8px;">{{ __("No checklist items yet. Add sub-items above.") }}</div>';
+                    checkContainer.innerHTML = '<div style="font-size: 12.5px; color: var(--ula-text-muted); padding: 12px; background: var(--ula-surface-page-alt); border-radius: 10px; text-align: center;">{{ __("No checklist items yet. Add sub-items above.") }}</div>';
                 } else {
                     items.forEach(item => {
                         const div = document.createElement('div');
-                        div.style = 'display: flex; align-items: center; justify-content: space-between; background: var(--ula-surface-page-alt); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--ula-border-subtle);';
+                        div.style = 'display: flex; align-items: center; justify-content: space-between; background: var(--ula-surface-page-alt); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--ula-border-subtle); gap: 10px;';
                         div.innerHTML = `
-                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 13px; color: var(--ula-text-primary); text-decoration: ${item.is_completed ? 'line-through' : 'none'}; opacity: ${item.is_completed ? 0.6 : 1};">
-                                <input type="checkbox" onchange="toggleTaskChecklistItem('${item.id}')" ${item.is_completed ? 'checked' : ''}>
+                            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; font-weight: 600; color: var(--ula-text-primary); text-decoration: ${item.is_completed ? 'line-through' : 'none'}; opacity: ${item.is_completed ? 0.6 : 1};">
+                                <input type="checkbox" onchange="toggleTaskChecklistItem('${item.id}')" ${item.is_completed ? 'checked' : ''} style="width: 17px; height: 17px; accent-color: var(--ula-palm-900);">
                                 <span>${item.title}</span>
                             </label>
-                            <span class="badge ${item.is_completed ? 'badge-green' : 'badge-gray'}" style="font-size: 10px;">${item.is_completed ? '{{ __("Done") }}' : '{{ __("Pending") }}'}</span>
+                            <span class="ula-badge ula-badge--sm ${item.is_completed ? 'ula-badge--live' : 'ula-badge--default'}">${item.is_completed ? '{{ __("Done") }}' : '{{ __("Pending") }}'}</span>
                         `;
                         checkContainer.appendChild(div);
                     });
@@ -2165,18 +2246,18 @@
             if (attContainer) {
                 attContainer.innerHTML = '';
                 if (attachments.length === 0) {
-                    attContainer.innerHTML = '<div style="font-size: 12px; color: var(--ula-text-muted); padding: 8px; grid-column: 1 / -1;">{{ __("No files attached to this task.") }}</div>';
+                    attContainer.innerHTML = '<div style="font-size: 12.5px; color: var(--ula-text-muted); padding: 14px; background: var(--ula-surface-page-alt); border-radius: 10px; text-align: center; grid-column: 1 / -1;">{{ __("No files attached to this task.") }}</div>';
                 } else {
                     attachments.forEach(att => {
                         const card = document.createElement('div');
-                        card.style = 'background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; gap: 6px;';
+                        card.style = 'background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; box-shadow: var(--ula-shadow-xs);';
                         const uploader = att.user ? att.user.name : '{{ __("Member") }}';
                         card.innerHTML = `
-                            <div style="font-weight: 800; font-size: 12px; color: var(--ula-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">description</span> ${att.file_name}</div>
-                            <div style="font-size: 10px; color: var(--ula-text-muted);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">person</span> ${uploader} • ${(att.file_size / 1024).toFixed(1)} KB</div>
+                            <div style="font-weight: 700; font-size: 12.5px; color: var(--ula-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><span class="material-symbols-rounded" style="font-size: 16px; vertical-align: text-bottom; color: var(--ula-palm-700);">description</span> ${att.file_name}</div>
+                            <div style="font-size: 11px; color: var(--ula-text-muted);"><span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom;">person</span> ${uploader} • ${(att.file_size / 1024).toFixed(1)} KB</div>
                             <div style="display: flex; gap: 6px; margin-top: 4px;">
-                                <a href="${att.file_url || ('/uploads/tasks/' + t.id + '/' + att.file_name)}" target="_blank" download class="tactile-btn btn-secondary" style="flex: 1; padding: 4px 8px; font-size: 10px; text-align: center; text-decoration: none;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">arrow_downward</span> {{ __("Download") }}</a>
-                                <button type="button" onclick="deleteTaskAttachmentAction('${att.id}')" class="tactile-btn" style="background: rgba(217, 107, 95, 0.15); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.3); padding: 4px 8px; font-size: 10px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">delete</span></button>
+                                <a href="${att.file_url || ('/uploads/tasks/' + t.id + '/' + att.file_name)}" target="_blank" download class="ula-btn ula-btn--secondary ula-btn--sm" style="flex: 1; height: 32px; min-height: 32px; font-size: 11px;"><span class="material-symbols-rounded ula-btn__icon">download</span> {{ __("Download") }}</a>
+                                <button type="button" onclick="deleteTaskAttachmentAction('${att.id}')" class="ula-icon-btn ula-icon-btn--danger ula-icon-btn--sm" style="width: 32px; height: 32px; min-width: 32px;"><span class="material-symbols-rounded">delete</span></button>
                             </div>
                         `;
                         attContainer.appendChild(card);
@@ -2191,19 +2272,19 @@
             if (commContainer) {
                 commContainer.innerHTML = '';
                 if (comments.length === 0) {
-                    commContainer.innerHTML = '<div style="font-size: 12px; color: var(--ula-text-muted); padding: 8px;">{{ __("No discussions or comments yet.") }}</div>';
+                    commContainer.innerHTML = '<div style="font-size: 12.5px; color: var(--ula-text-muted); padding: 14px; background: var(--ula-surface-page-alt); border-radius: 10px; text-align: center;">{{ __("No discussions or comments yet.") }}</div>';
                 } else {
                     comments.forEach(c => {
                         const box = document.createElement('div');
-                        box.style = 'background: var(--ula-surface-page-alt); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--ula-border-subtle); font-size: 12px;';
+                        box.style = 'background: var(--ula-surface-page-alt); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--ula-border-subtle); font-size: 12.5px;';
                         const author = c.user ? c.user.name : '{{ __("Member") }}';
                         const time = new Date(c.created_at).toLocaleString();
                         box.innerHTML = `
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11px;">
-                                <strong style="color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">person</span> ${author}</strong>
-                                <span style="color: var(--ula-text-muted);">${time}</span>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 11.5px;">
+                                <strong style="color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom; color: var(--ula-palm-700);">person</span> ${author}</strong>
+                                <span style="color: var(--ula-text-muted); font-family: var(--ula-font-mono); font-size: 10.5px;">${time}</span>
                             </div>
-                            <div style="color: var(--ula-text-primary); line-height: 1.4;">${c.body || ''}</div>
+                            <div style="color: var(--ula-text-primary); line-height: 1.5;">${c.body || ''}</div>
                         `;
                         commContainer.appendChild(box);
                     });
@@ -2216,15 +2297,15 @@
             if (depContainer) {
                 depContainer.innerHTML = '';
                 if (deps.length === 0) {
-                    depContainer.innerHTML = '<div style="font-size: 12px; color: var(--ula-text-muted); padding: 8px;">{{ __("No blocker dependencies. This task can be started immediately.") }}</div>';
+                    depContainer.innerHTML = '<div style="font-size: 12.5px; color: var(--ula-text-muted); padding: 14px; background: var(--ula-surface-page-alt); border-radius: 10px; text-align: center;">{{ __("No blocker dependencies. This task can be started immediately.") }}</div>';
                 } else {
                     deps.forEach(d => {
                         const item = document.createElement('div');
-                        item.style = 'background: var(--ula-surface-page-alt); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--ula-border-subtle); font-size: 12px; display: flex; justify-content: space-between; align-items: center;';
+                        item.style = 'background: var(--ula-surface-page-alt); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--ula-border-subtle); font-size: 12.5px; display: flex; justify-content: space-between; align-items: center; gap: 10px;';
                         const depTask = d.depends_on_task || {};
                         item.innerHTML = `
-                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">lock</span> <strong>{{ __("Depends On:") }}</strong> #${depTask.task_number || ''} ${depTask.title || '{{ __("Predecessor Task") }}'}</span>
-                            <span class="badge ${depTask.status === 'done' ? 'badge-green' : 'badge-crimson'}">${statusLabels[depTask.status] || (depTask.status || 'pending')}</span>
+                            <span><span class="material-symbols-rounded" style="font-size: 15px; vertical-align: text-bottom; color: var(--ula-gold-500);">lock</span> <strong>{{ __("Depends On:") }}</strong> #${depTask.task_number || ''} ${depTask.title || '{{ __("Predecessor Task") }}'}</span>
+                            <span class="ula-badge ula-badge--sm ${depTask.status === 'done' ? 'ula-badge--live' : 'ula-badge--attention'}">${statusLabels[depTask.status] || (depTask.status || 'pending')}</span>
                         `;
                         depContainer.appendChild(item);
                     });
@@ -2237,17 +2318,17 @@
                 timeBody.innerHTML = '';
                 const entries = t.time_entries || [];
                 if (entries.length === 0) {
-                    timeBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 14px; color: var(--ula-text-muted);">{{ __("No time tracked on this task yet.") }}</td></tr>';
+                    timeBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: var(--ula-text-muted);">{{ __("No time tracked on this task yet.") }}</td></tr>';
                 } else {
                     entries.forEach(e => {
                         const tr = document.createElement('tr');
                         const hrs = (e.duration_seconds / 3600).toFixed(2);
                         tr.innerHTML = `
-                            <td>${new Date(e.started_at).toLocaleDateString()}</td>
+                            <td style="font-family: var(--ula-font-mono); font-size: 12px;">${new Date(e.started_at).toLocaleDateString()}</td>
                             <td style="font-weight: 700;">${e.user ? e.user.name : '{{ __("Member") }}'}</td>
-                            <td style="font-weight: 800; color: var(--ula-text-primary); font-family: monospace;">${hrs} {{ __("h") }}</td>
-                            <td style="font-size: 11px;">${e.description || '{{ __("Work session") }}'}</td>
-                            <td><span class="badge ${e.status === 'approved' ? 'badge-green' : 'badge-gray'}">${e.status === 'approved' ? '{{ __("Approved") }}' : '{{ __("Pending") }}'}</span></td>
+                            <td style="font-weight: 800; color: var(--ula-text-primary); font-family: var(--ula-font-mono);">${hrs} {{ __("h") }}</td>
+                            <td style="font-size: 12px;">${e.description || '{{ __("Work session") }}'}</td>
+                            <td><span class="ula-badge ula-badge--sm ${e.status === 'approved' ? 'ula-badge--live' : 'ula-badge--default'}">${e.status === 'approved' ? '{{ __("Approved") }}' : '{{ __("Pending") }}'}</span></td>
                         `;
                         timeBody.appendChild(tr);
                     });
@@ -3224,6 +3305,7 @@
                 // 1. Update KPI Summary Cards
                 const officeEl = document.getElementById('ts-kpi-office-time');
                 const taskEl = document.getElementById('ts-kpi-task-time');
+                const totalWorkEl = document.getElementById('ts-kpi-total-work');
                 const idleEl = document.getElementById('ts-kpi-idle-time');
                 const ratioEl = document.getElementById('ts-kpi-ratio');
 
@@ -3233,6 +3315,7 @@
 
                 if (officeEl) officeEl.textContent = data.total_office_formatted || '00:00:00';
                 if (taskEl) taskEl.textContent = data.total_task_formatted || '00:00:00';
+                if (totalWorkEl) totalWorkEl.textContent = data.total_attendance_formatted || '00:00:00';
 
                 const idleH = Math.floor(idleSec / 3600);
                 const idleM = Math.floor((idleSec % 3600) / 60);
@@ -3424,7 +3507,7 @@
                 if (!roster.length) {
                     tbody.innerHTML = `
                         <tr>
-                            <td colspan="7" style="text-align: center; padding: 24px; color: var(--ula-text-muted);">
+                            <td colspan="8" style="text-align: center; padding: 24px; color: var(--ula-text-muted);">
                                 {{ __('No team members found in organization.') }}
                             </td>
                         </tr>
@@ -3471,6 +3554,9 @@
                             </td>
                             <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--ula-status-success);">
                                 ${m.total_task_formatted}
+                            </td>
+                            <td style="font-family: monospace; font-weight: 900; font-size: 13px; color: var(--ula-accent-default);">
+                                ${m.total_attendance_formatted || '00:00:00'}
                             </td>
                             <td>${activeTaskLabel}</td>
                             <td>
@@ -3621,8 +3707,39 @@
             }
         }
 
+        // ── LIVE CLOCK & DYNAMIC AM/PM GREETING IN OVERVIEW HERO ──
+        function initOverviewLiveClock() {
+            function updateClock() {
+                const now = new Date();
+                const clockEl = document.getElementById('nx-hero-live-clock');
+                const greetingEl = document.getElementById('nx-hero-dynamic-greeting');
+
+                if (clockEl) {
+                    const hours = String(now.getHours()).padStart(2, '0');
+                    const minutes = String(now.getMinutes()).padStart(2, '0');
+                    const seconds = String(now.getSeconds()).padStart(2, '0');
+                    clockEl.textContent = `${hours}:${minutes}:${seconds}`;
+                }
+
+                if (greetingEl) {
+                    const hour = now.getHours();
+                    const isPM = hour >= 12;
+                    const userName = '{{ addslashes(Auth::user()->name ?? "User") }}';
+                    const isArabic = document.documentElement.getAttribute('dir') === 'rtl' || document.documentElement.getAttribute('lang') === 'ar';
+                    if (isArabic) {
+                        greetingEl.textContent = isPM ? `مساء الخير، ${userName}!` : `صباح الخير، ${userName}!`;
+                    } else {
+                        greetingEl.textContent = isPM ? `Good evening, ${userName}!` : `Good morning, ${userName}!`;
+                    }
+                }
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
         // Auto-load timesheet on DOM load if timesheets tab is active
         document.addEventListener('DOMContentLoaded', () => {
+            initOverviewLiveClock();
             if (window.location.hash === '#timesheets' || document.getElementById('tab-timesheets')?.classList.contains('active')) {
                 refreshDailyTimesheet();
                 loadTeamPresenceOverview();

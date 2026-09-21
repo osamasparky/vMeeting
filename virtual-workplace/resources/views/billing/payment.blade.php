@@ -76,19 +76,34 @@
                 </div>
                 <div style="font-size: 11px; font-weight: 900; color: var(--ula-text-primary); text-transform: uppercase; margin-bottom: 4px;">{{ $plan->slug }}</div>
                 <h2 style="font-size: 24px; font-weight: 900; color: var(--ula-text-primary); margin-bottom: 8px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">diamond</span> {{ $plan->name }} {{ __('Plan') }}</h2>
-                <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--ula-border-subtle);">
-                    <span style="font-size: 32px; font-weight: 900; color: var(--ula-text-primary);">
+                <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--ula-border-subtle); flex-wrap: wrap;">
+                    <span style="font-size: 32px; font-weight: 900; color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">
                         {{ number_format($priceSAR, 2) }} <span style="font-size: 15px; font-weight: 800; color: var(--ula-text-secondary);">{{ __('SAR') }}</span>
                     </span>
-                    <span style="font-size: 13px; font-weight: 700; color: var(--ula-text-muted);">
-                        (${{ number_format($priceUSD, 2) }} USD / {{ __('month') }})
+                    <span style="font-size: 13px; font-weight: 700; color: var(--ula-text-muted); font-family: 'IBM Plex Mono', monospace;">
+                        (${{ number_format($priceUSD, 2) }} USD / {{ $billingCycle === 'yearly' ? __('year') : __('month') }})
                     </span>
                 </div>
+
+                @if($plan->isPerSeat())
+                <div style="background: var(--ula-surface-page-alt); border-radius: var(--ula-radius-md); padding: 12px 16px; margin-bottom: 16px; border: 1px solid var(--ula-border-subtle);">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                        <span style="color: var(--ula-text-secondary);">{{ __('Per Person Price') }}:</span>
+                        <strong style="font-family: 'IBM Plex Mono', monospace;">${{ number_format($plan->price, 2) }} / {{ __('person') }}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                        <span style="color: var(--ula-text-secondary);">{{ __('Selected Seats') }}:</span>
+                        <strong style="color: var(--ula-palm-900); font-family: 'IBM Plex Mono', monospace;">{{ $requestedSeats ?? $plan->getEffectiveMinSeats() }} {{ __('Seats') }}</strong>
+                    </div>
+                </div>
+                @endif
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;">
                     <div style="background: var(--ula-surface-page-alt); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--ula-border-subtle);">
                         <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">group</span> {{ __('Seats Capacity') }}</div>
-                        <div style="font-size: 14px; font-weight: 900; color: var(--ula-text-primary);">{{ $plan->seat_limit === 0 ? __('Unlimited Seats') : $plan->seat_limit . ' ' . __('Seats') }}</div>
+                        <div style="font-size: 14px; font-weight: 900; color: var(--ula-text-primary);">
+                            {{ $plan->isPerSeat() ? ($requestedSeats . ' ' . __('Seats')) : ($plan->seat_limit === 0 ? __('Unlimited Seats') : $plan->seat_limit . ' ' . __('Seats')) }}
+                        </div>
                     </div>
                     <div style="background: var(--ula-surface-page-alt); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--ula-border-subtle);">
                         <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> {{ __('Meeting Rooms') }}</div>
@@ -100,7 +115,7 @@
                     </div>
                     <div style="background: var(--ula-surface-page-alt); padding: 10px 14px; border-radius: 10px; border: 1px solid var(--ula-border-subtle);">
                         <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('Activation') }}</div>
-                        <div style="font-size: 14px; font-weight: 900; color: var(--ula-text-primary);">{{ __('Instant SuperAdmin Review') }}</div>
+                        <div style="font-size: 14px; font-weight: 900; color: var(--ula-text-primary);">{{ __('Instant Review') }}</div>
                     </div>
                 </div>
 
@@ -232,16 +247,23 @@
 
             <form method="POST" action="{{ route('subscription.payment.submit', $plan->id) }}" enctype="multipart/form-data" id="bankPaymentForm">
                 @csrf
+                <input type="hidden" name="seats" value="{{ $requestedSeats ?? 1 }}">
+                <input type="hidden" name="request_type" value="{{ $requestType ?? 'new_subscription' }}">
 
                 <!-- Company & Plan Summary Header in form -->
-                <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 12px; padding: 14px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 12px; padding: 14px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                     <div>
                         <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;">{{ __('Subscribing Company') }}</div>
                         <div style="font-size: 14px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">account_balance</span> {{ $organization->name }}</div>
                     </div>
                     <div style="text-align: end;">
-                        <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;">{{ __('Target Plan') }}</div>
-                        <div style="font-size: 14px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">diamond</span> {{ $plan->name }}</div>
+                        <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;">{{ __('Target Plan & Seats') }}</div>
+                        <div style="font-size: 14px; font-weight: 900; color: var(--ula-text-primary);">
+                            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">diamond</span> {{ $plan->name }}
+                            @if($plan->isPerSeat())
+                                <span style="color: var(--ula-palm-900); font-family: 'IBM Plex Mono', monospace;">({{ $requestedSeats ?? 2 }} {{ __('Seats') }})</span>
+                            @endif
+                        </div>
                     </div>
                 </div>
 

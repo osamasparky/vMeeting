@@ -12,6 +12,8 @@ class SubscriptionRequest extends Model
         'organization_id',
         'user_id',
         'plan_id',
+        'seats',
+        'price_per_seat',
         'amount',
         'currency',
         'billing_cycle',
@@ -24,12 +26,15 @@ class SubscriptionRequest extends Model
         'receipt_path',
         'notes',
         'status',
+        'request_type',
         'reviewed_by',
         'reviewed_at',
         'admin_notes',
     ];
 
     protected $casts = [
+        'seats' => 'integer',
+        'price_per_seat' => 'decimal:2',
         'amount' => 'decimal:2',
         'transfer_date' => 'date',
         'reviewed_at' => 'datetime',

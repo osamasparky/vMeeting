@@ -9,7 +9,7 @@
     <!-- Typography: IBM Plex Sans Arabic & IBM Plex Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
     <!-- Centralized UlaSpace Design System Tokens -->
     <link rel="stylesheet" href="{{ asset('css/ulaspace-tokens.css') }}">
     <link rel="stylesheet" href="{{ asset('css/modern-design-system.css') }}">
@@ -61,20 +61,20 @@
         /* ── WORKSPACE APP SHELL & SIDEBAR ── */
         .app-sidebar {
             width: 270px;
-            background: var(--ula-surface-dark);
-            color: var(--ula-text-on-dark);
+            background: var(--ula-surface-card);
+            color: var(--ula-text-primary);
             height: 100vh;
             position: sticky;
             top: 0;
             display: flex;
             flex-direction: column;
-            border-inline-end: 1px solid var(--ula-border-on-dark);
+            border-inline-end: 1px solid var(--ula-border-subtle);
             z-index: 200;
             transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             flex-shrink: 0;
             overflow-y: auto;
             overflow-x: hidden;
-            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+            box-shadow: 4px 0 24px rgba(36, 92, 58, 0.04);
         }
 
         .app-sidebar.collapsed {
@@ -86,7 +86,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid var(--ula-border-on-dark);
+            border-bottom: 1px solid var(--ula-border-subtle);
         }
 
         .brand-logo-area {
@@ -108,7 +108,7 @@
             justify-content: center;
             font-size: 18px;
             font-weight: 900;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             flex-shrink: 0;
         }
 
@@ -116,12 +116,12 @@
             font-size: 15px;
             font-weight: 900;
             letter-spacing: -0.2px;
-            color: var(--ula-white);
+            color: var(--ula-text-primary);
         }
 
         .brand-sub {
             font-size: 11px;
-            color: var(--ula-text-on-dark-muted);
+            color: var(--ula-text-muted);
         }
 
         .sidebar-nav-list {
@@ -138,7 +138,7 @@
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: 0.8px;
-            color: var(--ula-text-on-dark-muted);
+            color: var(--ula-text-muted);
             padding: 12px 14px 6px 14px;
             white-space: nowrap;
         }
@@ -153,7 +153,7 @@
             gap: 12px;
             padding: 10px 14px;
             border-radius: var(--ula-radius-sm);
-            color: var(--ula-text-on-dark);
+            color: var(--ula-text-primary);
             font-size: 13px;
             font-weight: 700;
             transition: var(--ula-transition-smooth);
@@ -163,8 +163,8 @@
         }
 
         .sidebar-link-btn:hover {
-            background: var(--ula-control-dark-fill-hover);
-            color: var(--ula-white);
+            background: var(--ula-surface-page-alt);
+            color: var(--ula-text-primary);
             transform: translateX(2px);
         }
 
@@ -173,9 +173,18 @@
         }
 
         .sidebar-link-btn.active {
-            background: var(--ula-control-dark-fill-strong);
-            color: var(--ula-white);
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+            background: linear-gradient(135deg, var(--ula-palm-900) 0%, var(--ula-palm-800) 100%) !important;
+            color: var(--ula-sand-50) !important;
+            box-shadow: 0 4px 14px rgba(20, 43, 36, 0.18);
+            font-weight: 700;
+        }
+        .sidebar-link-btn.active .nav-icon {
+            color: var(--ula-gold-400);
+        }
+        .sidebar-link-btn.active .sidebar-badge-pill {
+            background: rgba(211, 165, 83, 0.25);
+            color: var(--ula-gold-300);
+            border-color: rgba(211, 165, 83, 0.4);
         }
 
         .sidebar-link-btn .nav-icon {
@@ -183,6 +192,7 @@
             width: 22px;
             text-align: center;
             flex-shrink: 0;
+            color: var(--ula-text-secondary);
         }
 
         .app-sidebar.collapsed .nav-label-text,
@@ -194,8 +204,9 @@
 
         .sidebar-badge-pill {
             margin-inline-start: auto;
-            background: rgba(255, 255, 255, 0.15);
-            color: var(--ula-white);
+            background: var(--ula-surface-page-alt);
+            color: var(--ula-text-secondary);
+            border: 1px solid var(--ula-border-subtle);
             font-size: 11px;
             font-weight: 800;
             padding: 2px 8px;
@@ -204,7 +215,7 @@
 
         .sidebar-footer {
             padding: 16px;
-            border-top: 1px solid var(--ula-border-on-dark);
+            border-top: 1px solid var(--ula-border-subtle);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -267,50 +278,58 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            padding: 10px 18px;
-            border-radius: var(--ula-radius-sm);
-            font-size: 13px;
-            font-weight: 800;
+            padding: 10px 22px;
+            height: 44px;
+            min-height: 44px;
+            border-radius: var(--ula-radius-pill);
+            font-size: 14px;
+            font-weight: 700;
             cursor: pointer;
             border: 1px solid transparent;
             transition: var(--ula-transition-smooth);
-            font-family: inherit;
+            font-family: 'Cairo', sans-serif;
+            line-height: 1.5;
+            white-space: nowrap;
         }
 
         .btn-primary {
-            background: var(--ula-accent-default);
-            color: var(--ula-accent-fg);
-            box-shadow: 0 3px 0 var(--ula-palm-800), var(--ula-shadow-sm);
+            background: var(--ula-palm-900);
+            color: var(--ula-white);
+            border-color: var(--ula-palm-900);
+            padding: 10px 26px;
+            box-shadow: 0 3px 0 var(--ula-palm-950), var(--ula-shadow-xs);
         }
 
         .btn-primary:hover {
-            background: var(--ula-accent-hover);
+            background: var(--ula-palm-800);
+            border-color: var(--ula-palm-800);
             transform: translateY(-1.5px);
-            box-shadow: 0 4px 0 var(--ula-palm-800), var(--ula-shadow-md);
+            box-shadow: 0 4px 0 var(--ula-palm-950), var(--ula-shadow-sm);
         }
 
         .btn-primary:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 var(--ula-palm-800);
+            transform: translateY(1px);
+            box-shadow: 0 1px 0 var(--ula-palm-950);
         }
 
         .btn-secondary {
-            background: var(--ula-surface-card);
-            color: var(--ula-text-primary);
-            border-color: var(--ula-border-subtle);
-            box-shadow: 0 3px 0 var(--ula-border-subtle), var(--ula-shadow-xs);
+            background: var(--ula-sand-100);
+            color: var(--ula-palm-900);
+            border-color: var(--ula-stone-300);
+            padding: 10px 22px;
+            box-shadow: 0 3px 0 var(--ula-stone-300), var(--ula-shadow-xs);
         }
 
         .btn-secondary:hover {
-            background: var(--ula-surface-page-alt);
-            border-color: var(--ula-palm-900);
+            background: var(--ula-sand-50);
+            border-color: var(--ula-palm-700);
             transform: translateY(-1.5px);
-            box-shadow: 0 4px 0 var(--ula-border-subtle), var(--ula-shadow-xs);
+            box-shadow: 0 4px 0 var(--ula-stone-300), var(--ula-shadow-xs);
         }
 
         .btn-secondary:active {
-            transform: translateY(2px);
-            box-shadow: 0 1px 0 var(--ula-border-subtle);
+            transform: translateY(1px);
+            box-shadow: 0 1px 0 var(--ula-stone-300);
         }
 
         /* Hero Project Banner */
@@ -339,11 +358,15 @@
         .badge-pill {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            padding: 4px 10px;
+            justify-content: center;
+            gap: 6px;
+            padding: 5px 14px;
+            min-height: 28px;
             border-radius: var(--ula-radius-pill);
-            font-size: 11px;
-            font-weight: 800;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.4;
+            white-space: nowrap;
         }
 
         .badge-green { background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success); border: 1px solid rgba(79, 155, 95, 0.25); }
@@ -483,24 +506,6 @@
             border-bottom: 1px solid var(--ula-border-subtle);
             font-size: 13px;
             font-weight: 900;
-        }
-
-        .kanban-card {
-            background: var(--ula-surface-card);
-            border: 1px solid var(--ula-border-subtle);
-            border-radius: var(--ula-radius-sm);
-            padding: 14px;
-            box-shadow: var(--ula-shadow-xs);
-            margin-bottom: 12px;
-            cursor: pointer;
-            transition: var(--ula-transition-smooth);
-            position: relative;
-        }
-
-        .kanban-card:hover {
-            transform: translateY(-2px);
-            border-color: var(--ula-palm-900);
-            box-shadow: var(--ula-shadow-xs);
         }
 
         /* ── ClickUp 3D Tactile Task Context Menu ── */
@@ -744,134 +749,6 @@
         .kanban-card-drag {
             opacity: 0.95 !important;
             transform: rotate(2deg) scale(1.02);
-        }
-
-        /* ── Task Card Premium Component Styles ── */
-        .task-card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 6px;
-            margin-bottom: 8px;
-        }
-        .task-card-tags {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            flex-wrap: wrap;
-        }
-        .task-code-badge {
-            font-family: monospace;
-            font-size: 11px;
-            font-weight: 900;
-            color: var(--ula-text-muted);
-            background: var(--ula-surface-page-alt);
-            padding: 2px 6px;
-            border-radius: var(--ula-radius-xs, 6px);
-            border: 1px solid var(--ula-border-subtle);
-        }
-        .task-card-actions {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .task-dots-btn {
-            background: transparent;
-            border: 1px solid transparent;
-            color: var(--ula-text-muted);
-            cursor: pointer;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 800;
-            transition: all 0.15s ease;
-        }
-        .task-dots-btn:hover {
-            background: var(--ula-surface-page-alt);
-            border-color: var(--ula-border-subtle);
-            color: var(--ula-text-primary);
-        }
-        .task-card-title {
-            font-size: 13.5px;
-            font-weight: 800;
-            color: var(--ula-text-primary);
-            margin: 0 0 8px 0;
-            line-height: 1.45;
-            word-break: break-word;
-        }
-        .task-card-milestone {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 10.5px;
-            font-weight: 800;
-            padding: 2px 8px;
-            border-radius: 99px;
-            background: rgba(66, 119, 76, 0.15);
-            color: var(--ula-status-success);
-            border: 1px solid rgba(66, 119, 76, 0.3);
-            margin-bottom: 8px;
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .task-card-meta {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 6px;
-            font-size: 11px;
-            color: var(--ula-text-muted);
-            margin-bottom: 8px;
-        }
-        .task-due-date {
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            font-size: 10.5px;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 6px;
-            background: var(--ula-surface-page-alt);
-            border: 1px solid var(--ula-border-subtle);
-            color: var(--ula-text-secondary);
-        }
-        .task-due-date.is-overdue {
-            background: rgba(239, 68, 68, 0.12);
-            color: var(--ula-status-danger);
-            border-color: rgba(239, 68, 68, 0.3);
-        }
-        .task-card-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            padding-top: 8px;
-            border-top: 1px solid var(--ula-border-subtle);
-            margin-top: 4px;
-        }
-        .task-assignee-chip {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--ula-text-secondary);
-            min-width: 0;
-        }
-        .task-avatar-circle {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            background: var(--ula-gradient-accent);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 9px;
-            font-weight: 900;
-            flex-shrink: 0;
         }
 
         /* ── Frappe Gantt Dark Mode & High Contrast Styles ── */
@@ -1147,13 +1024,13 @@
                     {{ strtoupper(substr($user->name, 0, 2)) }}
                 </div>
                 <div class="user-info-text">
-                    <div style="font-size: 12px; font-weight: 800; color: var(--ula-white);">{{ $user->name }}</div>
-                    <div style="font-size: 10px; color: var(--ula-text-on-dark-muted);">{{ $membership->role->name ?? 'Member' }}</div>
+                    <div style="font-size: 12px; font-weight: 800; color: var(--ula-text-primary);">{{ $user->name }}</div>
+                    <div style="font-size: 10px; color: var(--ula-text-muted);">{{ $membership->role->name ?? 'Member' }}</div>
                 </div>
             </div>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button type="submit" style="background: transparent; border: none; color: var(--ula-text-on-dark-muted); cursor: pointer; font-size: 14px;" title="{{ __('Logout') }}">
+                <button type="submit" style="background: transparent; border: none; color: var(--ula-text-muted); cursor: pointer; font-size: 14px;" title="{{ __('Logout') }}">
                     <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span>
                 </button>
             </form>
@@ -1311,12 +1188,12 @@
                         <span class="kpi-title">{{ __('Budget & Cost') }}</span>
                         <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">payments</span></div>
                     </div>
-                    <div class="kpi-value">${{ number_format($kpis['labor_cost'] ?? 0, 2) }}</div>
+                    <div class="kpi-value">{{ number_format($kpis['labor_cost'] ?? 0, 2) }} <span style="font-size: 13px; font-weight: 600; color: var(--ula-text-muted);">{{ __('SAR') }}</span></div>
                     <div style="font-size: 11px; color: var(--ula-text-secondary); margin-bottom: 4px;">
-                        {{ __('Budget') }}: <strong>${{ number_format($kpis['budget'] ?? $kpis['budget_amount'] ?? 0, 2) }}</strong>
+                        {{ __('Budget') }}: <strong>{{ number_format($kpis['budget'] ?? $kpis['budget_amount'] ?? 0, 2) }} {{ __('SAR') }}</strong>
                     </div>
                     <div style="font-size: 11px; color: {{ ($kpis['budget_variance'] ?? 0) < 0 ? 'var(--ula-status-danger)' : 'var(--ula-palm-900)' }}; font-weight: 800;">
-                        {{ ($kpis['budget_variance'] ?? 0) >= 0 ? __('Remaining') : __('Over') }}: ${{ number_format(abs($kpis['budget_variance'] ?? 0), 2) }}
+                        {{ ($kpis['budget_variance'] ?? 0) >= 0 ? __('Remaining') : __('Over') }}: {{ number_format(abs($kpis['budget_variance'] ?? 0), 2) }} {{ __('SAR') }}
                     </div>
                 </div>
 
@@ -1326,9 +1203,9 @@
                         <span class="kpi-title">{{ __('Revenue & Margin') }}</span>
                         <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">trending_up</span></div>
                     </div>
-                    <div class="kpi-value" style="color: var(--ula-text-primary);">${{ number_format($kpis['billable_revenue'] ?? 0, 2) }}</div>
+                    <div class="kpi-value" style="color: var(--ula-text-primary);">{{ number_format($kpis['billable_revenue'] ?? 0, 2) }} <span style="font-size: 13px; font-weight: 600; color: var(--ula-text-muted);">{{ __('SAR') }}</span></div>
                     <div style="font-size: 11px; color: var(--ula-text-secondary); margin-bottom: 4px;">
-                        {{ __('Gross Margin') }}: <strong>${{ number_format($kpis['gross_margin'] ?? 0, 2) }}</strong>
+                        {{ __('Gross Margin') }}: <strong>{{ number_format($kpis['gross_margin'] ?? 0, 2) }} {{ __('SAR') }}</strong>
                     </div>
                     <div style="font-size: 11px; color: var(--ula-status-success); font-weight: 800;">
                         {{ $kpis['gross_margin_pct'] ?? 0 }}% {{ __('Margin Rate') }}
@@ -1493,111 +1370,7 @@
                                     @php
                                         $canEditThisTask = $user->can('update', $t);
                                     @endphp
-                                    <div class="kanban-task-card kanban-card" 
-                                         id="task-card-{{ $t->id }}"
-                                         data-task-id="{{ $t->id }}"
-                                         data-status="{{ $t->status }}"
-                                         data-assignee="{{ $t->assignee_id ?? 'unassigned' }}"
-                                         data-priority="{{ $t->priority ?? 'medium' }}"
-                                         data-milestone="{{ $t->milestone_id ?? 'none' }}"
-                                         data-due="{{ $t->due_date ? $t->due_date->format('Y-m-d') : '' }}"
-                                         data-title="{{ strtolower($t->title) }} #{{ $t->task_number }}"
-                                         onclick="openTaskInspector('{{ $t->id }}')"
-                                         oncontextmenu="event.preventDefault(); event.stopPropagation(); openTaskContextMenu(event, '{{ $t->id }}', '{{ $project->id }}', '{{ addslashes($t->title) }}')">
-                                        
-                                        <!-- Header: Code & Action Buttons -->
-                                        <div class="task-card-header">
-                                            <div class="task-card-tags">
-                                                <span class="task-code-badge">
-                                                    #{{ $t->task_number }}
-                                                </span>
-                                                @if($t->checklistItems && $t->checklistItems->count() > 0)
-                                                    <span class="badge-pill badge-green" style="font-size: 9.5px;" title="{{ __('Checklist Progress') }}">
-                                                        ⊞ {{ $t->checklistItems->where('is_completed', true)->count() }}/{{ $t->checklistItems->count() }}
-                                                    </span>
-                                                @endif
-                                                @if($t->isRecurring())
-                                                    <span class="badge-pill" style="font-size: 9px; background: rgba(214, 162, 58, 0.15); color: var(--ula-gold-400); border: 1px solid rgba(214, 162, 58, 0.3);" title="{{ __('Recurring :rule', ['rule' => $t->recurrence_rule]) }}">
-                                                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">refresh</span> {{ ucfirst($t->recurrence_rule) }}
-                                                    </span>
-                                                @endif
-                                            </div>
-
-                                            <div class="task-card-actions">
-                                                @if($t->priority === 'urgent')
-                                                    <span class="badge-pill badge-danger"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">local_fire_department</span> {{ __('Urgent') }}</span>
-                                                @elseif($t->priority === 'high')
-                                                    <span class="badge-pill badge-gold"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('High') }}</span>
-                                                @endif
-
-                                                <button type="button" onclick="event.stopPropagation(); openTaskContextMenu(event, '{{ $t->id }}', '{{ $project->id }}', '{{ addslashes($t->title) }}')" class="task-dots-btn" title="{{ __('More actions') }}">
-                                                    •••
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        <!-- Body: Title -->
-                                        <h4 class="task-card-title" style="{{ $t->status === 'done' ? 'text-decoration: line-through; opacity: 0.6;' : '' }}">
-                                            {{ $t->title }}
-                                        </h4>
-
-                                        <!-- Milestone Badge (if task belongs to a milestone) -->
-                                        @if($t->milestone)
-                                            <div class="task-card-milestone" title="{{ __('Milestone: :name', ['name' => $t->milestone->name]) }}">
-                                                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ $t->milestone->name }}
-                                            </div>
-                                        @endif
-
-                                        @if($t->approval_status === 'pending_approval')
-                                            <div style="background: rgba(214, 162, 58, 0.15); border: 1px solid rgba(214, 162, 58, 0.35); color: var(--ula-gold-400); font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                                                <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">hourglass_empty</span> {{ __('Pending PM Approval') }}</span>
-                                                @if($isProjectManager)
-                                                    <button type="button" onclick="event.stopPropagation(); quickApproveHubTask('{{ $t->id }}')" class="tactile-btn" style="background: var(--ula-status-success); color: white; border: none; padding: 2px 6px; font-size: 9px; border-radius: 4px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check</span> {{ __('Approve') }}</button>
-                                                @endif
-                                            </div>
-                                        @elseif($t->approval_status === 'rejected')
-                                            <div style="background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); color: var(--ula-status-danger); font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 8px; margin-bottom: 8px;">
-                                                <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">warning</span> {{ __('Changes Requested') }}</span>
-                                            </div>
-                                        @endif
-
-                                        <!-- Metadata: Assignee & Due Date -->
-                                        <div class="task-card-meta">
-                                            <span class="task-project-name"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> {{ $project->name }}</span>
-                                            <div style="display: flex; align-items: center; gap: 6px;">
-                                                @if($t->assignee)
-                                                    <div class="task-assignee-chip" title="{{ $t->assignee->name }}">
-                                                        <div class="task-avatar-circle">
-                                                            {{ strtoupper(substr($t->assignee->name, 0, 2)) }}
-                                                        </div>
-                                                        <span style="max-width: 65px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ explode(' ', $t->assignee->name)[0] }}</span>
-                                                    </div>
-                                                @endif
-                                                @if($t->due_date)
-                                                    <span class="task-due-date {{ $t->due_date->isPast() && $t->status !== 'done' ? 'is-overdue' : '' }}">
-                                                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ $t->due_date->format('M d') }}
-                                                    </span>
-                                                @endif
-                                            </div>
-                                        </div>
-
-                                        <!-- Footer: Direct Status Dropdown & Timer -->
-                                        <div class="task-card-footer">
-                                            <div style="display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0;">
-                                                <select onclick="event.stopPropagation()" onchange="updateHubTaskStatusDirect('{{ $t->id }}', this.value)" class="card-status-select" style="max-width: 100%;">
-                                                    <option value="backlog" {{ $t->status === 'backlog' ? 'selected' : '' }}>{{ __('Backlog') }}</option>
-                                                    <option value="ready" {{ $t->status === 'ready' ? 'selected' : '' }}>{{ __('Ready') }}</option>
-                                                    <option value="in_progress" {{ $t->status === 'in_progress' ? 'selected' : '' }}>{{ __('In Progress') }}</option>
-                                                    <option value="review" {{ $t->status === 'review' || $t->status === 'qa' ? 'selected' : '' }}>{{ __('Review') }}</option>
-                                                    <option value="done" {{ $t->status === 'done' ? 'selected' : '' }}>{{ __('Done') }}</option>
-                                                </select>
-                                            </div>
-
-                                            <button type="button" onclick="event.stopPropagation(); startHubTaskTimerDirect('{{ $project->id }}', '{{ $t->id }}', '{{ addslashes($t->title) }}', '{{ addslashes($project->name) }}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-text-primary); border: 1px solid rgba(79, 155, 95, 0.3); padding: 3px 8px; font-size: 10.5px; border-radius: var(--ula-radius-pill); font-weight: 800; white-space: nowrap; flex-shrink: 0;" title="{{ __('Start Timer') }}">
-                                                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">play_arrow</span> {{ round($t->logged_hours ?? $t->actual_hours ?? 0, 1) }}h
-                                            </button>
-                                        </div>
-                                    </div>
+                                    <x-task-card :task="$t" context="hub" :project="$project" :can-edit="$canEditThisTask" :is-manager="$isProjectManager" />
                                 @endforeach
 
                                 <div class="kanban-empty-drop-hint" style="display: {{ $colTasks->count() === 0 ? 'block' : 'none' }}; text-align: center; padding: 24px 10px; color: var(--ula-text-muted); font-size: 11px; border: 1px dashed var(--ula-border-subtle); border-radius: var(--ula-radius-sm);">
@@ -1689,49 +1462,72 @@
                                             #{{ $t->task_number }}
                                         </td>
                                         <td>
-                                            <div style="font-weight: 800; color: var(--ula-text-primary); font-size: 13px; display: flex; align-items: center; gap: 6px;">
+                                            <div style="font-weight: 700; color: var(--ula-text-primary); font-size: 13.5px; display: flex; align-items: center; gap: 6px;">
                                                 <span>{{ $t->title }}</span>
                                                 @if($t->isRecurring())
-                                                    <span class="badge-pill" style="font-size: 9px; background: rgba(214, 162, 58, 0.15); color: var(--ula-gold-400); border: 1px solid rgba(214, 162, 58, 0.3);" title="{{ __('Recurring :rule', ['rule' => $t->recurrence_rule]) }}">
-                                                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">refresh</span> {{ ucfirst($t->recurrence_rule) }}
+                                                    <span class="ula-badge ula-badge--attention ula-badge--sm" style="font-size: 10px; gap: 3px;" title="{{ __('Recurring :rule', ['rule' => $t->recurrence_rule]) }}">
+                                                        <span class="material-symbols-rounded" style="font-size: 12px;">refresh</span>
+                                                        <span>{{ ucfirst($t->recurrence_rule) }}</span>
                                                     </span>
                                                 @endif
                                                 @if($t->checklistItems && $t->checklistItems->count() > 0)
-                                                    <span class="badge-pill" style="font-size: 9px; background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success);">⊞ {{ $t->checklistItems->where('is_completed', true)->count() }}/{{ $t->checklistItems->count() }}</span>
+                                                    <span class="ula-badge ula-badge--live ula-badge--sm" style="font-size: 10px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; gap: 3px;">
+                                                        <span class="material-symbols-rounded" style="font-size: 12px;">check_box</span>
+                                                        <span>{{ $t->checklistItems->where('is_completed', true)->count() }}/{{ $t->checklistItems->count() }}</span>
+                                                    </span>
                                                 @endif
                                             </div>
                                             @if($t->description)
-                                                <div style="font-size: 11px; color: var(--ula-text-muted);">{{ Str::limit($t->description, 50) }}</div>
+                                                <div style="font-size: 11px; color: var(--ula-text-muted); margin-top: 2px;">{{ Str::limit($t->description, 50) }}</div>
                                             @endif
                                         </td>
                                         <td>
                                             @if($t->milestone)
-                                                <span class="badge-pill" style="font-size: 10px; font-weight: 700; background: rgba(79, 155, 95, 0.12); color: var(--ula-text-primary);">
-                                                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ $t->milestone->name }}
+                                                <span class="ula-badge ula-badge--default ula-badge--sm" style="gap: 3px;">
+                                                    <span class="material-symbols-rounded" style="font-size: 12px;">flag</span>
+                                                    <span>{{ $t->milestone->name }}</span>
                                                 </span>
                                             @else
                                                 <span style="font-size: 11px; color: var(--ula-text-muted);">—</span>
                                             @endif
                                         </td>
                                         <td>
-                                            <span class="badge-pill {{ $t->status === 'done' ? 'badge-green' : ($t->status === 'in_progress' ? 'badge-green' : 'badge-gold') }}">
+                                            @php
+                                                $statusBadgeClass = match($t->status) {
+                                                    'done' => 'ula-badge--live',
+                                                    'in_progress' => 'ula-badge--scheduled',
+                                                    'review', 'qa' => 'ula-badge--attention',
+                                                    default => 'ula-badge--default',
+                                                };
+                                            @endphp
+                                            <span class="ula-badge {{ $statusBadgeClass }} ula-badge--sm">
                                                 {{ ucfirst(str_replace('_', ' ', $t->status)) }}
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="badge-pill {{ $t->priority === 'urgent' ? 'badge-danger' : ($t->priority === 'high' ? 'badge-gold' : 'badge-neutral') }}">
-                                                {!! $t->priority === 'urgent' ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> ' . __('Urgent') : ($t->priority === 'high' ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> ' . __('High') : ucfirst($t->priority)) !!}
-                                            </span>
+                                            @if($t->priority === 'urgent')
+                                                <span class="ula-badge ula-badge--live ula-badge--sm" style="background: var(--ula-surface-danger-soft); color: var(--ula-status-danger); border-color: rgba(154, 88, 39, 0.3); gap: 3px;">
+                                                    <span class="material-symbols-rounded" style="font-size: 13px;">local_fire_department</span>
+                                                    <span>{{ __('Urgent') }}</span>
+                                                </span>
+                                            @elseif($t->priority === 'high')
+                                                <span class="ula-badge ula-badge--attention ula-badge--sm" style="gap: 3px;">
+                                                    <span class="material-symbols-rounded" style="font-size: 13px;">bolt</span>
+                                                    <span>{{ __('High') }}</span>
+                                                </span>
+                                            @else
+                                                <span class="ula-badge ula-badge--default ula-badge--sm">{{ ucfirst($t->priority) }}</span>
+                                            @endif
                                         </td>
                                         <td>
                                             <div style="display: flex; align-items: center; gap: 6px;">
-                                                <div style="width: 22px; height: 22px; border-radius: 50%; background: var(--ula-gradient-accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800;">
-                                                    {{ strtoupper(substr($t->assignee->name ?? 'U', 0, 1)) }}
+                                                <div class="task-avatar-circle">
+                                                    {{ strtoupper(substr($t->assignee->name ?? 'U', 0, 2)) }}
                                                 </div>
-                                                <span style="font-weight: 700;">{{ $t->assignee->name ?? __('Unassigned') }}</span>
+                                                <span style="font-weight: 700; font-size: 12px; color: var(--ula-text-primary);">{{ $t->assignee->name ?? __('Unassigned') }}</span>
                                             </div>
                                         </td>
-                                        <td style="font-family: monospace; font-weight: 800;">
+                                        <td style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-weight: 700; font-size: 12px;">
                                             <span style="color: var(--ula-text-primary);">{{ $t->actual_hours ?? 0 }}h</span>
                                             <span style="color: var(--ula-text-muted);">/ {{ $t->estimated_hours ?? 0 }}h</span>
                                         </td>
@@ -1742,23 +1538,27 @@
                                                 $checkTotal = $checks->count();
                                             @endphp
                                             @if($checkTotal > 0)
-                                                <span class="badge-pill badge-neutral" style="font-size: 10px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check_box</span> {{ $checkDone }}/{{ $checkTotal }}</span>
+                                                <span class="ula-badge ula-badge--default ula-badge--sm" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; gap: 3px;">
+                                                    <span class="material-symbols-rounded" style="font-size: 12px;">check_box</span>
+                                                    <span>{{ $checkDone }}/{{ $checkTotal }}</span>
+                                                </span>
                                             @else
                                                 <span style="font-size: 11px; color: var(--ula-text-muted);">—</span>
                                             @endif
                                         </td>
                                         <td>
-                                            <span style="font-size: 12px; font-weight: 700; color: {{ $t->due_date && $t->due_date->isPast() && $t->status !== 'done' ? 'var(--ula-status-danger)' : 'var(--ula-text-secondary)' }};">
+                                            <span style="font-size: 12px; font-weight: 700; color: {{ $t->due_date && $t->due_date->isPast() && $t->status !== 'done' ? 'var(--ula-status-danger)' : 'var(--ula-text-secondary)' }}; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                                                 {{ $t->due_date ? $t->due_date->format('M d, Y') : '—' }}
                                             </span>
                                         </td>
                                         <td onclick="event.stopPropagation();">
-                                            <div style="display: flex; gap: 6px;">
-                                                <button onclick="openTaskInspector('{{ $t->id }}')" class="tactile-btn btn-secondary" style="padding: 4px 10px; font-size: 11px;">
-                                                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span> {{ __('Inspect') }}
+                                            <div style="display: flex; gap: 6px; align-items: center;">
+                                                <button onclick="openTaskInspector('{{ $t->id }}')" class="ula-btn ula-btn--secondary ula-btn--sm" style="height: 30px; min-height: 30px; padding: 0 10px; font-size: 11px;">
+                                                    <span class="material-symbols-rounded" style="font-size: 14px;">visibility</span>
+                                                    <span>{{ __('Inspect') }}</span>
                                                 </button>
-                                                <button onclick="openTaskContextMenu(event, '{{ $t->id }}', '{{ $project->id }}', '{{ addslashes($t->title) }}')" class="tactile-btn btn-secondary" style="padding: 4px 8px; font-size: 11px;" title="{{ __('More Actions') }}">
-                                                    •••
+                                                <button onclick="openTaskContextMenu(event, '{{ $t->id }}', '{{ $project->id }}', '{{ addslashes($t->title) }}')" class="ula-icon-btn ula-icon-btn--ghost ula-icon-btn--sm" title="{{ __('More Actions') }}">
+                                                    <span class="material-symbols-rounded" style="font-size: 16px;">more_horiz</span>
                                                 </button>
                                             </div>
                                         </td>
@@ -2003,7 +1803,7 @@
                                         {{ number_format($memberHours, 1) }}h
                                     </td>
                                     <td style="font-family: monospace; font-weight: 700; color: var(--ula-text-secondary);">
-                                        ${{ number_format($pm->hourly_rate ?? 50, 2) }}/h
+                                        {{ number_format($pm->hourly_rate ?? 50, 2) }} {{ __('SAR') }}/h
                                     </td>
                                 </tr>
                                 @empty
@@ -2991,20 +2791,26 @@
 
             menu.style.display = 'flex';
 
-            let x = e.clientX || (e.target ? e.target.getBoundingClientRect().left : 200);
-            let y = e.clientY || (e.target ? e.target.getBoundingClientRect().bottom : 200);
+            let x = e.clientX || 200;
+            let y = e.clientY || 200;
+
+            if (e.currentTarget && typeof e.currentTarget.getBoundingClientRect === 'function') {
+                const rect = e.currentTarget.getBoundingClientRect();
+                x = rect.left;
+                y = rect.bottom + 6;
+            }
 
             const menuWidth = 250;
-            const menuHeight = 330;
+            const menuHeight = 340;
 
-            if (x + menuWidth > window.innerWidth - 10) {
-                x = window.innerWidth - menuWidth - 14;
+            if (x + menuWidth > window.innerWidth - 12) {
+                x = window.innerWidth - menuWidth - 12;
             }
-            if (y + menuHeight > window.innerHeight - 10) {
-                y = window.innerHeight - menuHeight - 14;
+            if (y + menuHeight > window.innerHeight - 12) {
+                y = window.innerHeight - menuHeight - 12;
             }
-            if (x < 10) x = 10;
-            if (y < 10) y = 10;
+            if (x < 12) x = 12;
+            if (y < 12) y = 12;
 
             menu.style.left = x + 'px';
             menu.style.top = y + 'px';
@@ -3039,7 +2845,7 @@
 
         function ctxActionCopyLink() {
             closeTaskContextMenu();
-            const link = `${window.location.origin}/projects/hub/${activeCtxProjectId}?task=${activeCtxTaskId}`;
+            const link = `${window.location.origin}/projects/${activeCtxProjectId}?task=${activeCtxTaskId}`;
             executeClipboardCopy(link);
             showHubToast('📋 ' + "{{ __('Task link copied to clipboard!') }}");
         }
@@ -3052,7 +2858,7 @@
 
         function ctxActionOpenNewTab() {
             closeTaskContextMenu();
-            window.open(`/projects/hub/${activeCtxProjectId}?task=${activeCtxTaskId}`, '_blank');
+            window.open(`/projects/${activeCtxProjectId}?task=${activeCtxTaskId}`, '_blank');
         }
 
         function ctxActionInspect() {

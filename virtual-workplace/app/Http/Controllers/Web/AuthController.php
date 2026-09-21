@@ -20,7 +20,8 @@ class AuthController extends Controller
     public function showLogin()
     {
         if (Auth::check()) {
-            if (Auth::user()->isSuperAdmin()) {
+            $user = Auth::user();
+            if ($user->isSuperAdmin()) {
                 return redirect()->route('superadmin.dashboard');
             }
 
@@ -61,7 +62,8 @@ class AuthController extends Controller
     public function showRegister()
     {
         if (Auth::check()) {
-            if (Auth::user()->isSuperAdmin()) {
+            $user = Auth::user();
+            if ($user->isSuperAdmin()) {
                 return redirect()->route('superadmin.dashboard');
             }
 

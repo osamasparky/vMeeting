@@ -135,13 +135,40 @@ class Organization extends Model
         return $this->members()->where('status', 'active')->count();
     }
 
+    public function getEffectiveSeatLimit(): int
+    {
+        if (! $this->plan) {
+            return 5;
+        }
+
+        if ($this->plan->isPerSeat()) {
+            $subscription = $this->subscription;
+            if ($subscription && $subscription->isActive() && $subscription->seats > 0) {
+                return $subscription->seats;
+            }
+
+            return $this->plan->getEffectiveMinSeats();
+        }
+
+        return (int) $this->plan->seat_limit;
+    }
+
     public function hasReachedSeatLimit(): bool
     {
-        if (! $this->plan || $this->plan->seat_limit === 0) {
+        if (! $this->plan) {
+            return $this->activeMembersCount() >= 5;
+        }
+
+        if ($this->plan->isUnlimitedSeats()) {
             return false; // Unlimited
         }
 
-        return $this->activeMembersCount() >= $this->plan->seat_limit;
+        $limit = $this->getEffectiveSeatLimit();
+        if ($limit === 0) {
+            return false;
+        }
+
+        return $this->activeMembersCount() >= $limit;
     }
 
     public function offices(): HasMany
@@ -205,27 +232,33 @@ class Organization extends Model
         $totalOffices = $this->offices()->count();
         $activeGuests = $this->activeGuestInvitationsCount();
 
-        $seatLimit = $plan ? $plan->seat_limit : 5;
+        $seatLimit = $this->getEffectiveSeatLimit();
         $roomLimit = $plan ? $plan->room_limit : 3;
         $officeLimit = $plan ? ($plan->max_offices ?? 1) : 1;
         $guestLimit = $plan ? ($plan->max_guest_invitations ?? 5) : 5;
         $storageLimit = $plan ? $plan->storage_limit_gb : 1;
 
-        $isSeatsExceeded = ($seatLimit > 0 && $activeMembers > $seatLimit);
+        $isUnlimitedSeats = $plan ? $plan->isUnlimitedSeats() : false;
+        $isSeatsExceeded = (! $isUnlimitedSeats && $seatLimit > 0 && $activeMembers > $seatLimit);
         $isRoomsExceeded = ($roomLimit > 0 && $totalRooms > $roomLimit);
         $isOfficesExceeded = ($officeLimit > 0 && $totalOffices > $officeLimit);
         $isGuestsExceeded = ($guestLimit > 0 && $activeGuests > $guestLimit);
 
+        $availableSeats = $isUnlimitedSeats ? 9999 : max(0, $seatLimit - $activeMembers);
+
         return [
             'plan_name' => $plan ? $plan->name : 'Free',
             'plan_slug' => $plan ? $plan->slug : 'free',
+            'is_per_seat' => $plan ? $plan->isPerSeat() : false,
             'is_active' => $this->isActive(),
             'members' => [
                 'used' => $activeMembers,
                 'limit' => $seatLimit,
-                'is_unlimited' => $seatLimit === 0,
+                'purchased' => $seatLimit,
+                'available' => $availableSeats,
+                'is_unlimited' => $isUnlimitedSeats,
                 'is_exceeded' => $isSeatsExceeded,
-                'percentage' => $seatLimit > 0 ? min(100, round(($activeMembers / $seatLimit) * 100)) : 0,
+                'percentage' => (! $isUnlimitedSeats && $seatLimit > 0) ? min(100, round(($activeMembers / $seatLimit) * 100)) : 0,
             ],
             'rooms' => [
                 'used' => $totalRooms,

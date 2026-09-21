@@ -409,6 +409,8 @@ class AttendanceService
             ];
         });
 
+        $totalAttendanceSeconds = $totalOfficeSeconds + $totalTaskSeconds;
+
         return [
             'is_all_members' => $isAll,
             'date' => $targetDate->format('Y-m-d'),
@@ -419,6 +421,9 @@ class AttendanceService
             'total_task_seconds' => $totalTaskSeconds,
             'total_task_hours' => round($totalTaskSeconds / 3600, 2),
             'total_task_formatted' => sprintf('%02d:%02d:%02d', floor($totalTaskSeconds / 3600), floor(($totalTaskSeconds % 3600) / 60), $totalTaskSeconds % 60),
+            'total_attendance_seconds' => $totalAttendanceSeconds,
+            'total_attendance_hours' => round($totalAttendanceSeconds / 3600, 2),
+            'total_attendance_formatted' => sprintf('%02d:%02d:%02d', floor($totalAttendanceSeconds / 3600), floor(($totalAttendanceSeconds % 3600) / 60), $totalAttendanceSeconds % 60),
             'idle_seconds' => $idlePausedSeconds,
             'is_in_office' => (bool) $activeOfficeSession,
             'has_running_task' => (bool) $activeTaskTimer,
@@ -607,6 +612,8 @@ class AttendanceService
             $currentRoom = $activeSession?->room?->name ?? ($isOnline ? 'Open Space' : null);
             $currentOffice = $activeSession?->room?->floor?->name ?? ($activeSession?->room?->map?->floor?->name ?? ($isOnline ? 'Main Office' : 'Offline'));
 
+            $totalAttSec = $totalOfficeSec + $totalTaskSec;
+
             return [
                 'user_id' => $u->id,
                 'member_id' => $m->id,
@@ -623,6 +630,9 @@ class AttendanceService
                 'total_office_formatted' => sprintf('%02d:%02d:%02d', floor($totalOfficeSec / 3600), floor(($totalOfficeSec % 3600) / 60), $totalOfficeSec % 60),
                 'total_task_seconds' => $totalTaskSec,
                 'total_task_formatted' => sprintf('%02d:%02d:%02d', floor($totalTaskSec / 3600), floor(($totalTaskSec % 3600) / 60), $totalTaskSec % 60),
+                'total_attendance_seconds' => $totalAttSec,
+                'total_attendance_hours' => round($totalAttSec / 3600, 2),
+                'total_attendance_formatted' => sprintf('%02d:%02d:%02d', floor($totalAttSec / 3600), floor(($totalAttSec % 3600) / 60), $totalAttSec % 60),
                 'active_task' => $activeTimer ? [
                     'task_title' => $activeTimer->task?->title ?? 'Work Session',
                     'project_name' => $activeTimer->project?->name ?? 'General',

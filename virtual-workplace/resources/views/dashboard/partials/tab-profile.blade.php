@@ -1,11 +1,5 @@
 <div id="tab-profile" class="tab-view">
-    <div class="page-header" style="margin-bottom: var(--ula-space-7, 24px);">
-        <h1 class="page-title" style="font-size: var(--ula-size-h3, 24px); font-weight: 800; color: var(--ula-text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
-            <span class="material-symbols-rounded" style="font-size: 28px; color: var(--ula-palm-700, var(--ula-palm-700));">account_circle</span>
-            <span>{{ __('User Profile & Account') }}</span>
-        </h1>
-        <p class="page-subtitle" style="font-size: var(--ula-size-sm, 14px); color: var(--ula-text-secondary);">{{ __('Manage your digital identity, avatar, contact details, skills, social links, and security.') }}</p>
-    </div>
+
 
     <!-- Profile Hero Card (UlaSpace 3D Tactile) -->
     <div class="card" style="margin-bottom: var(--ula-space-7, 24px); border-radius: var(--ula-radius-xl, 20px); padding: 24px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-sm); background: var(--ula-surface-card); position: relative; overflow: hidden;">
@@ -70,10 +64,9 @@
                     </label>
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <input type="file" id="profileAvatarInput" name="avatar" accept="image/*" onchange="previewUserAvatar(this)" style="display: none;">
-                        <button type="button" onclick="document.getElementById('profileAvatarInput').click()" class="tactile-btn btn-secondary" style="padding: 8px 16px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
-                            <span class="material-symbols-rounded" style="font-size: 16px;">upload_file</span>
-                            <span>{{ __('Choose New Photo') }}</span>
-                        </button>
+                        <x-btn variant="secondary" size="sm" type="button" onclick="document.getElementById('profileAvatarInput').click()" icon="upload_file">
+                            {{ __('Choose New Photo') }}
+                        </x-btn>
                         <span id="profileAvatarName" style="font-size: 12px; color: var(--ula-text-muted);">{{ __('JPEG, PNG, WebP up to 4MB') }}</span>
                     </div>
                 </div>
@@ -154,10 +147,9 @@
                 </div>
 
                 <div style="padding-top: 12px; border-top: 1px solid var(--ula-border-subtle);">
-                    <button type="submit" class="nx-btn nx-btn--primary" style="padding: 10px 20px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded" style="font-size: 18px;">save</span>
-                        <span>{{ __('Save Profile Details') }}</span>
-                    </button>
+                    <x-btn variant="primary" size="md" type="submit" icon="save">
+                        {{ __('Save Profile Details') }}
+                    </x-btn>
                 </div>
             </form>
         </div>
@@ -240,10 +232,9 @@
                     </div>
 
                     <div style="padding-top: 12px; border-top: 1px solid var(--ula-border-subtle);">
-                        <button type="submit" class="nx-btn nx-btn--primary" style="padding: 10px 20px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;">
-                            <span class="material-symbols-rounded" style="font-size: 18px;">save</span>
-                            <span>{{ __('Save Hobbies, Skills & Social') }}</span>
-                        </button>
+                        <x-btn variant="primary" size="md" type="submit" icon="save">
+                            {{ __('Save Hobbies, Skills & Social') }}
+                        </x-btn>
                     </div>
                 </form>
             </div>
@@ -284,10 +275,9 @@
                     </div>
 
                     <div style="padding-top: 12px; border-top: 1px solid var(--ula-border-subtle);">
-                        <button type="submit" class="nx-btn nx-btn--primary" style="padding: 10px 20px; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;">
-                            <span class="material-symbols-rounded" style="font-size: 18px;">lock_reset</span>
-                            <span>{{ __('Update Password') }}</span>
-                        </button>
+                        <x-btn variant="primary" size="md" type="submit" icon="lock_reset">
+                            {{ __('Update Password') }}
+                        </x-btn>
                     </div>
                 </form>
             </div>

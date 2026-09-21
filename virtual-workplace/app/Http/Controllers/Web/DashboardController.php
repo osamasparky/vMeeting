@@ -39,7 +39,23 @@ class DashboardController extends Controller
             ->first();
 
         if (! $membership) {
-            return redirect()->route('login')->with('error', 'No active organization found.');
+            if ($user->isSuperAdmin()) {
+                return redirect()->route('superadmin.dashboard');
+            }
+
+            $firstOrg = Organization::first();
+            if ($firstOrg) {
+                $defaultRole = \App\Domains\Administration\Models\Role::where('organization_id', $firstOrg->id)->where('slug', 'company_admin')->first() 
+                    ?? \App\Domains\Administration\Models\Role::first();
+                $membership = OrganizationMember::firstOrCreate(
+                    ['user_id' => $user->id, 'organization_id' => $firstOrg->id],
+                    ['role_id' => $defaultRole ? $defaultRole->id : 2, 'status' => 'active']
+                );
+                $membership->load(['organization.plan', 'organization.subscription', 'role']);
+            } else {
+                Auth::logout();
+                return redirect()->route('login')->with('error', 'No active organization found.');
+            }
         }
 
         return view('dashboard', $buildDashboard->execute($user, $membership));

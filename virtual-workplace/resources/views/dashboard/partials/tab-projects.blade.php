@@ -1,20 +1,11 @@
 <div id="tab-projects" class="tab-view">
-    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
-        <div>
-            <h1 class="page-title" style="font-size: 22px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
-                <span class="material-symbols-rounded" style="font-size: 24px; color: var(--ula-highlight-default);">folder</span>
-                <span>{{ __('Projects Portfolio') }}</span>
-            </h1>
-            <p class="page-subtitle" style="font-size: 13px; color: var(--ula-text-secondary);">{{ __('Manage company initiatives, milestones, tasks, and budgets.') }}</p>
-        </div>
-        @if($membership->hasPermission('projects.manage') || $membership->role?->slug === 'company_admin')
-        <div style="display: flex; gap: 10px;">
-            <x-btn variant="primary" size="md" onclick="openNewProjectModal()" icon="add">
-                {{ __('New Project') }}
-            </x-btn>
-        </div>
-        @endif
+    @if($membership->hasPermission('projects.manage') || $membership->role?->slug === 'company_admin')
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+        <x-btn variant="primary" size="md" onclick="openNewProjectModal()" icon="add">
+            {{ __('New Project') }}
+        </x-btn>
     </div>
+    @endif
 
     <!-- Project KPI Metrics -->
     <div class="kpi-grid" style="margin-bottom: 24px;">
@@ -132,6 +123,10 @@
                                     <x-badge variant="attention" icon="local_fire_department">{{ __('Urgent') }}</x-badge>
                                 @elseif($p->priority === 'high')
                                     <x-badge variant="scheduled" icon="bolt">{{ __('High') }}</x-badge>
+                                @elseif($p->priority === 'medium')
+                                    <x-badge variant="default">{{ __('Medium') }}</x-badge>
+                                @elseif($p->priority === 'low')
+                                    <x-badge variant="cancelled">{{ __('Low') }}</x-badge>
                                 @else
                                     <x-badge variant="default">{{ ucfirst($p->priority) }}</x-badge>
                                 @endif

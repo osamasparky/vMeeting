@@ -1,16 +1,8 @@
 <div id="tab-departments" class="tab-view">
-    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-7); flex-wrap: wrap; gap: var(--ula-space-5);">
-        <div>
-            <h1 class="page-title" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); margin-bottom: var(--ula-space-2); display: flex; align-items: center; gap: var(--ula-space-3);">
-                <span class="material-symbols-rounded" style="font-size: 28px; color: var(--ula-accent-default);">apartment</span>
-                <span>{{ __('Departments & Teams') }}</span>
-            </h1>
-            <p class="page-subtitle" style="font-size: var(--ula-size-sm); color: var(--ula-text-secondary);">{{ __('Organize your organization staff, distribute members across departments, and manage sub-teams.') }}</p>
-        </div>
-        <button onclick="openDepartmentModal()" class="tactile-btn btn-primary" style="padding: 10px 18px; font-size: var(--ula-size-sm); display: inline-flex; align-items: center; gap: var(--ula-space-3);">
-            <span class="material-symbols-rounded" style="font-size: 18px;">add</span>
-            <span>{{ __('New Department') }}</span>
-        </button>
+    <div style="display: flex; justify-content: flex-end; margin-bottom: var(--ula-space-6);">
+        <x-btn variant="primary" size="md" onclick="openDepartmentModal()" icon="add">
+            {{ __('New Department') }}
+        </x-btn>
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: var(--ula-space-6);">
@@ -34,16 +26,12 @@
                                 <span style="font-size: var(--ula-size-xs); color: var(--ula-text-muted); font-weight: var(--ula-weight-semibold); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $dept->teams->count() }} {{ __('Teams') }} • {{ $deptMembers->count() }} {{ __('Members') }}</span>
                             </div>
                         </div>
-                        <div style="display: flex; align-items: center; gap: var(--ula-space-3);">
-                            <button onclick="editDepartment('{{ $dept->id }}', '{{ addslashes($dept->name) }}')" class="tactile-btn btn-secondary" style="padding: 6px 10px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center;" title="{{ __('Edit Department') }}">
-                                <span class="material-symbols-rounded" style="font-size: 16px;">edit</span>
-                            </button>
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <x-btn variant="secondary" size="sm" :iconOnly="true" icon="edit" onclick="editDepartment('{{ $dept->id }}', '{{ addslashes($dept->name) }}')" title="{{ __('Edit Department') }}" />
                             <form action="{{ route('departments.delete', $dept->id) }}" method="POST" onsubmit="return confirm('{{ __('Are you sure you want to delete this department?') }}');" style="display: inline; margin: 0;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="tactile-btn" style="background: rgba(217, 107, 95, 0.12); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.25); padding: 6px 10px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--ula-radius-md);" title="{{ __('Delete Department') }}">
-                                <span class="material-symbols-rounded" style="font-size: 16px;">delete</span>
-                                </button>
+                                <x-btn variant="danger" size="sm" :iconOnly="true" icon="delete" type="submit" title="{{ __('Delete Department') }}" />
                             </form>
                         </div>
                     </div>

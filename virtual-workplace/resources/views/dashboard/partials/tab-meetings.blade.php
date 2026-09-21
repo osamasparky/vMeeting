@@ -1,17 +1,8 @@
 <div id="tab-meetings" class="tab-view">
-    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
-        <div>
-            <h1 class="page-title" style="font-size: 22px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
-                <span class="material-symbols-rounded" style="font-size: 24px; color: var(--ula-highlight-default);">calendar_month</span>
-                <span>{{ __('Scheduled Meetings & Sessions') }}</span>
-            </h1>
-            <p class="page-subtitle" style="font-size: 13px; color: var(--ula-text-secondary);">{{ __('Schedule general or project meetings, manage attendee invitations, and broadcast sound alerts.') }}</p>
-        </div>
-        <div style="display: flex; gap: 10px; align-items: center;">
-            <x-btn variant="primary" size="md" onclick="openScheduleMeetingModal('general')" icon="add">
-                {{ __('Schedule General Meeting') }}
-            </x-btn>
-        </div>
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+        <x-btn variant="primary" size="md" onclick="openScheduleMeetingModal('general')" icon="add">
+            {{ __('Schedule General Meeting') }}
+        </x-btn>
     </div>
 
     <!-- KPI Metric Cards for Meetings -->
@@ -174,11 +165,9 @@
                                         {{ __('Join') }}
                                     </x-btn>
                                     @if($m->status === 'scheduled')
-                                        <form method="POST" action="{{ route('meetings.cancel', $m->id) }}" onsubmit="return confirm('{{ __('Are you sure you want to cancel this meeting?') }}');" style="display: inline;">
+                                        <form method="POST" action="{{ route('meetings.cancel', $m->id) }}" onsubmit="return confirm('{{ __('Are you sure you want to cancel this meeting?') }}');" style="display: inline; margin: 0;">
                                             @csrf
-                                            <button type="submit" class="nx-btn nx-btn-danger nx-btn-sm" style="padding: 6px 8px;" title="{{ __('Cancel Meeting') }}">
-                                                <span class="material-symbols-rounded" style="font-size: 14px;">close</span>
-                                            </button>
+                                            <x-btn variant="danger" size="sm" :iconOnly="true" icon="close" type="submit" title="{{ __('Cancel Meeting') }}" />
                                         </form>
                                     @endif
                                 </div>

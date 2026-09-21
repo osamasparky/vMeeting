@@ -18,12 +18,18 @@ class Plan extends Model
         'storage_limit_gb',
         'features',
         'price',
+        'is_per_seat',
+        'min_seats',
+        'max_seats',
         'is_active',
     ];
 
     protected $casts = [
         'features' => 'array',
         'price' => 'decimal:2',
+        'is_per_seat' => 'boolean',
+        'min_seats' => 'integer',
+        'max_seats' => 'integer',
         'seat_limit' => 'integer',
         'max_offices' => 'integer',
         'room_limit' => 'integer',
@@ -38,9 +44,19 @@ class Plan extends Model
         return $this->hasMany(Organization::class);
     }
 
+    public function isPerSeat(): bool
+    {
+        return (bool) ($this->is_per_seat ?? false);
+    }
+
+    public function getEffectiveMinSeats(): int
+    {
+        return max(1, (int) ($this->min_seats ?? 2));
+    }
+
     public function isUnlimitedSeats(): bool
     {
-        return $this->seat_limit === 0;
+        return ! $this->isPerSeat() && $this->seat_limit === 0;
     }
 
     public function isUnlimitedOffices(): bool

@@ -92,23 +92,31 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    height: 42px;
+    height: 44px;
+    min-height: 44px;
     padding: 0 22px;
-    border-radius: 9999px;
-    background: var(--ula-surface-dark);
-    color: #FFFFFF !important;
-    font-size: 13px;
-    font-weight: 600;
+    border-radius: 12px;
+    background: var(--ula-palm-900, #1b3524);
+    color: var(--ula-white, #FFFFFF) !important;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Cairo', sans-serif;
     text-decoration: none;
-    border: none;
+    border: 1px solid var(--ula-palm-900, #1b3524);
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(20, 43, 36, 0.20);
-    transition: all 0.2s ease;
+    box-shadow: var(--ula-shadow-xs, 0 1px 2px rgba(0,0,0,0.05));
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .nx-btn-primary:hover {
-    background: var(--ula-accent-hover);
+    background: var(--ula-palm-800, #245c3a);
+    border-color: var(--ula-palm-800, #245c3a);
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(20, 43, 36, 0.28);
+    box-shadow: var(--ula-shadow-sm, 0 4px 6px -1px rgba(0,0,0,0.1));
+}
+.nx-btn-primary:active {
+    background: var(--ula-palm-950, #0f2015);
+    border-color: var(--ula-palm-950, #0f2015);
+    transform: translateY(0);
 }
 
 .nx-btn-secondary {
@@ -116,21 +124,30 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    height: 42px;
-    padding: 0 20px;
-    border-radius: 9999px;
-    background: var(--ula-surface-warm);
-    color: var(--ula-text-primary) !important;
-    font-size: 13px;
-    font-weight: 600;
+    height: 44px;
+    min-height: 44px;
+    padding: 0 22px;
+    border-radius: 12px;
+    background: var(--ula-sand-100, #f0eae1);
+    color: var(--ula-palm-900, #1b3524) !important;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Cairo', sans-serif;
     text-decoration: none;
-    border: 1px solid var(--ula-border-subtle);
+    border: 1px solid var(--ula-stone-300, #d5ded0);
     cursor: pointer;
-    transition: all 0.2s ease;
+    box-shadow: var(--ula-shadow-xs, 0 1px 2px rgba(0,0,0,0.05));
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .nx-btn-secondary:hover {
-    background: #E8DECC;
+    background: var(--ula-sand-50, #f9f7f4);
+    border-color: var(--ula-palm-700, #2d6a45);
     transform: translateY(-1px);
+}
+.nx-btn-secondary:active {
+    background: var(--ula-sand-200, #e5dccf);
+    border-color: var(--ula-palm-900, #1b3524);
+    transform: translateY(0);
 }
 
 .nx-btn-outline {
@@ -138,21 +155,26 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    height: 42px;
-    padding: 0 18px;
-    border-radius: 9999px;
+    height: 44px;
+    min-height: 44px;
+    padding: 0 20px;
+    border-radius: 12px;
     background: transparent;
-    color: var(--ula-text-primary) !important;
-    font-size: 13px;
-    font-weight: 500;
+    color: var(--ula-palm-900, #1b3524) !important;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Cairo', sans-serif;
     text-decoration: none;
-    border: 1px solid var(--ula-border-subtle);
+    border: 1px solid var(--ula-stone-300, #d5ded0);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .nx-btn-outline:hover {
-    border-color: var(--ula-text-primary);
-    background: var(--ula-surface-page-alt);
+    border-color: var(--ula-palm-700, #2d6a45);
+    background: var(--ula-sand-50, #f9f7f4);
+}
+.nx-btn-outline:active {
+    background: var(--ula-sand-200, #e5dccf);
 }
 
 .nx-hero-date-card {

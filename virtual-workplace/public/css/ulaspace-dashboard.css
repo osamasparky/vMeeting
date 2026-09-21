@@ -9,7 +9,7 @@
 body {
     background-color: var(--ula-surface-page) !important;
     color: var(--ula-text-primary);
-    font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', -apple-system, sans-serif;
+    font-family: var(--ula-font-family), 'Cairo', 'IBM Plex Sans Arabic', 'IBM Plex Sans', -apple-system, sans-serif;
     margin: 0;
     padding: 0;
 }
@@ -92,23 +92,31 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    height: 42px;
+    height: 44px;
+    min-height: 44px;
     padding: 0 22px;
-    border-radius: 9999px;
-    background: var(--ula-surface-dark);
-    color: #FFFFFF !important;
-    font-size: 13px;
-    font-weight: 600;
+    border-radius: 12px;
+    background: var(--ula-palm-900, #1b3524);
+    color: var(--ula-white, #FFFFFF) !important;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Cairo', sans-serif;
     text-decoration: none;
-    border: none;
+    border: 1px solid var(--ula-palm-900, #1b3524);
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(20, 43, 36, 0.20);
-    transition: all 0.2s ease;
+    box-shadow: var(--ula-shadow-xs, 0 1px 2px rgba(0,0,0,0.05));
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .nx-btn-primary:hover {
-    background: var(--ula-accent-hover);
+    background: var(--ula-palm-800, #245c3a);
+    border-color: var(--ula-palm-800, #245c3a);
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(20, 43, 36, 0.28);
+    box-shadow: var(--ula-shadow-sm, 0 4px 6px -1px rgba(0,0,0,0.1));
+}
+.nx-btn-primary:active {
+    background: var(--ula-palm-950, #0f2015);
+    border-color: var(--ula-palm-950, #0f2015);
+    transform: translateY(0);
 }
 
 .nx-btn-secondary {
@@ -116,21 +124,30 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    height: 42px;
-    padding: 0 20px;
-    border-radius: 9999px;
-    background: var(--ula-surface-warm);
-    color: var(--ula-text-primary) !important;
-    font-size: 13px;
-    font-weight: 600;
+    height: 44px;
+    min-height: 44px;
+    padding: 0 22px;
+    border-radius: 12px;
+    background: var(--ula-sand-100, #f0eae1);
+    color: var(--ula-palm-900, #1b3524) !important;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Cairo', sans-serif;
     text-decoration: none;
-    border: 1px solid var(--ula-border-subtle);
+    border: 1px solid var(--ula-stone-300, #d5ded0);
     cursor: pointer;
-    transition: all 0.2s ease;
+    box-shadow: var(--ula-shadow-xs, 0 1px 2px rgba(0,0,0,0.05));
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .nx-btn-secondary:hover {
-    background: #E8DECC;
+    background: var(--ula-sand-50, #f9f7f4);
+    border-color: var(--ula-palm-700, #2d6a45);
     transform: translateY(-1px);
+}
+.nx-btn-secondary:active {
+    background: var(--ula-sand-200, #e5dccf);
+    border-color: var(--ula-palm-900, #1b3524);
+    transform: translateY(0);
 }
 
 .nx-btn-outline {
@@ -138,17 +155,13 @@ body {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    height: 42px;
-    padding: 0 18px;
-    border-radius: 9999px;
+    height: 44px;
+    min-height: 44px;
+    padding: 0 20px;
+    border-radius: 12px;
     background: transparent;
-    color: var(--ula-text-primary) !important;
-    font-size: 13px;
-    font-weight: 500;
-    text-decoration: none;
-    border: 1px solid var(--ula-border-subtle);
-    cursor: pointer;
     transition: all 0.2s ease;
+    white-space: nowrap;
 }
 .nx-btn-outline:hover {
     border-color: var(--ula-text-primary);
@@ -532,3 +545,200 @@ body {
     align-items: center;
     gap: 4px;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   ULASPACE TOP APP BAR & SEARCH SYSTEM (Figma 9:16 Spec)
+   ═══════════════════════════════════════════════════════════════ */
+.ulaspace-appbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 40;
+}
+
+.appbar-title-group {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 220px;
+}
+
+.appbar-page-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ula-text-primary);
+    line-height: 1.25;
+    margin: 0;
+    font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif !important;
+    letter-spacing: -0.2px;
+}
+
+.appbar-page-subtitle {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ula-text-muted);
+    margin: 2px 0 0 0;
+    line-height: 1.4;
+    font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif !important;
+}
+
+/* ── Figma 9:16 Tactile Pill Search Bar ── */
+.appbar-search-container {
+    flex: 1;
+    max-width: 440px;
+    min-width: 260px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.appbar-search-input {
+    width: 100%;
+    height: 42px;
+    background: var(--ula-surface-card);
+    border: 1.5px solid var(--ula-border-subtle);
+    border-radius: var(--ula-radius-pill);
+    padding-inline-start: 42px;
+    padding-inline-end: 64px;
+    font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif !important;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ula-text-primary);
+    box-shadow: 0 2px 8px rgba(20, 43, 36, 0.04);
+    outline: none;
+    transition: all var(--ula-duration-fast) var(--ula-ease-out);
+}
+
+.appbar-search-input::placeholder {
+    color: var(--ula-text-muted);
+    font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif !important;
+    font-size: 13px;
+    font-weight: 400;
+    opacity: 0.85;
+}
+
+.appbar-search-input:focus {
+    background: var(--ula-surface-raised);
+    border-color: var(--ula-palm-600);
+    box-shadow: 0 0 0 3px rgba(42, 84, 57, 0.15), 0 4px 14px rgba(20, 43, 36, 0.08);
+}
+
+.appbar-search-icon {
+    position: absolute;
+    inset-inline-start: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+    color: var(--ula-text-muted);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+
+.appbar-search-input:focus ~ .appbar-search-icon,
+.appbar-search-container:focus-within .appbar-search-icon {
+    color: var(--ula-palm-600);
+}
+
+.appbar-search-kbd {
+    position: absolute;
+    inset-inline-end: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--ula-surface-page-alt);
+    border: 1px solid var(--ula-border-subtle);
+    border-radius: 6px;
+    padding: 2px 7px;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--ula-text-muted);
+    font-family: var(--ula-font-mono);
+    letter-spacing: 0.5px;
+    pointer-events: none;
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* ── Header Actions Group ── */
+.appbar-actions-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.appbar-capsule-btn {
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 14px;
+    border-radius: var(--ula-radius-pill);
+    background: var(--ula-surface-card);
+    border: 1px solid var(--ula-border-subtle);
+    color: var(--ula-text-primary);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: var(--ula-shadow-xs);
+    transition: all var(--ula-duration-fast) var(--ula-ease-out);
+    font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif !important;
+}
+
+.appbar-capsule-btn:hover {
+    border-color: var(--ula-palm-700);
+    background: var(--ula-surface-raised);
+    transform: translateY(-1px);
+    box-shadow: var(--ula-shadow-sm);
+}
+
+.appbar-user-capsule {
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding-inline-start: 4px;
+    padding-inline-end: 12px;
+    border-radius: var(--ula-radius-pill);
+    background: var(--ula-surface-card);
+    border: 1px solid var(--ula-border-subtle);
+    box-shadow: var(--ula-shadow-xs);
+    cursor: pointer;
+    transition: all var(--ula-duration-fast) var(--ula-ease-out);
+}
+
+.appbar-user-capsule:hover {
+    border-color: var(--ula-palm-700);
+    transform: translateY(-1px);
+    box-shadow: var(--ula-shadow-sm);
+}
+
+.appbar-user-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--ula-palm-900);
+    color: var(--ula-sand-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    font-family: var(--ula-font-mono);
+    flex-shrink: 0;
+}
+
+.appbar-user-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ula-text-primary);
+    font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif !important;
+}
+

@@ -1,0 +1,53 @@
+@import './ulaspace-tokens.css';
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+/* The former blue/violet HSL palette (--brand-*, --bg-base, --text-*, --radius-*,
+   --shadow-*, --ease-*) has been retired. Every reference was rewritten to the
+   UlaSpace tokens in ulaspace-tokens.css, which are generated from the Figma file. */
+
+/* Tailwind theme bridge — utility classes resolve to UlaSpace tokens */
+@theme {
+  --color-page: var(--ula-surface-page);
+  --color-card: var(--ula-surface-card);
+  --color-raised: var(--ula-surface-raised);
+  --color-ink: var(--ula-text-primary);
+  --color-body: var(--ula-text-body);
+  --color-muted: var(--ula-text-muted);
+  --color-accent: var(--ula-accent-default);
+  --color-highlight: var(--ula-highlight-default);
+  --color-line: var(--ula-border-subtle);
+  --font-ar: var(--ula-font-ar);
+  --font-en: var(--ula-font-en);
+  --font-mono: var(--ula-font-mono);
+  --radius-xs: var(--ula-radius-xs);
+  --radius-sm: var(--ula-radius-sm);
+  --radius-md: var(--ula-radius-md);
+  --radius-lg: var(--ula-radius-lg);
+  --radius-xl: var(--ula-radius-xl);
+  --shadow-xs: var(--ula-shadow-xs);
+  --shadow-sm: var(--ula-shadow-sm);
+  --shadow-md: var(--ula-shadow-md);
+  --shadow-lg: var(--ula-shadow-lg);
+  --shadow-xl: var(--ula-shadow-xl);
+}
+
+/* Presence / speaking animations — recoloured onto UlaSpace status tokens */
+@keyframes pulseSpeaking {
+  0%   { box-shadow: 0 0 0 0 rgba(94, 138, 108, 0.6); }
+  70%  { box-shadow: 0 0 0 10px rgba(94, 138, 108, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(94, 138, 108, 0); }
+}
+
+@keyframes pulseRadar {
+  0%   { transform: scale(0.96); opacity: 0.7; }
+  50%  { transform: scale(1.04); opacity: 0.3; }
+  100% { transform: scale(0.96); opacity: 0.7; }
+}
+
+.animate-speaking { animation: pulseSpeaking 1.8s infinite; }
+.animate-radar    { animation: pulseRadar 3s infinite var(--ula-ease-in-out); }

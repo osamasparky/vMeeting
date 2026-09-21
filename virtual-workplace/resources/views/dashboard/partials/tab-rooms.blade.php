@@ -1,28 +1,17 @@
         <!-- 3. ROOMS & SPATIAL DISTRIBUTION TAB -->
         @if($membership->hasPermission('rooms.manage'))
         <div id="tab-rooms" class="tab-view">
-            <!-- Page Header -->
-            <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
-                <div>
-                    <h1 class="page-title" style="font-size: 22px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded" style="font-size: 24px; color: var(--ula-highlight-default);">meeting_room</span>
-                        <span>{{ __('Meeting Rooms & Spatial Office Distribution') }}</span>
-                    </h1>
-                    <p class="page-subtitle" style="font-size: 13px; color: var(--ula-text-secondary);">
-                        {{ __('Explore, inspect, and organize rooms across all company branches, maps, and spatial floorplans.') }}
-                    </p>
-                </div>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                    <x-btn variant="primary" size="md" href="{{ route('office') }}" icon="login">
-                        {{ __('Enter Virtual Office') }}
-                    </x-btn>
-                    <x-btn variant="secondary" size="md" href="{{ route('editor') }}" icon="auto_awesome">
-                        {{ __('AI Office Generator') }}
-                    </x-btn>
-                    <x-btn variant="outline" size="md" href="{{ route('editor') }}" icon="design_services">
-                        {{ __('Floor Map Editor') }}
-                    </x-btn>
-                </div>
+            <!-- Action Toolbar -->
+            <div style="display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 20px;">
+                <x-btn variant="primary" size="md" href="{{ route('office') }}" icon="login">
+                    {{ __('Enter Virtual Office') }}
+                </x-btn>
+                <x-btn variant="secondary" size="md" href="{{ route('editor') }}" icon="auto_awesome">
+                    {{ __('AI Office Generator') }}
+                </x-btn>
+                <x-btn variant="outline" size="md" href="{{ route('editor') }}" icon="design_services">
+                    {{ __('Floor Map Editor') }}
+                </x-btn>
             </div>
 
             <!-- Top Metric Stats Cards -->
@@ -448,9 +437,7 @@
                                                             <x-btn variant="primary" size="sm" href="{{ route('office', ['office_id' => $off->id, 'room_id' => $r->id]) }}" icon="login">
                                                                 {{ __('Enter') }}
                                                             </x-btn>
-                                                            <button type="button" onclick="openRoomGuestModal('{{ $r->id }}', '{{ addslashes($r->name) }}')" class="nx-btn nx-btn-secondary nx-btn-sm" style="padding: 6px 10px; font-size: 11px;" title="{{ __('Generate Guest Link') }}">
-                                                                <span class="material-symbols-rounded" style="font-size: 14px;">link</span>
-                                                            </button>
+                                                            <x-btn variant="secondary" size="sm" :iconOnly="true" icon="link" onclick="openRoomGuestModal('{{ $r->id }}', '{{ addslashes($r->name) }}')" title="{{ __('Generate Guest Link') }}" />
                                                         </div>
                                                     </td>
                                                 </tr>

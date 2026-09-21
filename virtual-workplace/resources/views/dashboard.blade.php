@@ -7,7 +7,7 @@
     <title>{{ $organization->name }} — Workspace Admin Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/ulaspace-tokens.css') }}">
     <link rel="stylesheet" href="{{ asset('css/modern-design-system.css') }}">
     <link rel="stylesheet" href="{{ asset('css/ulaspace-dashboard.css') }}">
@@ -18,22 +18,19 @@
            ULASPACE DESIGN SYSTEM — WORKSPACE DASHBOARD
            ═══════════════════════════════════════════════════════════════ */
         :root {
-            /* Only --ula-gradient-accent is actually referenced below; every
-               other declaration this block used to carry (the old
-               brand-prefixed variables, --bg-secondary, --accent-*,
-               --border-focus, --status-info, --radius-xs, --shadow-kpi-icon)
-               had zero usages in this file -- dead weight left by the token
-               sweep, some of it under a retired naming prefix. Removed
-               rather than kept unused. */
             --ula-gradient-accent: linear-gradient(135deg, var(--ula-palm-900) 0%, var(--ula-palm-700) 100%);
         }
 
+        html, body, button, input, select, textarea, optgroup, .sidebar, .main-content, .nav-tab-btn {
+            font-family: 'Cairo', 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif !important;
+        }
+
         [dir="rtl"], [lang="ar"] {
-            --font-family: var(--ula-font-ar);
+            --font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
         }
 
         [dir="ltr"], [lang="en"] {
-            --font-family: var(--ula-font-en);
+            --font-family: 'IBM Plex Sans', 'Cairo', sans-serif;
         }
 
         /* ── Tabs Visibility Enforcement ── */
@@ -67,11 +64,11 @@
             color: var(--ula-palm-300);
         }
         [data-theme="dark"] .nav-tab-btn {
-            color: var(--ula-text-muted);
+            color: var(--ula-sand-400);
         }
         [data-theme="dark"] .nav-tab-btn:hover {
             background: var(--ula-palm-900);
-            color: var(--ula-text-primary);
+            color: var(--ula-sand-100);
             border-color: var(--ula-border-subtle);
         }
         [data-theme="dark"] .nav-icon-tile {
@@ -118,7 +115,7 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
         body {
-            background: var(--ula-accent-default);
+            background: var(--ula-surface-page);
             color: var(--ula-text-primary);
             min-height: 100vh;
             display: flex;
@@ -424,14 +421,20 @@
         }
 
         .nav-tab-btn.active {
-            background: var(--ula-palm-900) !important;
-            color: var(--ula-accent-default) !important;
-            border-color: var(--ula-palm-900) !important;
-            font-weight: 600;
-            box-shadow: var(--ula-shadow-xs) !important;
+            background: linear-gradient(135deg, var(--ula-palm-900) 0%, var(--ula-palm-800) 100%) !important;
+            color: var(--ula-sand-50) !important;
+            border-color: var(--ula-palm-700) !important;
+            font-weight: 700 !important;
+            box-shadow: 0 4px 14px rgba(20, 43, 36, 0.25) !important;
         }
-        .nav-tab-btn.active span {
-            color: var(--ula-accent-default) !important;
+        .nav-tab-btn.active span,
+        .nav-tab-btn.active strong {
+            color: var(--ula-sand-50) !important;
+        }
+        .nav-tab-btn.active .nav-icon-tile {
+            background: rgba(211, 165, 83, 0.22) !important;
+            border-color: var(--ula-gold-400) !important;
+            color: var(--ula-gold-300) !important;
         }
 
         .org-settings-tabs-nav .org-subtab-btn {
@@ -1535,10 +1538,9 @@
             </div>
             <form method="POST" action="{{ route('impersonate.leave') }}" style="margin: 0; display: inline-flex;">
                 @csrf
-                <button type="submit" style="background: rgba(211, 165, 83, 0.15); color: var(--ula-sand-100); border: 1px solid var(--ula-gold-400); padding: 6px 14px; border-radius: var(--ula-radius-pill); font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease;">
-                    <span class="material-symbols-rounded" style="font-size: 16px;">logout</span>
-                    <span>{{ __('Return to Super Admin') }}</span>
-                </button>
+                <x-btn variant="nav-cta" size="sm" type="submit" icon="logout" pill="true">
+                    {{ __('Return to Super Admin') }}
+                </x-btn>
             </form>
         </div>
         @endif
@@ -1546,47 +1548,47 @@
         @if(session('org_impersonator_id'))
         <div style="background: var(--ula-palm-900); border: 1px solid rgba(78, 166, 111, 0.4); border-radius: var(--ula-radius-lg); color: var(--ula-sand-100); padding: 12px 18px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; box-shadow: var(--ula-shadow-sm);">
             <div style="display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600;">
-                <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-palm-500, var(--ula-palm-300));">switch_account</span>
+                <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-palm-300);">switch_account</span>
                 <span>{{ __('You are currently logged in as team member:') }} <strong style="color: var(--ula-sand-200); text-decoration: underline;">{{ Auth::user()->name }}</strong> ({{ Auth::user()->email }})</span>
             </div>
             <form method="POST" action="{{ route('organization.members.impersonate.leave') }}" style="margin: 0; display: inline-flex;">
                 @csrf
-                <button type="submit" style="background: rgba(78, 166, 111, 0.15); color: var(--ula-sand-100); border: 1px solid var(--ula-palm-500, var(--ula-palm-300)); padding: 6px 14px; border-radius: var(--ula-radius-pill); font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease;">
-                    <span class="material-symbols-rounded" style="font-size: 16px;">logout</span>
-                    <span>{{ __('Leave Impersonation') }}</span>
-                </button>
+                <x-btn variant="secondary" size="sm" type="submit" icon="logout" pill="true">
+                    {{ __('Leave Impersonation') }}
+                </x-btn>
             </form>
         </div>
         @endif
 
-        <!-- Top App Bar Navigation Header (Figma App Bar Component) -->
-        <div class="flex items-center justify-between mb-6 gap-4 flex-wrap">
-            <div class="flex items-center gap-3.5">
+        <!-- Top App Bar Navigation Header (Figma App Bar Component 9:16) -->
+        <header class="ulaspace-appbar">
+            <div class="appbar-title-group">
                 <button class="mobile-menu-btn" onclick="toggleDashboardSidebar()">
-                    <span class="material-symbols-rounded text-[22px]">menu</span>
+                    <span class="material-symbols-rounded" style="font-size: 22px;">menu</span>
                 </button>
-                <div class="flex flex-col">
-                    <h1 id="page-primary-title" class="text-[22px] font-semibold text-[var(--ula-text-primary)] leading-tight font-['IBM_Plex_Sans_Arabic',sans-serif]">
+                <div style="display: flex; flex-direction: column;">
+                    <h1 id="page-primary-title" class="appbar-page-title">
                         {{ __('Dashboard') }}
                     </h1>
-                    <p id="page-primary-subtitle" class="text-[12px] text-[var(--ula-text-muted)] font-normal mt-0.5">
+                    <p id="page-primary-subtitle" class="appbar-page-subtitle">
                         {{ __('Welcome to your virtual workspace') }}
                     </p>
                 </div>
             </div>
 
-            <!-- Soft Search Bar -->
-            <div class="flex-1 max-w-[380px] relative flex items-center">
-                <span class="material-symbols-rounded absolute inset-inline-start-3.5 text-[18px] text-[var(--ula-text-muted)] pointer-events-none">search</span>
-                <input type="text" class="w-full bg-[var(--ula-surface-card)] border border-[var(--ula-border-subtle)] rounded-full py-2.5 px-4 ps-10 text-[13px] font-normal text-[var(--ula-text-primary)] placeholder-[var(--ula-text-muted)] focus:border-[var(--ula-palm-900)] focus:outline-none transition-colors" placeholder="{{ __('Search people, rooms, files...') }}" id="globalSearchInput" onkeyup="handleGlobalSearch(this.value)">
+            <!-- Soft Search Bar with Keyboard Shortcut Badge -->
+            <div class="appbar-search-container">
+                <span class="material-symbols-rounded appbar-search-icon">search</span>
+                <input type="text" class="appbar-search-input" placeholder="{{ __('Search people, rooms, files...') }}" id="globalSearchInput" onkeyup="handleGlobalSearch(this.value)">
+                <kbd class="appbar-search-kbd">⌘K</kbd>
             </div>
 
             <!-- Header Actions Group -->
-            <div class="flex items-center gap-2.5">
+            <div class="appbar-actions-group">
                 <x-icon-btn icon="group_add" onclick="openInviteModal()" title="{{ __('Invite People') }}" size="md" variant="subtle" />
 
                 <!-- Notification Center Bell & Dropdown -->
-                <div class="relative inline-block" id="notifWrapper">
+                <div class="relative inline-block" id="notifWrapper" style="position: relative; display: inline-block;">
                     <x-icon-btn icon="notifications" onclick="toggleNotificationDropdown()" id="notifBellBtn" title="{{ __('Notifications') }}" size="md" variant="subtle" />
                     <span class="notification-badge-pulse" id="notifBadge" style="display: none;">0</span>
 
@@ -1595,16 +1597,16 @@
                         <!-- Dropdown Header -->
                         <div style="padding: 14px 18px; background: var(--ula-surface-page-alt); border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center;">
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <span class="material-symbols-rounded text-[18px] text-[var(--ula-highlight-default)]">notifications</span>
-                                <strong style="font-size: 13px; color: var(--ula-text-primary);">{{ __('Notifications') }}</strong>
+                                <span class="material-symbols-rounded" style="font-size: 18px; color: var(--ula-gold-500);">notifications</span>
+                                <strong style="font-size: 13px; color: var(--ula-text-primary); font-family: 'Cairo', sans-serif;">{{ __('Notifications') }}</strong>
                                 <span id="notifHeaderCount" class="badge-status badge-active" style="font-size: 10px; padding: 2px 8px; display: none;">0 new</span>
                             </div>
                             <div style="display: flex; gap: 8px; align-items: center;">
-                                <button type="button" onclick="markAllNotificationsAsRead()" style="background: none; border: none; font-size: 11px; font-weight: 700; color: var(--ula-text-primary); cursor: pointer;" title="{{ __('Mark all as read') }}">
+                                <button type="button" onclick="markAllNotificationsAsRead()" style="background: none; border: none; font-size: 11px; font-weight: 700; color: var(--ula-text-primary); cursor: pointer; font-family: 'Cairo', sans-serif;" title="{{ __('Mark all as read') }}">
                                     {{ __('Mark read') }}
                                 </button>
                                 <button type="button" onclick="clearAllNotificationsFromServer()" style="background: none; border: none; font-size: 11px; font-weight: 700; color: var(--ula-text-muted); cursor: pointer;" title="{{ __('Clear all') }}">
-                                    <span class="material-symbols-rounded text-[16px]">delete_sweep</span>
+                                    <span class="material-symbols-rounded" style="font-size: 16px;">delete_sweep</span>
                                 </button>
                             </div>
                         </div>
@@ -1620,9 +1622,9 @@
                         <!-- Notifications Scrollable Feed -->
                         <div id="notifListContainer" style="max-height: 380px; overflow-y: auto; display: flex; flex-direction: column;">
                             <div id="notifEmptyState" style="padding: 36px 18px; text-align: center; color: var(--ula-text-muted);">
-                                <span class="material-symbols-rounded text-[32px] text-[var(--ula-text-muted)] block mb-2">celebration</span>
-                                <strong style="display: block; font-size: 13px; color: var(--ula-text-primary); margin-bottom: 4px;">{{ __('All caught up!') }}</strong>
-                                <span style="font-size: 12px;">{{ __('No new notifications right now.') }}</span>
+                                <span class="material-symbols-rounded" style="font-size: 32px; color: var(--ula-text-muted); display: block; margin-bottom: 8px;">celebration</span>
+                                <strong style="display: block; font-size: 13px; color: var(--ula-text-primary); margin-bottom: 4px; font-family: 'Cairo', sans-serif;">{{ __('All caught up!') }}</strong>
+                                <span style="font-size: 12px; font-family: 'Cairo', sans-serif;">{{ __('No new notifications right now.') }}</span>
                             </div>
                         </div>
                     </div>
@@ -1632,32 +1634,32 @@
 
                 <!-- Language Switcher -->
                 @if(app()->getLocale() === 'ar')
-                    <a href="{{ route('lang.switch', 'en') }}" class="inline-flex items-center gap-1 px-3 py-2 rounded-[var(--ula-radius-md)] bg-[var(--ula-surface-card)] border border-[var(--ula-border-subtle)] text-[12px] font-semibold text-[var(--ula-text-primary)] hover:border-[var(--ula-palm-900)] transition-colors" title="{{ __('Switch to English') }}">
-                        <span class="material-symbols-rounded text-[16px] text-[var(--ula-highlight-default)]">language</span>
-                        <span>EN</span>
+                    <a href="{{ route('lang.switch', 'en') }}" class="appbar-capsule-btn" title="{{ __('Switch to English') }}">
+                        <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-gold-500);">language</span>
+                        <span>English</span>
                     </a>
                 @else
-                    <a href="{{ route('lang.switch', 'ar') }}" class="inline-flex items-center gap-1 px-3 py-2 rounded-[var(--ula-radius-md)] bg-[var(--ula-surface-card)] border border-[var(--ula-border-subtle)] text-[12px] font-semibold text-[var(--ula-text-primary)] hover:border-[var(--ula-palm-900)] transition-colors" title="{{ __('التبديل إلى العربية') }}">
-                        <span class="material-symbols-rounded text-[16px] text-[var(--ula-highlight-default)]">language</span>
-                        <span>عربي</span>
+                    <a href="{{ route('lang.switch', 'ar') }}" class="appbar-capsule-btn" title="{{ __('التبديل إلى العربية') }}">
+                        <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-gold-500);">language</span>
+                        <span>العربية</span>
                     </a>
                 @endif
 
                 <!-- User Profile Capsule (App Bar spec) -->
-                <div onclick="switchAdminTab('profile')" class="cursor-pointer flex items-center gap-2 py-1 px-2.5 rounded-full bg-[var(--ula-surface-card)] border border-[var(--ula-border-subtle)] shadow-[var(--ula-shadow-sm)] hover:border-[var(--ula-palm-900)] transition-all" title="{{ __('View Profile') }}">
-                    <div class="w-7 h-7 rounded-full overflow-hidden bg-[var(--ula-sand-200)] flex items-center justify-center text-[var(--ula-palm-900)] font-bold text-[11px] shrink-0">
+                <div onclick="switchAdminTab('profile')" class="appbar-user-capsule" title="{{ __('View Profile') }}">
+                    <div class="appbar-user-avatar">
                         @if($user->avatar_url)
-                            <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" class="w-full h-full object-cover">
+                            <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; object-fit: cover;">
                         @else
                             <span>{{ strtoupper(substr($user->name, 0, 2)) }}</span>
                         @endif
                     </div>
-                    <span class="text-[12px] font-medium text-[var(--ula-text-primary)] pe-1.5 hidden sm:inline">
+                    <span class="appbar-user-name">
                         {{ explode(' ', $user->name)[0] }}
                     </span>
                 </div>
             </div>
-        </div>
+        </header>
 
         @if(session('success'))
         <div style="background: rgba(60, 107, 76, 0.12); border: 1px solid rgba(60, 107, 76, 0.3); color: var(--ula-status-success, var(--ula-palm-500)); border-radius: var(--ula-radius-md, 12px); padding: 12px 18px; margin-bottom: 20px; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--ula-shadow-sm);">

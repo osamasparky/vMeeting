@@ -1,19 +1,4 @@
 <div id="tab-chat" class="tab-view">
-    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-5); flex-wrap: wrap; gap: var(--ula-space-4);">
-        <div>
-            <h1 class="page-title" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); margin-bottom: var(--ula-space-2); display: flex; align-items: center; gap: var(--ula-space-3);">
-                <span class="material-symbols-rounded" style="font-size: 26px; color: var(--ula-accent-default);">chat</span>
-                <span>{{ __('Team Chat & Direct Messages') }}</span>
-            </h1>
-            <p class="page-subtitle" style="font-size: var(--ula-size-xs); color: var(--ula-text-secondary); margin: 0;">{{ __('Realtime company communication, direct colleague messaging, and team collaboration channels.') }}</p>
-        </div>
-        <div style="display: flex; gap: var(--ula-space-3); align-items: center;">
-            <button onclick="loadChatConversations(true)" class="tactile-btn btn-secondary" style="padding: 7px 14px; font-size: var(--ula-size-xs); display: inline-flex; align-items: center; gap: 6px;" title="{{ __('Refresh Messages') }}">
-                <span class="material-symbols-rounded" style="font-size: 15px;">refresh</span>
-                <span>{{ __('Refresh') }}</span>
-            </button>
-        </div>
-    </div>
 
     <!-- Chat Workspace Split Container (UlaSpace Figma Standard) -->
     <div class="chat-workspace-container" style="display: flex; height: calc(100vh - 210px); min-height: 560px; max-height: 820px; border-radius: var(--ula-radius-xl); overflow: hidden; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs); background: var(--ula-surface-card);">
@@ -21,12 +6,15 @@
         <!-- Left Pane: Channels & Colleagues Roster (290px Figma Layout) -->
         <div style="width: 290px; flex-shrink: 0; border-inline-end: 1px solid var(--ula-border-subtle); background: var(--ula-surface-page-alt); display: flex; flex-direction: column;">
             
-            <!-- Search Bar -->
-            <div style="padding: var(--ula-space-4) var(--ula-space-5); border-bottom: 1px solid var(--ula-border-subtle);">
-                <div style="position: relative;">
-                    <input type="text" id="chat-search-input" onkeyup="filterChatRoster()" placeholder="{{ __('Search colleagues & channels...') }}" style="width: 100%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md); padding: 8px 12px 8px 34px; font-size: var(--ula-size-xs); color: var(--ula-text-primary); outline: none; box-shadow: var(--ula-shadow-xs);">
+            <!-- Search Bar & Refresh -->
+            <div style="padding: var(--ula-space-3) var(--ula-space-4); border-bottom: 1px solid var(--ula-border-subtle); display: flex; gap: var(--ula-space-2); align-items: center;">
+                <div style="position: relative; flex: 1;">
+                    <input type="text" id="chat-search-input" onkeyup="filterChatRoster()" placeholder="{{ __('Search...') }}" style="width: 100%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md); padding: 8px 12px 8px 34px; font-size: var(--ula-size-xs); color: var(--ula-text-primary); outline: none; box-shadow: var(--ula-shadow-xs);">
                     <span class="material-symbols-rounded" style="position: absolute; inset-inline-start: 10px; top: 50%; transform: translateY(-50%); font-size: 16px; color: var(--ula-text-muted);">search</span>
                 </div>
+                <button onclick="loadChatConversations(true)" class="tactile-btn btn-secondary" style="width: 34px; height: 34px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--ula-radius-md); flex-shrink: 0;" title="{{ __('Refresh Messages') }}">
+                    <span class="material-symbols-rounded" style="font-size: 17px;">refresh</span>
+                </button>
             </div>
 
             <!-- Scrollable Roster Lists -->

@@ -950,6 +950,8 @@
     "Good": "Good",
     "Good Morning": "Good Morning",
     "Good morning, :name!": "Good morning, :name!",
+    "Good Evening": "Good Evening",
+    "Good evening, :name!": "Good evening, :name!",
     "Great Work": "Great Work",
     "Great work! Your task was reviewed and approved.": "Great work! Your task was reviewed and approved.",
     "Grid Bounds": "Grid Bounds",

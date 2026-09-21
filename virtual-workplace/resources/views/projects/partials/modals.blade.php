@@ -207,25 +207,39 @@
     </div>
 
     <!-- Modal: Task Inspector & Activity Drawer -->
+    <!-- Modal: Task Inspector & Activity Drawer -->
     <div id="task-details-modal" class="modal-overlay">
-        <div class="modal-card" style="max-width: 850px; width: 95vw; max-height: 90vh; display: flex; flex-direction: column; padding: 22px; overflow: hidden; border-radius: 20px;">
-            <div class="modal-header" style="padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--ula-border-subtle);">
-                <div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span id="task-modal-code" class="badge-pill badge-neutral" style="font-family: monospace; font-size: 11px; font-weight: 900;">#1</span>
-                        <span id="task-modal-priority-badge" class="badge-pill badge-gold" style="font-size: 10px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> Normal</span>
+        <div class="modal-card" style="max-width: 860px; width: 95vw; max-height: 90vh; display: flex; flex-direction: column; padding: 28px; overflow: hidden; border-radius: 24px; background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xl); border: 1px solid var(--ula-border-subtle);">
+            <!-- Header -->
+            <div style="margin-bottom: 16px; border-bottom: 1px solid var(--ula-border-subtle); padding-bottom: 16px;">
+                <!-- Top Row -->
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <span id="task-modal-code" class="nav-badge-pill" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-weight: 800;">#1</span>
+                        <span id="task-modal-priority-badge" class="ula-badge ula-badge--attention ula-badge--sm"><span class="material-symbols-rounded ula-badge__icon">bolt</span> Normal</span>
                     </div>
-                    <h2 id="task-modal-title" style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary); margin-top: 4px;">Task Title</h2>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <button id="task-modal-timer-btn" onclick="toggleTaskTimerAction()" class="ula-btn ula-btn--secondary ula-btn--sm" type="button">
+                            <span class="material-symbols-rounded ula-btn__icon">play_arrow</span>
+                            <span>{{ __('Start Timer') }}</span>
+                        </button>
+                        <button onclick="closeTaskInspector()" class="ula-icon-btn ula-icon-btn--subtle ula-icon-btn--sm" type="button" title="{{ __('Close') }}">
+                            <span class="material-symbols-rounded">close</span>
+                        </button>
+                    </div>
                 </div>
-                <button onclick="closeTaskInspector()" class="modal-close"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span></button>
+
+                <!-- Title -->
+                <h2 id="task-modal-title" style="font-size: 20px; font-weight: 800; color: var(--ula-text-primary); margin: 12px 0 0; line-height: 1.35; font-family: var(--ula-font-ar, 'Cairo', sans-serif);">Task Title</h2>
             </div>
 
             <!-- Quick Status Change, Milestone, & Timer Action -->
-            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-page-alt); padding: 8px 12px; border-radius: var(--ula-radius-sm); border: 1px solid var(--ula-border-subtle); flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-page-alt); padding: 10px 16px; border-radius: var(--ula-radius-md, 14px); border: 1px solid var(--ula-border-subtle); flex-wrap: wrap; gap: 12px;">
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 12px; font-weight: 800; color: var(--ula-text-secondary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ __('Status') }}:</span>
-                        <select id="task-modal-status-select" onchange="updateCurrentTaskStatus(this.value)" class="form-input" style="padding: 4px 8px; font-size: 12px; width: auto; font-weight: 800;">
+                        <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-gold-500);">bolt</span>
+                        <span style="font-size: 12.5px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Status') }}:</span>
+                        <select id="task-modal-status-select" onchange="updateCurrentTaskStatus(this.value)" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-default); color: var(--ula-text-primary); font-size: 12.5px; font-weight: 700; border-radius: 8px; padding: 4px 12px; height: 32px; outline: none; cursor: pointer;">
                             <option value="backlog">{{ __('Backlog') }}</option>
                             <option value="ready">{{ __('Ready') }}</option>
                             <option value="in_progress">{{ __('In Progress') }}</option>
@@ -235,8 +249,9 @@
                     </div>
 
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 12px; font-weight: 800; color: var(--ula-text-secondary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ __('Milestone') }}:</span>
-                        <select id="task-modal-milestone-select" onchange="updateCurrentTaskMilestone(this.value)" class="form-input" style="padding: 4px 8px; font-size: 12px; width: auto; font-weight: 700;">
+                        <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-palm-600);">flag</span>
+                        <span style="font-size: 12.5px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Milestone') }}:</span>
+                        <select id="task-modal-milestone-select" onchange="updateCurrentTaskMilestone(this.value)" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-default); color: var(--ula-text-primary); font-size: 12.5px; font-weight: 700; border-radius: 8px; padding: 4px 12px; height: 32px; outline: none; cursor: pointer;">
                             <option value="">— {{ __('No Milestone') }} —</option>
                             @foreach($project->milestones as $pms)
                                 <option value="{{ $pms->id }}">{{ $pms->name }}</option>
@@ -245,8 +260,9 @@
                     </div>
 
                     <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 12px; font-weight: 800; color: var(--ula-text-secondary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">refresh</span> {{ __('Repeat') }}:</span>
-                        <select id="task-modal-recurrence-select" onchange="updateCurrentTaskRecurrence(this.value)" class="form-input" style="padding: 4px 8px; font-size: 12px; width: auto; font-weight: 700;">
+                        <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-accent-default);">refresh</span>
+                        <span style="font-size: 12.5px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Repeat') }}:</span>
+                        <select id="task-modal-recurrence-select" onchange="updateCurrentTaskRecurrence(this.value)" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-default); color: var(--ula-text-primary); font-size: 12.5px; font-weight: 700; border-radius: 8px; padding: 4px 12px; height: 32px; outline: none; cursor: pointer;">
                             <option value="">— {{ __('One-time') }} —</option>
                             <option value="daily">{{ __('Daily') }}</option>
                             <option value="weekly">{{ __('Weekly') }}</option>
@@ -256,34 +272,39 @@
                         </select>
                     </div>
 
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span id="task-modal-hours-pill" style="font-family: monospace; font-size: 11px; font-weight: 800; color: var(--ula-text-primary);">0h / 0h</span>
-                        <button id="task-modal-timer-btn" onclick="toggleTaskTimerAction()" class="tactile-btn btn-secondary" style="padding: 5px 12px; font-size: 11px;">
-                            ⏱️ {{ __('Start Timer') }}
-                        </button>
+                    <div class="task-modal-chip" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-weight: 800; color: var(--ula-palm-900);">
+                        <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-status-success);">timer</span>
+                        <span id="task-modal-hours-pill">0h / 0h</span>
                     </div>
                 </div>
 
                 <!-- Approval Banner -->
-                <div id="task-modal-hub-approval-banner" style="display: none; padding: 10px 14px; border-radius: var(--ula-radius-sm); font-size: 12px; font-weight: 700; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <div id="task-modal-hub-approval-banner" style="display: none; padding: 12px 16px; border-radius: var(--ula-radius-md); font-size: 12.5px; font-weight: 700; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
                     <div id="task-modal-hub-approval-text" style="display: flex; align-items: center; gap: 8px;"></div>
                     <div id="task-modal-hub-approval-actions" style="display: flex; gap: 8px;"></div>
                 </div>
             </div>
 
             <!-- Inspector Tab Navigation -->
-            <div style="display: flex; gap: 4px; border-bottom: 1px solid var(--ula-border-subtle); margin-bottom: 14px;">
-                <button type="button" onclick="switchInspectorTab('overview')" id="task-tab-btn-overview" class="task-inspector-tab-btn active">
-                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">assignment</span> {{ __('Overview & Checklist') }}
+            <div class="task-modal-segmented-bar">
+                <button type="button" onclick="switchInspectorTab('overview')" id="task-tab-btn-overview" class="task-modal-tab-btn active">
+                    <span class="material-symbols-rounded" style="font-size: 17px;">assignment</span>
+                    <span>{{ __('Overview & Checklist') }}</span>
                 </button>
-                <button type="button" onclick="switchInspectorTab('discussion')" id="task-tab-btn-discussion" class="task-inspector-tab-btn">
-                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">chat</span> {{ __('Discussions') }} (<span id="task-modal-comments-badge">0</span>)
+                <button type="button" onclick="switchInspectorTab('discussion')" id="task-tab-btn-discussion" class="task-modal-tab-btn">
+                    <span class="material-symbols-rounded" style="font-size: 17px;">chat</span>
+                    <span>{{ __('Discussions') }}</span>
+                    <span id="task-modal-comments-badge" class="task-modal-tab-count">0</span>
                 </button>
-                <button type="button" onclick="switchInspectorTab('files')" id="task-tab-btn-files" class="task-inspector-tab-btn">
-                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">attach_file</span> {{ __('Files') }} (<span id="task-hub-attachments-count">0</span>)
+                <button type="button" onclick="switchInspectorTab('files')" id="task-tab-btn-files" class="task-modal-tab-btn">
+                    <span class="material-symbols-rounded" style="font-size: 17px;">attach_file</span>
+                    <span>{{ __('Files') }}</span>
+                    <span id="task-hub-attachments-count" class="task-modal-tab-count">0</span>
                 </button>
-                <button type="button" onclick="switchInspectorTab('activity')" id="task-tab-btn-activity" class="task-inspector-tab-btn">
-                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">description</span> {{ __('Activity History') }} (<span id="task-modal-activity-badge">0</span>)
+                <button type="button" onclick="switchInspectorTab('activity')" id="task-tab-btn-activity" class="task-modal-tab-btn">
+                    <span class="material-symbols-rounded" style="font-size: 17px;">description</span>
+                    <span>{{ __('Activity History') }}</span>
+                    <span id="task-modal-activity-badge" class="task-modal-tab-count">0</span>
                 </button>
             </div>
 
@@ -293,8 +314,8 @@
                 <div id="task-tab-content-overview" class="task-inspector-tab-pane" style="display: block;">
                     <!-- Description -->
                     <div style="margin-bottom: 14px;">
-                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase; margin-bottom: 4px;">{{ __('Description') }}</label>
-                        <div id="task-modal-description" style="background: var(--ula-surface-page-alt); padding: 12px; border-radius: var(--ula-radius-sm); font-size: 13px; color: var(--ula-text-primary); border: 1px solid var(--ula-border-subtle); line-height: 1.5; white-space: pre-wrap;">
+                        <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 6px;">{{ __('Description') }}</label>
+                        <div id="task-modal-description" style="background: var(--ula-surface-page-alt); padding: 16px; border-radius: 12px; font-size: 13.5px; color: var(--ula-text-primary); border: 1px solid var(--ula-border-subtle); line-height: 1.6; white-space: pre-wrap;">
                             —
                         </div>
                     </div>
@@ -302,26 +323,29 @@
                     <!-- Checklist -->
                     <div style="margin-bottom: 14px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <label style="font-size: 11px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;">{{ __('Checklist Sub-items') }}</label>
+                            <label style="font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase;">{{ __('Checklist Sub-items') }}</label>
                         </div>
-                        <div id="task-checklist-container" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px;"></div>
+                        <div id="task-checklist-container" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;"></div>
                         <form onsubmit="addTaskChecklistItem(event)" style="display: flex; gap: 8px;">
-                            <input type="text" id="new-checklist-item-input" required placeholder="{{ __('Add sub-item...') }}" class="form-input" style="font-size: 12px; padding: 7px 10px;">
-                            <button type="submit" class="tactile-btn btn-secondary" style="padding: 7px 12px; font-size: 11px;">+ {{ __('Add') }}</button>
+                            <input type="text" id="new-checklist-item-input" required placeholder="{{ __('Add sub-item...') }}" style="flex: 1; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                            <button type="submit" class="ula-btn ula-btn--primary ula-btn--md" style="height: 42px; min-height: 42px;">
+                                <span class="material-symbols-rounded ula-btn__icon">add</span>
+                                <span>{{ __('Add') }}</span>
+                            </button>
                         </form>
                     </div>
                 </div>
 
                 <!-- Tab 2: Discussions & Comments -->
                 <div id="task-tab-content-discussion" class="task-inspector-tab-pane" style="display: none;">
-                    <div id="task-comments-feed" style="max-height: 240px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;"></div>
+                    <div id="task-comments-feed" style="max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px;"></div>
                     
                     <!-- Mention chips -->
                     <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px; flex-wrap: wrap;">
-                        <span style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted);">@ {{ __('Mention') }}:</span>
+                        <span style="font-size: 11px; font-weight: 800; color: var(--ula-text-secondary);">@ {{ __('Mention') }}:</span>
                         @foreach($allMembers->take(6) as $chipMember)
                             @if($chipMember->user_id !== $user->id)
-                                <button type="button" onclick="insertHubMentionHandle('{{ $chipMember->user->name }}')" class="badge-pill" style="cursor: pointer; font-size: 10px; border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-page-alt); color: var(--ula-text-primary);" title="{{ __('Mention :name', ['name' => $chipMember->user->name]) }}">
+                                <button type="button" onclick="insertHubMentionHandle('{{ $chipMember->user->name }}')" class="nav-badge-pill" style="cursor: pointer; font-size: 10px; border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-page-alt); color: var(--ula-accent-default); font-weight: 700;" title="{{ __('Mention :name', ['name' => $chipMember->user->name]) }}">
                                     @<span>{{ $chipMember->user->name }}</span>
                                 </button>
                             @endif
@@ -329,28 +353,34 @@
                     </div>
 
                     <form onsubmit="addTaskComment(event)" style="display: flex; gap: 8px;">
-                        <input type="text" id="new-comment-input" required placeholder="{{ __('Write a comment... Type @name to mention') }}" class="form-input" style="font-size: 12px; padding: 7px 10px;">
-                        <button type="submit" class="tactile-btn btn-primary" style="padding: 7px 14px; font-size: 11px;">{{ __('Post') }}</button>
+                        <input type="text" id="new-comment-input" required placeholder="{{ __('Write a comment... Type @name to mention') }}" style="flex: 1; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <button type="submit" class="ula-btn ula-btn--primary ula-btn--md" style="height: 42px; min-height: 42px;">
+                            <span class="material-symbols-rounded ula-btn__icon">chat_bubble</span>
+                            <span>{{ __('Post') }}</span>
+                        </button>
                     </form>
                 </div>
 
                 <!-- Tab 3: Attachments & Files -->
                 <div id="task-tab-content-files" class="task-inspector-tab-pane" style="display: none;">
-                    <form onsubmit="uploadHubTaskAttachmentSubmit(event)" style="background: var(--ula-surface-page-alt); border: 1px dashed var(--ula-border-subtle); border-radius: var(--ula-radius-sm); padding: 12px; text-align: center; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;">
-                        <input type="file" id="hub-task-file-input" required class="form-input" style="font-size: 11px; max-width: 260px;">
-                        <button type="submit" class="tactile-btn btn-primary" style="padding: 6px 12px; font-size: 11px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">upload</span> {{ __('Upload') }}</button>
+                    <form onsubmit="uploadHubTaskAttachmentSubmit(event)" style="background: var(--ula-surface-page-alt); border: 1px dashed var(--ula-border-default); border-radius: 14px; padding: 20px; text-align: center; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap;">
+                        <input type="file" id="hub-task-file-input" required style="font-size: 12px; color: var(--ula-text-primary); max-width: 260px;">
+                        <button type="submit" class="ula-btn ula-btn--primary ula-btn--sm">
+                            <span class="material-symbols-rounded ula-btn__icon">upload</span>
+                            <span>{{ __('Upload') }}</span>
+                        </button>
                     </form>
-                    <div id="task-hub-attachments-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 8px;"></div>
+                    <div id="task-hub-attachments-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;"></div>
                 </div>
 
                 <!-- Tab 4: Activity & Audit History (Harnessing AuditLog) -->
                 <div id="task-tab-content-activity" class="task-inspector-tab-pane" style="display: none;">
-                    <div style="margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 11px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;">
-                            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">description</span> {{ __('Chronological Audit Trail & Mutation History') }}
+                    <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 11.5px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase;">
+                            <span class="material-symbols-rounded" style="font-size: 15px; vertical-align: text-bottom;">description</span> {{ __('Chronological Audit Trail & Mutation History') }}
                         </span>
-                        <span style="font-size: 10px; color: var(--ula-text-primary); font-weight: 700;">
-                            <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">lock</span> {{ __('Tamper-proof Logged') }}
+                        <span class="nav-badge-pill" style="font-size: 10.5px;">
+                            <span class="material-symbols-rounded" style="font-size: 13px; vertical-align: text-bottom;">lock</span> {{ __('Tamper-proof Logged') }}
                         </span>
                     </div>
                     <div id="task-activity-timeline-feed" style="display: flex; flex-direction: column; gap: 10px; padding: 4px;">

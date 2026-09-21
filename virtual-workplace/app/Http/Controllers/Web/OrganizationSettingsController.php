@@ -17,7 +17,9 @@ use App\Domains\Tenancy\Actions\CreateOrInviteOrganizationMemberAction;
 use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Domains\Tenancy\Models\Plan;
+use App\Domains\Tenancy\Models\Subscription;
 use App\Domains\Tenancy\Models\SubscriptionRequest;
+use App\Domains\Tenancy\Services\SubscriptionPricingService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -43,7 +45,7 @@ class OrganizationSettingsController extends Controller
             }
         }
 
-        return $membership->role?->slug !== 'company_admin';
+        return ! $membership->isCompanyAdmin();
     }
 
     public function upgradePlan(Request $request)
@@ -81,7 +83,7 @@ class OrganizationSettingsController extends Controller
     /**
      * Show the Bank Transfer Payment & Plan Details Page.
      */
-    public function showPaymentPage(Plan $plan)
+    public function showPaymentPage(Request $request, Plan $plan, SubscriptionPricingService $pricingService)
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)
@@ -101,7 +103,36 @@ class OrganizationSettingsController extends Controller
         $pendingRequest = $organization->pendingSubscriptionRequest()->where('plan_id', $plan->id)->first()
             ?: $organization->pendingSubscriptionRequest()->with('plan')->first();
 
-        $priceUSD = (float) $plan->price;
+        $paymentSettings = SystemSetting::get('payment_settings', [
+            'usd_to_sar_rate' => 3.75,
+            'usd_to_egp_rate' => 48.5,
+            'usd_to_aed_rate' => 3.67,
+            'default_currency' => 'SAR',
+            'tax_percentage' => 15,
+            'tax_number' => '300012345600003',
+            'bank_accounts' => [],
+            'instapay_handle' => 'nextspace@instapay',
+            'instapay_phone' => '+201000000000',
+            'stc_pay_phone' => '+966500000000',
+            'vodafone_cash_phone' => '+201000000000',
+            'checkout_terms_ar' => 'يتم تفعيل الاشتراك فور مراجعة إيصال التحويل البنكي أو الدفع الإلكتروني من قبل المشرفين.',
+            'checkout_terms_en' => 'Your subscription will be activated immediately upon review of the payment receipt by our administration team.',
+            'enable_bank_transfer' => true,
+            'enable_instapay' => true,
+            'enable_wallets' => true,
+        ]);
+
+        $sarRate = (float) ($paymentSettings['usd_to_sar_rate'] ?? 3.75);
+
+        // Requested seats and cycle from URL query parameters
+        $requestedSeats = (int) $request->input('seats', $plan->getEffectiveMinSeats());
+        $billingCycle = $request->input('cycle', 'monthly') === 'yearly' ? 'yearly' : 'monthly';
+        $requestType = $request->input('type', 'new_subscription');
+
+        $pricingDetails = $pricingService->calculatePrice($plan, $requestedSeats, $billingCycle, $sarRate);
+
+        $priceUSD = $pricingDetails['total_usd'];
+        $priceSAR = $pricingDetails['total_sar'];
 
         $defaultBankAccounts = [
             [
@@ -126,28 +157,6 @@ class OrganizationSettingsController extends Controller
             ],
         ];
 
-        $paymentSettings = SystemSetting::get('payment_settings', [
-            'usd_to_sar_rate' => 3.75,
-            'usd_to_egp_rate' => 48.5,
-            'usd_to_aed_rate' => 3.67,
-            'default_currency' => 'SAR',
-            'tax_percentage' => 15,
-            'tax_number' => '300012345600003',
-            'bank_accounts' => $defaultBankAccounts,
-            'instapay_handle' => 'nextspace@instapay',
-            'instapay_phone' => '+201000000000',
-            'stc_pay_phone' => '+966500000000',
-            'vodafone_cash_phone' => '+201000000000',
-            'checkout_terms_ar' => 'يتم تفعيل الاشتراك فور مراجعة إيصال التحويل البنكي أو الدفع الإلكتروني من قبل المشرفين.',
-            'checkout_terms_en' => 'Your subscription will be activated immediately upon review of the payment receipt by our administration team.',
-            'enable_bank_transfer' => true,
-            'enable_instapay' => true,
-            'enable_wallets' => true,
-        ]);
-
-        $sarRate = (float) ($paymentSettings['usd_to_sar_rate'] ?? 3.75);
-        $priceSAR = round($priceUSD * $sarRate, 2);
-
         $bankAccounts = ! empty($paymentSettings['bank_accounts']) ? $paymentSettings['bank_accounts'] : $defaultBankAccounts;
 
         $cleanSlug = preg_replace('/[^a-zA-Z0-9]/', '', $organization->slug ?: 'ORG');
@@ -157,14 +166,15 @@ class OrganizationSettingsController extends Controller
 
         return view('billing.payment', compact(
             'user', 'membership', 'organization', 'plan', 'pendingRequest',
-            'priceUSD', 'priceSAR', 'referenceCode', 'bankAccounts', 'paymentSettings'
+            'priceUSD', 'priceSAR', 'referenceCode', 'bankAccounts', 'paymentSettings',
+            'pricingDetails', 'requestedSeats', 'billingCycle', 'requestType'
         ));
     }
 
     /**
      * Submit Bank Transfer Payment Confirmation & Receipt.
      */
-    public function submitBankTransferPayment(Request $request, Plan $plan)
+    public function submitBankTransferPayment(Request $request, Plan $plan, SubscriptionPricingService $pricingService)
     {
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)
@@ -191,9 +201,14 @@ class OrganizationSettingsController extends Controller
             'currency' => ['required', 'string', 'in:SAR,USD'],
             'billing_cycle' => ['required', 'string', 'in:monthly,yearly'],
             'transfer_date' => ['required', 'date'],
+            'seats' => ['nullable', 'integer', 'min:1'],
+            'request_type' => ['nullable', 'string', 'in:new_subscription,seat_increase,seat_decrease,plan_upgrade'],
             'receipt' => ['required', 'file', 'mimes:jpeg,png,jpg,webp,pdf', 'max:15360'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ]);
+
+        $seats = (int) ($validated['seats'] ?? $plan->getEffectiveMinSeats());
+        $pricePerSeat = $plan->isPerSeat() ? (float) $plan->price : null;
 
         // Store receipt
         $receiptPath = $request->file('receipt')->store('receipts', 'public');
@@ -203,6 +218,8 @@ class OrganizationSettingsController extends Controller
             'organization_id' => $organization->id,
             'user_id' => $user->id,
             'plan_id' => $plan->id,
+            'seats' => $seats,
+            'price_per_seat' => $pricePerSeat,
             'amount' => $validated['amount'],
             'currency' => $validated['currency'],
             'billing_cycle' => $validated['billing_cycle'],
@@ -215,6 +232,7 @@ class OrganizationSettingsController extends Controller
             'receipt_path' => $receiptPath,
             'notes' => $validated['notes'] ?? null,
             'status' => 'pending',
+            'request_type' => $validated['request_type'] ?? 'new_subscription',
         ]);
 
         AuditLog::create([
@@ -224,6 +242,7 @@ class OrganizationSettingsController extends Controller
             'metadata' => [
                 'plan_id' => $plan->id,
                 'plan_name' => $plan->name,
+                'seats' => $seats,
                 'amount' => $validated['amount'],
                 'currency' => $validated['currency'],
                 'transfer_reference' => $validated['transfer_reference'],
@@ -232,7 +251,89 @@ class OrganizationSettingsController extends Controller
         ]);
 
         return redirect()->route('dashboard')
-            ->with('success', "تم إرسال إشعار التحويل البنكي للاشتراك في باقة ({$plan->name}) بنجاح! طلبكم قيد المراجعة والاعتماد من الإدارة.");
+            ->with('success', "تم إرسال إشعار التحويل البنكي للاشتراك في باقة ({$plan->name}) لعدد ({$seats}) مقاعد بنجاح! طلبكم قيد المراجعة والاعتماد من الإدارة.");
+    }
+
+    /**
+     * Update Subscription Seats for Existing Active Subscription.
+     */
+    public function updateSubscriptionSeats(Request $request, SubscriptionPricingService $pricingService)
+    {
+        $user = Auth::user();
+        $membership = OrganizationMember::where('user_id', $user->id)
+            ->whereIn('status', ['active', 'invited'])
+            ->with(['organization.plan', 'role.permissions'])
+            ->first();
+
+        if (! $membership) {
+            return redirect()->route('login');
+        }
+
+        if ($this->memberLacksPermission($membership, 'organizations.manage')) {
+            abort(403, 'Unauthorized: only organization admins can manage subscription seats.');
+        }
+
+        $organization = $membership->organization;
+        $plan = $organization->plan;
+
+        if (! $plan) {
+            return back()->with('error', __('No active plan found for this workspace.'));
+        }
+
+        $validated = $request->validate([
+            'seats' => ['required', 'integer', 'min:1'],
+        ]);
+
+        $newSeats = (int) $validated['seats'];
+        $activeMembers = $organization->activeMembersCount();
+
+        // 1. Enforce active members floor: cannot reduce seats below active user count
+        $validation = $pricingService->validateSeatQuantity($plan, $newSeats, $activeMembers);
+        if (! $validation['valid']) {
+            return back()->with('error', $validation['message']);
+        }
+
+        $subscription = $organization->subscription;
+        $currentSeats = $organization->getEffectiveSeatLimit();
+
+        if ($newSeats === $currentSeats) {
+            return back()->with('info', __('The requested seat count is identical to your current seat count.'));
+        }
+
+        // If seat decrease
+        if ($newSeats < $currentSeats) {
+            if ($subscription) {
+                $subscription->update(['seats' => $newSeats]);
+            }
+
+            AuditLog::create([
+                'organization_id' => $organization->id,
+                'actor_id' => $user->id,
+                'action' => 'subscription.seats_reduced',
+                'metadata' => [
+                    'previous_seats' => $currentSeats,
+                    'new_seats' => $newSeats,
+                ],
+            ]);
+
+            return back()->with('success', __("Your subscription seats have been successfully updated to :count seats.", ['count' => $newSeats]));
+        }
+
+        // If seat increase on paid/per-seat plan: redirect to payment/checkout page to confirm & transfer
+        if ($plan->isPerSeat() && (float) $plan->price > 0) {
+            return redirect()->route('subscription.payment', [
+                'plan' => $plan->id,
+                'seats' => $newSeats,
+                'type' => 'seat_increase',
+            ])->with('info', __("Please confirm and submit bank transfer details to activate your additional :count seats.", ['count' => $newSeats - $currentSeats]));
+        }
+
+        // If free tier or custom plan without per-seat price: apply directly
+        if ($subscription) {
+            $subscription->update(['seats' => $newSeats]);
+        }
+
+        return back()->with('success', __("Seats updated to :count successfully.", ['count' => $newSeats]));
     }
 
     /**
@@ -510,9 +611,9 @@ class OrganizationSettingsController extends Controller
 
         // Strict Plan Seat Limit Enforcement
         if ($membership->organization->hasReachedSeatLimit()) {
-            $limit = $membership->organization->plan->seat_limit ?? 5;
+            $limit = $membership->organization->getEffectiveSeatLimit();
 
-            return back()->with('error', __('You have reached the maximum team member capacity (:limit seats) for your subscription plan. Please upgrade your plan to add more team members.', ['limit' => $limit]));
+            return back()->with('error', __('You have reached the maximum team member capacity (:limit seats) for your subscription plan. Please increase your seat count or upgrade your plan to add more team members.', ['limit' => $limit]));
         }
 
         $validated = $request->validate([

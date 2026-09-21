@@ -1,39 +1,18 @@
 <div id="tab-timesheets" class="tab-view">
-    <!-- Top Controls & Filters Bar -->
-    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-6); flex-wrap: wrap; gap: var(--ula-space-5);">
-        <div>
-            <h1 class="page-title" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); margin-bottom: var(--ula-space-2); display: flex; align-items: center; gap: var(--ula-space-3);">
-                <span class="material-symbols-rounded" style="font-size: 28px; color: var(--ula-accent-default);">schedule</span>
-                <span>{{ __('Timesheets & Time Tracking') }}</span>
-            </h1>
-            <p class="page-subtitle" style="font-size: var(--ula-size-sm); color: var(--ula-text-secondary);">{{ __('Automated virtual office attendance, project task duration, and daily productivity analytics.') }}</p>
-        </div>
-        <div style="display: flex; gap: var(--ula-space-4); flex-wrap: wrap; align-items: center;">
-            <button onclick="openManualTimeModal()" class="tactile-btn btn-secondary" style="padding: 9px 16px; font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); display: inline-flex; align-items: center; gap: var(--ula-space-3);">
-                <span class="material-symbols-rounded" style="font-size: 16px;">edit_note</span>
-                <span>{{ __('Manual Time Entry') }}</span>
-            </button>
-            <button onclick="submitMyCurrentTimesheet()" class="tactile-btn btn-primary" style="padding: 9px 18px; font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); display: inline-flex; align-items: center; gap: var(--ula-space-3);">
-                <span class="material-symbols-rounded" style="font-size: 16px;">publish</span>
-                <span>{{ __('Submit Weekly Timesheet') }}</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- Interactive Date & Member Filter Ribbon -->
-    <div class="card" style="padding: var(--ula-space-5) var(--ula-space-6); margin-bottom: var(--ula-space-6); border-radius: var(--ula-radius-xl); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--ula-space-5); background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-sm);">
+    <!-- Interactive Date & Member Filter Ribbon with Action CTAs -->
+    <div class="card" style="padding: var(--ula-space-5) var(--ula-space-6); margin-bottom: var(--ula-space-6); border-radius: var(--ula-radius-xl); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--ula-space-4); background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-sm);">
         <!-- Date Navigation Bar -->
         <div style="display: flex; align-items: center; gap: var(--ula-space-3); flex-wrap: wrap;">
             <span style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary); text-transform: uppercase; display: flex; align-items: center; gap: 4px; letter-spacing: 0.04em;">
                 <span class="material-symbols-rounded" style="font-size: 14px; color: var(--ula-text-muted);">calendar_today</span>
                 <span>{{ __('Date') }}:</span>
             </span>
-            <button type="button" onclick="shiftTimesheetDate(-1)" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center;" title="{{ __('Previous Day') }}">
+            <button type="button" onclick="shiftTimesheetDate(-1)" class="appbar-capsule-btn" style="padding: 0 10px; height: 34px;" title="{{ __('Previous Day') }}">
                 <span class="material-symbols-rounded" style="font-size: 14px;">chevron_left</span>
             </button>
-            <input type="date" id="ts-filter-date" value="{{ date('Y-m-d') }}" onchange="handleTimesheetDateChange(this.value)" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md); padding: 6px 12px; color: var(--ula-text-primary); font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; outline: none; box-shadow: var(--ula-shadow-xs);">
-            <button type="button" onclick="setTimesheetToday()" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold);">{{ __('Today') }}</button>
-            <button type="button" onclick="shiftTimesheetDate(1)" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center;" title="{{ __('Next Day') }}">
+            <input type="date" id="ts-filter-date" value="{{ date('Y-m-d') }}" onchange="handleTimesheetDateChange(this.value)" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md); padding: 6px 12px; color: var(--ula-text-primary); font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; outline: none; box-shadow: var(--ula-shadow-xs); height: 34px;">
+            <button type="button" onclick="setTimesheetToday()" class="appbar-capsule-btn" style="padding: 0 12px; height: 34px; font-size: var(--ula-size-xs);">{{ __('Today') }}</button>
+            <button type="button" onclick="shiftTimesheetDate(1)" class="appbar-capsule-btn" style="padding: 0 10px; height: 34px;" title="{{ __('Next Day') }}">
                 <span class="material-symbols-rounded" style="font-size: 14px;">chevron_right</span>
             </button>
         </div>
@@ -42,14 +21,14 @@
         @php
             $canSelectMember = $membership->hasPermission('reports.view') || $membership->hasPermission('members.manage') || $membership->role?->slug === 'company_admin' || $user->isSuperAdmin();
         @endphp
-        <div style="display: flex; align-items: center; gap: var(--ula-space-4); flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
             @if($canSelectMember)
             <div style="display: flex; align-items: center; gap: 6px;">
                 <span style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary); text-transform: uppercase; display: flex; align-items: center; gap: 4px; letter-spacing: 0.04em;">
                     <span class="material-symbols-rounded" style="font-size: 14px; color: var(--ula-text-muted);">person</span>
                     <span>{{ __('Member / View') }}:</span>
                 </span>
-                <select id="ts-filter-user" onchange="handleTimesheetUserChange(this.value)" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md); padding: 6px 12px; color: var(--ula-text-primary); font-size: var(--ula-size-xs); font-weight: 700; outline: none;">
+                <select id="ts-filter-user" onchange="handleTimesheetUserChange(this.value)" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md); padding: 6px 12px; color: var(--ula-text-primary); font-size: var(--ula-size-xs); font-weight: 700; outline: none; height: 34px;">
                     <option value="all">{{ __('All Employees (Company Overview)') }}</option>
                     <option value="{{ $user->id }}" selected>{{ __('My Timesheet') }} ({{ $user->name }})</option>
                     @foreach($members as $m)
@@ -63,10 +42,17 @@
                 <input type="hidden" id="ts-filter-user" value="{{ $user->id }}">
             @endif
 
-            <button type="button" onclick="refreshDailyTimesheet()" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: var(--ula-size-xs); display: inline-flex; align-items: center; gap: 4px;" title="{{ __('Refresh Data') }}">
+            <button type="button" onclick="refreshDailyTimesheet()" class="appbar-capsule-btn" style="padding: 0 12px; height: 34px; font-size: var(--ula-size-xs);" title="{{ __('Refresh Data') }}">
                 <span class="material-symbols-rounded" style="font-size: 14px;">refresh</span>
                 <span>{{ __('Refresh') }}</span>
             </button>
+
+            <x-btn variant="secondary" size="sm" onclick="openManualTimeModal()" icon="edit_note">
+                {{ __('Manual Time Entry') }}
+            </x-btn>
+            <x-btn variant="primary" size="sm" onclick="submitMyCurrentTimesheet()" icon="publish">
+                {{ __('Submit Weekly Timesheet') }}
+            </x-btn>
         </div>
     </div>
 
@@ -101,13 +87,14 @@
                         <th style="padding: 12px 16px; text-align: start; font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary); border-bottom: 1px solid var(--ula-border-subtle);">{{ __('Current Office / Zone') }}</th>
                         <th style="padding: 12px 16px; text-align: start; font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary); border-bottom: 1px solid var(--ula-border-subtle);">{{ __('Today Office Time') }}</th>
                         <th style="padding: 12px 16px; text-align: start; font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary); border-bottom: 1px solid var(--ula-border-subtle);">{{ __('Today Task Time') }}</th>
+                        <th style="padding: 12px 16px; text-align: start; font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary); border-bottom: 1px solid var(--ula-border-subtle);">{{ __('Total Attendance (Combined)') }}</th>
                         <th style="padding: 12px 16px; text-align: start; font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary); border-bottom: 1px solid var(--ula-border-subtle);">{{ __('Active Task / Focus') }}</th>
                         <th style="padding: 12px 16px; text-align: start; font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary); border-bottom: 1px solid var(--ula-border-subtle);">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody id="ts-team-roster-tbody">
                     <tr>
-                        <td colspan="7" style="text-align: center; padding: 24px; color: var(--ula-text-muted);">
+                        <td colspan="8" style="text-align: center; padding: 24px; color: var(--ula-text-muted);">
                             <div style="display: flex; align-items: center; justify-content: center; gap: 6px;">
                                 <span class="material-symbols-rounded" style="font-size: 16px;">hourglass_top</span>
                                 <span>{{ __('Loading team presence across all offices...') }}</span>
@@ -119,8 +106,8 @@
         </div>
     </div>
 
-    <!-- Daily Summary Metric KPI Cards (4-Grid) -->
-    <div class="kpi-grid" style="margin-bottom: var(--ula-space-7); display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--ula-space-5);">
+    <!-- Daily Summary Metric KPI Cards (5-Grid) -->
+    <div class="kpi-grid" style="margin-bottom: var(--ula-space-7); display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--ula-space-5);">
         <!-- 1. Total Office Time -->
         <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: var(--ula-space-5); box-shadow: var(--ula-shadow-xs);">
             <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-3);">
@@ -151,7 +138,22 @@
             </div>
         </div>
 
-        <!-- 3. Idle / Paused Time -->
+        <!-- 3. Total Combined Attendance Time -->
+        <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: var(--ula-space-5); box-shadow: var(--ula-shadow-xs);">
+            <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-3);">
+                <span class="kpi-title" style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary);">{{ __('Total Working Attendance') }}</span>
+                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(36, 92, 58, 0.15); color: var(--ula-palm-800); display: flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">badge</span>
+                </div>
+            </div>
+            <div class="kpi-value" id="ts-kpi-total-work" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-palm-800);">00:00:00</div>
+            <div class="kpi-trend" style="color: var(--ula-palm-700); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
+                <span class="material-symbols-rounded" style="font-size: 14px;">verified_user</span>
+                <span>{{ __('Office Presence + Task Work') }}</span>
+            </div>
+        </div>
+
+        <!-- 4. Idle / Paused Time -->
         <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: var(--ula-space-5); box-shadow: var(--ula-shadow-xs);">
             <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-3);">
                 <span class="kpi-title" style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary);">{{ __('Idle / Paused Time') }}</span>
@@ -166,7 +168,7 @@
             </div>
         </div>
 
-        <!-- 4. Productivity Ratio -->
+        <!-- 5. Productivity Ratio -->
         <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: var(--ula-space-5); box-shadow: var(--ula-shadow-xs);">
             <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-3);">
                 <span class="kpi-title" style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary);">{{ __('Productivity Ratio') }}</span>

@@ -1,18 +1,11 @@
 <div id="tab-members" class="tab-view">
-    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
-        <div>
-            <h1 class="page-title" style="font-size: 22px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
-                <span class="material-symbols-rounded" style="font-size: 24px; color: var(--ula-highlight-default);">group</span>
-                <span>{{ __('Team Members & Roles') }}</span>
-            </h1>
-            <p class="page-subtitle" style="font-size: 13px; color: var(--ula-text-secondary);">{{ __('Manage organization membership, departments, teams, and security roles.') }}</p>
-        </div>
-        @if($membership->hasPermission('members.manage') || $membership->role?->slug === 'company_admin')
+    @if($membership->hasPermission('members.manage') || $membership->role?->slug === 'company_admin')
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
         <x-btn variant="primary" size="md" onclick="openInviteModal()" icon="person_add">
             {{ __('Invite Member') }}
         </x-btn>
-        @endif
     </div>
+    @endif
 
     <div class="card" style="border-radius: var(--ula-radius-lg); overflow: hidden; padding: 0;">
         <div style="padding: 20px 24px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-card);">
@@ -100,29 +93,24 @@
                             <td>
                                 <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
                                     @if($m->user_id !== $user->id)
-                                        <form method="POST" action="{{ route('organization.members.impersonate', $m->id) }}" style="display: inline;" onsubmit="return confirm('{{ __('Are you sure you want to log in as :name?', ['name' => addslashes($m->user->name)]) }}');">
+                                        <form method="POST" action="{{ route('organization.members.impersonate', $m->id) }}" style="display: inline; margin: 0;" onsubmit="return confirm('{{ __('Are you sure you want to log in as :name?', ['name' => addslashes($m->user->name)]) }}');">
                                             @csrf
-                                            <button type="submit" class="nx-btn nx-btn-secondary nx-btn-sm" style="padding: 5px 8px; font-size: 11px;" title="{{ __('Log in as this member') }}">
-                                                <span class="material-symbols-rounded" style="font-size: 13px;">switch_account</span>
-                                                <span>{{ __('Login As') }}</span>
-                                            </button>
+                                            <x-btn variant="secondary" size="sm" type="submit" icon="switch_account" title="{{ __('Log in as this member') }}">
+                                                {{ __('Login As') }}
+                                            </x-btn>
                                         </form>
                                     @endif
-                                    <button onclick="openEditMemberModal('{{ $m->id }}', '{{ addslashes($m->user->name) }}', '{{ addslashes($m->user->email) }}', '{{ $profile?->department_id }}', '{{ $profile?->team_id }}', '{{ $m->role_id }}', '{{ addslashes($profile?->job_title ?? '') }}', '{{ $m->status }}')" class="nx-btn nx-btn-secondary nx-btn-sm" style="padding: 5px 8px; font-size: 11px;" title="{{ __('Edit Member') }}">
-                                        <span class="material-symbols-rounded" style="font-size: 13px;">edit</span>
-                                        <span>{{ __('Edit') }}</span>
-                                    </button>
-                                    <button onclick="openChangeMemberPasswordModal('{{ $m->id }}', '{{ addslashes($m->user->name) }}')" class="nx-btn nx-btn-outline nx-btn-sm" style="padding: 5px 8px; font-size: 11px;" title="{{ __('Change Password') }}">
-                                        <span class="material-symbols-rounded" style="font-size: 13px;">key</span>
-                                        <span>{{ __('Password') }}</span>
-                                    </button>
+                                    <x-btn variant="secondary" size="sm" type="button" onclick="openEditMemberModal('{{ $m->id }}', '{{ addslashes($m->user->name) }}', '{{ addslashes($m->user->email) }}', '{{ $profile?->department_id }}', '{{ $profile?->team_id }}', '{{ $m->role_id }}', '{{ addslashes($profile?->job_title ?? '') }}', '{{ $m->status }}')" icon="edit" title="{{ __('Edit Member') }}">
+                                        {{ __('Edit') }}
+                                    </x-btn>
+                                    <x-btn variant="outline" size="sm" type="button" onclick="openChangeMemberPasswordModal('{{ $m->id }}', '{{ addslashes($m->user->name) }}')" icon="key" title="{{ __('Change Password') }}">
+                                        {{ __('Password') }}
+                                    </x-btn>
                                     @if($m->user_id !== $user->id)
-                                        <form method="POST" action="{{ route('organization.members.delete', $m->id) }}" onsubmit="return confirm('{{ __('Are you sure you want to remove this member from your company?') }}');" style="display: inline;">
+                                        <form method="POST" action="{{ route('organization.members.delete', $m->id) }}" onsubmit="return confirm('{{ __('Are you sure you want to remove this member from your company?') }}');" style="display: inline; margin: 0;">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="nx-btn nx-btn-danger nx-btn-sm" style="padding: 5px 7px;" title="{{ __('Remove Member') }}">
-                                                <span class="material-symbols-rounded" style="font-size: 13px;">delete</span>
-                                            </button>
+                                            <x-btn variant="danger" size="sm" :iconOnly="true" icon="delete" type="submit" title="{{ __('Remove Member') }}" />
                                         </form>
                                     @endif
                                 </div>

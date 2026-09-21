@@ -31,11 +31,24 @@ class ProjectHubController extends Controller
         }
 
         $membership = OrganizationMember::where('user_id', $user->id)
+            ->where('organization_id', $project->organization_id)
             ->whereIn('status', ['active', 'invited'])
             ->with(['organization.plan', 'role.permissions'])
             ->first();
 
-        if (! $membership || $project->organization_id !== $membership->organization_id) {
+        if (! $membership && ($user->is_super_admin ?? false)) {
+            $superAdminRole = \App\Domains\Administration\Models\Role::firstOrCreate(
+                ['organization_id' => $project->organization_id, 'slug' => 'company_admin'],
+                ['name' => 'Company Admin', 'is_default' => false]
+            );
+            $membership = OrganizationMember::firstOrCreate(
+                ['user_id' => $user->id, 'organization_id' => $project->organization_id],
+                ['role_id' => $superAdminRole->id, 'status' => 'active']
+            );
+            $membership->load(['organization.plan', 'role.permissions']);
+        }
+
+        if (! $membership) {
             abort(404);
         }
 

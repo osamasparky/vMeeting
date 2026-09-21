@@ -18,7 +18,7 @@
    IBM Plex Sans / Mono stay on the Google CDN — swap the same way if needed. */
 /* @import must be the first rule in the stylesheet (CSS spec) — anything
    ahead of it, @font-face included, makes conformant parsers drop it. */
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
 
 @font-face {
   font-family: 'Cairo';
@@ -35,6 +35,25 @@
   font-display: swap;
   src: url('/fonts/cairo/cairo-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+
+html {
+  font-family: 'Cairo', 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--ula-text-primary);
+  background-color: var(--ula-surface-page);
+  -webkit-font-smoothing: antialiased;
+}
+
+[dir="rtl"], [lang="ar"], html[dir="rtl"] body {
+  font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
+}
+
+[dir="ltr"], [lang="en"], html[dir="ltr"] body {
+  font-family: 'IBM Plex Sans', 'Cairo', sans-serif;
+}
+
+body, button, input, select, textarea, optgroup {
+  font-family: inherit;
 }
 
 :root {
@@ -649,3 +668,877 @@
   --nx-shadow-lg: var(--ula-shadow-lg);
   --nx-focus-ring: var(--ula-focus-ring);
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   ULASPACE BUTTON DESIGN SYSTEM (FIGMA 100% SPEC COMPLIANT)
+   ══════════════════════════════════════════════════════════════════════════ */
+.ula-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  text-decoration: none !important;
+  box-sizing: border-box !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  border-style: solid !important;
+  border-width: 1px !important;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease !important;
+  outline: none !important;
+}
+
+.ula-btn:focus-visible {
+  box-shadow: var(--ula-focus-ring) !important;
+}
+
+.ula-btn:disabled, .ula-btn.disabled {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+  transform: none !important;
+}
+
+/* --- SIZES --- */
+/* Large: 52px */
+.ula-btn--lg {
+  height: 52px !important;
+  min-height: 52px !important;
+  padding: 0 26px !important;
+  font-size: 16px !important;
+  border-radius: 16px !important;
+  gap: 10px !important;
+}
+.ula-btn--lg.ula-btn--icon-only {
+  width: 52px !important;
+  min-width: 52px !important;
+  padding: 0 !important;
+}
+.ula-btn--lg .material-symbols-rounded {
+  font-size: 20px !important;
+}
+
+/* Medium (Default): 44px */
+.ula-btn--md {
+  height: 44px !important;
+  min-height: 44px !important;
+  padding: 0 22px !important;
+  font-size: 14px !important;
+  border-radius: 12px !important;
+  gap: 8px !important;
+}
+.ula-btn--md.ula-btn--icon-only {
+  width: 44px !important;
+  min-width: 44px !important;
+  padding: 0 !important;
+}
+.ula-btn--md .material-symbols-rounded {
+  font-size: 18px !important;
+}
+
+/* Small: 36px */
+.ula-btn--sm {
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 16px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  border-radius: 10px !important;
+  gap: 7px !important;
+}
+.ula-btn--sm.ula-btn--icon-only {
+  width: 36px !important;
+  min-width: 36px !important;
+  padding: 0 !important;
+}
+.ula-btn--sm .material-symbols-rounded {
+  font-size: 16px !important;
+}
+
+/* Pill Modifier */
+.ula-btn--pill {
+  border-radius: 9999px !important;
+}
+
+/* --- VARIANTS --- */
+/* Primary: Forest Green */
+.ula-btn--primary {
+  background-color: var(--ula-palm-900, #1b3524) !important;
+  border-color: var(--ula-palm-900, #1b3524) !important;
+  color: #FFFFFF !important;
+  box-shadow: var(--ula-shadow-xs, 0 1px 2px rgba(0,0,0,0.05)) !important;
+}
+.ula-btn--primary:hover {
+  background-color: var(--ula-palm-800, #245c3a) !important;
+  border-color: var(--ula-palm-800, #245c3a) !important;
+  color: #FFFFFF !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--ula-shadow-sm, 0 4px 6px -1px rgba(0,0,0,0.1)) !important;
+}
+.ula-btn--primary:active {
+  background-color: var(--ula-palm-950, #0f2015) !important;
+  border-color: var(--ula-palm-950, #0f2015) !important;
+  transform: translateY(0) !important;
+}
+
+/* Secondary: Warm Sand */
+.ula-btn--secondary {
+  background-color: var(--ula-sand-100, #f0eae1) !important;
+  border-color: var(--ula-stone-300, #d5ded0) !important;
+  color: var(--ula-palm-900, #1b3524) !important;
+  box-shadow: var(--ula-shadow-xs, 0 1px 2px rgba(0,0,0,0.05)) !important;
+}
+.ula-btn--secondary:hover {
+  background-color: var(--ula-sand-50, #f9f7f4) !important;
+  border-color: var(--ula-palm-700, #2d6a45) !important;
+  color: var(--ula-palm-900, #1b3524) !important;
+  transform: translateY(-1px) !important;
+}
+.ula-btn--secondary:active {
+  background-color: var(--ula-sand-200, #e5dccf) !important;
+  border-color: var(--ula-palm-900, #1b3524) !important;
+  transform: translateY(0) !important;
+}
+
+/* Outline */
+.ula-btn--outline {
+  background-color: transparent !important;
+  border-color: var(--ula-stone-300, #d5ded0) !important;
+  color: var(--ula-palm-900, #1b3524) !important;
+}
+.ula-btn--outline:hover {
+  background-color: var(--ula-sand-50, #f9f7f4) !important;
+  border-color: var(--ula-palm-700, #2d6a45) !important;
+  color: var(--ula-palm-900, #1b3524) !important;
+}
+.ula-btn--outline:active {
+  background-color: var(--ula-sand-200, #e5dccf) !important;
+}
+
+/* Ghost */
+.ula-btn--ghost {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  color: var(--ula-palm-900, #1b3524) !important;
+}
+.ula-btn--ghost:hover {
+  background-color: var(--ula-palm-50, rgba(27,53,36,0.06)) !important;
+  color: var(--ula-palm-900, #1b3524) !important;
+}
+.ula-btn--ghost:active {
+  background-color: var(--ula-palm-100, rgba(27,53,36,0.12)) !important;
+}
+
+/* Danger */
+.ula-btn--danger {
+  background-color: var(--ula-terracotta-500, #c84b31) !important;
+  border-color: var(--ula-terracotta-500, #c84b31) !important;
+  color: #FFFFFF !important;
+  box-shadow: var(--ula-shadow-xs) !important;
+}
+.ula-btn--danger:hover {
+  background-color: var(--ula-terracotta-600, #ab3d25) !important;
+  border-color: var(--ula-terracotta-600, #ab3d25) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Nav CTA: Warm Gold */
+.ula-btn--nav-cta {
+  background-color: var(--ula-gold-400, #d4a343) !important;
+  border-color: var(--ula-gold-400, #d4a343) !important;
+  color: var(--ula-palm-900, #1b3524) !important;
+  font-weight: 800 !important;
+  box-shadow: var(--ula-shadow-xs) !important;
+}
+.ula-btn--nav-cta:hover {
+  background-color: var(--ula-gold-500, #bf8f30) !important;
+  border-color: var(--ula-gold-500, #bf8f30) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ==========================================================================
+   ULA DESIGN SYSTEM: BADGES, TAGS & CHIPS
+   ========================================================================== */
+.ula-badge,
+.badge,
+.badge-status {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+  user-select: none !important;
+  box-sizing: border-box !important;
+  font-family: var(--ula-font-ar, 'Cairo', sans-serif) !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  border-radius: var(--ula-radius-pill, 9999px) !important;
+  border: 1px solid transparent !important;
+  transition: all var(--ula-duration-fast, 160ms) var(--ula-ease-out, ease-out) !important;
+}
+
+/* Badge Sizes */
+.ula-badge--sm {
+  min-height: 24px !important;
+  height: 24px !important;
+  padding: 0 10px !important;
+  font-size: 11.5px !important;
+  gap: 5px !important;
+}
+.ula-badge--md {
+  min-height: 29px !important;
+  height: 29px !important;
+  padding: 0 14px !important;
+  font-size: 12.5px !important;
+  gap: 6px !important;
+}
+.ula-badge--lg,
+.ula-badge--chip {
+  min-height: 36px !important;
+  height: 36px !important;
+  padding: 0 18px !important;
+  font-size: 13.5px !important;
+  gap: 8px !important;
+}
+
+/* Badge Variants */
+/* Live / Active / Success */
+.ula-badge--live {
+  background-color: var(--ula-tone-palm-bg, #dbe6dd) !important;
+  color: var(--ula-tone-palm-fg, #1e412f) !important;
+  border-color: rgba(30, 65, 47, 0.14) !important;
+}
+.ula-badge--live .ula-badge__dot {
+  background-color: var(--ula-tone-palm-dot, #3c6b4c) !important;
+}
+
+/* Scheduled / Warning / Gold / High */
+.ula-badge--scheduled {
+  background-color: var(--ula-tone-gold-bg, #f0dfbc) !important;
+  color: var(--ula-tone-gold-fg, #946c27) !important;
+  border-color: rgba(148, 108, 39, 0.18) !important;
+}
+.ula-badge--scheduled .ula-badge__dot {
+  background-color: var(--ula-tone-gold-dot, #d3a553) !important;
+}
+
+/* Attention / Danger / Terracotta / Urgent */
+.ula-badge--attention {
+  background-color: var(--ula-tone-terracotta-bg, #ecc9ae) !important;
+  color: var(--ula-tone-terracotta-fg, #7d451d) !important;
+  border-color: rgba(125, 69, 29, 0.18) !important;
+}
+.ula-badge--attention .ula-badge__dot {
+  background-color: var(--ula-tone-terracotta-dot, #b46c34) !important;
+}
+
+/* Cancelled / Stone / Neutral / Low */
+.ula-badge--cancelled,
+.ula-badge--stone {
+  background-color: var(--ula-tone-stone-bg, #e8e4dc) !important;
+  color: var(--ula-tone-stone-fg, #4a443c) !important;
+  border-color: rgba(74, 68, 60, 0.14) !important;
+}
+.ula-badge--cancelled .ula-badge__dot,
+.ula-badge--stone .ula-badge__dot {
+  background-color: var(--ula-tone-stone-dot, #a49889) !important;
+}
+
+/* Default / Medium / Sand */
+.ula-badge--default {
+  background-color: var(--ula-sand-200, #f4ede1) !important;
+  color: var(--ula-palm-900, #142b24) !important;
+  border-color: var(--ula-stone-300, #c1b6a6) !important;
+}
+.ula-badge--default .ula-badge__dot {
+  background-color: var(--ula-palm-600, #2a5439) !important;
+}
+
+/* Accent (Solid Gold/Palm) */
+.ula-badge--accent {
+  background-color: var(--ula-highlight-default, #d3a553) !important;
+  color: var(--ula-palm-900, #142b24) !important;
+  border-color: transparent !important;
+}
+
+/* Chip / Filter Variant */
+.ula-badge--filter {
+  background-color: var(--ula-surface-card, #f9f6ef) !important;
+  border-color: var(--ula-border-default, #d9d3c8) !important;
+  color: var(--ula-text-body, #4a443c) !important;
+}
+.ula-badge--filter:hover {
+  background-color: var(--ula-surface-hover, #f4ede1) !important;
+  border-color: var(--ula-border-hover, #857a6c) !important;
+}
+
+/* Badge Dot and Icon */
+.ula-badge__dot {
+  width: 7px !important;
+  height: 7px !important;
+  min-width: 7px !important;
+  border-radius: 9999px !important;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
+}
+
+.ula-badge__icon {
+  font-size: 15px !important;
+  line-height: 1 !important;
+  flex-shrink: 0 !important;
+}
+
+/* Generic nav-badge-pill standardized */
+.nav-badge-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 3px 10px !important;
+  min-height: 22px !important;
+  border-radius: var(--ula-radius-pill, 9999px) !important;
+  font-family: var(--ula-font-mono, 'IBM Plex Mono', monospace) !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  background-color: var(--ula-tone-palm-bg, #dbe6dd) !important;
+  color: var(--ula-tone-palm-fg, #1e412f) !important;
+  border: 1px solid rgba(30, 65, 47, 0.12) !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+}
+
+/* ==========================================================================
+   ULA DESIGN SYSTEM: ICON BUTTONS
+   ========================================================================== */
+.ula-icon-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  vertical-align: middle !important;
+  user-select: none !important;
+  box-sizing: border-box !important;
+  border: 1px solid var(--ula-border-default, #d9d3c8) !important;
+  border-radius: 12px !important;
+  background-color: var(--ula-surface-card, #f9f6ef) !important;
+  color: var(--ula-icon-secondary, #665d52) !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  transition: all var(--ula-duration-fast, 160ms) var(--ula-ease-out, ease-out) !important;
+  position: relative !important;
+}
+
+.ula-icon-btn:hover {
+  background-color: var(--ula-surface-hover, #f4ede1) !important;
+  border-color: var(--ula-border-hover, #857a6c) !important;
+  color: var(--ula-icon-primary, #1b3223) !important;
+  transform: translateY(-1px) !important;
+}
+
+.ula-icon-btn:active {
+  transform: translateY(0) !important;
+}
+
+.ula-icon-btn--sm {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  border-radius: 10px !important;
+}
+.ula-icon-btn--sm .material-symbols-rounded {
+  font-size: 18px !important;
+}
+
+.ula-icon-btn--md {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px !important;
+  border-radius: 12px !important;
+}
+.ula-icon-btn--md .material-symbols-rounded {
+  font-size: 20px !important;
+}
+
+.ula-icon-btn--lg {
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  border-radius: 14px !important;
+}
+.ula-icon-btn--lg .material-symbols-rounded {
+  font-size: 24px !important;
+}
+
+.ula-icon-btn--primary {
+  background-color: var(--ula-palm-900, #1b3524) !important;
+  border-color: var(--ula-palm-900, #1b3524) !important;
+  color: #FFFFFF !important;
+}
+.ula-icon-btn--primary:hover {
+  background-color: var(--ula-palm-800, #245c3a) !important;
+  border-color: var(--ula-palm-800, #245c3a) !important;
+  color: #FFFFFF !important;
+}
+
+.ula-icon-btn--ghost {
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+.ula-icon-btn--ghost:hover {
+  background-color: var(--ula-palm-50, rgba(27,53,36,0.06)) !important;
+  border-color: transparent !important;
+}
+
+.ula-icon-btn--danger {
+  background-color: var(--ula-surface-danger-soft, #ecc9ae) !important;
+  border-color: transparent !important;
+  color: var(--ula-status-danger, #9a5827) !important;
+}
+.ula-icon-btn--danger:hover {
+  background-color: var(--ula-status-danger, #9a5827) !important;
+  color: #FFFFFF !important;
+}
+
+.ula-icon-btn--pill {
+  border-radius: 9999px !important;
+}
+
+/* ==========================================================================
+   ULA DESIGN SYSTEM: TASK MODAL TABS & INSPECTOR
+   ========================================================================== */
+.task-modal-segmented-bar {
+  display: flex !important;
+  gap: 6px !important;
+  background: var(--ula-surface-page-alt, #f4ede1) !important;
+  padding: 5px !important;
+  border-radius: 14px !important;
+  border: 1px solid var(--ula-border-subtle, #e8e4dc) !important;
+  margin-bottom: 18px !important;
+  overflow-x: auto !important;
+  scrollbar-width: none !important;
+}
+.task-modal-segmented-bar::-webkit-scrollbar {
+  display: none !important;
+}
+
+.task-modal-tab-btn {
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 16px !important;
+  border-radius: 10px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  border: 1px solid transparent !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  transition: all var(--ula-duration-fast, 160ms) var(--ula-ease-out, ease-out) !important;
+  font-family: var(--ula-font-ar, 'Cairo', sans-serif) !important;
+  background: transparent !important;
+  color: var(--ula-text-secondary, #665d52) !important;
+  text-decoration: none !important;
+  box-sizing: border-box !important;
+}
+
+.task-modal-tab-btn:hover {
+  background: var(--ula-surface-card, #f9f6ef) !important;
+  color: var(--ula-text-primary, #142b24) !important;
+  border-color: var(--ula-border-subtle, #e8e4dc) !important;
+}
+
+.task-modal-tab-btn.active,
+.task-modal-tab-btn[aria-selected="true"] {
+  background: var(--ula-palm-900, #1b3524) !important;
+  color: #FFFFFF !important;
+  border-color: var(--ula-palm-900, #1b3524) !important;
+  box-shadow: var(--ula-shadow-xs, 0 1px 2px rgba(0,0,0,0.05)) !important;
+}
+
+.task-modal-tab-btn .task-modal-tab-count {
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  padding: 1px 7px !important;
+  border-radius: 9999px !important;
+  font-family: var(--ula-font-mono, 'IBM Plex Mono', monospace) !important;
+  direction: ltr !important;
+  unicode-bidi: isolate !important;
+  background: var(--ula-tone-palm-bg, #dbe6dd) !important;
+  color: var(--ula-tone-palm-fg, #1e412f) !important;
+  transition: all var(--ula-duration-fast, 160ms) ease !important;
+}
+
+.task-modal-tab-btn.active .task-modal-tab-count {
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: #FFFFFF !important;
+}
+
+/* Task Meta Chips in Modal Header */
+.task-modal-chip {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  background: var(--ula-surface-page-alt, #f4ede1) !important;
+  border: 1px solid var(--ula-border-subtle, #e8e4dc) !important;
+  border-radius: var(--ula-radius-pill, 9999px) !important;
+  padding: 4px 12px !important;
+  font-size: 12px !important;
+  color: var(--ula-text-secondary, #665d52) !important;
+  font-weight: 600 !important;
+}
+.task-modal-chip strong {
+  color: var(--ula-text-primary, #142b24) !important;
+}
+.task-modal-chip.clickable:hover {
+  background: var(--ula-surface-card, #f9f6ef) !important;
+  border-color: var(--ula-palm-600, #2a5439) !important;
+  cursor: pointer !important;
+}
+
+/* Dark mode overrides for task modal */
+[data-theme="dark"] .task-modal-segmented-bar,
+.dark .task-modal-segmented-bar {
+  background: rgba(20, 43, 36, 0.4) !important;
+  border-color: var(--ula-border-subtle) !important;
+}
+[data-theme="dark"] .task-modal-tab-btn.active,
+.dark .task-modal-tab-btn.active {
+  background: var(--ula-palm-700) !important;
+  color: #FFFFFF !important;
+  border-color: var(--ula-palm-600) !important;
+}
+[data-theme="dark"] .task-modal-chip,
+.dark .task-modal-chip {
+  background: var(--ula-palm-900) !important;
+  border-color: var(--ula-border-subtle) !important;
+  color: var(--ula-sand-300) !important;
+}
+[data-theme="dark"] .task-modal-chip strong,
+.dark .task-modal-chip strong {
+  color: var(--ula-sand-100) !important;
+}
+
+/* ==========================================================================
+   ULASPACE TASK CARD DESIGN SYSTEM (KANBAN & LISTS)
+   ========================================================================== */
+.kanban-task-card, .global-kanban-card, .kanban-card {
+  background: var(--ula-surface-card, #f9f6ef) !important;
+  border: 1px solid var(--ula-border-subtle, #e8e4dc) !important;
+  border-radius: 14px !important;
+  padding: 14px 15px !important;
+  box-shadow: 0 1px 3px rgba(27, 53, 36, 0.04), 0 1px 2px rgba(27, 53, 36, 0.02) !important;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s ease !important;
+  position: relative !important;
+  user-select: none !important;
+  cursor: grab !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  font-family: var(--ula-font-ar, 'Cairo', sans-serif) !important;
+  box-sizing: border-box !important;
+}
+
+.kanban-task-card:hover, .global-kanban-card:hover, .kanban-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 16px rgba(27, 53, 36, 0.08), 0 2px 4px rgba(27, 53, 36, 0.04) !important;
+  border-color: var(--ula-palm-600, #2a5439) !important;
+}
+
+.kanban-task-card:active, .global-kanban-card:active, .kanban-card:active {
+  cursor: grabbing !important;
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 6px rgba(27, 53, 36, 0.06) !important;
+}
+
+/* Header row */
+.task-card-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 8px !important;
+  min-height: 24px !important;
+}
+
+.task-card-tags {
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  flex-wrap: wrap !important;
+}
+
+.task-code-badge {
+  font-family: var(--ula-font-mono, 'IBM Plex Mono', monospace) !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  padding: 2px 8px !important;
+  border-radius: 6px !important;
+  background: var(--ula-surface-page-alt, #f4ede1) !important;
+  color: var(--ula-palm-800, #1f452d) !important;
+  border: 1px solid var(--ula-border-subtle, #e8e4dc) !important;
+  line-height: 1.3 !important;
+  direction: ltr !important;
+  unicode-bidi: isolate !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+.task-card-actions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+}
+
+.task-dots-btn {
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 7px !important;
+  border: 1px solid transparent !important;
+  background: transparent !important;
+  color: var(--ula-text-muted, #948b7e) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 16px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+}
+
+.task-dots-btn:hover {
+  background: var(--ula-surface-page-alt, #f4ede1) !important;
+  color: var(--ula-text-primary, #142b24) !important;
+  border-color: var(--ula-border-subtle, #e8e4dc) !important;
+  transform: scale(1.05) !important;
+}
+
+/* Title */
+.task-card-title {
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  color: var(--ula-text-primary, #142b24) !important;
+  line-height: 1.45 !important;
+  margin: 0 !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+  word-break: break-word !important;
+  transition: color 0.15s ease !important;
+}
+
+.kanban-task-card:hover .task-card-title {
+  color: var(--ula-palm-800, #1f452d) !important;
+}
+
+/* Milestone */
+.task-card-milestone {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 2px 8px !important;
+  border-radius: 9999px !important;
+  background: rgba(36, 92, 58, 0.08) !important;
+  color: var(--ula-palm-800, #1f452d) !important;
+  border: 1px solid rgba(36, 92, 58, 0.18) !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Meta */
+.task-card-meta {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  font-size: 11.5px !important;
+  color: var(--ula-text-secondary, #665d52) !important;
+  flex-wrap: wrap !important;
+  padding-top: 4px !important;
+  border-top: 1px dashed var(--ula-border-subtle, #e8e4dc) !important;
+}
+
+.task-project-name {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  font-weight: 600 !important;
+  color: var(--ula-text-secondary, #665d52) !important;
+  max-width: 120px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.task-assignee-chip {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  background: var(--ula-surface-page-alt, #f4ede1) !important;
+  border: 1px solid var(--ula-border-subtle, #e8e4dc) !important;
+  border-radius: 9999px !important;
+  padding: 2px 8px 2px 3px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: var(--ula-text-primary, #142b24) !important;
+}
+
+.task-avatar-circle {
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 50% !important;
+  background: var(--ula-palm-900, #1b3524) !important;
+  color: #FFFFFF !important;
+  font-size: 9.5px !important;
+  font-weight: 800 !important;
+  font-family: var(--ula-font-mono, 'IBM Plex Mono', monospace) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+}
+
+.task-due-date {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  padding: 2px 7px !important;
+  border-radius: 6px !important;
+  background: var(--ula-surface-page-alt, #f4ede1) !important;
+  border: 1px solid var(--ula-border-subtle, #e8e4dc) !important;
+  color: var(--ula-text-secondary, #665d52) !important;
+  font-family: var(--ula-font-mono, 'IBM Plex Mono', monospace) !important;
+  direction: ltr !important;
+  unicode-bidi: isolate !important;
+}
+
+.task-due-date.is-overdue {
+  background: var(--ula-surface-danger-soft, #ecc9ae) !important;
+  color: var(--ula-status-danger, #9a5827) !important;
+  border-color: rgba(154, 88, 39, 0.3) !important;
+}
+
+/* Footer */
+.task-card-footer {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  padding-top: 8px !important;
+  border-top: 1px solid var(--ula-border-subtle, #e8e4dc) !important;
+  margin-top: 2px !important;
+}
+
+.card-status-select {
+  background: var(--ula-surface-page-alt, #f4ede1) !important;
+  border: 1px solid var(--ula-border-subtle, #e8e4dc) !important;
+  color: var(--ula-text-primary, #142b24) !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+  padding: 4px 10px !important;
+  outline: none !important;
+  cursor: pointer !important;
+  font-family: var(--ula-font-ar, 'Cairo', sans-serif) !important;
+  transition: all 0.15s ease !important;
+}
+
+.card-status-select:hover {
+  border-color: var(--ula-border-hover, #857a6c) !important;
+  background: var(--ula-surface-card, #f9f6ef) !important;
+}
+
+.card-status-select:focus {
+  border-color: var(--ula-palm-700, #204b32) !important;
+  box-shadow: var(--ula-focus-ring) !important;
+}
+
+.task-timer-pill {
+  background: rgba(36, 92, 58, 0.08) !important;
+  color: var(--ula-palm-800, #1f452d) !important;
+  border: 1px solid rgba(36, 92, 58, 0.2) !important;
+  padding: 4px 10px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  border-radius: 9999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  font-family: var(--ula-font-mono, 'IBM Plex Mono', monospace) !important;
+  direction: ltr !important;
+  unicode-bidi: isolate !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+}
+
+.task-timer-pill:hover {
+  background: var(--ula-palm-900, #1b3524) !important;
+  color: #FFFFFF !important;
+  border-color: var(--ula-palm-900, #1b3524) !important;
+  transform: scale(1.03) !important;
+}
+
+/* Dark mode for task cards */
+[data-theme="dark"] .kanban-task-card,
+[data-theme="dark"] .global-kanban-card,
+[data-theme="dark"] .kanban-card,
+.dark .kanban-task-card,
+.dark .global-kanban-card,
+.dark .kanban-card {
+  background: var(--ula-surface-card) !important;
+  border-color: var(--ula-border-subtle) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+}
+
+[data-theme="dark"] .task-code-badge,
+.dark .task-code-badge {
+  background: var(--ula-palm-900) !important;
+  color: var(--ula-sand-200) !important;
+  border-color: var(--ula-border-subtle) !important;
+}
+
+[data-theme="dark"] .task-assignee-chip,
+.dark .task-assignee-chip {
+  background: var(--ula-palm-900) !important;
+  border-color: var(--ula-border-subtle) !important;
+  color: var(--ula-sand-100) !important;
+}
+
+[data-theme="dark"] .task-due-date,
+.dark .task-due-date {
+  background: var(--ula-palm-900) !important;
+  border-color: var(--ula-border-subtle) !important;
+  color: var(--ula-sand-300) !important;
+}
+
+[data-theme="dark"] .card-status-select,
+.dark .card-status-select {
+  background: var(--ula-palm-900) !important;
+  border-color: var(--ula-border-subtle) !important;
+  color: var(--ula-sand-100) !important;
+}
+
+[data-theme="dark"] .task-timer-pill,
+.dark .task-timer-pill {
+  background: rgba(36, 92, 58, 0.25) !important;
+  color: var(--ula-sand-100) !important;
+  border-color: rgba(36, 92, 58, 0.45) !important;
+}
+[data-theme="dark"] .task-timer-pill:hover,
+.dark .task-timer-pill:hover {
+  background: var(--ula-palm-700) !important;
+  color: #FFFFFF !important;
+}
+
+

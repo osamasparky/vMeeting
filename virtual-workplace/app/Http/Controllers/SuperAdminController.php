@@ -366,6 +366,9 @@ class SuperAdminController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:100'],
             'price' => ['required', 'numeric', 'min:0'],
+            'is_per_seat' => ['nullable', 'boolean'],
+            'min_seats' => ['nullable', 'integer', 'min:1'],
+            'max_seats' => ['nullable', 'integer', 'min:1'],
             'seat_limit' => ['required', 'integer', 'min:0'],
             'max_offices' => ['required', 'integer', 'min:0'],
             'room_limit' => ['required', 'integer', 'min:0'],
@@ -382,6 +385,9 @@ class SuperAdminController extends Controller
             'name' => $validated['name'],
             'slug' => Str::slug($validated['name']).'-'.Str::random(3),
             'price' => $validated['price'],
+            'is_per_seat' => $request->has('is_per_seat'),
+            'min_seats' => $validated['min_seats'] ?? 2,
+            'max_seats' => $validated['max_seats'] ?? null,
             'seat_limit' => $validated['seat_limit'],
             'max_offices' => $validated['max_offices'],
             'room_limit' => $validated['room_limit'],
@@ -401,6 +407,9 @@ class SuperAdminController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:100'],
             'price' => ['required', 'numeric', 'min:0'],
+            'is_per_seat' => ['nullable', 'boolean'],
+            'min_seats' => ['nullable', 'integer', 'min:1'],
+            'max_seats' => ['nullable', 'integer', 'min:1'],
             'seat_limit' => ['required', 'integer', 'min:0'],
             'max_offices' => ['required', 'integer', 'min:0'],
             'room_limit' => ['required', 'integer', 'min:0'],
@@ -415,6 +424,9 @@ class SuperAdminController extends Controller
         $plan->update([
             'name' => $validated['name'],
             'price' => $validated['price'],
+            'is_per_seat' => $request->has('is_per_seat'),
+            'min_seats' => $validated['min_seats'] ?? 2,
+            'max_seats' => $validated['max_seats'] ?? null,
             'seat_limit' => $validated['seat_limit'],
             'max_offices' => $validated['max_offices'],
             'room_limit' => $validated['room_limit'],
@@ -495,19 +507,35 @@ class SuperAdminController extends Controller
         }
 
         $months = $subscriptionRequest->billing_cycle === 'yearly' ? 12 : 1;
+        $seats = $subscriptionRequest->seats ?: ($plan->isPerSeat() ? $plan->getEffectiveMinSeats() : $plan->seat_limit);
 
         // 1. Update Organization Plan
         $organization->update([
             'plan_id' => $plan->id,
         ]);
 
-        // 2. Create / Renew Subscription Record
-        Subscription::create([
-            'organization_id' => $organization->id,
-            'plan_id' => $plan->id,
-            'status' => 'active',
-            'current_period_end' => now()->addMonths($months),
-        ]);
+        // 2. Create / Renew / Update Subscription Record
+        $existingSub = Subscription::where('organization_id', $organization->id)->first();
+        if ($existingSub) {
+            $existingSub->update([
+                'plan_id' => $plan->id,
+                'seats' => $seats,
+                'billing_cycle' => $subscriptionRequest->billing_cycle ?: 'monthly',
+                'price_per_seat' => $subscriptionRequest->price_per_seat,
+                'status' => 'active',
+                'current_period_end' => now()->addMonths($months),
+            ]);
+        } else {
+            Subscription::create([
+                'organization_id' => $organization->id,
+                'plan_id' => $plan->id,
+                'seats' => $seats,
+                'billing_cycle' => $subscriptionRequest->billing_cycle ?: 'monthly',
+                'price_per_seat' => $subscriptionRequest->price_per_seat,
+                'status' => 'active',
+                'current_period_end' => now()->addMonths($months),
+            ]);
+        }
 
         // 3. Mark Request as Approved
         $adminNotes = $request->input('admin_notes', 'Approved by SuperAdmin');
@@ -527,12 +555,13 @@ class SuperAdminController extends Controller
                 'request_id' => $subscriptionRequest->id,
                 'plan_id' => $plan->id,
                 'plan_name' => $plan->name,
+                'seats' => $seats,
                 'amount' => $subscriptionRequest->amount,
                 'reference' => $subscriptionRequest->transfer_reference,
             ],
         ]);
 
-        return back()->with('success', "تم قبول طلب التحويل البنكي وتفعيل باقة ({$plan->name}) لشركة {$organization->name} بنجاح!");
+        return back()->with('success', "تم قبول طلب التحويل البنكي وتفعيل باقة ({$plan->name}) لعدد ({$seats}) مقاعد لشركة {$organization->name} بنجاح!");
     }
 
     /**

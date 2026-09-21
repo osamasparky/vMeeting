@@ -25,7 +25,7 @@ Route::get('/lang/{locale}', function (string $locale) {
         cookie()->queue('locale', $locale, 525600);
     }
     $referer = request()->header('referer');
-    if ($referer) {
+    if ($referer && ! str_contains($referer, '/lang/')) {
         return redirect($referer)->withCookie(cookie('locale', $locale, 525600));
     }
 
@@ -46,6 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/organization/upgrade-plan', [OrganizationSettingsController::class, 'upgradePlan'])->name('organization.upgrade_plan');
     Route::get('/billing/payment/{plan}', [OrganizationSettingsController::class, 'showPaymentPage'])->name('subscription.payment');
     Route::post('/billing/payment/{plan}/submit', [OrganizationSettingsController::class, 'submitBankTransferPayment'])->name('subscription.payment.submit');
+    Route::post('/billing/seats/update', [OrganizationSettingsController::class, 'updateSubscriptionSeats'])->name('subscription.seats.update');
     Route::post('/billing/payment-requests/{subscriptionRequest}/cancel', [OrganizationSettingsController::class, 'cancelSubscriptionRequest'])->name('subscription.payment.cancel');
     Route::post('/organization/settings', [OrganizationSettingsController::class, 'updateOrganizationSettings'])->name('organization.settings.update');
     Route::post('/profile', [AuthController::class, 'updateProfile'])->name('profile.update');

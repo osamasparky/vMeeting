@@ -11,8 +11,16 @@
                 <span style="color: var(--ula-text-muted);">{{ $organization->name }}</span>
             </div>
 
-            <h1 class="nx-hero-title">
-                {{ __('Good morning, :name!', ['name' => explode(' ', $user->name)[0]]) }}
+            @php
+                $hour = (int) now()->format('H');
+                $isEvening = $hour >= 12;
+            @endphp
+            <h1 class="nx-hero-title" id="nx-hero-dynamic-greeting">
+                @if($isEvening)
+                    {{ __('Good evening, :name!', ['name' => explode(' ', $user->name)[0]]) }}
+                @else
+                    {{ __('Good morning, :name!', ['name' => explode(' ', $user->name)[0]]) }}
+                @endif
             </h1>
             
             <p class="nx-hero-tagline">
@@ -21,27 +29,24 @@
 
             <!-- Action CTAs -->
             <div class="nx-hero-actions">
-                <a href="{{ route('office') }}" class="nx-btn-primary">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">apartment</span>
-                    <span>{{ __('Enter Workspace') }}</span>
-                </a>
+                <x-btn variant="primary" size="md" href="{{ route('office') }}" icon="apartment">
+                    {{ __('Enter Workspace') }}
+                </x-btn>
                 
-                <button type="button" onclick="openScheduleMeetingModal('general')" class="nx-btn-secondary">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">calendar_add_on</span>
-                    <span>{{ __('Schedule Meeting') }}</span>
-                </button>
+                <x-btn variant="secondary" size="md" type="button" onclick="openScheduleMeetingModal('general')" icon="calendar_add_on">
+                    {{ __('Schedule Meeting') }}
+                </x-btn>
 
                 @if($membership->hasPermission('maps.manage'))
-                    <a href="{{ route('editor') }}" class="nx-btn-outline">
-                        <span class="material-symbols-rounded" style="font-size: 18px;">design_services</span>
-                        <span>{{ __('Floor Editor') }}</span>
-                    </a>
+                    <x-btn variant="outline" size="md" href="{{ route('editor') }}" icon="design_services">
+                        {{ __('Floor Editor') }}
+                    </x-btn>
                 @endif
             </div>
         </div>
 
-        <!-- Right / RTL End: Date Capsule & User Avatar -->
-        <div class="nx-hero-date-card">
+        <!-- Right / RTL End: Date Capsule & Live Working Clock & User Avatar -->
+        <div class="nx-hero-date-card" style="display: flex; align-items: center; gap: 14px; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); padding: 12px 18px; border-radius: 20px; box-shadow: var(--ula-shadow-xs);">
             <!-- User Avatar with Online status -->
             <div style="position: relative; cursor: pointer;" onclick="switchAdminTab('profile')" title="{{ __('View Profile') }}">
                 <div style="width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--ula-white); box-shadow: 0 2px 8px rgba(20,43,36,0.08); overflow: hidden; background: var(--ula-sand-200); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--ula-text-primary);">
@@ -56,15 +61,26 @@
 
             <!-- Date Info Block -->
             <div style="display: flex; flex-direction: column; text-align: start;">
-                <span style="font-size: 11px; font-weight: 600; color: var(--ula-gold-400); text-transform: uppercase; letter-spacing: 0.5px;">
+                <span style="font-size: 11px; font-weight: 700; color: var(--ula-gold-500); text-transform: uppercase; letter-spacing: 0.5px;">
                     {{ now()->locale(app()->getLocale())->translatedFormat('l') }}
                 </span>
-                <span style="font-size: 18px; font-weight: 300; color: var(--ula-text-primary); line-height: 1.2;">
+                <span style="font-size: 17px; font-weight: 700; color: var(--ula-text-primary); line-height: 1.2;">
                     {{ now()->format('d') }} {{ now()->locale(app()->getLocale())->translatedFormat('F') }}
                 </span>
-                <span style="font-size: 11px; color: var(--ula-stone-500); font-family: 'IBM Plex Mono', monospace;">
+                <span style="font-size: 11px; color: var(--ula-text-muted); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                     {{ now()->format('Y') }}
                 </span>
+            </div>
+
+            <!-- Working Live Time Clock (Item 2) -->
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding-inline-start: 12px; border-inline-start: 1px solid var(--ula-border-subtle);">
+                <span style="font-size: 10px; font-weight: 700; color: var(--ula-text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">
+                    {{ __('Current Time') }}
+                </span>
+                <div style="background: var(--ula-palm-900); color: #FFFFFF; padding: 4px 12px; border-radius: var(--ula-radius-pill); font-family: var(--ula-font-mono); font-size: 13.5px; font-weight: 800; display: inline-flex; align-items: center; gap: 5px; direction: ltr; unicode-bidi: isolate; box-shadow: 0 2px 6px rgba(27,53,36,0.15);">
+                    <span class="material-symbols-rounded" style="font-size: 14px; color: var(--ula-gold-400);">schedule</span>
+                    <span id="nx-hero-live-clock">{{ now()->format('h:i:s A') }}</span>
+                </div>
             </div>
         </div>
     </div>
@@ -237,10 +253,9 @@
                         <p style="font-size: 11px; color: var(--ula-stone-500); margin: 0 0 12px 0;">
                             {{ __('All clear for today. You can schedule a new meeting anytime.') }}
                         </p>
-                        <button type="button" onclick="openScheduleMeetingModal('general')" class="nx-btn-secondary" style="height: 34px; padding: 0 14px; font-size: 12px;">
-                            <span class="material-symbols-rounded" style="font-size: 15px;">add</span>
-                            <span>{{ __('Schedule Meeting') }}</span>
-                        </button>
+                        <x-btn variant="secondary" size="sm" type="button" onclick="openScheduleMeetingModal('general')" icon="add">
+                            {{ __('Schedule Meeting') }}
+                        </x-btn>
                     </div>
                 @endforelse
             </div>

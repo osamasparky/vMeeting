@@ -27,7 +27,7 @@
 body {
     background: var(--ula-surface-map-canvas) !important;
     color: var(--ula-text-on-dark);
-    font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', -apple-system, sans-serif;
+    font-family: var(--ula-font-family), 'Cairo', 'IBM Plex Sans Arabic', 'IBM Plex Sans', -apple-system, sans-serif;
     margin: 0;
     padding: 0;
     height: 100vh;
