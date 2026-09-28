@@ -27,6 +27,11 @@
                 {{ __('Your workspace is ready. Let\'s make today productive!') }}
             </p>
 
+            <div class="ula-headline-group" style="padding-inline-start: 14px; border-inline-start: 2px solid var(--ula-highlight-default); margin-bottom: 4px;">
+                <span class="ula-headline-ar" style="font-size: var(--ula-size-h3); color: var(--ula-text-strong);">المساحات الأفضل تصنع فرقاً أعظم.</span>
+                <span class="ula-headline-en" style="font-size: var(--ula-size-body-en);">Better spaces carve greater teams.</span>
+            </div>
+
             <!-- Action CTAs -->
             <div class="nx-hero-actions">
                 <x-btn variant="primary" size="md" href="{{ route('office') }}" icon="apartment">
@@ -77,7 +82,7 @@
                 <span style="font-size: 10px; font-weight: 700; color: var(--ula-text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px;">
                     {{ __('Current Time') }}
                 </span>
-                <div style="background: var(--ula-palm-900); color: #FFFFFF; padding: 4px 12px; border-radius: var(--ula-radius-pill); font-family: var(--ula-font-mono); font-size: 13.5px; font-weight: 800; display: inline-flex; align-items: center; gap: 5px; direction: ltr; unicode-bidi: isolate; box-shadow: 0 2px 6px rgba(27,53,36,0.15);">
+                <div style="background: var(--ula-surface-dark); color: var(--ula-text-on-dark); padding: 4px 12px; border-radius: var(--ula-radius-pill); font-family: var(--ula-font-mono); font-size: 13.5px; font-weight: 800; display: inline-flex; align-items: center; gap: 5px; direction: ltr; unicode-bidi: isolate; box-shadow: var(--ula-shadow-sm);">
                     <span class="material-symbols-rounded" style="font-size: 14px; color: var(--ula-gold-400);">schedule</span>
                     <span id="nx-hero-live-clock">{{ now()->format('h:i:s A') }}</span>
                 </div>
@@ -314,13 +319,12 @@
     </div>
 
     <!-- ── 4. Quote Banner Strip (Figma Spec) ── -->
-    <div class="nx-quote-banner">
+    <div class="nx-quote-banner" style="border-inline-start: 2px solid var(--ula-highlight-default);">
         <div style="display: flex; align-items: center; gap: 12px;">
             <span class="material-symbols-rounded" style="font-size: 22px; color: var(--ula-gold-400);">format_quote</span>
-            <div style="display: flex; flex-direction: column;">
-                <span style="font-size: 13px; font-weight: 500; color: var(--ula-text-primary);">
-                    {{ __('Better spaces carve greater teams.') }}
-                </span>
+            <div class="ula-headline-group">
+                <span class="ula-headline-ar" style="font-size: var(--ula-size-sm);">المساحات الأفضل تصنع فرقاً أعظم.</span>
+                <span class="ula-headline-en" style="font-size: var(--ula-size-label);">Better spaces carve greater teams.</span>
             </div>
         </div>
         <div style="display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--ula-stone-500);">
