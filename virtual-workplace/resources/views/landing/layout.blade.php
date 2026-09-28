@@ -29,39 +29,29 @@
             box-sizing: border-box;
         }
 
-        :root {
-            --ula-canvas-bg: #F4EDE1;
-            --ula-nav-dark: #142B24;
-            --ula-nav-text: #C1B6A6;
-            --ula-nav-cta: #EDE6D9;
-            --ula-accent-green: #1E412F;
-            --ula-text-dark: #142B24;
-            --ula-text-body: #4A443C;
-            --ula-text-muted: #665D52;
-            --ula-sand-light: #F9F6EF;
-            --ula-border-sand: #E8E4DC;
-            --ula-layout-max: 1280px;
-        }
-
         html {
             scroll-behavior: smooth;
         }
 
+        section[id], div[id] {
+            scroll-margin-top: 84px;
+        }
+
         /* ── Full Bleed Page with Flush Top ── */
         body {
-            background-color: var(--ula-canvas-bg);
-            color: var(--ula-text-dark);
-            font-family: 'Cairo', 'IBM Plex Sans Arabic', -apple-system, sans-serif;
+            background-color: var(--ula-surface-page-alt);
+            color: var(--ula-text-primary);
+            font-family: var(--ula-font-ar);
             min-height: 100vh;
             margin: 0;
             padding: 0;
-            line-height: 1.6;
+            line-height: var(--ula-lh-body);
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
         }
 
         [dir="ltr"] body {
-            font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+            font-family: var(--ula-font-en);
         }
 
         /* ── Top Fixed Navigation Bar (#56:22 / #53:69) ── */
@@ -70,42 +60,38 @@
             top: 0;
             inset-inline: 0;
             z-index: 1000;
-            background: rgba(20, 43, 36, 0.96);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border-bottom: 1px solid rgba(237, 230, 217, 0.12);
-            padding: 14px 32px;
-            transition: all 0.2s ease;
+            background: var(--ula-surface-dark);
+            border-bottom: var(--ula-border-width-hairline) solid var(--ula-border-on-dark);
+            padding: var(--ula-space-4) var(--ula-space-8);
+            transition: padding var(--ula-duration-base) var(--ula-ease-in-out), box-shadow var(--ula-duration-base) var(--ula-ease-in-out);
         }
 
         .nx-header.scrolled {
-            padding: 10px 32px;
-            background: rgba(14, 30, 25, 0.98);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            padding: var(--ula-space-3) var(--ula-space-8);
+            box-shadow: var(--ula-shadow-lg);
         }
 
         .nx-header-container {
-            max-width: var(--ula-layout-max);
-            margin: 0 auto;
+            max-width: var(--ula-layout-container-max);
+            margin-inline: auto;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 24px;
+            gap: var(--ula-space-7);
         }
 
         /* Brand Lockup (#27:48) */
         .nx-brand-lockup {
             display: inline-flex;
             align-items: center;
-            gap: 12px;
+            gap: var(--ula-space-4);
             text-decoration: none;
-            color: #F9F6EF;
+            color: var(--ula-text-on-dark);
         }
 
         .nx-brand-icon {
             width: 32px;
             height: 22px;
-            fill: #EDE6D9;
             flex-shrink: 0;
         }
 
@@ -115,19 +101,19 @@
         }
 
         .nx-brand-name {
-            font-family: 'IBM Plex Sans', sans-serif;
+            font-family: var(--ula-font-en);
             font-size: 18px;
-            font-weight: 600;
-            color: #F9F6EF;
+            font-weight: var(--ula-weight-semibold);
+            color: var(--ula-text-on-dark);
             line-height: 1.1;
         }
 
         .nx-brand-sub {
-            font-family: 'IBM Plex Sans', sans-serif;
+            font-family: var(--ula-font-en);
             font-size: 9px;
-            font-weight: 600;
-            color: #C1B6A6;
-            letter-spacing: 0.12em;
+            font-weight: var(--ula-weight-semibold);
+            color: var(--ula-text-on-dark-subtle);
+            letter-spacing: var(--ula-tracking-brand);
             text-transform: uppercase;
             margin-top: 1px;
         }
@@ -136,110 +122,94 @@
         .nx-nav-menu {
             display: flex;
             align-items: center;
-            gap: 24px;
+            gap: var(--ula-space-7);
             list-style: none;
         }
 
         .nx-nav-link {
-            color: var(--ula-nav-text);
+            color: var(--ula-text-on-dark-muted);
             text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: color 0.15s ease;
+            font-size: var(--ula-size-sm);
+            font-weight: var(--ula-weight-semibold);
+            transition: color var(--ula-duration-fast) var(--ula-ease-out);
         }
 
         .nx-nav-link:hover {
-            color: #F9F6EF;
+            color: var(--ula-text-on-dark);
+            text-decoration: none;
         }
 
         /* Header Actions */
         .nx-header-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: var(--ula-space-4);
         }
 
         .nx-lang-pill {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 999px;
-            background: rgba(237, 230, 217, 0.08);
-            border: 1px solid rgba(237, 230, 217, 0.16);
-            color: #C1B6A6;
+            gap: var(--ula-space-3);
+            height: var(--ula-size-touch-target);
+            padding-inline: var(--ula-space-5);
+            border-radius: var(--ula-radius-pill);
+            background: var(--ula-control-dark-fill);
+            border: var(--ula-border-width-hairline) solid var(--ula-control-dark-border);
+            color: var(--ula-text-on-dark-subtle);
             text-decoration: none;
-            font-size: 12px;
-            font-weight: 600;
-            font-family: 'IBM Plex Sans', sans-serif;
-            transition: all 0.15s ease;
+            font-size: var(--ula-size-xs);
+            font-weight: var(--ula-weight-semibold);
+            font-family: var(--ula-font-en);
+            transition: all var(--ula-duration-fast) var(--ula-ease-out);
         }
 
         .nx-lang-pill:hover {
-            background: rgba(237, 230, 217, 0.16);
-            color: #F9F6EF;
-        }
-
-        .nx-nav-cta {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 9px 22px;
-            background: var(--ula-nav-cta);
-            color: var(--ula-nav-dark);
-            font-size: 13px;
-            font-weight: 700;
+            background: var(--ula-control-dark-fill-hover);
+            color: var(--ula-text-on-dark);
             text-decoration: none;
-            border-radius: 999px;
-            transition: all 0.15s ease;
-            white-space: nowrap;
-        }
-
-        .nx-nav-cta:hover {
-            background: #F9F6EF;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
         }
 
         /* Mobile Toggle & Drawer */
         .nx-mobile-toggle {
             display: none;
-            background: rgba(237, 230, 217, 0.08);
-            border: 1px solid rgba(237, 230, 217, 0.15);
-            color: #F9F6EF;
+            min-width: var(--ula-size-touch-target);
+            min-height: var(--ula-size-touch-target);
+            align-items: center;
+            justify-content: center;
+            background: var(--ula-control-dark-fill);
+            border: var(--ula-border-width-hairline) solid var(--ula-control-dark-border);
+            color: var(--ula-text-on-dark);
             font-size: 20px;
-            padding: 6px 10px;
-            border-radius: 8px;
+            border-radius: var(--ula-radius-sm);
             cursor: pointer;
         }
 
         .nx-mobile-drawer {
             display: none;
             position: fixed;
-            top: 66px;
-            inset-inline: 16px;
-            background: rgba(16, 36, 30, 0.98);
-            border: 1px solid rgba(237, 230, 217, 0.15);
-            border-radius: 18px;
-            padding: 24px;
+            top: 76px;
+            inset-inline: var(--ula-space-5);
+            background: var(--ula-surface-dark-alt);
+            border: var(--ula-border-width-hairline) solid var(--ula-border-on-dark);
+            border-radius: var(--ula-radius-lg);
+            padding: var(--ula-space-7);
             z-index: 999;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(20px);
+            box-shadow: var(--ula-shadow-xl);
         }
 
         .nx-mobile-drawer.open {
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: var(--ula-space-4);
         }
 
         .nx-mobile-drawer a {
-            color: #F9F6EF;
+            color: var(--ula-text-on-dark);
             text-decoration: none;
-            font-size: 15px;
-            font-weight: 600;
-            padding: 8px 12px;
-            border-radius: 8px;
+            font-size: var(--ula-size-body);
+            font-weight: var(--ula-weight-semibold);
+            padding: var(--ula-space-3) var(--ula-space-4);
+            border-radius: var(--ula-radius-xs);
         }
 
         /* ── Master Page Container ── */
@@ -248,29 +218,29 @@
             width: 100%;
         }
 
-        /* ── Full-Width Master Footer (#56:130 / #53:124) ── */
+        /* ── Full-Width Master Footer — light surface, green mark (Brand mark rules) ── */
         .nx-footer {
-            background: #142B24;
-            color: #C1B6A6;
-            padding: 64px 32px 32px;
-            border-top: 1px solid rgba(237, 230, 217, 0.12);
+            background: var(--ula-surface-page);
+            color: var(--ula-text-secondary);
+            padding: var(--ula-space-13) var(--ula-space-8) var(--ula-space-8);
+            border-top: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
         }
 
         .nx-footer-container {
-            max-width: var(--ula-layout-max);
-            margin: 0 auto;
+            max-width: var(--ula-layout-container-max);
+            margin-inline: auto;
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 1.2fr;
-            gap: 48px;
-            margin-bottom: 48px;
+            gap: var(--ula-space-10);
+            margin-bottom: var(--ula-space-10);
         }
 
         .nx-footer-col h4 {
-            font-family: 'IBM Plex Sans', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
-            color: #F9F6EF;
-            margin-bottom: 18px;
+            font-family: var(--ula-font-en);
+            font-size: var(--ula-size-sm);
+            font-weight: var(--ula-weight-bold);
+            color: var(--ula-text-primary);
+            margin-bottom: var(--ula-space-6);
             text-transform: uppercase;
             letter-spacing: 0.08em;
         }
@@ -279,83 +249,95 @@
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: var(--ula-space-4);
         }
 
         .nx-footer-links a {
-            color: #C1B6A6;
+            color: var(--ula-text-secondary);
             text-decoration: none;
-            font-size: 13.5px;
-            transition: color 0.15s ease;
+            font-size: var(--ula-size-sm);
+            transition: color var(--ula-duration-fast) var(--ula-ease-out);
         }
 
         .nx-footer-links a:hover {
-            color: #F9F6EF;
+            color: var(--ula-text-link-hover);
+            text-decoration: underline;
         }
 
         .nx-footer-bottom {
-            max-width: var(--ula-layout-max);
-            margin: 0 auto;
-            padding-top: 24px;
-            border-top: 1px solid rgba(237, 230, 217, 0.08);
+            max-width: var(--ula-layout-container-max);
+            margin-inline: auto;
+            padding-top: var(--ula-space-7);
+            border-top: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 12px;
-            color: #857A6C;
+            font-size: var(--ula-size-xs);
+            color: var(--ula-text-muted);
             flex-wrap: wrap;
-            gap: 16px;
+            gap: var(--ula-space-5);
         }
 
         .nx-footer-tagline {
-            font-family: 'IBM Plex Sans', sans-serif;
-            font-size: 11px;
-            letter-spacing: 0.14em;
+            font-family: var(--ula-font-en);
+            font-size: var(--ula-size-label);
+            letter-spacing: var(--ula-tracking-brand);
             text-transform: uppercase;
-            color: #EDE6D9;
+            color: var(--ula-text-muted);
         }
 
         /* ── Currency Picker Widget in Footer ── */
         .nx-currency-box {
-            margin-top: 20px;
-            background: rgba(237, 230, 217, 0.06);
-            border: 1px solid rgba(237, 230, 217, 0.14);
-            border-radius: 12px;
-            padding: 10px 14px;
+            margin-top: var(--ula-space-6);
+            background: var(--ula-surface-page-alt);
+            border: var(--ula-border-width-hairline) solid var(--ula-border-default);
+            border-radius: var(--ula-radius-sm);
+            padding: var(--ula-space-3) var(--ula-space-4);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 10px;
+            gap: var(--ula-space-3);
         }
 
         .nx-currency-select {
             background: transparent;
-            color: #F9F6EF;
+            color: var(--ula-text-primary);
             border: none;
             outline: none;
-            font-family: 'Cairo', 'IBM Plex Sans', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
+            font-family: var(--ula-font-ar);
+            font-size: var(--ula-size-sm);
+            font-weight: var(--ula-weight-bold);
             cursor: pointer;
             width: 100%;
         }
 
         .nx-currency-select option {
-            background: #142B24;
-            color: #F9F6EF;
+            background: var(--ula-surface-raised);
+            color: var(--ula-text-primary);
+        }
+
+        /* Footer sits on surface/page, which is light in light mode but flips to a
+           dark palm tone in dark mode — the mark must follow the surface, not stay
+           permanently green (see FIX_BRIEF.md "pick by surface, not by page"). */
+        .nx-footer-mark { fill: var(--ula-brand-mark-green); }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .nx-footer-mark { fill: var(--ula-brand-mark-ivory); }
+        }
+        [data-theme="dark"] .nx-footer-mark, .dark .nx-footer-mark {
+            fill: var(--ula-brand-mark-ivory);
         }
 
         /* Responsive */
         @media (max-width: 1024px) {
             .nx-nav-menu { display: none; }
-            .nx-mobile-toggle { display: block; }
-            .nx-footer-container { grid-template-columns: 1fr 1fr; gap: 36px; }
+            .nx-mobile-toggle { display: flex; }
+            .nx-footer-container { grid-template-columns: 1fr 1fr; gap: var(--ula-space-8); }
         }
 
         @media (max-width: 640px) {
-            .nx-header { padding: 12px 18px; }
-            .nx-footer { padding: 48px 20px 24px; }
-            .nx-footer-container { grid-template-columns: 1fr; gap: 28px; }
+            .nx-header { padding: var(--ula-space-3) var(--ula-space-5); }
+            .nx-footer { padding: var(--ula-space-10) var(--ula-space-5) var(--ula-space-6); }
+            .nx-footer-container { grid-template-columns: 1fr; gap: var(--ula-space-7); }
             .nx-footer-bottom { flex-direction: column; align-items: flex-start; }
         }
     </style>
@@ -363,14 +345,13 @@
 </head>
 <body>
 
-    <!-- ── Top Fixed Navigation Bar (#56:22 / #53:69) ── -->
+    <!-- ── Top Fixed Navigation Bar (#56:22 / #53:69) — dark chrome, ivory mark ── -->
     <header class="nx-header" id="navbar">
         <div class="nx-header-container">
             <!-- Brand Lockup (#27:48) -->
             <a href="{{ route('landing.home') }}" class="nx-brand-lockup">
-                <!-- Precision Jabal AlFil Mountain Arch Shape -->
-                <svg class="nx-brand-icon" viewBox="0 0 100 67" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M0 67C0 24 16 0 52 0C84 0 100 24 100 67H46C46 38 38 28 28 28C18 28 14 38 14 67H0Z" fill="#EDE6D9"/>
+                <svg class="nx-brand-icon" viewBox="0 0 100 67" fill="var(--ula-brand-mark-ivory)" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M0 67C0 24 16 0 52 0C84 0 100 24 100 67H46C46 38 38 28 28 28C18 28 14 38 14 67H0Z"/>
                 </svg>
                 <div class="nx-brand-text-block">
                     <span class="nx-brand-name">UlaSpace</span>
@@ -378,33 +359,43 @@
                 </div>
             </a>
 
+            @php
+                $siteNavItems = \App\Domains\CMS\Models\CmsThemeSetting::getByKey('main_navigation', [
+                    ['label_en' => 'Spaces', 'label_ar' => 'المساحات الذكية', 'url' => '#spaces'],
+                    ['label_en' => 'Benefits', 'label_ar' => 'مميزات النظام', 'url' => '#benefits'],
+                    ['label_en' => 'Meetings', 'label_ar' => 'الاجتماعات', 'url' => '#meetings'],
+                    ['label_en' => 'Heritage', 'label_ar' => 'عن المنصة', 'url' => '#identity'],
+                    ['label_en' => 'Pricing', 'label_ar' => 'الباقات والاشتراكات', 'url' => '#pricing'],
+                ]);
+            @endphp
+
             <!-- Navigation Links (#53:75) -->
             <ul class="nx-nav-menu">
-                <li><a href="#spaces" class="nx-nav-link">{{ app()->getLocale() === 'ar' ? 'المساحات الذكية' : 'Spaces' }}</a></li>
-                <li><a href="#benefits" class="nx-nav-link">{{ app()->getLocale() === 'ar' ? 'مميزات النظام' : 'Benefits' }}</a></li>
-                <li><a href="#meetings" class="nx-nav-link">{{ app()->getLocale() === 'ar' ? 'الاجتماعات' : 'Meetings' }}</a></li>
-                <li><a href="#identity" class="nx-nav-link">{{ app()->getLocale() === 'ar' ? 'عن المنصة' : 'Heritage' }}</a></li>
-                <li><a href="#pricing" class="nx-nav-link">{{ app()->getLocale() === 'ar' ? 'الباقات والاشتراكات' : 'Pricing' }}</a></li>
+                @foreach($siteNavItems as $item)
+                    @php
+                        $rawUrl = $item['url'] ?? '#';
+                        $targetUrl = str_starts_with($rawUrl, '#')
+                            ? (request()->routeIs('landing.home') ? $rawUrl : route('landing.home') . $rawUrl)
+                            : $rawUrl;
+                        $label = (app()->getLocale() === 'ar' ? ($item['label_ar'] ?? $item['label_en'] ?? '') : ($item['label_en'] ?? $item['label_ar'] ?? ''));
+                    @endphp
+                    <li><a href="{{ $targetUrl }}" class="nx-nav-link">{{ $label }}</a></li>
+                @endforeach
             </ul>
 
             <!-- Header Actions (#53:81) -->
             <div class="nx-header-actions">
                 <!-- Language Switcher (#44:134) -->
                 <a href="{{ route('lang.switch', app()->getLocale() === 'ar' ? 'en' : 'ar') }}" class="nx-lang-pill">
-                    <span class="material-symbols-rounded text-[14px]">language</span>
+                    <span class="material-symbols-rounded text-[16px]">language</span>
                     <span>{{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}</span>
                 </a>
 
                 @auth
-                    <a href="{{ route('office') }}" class="nx-nav-cta">
-                        <span class="material-symbols-rounded text-[16px] mr-1">apartment</span>
-                        <span>{{ __('ادخل المقر') }}</span>
-                    </a>
+                    <x-btn href="{{ route('office') }}" variant="nav-cta" size="md" icon="apartment" pill>{{ __('ادخل المقر') }}</x-btn>
                 @else
-                    <!-- Nav CTA Ivory Pill (#53:87) -->
-                    <a href="{{ route('register') }}" class="nx-nav-cta">
-                        <span>{{ app()->getLocale() === 'ar' ? 'ابدأ مجاناً' : 'Try Free' }}</span>
-                    </a>
+                    <!-- Nav CTA Pill (#53:87) — control/cta-on-dark, never gold -->
+                    <x-btn href="{{ route('register') }}" variant="nav-cta" size="md" pill>{{ app()->getLocale() === 'ar' ? 'ابدأ مجاناً' : 'Try Free' }}</x-btn>
                 @endauth
 
                 <button type="button" class="nx-mobile-toggle" onclick="toggleNav()" aria-label="Menu">
@@ -415,17 +406,22 @@
 
         <!-- Mobile Drawer Menu -->
         <div class="nx-mobile-drawer" id="mobileDrawer">
-            <a href="#spaces" onclick="toggleNav()">{{ app()->getLocale() === 'ar' ? 'المساحات الذكية' : 'Spaces' }}</a>
-            <a href="#benefits" onclick="toggleNav()">{{ app()->getLocale() === 'ar' ? 'مميزات النظام' : 'Benefits' }}</a>
-            <a href="#meetings" onclick="toggleNav()">{{ app()->getLocale() === 'ar' ? 'الاجتماعات' : 'Meetings' }}</a>
-            <a href="#identity" onclick="toggleNav()">{{ app()->getLocale() === 'ar' ? 'عن المنصة' : 'Heritage' }}</a>
-            <a href="#pricing" onclick="toggleNav()">{{ app()->getLocale() === 'ar' ? 'الباقات والاشتراكات' : 'Pricing' }}</a>
-            <hr style="border-color: rgba(237, 230, 217, 0.1);">
+            @foreach($siteNavItems as $item)
+                @php
+                    $rawUrl = $item['url'] ?? '#';
+                    $targetUrl = str_starts_with($rawUrl, '#')
+                        ? (request()->routeIs('landing.home') ? $rawUrl : route('landing.home') . $rawUrl)
+                        : $rawUrl;
+                    $label = (app()->getLocale() === 'ar' ? ($item['label_ar'] ?? $item['label_en'] ?? '') : ($item['label_en'] ?? $item['label_ar'] ?? ''));
+                @endphp
+                <a href="{{ $targetUrl }}" onclick="toggleNav()">{{ $label }}</a>
+            @endforeach
+            <hr style="border-color: var(--ula-border-on-dark-subtle); margin-block: var(--ula-space-3);">
             @auth
-                <a href="{{ route('office') }}" class="nx-nav-cta" style="text-align: center;">{{ __('ادخل المقر') }}</a>
+                <x-btn href="{{ route('office') }}" variant="nav-cta" size="md" pill>{{ __('ادخل المقر') }}</x-btn>
             @else
-                <a href="{{ route('login') }}" style="color: #EDE6D9;">{{ __('تسجيل الدخول') }}</a>
-                <a href="{{ route('register') }}" class="nx-nav-cta" style="text-align: center;">{{ app()->getLocale() === 'ar' ? 'ابدأ مجاناً' : 'Try Free' }}</a>
+                <a href="{{ route('login') }}" style="color: var(--ula-text-on-dark);">{{ __('تسجيل الدخول') }}</a>
+                <x-btn href="{{ route('register') }}" variant="nav-cta" size="md" pill>{{ app()->getLocale() === 'ar' ? 'ابدأ مجاناً' : 'Try Free' }}</x-btn>
             @endauth
         </div>
     </header>
@@ -435,23 +431,23 @@
         @yield('content')
     </div>
 
-    <!-- ── Full-Width Master Footer (#56:130 / #53:124) ── -->
+    <!-- ── Full-Width Master Footer — light surface, green mark (Brand mark rules §"footer") ── -->
     <footer class="nx-footer">
         <div class="nx-footer-container">
             <div>
-                <div class="nx-brand-lockup" style="margin-bottom: 14px;">
-                    <svg class="nx-brand-icon" viewBox="0 0 100 67" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd" clip-rule="evenodd" d="M0 67C0 24 16 0 52 0C84 0 100 24 100 67H46C46 38 38 28 28 28C18 28 14 38 14 67H0Z" fill="#EDE6D9"/>
+                <div class="nx-brand-lockup" style="margin-bottom: var(--ula-space-4); color: var(--ula-text-primary);">
+                    <svg class="nx-brand-icon nx-footer-mark" viewBox="0 0 100 67" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M0 67C0 24 16 0 52 0C84 0 100 24 100 67H46C46 38 38 28 28 28C18 28 14 38 14 67H0Z"/>
                     </svg>
                     <div class="nx-brand-text-block">
-                        <span class="nx-brand-name" style="font-size: 20px;">UlaSpace</span>
-                        <span class="nx-brand-sub">{{ __('المكتب الافتراضي') }}</span>
+                        <span class="nx-brand-name" style="font-size: 20px; color: var(--ula-text-primary);">UlaSpace</span>
+                        <span class="nx-brand-sub" style="color: var(--ula-text-muted);">{{ __('المكتب الافتراضي') }}</span>
                     </div>
                 </div>
                 <div class="nx-footer-tagline">
                     SPACES CARVED, NOT BUILT.
                 </div>
-                <p style="font-size: 13.5px; color: #857A6C; max-width: 320px; line-height: 1.7; margin-top: 14px;">
+                <p style="font-size: var(--ula-size-sm); color: var(--ula-text-secondary); max-width: 320px; line-height: var(--ula-lh-body); margin-top: var(--ula-space-4);">
                     {{ __("صُمّمت UlaSpace بإلهام من العلا لفرق تعمل من كل مكان: أصالة الضيافة في التفاصيل، وهندسة عالمية رائدة في الأداء.") }}
                 </p>
             </div>
@@ -478,13 +474,13 @@
 
             <div class="nx-footer-col">
                 <h4>{{ __('المقر والعملة') }}</h4>
-                <div style="font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; color: #C1B6A6; line-height: 1.8; text-transform: uppercase;">
+                <div style="font-family: var(--ula-font-en); font-size: var(--ula-size-label); font-weight: var(--ula-weight-semibold); letter-spacing: var(--ula-tracking-brand); color: var(--ula-text-muted); line-height: 1.8; text-transform: uppercase;">
                     ALULA · SAUDI ARABIA<br>THE WORLD
                 </div>
 
                 <!-- Currency Changer Widget in Footer (Default: SAR / ر.س) -->
                 <div class="nx-currency-box">
-                    <span class="material-symbols-rounded text-[18px] text-[#D3A553]">payments</span>
+                    <span class="material-symbols-rounded text-[18px]" style="color: var(--ula-icon-highlight);">payments</span>
                     <select id="footerCurrencySelect" onchange="setSiteCurrency(this.value)" class="nx-currency-select" aria-label="Select Currency">
                         <option value="SAR" selected>🇸🇦 ريال سعودي (ر.س)</option>
                         <option value="USD">🇺🇸 دولار أمريكي ($ USD)</option>
@@ -493,8 +489,8 @@
                     </select>
                 </div>
 
-                <div style="margin-top: 16px; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: #DBE6DD;">
-                    <span style="width: 7px; height: 7px; border-radius: 50%; background: #3C6B4C; box-shadow: 0 0 8px #3C6B4C;"></span>
+                <div style="margin-top: var(--ula-space-5); display: inline-flex; align-items: center; gap: var(--ula-space-3); font-size: var(--ula-size-xs); color: var(--ula-text-secondary);">
+                    <span style="width: 7px; height: 7px; border-radius: var(--ula-radius-pill); background: var(--ula-status-success); box-shadow: 0 0 8px var(--ula-status-success);"></span>
                     <span>{{ __('All systems operational') }}</span>
                 </div>
             </div>
@@ -504,7 +500,7 @@
             <div>
                 © {{ date('Y') }} UlaSpace Inc. {{ __('جميع الحقوق محفوظة.') }}
             </div>
-            <div style="font-family: 'IBM Plex Sans', sans-serif; font-size: 11px; color: #857A6C;">
+            <div style="font-family: var(--ula-font-en); font-size: var(--ula-size-label); color: var(--ula-text-muted);">
                 Crafted for High-Performing Distributed Teams
             </div>
         </div>
