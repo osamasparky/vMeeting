@@ -22,16 +22,19 @@
     <div class="auth-left">
         <div class="auth-card">
             <div class="auth-logo">
-                <div class="logo-icon" style="background: var(--ula-palm-900); border-radius: 12px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; box-shadow: var(--ula-shadow-sm); padding: 6px;">
-                    <img src="{{ asset('images/ulaspace-icon.png') }}" alt="UlaSpace" style="width: 26px; height: auto; object-fit: contain;">
-                </div>
+                <svg class="auth-brand-mark" viewBox="0 0 100 67" width="34" height="23" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M0 67C0 24 16 0 52 0C84 0 100 24 100 67H46C46 38 38 28 28 28C18 28 14 38 14 67H0Z"/>
+                </svg>
                 <div>
                     <span class="logo-text" style="display: block; line-height: 1.1; font-weight: 800;">UlaSpace</span>
                     <span style="font-size: 10px; font-weight: 700; color: var(--ula-text-secondary); letter-spacing: 0.5px; text-transform: uppercase;">{{ __('Virtual Workplace') }}</span>
                 </div>
             </div>
 
-            <h1 class="auth-title">{{ __('Welcome back') }}</h1>
+            <div class="ula-headline-group" style="margin-bottom: 4px;">
+                <span class="ula-headline-ar" style="font-size: 24px;">أهلاً بعودتك</span>
+                <span class="ula-headline-en" style="font-size: 15px;">Welcome back</span>
+            </div>
             <p class="auth-subtitle">{{ __('Sign in to your account to access your virtual office') }}</p>
 
             @if($errors->any())
@@ -56,22 +59,17 @@
                 @csrf
 
                 <div class="form-group">
-                    <label class="form-label" for="email">{{ __('Email Address') }}</label>
-                    <div class="form-input-wrapper">
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            class="form-input"
-                            placeholder="name@company.com"
-                            value="{{ old('email') }}"
-                            required
-                            autocomplete="email"
-                        >
-                        <span class="form-input-icon">
-                            <span class="material-symbols-rounded">mail</span>
-                        </span>
-                    </div>
+                    <x-input
+                        id="email"
+                        name="email"
+                        type="email"
+                        :label="__('Email Address')"
+                        placeholder="name@company.com"
+                        value="{{ old('email') }}"
+                        icon="mail"
+                        required
+                        autocomplete="email"
+                    />
                 </div>
 
                 <div class="form-group">
@@ -96,11 +94,8 @@
                 </div>
 
                 <div class="form-check">
-                    <label class="form-check-label">
-                        <input type="checkbox" name="remember" class="form-check-input">
-                        {{ __('Remember me') }}
-                    </label>
-                    <span style="color: var(--text-muted); font-size: 13px; font-weight: 700;">{{ __('Forgot password?') }}</span>
+                    <x-checkbox name="remember">{{ __('Remember me') }}</x-checkbox>
+                    <span style="color: var(--ula-text-muted); font-size: 13px; font-weight: 700;">{{ __('Forgot password?') }}</span>
                 </div>
 
                 <button type="submit" class="nx-btn nx-btn--primary" id="loginBtn" style="width: 100%; justify-content: center; padding: 12px 20px; font-weight: 700;">
@@ -117,11 +112,16 @@
 
     <!-- Right: Branding Panel -->
     <div class="auth-right">
+        <div class="auth-right-stripes"></div>
+        <div class="auth-right-scrim"></div>
         <div class="brand-panel">
             <div style="margin-bottom: 28px;">
                 <img src="{{ asset('images/ulaspace-logo.png') }}" alt="UlaSpace" style="max-width: 260px; width: 100%; height: auto; margin: 0 auto; display: block;">
             </div>
-            <h2 class="brand-title">{{ __('Your Virtual Office Awaits') }}</h2>
+            <div class="ula-headline-group" style="margin-bottom: 14px;">
+                <span class="ula-headline-ar" style="font-size: 30px;">مكتبك الافتراضي بانتظارك</span>
+                <span class="ula-headline-en" style="font-size: 17px;">Your Virtual Office Awaits</span>
+            </div>
             <p class="brand-description">
                 {{ __('Step into a persistent, spatial workspace where your team connects naturally — just like a real office, but without walls.') }}
             </p>

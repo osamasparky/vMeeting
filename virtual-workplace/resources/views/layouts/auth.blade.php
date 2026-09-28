@@ -93,10 +93,23 @@
             align-items: center;
             justify-content: center;
             padding: 60px;
-            background: linear-gradient(145deg, var(--ula-palm-900) 0%, var(--ula-palm-800) 50%, var(--ula-palm-950) 100%);
-            color: var(--ula-sand-100);
+            background: var(--ula-gradient-accent);
+            color: var(--ula-text-on-dark);
             position: relative;
             overflow: hidden;
+        }
+
+        .auth-right-stripes {
+            position: absolute;
+            inset: 0;
+            background-image: repeating-linear-gradient(135deg, var(--ula-palm-800) 0 14px, var(--ula-palm-chrome) 14px 28px);
+            opacity: 0.5;
+        }
+
+        .auth-right-scrim {
+            position: absolute;
+            inset: 0;
+            background: var(--ula-scrim-bottom);
         }
 
         .auth-right::before {
@@ -107,7 +120,7 @@
             width: 400px;
             height: 400px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(211, 165, 83, 0.15) 0%, transparent 70%);
+            background: radial-gradient(circle, var(--ula-alpha-gold-400-18) 0%, transparent 70%);
             pointer-events: none;
         }
 
@@ -321,14 +334,14 @@
         }
 
         .alert-error {
-            background: rgba(154, 88, 39, 0.08);
-            border: 1px solid rgba(154, 88, 39, 0.25);
+            background: var(--ula-surface-danger-soft);
+            border: 1px solid var(--ula-border-danger);
             color: var(--ula-status-danger);
         }
 
         .alert-success {
-            background: rgba(60, 107, 76, 0.08);
-            border: 1px solid rgba(60, 107, 76, 0.25);
+            background: var(--ula-surface-accent-soft);
+            border: 1px solid var(--ula-status-success);
             color: var(--ula-status-success);
         }
 
@@ -338,8 +351,24 @@
         }
 
         .brand-panel {
+            position: relative;
+            z-index: 1;
             text-align: center;
             max-width: 440px;
+        }
+        .brand-panel .ula-headline-group,
+        .brand-panel .ula-headline-ar { align-items: center; }
+        .brand-panel .ula-headline-ar { color: var(--ula-text-on-dark); }
+        .brand-panel .ula-headline-en { color: var(--ula-text-on-dark-muted); }
+
+        /* Small corner mark on the light auth card: green in light mode, ivory in
+           dark mode (surface/card flips dark) — see FIX_BRIEF.md "pick by surface". */
+        .auth-brand-mark { fill: var(--ula-brand-mark-green); }
+        @media (prefers-color-scheme: dark) {
+            :root:not([data-theme="light"]) .auth-brand-mark { fill: var(--ula-brand-mark-ivory); }
+        }
+        [data-theme="dark"] .auth-brand-mark, .dark .auth-brand-mark {
+            fill: var(--ula-brand-mark-ivory);
         }
         .brand-panel-icon {
             width: 72px;
