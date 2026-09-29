@@ -2264,8 +2264,8 @@
                 else if (doorSide === 'right') { dX = rx + rw; dY = ry + rh * doorOffset; }
 
                 ctx.save();
-                ctx.fillStyle = '#10B981';
-                ctx.strokeStyle = '#FFFFFF';
+                ctx.fillStyle = 'var(--ula-status-success)';
+                ctx.strokeStyle = 'var(--ula-white)';
                 ctx.lineWidth = 1.5;
                 if (doorSide === 'top' || doorSide === 'bottom') {
                     ctx.fillRect(dX - dW/2, dY - 3, dW, 6);
@@ -2315,7 +2315,7 @@
                     ctx.beginPath();
                     ctx.arc(c.x, c.y, 4, 0, Math.PI * 2);
                     ctx.fill();
-                    ctx.strokeStyle = '#FFFFFF';
+                    ctx.strokeStyle = 'var(--ula-white)';
                     ctx.lineWidth = 1.5;
                     ctx.stroke();
                 });
@@ -2371,7 +2371,7 @@
                 if (hasBlueprint && !imgUrl) {
                     if (isSelected) {
                         ctx.save();
-                        ctx.strokeStyle = '#10B981';
+                        ctx.strokeStyle = 'var(--ula-status-success)';
                         ctx.lineWidth = 1.5;
                         ctx.setLineDash([4, 4]);
                         ctx.strokeRect(ox, oy, objW, objH);
@@ -2417,7 +2417,7 @@
                 }
 
                 if (isSelected) {
-                    ctx.strokeStyle = '#10B981';
+                    ctx.strokeStyle = 'var(--ula-status-success)';
                     ctx.lineWidth = 2;
                     ctx.setLineDash([4, 4]);
                     if (ctx.roundRect) ctx.roundRect(-objW / 2 - 2, -objH / 2 - 2, objW + 4, objH + 4, 4);
@@ -2433,11 +2433,11 @@
                         { x: hw, y: hh }, { x: -hw, y: hh }
                     ];
                     grabPoints.forEach(p => {
-                        ctx.fillStyle = '#10B981';
+                        ctx.fillStyle = 'var(--ula-status-success)';
                         ctx.beginPath();
                         ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
                         ctx.fill();
-                        ctx.strokeStyle = '#FFFFFF';
+                        ctx.strokeStyle = 'var(--ula-white)';
                         ctx.lineWidth = 1.2;
                         ctx.stroke();
                     });
@@ -2455,7 +2455,7 @@
 
                 ctx.fillStyle = 'rgba(16, 185, 129, 0.18)';
                 ctx.fillRect(dx, dy, dw, dh);
-                ctx.strokeStyle = '#10B981';
+                ctx.strokeStyle = 'var(--ula-status-success)';
                 ctx.lineWidth = 2;
                 ctx.setLineDash([4, 4]);
                 ctx.strokeRect(dx, dy, dw, dh);
