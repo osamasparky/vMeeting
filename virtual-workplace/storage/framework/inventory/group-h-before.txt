@@ -1,0 +1,206 @@
+@foreach($allMembers as $am)
+@foreach($allMembers as $m)
+@foreach($allMembers as $pm)
+@foreach($allMembers->take(6) as $chipMember)
+@foreach($allProjects as $p)
+@foreach($colTasks as $t)
+@foreach($columns as $colKey => $colMeta)
+@foreach($mParts as $p)
+@foreach($ms->tasks as $mt)
+@foreach($project->milestones as $pms)
+@foreach($project->tasks as $oth)
+@foreach($projectMembers ?? [] as $pm)
+@foreach($rooms as $r)
+@foreach($tasks as $t)
+@if($activeTimer)
+@if($canDelete)
+@if($canSeeAdmin)
+@if($checkTotal > 0)
+@if($chipMember->user_id !== $user->id)
+@if($doc->icon){{ $doc->icon }}@else<span class="material-symbo
+@if($goal->description)
+@if($isLive)
+@if($m->description)
+@if($membership->hasPermission('departments.manage') || $member
+@if($membership->hasPermission('members.view') || $membership->
+@if($membership->hasPermission('organizations.manage'))
+@if($membership->hasPermission('rooms.manage'))
+@if($membership->hasPermission('tasks.assign') || $membership->
+@if($moreParts > 0)
+@if($ms->tasks && $ms->tasks->count() > 0)
+@if($pm->user_id !== $user->id)
+@if($t->checklistItems && $t->checklistItems->count() > 0)
+@if($t->description)
+@if($t->isRecurring())
+@if($t->milestone)
+@if($t->priority === 'urgent')
+@if($target->is_completed)
+@if($user->is_superadmin ?? false)
+@if($wm['status'] === 'overloaded')
+@if(($kpis['overdue_tasks'] ?? 0) > 0)
+@if(in_array($target->target_type, ['tasks', 'milestones', 'hou
+@include('projects.partials.modals')
+id="btn-mobile-sidebar-toggle"
+id="bulk-action-toolbar"
+id="bulk-assign-select"
+id="bulk-select-all"
+id="bulk-selected-count"
+id="bulk-status-select"
+id="count-total-files"
+id="count-total-kanban"
+id="dependency-blocker-select"
+id="doc_pinned"
+id="frappe-gantt-container"
+id="frappe-gantt-wrapper"
+id="gantt-btn-Day"
+id="gantt-btn-Half_Day"
+id="gantt-btn-Month"
+id="gantt-btn-Quarter_Day"
+id="gantt-btn-Week"
+id="gantt-empty-state"
+id="gantt-popover-content"
+id="gantt-popover-open-btn"
+id="gantt-task-popover"
+id="goal-custom-target-row"
+id="goal-target-type-select"
+id="hub-clear-filters-btn"
+id="hub-filter-assignee"
+id="hub-filter-due"
+id="hub-filter-milestone"
+id="hub-filter-priority"
+id="hub-live-timer-clock"
+id="hub-meeting-time-input"
+id="hub-nav-btn-docs"
+id="hub-nav-btn-files"
+id="hub-nav-btn-gantt"
+id="hub-nav-btn-goals"
+id="hub-nav-btn-kanban"
+id="hub-nav-btn-meetings"
+id="hub-nav-btn-milestones"
+id="hub-nav-btn-tasks"
+id="hub-nav-btn-team"
+id="hub-nav-btn-timelog"
+id="hub-nav-btn-workload"
+id="hub-project-file-btn"
+id="hub-project-file-form"
+id="hub-project-file-input"
+id="hub-schedule-meeting-btn"
+id="hub-schedule-meeting-form"
+id="hub-section-docs"
+id="hub-section-files"
+id="hub-section-gantt"
+id="hub-section-goals"
+id="hub-section-kanban"
+id="hub-section-meetings"
+id="hub-section-milestones"
+id="hub-section-tasks"
+id="hub-section-team"
+id="hub-section-timelog"
+id="hub-section-workload"
+id="hub-task-search-input"
+id="hub-toast-container"
+id="kanban-cards-{{ $colKey }}"
+id="kanban-column-{{ $colKey }}"
+id="kanban-count-{{ $colKey }}"
+id="manual-time-form"
+id="manual-time-modal"
+id="move-target-project-select"
+id="move-task-id-input"
+id="move-task-modal"
+id="new-checklist-title-input"
+id="new-comment-body-input"
+id="new-doc-form"
+id="new-doc-modal"
+id="new-goal-form"
+id="new-goal-modal"
+id="new-milestone-form"
+id="new-milestone-modal"
+id="new-task-form"
+id="new-task-modal"
+id="new-task-recurrence-extra"
+id="new-task-recurrence-rule"
+id="schedule-meeting-modal"
+id="sidebar-main"
+id="task-attachments-count"
+id="task-attachments-list-container"
+id="task-checklist-count"
+id="task-checklist-items-container"
+id="task-comments-count"
+id="task-comments-feed"
+id="task-context-menu"
+id="task-dependencies-container"
+id="task-dependencies-count"
+id="task-details-modal"
+id="task-file-input"
+id="task-inspector-attachments"
+id="task-inspector-checklist"
+id="task-inspector-comments"
+id="task-inspector-dependencies"
+id="task-inspector-details"
+id="task-inspector-timelog"
+id="task-modal-approval-actions"
+id="task-modal-approval-banner"
+id="task-modal-approval-text"
+id="task-modal-assignee"
+id="task-modal-code"
+id="task-modal-description"
+id="task-modal-due"
+id="task-modal-hours"
+id="task-modal-milestone"
+id="task-modal-milestone-chip"
+id="task-modal-priority-badge"
+id="task-modal-project"
+id="task-modal-recurrence"
+id="task-modal-recurrence-chip"
+id="task-modal-status-badge"
+id="task-modal-status-select"
+id="task-modal-timelog-body"
+id="task-modal-timer-btn"
+id="task-modal-title"
+id="task-tab-btn-attachments"
+id="task-tab-btn-checklist"
+id="task-tab-btn-comments"
+id="task-tab-btn-dependencies"
+id="task-tab-btn-details"
+id="task-tab-btn-timelog"
+id="task-timelog-count"
+id="{{ $t->id }}"
+name="assignee_id"
+name="attendee_ids[]"
+name="content"
+name="csrf-token"
+name="description"
+name="due_date"
+name="duration_minutes"
+name="ended_at"
+name="estimated_hours"
+name="file"
+name="icon"
+name="is_pinned"
+name="milestone_id"
+name="name"
+name="priority"
+name="project_id"
+name="recurrence_ends_at"
+name="recurrence_interval"
+name="recurrence_rule"
+name="room_id"
+name="scheduled_at"
+name="scope"
+name="started_at"
+name="target_type"
+name="target_value"
+name="task_id"
+name="title"
+name="unit"
+name="viewport"
+route("meetings.schedule")
+route("projects.files.store", $project)
+route('dashboard')
+route('lang.switch', app()
+route('logout')
+route('meetings.schedule')
+route('office')
+route('projects.files.destroy', [$project, $file])
+route('projects.files.store', $project)
+route('superadmin.dashboard')
