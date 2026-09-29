@@ -1,45 +1,76 @@
 @extends('layouts.auth')
 
-@section('title', __('Register') . ' — UlaSpace')
+@section('title', __('إنشاء حساب') . ' — UlaSpace')
+
+@section('styles')
+<style>
+    .ula-plan-radio-box {
+        padding: 14px;
+        border-radius: 14px;
+        border: var(--ula-border-width-hairline) solid var(--ula-border-default);
+        background: var(--ula-surface-page);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        cursor: pointer;
+        transition: all var(--ula-duration-fast) var(--ula-ease-out);
+        position: relative;
+    }
+
+    .ula-plan-radio-box.selected {
+        border: 2px solid var(--ula-accent-default);
+        background: var(--ula-palm-50);
+    }
+
+    .ula-plan-radio-circle {
+        width: 18px;
+        height: 18px;
+        border-radius: var(--ula-radius-pill);
+        border: 1.5px solid var(--ula-border-strong);
+        box-sizing: border-box;
+        transition: all var(--ula-duration-fast) var(--ula-ease-out);
+    }
+
+    .ula-plan-radio-box.selected .ula-plan-radio-circle {
+        border: 6px solid var(--ula-accent-default);
+    }
+</style>
+@endsection
 
 @section('content')
-<div style="position: absolute; top: 20px; inset-inline-end: 24px; z-index: 10;">
-    @if(app()->getLocale() === 'ar')
-        <a href="{{ route('lang.switch', 'en') }}" class="lang-switch-btn">
-            <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
-            <span>English</span>
-        </a>
-    @else
-        <a href="{{ route('lang.switch', 'ar') }}" class="lang-switch-btn">
-            <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
-            <span>العربية</span>
-        </a>
-    @endif
-</div>
-
-<div class="auth-wrapper">
+<div class="ula-auth-container register-layout">
     <!-- Left: Register Form -->
-    <div class="auth-left">
-        <div class="auth-card" style="max-width: 580px;">
-            <div class="auth-logo">
-                <svg class="auth-brand-mark" viewBox="0 0 100 67" width="34" height="23" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M0 67C0 24 16 0 52 0C84 0 100 24 100 67H46C46 38 38 28 28 28C18 28 14 38 14 67H0Z"/>
-                </svg>
-                <div>
-                    <span class="logo-text" style="display: block; line-height: 1.1; font-weight: 800;">UlaSpace</span>
-                    <span style="font-size: 10px; font-weight: 700; color: var(--ula-text-secondary); letter-spacing: 0.5px; text-transform: uppercase;">{{ __('Virtual Workplace') }}</span>
-                </div>
-            </div>
+    <div class="ula-auth-form-side">
+        <!-- Top bar: Logo & Language Switcher -->
+        <div class="ula-auth-top-bar">
+            <a href="{{ route('landing.home') }}" class="ula-auth-brand">
+                <svg role="img" aria-label="UlaSpace" width="43" height="29" viewBox="-1.2 -1.3 60 40" fill="var(--ula-brand-mark-green)" style="flex-shrink: 0; display: block"><path d="M0 38.734L1.493 30.973L4.179 20.824L6.865 11.869C8.259 7.491 11.94 4.207 17.91 2.018C26.268 -0.569 34.427 -0.669 42.387 1.719C49.153 3.311 54.128 7.292 57.312 13.66L57.312 38.734L26.268 38.734L25.074 27.988C23.482 20.824 21.591 17.242 19.403 17.242C17.214 18.038 15.721 21.819 14.925 28.585L14.328 38.734L0 38.734Z"></path></svg>
+                <span class="ula-auth-brand-name">UlaSpace</span>
+            </a>
 
-            <div class="ula-headline-group" style="margin-bottom: 4px;">
-                <span class="ula-headline-ar" style="font-size: 24px;">أنشئ حسابك</span>
-                <span class="ula-headline-en" style="font-size: 15px;">Create your account</span>
+            @if(app()->getLocale() === 'ar')
+                <a href="{{ route('lang.switch', 'en') }}" class="ula-auth-lang-btn">
+                    <span class="ms" style="font-size: 20px;">language</span>
+                    <span>English</span>
+                </a>
+            @else
+                <a href="{{ route('lang.switch', 'ar') }}" class="ula-auth-lang-btn">
+                    <span class="ms" style="font-size: 20px;">language</span>
+                    <span>العربية</span>
+                </a>
+            @endif
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 24px;">
+            <!-- Heading -->
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <h1 style="font-size: 34px; font-weight: 600; line-height: 1.25; color: var(--ula-text-primary);">أنشئ حسابك</h1>
+                <span style="font-family: var(--ula-font-en); font-size: 18px; font-weight: 300; color: var(--ula-text-secondary);">Create your account</span>
             </div>
-            <p class="auth-subtitle">{{ __('Join the future of remote work — set up your virtual office in minutes') }}</p>
 
             @if($errors->any())
-                <div class="alert alert-error">
-                    <span class="material-symbols-rounded">warning</span>
+                <div class="ula-auth-alert-error">
+                    <span class="ms" style="font-size: 20px;">error</span>
                     <ul style="list-style: none; padding: 0; margin: 0;">
                         @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -48,194 +79,173 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('register.submit') }}" id="registerForm">
+            <form method="POST" action="{{ route('register.submit') }}" id="registerForm" style="display: flex; flex-direction: column; gap: 20px;">
                 @csrf
 
-                <div class="form-group">
-                    <x-input
-                        id="name"
-                        name="name"
-                        type="text"
-                        :label="__('Full Name')"
-                        :placeholder="__('Enter your full name')"
-                        value="{{ old('name') }}"
-                        icon="person"
-                        required
-                        autocomplete="name"
-                    />
-                </div>
+                <!-- Form Fields Grid (2 columns) -->
+                <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;">
+                    <!-- Full Name -->
+                    <div class="ula-field-group">
+                        <label class="ula-field-label" for="name">{{ __('الاسم الكامل') }}</label>
+                        <div class="ula-input-box">
+                            <span class="ms" style="font-size: 20px;">person</span>
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                class="ula-input-control"
+                                placeholder="{{ __('أدخل اسمك الكامل') }}"
+                                value="{{ old('name') }}"
+                                required
+                                autocomplete="name"
+                            >
+                        </div>
+                    </div>
 
-                <div class="form-group">
-                    <x-input
-                        id="email"
-                        name="email"
-                        type="email"
-                        :label="__('Email Address')"
-                        placeholder="name@company.com"
-                        value="{{ old('email') }}"
-                        icon="mail"
-                        required
-                        autocomplete="email"
-                    />
-                </div>
+                    <!-- Email Address -->
+                    <div class="ula-field-group">
+                        <label class="ula-field-label" for="email">{{ __('البريد الإلكتروني') }}</label>
+                        <div class="ula-input-box">
+                            <span class="ms" style="font-size: 20px;">mail</span>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                class="ula-input-control"
+                                placeholder="name@company.com"
+                                value="{{ old('email') }}"
+                                required
+                                autocomplete="email"
+                                style="direction: ltr; unicode-bidi: isolate;"
+                            >
+                        </div>
+                    </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
-                    <div class="form-group">
-                        <label class="form-label" for="password">{{ __('Password') }}</label>
-                        <div class="form-input-wrapper">
+                    <!-- Password -->
+                    <div class="ula-field-group">
+                        <label class="ula-field-label" for="password">{{ __('كلمة المرور') }}</label>
+                        <div class="ula-input-box">
+                            <span class="ms" style="font-size: 20px;">lock</span>
                             <input
                                 type="password"
                                 id="password"
                                 name="password"
-                                class="form-input"
-                                placeholder="{{ __('Create password') }}"
+                                class="ula-input-control"
+                                placeholder="{{ __('أنشئ كلمة مرور') }}"
                                 required
                                 minlength="8"
                                 autocomplete="new-password"
                             >
-                            <span class="form-input-icon">
-                                <span class="material-symbols-rounded">lock</span>
-                            </span>
-                            <button type="button" class="password-toggle" onclick="togglePassword('password', this)" aria-label="Toggle password visibility">
-                                <span class="material-symbols-rounded">visibility</span>
+                            <button type="button" class="ula-password-toggle-btn" onclick="togglePassword('password', this)" aria-label="Toggle password visibility">
+                                <span class="ms" style="font-size: 20px;">visibility</span>
                             </button>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <x-input
-                            id="password_confirmation"
-                            name="password_confirmation"
-                            type="password"
-                            :label="__('Confirm Password')"
-                            :placeholder="__('Confirm password')"
-                            icon="lock"
-                            required
-                            autocomplete="new-password"
-                        />
+                    <!-- Confirm Password -->
+                    <div class="ula-field-group">
+                        <label class="ula-field-label" for="password_confirmation">{{ __('تأكيد كلمة المرور') }}</label>
+                        <div class="ula-input-box">
+                            <span class="ms" style="font-size: 20px;">lock</span>
+                            <input
+                                type="password"
+                                id="password_confirmation"
+                                name="password_confirmation"
+                                class="ula-input-control"
+                                placeholder="{{ __('أكّد كلمة المرور') }}"
+                                required
+                                minlength="8"
+                                autocomplete="new-password"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Company Name (Full width in grid) -->
+                    <div class="ula-field-group" style="grid-column: span 2;">
+                        <label class="ula-field-label" for="organization_name">{{ __('اسم الشركة أو الفريق') }}</label>
+                        <div class="ula-input-box">
+                            <span class="ms" style="font-size: 20px;">apartment</span>
+                            <input
+                                type="text"
+                                id="organization_name"
+                                name="organization_name"
+                                class="ula-input-control"
+                                placeholder="{{ __('اسم شركتك أو فريقك') }}"
+                                value="{{ old('organization_name') }}"
+                                required
+                            >
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <x-input
-                        id="organization_name"
-                        name="organization_name"
-                        type="text"
-                        :label="__('Company Name')"
-                        :placeholder="__('Your company or team name')"
-                        value="{{ old('organization_name') }}"
-                        icon="apartment"
-                        required
-                    />
-                </div>
-
-                <!-- Choose Subscription Plan (Seats) -->
-                <div class="form-group" style="margin-top: 20px; margin-bottom: 24px;">
-                    <label class="form-label">{{ __('Choose Subscription Plan') }}</label>
+                <!-- Choose Subscription Plan -->
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <span class="ula-field-label">{{ __('اختر باقة الاشتراك') }}</span>
                     <input type="hidden" name="plan_id" id="selectedPlanId" value="{{ $plans->first()?->id }}">
 
                     @php
                         $planNameAr = ['Free' => 'مجاني', 'Starter' => 'مبتدئ', 'Business' => 'أعمال', 'Enterprise' => 'مؤسسات'];
+                        $defaultPlanSlug = request('plan', 'business');
                     @endphp
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px;">
+
+                    <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px;">
                         @foreach($plans as $index => $plan)
-                        <div
-                            class="plan-card-opt {{ $index === 0 ? 'selected' : '' }}"
-                            onclick="selectPlan('{{ $plan->id }}', this)"
-                            style="position: relative; border: 1.5px solid var(--ula-border-subtle); background: var(--ula-surface-page); border-radius: var(--ula-radius-md); padding: 12px; cursor: pointer; transition: all var(--ula-duration-fast) var(--ula-ease-out);"
-                        >
-                            <span class="plan-card-opt-radio" style="position: absolute; top: 12px; inset-inline-end: 12px; width: 16px; height: 16px; border-radius: var(--ula-radius-pill); border: 1.5px solid var(--ula-border-strong); box-sizing: border-box;"></span>
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; padding-inline-end: 22px;">
-                                <div style="display: flex; align-items: center; gap: 6px;">
-                                    <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-icon-accent);">verified</span>
-                                    <span class="ula-headline-group">
-                                        <span class="ula-headline-ar" style="font-size: 13px; font-weight: 700;">{{ $planNameAr[$plan->name] ?? $plan->name }}</span>
-                                        <span class="ula-headline-en" style="font-size: 10px;">{{ $plan->name }}</span>
-                                    </span>
+                            @php
+                                $isSelected = (request('plan') && $plan->slug === request('plan')) || (!request('plan') && ($plan->slug === 'business' || $index === 0));
+                            @endphp
+                            <div
+                                class="ula-plan-radio-box {{ $isSelected ? 'selected' : '' }}"
+                                onclick="selectPlan('{{ $plan->id }}', this)"
+                            >
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <span style="font-size: 15px; font-weight: 600;">{{ $planNameAr[$plan->name] ?? $plan->name }}</span>
+                                    <span class="ula-plan-radio-circle"></span>
                                 </div>
+                                <span style="font-family: var(--ula-font-mono); font-size: 20px; font-weight: 500; direction: ltr; unicode-bidi: isolate; text-align: end; color: var(--ula-text-primary);">${{ $plan->price }}</span>
+                                <span style="font-size: 12px; color: var(--ula-text-secondary);">
+                                    @if($plan->seat_limit === 0)
+                                        غير محدود
+                                    @else
+                                        {{ $plan->seat_limit }} مقعداً
+                                    @endif
+                                </span>
                             </div>
-                            <div style="display: flex; align-items: baseline; justify-content: space-between;">
-                                <div style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--ula-text-secondary); font-weight: 500;">
-                                    <span class="material-symbols-rounded" style="font-size: 14px;">group</span>
-                                    <span>
-                                        @if($plan->seat_limit === 0)
-                                            <strong>{{ __('غير محدود') }}</strong>
-                                        @else
-                                            <strong style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; display: inline-block;">{{ $plan->seat_limit }}</strong> {{ __('مقعداً') }}
-                                        @endif
-                                    </span>
-                                </div>
-                                <span style="font-size: 12px; font-weight: 700; font-family: var(--ula-font-mono); color: var(--ula-status-success); direction: ltr; unicode-bidi: isolate;">${{ number_format($plan->price, 0) }}/mo</span>
-                            </div>
-                        </div>
                         @endforeach
                     </div>
                 </div>
 
-                <button type="submit" class="nx-btn nx-btn--primary" id="registerBtn" style="width: 100%; justify-content: center; padding: 12px 20px; font-weight: 700; margin-top: 8px;">
-                    <span class="btn-text">{{ __('Create Account') }}</span>
-                    <div class="spinner"></div>
+                <!-- Submit Button -->
+                <button type="submit" class="ula-btn-auth-submit" id="registerBtn">
+                    {{ __('إنشاء الحساب') }}
                 </button>
             </form>
 
-            <div class="auth-footer">
-                {{ __('Already have an account?') }} <a href="{{ route('login') }}">{{ __('Sign in') }}</a>
+            <div class="ula-auth-switch-text">
+                {{ __('لديك حساب بالفعل؟') }} <a href="{{ route('login') }}">{{ __('سجّل الدخول') }}</a>
             </div>
         </div>
     </div>
 
-    <!-- Right: Branding Panel — pull quote -->
-    <div class="auth-right">
-        <div class="auth-right-stripes"></div>
-        <div class="auth-right-scrim"></div>
-        <div class="brand-panel" style="text-align: start; max-width: 480px; padding-inline-start: 18px; border-inline-start: 2px solid var(--ula-highlight-default);">
-            <span class="ula-headline-ar" style="font-size: 26px; display: block; margin-bottom: 6px;">
+    <!-- Right: Branding Hero Panel with Quote -->
+    <div class="ula-auth-hero-side">
+        <div class="ula-auth-hero-stripes"></div>
+        <div class="ula-auth-hero-scrim"></div>
+        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; gap: 6px; padding-inline-start: 16px; border-inline-start: 2px solid var(--ula-highlight-default);">
+            <blockquote style="font-size: 26px; font-weight: 600; line-height: 1.4; color: var(--ula-text-on-dark); margin: 0;">
                 "المكان ليس مجرد جدران، بل مساحة تلتقي فيها العقول."
-            </span>
-            <span class="ula-headline-en" style="font-size: 14px;">UlaSpace</span>
+            </blockquote>
+            <span style="font-family: var(--ula-font-en); font-size: 14px; color: var(--ula-sand-400);">UlaSpace</span>
         </div>
     </div>
 </div>
 @endsection
 
-@section('styles')
-<style>
-    .plan-card-opt.selected {
-        border-color: var(--ula-accent-default) !important;
-        background: var(--ula-surface-accent-soft) !important;
-        box-shadow: 0 0 0 1px var(--ula-accent-default);
-    }
-    .plan-card-opt.selected .plan-card-opt-radio {
-        border-color: var(--ula-accent-default);
-        border-width: 5px;
-    }
-</style>
-@endsection
-
 @section('scripts')
 <script nonce="{{ $cspNonce ?? '' }}">
-    function togglePassword(inputId, btn) {
-        const input = document.getElementById(inputId);
-        const icon = btn.querySelector('.material-symbols-rounded');
-        if (input.type === 'password') {
-            input.type = 'text';
-            if (icon) icon.textContent = 'visibility_off';
-        } else {
-            input.type = 'password';
-            if (icon) icon.textContent = 'visibility';
-        }
-    }
-
     function selectPlan(planId, element) {
         document.getElementById('selectedPlanId').value = planId;
-        document.querySelectorAll('.plan-card-opt').forEach(el => el.classList.remove('selected'));
+        document.querySelectorAll('.ula-plan-radio-box').forEach(el => el.classList.remove('selected'));
         element.classList.add('selected');
     }
-
-    document.getElementById('registerForm').addEventListener('submit', function() {
-        const btn = document.getElementById('registerBtn');
-        btn.classList.add('btn-loading');
-        btn.disabled = true;
-    });
 </script>
 @endsection

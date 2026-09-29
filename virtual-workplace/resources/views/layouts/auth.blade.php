@@ -18,467 +18,307 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/ulaspace-tokens.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/modern-design-system.css') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-        :root {
-            --bg-primary: var(--ula-surface-page);
-            --bg-card: var(--ula-surface-card);
-            --bg-input: var(--ula-surface-sunken);
-            --border-color: var(--ula-border-subtle);
-            --text-primary: var(--ula-text-primary);
-            --text-secondary: var(--ula-text-secondary);
-            --text-muted: var(--ula-text-muted);
-            --status-success: var(--ula-status-success);
-            --status-error: var(--ula-status-danger);
-            --font-ar: var(--ula-font-ar);
-            --font-en: var(--ula-font-en);
-            --font-mono: var(--ula-font-mono);
-            --font-family: var(--font-en);
-        }
-
-        [dir="rtl"], [lang="ar"] {
-            --font-family: var(--font-ar);
-        }
-
-        * {
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: var(--font-family);
         }
 
         body {
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            background-color: var(--ula-surface-sunken);
+            color: var(--ula-text-primary);
+            font-family: var(--ula-font-ar);
             min-height: 100vh;
-            overflow-x: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px 24px;
             -webkit-font-smoothing: antialiased;
         }
 
-        .bg-pattern {
-            position: fixed;
-            top: 0;
-            inset-inline-start: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            overflow: hidden;
-            background: radial-gradient(circle at 10% 20%, rgba(27, 50, 35, 0.04) 0%, transparent 45%),
-                        radial-gradient(circle at 90% 80%, rgba(211, 165, 83, 0.05) 0%, transparent 40%);
-            pointer-events: none;
+        [dir="ltr"] body {
+            font-family: var(--ula-font-en);
         }
 
-        .auth-wrapper {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .auth-left {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 24px;
-        }
-
-        .auth-right {
-            flex: 1;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 60px;
-            background: var(--ula-gradient-accent);
-            color: var(--ula-text-on-dark);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .auth-right-stripes {
-            position: absolute;
-            inset: 0;
-            background-image: repeating-linear-gradient(135deg, var(--ula-palm-800) 0 14px, var(--ula-palm-chrome) 14px 28px);
-            opacity: 0.5;
-        }
-
-        .auth-right-scrim {
-            position: absolute;
-            inset: 0;
-            background: var(--ula-scrim-bottom);
-        }
-
-        .auth-right::before {
-            content: '';
-            position: absolute;
-            top: -100px;
-            inset-inline-end: -100px;
-            width: 400px;
-            height: 400px;
-            border-radius: 50%;
-            background: radial-gradient(circle, var(--ula-alpha-gold-400-18) 0%, transparent 70%);
-            pointer-events: none;
-        }
-
-        @media (min-width: 1024px) {
-            .auth-right {
-                display: flex;
-            }
-        }
-
-        .auth-card {
-            width: 100%;
-            max-width: 460px;
-            background: var(--ula-surface-card);
-            border: 1px solid var(--ula-border-subtle);
-            border-radius: var(--ula-radius-xl);
-            padding: 40px 32px;
-            box-shadow: var(--ula-shadow-md);
-            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .auth-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .logo-icon {
-            width: 42px;
-            height: 42px;
-            background: linear-gradient(135deg, var(--ula-palm-900) 0%, var(--ula-palm-700) 100%);
-            border-radius: var(--ula-radius-md);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--ula-white);
-            box-shadow: var(--ula-shadow-sm);
-        }
-
-        .logo-icon .material-symbols-rounded {
-            font-size: 24px;
-        }
-
-        .logo-text {
-            font-size: 19px;
-            font-weight: 800;
-            color: var(--ula-text-primary);
-            letter-spacing: -0.2px;
-        }
-
-        .auth-title {
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--ula-text-primary);
-            margin-bottom: 6px;
-            line-height: 1.25;
-        }
-
-        .auth-subtitle {
-            color: var(--ula-text-secondary);
-            font-size: 14px;
-            margin-bottom: 24px;
-            line-height: 1.5;
-            font-weight: 500;
-        }
-
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--ula-text-secondary);
-            margin-bottom: 6px;
-            letter-spacing: 0.2px;
-        }
-
-        .form-input-wrapper {
-            position: relative;
-        }
-
-        .form-input-icon {
-            position: absolute;
-            inset-inline-start: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--ula-text-muted);
-            font-size: 20px;
-            pointer-events: none;
-            display: flex;
-            align-items: center;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px 16px;
-            padding-inline-start: 42px;
-            background: var(--ula-surface-page);
-            border: 1px solid var(--ula-border-subtle);
-            border-radius: var(--ula-radius-md);
-            color: var(--ula-text-primary);
-            font-size: 14px;
-            font-weight: 500;
-            font-family: inherit;
-            transition: all 0.2s ease;
-            outline: none;
-        }
-
-        .form-input:focus {
-            background: var(--bg-card);
-            border-color: var(--ula-accent-default);
-            box-shadow: var(--ula-focus-ring);
-        }
-
-        .form-input::placeholder {
-            color: var(--ula-text-muted);
+        .ms {
+            font-family: 'Material Symbols Rounded';
             font-weight: 400;
+            font-style: normal;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            direction: ltr;
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
 
-        .password-toggle {
-            position: absolute;
-            inset-inline-end: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--ula-text-muted);
-            cursor: pointer;
-            padding: 4px;
+        /* ── Auth Master Container (Matches 02 & 03: 1440px wide, 20px radius, shadow) ── */
+        .ula-auth-container {
+            width: 100%;
+            max-width: 1440px;
+            background: var(--ula-surface-page);
+            border-radius: var(--ula-radius-lg);
+            overflow: hidden;
+            box-shadow: var(--ula-shadow-xl);
+            display: grid;
+        }
+
+        .ula-auth-container.login-layout {
+            min-height: 820px;
+            grid-template-columns: 640px minmax(0, 1fr);
+        }
+
+        .ula-auth-container.register-layout {
+            min-height: 900px;
+            grid-template-columns: 760px minmax(0, 1fr);
+        }
+
+        .ula-auth-form-side {
+            padding: 40px 80px;
             display: flex;
-            align-items: center;
-            border-radius: 6px;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 28px;
+            background: var(--ula-surface-page);
         }
 
-        .password-toggle:hover {
-            color: var(--ula-text-primary);
-        }
-
-        .password-toggle .material-symbols-rounded {
-            font-size: 20px;
-        }
-
-        .form-check {
+        .ula-auth-top-bar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
         }
 
-        .form-check-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--ula-text-secondary);
-            cursor: pointer;
-        }
-
-        .form-check-input {
-            width: 16px;
-            height: 16px;
-            accent-color: var(--ula-accent-default);
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        .form-link {
-            color: var(--ula-accent-default);
-            font-size: 13px;
-            text-decoration: none;
-            font-weight: 700;
-        }
-        .form-link:hover {
-            text-decoration: underline;
-        }
-
-        .auth-footer {
-            text-align: center;
-            margin-top: 24px;
-            font-size: 13px;
-            color: var(--ula-text-secondary);
-            font-weight: 500;
-        }
-
-        .auth-footer a {
-            color: var(--ula-accent-default);
-            text-decoration: none;
-            font-weight: 700;
-        }
-        .auth-footer a:hover {
-            text-decoration: underline;
-        }
-
-        .alert {
-            padding: 12px 16px;
-            border-radius: var(--ula-radius-md);
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            display: flex;
+        .ula-auth-brand {
+            display: inline-flex;
             align-items: center;
             gap: 10px;
-        }
-
-        .alert-error {
-            background: var(--ula-surface-danger-soft);
-            border: 1px solid var(--ula-border-danger);
-            color: var(--ula-status-danger);
-        }
-
-        .alert-success {
-            background: var(--ula-surface-accent-soft);
-            border: 1px solid var(--ula-status-success);
-            color: var(--ula-status-success);
-        }
-
-        .alert .material-symbols-rounded {
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        .brand-panel {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-            max-width: 440px;
-        }
-        .brand-panel .ula-headline-group,
-        .brand-panel .ula-headline-ar { align-items: center; }
-        .brand-panel .ula-headline-ar { color: var(--ula-text-on-dark); }
-        .brand-panel .ula-headline-en { color: var(--ula-text-on-dark-muted); }
-
-        /* Small corner mark on the light auth card: green in light mode, ivory in
-           dark mode (surface/card flips dark) — see FIX_BRIEF.md "pick by surface". */
-        .auth-brand-mark { fill: var(--ula-brand-mark-green); }
-        @media (prefers-color-scheme: dark) {
-            :root:not([data-theme="light"]) .auth-brand-mark { fill: var(--ula-brand-mark-ivory); }
-        }
-        [data-theme="dark"] .auth-brand-mark, .dark .auth-brand-mark {
-            fill: var(--ula-brand-mark-ivory);
-        }
-        .brand-panel-icon {
-            width: 72px;
-            height: 72px;
-            margin: 0 auto 24px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: var(--ula-radius-xl);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--ula-sand-300);
-        }
-        .brand-panel-icon .material-symbols-rounded {
-            font-size: 38px;
-        }
-        .brand-title {
-            font-size: 28px;
-            font-weight: 800;
-            margin-bottom: 14px;
-            color: var(--ula-sand-100);
-            letter-spacing: -0.3px;
-        }
-        .brand-description {
-            color: var(--ula-sand-400);
-            font-size: 15px;
-            line-height: 1.7;
-            font-weight: 400;
-        }
-
-        .lang-switch-btn {
-            background: var(--ula-surface-card);
-            border: 1px solid var(--ula-border-subtle);
-            color: var(--ula-text-primary);
-            padding: 8px 14px;
-            border-radius: var(--ula-radius-md);
-            font-size: 13px;
             text-decoration: none;
-            font-weight: 700;
-            box-shadow: var(--ula-shadow-sm);
+            color: var(--ula-accent-default);
+        }
+
+        .ula-auth-brand-name {
+            font-family: var(--ula-font-en);
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--ula-text-primary);
+        }
+
+        .ula-auth-lang-btn {
+            height: 44px;
+            padding: 0 14px;
+            border-radius: var(--ula-radius-sm);
+            border: var(--ula-border-width-hairline) solid var(--ula-border-default);
+            background: var(--ula-surface-card);
+            color: var(--ula-text-secondary);
+            font-family: var(--ula-font-en);
+            font-size: 14px;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: all 0.15s ease;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all var(--ula-duration-fast) var(--ula-ease-out);
         }
-        .lang-switch-btn:hover {
+
+        .ula-auth-lang-btn:hover {
+            background: var(--ula-surface-page-alt);
+            color: var(--ula-text-primary);
+        }
+
+        /* ── Input Styling ── */
+        .ula-field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .ula-field-label {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--ula-text-primary);
+        }
+
+        .ula-input-box {
+            position: relative;
+            height: 46px;
+            padding: 0 16px;
+            border-radius: 14px;
+            border: var(--ula-border-width-hairline) solid var(--ula-border-default);
+            background: var(--ula-surface-page);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--ula-text-muted);
+            transition: border-color var(--ula-duration-fast) var(--ula-ease-out), box-shadow var(--ula-duration-fast) var(--ula-ease-out);
+        }
+
+        .ula-input-box:focus-within {
             border-color: var(--ula-accent-default);
-            color: var(--ula-accent-default);
+            box-shadow: 0 0 0 2px var(--ula-surface-page), 0 0 0 4px var(--ula-highlight-default);
         }
 
-        .spinner {
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: var(--ula-white);
-            border-radius: 50%;
-            animation: spinnerRotate 0.6s linear infinite;
-            display: none;
+        .ula-input-control {
+            flex: 1;
+            height: 100%;
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            color: var(--ula-text-primary);
+            outline: none;
+            font-family: inherit;
         }
-        .btn-loading .spinner { display: block; }
-        .btn-loading .btn-text { display: none; }
 
-        /* Submit buttons (login/register): .nx-btn--primary has no rule of its
-           own in the regenerated ulaspace-tokens.css (it isn't a Figma token,
-           it's this page's own primary-action treatment), so it lives here. */
-        .nx-btn.nx-btn--primary {
+        .ula-input-control::placeholder {
+            color: var(--ula-text-muted);
+        }
+
+        .ula-password-toggle-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--ula-text-muted);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: var(--ula-space-3, 8px);
-            border: 1px solid transparent;
-            border-radius: var(--ula-radius-md);
-            font-family: var(--font-ar);
-            font-size: 15px;
-            font-weight: 700;
-            text-decoration: none;
-            cursor: pointer;
-            transition: background-color var(--ula-duration-fast) var(--ula-ease-out), border-color var(--ula-duration-fast) var(--ula-ease-out);
-            background: var(--ula-accent-default);
-            border-color: var(--ula-accent-default);
-            color: var(--ula-accent-fg);
-        }
-        .nx-btn.nx-btn--primary:hover {
-            background: var(--ula-accent-hover);
-            border-color: var(--ula-accent-hover);
-        }
-        .nx-btn.nx-btn--primary:active {
-            background: var(--ula-accent-press);
-            border-color: var(--ula-accent-press);
-        }
-        .nx-btn.nx-btn--primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        .nx-btn.nx-btn--primary:focus-visible {
-            box-shadow: var(--ula-focus-ring);
+            padding: 0;
             outline: none;
         }
 
-        @keyframes spinnerRotate {
-            to { transform: rotate(360deg); }
+        .ula-password-toggle-btn:hover {
+            color: var(--ula-text-primary);
+        }
+
+        /* ── Action Buttons & Links ── */
+        .ula-btn-auth-submit {
+            height: 52px;
+            width: 100%;
+            border-radius: 18px;
+            border: 0;
+            background: var(--ula-accent-default);
+            color: var(--ula-accent-fg);
+            font-family: var(--ula-font-ar);
+            font-size: 17px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--ula-shadow-xs);
+            transition: background var(--ula-duration-fast) var(--ula-ease-out);
+        }
+
+        .ula-btn-auth-submit:hover {
+            background: var(--ula-accent-hover);
+        }
+
+        .ula-auth-switch-text {
+            font-size: 15px;
+            color: var(--ula-text-secondary);
+            text-align: center;
+        }
+
+        .ula-auth-switch-text a {
+            color: var(--ula-accent-default);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .ula-auth-switch-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* ── Alerts ── */
+        .ula-auth-alert-error {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: var(--ula-tone-terracotta-bg);
+            color: var(--ula-tone-terracotta-fg);
+            font-size: 14px;
+        }
+
+        .ula-auth-alert-success {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            background: var(--ula-tone-palm-bg);
+            color: var(--ula-tone-palm-fg);
+            font-size: 14px;
+        }
+
+        /* ── Right Hero Panel (Dark Canvas with Stripes) ── */
+        .ula-auth-hero-side {
+            position: relative;
+            background: var(--ula-surface-dark);
+            color: var(--ula-text-on-dark);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 64px;
+            overflow: hidden;
+        }
+
+        .ula-auth-hero-stripes {
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(135deg, var(--ula-media-stripe-a) 0 14px, var(--ula-media-stripe-b) 14px 28px);
+        }
+
+        .ula-auth-hero-scrim {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(14,28,23,0.72) 0%, rgba(14,28,23,0.18) 48%, rgba(14,28,23,0) 100%);
+            pointer-events: none;
+        }
+
+        .ula-auth-hero-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 560px;
+        }
+
+        @media (max-width: 1024px) {
+            body { padding: 16px; }
+            .ula-auth-container.login-layout,
+            .ula-auth-container.register-layout {
+                grid-template-columns: 1fr;
+            }
+            .ula-auth-hero-side { display: none; }
+            .ula-auth-form-side { padding: 32px 24px; }
         }
     </style>
     @yield('styles')
 </head>
 <body>
-    <div class="bg-pattern"></div>
 
     @yield('content')
 
+    <script nonce="{{ $cspNonce ?? '' }}">
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('.ms');
+            if (input.type === 'password') {
+                input.type = 'text';
+                if (icon) icon.textContent = 'visibility_off';
+            } else {
+                input.type = 'password';
+                if (icon) icon.textContent = 'visibility';
+            }
+        }
+    </script>
     @yield('scripts')
 </body>
 </html>

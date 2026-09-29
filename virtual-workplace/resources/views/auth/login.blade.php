@@ -1,45 +1,42 @@
 @extends('layouts.auth')
 
-@section('title', __('Login') . ' — UlaSpace')
+@section('title', __('تسجيل الدخول') . ' — UlaSpace')
 
 @section('content')
-<div style="position: absolute; top: 20px; inset-inline-end: 24px; z-index: 10;">
-    @if(app()->getLocale() === 'ar')
-        <a href="{{ route('lang.switch', 'en') }}" class="lang-switch-btn">
-            <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
-            <span>English</span>
-        </a>
-    @else
-        <a href="{{ route('lang.switch', 'ar') }}" class="lang-switch-btn">
-            <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
-            <span>العربية</span>
-        </a>
-    @endif
-</div>
-
-<div class="auth-wrapper">
+<div class="ula-auth-container login-layout">
     <!-- Left: Login Form -->
-    <div class="auth-left">
-        <div class="auth-card">
-            <div class="auth-logo">
-                <svg class="auth-brand-mark" viewBox="0 0 100 67" width="34" height="23" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M0 67C0 24 16 0 52 0C84 0 100 24 100 67H46C46 38 38 28 28 28C18 28 14 38 14 67H0Z"/>
-                </svg>
-                <div>
-                    <span class="logo-text" style="display: block; line-height: 1.1; font-weight: 800;">UlaSpace</span>
-                    <span style="font-size: 10px; font-weight: 700; color: var(--ula-text-secondary); letter-spacing: 0.5px; text-transform: uppercase;">{{ __('Virtual Workplace') }}</span>
-                </div>
-            </div>
+    <div class="ula-auth-form-side">
+        <!-- Top bar: Logo & Language Switcher -->
+        <div class="ula-auth-top-bar">
+            <a href="{{ route('landing.home') }}" class="ula-auth-brand">
+                <svg role="img" aria-label="UlaSpace" width="43" height="29" viewBox="-1.2 -1.3 60 40" fill="var(--ula-brand-mark-green)" style="flex-shrink: 0; display: block"><path d="M0 38.734L1.493 30.973L4.179 20.824L6.865 11.869C8.259 7.491 11.94 4.207 17.91 2.018C26.268 -0.569 34.427 -0.669 42.387 1.719C49.153 3.311 54.128 7.292 57.312 13.66L57.312 38.734L26.268 38.734L25.074 27.988C23.482 20.824 21.591 17.242 19.403 17.242C17.214 18.038 15.721 21.819 14.925 28.585L14.328 38.734L0 38.734Z"></path></svg>
+                <span class="ula-auth-brand-name">UlaSpace</span>
+            </a>
 
-            <div class="ula-headline-group" style="margin-bottom: 4px;">
-                <span class="ula-headline-ar" style="font-size: 24px;">أهلاً بعودتك</span>
-                <span class="ula-headline-en" style="font-size: 15px;">Welcome back</span>
+            @if(app()->getLocale() === 'ar')
+                <a href="{{ route('lang.switch', 'en') }}" class="ula-auth-lang-btn">
+                    <span class="ms" style="font-size: 20px;">language</span>
+                    <span>English</span>
+                </a>
+            @else
+                <a href="{{ route('lang.switch', 'ar') }}" class="ula-auth-lang-btn">
+                    <span class="ms" style="font-size: 20px;">language</span>
+                    <span>العربية</span>
+                </a>
+            @endif
+        </div>
+
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 32px; max-width: 480px; width: 100%; margin-inline: auto;">
+            <!-- Heading Group -->
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <h1 style="font-size: 34px; font-weight: 600; line-height: 1.25; color: var(--ula-text-primary);">أهلاً بعودتك</h1>
+                <span style="font-family: var(--ula-font-en); font-size: 18px; font-weight: 300; color: var(--ula-text-secondary);">Welcome back</span>
+                <p style="font-size: 15px; color: var(--ula-text-secondary); margin-top: 8px;">سجّل الدخول للوصول إلى مكتبك الافتراضي</p>
             </div>
-            <p class="auth-subtitle">{{ __('Sign in to your account to access your virtual office') }}</p>
 
             @if($errors->any())
-                <div class="alert alert-error">
-                    <span class="material-symbols-rounded">warning</span>
+                <div class="ula-auth-alert-error">
+                    <span class="ms" style="font-size: 20px;">error</span>
                     <ul style="list-style: none; padding: 0; margin: 0;">
                         @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -49,105 +46,85 @@
             @endif
 
             @if(session('success'))
-                <div class="alert alert-success">
-                    <span class="material-symbols-rounded">check_circle</span>
+                <div class="ula-auth-alert-success">
+                    <span class="ms" style="font-size: 20px;">check_circle</span>
                     <span>{{ session('success') }}</span>
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('login.submit') }}" id="loginForm">
+            <form method="POST" action="{{ route('login.submit') }}" id="loginForm" style="display: flex; flex-direction: column; gap: 20px;">
                 @csrf
 
-                <div class="form-group">
-                    <x-input
-                        id="email"
-                        name="email"
-                        type="email"
-                        :label="__('Email Address')"
-                        placeholder="name@company.com"
-                        value="{{ old('email') }}"
-                        icon="mail"
-                        required
-                        autocomplete="email"
-                    />
+                <!-- Email Input -->
+                <div class="ula-field-group">
+                    <label class="ula-field-label" for="email">{{ __('البريد الإلكتروني') }}</label>
+                    <div class="ula-input-box">
+                        <span class="ms" style="font-size: 20px;">mail</span>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            class="ula-input-control"
+                            placeholder="name@company.com"
+                            value="{{ old('email') }}"
+                            required
+                            autocomplete="email"
+                            style="direction: ltr; unicode-bidi: isolate;"
+                        >
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label" for="password">{{ __('Password') }}</label>
-                    <div class="form-input-wrapper">
+                <!-- Password Input -->
+                <div class="ula-field-group">
+                    <label class="ula-field-label" for="password">{{ __('كلمة المرور') }}</label>
+                    <div class="ula-input-box">
+                        <span class="ms" style="font-size: 20px;">lock</span>
                         <input
                             type="password"
                             id="password"
                             name="password"
-                            class="form-input"
-                            placeholder="{{ __('Enter your password') }}"
+                            class="ula-input-control"
+                            placeholder="{{ __('أدخل كلمة المرور') }}"
                             required
                             autocomplete="current-password"
                         >
-                        <span class="form-input-icon">
-                            <span class="material-symbols-rounded">lock</span>
-                        </span>
-                        <button type="button" class="password-toggle" onclick="togglePassword('password', this)" aria-label="Toggle password visibility">
-                            <span class="material-symbols-rounded">visibility</span>
+                        <button type="button" class="ula-password-toggle-btn" onclick="togglePassword('password', this)" aria-label="Toggle password visibility">
+                            <span class="ms" style="font-size: 20px;">visibility</span>
                         </button>
                     </div>
                 </div>
 
-                <div class="form-check">
-                    <x-checkbox name="remember">{{ __('Remember me') }}</x-checkbox>
-                    <span style="color: var(--ula-text-muted); font-size: 13px; font-weight: 700;">{{ __('Forgot password?') }}</span>
+                <!-- Remember Me & Forgot Password -->
+                <div style="display: flex; align-items: center; justify-content: space-between; font-size: 15px;">
+                    <label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" name="remember" style="accent-color: var(--ula-accent-default); width: 18px; height: 18px; border-radius: 4px;">
+                        <span>{{ __('تذكرني') }}</span>
+                    </label>
+                    <a href="javascript:void(0)" style="font-size: 15px; font-weight: 500; color: var(--ula-text-secondary); text-decoration: none;">
+                        {{ __('نسيت كلمة المرور؟') }}
+                    </a>
                 </div>
 
-                <button type="submit" class="nx-btn nx-btn--primary" id="loginBtn" style="width: 100%; justify-content: center; padding: 12px 20px; font-weight: 700;">
-                    <span class="btn-text">{{ __('Sign In') }}</span>
-                    <div class="spinner"></div>
+                <!-- Submit Button -->
+                <button type="submit" class="ula-btn-auth-submit" id="loginBtn">
+                    {{ __('تسجيل الدخول') }}
                 </button>
             </form>
 
-            <div class="auth-footer">
-                {{ __("Don't have an account?") }} <a href="{{ route('register') }}">{{ __('Create one') }}</a>
+            <div class="ula-auth-switch-text">
+                {{ __('ليس لديك حساب؟') }} <a href="{{ route('register') }}">{{ __('أنشئ حساباً') }}</a>
             </div>
         </div>
     </div>
 
-    <!-- Right: Branding Panel -->
-    <div class="auth-right">
-        <div class="auth-right-stripes"></div>
-        <div class="auth-right-scrim"></div>
-        <div class="brand-panel">
-            <div style="margin-bottom: 28px;">
-                <img src="{{ asset('images/ulaspace-logo.png') }}" alt="UlaSpace" style="max-width: 260px; width: 100%; height: auto; margin: 0 auto; display: block;">
-            </div>
-            <div class="ula-headline-group" style="margin-bottom: 14px;">
-                <span class="ula-headline-ar" style="font-size: 30px;">مكتبك الافتراضي بانتظارك</span>
-                <span class="ula-headline-en" style="font-size: 17px;">Your Virtual Office Awaits</span>
-            </div>
-            <p class="brand-description">
-                {{ __('Step into a persistent, spatial workspace where your team connects naturally — just like a real office, but without walls.') }}
-            </p>
+    <!-- Right: Branding Hero Panel -->
+    <div class="ula-auth-hero-side">
+        <div class="ula-auth-hero-stripes"></div>
+        <div class="ula-auth-hero-scrim"></div>
+        <div class="ula-auth-hero-content">
+            <h2 style="font-size: 44px; font-weight: 600; line-height: 1.25; color: var(--ula-text-on-dark);">مكتبك الافتراضي بانتظارك</h2>
+            <span style="font-family: var(--ula-font-en); font-size: 20px; font-weight: 300; color: var(--ula-sand-400);">Your Virtual Office Awaits</span>
         </div>
     </div>
 </div>
-@endsection
-
-@section('scripts')
-<script nonce="{{ $cspNonce ?? '' }}">
-    function togglePassword(inputId, btn) {
-        const input = document.getElementById(inputId);
-        const icon = btn.querySelector('.material-symbols-rounded');
-        if (input.type === 'password') {
-            input.type = 'text';
-            if (icon) icon.textContent = 'visibility_off';
-        } else {
-            input.type = 'password';
-            if (icon) icon.textContent = 'visibility';
-        }
-    }
-
-    document.getElementById('loginForm').addEventListener('submit', function() {
-        const btn = document.getElementById('loginBtn');
-        btn.classList.add('btn-loading');
-        btn.disabled = true;
-    });
-</script>
 @endsection
