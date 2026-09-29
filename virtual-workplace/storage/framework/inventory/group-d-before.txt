@@ -1,0 +1,96 @@
+@foreach($errors->all() as $err)
+@if($canSeeAdminSec)
+@if($errors->any())
+@if($isEvening)
+@if($membership->hasPermission('audit.view'))
+@if($membership->hasPermission('billing.manage'))
+@if($membership->hasPermission('departments.manage') || $member
+@if($membership->hasPermission('guests.invite'))
+@if($membership->hasPermission('maps.manage') || $membership->r
+@if($membership->hasPermission('maps.manage'))
+@if($membership->hasPermission('members.view') || $membership->
+@if($membership->hasPermission('organizations.manage'))
+@if($membership->hasPermission('reports.view') || $membership->
+@if($membership->hasPermission('rooms.manage'))
+@if($membership->hasPermission('tasks.assign') || $membership->
+@if($organization->logo_url)
+@if($user->avatar_url)
+@if($user->isSuperAdmin())
+@if($user->nickname)
+@if(app()->getLocale() === 'ar')
+@if(session('error'))
+@if(session('org_impersonator_id'))
+@if(session('success'))
+@if(session('superadmin_impersonator_id'))
+@include('dashboard.partials.modals')
+@include('dashboard.partials.scripts')
+@include('dashboard.partials.tab-all-tasks')
+@include('dashboard.partials.tab-audit')
+@include('dashboard.partials.tab-billing')
+@include('dashboard.partials.tab-chat')
+@include('dashboard.partials.tab-departments')
+@include('dashboard.partials.tab-guests')
+@include('dashboard.partials.tab-meetings')
+@include('dashboard.partials.tab-members')
+@include('dashboard.partials.tab-my-tasks')
+@include('dashboard.partials.tab-offices')
+@include('dashboard.partials.tab-overview')
+@include('dashboard.partials.tab-profile')
+@include('dashboard.partials.tab-projects')
+@include('dashboard.partials.tab-rooms')
+@include('dashboard.partials.tab-settings')
+@include('dashboard.partials.tab-timesheets')
+@include('dashboard.partials.tab-workload')
+id="dashboardSidebar"
+id="globalSearchInput"
+id="live-timer-clock"
+id="nav-btn-all-tasks"
+id="nav-btn-audit"
+id="nav-btn-billing"
+id="nav-btn-chat"
+id="nav-btn-departments"
+id="nav-btn-guests"
+id="nav-btn-meetings"
+id="nav-btn-members"
+id="nav-btn-my-tasks"
+id="nav-btn-offices"
+id="nav-btn-overview"
+id="nav-btn-profile"
+id="nav-btn-projects"
+id="nav-btn-rooms"
+id="nav-btn-settings"
+id="nav-btn-timesheets"
+id="nav-btn-workload"
+id="notifBadge"
+id="notifBellBtn"
+id="notifDropdown"
+id="notifEmptyState"
+id="notifHeaderCount"
+id="notifListContainer"
+id="notifWrapper"
+id="nx-hero-dynamic-greeting"
+id="nx-hero-live-clock"
+id="page-primary-subtitle"
+id="page-primary-title"
+id="sec-admin"
+id="sec-projects"
+id="sec-settings"
+id="sec-workspace"
+id="sidebar-tenant-logo"
+id="sidebar-tenant-logo-icon"
+id="sidebar-user-avatar"
+id="tab-overview"
+id="theme-toggle-btn"
+id="timer-project-tag"
+id="timer-task-title"
+id="universal-timer-strip"
+name="csrf-token"
+name="viewport"
+route('editor')
+route('impersonate.leave')
+route('lang.switch', 'ar')
+route('lang.switch', 'en')
+route('logout')
+route('office')
+route('organization.members.impersonate.leave')
+route('superadmin.dashboard')
