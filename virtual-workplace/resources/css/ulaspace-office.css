@@ -127,7 +127,7 @@ body {
 .nx-toolbar-btn:hover {
     background: rgba(27, 50, 35, 0.90);
     border-color: var(--ula-highlight-default);
-    color: #FFFFFF;
+    color: var(--ula-text-on-dark);
     transform: translateY(-1px);
 }
 
@@ -165,7 +165,7 @@ body {
     border-radius: 9999px;
     background: rgba(60, 107, 76, 0.20);
     border: 1px solid rgba(60, 107, 76, 0.40);
-    color: #86EFAC;
+    color: var(--ula-status-success);
     font-size: 12px;
     font-weight: 500;
     white-space: nowrap;
@@ -175,8 +175,8 @@ body {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #3C6B4C;
-    box-shadow: 0 0 8px #3C6B4C;
+    background: var(--ula-status-success);
+    box-shadow: 0 0 8px var(--ula-status-success);
     animation: presencePulse 1.8s infinite;
     display: inline-block;
 }
@@ -272,19 +272,19 @@ body {
 .nx-dock-btn:hover {
     background: rgba(27, 50, 35, 0.95);
     border-color: var(--ula-highlight-default);
-    color: #FFFFFF;
+    color: var(--ula-text-on-dark);
     transform: translateY(-2px);
 }
 .nx-dock-btn.active {
     background: rgba(60, 107, 76, 0.35);
     border-color: var(--ula-status-success);
-    color: #86EFAC;
+    color: var(--ula-status-success);
     box-shadow: 0 0 12px rgba(60, 107, 76, 0.3);
 }
 .nx-dock-btn.muted {
     background: rgba(217, 107, 95, 0.18);
     border-color: rgba(217, 107, 95, 0.40);
-    color: #F87171;
+    color: var(--ula-status-danger);
 }
 
 .nx-dock-divider {
@@ -296,15 +296,15 @@ body {
 
 /* Leave Button (Terracotta / Orange Accent matching Figma) */
 .nx-dock-btn-leave {
-    background: #B85D30 !important;
+    background: var(--ula-status-danger) !important;
     border-color: rgba(237, 230, 217, 0.3) !important;
-    color: #FFFFFF !important;
+    color: var(--ula-text-on-dark) !important;
     margin-inline-start: 6px;
 }
 .nx-dock-btn-leave:hover {
     background: #C96636 !important;
-    border-color: #EDE6D9 !important;
-    color: #FFFFFF !important;
+    border-color: var(--ula-sand-300) !important;
+    color: var(--ula-text-on-dark) !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 16px rgba(184, 93, 48, 0.5);
 }
@@ -407,17 +407,17 @@ body {
 .action-link-btn:hover {
     background: rgba(27, 50, 35, 0.95);
     border-color: var(--ula-highlight-default);
-    color: #FFFFFF;
+    color: var(--ula-text-on-dark);
 }
 .action-link-btn.btn-danger {
     background: rgba(217, 107, 95, 0.2);
     border-color: rgba(217, 107, 95, 0.4);
-    color: #F87171;
+    color: var(--ula-status-danger);
 }
 .action-link-btn.btn-danger:hover {
     background: rgba(217, 107, 95, 0.4);
     border-color: #D96B5F;
-    color: #FFFFFF;
+    color: var(--ula-text-on-dark);
 }
 
 /* Chat Drawer */
@@ -559,7 +559,7 @@ body {
     transform: translateX(-50%);
     background: rgba(60, 107, 76, 0.95);
     backdrop-filter: blur(14px);
-    color: #FFFFFF;
+    color: var(--ula-text-on-dark);
     padding: 10px 22px;
     border-radius: 9999px;
     font-size: 12px;
@@ -605,7 +605,7 @@ body {
 .nx-viewport-ctrl-btn:hover {
     background: rgba(60, 107, 76, 0.45);
     border-color: var(--ula-highlight-default);
-    color: #FFFFFF;
+    color: var(--ula-text-on-dark);
     transform: scale(1.05);
 }
 
@@ -661,7 +661,7 @@ body {
     border-radius: 10px;
     background: rgba(60, 107, 76, 0.28);
     border: 1px solid rgba(60, 107, 76, 0.50);
-    color: #86EFAC;
+    color: var(--ula-status-success);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -677,7 +677,7 @@ body {
 .nx-toast-card.nx-toast-error .nx-toast-icon-wrap {
     background: rgba(217, 107, 95, 0.25);
     border-color: rgba(217, 107, 95, 0.50);
-    color: #F87171;
+    color: var(--ula-status-danger);
 }
 
 .nx-toast-content {
@@ -707,7 +707,7 @@ body {
     flex-shrink: 0;
 }
 .nx-toast-close:hover {
-    color: #FFFFFF;
+    color: var(--ula-text-on-dark);
 }
 
 @keyframes nxToastSlideIn {

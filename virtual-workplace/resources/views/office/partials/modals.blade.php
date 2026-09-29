@@ -289,26 +289,26 @@
             </div>
 
             <!-- Whiteboard Main Workspace & Sticky Notes Sidebar -->
-            <div style="flex: 1; display: flex; position: relative; background: #FFFFFF; overflow: hidden;" id="wb-container">
+            <div style="flex: 1; display: flex; position: relative; background: var(--ula-surface-raised); overflow: hidden;" id="wb-container">
                 <!-- Whiteboard Drawing Canvas -->
                 <canvas id="wb-canvas" style="flex: 1; width: 100%; height: 100%; cursor: crosshair;"></canvas>
 
                 <!-- Whiteboard Sticky Notes Sidebar -->
-                <div id="wb-sticky-sidebar" style="width: 260px; background: #F8FAFC; border-inline-start: 1px solid #E2E8F0; display: flex; flex-direction: column; z-index: 10;">
+                <div id="wb-sticky-sidebar" style="width: 260px; background: var(--ula-surface-page-alt); border-inline-start: 1px solid var(--ula-border-subtle); display: flex; flex-direction: column; z-index: 10;">
                     <!-- Sidebar Header -->
-                    <div style="padding: 12px 14px; background: #FFFFFF; border-bottom: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center;">
-                        <div style="display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 12px; color: #1E293B;">
+                    <div style="padding: 12px 14px; background: var(--ula-surface-raised); border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center;">
+                        <div style="display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 12px; color: var(--ula-text-primary);">
                             <span><span class="material-symbols-rounded">push_pin</span></span>
                             <span>{{ __('Sticky Notes') }}</span>
                         </div>
-                        <button type="button" onclick="toggleWbStickyForm()" class="tactile-btn" style="background: #10B981; color: white; padding: 4px 8px; font-size: 11px; font-weight: 800; border-radius: 6px;">
+                        <button type="button" onclick="toggleWbStickyForm()" class="tactile-btn" style="background: var(--ula-accent-default); color: white; padding: 4px 8px; font-size: 11px; font-weight: 800; border-radius: 6px;">
                             + {{ __('Add') }}
                         </button>
                     </div>
 
                     <!-- Create Sticky Note Drawer/Form -->
                     <div id="wb-sticky-form" style="display: none; padding: 12px; background: #FEF3C7; border-bottom: 1px solid #FDE68A; flex-direction: column; gap: 8px;">
-                        <textarea id="wb-sticky-text-input" placeholder="{{ __('Write note content...') }}" rows="3" style="width: 100%; background: #FFFFFF; border: 1px solid #F59E0B; border-radius: 8px; padding: 8px; font-size: 12px; color: #78350F; outline: none; resize: none; font-family: Cairo, Inter, sans-serif;"></textarea>
+                        <textarea id="wb-sticky-text-input" placeholder="{{ __('Write note content...') }}" rows="3" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid #F59E0B; border-radius: 8px; padding: 8px; font-size: 12px; color: #78350F; outline: none; resize: none; font-family: Cairo, Inter, sans-serif;"></textarea>
                         
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <!-- Color Swatches for sticky note -->
@@ -332,7 +332,7 @@
 
                     <!-- Sticky Notes Cards Feed -->
                     <div id="wb-sticky-list" style="flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
-                        <div style="text-align: center; color: #94A3B8; font-size: 11px; padding: 20px;">
+                        <div style="text-align: center; color: var(--ula-text-muted); font-size: 11px; padding: 20px;">
                             <span class="material-symbols-rounded">push_pin</span> {{ __('No sticky notes saved yet. Click + Add to save notes to your office whiteboard.') }}
                         </div>
                     </div>
@@ -530,7 +530,7 @@
             <p id="custom-link-modal-url" style="font-size: 13px; color: var(--ula-text-muted); margin-bottom: 22px; word-break: break-all; background: rgba(15, 23, 42, 0.6); padding: 10px; border-radius: 8px; border: 1px solid var(--ula-border-subtle); font-family: monospace;">
             </p>
             <div style="display: flex; gap: 10px;">
-                <a id="custom-link-modal-btn" href="#" target="_blank" rel="noopener noreferrer" class="action-link-btn" style="flex: 1; justify-content: center; background: var(--ula-accent-default); color: var(--ula-white); padding: 12px; font-size: 13px; font-weight: 800; text-decoration: none;">
+                <a id="custom-link-modal-btn" href="javascript:void(0)" target="_blank" rel="noopener noreferrer" class="action-link-btn" style="flex: 1; justify-content: center; background: var(--ula-accent-default); color: var(--ula-white); padding: 12px; font-size: 13px; font-weight: 800; text-decoration: none;">
                     <span class="material-symbols-rounded">rocket_launch</span> {{ __('Visit Link') }}
                 </a>
                 <button type="button" onclick="closeCustomLinkModal()" class="action-link-btn" style="background: rgba(255,255,255,0.1); color: var(--ula-text-muted); padding: 12px 18px; font-size: 13px; font-weight: 800;">

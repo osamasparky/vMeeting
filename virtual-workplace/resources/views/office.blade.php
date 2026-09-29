@@ -3596,7 +3596,7 @@
 
             // 1. Draw Blueprint / Procedural Floor Background (Warm Sand Diagonal Stripes matching Figma)
             if (hasBlueprint) {
-                ctx.fillStyle = '#EDE6D9';
+                ctx.fillStyle = 'var(--ula-sand-300)';
                 ctx.fillRect(0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
                 ctx.drawImage(BLUEPRINT_IMAGE, 0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
             } else {
@@ -3606,7 +3606,7 @@
                     pCan.width = 32;
                     pCan.height = 32;
                     const pCtx = pCan.getContext('2d');
-                    pCtx.fillStyle = '#EDE6D9';
+                    pCtx.fillStyle = 'var(--ula-sand-300)';
                     pCtx.fillRect(0, 0, 32, 32);
                     pCtx.strokeStyle = '#E1D8CA';
                     pCtx.lineWidth = 4.5;
@@ -3617,7 +3617,7 @@
                     pCtx.stroke();
                     window._floorSandPattern = ctx.createPattern(pCan, 'repeat');
                 }
-                ctx.fillStyle = window._floorSandPattern || '#EDE6D9';
+                ctx.fillStyle = window._floorSandPattern || 'var(--ula-sand-300)';
                 ctx.fillRect(0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
 
                 // Subtle Outer Floor Border
@@ -3669,7 +3669,7 @@
                     if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
                     else ctx.rect(-objW / 2, -objH / 2, objW, objH);
                     ctx.fill();
-                    ctx.strokeStyle = '#FFFFFF';
+                    ctx.strokeStyle = 'var(--ula-white)';
                     ctx.lineWidth = 1;
                     if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
                     else ctx.rect(-objW / 2, -objH / 2, objW, objH);
@@ -3744,7 +3744,7 @@
                 ctx.fillStyle = isLocked ? '#B91C1C' : '#334F40';
                 ctx.fillRect(cx - halfT + 1, cy - halfT + 1, thickness - 2, thickness - 2);
 
-                ctx.strokeStyle = isLocked ? '#EF4444' : 'rgba(237, 230, 217, 0.35)';
+                ctx.strokeStyle = isLocked ? 'var(--ula-status-danger)' : 'rgba(237, 230, 217, 0.35)';
                 ctx.lineWidth = 1;
                 ctx.strokeRect(cx - halfT + 0.5, cy - halfT + 0.5, thickness - 1, thickness - 1);
                 ctx.restore();
@@ -3831,7 +3831,7 @@
                     // 1. Floor Threshold Plate (Warm Brass transition strip)
                     ctx.fillStyle = isLocked ? 'rgba(239, 68, 68, 0.30)' : 'rgba(211, 165, 83, 0.32)';
                     ctx.fillRect(-halfW - 2, -5, door.width + 4, 10);
-                    ctx.strokeStyle = isLocked ? '#EF4444' : 'var(--ula-gold-400)';
+                    ctx.strokeStyle = isLocked ? 'var(--ula-status-danger)' : 'var(--ula-gold-400)';
                     ctx.lineWidth = 1.2;
                     ctx.strokeRect(-halfW - 2, -5, door.width + 4, 10);
 
@@ -3841,7 +3841,7 @@
                     // Left Post
                     ctx.fillStyle = isLocked ? '#7F1D1D' : '#0B1C13';
                     ctx.fillRect(-halfW - jambW, -jambD / 2, jambW, jambD);
-                    ctx.fillStyle = isLocked ? '#DC2626' : 'var(--ula-gold-400)';
+                    ctx.fillStyle = isLocked ? 'var(--ula-status-danger)' : 'var(--ula-gold-400)';
                     ctx.fillRect(-halfW - jambW, -jambD / 2 - 2, jambW, 3);
                     ctx.strokeStyle = 'rgba(237, 230, 217, 0.3)';
                     ctx.strokeRect(-halfW - jambW, -jambD / 2, jambW, jambD);
@@ -3849,7 +3849,7 @@
                     // Right Post
                     ctx.fillStyle = isLocked ? '#7F1D1D' : '#0B1C13';
                     ctx.fillRect(halfW, -jambD / 2, jambW, jambD);
-                    ctx.fillStyle = isLocked ? '#DC2626' : 'var(--ula-gold-400)';
+                    ctx.fillStyle = isLocked ? 'var(--ula-status-danger)' : 'var(--ula-gold-400)';
                     ctx.fillRect(halfW, -jambD / 2 - 2, jambW, 3);
                     ctx.strokeRect(halfW, -jambD / 2, jambW, jambD);
 
@@ -3884,7 +3884,7 @@
                     ctx.fill();
 
                     ctx.shadowColor = 'transparent';
-                    ctx.strokeStyle = isLocked ? '#FCA5A5' : (openProg > 0.4 ? 'var(--ula-status-success)' : 'var(--ula-gold-400)');
+                    ctx.strokeStyle = isLocked ? 'var(--ula-status-danger)' : (openProg > 0.4 ? 'var(--ula-status-success)' : 'var(--ula-gold-400)');
                     ctx.lineWidth = 1.2;
                     if (ctx.roundRect) ctx.roundRect(0, -doorThick / 2, leafW, doorThick, 2);
                     else ctx.rect(0, -doorThick / 2, leafW, doorThick);
@@ -3967,14 +3967,14 @@
                 else ctx.rect(cardX, cardY, cardW, cardH);
                 ctx.stroke();
 
-                // Localized Room Name (100% Solid Crisp Pure White #FFFFFF)
+                // Localized Room Name (100% solid crisp pure white)
                 ctx.save();
                 ctx.globalAlpha = 1.0;
                 ctx.shadowColor = 'transparent';
                 ctx.shadowBlur = 0;
                 ctx.shadowOffsetX = 0;
                 ctx.shadowOffsetY = 0;
-                ctx.fillStyle = '#FFFFFF';
+                ctx.fillStyle = 'var(--ula-white)';
                 ctx.font = '700 11px ' + (CURRENT_LOCALE === 'ar' ? '"IBM Plex Sans Arabic", sans-serif' : '"IBM Plex Sans", sans-serif');
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -4025,7 +4025,7 @@
             ctx.shadowBlur = 0;
             ctx.shadowOffsetX = 0;
             ctx.shadowOffsetY = 0;
-            ctx.fillStyle = '#FFFFFF';
+            ctx.fillStyle = 'var(--ula-white)';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(statusBadgeText, sX + sW / 2, sY + sH / 2);
@@ -4061,14 +4061,14 @@
                 const bh = bubble.emoji ? 32 : 22;
 
                 ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
-                ctx.strokeStyle = '#10B981';
+                ctx.strokeStyle = 'var(--ula-status-success)';
                 ctx.lineWidth = 1.5;
                 if (ctx.roundRect) ctx.roundRect(bx - (bw / 2), by - bh, bw, bh, 8);
                 else ctx.rect(bx - (bw / 2), by - bh, bw, bh);
                 ctx.fill();
                 ctx.stroke();
 
-                ctx.fillStyle = '#FFFFFF';
+                ctx.fillStyle = 'var(--ula-white)';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(text, bx, by - (bh / 2));
@@ -4100,7 +4100,7 @@
                 ctx.fill();
 
                 // Clear, crisp circular boundary ring for voice range
-                ctx.strokeStyle = isSelf ? '#10B981' : '#3B82F6';
+                ctx.strokeStyle = isSelf ? 'var(--ula-status-success)' : '#3B82F6';
                 ctx.lineWidth = 1.8;
                 ctx.setLineDash([5, 4]);
                 ctx.beginPath();
@@ -4113,7 +4113,7 @@
             const isSpeaking = isSelf ? (micActive && localAvatar.isSpeaking) : (av.micActive && av.isSpeaking);
             if (isSpeaking) {
                 const pulse = (Math.sin(Date.now() / 120) + 1) / 2;
-                ctx.strokeStyle = '#10B981';
+                ctx.strokeStyle = 'var(--ula-status-success)';
                 ctx.lineWidth = 2.5 + pulse * 2.5;
                 ctx.beginPath();
                 ctx.arc(x, y, radius + 4 + pulse * 4, 0, Math.PI * 2);
@@ -4166,8 +4166,8 @@
                 // Draw Modern Gradient Monogram with User's Initials
                 const bgGrad = ctx.createLinearGradient(x - radius, y - radius, x + radius, y + radius);
                 if (isSelf) {
-                    bgGrad.addColorStop(0, '#3C6B4C');
-                    bgGrad.addColorStop(1, '#1E412F');
+                    bgGrad.addColorStop(0, 'var(--ula-palm-500)');
+                    bgGrad.addColorStop(1, 'var(--ula-palm-700)');
                 } else {
                     bgGrad.addColorStop(0, '#2563EB');
                     bgGrad.addColorStop(1, '#1E40AF');
@@ -4181,7 +4181,7 @@
                     ? (nameParts[0][0] + nameParts[1][0]).toUpperCase()
                     : (nameParts[0].substring(0, 2)).toUpperCase();
                 ctx.font = 'bold 11px "IBM Plex Sans Arabic", "IBM Plex Sans", sans-serif';
-                ctx.fillStyle = '#FFFFFF';
+                ctx.fillStyle = 'var(--ula-white)';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(initials, x, y);
@@ -4199,15 +4199,15 @@
             const isMicOn = isSelf ? micActive : av.micActive;
             
             // Mic Badge
-            ctx.fillStyle = isMicOn ? '#10B981' : 'rgba(15, 23, 42, 0.90)';
+            ctx.fillStyle = isMicOn ? 'var(--ula-status-success)' : 'rgba(15, 23, 42, 0.90)';
             ctx.beginPath();
             ctx.arc(x + radius - 2, y - radius + 3, 5.5, 0, Math.PI * 2);
             ctx.fill();
-            ctx.strokeStyle = '#FFFFFF';
+            ctx.strokeStyle = 'var(--ula-white)';
             ctx.lineWidth = 1;
             ctx.stroke();
             ctx.font = '6px sans-serif';
-            ctx.fillStyle = '#FFFFFF';
+            ctx.fillStyle = 'var(--ula-white)';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(isMicOn ? '🎙️' : '🔇', x + radius - 2, y - radius + 3);
@@ -4218,11 +4218,11 @@
                 ctx.beginPath();
                 ctx.arc(x + radius - 2, y + radius - 3, 5.5, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.strokeStyle = '#FFFFFF';
+                ctx.strokeStyle = 'var(--ula-white)';
                 ctx.lineWidth = 1;
                 ctx.stroke();
                 ctx.font = '6px sans-serif';
-                ctx.fillStyle = '#FFFFFF';
+                ctx.fillStyle = 'var(--ula-white)';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText('📷', x + radius - 2, y + radius - 3);
@@ -4249,7 +4249,7 @@
             else ctx.rect(x - nameW / 2, badgeY, nameW, badgeH);
             ctx.stroke();
 
-            ctx.fillStyle = isSitting ? '#FFFFFF' : (isSelf ? 'var(--ula-status-success)' : 'var(--ula-sand-100)');
+            ctx.fillStyle = isSitting ? 'var(--ula-white)' : (isSelf ? 'var(--ula-status-success)' : 'var(--ula-sand-100)');
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(displayName, x, badgeY + (badgeH / 2));
@@ -4271,7 +4271,7 @@
                 ctx.stroke();
 
                 // Draw bouncing pin icon above head
-                ctx.fillStyle = '#34D399';
+                ctx.fillStyle = 'var(--ula-status-success)';
                 ctx.font = 'bold 20px "Material Symbols Rounded", sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
@@ -4315,7 +4315,7 @@
                         else ctx.rect(bx, by, bubbleW, bubbleH);
                         ctx.fill();
 
-                        ctx.strokeStyle = isSelf ? '#10B981' : '#3B82F6';
+                        ctx.strokeStyle = isSelf ? 'var(--ula-status-success)' : '#3B82F6';
                         ctx.lineWidth = 1.5;
                         if (ctx.roundRect) ctx.roundRect(bx, by, bubbleW, bubbleH, 10);
                         else ctx.rect(bx, by, bubbleW, bubbleH);
@@ -4329,7 +4329,7 @@
                         ctx.lineTo(x + 5, by + bubbleH);
                         ctx.fill();
 
-                        ctx.strokeStyle = isSelf ? '#10B981' : '#3B82F6';
+                        ctx.strokeStyle = isSelf ? 'var(--ula-status-success)' : '#3B82F6';
                         ctx.beginPath();
                         ctx.moveTo(x - 5, by + bubbleH);
                         ctx.lineTo(x, by + bubbleH + 6);
@@ -4337,7 +4337,7 @@
                         ctx.stroke();
 
                         // Bubble Text
-                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillStyle = 'var(--ula-white)';
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
                         ctx.fillText(text.length > 30 ? text.substring(0, 28) + '...' : text, x, by + bubbleH / 2);
@@ -4828,12 +4828,12 @@
                 const mapId = badge.getAttribute('data-map-id');
                 const count = counts[mapId] || 0;
                 if (count > 0) {
-                    badge.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #10B981; margin-inline-end: 4px;"></span>${count} {{ __("active") }}`;
+                    badge.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--ula-status-success); margin-inline-end: 4px;"></span>${count} {{ __("active") }}`;
                     badge.style.color = 'var(--ula-status-success)';
                     badge.style.background = 'rgba(16, 185, 129, 0.18)';
                 } else {
-                    badge.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #64748B; margin-inline-end: 4px;"></span>0 {{ __("active") }}`;
-                    badge.style.color = '#94A3B8';
+                    badge.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--ula-icon-muted); margin-inline-end: 4px;"></span>0 {{ __("active") }}`;
+                    badge.style.color = 'var(--ula-text-muted)';
                     badge.style.background = 'rgba(255, 255, 255, 0.05)';
                 }
             });
@@ -5676,7 +5676,7 @@
             document.querySelectorAll('.sticky-color-pick').forEach(p => {
                 p.style.border = '1px solid ' + p.getAttribute('data-border');
             });
-            if (el) el.style.border = '2px solid #000000';
+            if (el) el.style.border = '2px solid var(--ula-black)';
             const form = document.getElementById('wb-sticky-form');
             if (form) form.style.background = bg;
         }
@@ -5799,7 +5799,7 @@
                     wbCtx.lineTo(x, y);
                     wbCtx.stroke();
                 } else if (wbTool === 'eraser') {
-                    wbCtx.strokeStyle = '#FFFFFF';
+                    wbCtx.strokeStyle = 'var(--ula-white)';
                     wbCtx.lineWidth = 20;
                     wbCtx.lineTo(x, y);
                     wbCtx.stroke();
@@ -6051,12 +6051,12 @@
                         <span style="font-size: 20px;">${userGender === 'female' ? '👩' : '👨'}</span>
                         <div>
                             <strong style="font-size: 13px; color: var(--ula-text-primary); display: block;">
-                                ${localAvatar.name} <span style="font-size: 10px; color: #34D399; font-weight: 800;">({{ __('You / Host') }})</span>
+                                ${localAvatar.name} <span style="font-size: 10px; color: var(--ula-status-success); font-weight: 800;">({{ __('You / Host') }})</span>
                             </strong>
                             <span style="font-size: 11px; color: var(--ula-text-secondary);">🏢 ${localRoom ? localRoom.name : '{{ __("Open Floor") }}'}</span>
                         </div>
                     </div>
-                    <span style="font-size: 10px; background: rgba(16, 185, 129, 0.15); color: #10B981; padding: 3px 8px; border-radius: 6px; font-weight: 800;">🟢 {{ __('Active') }}</span>
+                    <span style="font-size: 10px; background: rgba(16, 185, 129, 0.15); color: var(--ula-status-success); padding: 3px 8px; border-radius: 6px; font-weight: 800;">🟢 {{ __('Active') }}</span>
                 </div>
             `;
 
@@ -6087,7 +6087,7 @@
                                 </div>
                             </div>
                             <div style="display: flex; gap: 6px; align-items: center;">
-                                <span style="font-size: 10px; background: rgba(16, 185, 129, 0.15); color: #10B981; padding: 3px 8px; border-radius: 6px; font-weight: 800;">🟢 Online</span>
+                                <span style="font-size: 10px; background: rgba(16, 185, 129, 0.15); color: var(--ula-status-success); padding: 3px 8px; border-radius: 6px; font-weight: 800;">🟢 Online</span>
                                 <button onclick="teleportToUser('${av.id}')" class="action-link-btn" style="padding: 4px 8px; font-size: 10px;" title="{{ __('Walk / Teleport to colleague') }}">🎯 {{ __('Go To') }}</button>
                             </div>
                         </div>
@@ -6460,7 +6460,7 @@
                                     ⏹️ {{ __('Stop') }}
                                 </button>
                             ` : `
-                                <button type="button" onclick="startTaskTimerInOffice('${t.id}', '${t.project_id}', '${escapeAttr(t.title)}', '${escapeAttr(t.project_name || 'Project')}')" class="tactile-btn" style="background: rgba(16, 185, 129, 0.18); color: #34D399; border: 1px solid rgba(52, 211, 153, 0.4); padding: 4px 10px; font-size: 11px; font-weight: 800;">
+                                <button type="button" onclick="startTaskTimerInOffice('${t.id}', '${t.project_id}', '${escapeAttr(t.title)}', '${escapeAttr(t.project_name || 'Project')}')" class="tactile-btn" style="background: rgba(16, 185, 129, 0.18); color: var(--ula-status-success); border: 1px solid rgba(52, 211, 153, 0.4); padding: 4px 10px; font-size: 11px; font-weight: 800;">
                                     ▶ {{ __('Start') }}
                                 </button>
                             `}
@@ -6594,7 +6594,7 @@
             let headerHint = '';
             if (chatScope === 'room') {
                 if (myRoom) {
-                    headerHint = `<div style="text-align: center; padding: 4px 8px; margin-bottom: 8px; font-size: 10px; font-weight: 800; color: #34D399; background: rgba(16, 185, 129, 0.12); border-radius: 6px;">🏢 {{ __("Acoustic Room Channel:") }} ${escapeHtml(myRoom.name)}</div>`;
+                    headerHint = `<div style="text-align: center; padding: 4px 8px; margin-bottom: 8px; font-size: 10px; font-weight: 800; color: var(--ula-status-success); background: rgba(16, 185, 129, 0.12); border-radius: 6px;">🏢 {{ __("Acoustic Room Channel:") }} ${escapeHtml(myRoom.name)}</div>`;
                 } else {
                     headerHint = `<div style="text-align: center; padding: 4px 8px; margin-bottom: 8px; font-size: 10px; font-weight: 800; color: var(--ula-gold-500); background: rgba(245, 158, 11, 0.12); border-radius: 6px;">🚪 {{ __("Hallway / Open Space (Enter a room to chat with room occupants)") }}</div>`;
                 }
@@ -6818,7 +6818,7 @@
                     rCard.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; padding:10px;"><div style="width:52px;height:52px;border-radius:50%;background:rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--ula-accent-default);">${init}</div>${statusHtml}</div>`;
                 }
                 const rLabel = document.createElement('div');
-                rLabel.style.cssText = 'position: absolute; bottom: 8px; inset-inline-start: 8px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; color: #FFFFFF;';
+                rLabel.style.cssText = 'position: absolute; bottom: 8px; inset-inline-start: 8px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; color: var(--ula-white);';
                 rLabel.textContent = `${av.name} ${av.micActive ? '🎙️' : '🔇'}`;
                 rCard.appendChild(rLabel);
                 rCard.onclick = () => openUserSpotlight(av.id);
@@ -6961,9 +6961,9 @@
                     document.getElementById('diag-overall-text').textContent = `${results.overall}`;
                     document.getElementById('diag-overall-badge').textContent = results.overall === 'Excellent' ? '🟢' : (results.overall.includes('Good') ? '🟡' : '🔴');
                     document.getElementById('diag-cam-status').textContent = results.camera.passed ? '✓ Active' : '✗ ' + results.camera.message;
-                    document.getElementById('diag-cam-status').style.color = results.camera.passed ? '#10B981' : '#EF4444';
+                    document.getElementById('diag-cam-status').style.color = results.camera.passed ? 'var(--ula-status-success)' : 'var(--ula-status-danger)';
                     document.getElementById('diag-mic-status').textContent = results.microphone.passed ? '✓ Active' : '✗ ' + results.microphone.message;
-                    document.getElementById('diag-mic-status').style.color = results.microphone.passed ? '#10B981' : '#EF4444';
+                    document.getElementById('diag-mic-status').style.color = results.microphone.passed ? 'var(--ula-status-success)' : 'var(--ula-status-danger)';
                     document.getElementById('diag-ping-status').textContent = `${results.internet.latencyMs} ms`;
                     document.getElementById('diag-turn-status').textContent = results.turn.passed ? '✓ Active (Coturn)' : '✗ Inactive';
                     document.getElementById('diag-livekit-host').textContent = results.livekit.host;
@@ -6993,7 +6993,7 @@
                 const dot = document.getElementById('webrtc-quality-dot');
                 const text = document.getElementById('webrtc-quality-text');
                 if (dot && text) {
-                    dot.style.background = quality === 'excellent' ? '#10B981' : (quality === 'good' || quality === 'fair' ? 'var(--ula-gold-500)' : '#EF4444');
+                    dot.style.background = quality === 'excellent' ? 'var(--ula-status-success)' : (quality === 'good' || quality === 'fair' ? 'var(--ula-gold-500)' : 'var(--ula-status-danger)');
                     text.textContent = quality === 'excellent' ? '{{ __("Excellent") }}' : (quality === 'good' ? '{{ __("Good") }}' : quality.toUpperCase());
                 }
             });
