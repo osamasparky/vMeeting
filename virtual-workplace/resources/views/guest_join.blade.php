@@ -17,7 +17,10 @@
 
         body {
             position: relative;
-            background-color: var(--ula-surface-map-canvas);
+            /* Screen 05 (error) is a plain light backdrop; screen 04 (form) is the
+               dark textured one -- .ula-guest-backdrop-stripes/-scrim below only
+               render in the form branch (not the error branch) and paint over this. */
+            background-color: var(--ula-surface-page-alt);
             color: var(--ula-text-primary);
             min-height: 100vh;
             display: flex;
@@ -235,9 +238,6 @@
 </head>
 <body>
 
-    <div class="ula-guest-backdrop-stripes"></div>
-    <div class="ula-guest-backdrop-scrim"></div>
-
     @if(!empty($error))
         <!-- ── Screen 05: Guest Invite Issue ── -->
         <div class="ula-issue-card">
@@ -260,7 +260,9 @@
             </a>
         </div>
     @else
-        <!-- ── Screen 04: Guest Join Form ── -->
+        <!-- ── Screen 04: Guest Join Form (dark textured backdrop) ── -->
+        <div class="ula-guest-backdrop-stripes"></div>
+        <div class="ula-guest-backdrop-scrim"></div>
         <div class="ula-guest-card">
             <div class="ula-guest-brand">
                 <svg role="img" aria-label="UlaSpace" width="43" height="29" viewBox="-1.2 -1.3 60 40" fill="var(--ula-brand-mark-green)" style="flex-shrink: 0; display: block"><path d="M0 38.734L1.493 30.973L4.179 20.824L6.865 11.869C8.259 7.491 11.94 4.207 17.91 2.018C26.268 -0.569 34.427 -0.669 42.387 1.719C49.153 3.311 54.128 7.292 57.312 13.66L57.312 38.734L26.268 38.734L25.074 27.988C23.482 20.824 21.591 17.242 19.403 17.242C17.214 18.038 15.721 21.819 14.925 28.585L14.328 38.734L0 38.734Z"></path></svg>
