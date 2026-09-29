@@ -1574,18 +1574,17 @@
 
         <!-- Top App Bar Navigation Header (Figma App Bar Component 9:16) -->
         <header class="ulaspace-appbar">
-            <div class="appbar-title-group">
-                <button class="mobile-menu-btn" onclick="toggleDashboardSidebar()">
-                    <span class="material-symbols-rounded" style="font-size: 22px;">menu</span>
-                </button>
-                <div style="display: flex; flex-direction: column;">
-                    <h1 id="page-primary-title" class="appbar-page-title">
-                        {{ __('Dashboard') }}
-                    </h1>
-                    <p id="page-primary-subtitle" class="appbar-page-subtitle">
-                        {{ __('Welcome to your virtual workspace') }}
-                    </p>
-                </div>
+            <button class="mobile-menu-btn" onclick="toggleDashboardSidebar()">
+                <span class="material-symbols-rounded" style="font-size: 22px;">menu</span>
+            </button>
+
+            <!-- page-primary-title/subtitle: switchAdminTab() rewrites these on every tab
+                 change. The reference app bar (06/07) has no title area -- sidebar
+                 highlighting + the gold accent bar already show the active tab -- so
+                 these stay in the DOM (sr-only) rather than visible chrome. -->
+            <div class="sr-only">
+                <h1 id="page-primary-title" class="appbar-page-title">{{ __('Dashboard') }}</h1>
+                <p id="page-primary-subtitle" class="appbar-page-subtitle">{{ __('Welcome to your virtual workspace') }}</p>
             </div>
 
             <!-- Soft Search Bar with Keyboard Shortcut Badge -->
@@ -1597,7 +1596,9 @@
 
             <!-- Header Actions Group -->
             <div class="appbar-actions-group">
-                <x-icon-btn icon="group_add" onclick="openInviteModal()" title="{{ __('Invite People') }}" size="md" variant="subtle" />
+                <x-btn variant="outline" size="md" onclick="openInviteModal()" icon="group_add" title="{{ __('Invite People') }}">
+                    {{ __('Invite People') }}
+                </x-btn>
 
                 <!-- Notification Center Bell & Dropdown -->
                 <div class="relative inline-block" id="notifWrapper" style="position: relative; display: inline-block;">
