@@ -181,17 +181,19 @@
                 <!-- Choose Subscription Plan -->
                 <div style="display: flex; flex-direction: column; gap: 10px;">
                     <span class="ula-field-label">{{ __('اختر باقة الاشتراك') }}</span>
-                    <input type="hidden" name="plan_id" id="selectedPlanId" value="{{ $plans->first()?->id }}">
 
                     @php
                         $planNameAr = ['Free' => 'مجاني', 'Starter' => 'مبتدئ', 'Business' => 'أعمال', 'Enterprise' => 'مؤسسات'];
                         $defaultPlanSlug = request('plan', 'business');
+                        $selectedPlanId = $plans->firstWhere('slug', $defaultPlanSlug)?->id ?? $plans->first()?->id;
                     @endphp
+
+                    <input type="hidden" name="plan_id" id="selectedPlanId" value="{{ $selectedPlanId }}">
 
                     <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px;">
                         @foreach($plans as $index => $plan)
                             @php
-                                $isSelected = (request('plan') && $plan->slug === request('plan')) || (!request('plan') && ($plan->slug === 'business' || $index === 0));
+                                $isSelected = $plan->id === $selectedPlanId;
                             @endphp
                             <div
                                 class="ula-plan-radio-box {{ $isSelected ? 'selected' : '' }}"

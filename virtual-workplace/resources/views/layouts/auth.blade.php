@@ -30,14 +30,10 @@
         }
 
         body {
-            background-color: var(--ula-surface-sunken);
+            background-color: var(--ula-surface-page);
             color: var(--ula-text-primary);
             font-family: var(--ula-font-ar);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 48px 24px;
             -webkit-font-smoothing: antialiased;
         }
 
@@ -58,24 +54,25 @@
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
 
-        /* ── Auth Master Container (Matches 02 & 03: 1440px wide, 20px radius, shadow) ── */
+        /* ── Auth Master Container ──
+           The reference screens (02/03) show this filling the entire browser
+           viewport edge-to-edge -- the rounded-corner/shadow/centered "card"
+           look in the design-reference mockup is that tool's own canvas frame
+           for displaying numbered screens side by side, not part of the
+           actual page (see CLAUDE_CODE_PROMPT.md: "visual targets, not code
+           to copy"). No outer padding, radius, or shadow here. */
         .ula-auth-container {
             width: 100%;
-            max-width: 1440px;
+            min-height: 100vh;
             background: var(--ula-surface-page);
-            border-radius: var(--ula-radius-lg);
-            overflow: hidden;
-            box-shadow: var(--ula-shadow-xl);
             display: grid;
         }
 
         .ula-auth-container.login-layout {
-            min-height: 820px;
             grid-template-columns: 640px minmax(0, 1fr);
         }
 
         .ula-auth-container.register-layout {
-            min-height: 900px;
             grid-template-columns: 760px minmax(0, 1fr);
         }
 
@@ -271,7 +268,7 @@
         .ula-auth-hero-stripes {
             position: absolute;
             inset: 0;
-            background: repeating-linear-gradient(135deg, var(--ula-media-stripe-a) 0 14px, var(--ula-media-stripe-b) 14px 28px);
+            background: repeating-linear-gradient(135deg, var(--ula-palm-800) 0 14px, var(--ula-palm-chrome) 14px 28px);
         }
 
         .ula-auth-hero-scrim {
@@ -291,7 +288,6 @@
         }
 
         @media (max-width: 1024px) {
-            body { padding: 16px; }
             .ula-auth-container.login-layout,
             .ula-auth-container.register-layout {
                 grid-template-columns: 1fr;
