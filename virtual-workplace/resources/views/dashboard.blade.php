@@ -134,11 +134,11 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* ── Soft Raised Sidebar ── */
+        /* ── Dark Chrome Sidebar (matches the landing nav / auth side panel) ── */
         .sidebar {
             width: 270px;
-            background: var(--ula-surface-card);
-            border-inline-end: 1px solid var(--ula-border-subtle);
+            background: var(--ula-surface-dark);
+            border-inline-end: 1px solid var(--ula-border-on-dark);
             padding: 24px 14px;
             display: flex;
             flex-direction: column;
@@ -294,15 +294,15 @@
         .sidebar-logo-text {
             font-size: 16px;
             font-weight: 900;
-            color: var(--ula-text-primary);
+            color: var(--ula-text-on-dark);
             letter-spacing: -0.4px;
             line-height: 1.2;
         }
 
         /* Sidebar Profile Card */
         .sidebar-profile-card {
-            background: var(--ula-surface-page-alt);
-            border: 1px solid var(--ula-border-subtle);
+            background: var(--ula-control-dark-fill);
+            border: 1px solid var(--ula-control-dark-border-subtle);
             border-radius: var(--ula-radius-lg);
             padding: 14px;
             margin-bottom: 20px;
@@ -318,7 +318,7 @@
         .sidebar-profile-card:hover {
             transform: translateY(-2px);
             box-shadow: var(--ula-shadow-md);
-            border-color: var(--ula-palm-900);
+            border-color: var(--ula-highlight-default);
         }
 
         .sidebar-profile-avatar-wrap {
@@ -358,7 +358,7 @@
             justify-content: space-between;
             font-size: 11px;
             font-weight: 600;
-            color: var(--ula-text-muted);
+            color: var(--ula-text-on-dark-subtle);
             text-transform: uppercase;
             letter-spacing: 0.6px;
             padding: 8px 10px;
@@ -372,14 +372,14 @@
         }
 
         .sidebar-accordion-header:hover {
-            color: var(--ula-text-primary);
-            background: var(--ula-surface-page-alt);
+            color: var(--ula-text-on-dark);
+            background: var(--ula-control-dark-fill);
         }
 
         .sidebar-accordion-chevron {
             font-size: 9px;
             transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            color: var(--ula-text-muted);
+            color: var(--ula-text-on-dark-subtle);
             display: inline-block;
         }
 
@@ -413,7 +413,7 @@
             gap: 8px;
             padding: 8px 12px;
             border-radius: var(--ula-radius-sm);
-            color: var(--ula-text-secondary);
+            color: var(--ula-text-on-dark-muted);
             background: transparent;
             border: 1px solid transparent;
             font-family: inherit;
@@ -427,20 +427,20 @@
         }
 
         .nav-tab-btn:hover {
-            background: var(--ula-surface-page-alt);
-            color: var(--ula-text-primary);
+            background: var(--ula-control-dark-fill);
+            color: var(--ula-text-on-dark);
         }
 
         .nav-tab-btn.active {
-            background: linear-gradient(135deg, var(--ula-palm-900) 0%, var(--ula-palm-800) 100%) !important;
-            color: var(--ula-sand-50) !important;
-            border-color: var(--ula-palm-700) !important;
+            background: var(--ula-control-dark-fill-strong) !important;
+            color: var(--ula-text-on-dark) !important;
+            border-color: transparent !important;
             font-weight: 700 !important;
-            box-shadow: 0 4px 14px rgba(20, 43, 36, 0.25) !important;
+            box-shadow: inset {{ app()->getLocale() === 'ar' ? '-3px' : '3px' }} 0 0 var(--ula-highlight-default) !important;
         }
         .nav-tab-btn.active span,
         .nav-tab-btn.active strong {
-            color: var(--ula-sand-50) !important;
+            color: var(--ula-text-on-dark) !important;
         }
         .nav-tab-btn.active .nav-icon-tile {
             background: rgba(211, 165, 83, 0.22) !important;
@@ -484,14 +484,13 @@
             width: 28px;
             height: 28px;
             border-radius: 9px;
-            background: var(--ula-sand-100);
-            border: 1px solid var(--ula-stone-200);
+            background: var(--ula-control-dark-fill);
+            border: 1px solid var(--ula-control-dark-border-subtle);
             display: inline-flex;
             align-items: center;
             justify-content: center;
             font-size: 14px;
-            color: var(--ula-palm-500);
-            box-shadow: 1px 1px 4px rgba(36, 92, 58, 0.08);
+            color: var(--ula-text-on-dark-muted);
             flex-shrink: 0;
             transition: all 0.2s ease;
         }
@@ -503,14 +502,13 @@
         }
 
         .nav-badge-pill {
-            background: var(--ula-tone-palm-bg);
-            color: var(--ula-tone-palm-fg);
+            background: var(--ula-control-dark-fill-strong);
+            color: var(--ula-text-on-dark);
             font-size: 10px;
             font-weight: 800;
             padding: 2px 7px;
             border-radius: 8px;
-            border: 1px solid var(--ula-border-subtle);
-            box-shadow: inset 1px 1px 2px rgba(36, 92, 58, 0.08);
+            border: 1px solid var(--ula-control-dark-border);
             transition: all 0.2s ease;
         }
         .nav-tab-btn.active .nav-badge-pill {
@@ -522,12 +520,15 @@
         /* Go Premium Gradient Card */
         .go-premium-card {
             margin-top: auto;
-            background: linear-gradient(145deg, var(--ula-gold-200) 0%, var(--ula-sand-50) 45%, var(--ula-sand-100) 100%);
-            border: 1px solid var(--ula-gold-200);
+            background: linear-gradient(135deg, var(--ula-palm-950) 0%, var(--ula-black) 100%);
+            border: 1px solid var(--ula-gold-600);
             border-radius: var(--ula-radius-lg);
             padding: 16px 14px;
             text-align: center;
-            box-shadow: 0 12px 28px rgba(180, 131, 27, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+        }
+        .go-premium-card div {
+            color: var(--ula-gold-300);
         }
         .go-premium-crown {
             font-size: 28px;
@@ -1276,16 +1277,16 @@
                 @if($organization->logo_url)
                     <img id="sidebar-tenant-logo" src="{{ $organization->logo_url }}" alt="{{ $organization->name }}" style="width: 38px; height: 38px; border-radius: 12px; object-fit: cover; box-shadow: var(--ula-shadow-xs); flex-shrink: 0;">
                 @else
-                    <div id="sidebar-tenant-logo-icon" class="sidebar-logo-icon" style="background: var(--ula-palm-900); width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 5px; flex-shrink: 0; box-shadow: var(--ula-shadow-sm);">
+                    <div id="sidebar-tenant-logo-icon" class="sidebar-logo-icon" style="background: var(--ula-control-dark-fill-strong); width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 5px; flex-shrink: 0; box-shadow: var(--ula-shadow-sm);">
                         <img src="{{ asset('images/ulaspace-icon.png') }}" alt="UlaSpace" style="width: 24px; height: auto; object-fit: contain;">
                     </div>
                 @endif
                 <div>
                     <div class="sidebar-logo-text" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $organization->name }}</div>
-                    <div style="font-size: 10px; color: var(--ula-palm-500); font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;">{{ __('Virtual Workplace') }}</div>
+                    <div style="font-size: 10px; color: var(--ula-text-on-dark-subtle); font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;">{{ __('Virtual Workplace') }}</div>
                 </div>
             </a>
-            <button onclick="toggleSidebarCollapse()" class="sidebar-toggle-btn" style="width: 28px; height: 28px; font-size: 11px; padding: 0; flex-shrink: 0; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 8px; cursor: pointer; color: var(--ula-text-secondary);" title="{{ __('Toggle Sidebar (Mini / Full)') }}">
+            <button onclick="toggleSidebarCollapse()" class="sidebar-toggle-btn" style="width: 28px; height: 28px; font-size: 11px; padding: 0; flex-shrink: 0; background: var(--ula-control-dark-fill); border: 1px solid var(--ula-control-dark-border); border-radius: 8px; cursor: pointer; color: var(--ula-text-on-dark-muted);" title="{{ __('Toggle Sidebar (Mini / Full)') }}">
                 {{ app()->getLocale() === 'ar' ? '◀' : '▶' }}
             </button>
         </div>
@@ -1410,7 +1411,7 @@
                         <span class="material-symbols-rounded text-[18px]">domain</span>
                         <span>{{ __('Offices & Branches') }}</span>
                     </span>
-                    <span class="nav-badge-pill" style="background: rgba(36, 92, 58, 0.2); color: var(--ula-text-primary);">{{ $offices->count() }}</span>
+                    <span class="nav-badge-pill">{{ $offices->count() }}</span>
                 </button>
                 @endif
                 @if($membership->hasPermission('rooms.manage'))
@@ -1506,7 +1507,7 @@
 
         @if($user->isSuperAdmin())
         <div style="margin-top: 8px;">
-            <a href="{{ route('superadmin.dashboard') }}" class="nav-tab-btn" data-tooltip="{{ __('Super Admin Portal') }}" style="background: rgba(36, 92, 58, 0.1); color: var(--ula-text-primary); border: 1px solid rgba(36, 92, 58, 0.25); text-decoration: none;">
+            <a href="{{ route('superadmin.dashboard') }}" class="nav-tab-btn" data-tooltip="{{ __('Super Admin Portal') }}" style="background: var(--ula-alpha-gold-400-18); color: var(--ula-text-on-dark); border: 1px solid var(--ula-gold-600); text-decoration: none;">
                 <span class="material-symbols-rounded text-[18px]">bolt</span>
                 <strong>{{ __('Super Admin Portal') }}</strong>
             </a>
@@ -1514,24 +1515,24 @@
         @endif
 
         <!-- User Profile Card (Footer) -->
-        <div class="sidebar-user" style="margin-top: auto; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: var(--ula-radius-sm); background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle);" onclick="switchAdminTab('profile')" title="{{ __('View and Edit Profile') }}">
+        <div class="sidebar-user" style="margin-top: auto; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: var(--ula-radius-sm); background: var(--ula-control-dark-fill); border: 1px solid var(--ula-control-dark-border-subtle);" onclick="switchAdminTab('profile')" title="{{ __('View and Edit Profile') }}">
             @if($user->avatar_url)
-                <img id="sidebar-user-avatar" src="{{ $user->avatar_url }}" alt="{{ $user->name }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1px solid var(--ula-border-subtle);">
+                <img id="sidebar-user-avatar" src="{{ $user->avatar_url }}" alt="{{ $user->name }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1px solid var(--ula-border-on-dark);">
             @else
                 <div class="sidebar-avatar" style="width: 36px; height: 36px; border-radius: 50%; background: var(--ula-gradient-accent); color: var(--ula-white); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900;">{{ strtoupper(substr($user->name, 0, 2)) }}</div>
             @endif
             <div style="flex: 1; min-width: 0;">
-                <div style="font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ula-text-primary);">
+                <div style="font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ula-text-on-dark);">
                     {{ $user->name }}
                     @if($user->nickname)
-                        <span style="font-size: 10px; color: var(--ula-text-primary); font-weight: 600;">({{ '@' . $user->nickname }})</span>
+                        <span style="font-size: 10px; color: var(--ula-text-on-dark-muted); font-weight: 600;">({{ '@' . $user->nickname }})</span>
                     @endif
                 </div>
-                <div style="font-size: 10px; color: var(--ula-text-muted);">{{ $membership->role->name ?? 'Company Admin' }}</div>
+                <div style="font-size: 10px; color: var(--ula-text-on-dark-subtle);">{{ $membership->role->name ?? 'Company Admin' }}</div>
             </div>
             <form method="POST" action="{{ route('logout') }}" style="display:inline;" onclick="event.stopPropagation();">
                 @csrf
-                <button type="submit" style="background: none; border: none; color: var(--ula-text-muted); cursor: pointer; display: flex; align-items: center;" title="{{ __('Logout') }}">
+                <button type="submit" style="background: none; border: none; color: var(--ula-text-on-dark-subtle); cursor: pointer; display: flex; align-items: center;" title="{{ __('Logout') }}">
                     <span class="material-symbols-rounded text-[18px]">logout</span>
                 </button>
             </form>
