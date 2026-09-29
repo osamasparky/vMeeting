@@ -3,253 +3,315 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ __('Guest Invitation') }} — {{ __('Virtual Workplace') }}</title>
+    <title>{{ __('دعوة ضيف') }} — UlaSpace</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/ulaspace-tokens.css') }}">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             position: relative;
-            background-color: var(--ula-palm-950);
-            color: var(--ula-text-on-dark);
+            background-color: var(--ula-surface-map-canvas);
+            color: var(--ula-text-primary);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: {{ app()->getLocale() === 'ar' ? "var(--ula-font-ar)" : "var(--ula-font-en)" }};
-            padding: var(--ula-space-6);
+            font-family: var(--ula-font-ar);
+            padding: 24px;
             overflow: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .lobby-backdrop-stripes {
+        [dir="ltr"] body {
+            font-family: var(--ula-font-en);
+        }
+
+        .ms {
+            font-family: 'Material Symbols Rounded';
+            font-weight: 400;
+            font-style: normal;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            direction: ltr;
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .ula-guest-backdrop-stripes {
             position: absolute;
             inset: 0;
-            background-image: repeating-linear-gradient(135deg, var(--ula-palm-900) 0 14px, var(--ula-palm-950) 14px 28px);
+            background: repeating-linear-gradient(135deg, var(--ula-surface-dark) 0 14px, var(--ula-surface-map-canvas) 14px 28px);
         }
 
-        .lobby-backdrop-scrim {
+        .ula-guest-backdrop-scrim {
             position: absolute;
             inset: 0;
-            background: var(--ula-surface-overlay);
+            background: rgba(14,28,23,0.48);
+            pointer-events: none;
         }
 
-        .lobby-card {
+        /* ── Screen 04 Guest Card ── */
+        .ula-guest-card {
             position: relative;
-            z-index: 1;
-            background: var(--ula-surface-card);
-            border: 1px solid var(--ula-border-subtle);
-            border-radius: var(--ula-radius-xl);
-            padding: var(--ula-space-9);
+            z-index: 2;
             width: 100%;
-            max-width: 480px;
-            box-shadow: var(--ula-shadow-xl);
-            text-align: start;
+            max-width: 520px;
+            padding: 40px;
+            border-radius: 28px;
+            background: var(--ula-surface-card);
             display: flex;
             flex-direction: column;
-            gap: var(--ula-space-7);
+            gap: 28px;
+            box-shadow: var(--ula-shadow-xl);
         }
 
-        .lobby-brand {
+        .ula-guest-brand {
             display: flex;
             align-items: center;
-            gap: var(--ula-space-4);
+            gap: 10px;
+            text-decoration: none;
+            color: var(--ula-accent-default);
         }
 
-        /* Card sits on surface/card, which flips dark in dark mode — mark must
-           follow the surface, not stay permanently green (see FIX_BRIEF.md
-           "pick by surface, not by page"; same pattern as landing/auth). */
-        .lobby-brand-mark { fill: var(--ula-brand-mark-green); }
-        @media (prefers-color-scheme: dark) {
-            :root:not([data-theme="light"]) .lobby-brand-mark { fill: var(--ula-brand-mark-ivory); }
-        }
-        [data-theme="dark"] .lobby-brand-mark, .dark .lobby-brand-mark {
-            fill: var(--ula-brand-mark-ivory);
-        }
-
-        .lobby-brand-name {
+        .ula-guest-brand-name {
             font-family: var(--ula-font-en);
-            font-size: var(--ula-size-h4);
-            font-weight: var(--ula-weight-medium);
+            font-size: 18px;
+            font-weight: 500;
             color: var(--ula-text-primary);
         }
 
-        .inviter-card {
+        .ula-guest-inviter-box {
             display: flex;
             align-items: center;
-            gap: var(--ula-space-4);
-            padding: var(--ula-space-5);
-            border-radius: var(--ula-radius-md);
+            gap: 14px;
+            padding: 16px;
+            border-radius: 16px;
             background: var(--ula-surface-page);
-            border: 1px solid var(--ula-border-subtle);
+            border: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
         }
 
-        .inviter-avatar {
+        .ula-guest-inviter-avatar {
             width: 44px;
             height: 44px;
-            min-width: 44px;
             border-radius: var(--ula-radius-pill);
             background: var(--ula-tone-palm-bg);
             color: var(--ula-tone-palm-fg);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: var(--ula-size-body-lg);
-            font-weight: var(--ula-weight-semibold);
+            font-size: 17px;
+            font-weight: 600;
+            flex-shrink: 0;
         }
 
-        .room-badge {
+        .ula-guest-room-badge {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: var(--ula-space-4) var(--ula-space-5);
-            border-radius: var(--ula-radius-md);
+            padding: 14px 16px;
+            border-radius: 14px;
             background: var(--ula-tone-palm-bg);
             color: var(--ula-tone-palm-fg);
         }
 
-        .form-label {
-            display: block;
-            font-size: var(--ula-size-body);
-            font-weight: var(--ula-weight-medium);
-            color: var(--ula-text-primary);
-            margin-bottom: 7px;
+        .ula-guest-field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
         }
 
-        .form-input {
-            width: 100%;
+        .ula-guest-input-box {
             height: 46px;
+            padding: 0 16px;
+            border-radius: 14px;
+            border: var(--ula-border-width-hairline) solid var(--ula-border-default);
             background: var(--ula-surface-page);
-            border: 1px solid var(--ula-border-default);
-            border-radius: var(--ula-radius-md);
-            padding-inline: var(--ula-space-5);
-            color: var(--ula-text-primary);
-            font-size: var(--ula-size-body);
-            font-family: inherit;
-            outline: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--ula-text-muted);
             transition: border-color var(--ula-duration-fast) var(--ula-ease-out), box-shadow var(--ula-duration-fast) var(--ula-ease-out);
         }
 
-        .form-input::placeholder {
-            color: var(--ula-text-muted);
+        .ula-guest-input-box:focus-within {
+            border-color: var(--ula-accent-default);
+            box-shadow: 0 0 0 2px var(--ula-surface-page), 0 0 0 4px var(--ula-highlight-default);
         }
 
-        .form-input:focus {
-            border-color: var(--ula-border-focus);
-            box-shadow: var(--ula-focus-ring);
+        .ula-guest-input-control {
+            flex: 1;
+            height: 100%;
+            border: none;
+            background: transparent;
+            font-size: 15px;
+            color: var(--ula-text-primary);
+            outline: none;
+            font-family: inherit;
         }
 
-        .join-btn {
+        .ula-guest-btn-submit {
+            height: 52px;
             width: 100%;
+            border-radius: 18px;
+            border: 0;
             background: var(--ula-accent-default);
             color: var(--ula-accent-fg);
-            border: none;
-            border-radius: var(--ula-radius-md);
-            height: 52px;
-            font-size: var(--ula-size-body-lg);
-            font-weight: var(--ula-weight-semibold);
-            cursor: pointer;
+            font-family: var(--ula-font-ar);
+            font-size: 17px;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: var(--ula-space-3);
-            transition: background-color var(--ula-duration-fast) var(--ula-ease-out), transform var(--ula-duration-fast) var(--ula-ease-out);
+            gap: 8px;
+            cursor: pointer;
             box-shadow: var(--ula-shadow-xs);
-            text-decoration: none;
+            transition: background var(--ula-duration-fast) var(--ula-ease-out);
         }
 
-        .join-btn:hover {
+        .ula-guest-btn-submit:hover {
             background: var(--ula-accent-hover);
-            transform: translateY(-1px);
-            text-decoration: none;
         }
 
-        .issue-icon {
+        /* ── Screen 05 Guest Issue Card ── */
+        .ula-issue-card {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            max-width: 480px;
+            padding: 40px;
+            border-radius: 28px;
+            background: var(--ula-surface-card);
+            border: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            text-align: center;
+            box-shadow: var(--ula-shadow-md);
+        }
+
+        .ula-issue-icon-box {
             width: 64px;
             height: 64px;
-            border-radius: var(--ula-radius-lg);
-            background: var(--ula-surface-danger-soft);
-            color: var(--ula-status-danger);
+            border-radius: 20px;
+            background: var(--ula-tone-terracotta-bg);
+            color: var(--ula-tone-terracotta-fg);
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            align-self: center;
         }
 
-        .error-card {
-            font-size: var(--ula-size-body);
-            color: var(--ula-text-body);
-            line-height: var(--ula-lh-body);
-            text-align: center;
+        .ula-issue-btn-home {
+            height: 44px;
+            padding: 0 22px;
+            border-radius: 14px;
+            border: var(--ula-border-width-hairline) solid var(--ula-border-strong);
+            background: var(--ula-surface-card);
+            color: var(--ula-text-primary);
+            font-family: var(--ula-font-ar);
+            font-size: 15px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all var(--ula-duration-fast) var(--ula-ease-out);
+        }
+
+        .ula-issue-btn-home:hover {
+            background: var(--ula-surface-page-alt);
         }
     </style>
 </head>
 <body>
 
-    <div class="lobby-backdrop-stripes"></div>
-    <div class="lobby-backdrop-scrim"></div>
+    <div class="ula-guest-backdrop-stripes"></div>
+    <div class="ula-guest-backdrop-scrim"></div>
 
     @if(!empty($error))
-        <div class="lobby-card" style="align-items: center; text-align: center;">
-            <span class="issue-icon">
-                <span class="material-symbols-rounded" style="font-size: 32px;">link_off</span>
+        <!-- ── Screen 05: Guest Invite Issue ── -->
+        <div class="ula-issue-card">
+            <span class="ula-issue-icon-box">
+                <span class="ms" style="font-size: 32px;">link_off</span>
             </span>
-            <div class="ula-headline-group" style="align-items: center;">
-                <span class="ula-headline-ar" style="font-size: var(--ula-size-h3);">مشكلة في الدعوة</span>
-                <span class="ula-headline-en" style="font-size: var(--ula-size-h2-en);">Invitation Issue</span>
+
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <h1 style="font-size: 26px; font-weight: 600; color: var(--ula-text-primary); margin: 0;">مشكلة في الدعوة</h1>
+                <span style="font-family: var(--ula-font-en); font-size: 15px; font-weight: 300; color: var(--ula-text-secondary);">Invitation Issue</span>
             </div>
-            <div class="error-card">{{ $error }}</div>
-            <a href="{{ route('login') }}" class="join-btn">
-                <span class="material-symbols-rounded" style="font-size: 18px;">home</span>
-                <span>{{ __('Go to Homepage') }}</span>
+
+            <p style="font-size: 15px; line-height: 1.6; color: var(--ula-text-body); margin: 0;">
+                {{ $error }}
+            </p>
+
+            <a href="{{ route('login') }}" class="ula-issue-btn-home">
+                <span class="ms" style="font-size: 20px;">home</span>
+                <span>{{ __('الذهاب للصفحة الرئيسية') }}</span>
             </a>
         </div>
     @else
-        <div class="lobby-card">
-            <div class="lobby-brand">
-                <svg class="lobby-brand-mark" viewBox="0 0 100 67" width="34" height="23" xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd" clip-rule="evenodd" d="M0 67C0 24 16 0 52 0C84 0 100 24 100 67H46C46 38 38 28 28 28C18 28 14 38 14 67H0Z"/>
-                </svg>
-                <span class="lobby-brand-name">UlaSpace</span>
+        <!-- ── Screen 04: Guest Join Form ── -->
+        <div class="ula-guest-card">
+            <div class="ula-guest-brand">
+                <svg role="img" aria-label="UlaSpace" width="43" height="29" viewBox="-1.2 -1.3 60 40" fill="var(--ula-brand-mark-green)" style="flex-shrink: 0; display: block"><path d="M0 38.734L1.493 30.973L4.179 20.824L6.865 11.869C8.259 7.491 11.94 4.207 17.91 2.018C26.268 -0.569 34.427 -0.669 42.387 1.719C49.153 3.311 54.128 7.292 57.312 13.66L57.312 38.734L26.268 38.734L25.074 27.988C23.482 20.824 21.591 17.242 19.403 17.242C17.214 18.038 15.721 21.819 14.925 28.585L14.328 38.734L0 38.734Z"></path></svg>
+                <span class="ula-guest-brand-name">UlaSpace</span>
             </div>
 
-            <div class="ula-headline-group">
-                <span class="ula-headline-ar" style="font-size: var(--ula-size-h3);">دعوة ضيف</span>
-                <span class="ula-headline-en" style="font-size: var(--ula-size-h2-en);">Guest Invitation</span>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+                <h1 style="font-size: 26px; font-weight: 600; line-height: 1.4; color: var(--ula-text-primary); margin: 0;">دعوة ضيف</h1>
+                <span style="font-family: var(--ula-font-en); font-size: 15px; font-weight: 300; color: var(--ula-text-secondary);">Guest Invitation</span>
             </div>
 
-            <div class="inviter-card">
-                <span class="inviter-avatar">{{ mb_substr($invitation->host->name, 0, 1) }}</span>
+            <div class="ula-guest-inviter-box">
+                <span class="ula-guest-inviter-avatar">{{ mb_substr($invitation->host->name, 0, 1) }}</span>
                 <div style="display: flex; flex-direction: column; gap: 2px;">
-                    <span style="font-size: var(--ula-size-xs); color: var(--ula-text-secondary);">{{ __('Invited by') }}</span>
-                    <span style="font-size: var(--ula-size-body); font-weight: var(--ula-weight-semibold); color: var(--ula-text-primary);">
+                    <span style="font-size: 13px; color: var(--ula-text-secondary);">{{ __('دعاك') }}</span>
+                    <span style="font-size: 15px; font-weight: 600; color: var(--ula-text-primary);">
                         {{ $invitation->host->name }} · {{ $invitation->organization->name }}
                     </span>
-                    <span style="font-size: var(--ula-size-xs); color: var(--ula-text-secondary);">{{ __('to join their virtual office space.') }}</span>
+                    <span style="font-size: 13px; color: var(--ula-text-secondary);">{{ __('للانضمام إلى مكتبهم الافتراضي') }}</span>
                 </div>
             </div>
 
-            <div class="room-badge">
-                <span style="display: inline-flex; align-items: center; gap: var(--ula-space-3); font-size: var(--ula-size-sm);">
-                    <span class="material-symbols-rounded" style="font-size: 20px;">meeting_room</span>
-                    {{ __('Destination Room:') }}
+            <div class="ula-guest-room-badge">
+                <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ula-tone-palm-fg);">
+                    <span class="ms" style="font-size: 20px;">meeting_room</span>
+                    <span>{{ __('الغرفة المقصودة:') }}</span>
                 </span>
-                <span style="font-size: var(--ula-size-body); font-weight: var(--ula-weight-semibold);">{{ $invitation->room->name }}</span>
+                <span style="font-size: 15px; font-weight: 600; color: var(--ula-tone-palm-fg);">{{ $invitation->room->name }}</span>
             </div>
 
-            <form action="{{ route('guest.enter', $invitation->token) }}" method="POST">
+            <form action="{{ route('guest.enter', $invitation->token) }}" method="POST" style="display: flex; flex-direction: column; gap: 20px;">
                 @csrf
-                <div style="margin-bottom: var(--ula-space-6);">
-                    <label class="form-label" for="guest_name">{{ __('Your Full Name (Display Name)') }}</label>
-                    <input type="text" id="guest_name" name="guest_name" class="form-input" value="{{ old('guest_name', $invitation->guest_name) }}" required placeholder="e.g. John Smith / Partner">
+                <div class="ula-guest-field-group">
+                    <label class="form-label" for="guest_name" style="font-size: 15px; font-weight: 500; color: var(--ula-text-primary);">{{ __('اسمك الكامل (اسم العرض)') }}</label>
+                    <div class="ula-guest-input-box">
+                        <span class="ms" style="font-size: 20px;">badge</span>
+                        <input
+                            type="text"
+                            id="guest_name"
+                            name="guest_name"
+                            class="ula-guest-input-control"
+                            value="{{ old('guest_name', $invitation->guest_name) }}"
+                            required
+                            placeholder="مثال: محمد أحمد"
+                        >
+                    </div>
                 </div>
 
-                <button type="submit" class="join-btn">
-                    <span class="material-symbols-rounded" style="font-size: 22px;">login</span>
-                    <span>{{ __('Enter Workplace as Guest') }}</span>
+                <button type="submit" class="ula-guest-btn-submit">
+                    <span class="ms" style="font-size: 22px;">login</span>
+                    <span>{{ __('ادخل كضيف') }}</span>
                 </button>
             </form>
         </div>
