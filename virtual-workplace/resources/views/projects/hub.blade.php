@@ -2464,13 +2464,13 @@
             const style = document.createElement('style');
             style.id = 'gantt-status-styles';
             style.textContent = `
-                .gantt .bar-wrapper.gantt-bar-done         .bar { fill: #3c6b4c !important; }
-                .gantt .bar-wrapper.gantt-bar-in_progress  .bar { fill: #b98a37 !important; }
-                .gantt .bar-wrapper.gantt-bar-review       .bar { fill: #b46c34 !important; }
-                .gantt .bar-wrapper.gantt-bar-qa           .bar { fill: #7d451d !important; }
-                .gantt .bar-wrapper.gantt-bar-ready        .bar { fill: #a49889 !important; }
-                .gantt .bar-wrapper.gantt-bar-backlog      .bar { fill: #c1b6a6 !important; }
-                .gantt .bar-label { font-size: 11px !important; font-weight: 800 !important; fill: #ffffff !important; }
+                .gantt .bar-wrapper.gantt-bar-done         .bar { fill: var(--ula-status-success) !important; }
+                .gantt .bar-wrapper.gantt-bar-in_progress  .bar { fill: var(--ula-status-warning) !important; }
+                .gantt .bar-wrapper.gantt-bar-review       .bar { fill: var(--ula-tone-terracotta-dot) !important; }
+                .gantt .bar-wrapper.gantt-bar-qa           .bar { fill: var(--ula-status-danger-hover) !important; }
+                .gantt .bar-wrapper.gantt-bar-ready        .bar { fill: var(--ula-icon-disabled) !important; }
+                .gantt .bar-wrapper.gantt-bar-backlog      .bar { fill: var(--ula-border-strong) !important; }
+                .gantt .bar-label { font-size: 11px !important; font-weight: 800 !important; fill: var(--ula-white) !important; }
             `;
             document.head.appendChild(style);
         }
