@@ -1,5 +1,10 @@
 <div id="tab-chat" class="tab-view">
-
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <h2 style="font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ula-text-primary); margin: 0;">{{ __('Team Chat & Instant Messaging') }}</h2>
+            <span style="font-family: 'IBM Plex Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--ula-text-secondary);">Team Chat &amp; Instant Messaging</span>
+        </div>
+    </div>
     <!-- Chat Workspace Split Container (UlaSpace Figma Standard) -->
     <div class="chat-workspace-container" style="display: flex; height: calc(100vh - 210px); min-height: 560px; max-height: 820px; border-radius: var(--ula-radius-xl); overflow: hidden; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs); background: var(--ula-surface-card);">
         

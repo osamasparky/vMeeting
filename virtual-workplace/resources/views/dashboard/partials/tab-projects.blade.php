@@ -1,75 +1,78 @@
 <div id="tab-projects" class="tab-view">
-    @if($membership->hasPermission('projects.manage') || $membership->role?->slug === 'company_admin')
-    <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
-        <x-btn variant="primary" size="md" onclick="openNewProjectModal()" icon="add">
-            {{ __('New Project') }}
-        </x-btn>
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <h2 style="font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ula-text-primary); margin: 0;">{{ __('Projects Portfolio & Strategic Initiatives') }}</h2>
+            <span style="font-family: 'IBM Plex Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--ula-text-secondary);">Projects Portfolio &amp; Strategic Initiatives</span>
+        </div>
+        @if($membership->hasPermission('projects.manage') || $membership->role?->slug === 'company_admin')
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <x-btn variant="primary" size="md" onclick="openNewProjectModal()" icon="add">
+                {{ __('New Project') }}
+            </x-btn>
+        </div>
+        @endif
     </div>
-    @endif
 
     <!-- Project KPI Metrics -->
-    <div class="kpi-grid" style="margin-bottom: 24px;">
-        <div class="kpi-card">
-            <div class="kpi-header">
-                <span class="kpi-title">{{ __('Total Projects') }}</span>
-                <div class="kpi-icon-box">
-                    <span class="material-symbols-rounded">folder</span>
-                </div>
+    <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div class="kpi-card" style="padding: 18px; border-radius: var(--ula-radius-xl); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+                <span style="font-size: 14px; font-weight: 600; color: var(--ula-text-secondary);">{{ __('Total Projects') }}</span>
+                <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: 999px; background: var(--ula-control-tone-palm-fill); color: var(--ula-palm-700); display: inline-flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">folder</span>
+                </span>
             </div>
-            <div class="kpi-value">{{ $projects->count() }}</div>
-            <div class="kpi-trend" style="color: var(--ula-status-success);">
-                <span class="material-symbols-rounded" style="font-size: 14px;">play_circle</span>
-                <span>{{ $projects->where('status', 'active')->count() }} {{ __('Active initiatives') }}</span>
-            </div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-header">
-                <span class="kpi-title">{{ __('Total Tasks') }}</span>
-                <div class="kpi-icon-box">
-                    <span class="material-symbols-rounded">task_alt</span>
-                </div>
-            </div>
-            <div class="kpi-value">{{ $tasks->count() }}</div>
-            <div class="kpi-trend" style="color: var(--ula-status-success);">
-                <span class="material-symbols-rounded" style="font-size: 14px;">pending_actions</span>
-                <span>{{ $tasks->where('status', '!=', 'done')->count() }} {{ __('In progress / Backlog') }}</span>
+            <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
+                <span style="font-size: 32px; font-weight: 400; line-height: 1.1; font-family: 'IBM Plex Mono', monospace;">{{ $projects->count() }}</span>
+                <span style="font-size: 12px; color: var(--ula-status-success);">{{ $projects->where('status', 'active')->count() }} {{ __('Active initiatives') }}</span>
             </div>
         </div>
-        <div class="kpi-card">
-            <div class="kpi-header">
-                <span class="kpi-title">{{ __('Logged Hours') }}</span>
-                <div class="kpi-icon-box">
-                    <span class="material-symbols-rounded">timer</span>
-                </div>
+        <div class="kpi-card" style="padding: 18px; border-radius: var(--ula-radius-xl); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+                <span style="font-size: 14px; font-weight: 600; color: var(--ula-text-secondary);">{{ __('Total Tasks') }}</span>
+                <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: 999px; background: var(--ula-control-tone-gold-fill); color: var(--ula-gold-700); display: inline-flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">task_alt</span>
+                </span>
             </div>
-            <div class="kpi-value">{{ round($projects->sum(fn($p) => $p->actualHours()), 1) }}h</div>
-            <div class="kpi-trend" style="color: var(--ula-status-success);">
-                <span class="material-symbols-rounded" style="font-size: 14px;">trending_up</span>
-                <span>{{ __('Tracked across all tasks') }}</span>
+            <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
+                <span style="font-size: 32px; font-weight: 400; line-height: 1.1; font-family: 'IBM Plex Mono', monospace;">{{ $tasks->count() }}</span>
+                <span style="font-size: 12px; color: var(--ula-text-muted);">{{ $tasks->where('status', '!=', 'done')->count() }} {{ __('In progress / Backlog') }}</span>
             </div>
         </div>
-        <div class="kpi-card">
-            <div class="kpi-header">
-                <span class="kpi-title">{{ __('Total Budget') }}</span>
-                <div class="kpi-icon-box">
-                    <span class="material-symbols-rounded">attach_money</span>
-                </div>
+        <div class="kpi-card" style="padding: 18px; border-radius: var(--ula-radius-xl); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+                <span style="font-size: 14px; font-weight: 600; color: var(--ula-text-secondary);">{{ __('Logged Hours') }}</span>
+                <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: 999px; background: var(--ula-surface-page-alt); color: var(--ula-text-primary); display: inline-flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">timer</span>
+                </span>
             </div>
-            <div class="kpi-value">${{ number_format($projects->sum('budget_amount'), 0) }}</div>
-            <div class="kpi-trend" style="color: var(--ula-status-success);">
-                <span class="material-symbols-rounded" style="font-size: 14px;">account_balance</span>
-                <span>{{ __('Allocated capital') }}</span>
+            <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
+                <span style="font-size: 32px; font-weight: 400; line-height: 1.1; font-family: 'IBM Plex Mono', monospace;">{{ round($projects->sum(fn($p) => $p->actualHours()), 1) }}h</span>
+                <span style="font-size: 12px; color: var(--ula-status-success);">{{ __('Tracked across all tasks') }}</span>
+            </div>
+        </div>
+        <div class="kpi-card" style="padding: 18px; border-radius: var(--ula-radius-xl); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+                <span style="font-size: 14px; font-weight: 600; color: var(--ula-text-secondary);">{{ __('Total Budget') }}</span>
+                <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: 999px; background: var(--ula-control-tone-palm-fill); color: var(--ula-palm-700); display: inline-flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">attach_money</span>
+                </span>
+            </div>
+            <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
+                <span style="font-size: 32px; font-weight: 400; line-height: 1.1; font-family: 'IBM Plex Mono', monospace;">${{ number_format($projects->sum('budget_amount'), 0) }}</span>
+                <span style="font-size: 12px; color: var(--ula-status-success);">{{ __('Allocated capital') }}</span>
             </div>
         </div>
     </div>
 
     <!-- Projects Table -->
-    <div class="card" style="border-radius: var(--ula-radius-lg); overflow: hidden; padding: 0;">
-        <div style="padding: 20px 24px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-card);">
-            <h3 style="font-size: 16px; font-weight: 800; color: var(--ula-text-primary); display: flex; align-items: center; gap: 8px;">
-                <span class="material-symbols-rounded" style="font-size: 18px; color: var(--ula-highlight-default);">assignment</span>
-                <span>{{ __('Active Initiatives') }} ({{ $projects->count() }})</span>
-            </h3>
+    <div class="card" style="border-radius: var(--ula-radius-xl); overflow: hidden; padding: 0; border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs);">
+        <div style="padding: 16px 20px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-card);">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-palm-700);">assignment</span>
+                <h3 style="font-size: 17px; font-weight: 700; color: var(--ula-text-primary); margin: 0;">{{ __('Active Initiatives') }}</h3>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--ula-text-muted);">({{ $projects->count() }})</span>
+            </div>
         </div>
         <div style="overflow-x: auto;">
             <table class="data-table">

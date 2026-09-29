@@ -1,16 +1,22 @@
 <div id="tab-guests" class="tab-view">
-    <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: var(--ula-space-6); gap: var(--ula-space-4); flex-wrap: wrap;">
-        @if($guestInvitations->count() > 0)
-            <form method="POST" action="{{ route('guest_invitations.clear') }}" onsubmit="return confirm('{{ __('Are you sure you want to delete all guest meeting links?') }}');" style="display: inline; margin: 0;">
-                @csrf
-                <x-btn variant="danger" size="md" type="submit" icon="delete_sweep">
-                    {{ __('Clear All Links') }}
-                </x-btn>
-            </form>
-        @endif
-        <x-btn variant="primary" size="md" onclick="openInviteModal()" icon="bolt">
-            {{ __('Create Guest Link') }}
-        </x-btn>
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <h2 style="font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ula-text-primary); margin: 0;">{{ __('Guest Links & Instant Access') }}</h2>
+            <span style="font-family: 'IBM Plex Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--ula-text-secondary);">Guest Links &amp; Instant Access</span>
+        </div>
+        <div style="display: flex; justify-content: flex-end; align-items: center; gap: var(--ula-space-4); flex-wrap: wrap;">
+            @if($guestInvitations->count() > 0)
+                <form method="POST" action="{{ route('guest_invitations.clear') }}" onsubmit="return confirm('{{ __('Are you sure you want to delete all guest meeting links?') }}');" style="display: inline; margin: 0;">
+                    @csrf
+                    <x-btn variant="danger" size="md" type="submit" icon="delete_sweep">
+                        {{ __('Clear All Links') }}
+                    </x-btn>
+                </form>
+            @endif
+            <x-btn variant="primary" size="md" onclick="openInviteModal()" icon="bolt">
+                {{ __('Create Guest Link') }}
+            </x-btn>
+        </div>
     </div>
 
     <div class="card" style="border-radius: var(--ula-radius-xl); overflow: hidden; padding: 0; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs); background: var(--ula-surface-card);">

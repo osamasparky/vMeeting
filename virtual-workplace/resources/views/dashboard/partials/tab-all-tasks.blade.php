@@ -1,18 +1,24 @@
 <div id="tab-all-tasks" class="tab-view">
-    <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: var(--ula-space-6); flex-wrap: wrap; gap: var(--ula-space-4);">
-        <div style="display: flex; gap: 4px; background: var(--ula-surface-page-alt); padding: 4px; border-radius: var(--ula-radius-lg); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
-            <button onclick="switchAllTasksView('table')" id="alltasks-btn-table" class="ula-btn ula-btn--primary ula-btn--sm" style="border-radius: var(--ula-radius-md);">
-                <span class="material-symbols-rounded">table_rows</span>
-                <span>{{ __('Table View') }}</span>
-            </button>
-            <button onclick="switchAllTasksView('kanban')" id="alltasks-btn-kanban" class="ula-btn ula-btn--ghost ula-btn--sm" style="border-radius: var(--ula-radius-md);">
-                <span class="material-symbols-rounded">view_kanban</span>
-                <span>{{ __('Kanban Board') }}</span>
-            </button>
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <h2 style="font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ula-text-primary); margin: 0;">{{ __('All Tasks & Workflow Board') }}</h2>
+            <span style="font-family: 'IBM Plex Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--ula-text-secondary);">All Tasks &amp; Workflow Board</span>
         </div>
-        <x-btn variant="primary" size="md" onclick="openNewTaskModal()" icon="add">
-            {{ __('New Task') }}
-        </x-btn>
+        <div style="display: flex; justify-content: flex-end; align-items: center; flex-wrap: wrap; gap: var(--ula-space-4);">
+            <div style="display: flex; gap: 4px; background: var(--ula-surface-page-alt); padding: 4px; border-radius: var(--ula-radius-lg); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
+                <button onclick="switchAllTasksView('table')" id="alltasks-btn-table" class="ula-btn ula-btn--primary ula-btn--sm" style="border-radius: var(--ula-radius-md);">
+                    <span class="material-symbols-rounded">table_rows</span>
+                    <span>{{ __('Table View') }}</span>
+                </button>
+                <button onclick="switchAllTasksView('kanban')" id="alltasks-btn-kanban" class="ula-btn ula-btn--ghost ula-btn--sm" style="border-radius: var(--ula-radius-md);">
+                    <span class="material-symbols-rounded">view_kanban</span>
+                    <span>{{ __('Kanban Board') }}</span>
+                </button>
+            </div>
+            <x-btn variant="primary" size="md" onclick="openNewTaskModal()" icon="add">
+                {{ __('New Task') }}
+            </x-btn>
+        </div>
     </div>
 
     <!-- Task KPIs Summary (3D Soft Neumorphic) -->

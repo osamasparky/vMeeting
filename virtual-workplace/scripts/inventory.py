@@ -1,14 +1,21 @@
-import re, sys, os
+import re, sys, os, glob
 
-def inventory(group_name, files):
+def inventory(group_name, raw_patterns):
     pattern = re.compile(r'id="[^"]+"|name="[^"]+"|route\([^)]+\)|@(if|foreach|can|auth|guest|include)\b[^\r\n]{0,60}')
     matches = set()
-    for f in files:
-        if os.path.exists(f):
-            with open(f, 'r', encoding='utf-8') as fp:
-                content = fp.read()
-                for m in pattern.finditer(content):
-                    matches.add(m.group(0))
+    files = []
+    for p in raw_patterns:
+        matched = glob.glob(p)
+        if matched:
+            files.extend(matched)
+        elif os.path.exists(p):
+            files.append(p)
+
+    for f in sorted(set(files)):
+        with open(f, 'r', encoding='utf-8') as fp:
+            content = fp.read()
+            for m in pattern.finditer(content):
+                matches.add(m.group(0))
     
     os.makedirs('storage/framework/inventory', exist_ok=True)
     out_path = f'storage/framework/inventory/{group_name}.txt'
@@ -16,7 +23,7 @@ def inventory(group_name, files):
     with open(out_path, 'w', encoding='utf-8') as out:
         for item in sorted_matches:
             out.write(item + '\n')
-    print(f'Wrote {len(sorted_matches)} items to {out_path}')
+    print(f'Wrote {len(sorted_matches)} items to {out_path} from {len(files)} files')
 
 if __name__ == '__main__':
     group = sys.argv[1]

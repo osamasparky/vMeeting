@@ -1,14 +1,20 @@
 <div id="tab-offices" class="tab-view">
-    <div style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: var(--ula-space-6); gap: var(--ula-space-4);">
-        @if(!$organization->hasReachedOfficeLimit())
-        <x-btn variant="primary" size="md" onclick="openNewOfficeModal()" icon="add">
-            {{ __('Add Office Branch') }}
-        </x-btn>
-        @else
-        <x-btn variant="nav-cta" size="md" onclick="switchAdminTab('billing')" icon="workspace_premium">
-            {{ __('Upgrade Plan for More Offices') }}
-        </x-btn>
-        @endif
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <h2 style="font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ula-text-primary); margin: 0;">{{ __('Offices & Branches Management') }}</h2>
+            <span style="font-family: 'IBM Plex Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--ula-text-secondary);">Offices &amp; Branches Management</span>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            @if(!$organization->hasReachedOfficeLimit())
+            <x-btn variant="primary" size="md" onclick="openNewOfficeModal()" icon="add">
+                {{ __('Add Office Branch') }}
+            </x-btn>
+            @else
+            <x-btn variant="nav-cta" size="md" onclick="switchAdminTab('billing')" icon="workspace_premium">
+                {{ __('Upgrade Plan for More Offices') }}
+            </x-btn>
+            @endif
+        </div>
     </div>
 
     <!-- Quota Indicator Banner -->

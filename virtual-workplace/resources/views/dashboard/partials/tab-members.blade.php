@@ -1,18 +1,25 @@
 <div id="tab-members" class="tab-view">
-    @if($membership->hasPermission('members.manage') || $membership->role?->slug === 'company_admin')
-    <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
-        <x-btn variant="primary" size="md" onclick="openInviteModal()" icon="person_add">
-            {{ __('Invite Member') }}
-        </x-btn>
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <h2 style="font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ula-text-primary); margin: 0;">{{ __('Team Members & Workspace Roster') }}</h2>
+            <span style="font-family: 'IBM Plex Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--ula-text-secondary);">Team Members &amp; Workspace Roster</span>
+        </div>
+        @if($membership->hasPermission('members.manage') || $membership->role?->slug === 'company_admin')
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <x-btn variant="primary" size="md" onclick="openInviteModal()" icon="person_add">
+                {{ __('Invite Member') }}
+            </x-btn>
+        </div>
+        @endif
     </div>
-    @endif
 
-    <div class="card" style="border-radius: var(--ula-radius-lg); overflow: hidden; padding: 0;">
-        <div style="padding: 20px 24px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-card);">
-            <h3 style="font-size: 16px; font-weight: 800; color: var(--ula-text-primary); display: flex; align-items: center; gap: 8px;">
-                <span class="material-symbols-rounded" style="font-size: 18px; color: var(--ula-highlight-default);">badge</span>
-                <span>{{ __('Workspace Roster') }} ({{ $members->count() }})</span>
-            </h3>
+    <div class="card" style="border-radius: var(--ula-radius-xl); overflow: hidden; padding: 0; border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs);">
+        <div style="padding: 16px 20px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-card);">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-palm-700);">badge</span>
+                <h3 style="font-size: 17px; font-weight: 700; color: var(--ula-text-primary); margin: 0;">{{ __('Workspace Roster') }}</h3>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--ula-text-muted);">({{ $members->count() }})</span>
+            </div>
         </div>
         <div style="overflow-x: auto;">
             <table class="data-table">

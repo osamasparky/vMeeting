@@ -1,8 +1,14 @@
 <div id="tab-departments" class="tab-view">
-    <div style="display: flex; justify-content: flex-end; margin-bottom: var(--ula-space-6);">
-        <x-btn variant="primary" size="md" onclick="openDepartmentModal()" icon="add">
-            {{ __('New Department') }}
-        </x-btn>
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <h2 style="font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ula-text-primary); margin: 0;">{{ __('Departments & Teams Structure') }}</h2>
+            <span style="font-family: 'IBM Plex Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--ula-text-secondary);">Departments &amp; Teams Structure</span>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <x-btn variant="primary" size="md" onclick="openDepartmentModal()" icon="add">
+                {{ __('New Department') }}
+            </x-btn>
+        </div>
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: var(--ula-space-6);">

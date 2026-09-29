@@ -1,0 +1,259 @@
+@foreach($allPlans as $p)
+@foreach($branchRooms as $r)
+@foreach($commonTimezones as $tzKey => $tzLabel)
+@foreach($errors->all() as $err)
+@foreach($kanbanColumns as $statusKey => $colMeta)
+@foreach($mParts as $p)
+@foreach($members as $m)
+@foreach($myKanbanCols as $colKey => $colMeta)
+@foreach($offices as $off)
+@foreach($projects as $p)
+@if(!$isUnlimitedSeats && $seatLimit <= 40)
+@if(!$isUnlimitedSeats)
+@if(!$organization->hasReachedOfficeLimit())
+@if($auditLogs->count() > 0)
+@if($branchRooms->count() > 0)
+@if($canOpenHub)
+@if($canOpenHub) onclick="window.location.href='{{ route('proje
+@if($canSelectMember)
+@if($errors->any())
+@if($guestInvitations->count() > 0)
+@if($i < $usedSeats)
+@if($isAnyExceeded)
+@if($isCurrent)
+@if($isEvening)
+@if($isLive)
+@if($isOverdue) <span class="nav-badge-pill" style="background:
+@if($isPerSeat || ($currentPlan && (float)$currentPlan->price >
+@if($isPerSeat)
+@if($isRoomsExceeded)
+@if($isSeatsExceeded)
+@if($m->description)
+@if($m->project)
+@if($m->status === 'active')
+@if($m->status === 'scheduled')
+@if($m->user->nickname)
+@if($m->user_id !== $user->id && $m->user)
+@if($m->user_id !== $user->id)
+@if($meeting->status === 'live')
+@if($memberDept)
+@if($memberTeam)
+@if($membership->hasPermission('maps.manage'))
+@if($membership->hasPermission('members.manage') || $membership
+@if($membership->hasPermission('projects.manage') || $membershi
+@if($membership->hasPermission('rooms.manage'))
+@if($moreParts > 0)
+@if($off->city_location)
+@if($off->description)
+@if($off->is_default)
+@if($offices->count() > 1)
+@if($p->description)
+@if($p->priority === 'urgent')
+@if($p->status === 'active')
+@if($pIsPerSeat)
+@if($pendingSubscriptionRequest->seats)
+@if($prof?->job_title)
+@if($publishedMap)
+@if($r->access_mode === 'private')
+@if($t->assignee)
+@if($t->checklistItems && $t->checklistItems->count() > 0)
+@if($t->description)
+@if($t->priority === 'urgent')
+@if($tObj)
+@if($ts->status === 'approved')
+@if($ts->status === 'submitted' && ($membership->hasPermission(
+@if($user->nickname)
+@if(isset($pendingSubscriptionRequest) && $pendingSubscriptionR
+@if(session('success'))
+id="alltasks-btn-kanban"
+id="alltasks-btn-table"
+id="alltasks-filter-assignee"
+id="alltasks-filter-priority"
+id="alltasks-filter-project"
+id="alltasks-filter-search"
+id="alltasks-filter-status"
+id="alltasks-filtered-count"
+id="alltasks-kpi-done"
+id="alltasks-kpi-in-progress"
+id="alltasks-kpi-review"
+id="alltasks-kpi-total"
+id="alltasks-table-body"
+id="alltasks-view-kanban"
+id="alltasks-view-table"
+id="available-plans-section"
+id="branch-pill-all"
+id="branch-pill-{{ $off->id }}"
+id="btn-test-org-ai"
+id="btn-test-smtp"
+id="chat-active-avatar-box"
+id="chat-active-avatar-initials"
+id="chat-active-badge"
+id="chat-active-state"
+id="chat-active-subtitle"
+id="chat-active-title"
+id="chat-channels-list"
+id="chat-empty-state"
+id="chat-members-list"
+id="chat-message-input"
+id="chat-messages-container"
+id="chat-roster-count"
+id="chat-search-input"
+id="chat-send-btn"
+id="chat-view-profile-btn"
+id="global-kanban-cnt-{{ $statusKey }}"
+id="global-kanban-col-{{ $statusKey }}"
+id="global-kanban-zone-{{ $statusKey }}"
+id="logo-preview-img"
+id="logo-preview-placeholder"
+id="manageSeatsForm"
+id="manageSeatsModal"
+id="modal-diff-container"
+id="modal-new-price"
+id="modal-seat-diff"
+id="modal-seats-input"
+id="modal-seats-warning"
+id="modal-submit-btn"
+id="mytasks-empty-{{ $colKey }}"
+id="mytasks-kanban-cnt-{{ $colKey }}"
+id="mytasks-kanban-col-{{ $colKey }}"
+id="mytasks-kanban-zone-{{ $colKey }}"
+id="nx-hero-dynamic-greeting"
+id="nx-hero-live-clock"
+id="office-branch-section-{{ $off->id }}"
+id="office-branches-container"
+id="org-ai-test-result-box"
+id="org-logo-input"
+id="org-openai-key-input"
+id="org-subtab-btn-ai"
+id="org-subtab-btn-attendance"
+id="org-subtab-btn-general"
+id="org-subtab-btn-smtp"
+id="org-subtab-content-ai"
+id="org-subtab-content-attendance"
+id="org-subtab-content-general"
+id="org-subtab-content-smtp"
+id="plan-card-{{ $p->id }}"
+id="plan-checkout-btn-{{ $p->id }}"
+id="plan-feature-seats-{{ $p->id }}"
+id="plan-seats-input-{{ $p->id }}"
+id="plan-total-sar-{{ $p->id }}"
+id="plan-total-usd-{{ $p->id }}"
+id="profileAvatarInput"
+id="profileAvatarName"
+id="rooms-no-results-hint"
+id="rooms-search-input"
+id="rooms-type-filter"
+id="rooms-view-cards-btn"
+id="rooms-view-table-btn"
+id="rooms-visible-count-badge"
+id="smtp-encryption-input"
+id="smtp-from-email-input"
+id="smtp-from-name-input"
+id="smtp-host-input"
+id="smtp-password-input"
+id="smtp-port-input"
+id="smtp-test-result-box"
+id="smtp-username-input"
+id="tab-all-tasks"
+id="tab-audit"
+id="tab-billing"
+id="tab-chat"
+id="tab-departments"
+id="tab-guests"
+id="tab-meetings"
+id="tab-members"
+id="tab-my-tasks"
+id="tab-offices"
+id="tab-overview"
+id="tab-profile"
+id="tab-projects"
+id="tab-rooms"
+id="tab-settings"
+id="tab-timesheets"
+id="tab-workload"
+id="ts-attendance-count-pill"
+id="ts-attendance-tbody"
+id="ts-banner-clock"
+id="ts-banner-project-pill"
+id="ts-banner-task-title"
+id="ts-filter-date"
+id="ts-filter-user"
+id="ts-kpi-idle-time"
+id="ts-kpi-office-time"
+id="ts-kpi-ratio"
+id="ts-kpi-task-time"
+id="ts-kpi-total-work"
+id="ts-live-timer-banner"
+id="ts-online-count-pill"
+id="ts-tasks-count-pill"
+id="ts-tasks-tbody"
+id="ts-team-roster-tbody"
+id="ts-total-members-pill"
+id="user-profile-avatar-fallback"
+id="user-profile-preview-avatar"
+id="{{ $off->id }}"
+id="{{ $p->id }}"
+id="{{ $r->id }}"
+id="{{ $t->assignee_id }}"
+id="{{ $t->id }}"
+id="{{ $t->project_id }}"
+name="attendance_auto_enabled"
+name="attendance_idle_grace_seconds"
+name="attendance_idle_prompt_minutes"
+name="avatar"
+name="bio"
+name="current_password"
+name="date_of_birth"
+name="email"
+name="github"
+name="hobbies"
+name="job_title"
+name="linkedin"
+name="logo"
+name="mail_encryption"
+name="mail_from_address"
+name="mail_from_name"
+name="mail_host"
+name="mail_password"
+name="mail_port"
+name="mail_username"
+name="name"
+name="nickname"
+name="notes"
+name="openai_api_key"
+name="openai_image_size"
+name="openai_model"
+name="password"
+name="password_confirmation"
+name="phone"
+name="plan_id"
+name="seats"
+name="skills"
+name="timezone"
+name="twitter"
+name="website"
+name="work_mode"
+name="{{ strtolower($off->name) }}"
+name="{{ strtolower($r->name) }}"
+route('audit_logs.clear')
+route('departments.delete', $dept->id)
+route('editor')
+route('guest_invitations.clear')
+route('meetings.cancel', $m->id)
+route('office')
+route('office', ['office' => $off->id])
+route('office', ['office_id' => $off->id, 'room_id' => $r->id])
+route('office', ['office_id' => $off->id])
+route('offices.delete', $off->id)
+route('organization.members.delete', $m->id)
+route('organization.members.impersonate', $m->id)
+route('organization.settings.update')
+route('organization.upgrade_plan')
+route('profile.password.update')
+route('profile.update')
+route('projects.hub', $p->id)
+route('subscription.payment', $p->id)
+route('subscription.payment', $pendingSubscriptionRequest->plan_id)
+route('subscription.payment.cancel', $pendingSubscriptionRequest->id)
+route('subscription.seats.update')
+route('teams.delete', $t->id)

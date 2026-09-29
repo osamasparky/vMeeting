@@ -1,4 +1,10 @@
 <div id="tab-profile" class="tab-view">
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <h2 style="font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ula-text-primary); margin: 0;">{{ __('User Profile & Account Settings') }}</h2>
+            <span style="font-family: 'IBM Plex Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--ula-text-secondary);">User Profile &amp; Account Settings</span>
+        </div>
+    </div>
 
 
     <!-- Profile Hero Card (UlaSpace 3D Tactile) -->

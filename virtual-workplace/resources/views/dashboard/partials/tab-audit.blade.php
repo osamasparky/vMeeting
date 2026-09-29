@@ -1,15 +1,21 @@
 <div id="tab-audit" class="tab-view">
-    @if($auditLogs->count() > 0)
-    <div style="display: flex; justify-content: flex-end; margin-bottom: var(--ula-space-6);">
-        <form method="POST" action="{{ route('audit_logs.clear') }}" onsubmit="return confirm('{{ __('Are you sure you want to purge all audit logs?') }}');" style="display: inline; margin: 0;">
-            @csrf
-            <button type="submit" class="tactile-btn" style="background: rgba(217, 107, 95, 0.12); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.25); padding: 10px 16px; font-size: var(--ula-size-sm); display: inline-flex; align-items: center; gap: var(--ula-space-3); border-radius: var(--ula-radius-lg);">
-                <span class="material-symbols-rounded" style="font-size: 18px;">delete_sweep</span>
-                <span>{{ __('Clear All Logs') }}</span>
-            </button>
-        </form>
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <h2 style="font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ula-text-primary); margin: 0;">{{ __('Security Audit Trail & Compliance Logs') }}</h2>
+            <span style="font-family: 'IBM Plex Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--ula-text-secondary);">Security Audit Trail &amp; Compliance Logs</span>
+        </div>
+        @if($auditLogs->count() > 0)
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <form method="POST" action="{{ route('audit_logs.clear') }}" onsubmit="return confirm('{{ __('Are you sure you want to purge all audit logs?') }}');" style="display: inline; margin: 0;">
+                @csrf
+                <button type="submit" class="tactile-btn" style="background: rgba(217, 107, 95, 0.12); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.25); padding: 10px 16px; font-size: var(--ula-size-sm); display: inline-flex; align-items: center; gap: var(--ula-space-3); border-radius: var(--ula-radius-lg);">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">delete_sweep</span>
+                    <span>{{ __('Clear All Logs') }}</span>
+                </button>
+            </form>
+        </div>
+        @endif
     </div>
-    @endif
 
     <div class="card" style="border-radius: var(--ula-radius-xl); overflow: hidden; padding: 0; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs); background: var(--ula-surface-card);">
         <div style="padding: var(--ula-space-6) var(--ula-space-7); border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-card);">

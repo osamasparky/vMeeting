@@ -1,73 +1,76 @@
 <div id="tab-meetings" class="tab-view">
-    <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
-        <x-btn variant="primary" size="md" onclick="openScheduleMeetingModal('general')" icon="add">
-            {{ __('Schedule General Meeting') }}
-        </x-btn>
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+            <h2 style="font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ula-text-primary); margin: 0;">{{ __('Scheduled Meetings & Sessions') }}</h2>
+            <span style="font-family: 'IBM Plex Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--ula-text-secondary);">Scheduled Meetings &amp; Sessions</span>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <x-btn variant="primary" size="md" onclick="openScheduleMeetingModal('general')" icon="add">
+                {{ __('Schedule General Meeting') }}
+            </x-btn>
+        </div>
     </div>
 
     <!-- KPI Metric Cards for Meetings -->
-    <div class="kpi-grid" style="margin-bottom: 24px;">
-        <div class="kpi-card">
-            <div class="kpi-header">
-                <span class="kpi-title">{{ __('Upcoming Meetings') }}</span>
-                <div class="kpi-icon-box">
-                    <span class="material-symbols-rounded">calendar_today</span>
-                </div>
+    <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div class="kpi-card" style="padding: 18px; border-radius: var(--ula-radius-xl); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+                <span style="font-size: 14px; font-weight: 600; color: var(--ula-text-secondary);">{{ __('Upcoming Meetings') }}</span>
+                <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: 999px; background: var(--ula-control-tone-palm-fill); color: var(--ula-palm-700); display: inline-flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">event_upcoming</span>
+                </span>
             </div>
-            <div class="kpi-value">{{ $upcomingMeetings->count() }}</div>
-            <div class="kpi-trend" style="color: var(--ula-status-success);">
-                <span class="material-symbols-rounded" style="font-size: 14px;">play_circle</span>
-                <span>{{ __('Ready to join') }}</span>
-            </div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-header">
-                <span class="kpi-title">{{ __('Project Meetings') }}</span>
-                <div class="kpi-icon-box">
-                    <span class="material-symbols-rounded">folder</span>
-                </div>
-            </div>
-            <div class="kpi-value">{{ $allMeetings->whereNotNull('project_id')->count() }}</div>
-            <div class="kpi-trend">
-                <span class="material-symbols-rounded" style="font-size: 14px;">groups</span>
-                <span>{{ __('Team synced') }}</span>
+            <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
+                <span style="font-size: 32px; font-weight: 400; line-height: 1.1; font-family: 'IBM Plex Mono', monospace;">{{ $upcomingMeetings->count() }}</span>
+                <span style="font-size: 12px; color: var(--ula-text-muted);">{{ __('Ready to join') }}</span>
             </div>
         </div>
-        <div class="kpi-card">
-            <div class="kpi-header">
-                <span class="kpi-title">{{ __('General Meetings') }}</span>
-                <div class="kpi-icon-box">
-                    <span class="material-symbols-rounded">public</span>
-                </div>
+        <div class="kpi-card" style="padding: 18px; border-radius: var(--ula-radius-xl); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+                <span style="font-size: 14px; font-weight: 600; color: var(--ula-text-secondary);">{{ __('Project Meetings') }}</span>
+                <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: 999px; background: var(--ula-control-tone-gold-fill); color: var(--ula-gold-700); display: inline-flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">folder</span>
+                </span>
             </div>
-            <div class="kpi-value">{{ $allMeetings->whereNull('project_id')->count() }}</div>
-            <div class="kpi-trend">
-                <span class="material-symbols-rounded" style="font-size: 14px;">shield</span>
-                <span>{{ __('Ad-hoc roster') }}</span>
+            <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
+                <span style="font-size: 32px; font-weight: 400; line-height: 1.1; font-family: 'IBM Plex Mono', monospace;">{{ $allMeetings->whereNotNull('project_id')->count() }}</span>
+                <span style="font-size: 12px; color: var(--ula-text-muted);">{{ __('Team synced') }}</span>
             </div>
         </div>
-        <div class="kpi-card">
-            <div class="kpi-header">
-                <span class="kpi-title">{{ __('Total Hosted') }}</span>
-                <div class="kpi-icon-box">
-                    <span class="material-symbols-rounded">bolt</span>
-                </div>
+        <div class="kpi-card" style="padding: 18px; border-radius: var(--ula-radius-xl); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+                <span style="font-size: 14px; font-weight: 600; color: var(--ula-text-secondary);">{{ __('General Meetings') }}</span>
+                <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: 999px; background: var(--ula-surface-page-alt); color: var(--ula-text-primary); display: inline-flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">groups</span>
+                </span>
             </div>
-            <div class="kpi-value">{{ $allMeetings->count() }}</div>
-            <div class="kpi-trend" style="color: var(--ula-status-success);">
-                <span class="material-symbols-rounded" style="font-size: 14px;">check_circle</span>
-                <span>{{ $allMeetings->where('status', 'ended')->count() }} {{ __('Completed') }}</span>
+            <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
+                <span style="font-size: 32px; font-weight: 400; line-height: 1.1; font-family: 'IBM Plex Mono', monospace;">{{ $allMeetings->whereNull('project_id')->count() }}</span>
+                <span style="font-size: 12px; color: var(--ula-text-muted);">{{ __('Ad-hoc roster') }}</span>
+            </div>
+        </div>
+        <div class="kpi-card" style="padding: 18px; border-radius: var(--ula-radius-xl); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
+                <span style="font-size: 14px; font-weight: 600; color: var(--ula-text-secondary);">{{ __('Total Hosted') }}</span>
+                <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: 999px; background: var(--ula-control-tone-palm-fill); color: var(--ula-palm-700); display: inline-flex; align-items: center; justify-content: center;">
+                    <span class="material-symbols-rounded" style="font-size: 18px;">check_circle</span>
+                </span>
+            </div>
+            <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
+                <span style="font-size: 32px; font-weight: 400; line-height: 1.1; font-family: 'IBM Plex Mono', monospace;">{{ $allMeetings->count() }}</span>
+                <span style="font-size: 12px; color: var(--ula-status-success);">{{ $allMeetings->where('status', 'ended')->count() }} {{ __('Completed') }}</span>
             </div>
         </div>
     </div>
 
     <!-- Meetings Table Card -->
-    <div class="card" style="border-radius: var(--ula-radius-lg); overflow: hidden; padding: 0;">
-        <div style="padding: 20px 24px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-card);">
-            <h3 style="font-size: 16px; font-weight: 800; color: var(--ula-text-primary); display: flex; align-items: center; gap: 8px;">
-                <span class="material-symbols-rounded" style="font-size: 18px; color: var(--ula-highlight-default);">event_note</span>
-                <span>{{ __('All Organization Meetings & Sessions') }} ({{ $allMeetings->count() }})</span>
-            </h3>
+    <div class="card" style="border-radius: var(--ula-radius-xl); overflow: hidden; padding: 0; border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs);">
+        <div style="padding: 16px 20px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-card);">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-palm-700);">event_note</span>
+                <h3 style="font-size: 17px; font-weight: 700; color: var(--ula-text-primary); margin: 0;">{{ __('All Organization Meetings & Sessions') }}</h3>
+                <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--ula-text-muted);">({{ $allMeetings->count() }})</span>
+            </div>
         </div>
         <div style="overflow-x: auto;">
             <table class="data-table">
