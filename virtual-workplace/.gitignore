@@ -22,3 +22,6 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Redesign screenshot-diff tooling — session state, not source
+/scripts/.auth-state.json
