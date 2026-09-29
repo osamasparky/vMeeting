@@ -18,7 +18,7 @@
    IBM Plex Sans / Mono stay on the Google CDN — swap the same way if needed. */
 /* @import must be the first rule in the stylesheet (CSS spec) — anything
    ahead of it, @font-face included, makes conformant parsers drop it. */
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
 
 @font-face {
   font-family: 'Cairo';
@@ -35,6 +35,25 @@
   font-display: swap;
   src: url('/fonts/cairo/cairo-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215;
+}
+
+html {
+  font-family: 'Cairo', 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--ula-text-primary);
+  background-color: var(--ula-surface-page);
+  -webkit-font-smoothing: antialiased;
+}
+
+[dir="rtl"], [lang="ar"], html[dir="rtl"] body {
+  font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
+}
+
+[dir="ltr"], [lang="en"], html[dir="ltr"] body {
+  font-family: 'IBM Plex Sans', 'Cairo', sans-serif;
+}
+
+body, button, input, select, textarea, optgroup {
+  font-family: inherit;
 }
 
 :root {
@@ -1521,6 +1540,5 @@
   background: var(--ula-palm-700) !important;
   color: #FFFFFF !important;
 }
-
 
 
