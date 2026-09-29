@@ -30,14 +30,14 @@
     <a href="{{ $href }}" {{ $attributes->merge(['class' => $classes]) }}>
         <span class="material-symbols-rounded">{{ $icon ?? $slot }}</span>
         @if($dot)
-            <span style="position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; border-radius: 9999px; background: var(--ula-tone-terracotta-dot, #b46c34); box-shadow: 0 0 0 2px var(--ula-surface-card, #ffffff);"></span>
+            <span style="position: absolute; top: 2px; inset-inline-end: 2px; width: 8px; height: 8px; border-radius: 9999px; background: var(--ula-tone-terracotta-dot, #b46c34); box-shadow: 0 0 0 2px var(--ula-surface-card, #ffffff);"></span>
         @endif
     </a>
 @else
     <button type="{{ $type }}" {{ $attributes->merge(['class' => $classes]) }}>
         <span class="material-symbols-rounded">{{ $icon ?? $slot }}</span>
         @if($dot)
-            <span style="position: absolute; top: 2px; right: 2px; width: 8px; height: 8px; border-radius: 9999px; background: var(--ula-tone-terracotta-dot, #b46c34); box-shadow: 0 0 0 2px var(--ula-surface-card, #ffffff);"></span>
+            <span style="position: absolute; top: 2px; inset-inline-end: 2px; width: 8px; height: 8px; border-radius: 9999px; background: var(--ula-tone-terracotta-dot, #b46c34); box-shadow: 0 0 0 2px var(--ula-surface-card, #ffffff);"></span>
         @endif
     </button>
 @endif
