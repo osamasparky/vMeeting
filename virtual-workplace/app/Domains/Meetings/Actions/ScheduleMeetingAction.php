@@ -127,14 +127,18 @@ class ScheduleMeetingAction
     private function applyOrganizationSmtp(Organization $organization): void
     {
         $smtp = $organization->settings?->smtp_settings ?? [];
-        if (! empty($smtp['host'])) {
-            Config::set('mail.mailers.smtp.host', $smtp['host']);
-            Config::set('mail.mailers.smtp.port', $smtp['port'] ?? 587);
-            Config::set('mail.mailers.smtp.encryption', $smtp['encryption'] ?? 'tls');
-            Config::set('mail.mailers.smtp.username', $smtp['username'] ?? null);
-            Config::set('mail.mailers.smtp.password', $smtp['password'] ?? null);
-            Config::set('mail.from.address', $smtp['from_address'] ?? env('MAIL_FROM_ADDRESS'));
-            Config::set('mail.from.name', $smtp['from_name'] ?? $organization->name);
+        // Settings → SMTP saves mail_* keys; the bare names are read too for rows saved before that.
+        $get = fn (string $key) => $smtp['mail_'.$key] ?? $smtp[$key] ?? null;
+        if (! empty($get('host'))) {
+            $encryption = $get('encryption') ?? 'tls';
+            Config::set('mail.default', 'smtp');
+            Config::set('mail.mailers.smtp.host', $get('host'));
+            Config::set('mail.mailers.smtp.port', (int) ($get('port') ?? 587));
+            Config::set('mail.mailers.smtp.encryption', $encryption === 'none' ? null : $encryption);
+            Config::set('mail.mailers.smtp.username', $get('username'));
+            Config::set('mail.mailers.smtp.password', $get('password'));
+            Config::set('mail.from.address', $get('from_address') ?? config('mail.from.address'));
+            Config::set('mail.from.name', $get('from_name') ?? $organization->name);
         }
     }
 }

@@ -1,8 +1,8 @@
 <div id="tab-all-tasks" class="tab-view">
     <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
         <div style="display: flex; flex-direction: column; gap: 2px;">
-            <h2 style="font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ula-text-primary); margin: 0;">{{ __('All Tasks & Workflow Board') }}</h2>
-            <span style="font-family: 'IBM Plex Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--ula-text-secondary);">All Tasks &amp; Workflow Board</span>
+            <h2 class="ula-headline-ar" style="font-size: var(--ula-size-h1); margin: 0;">{{ __('page.all_tasks') }}</h2>
+            @if(app()->getLocale() === 'ar')<span class="ula-headline-en" style="font-size: var(--ula-size-h4);">All Tasks &amp; Work Orders</span>@endif
         </div>
         <div style="display: flex; justify-content: flex-end; align-items: center; flex-wrap: wrap; gap: var(--ula-space-4);">
             <div style="display: flex; gap: 4px; background: var(--ula-surface-page-alt); padding: 4px; border-radius: var(--ula-radius-lg); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
@@ -21,77 +21,13 @@
         </div>
     </div>
 
-    <!-- Task KPIs Summary (3D Soft Neumorphic) -->
-    <div class="kpi-grid" style="margin-bottom: var(--ula-space-7); display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--ula-space-5);">
-        <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: var(--ula-space-5); box-shadow: var(--ula-shadow-xs);">
-            <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-3);">
-                <span class="kpi-title" style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary);">{{ __('Total Tasks') }}</span>
-                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: var(--ula-surface-accent-soft); color: var(--ula-accent-default); display: flex; align-items: center; justify-content: center;">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">assignment</span>
-                </div>
-            </div>
-            <div class="kpi-value" id="alltasks-kpi-total" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $tasks->count() }}</div>
-            <div class="kpi-trend" style="color: var(--ula-accent-default); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
-                <span class="material-symbols-rounded" style="font-size: 14px;">folder</span>
-                <span>{{ __('Across active projects') }}</span>
-            </div>
-        </div>
-
-        <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: var(--ula-space-5); box-shadow: var(--ula-shadow-xs);">
-            <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-3);">
-                <span class="kpi-title" style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary);">{{ __('In Progress') }}</span>
-                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(185, 138, 55, 0.12); color: var(--ula-gold-500); display: flex; align-items: center; justify-content: center;">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">bolt</span>
-                </div>
-            </div>
-            <div class="kpi-value" id="alltasks-kpi-in-progress" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $tasks->where('status', 'in_progress')->count() }}</div>
-            <div class="kpi-trend" style="color: var(--ula-gold-500); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
-                <span class="material-symbols-rounded" style="font-size: 14px;">trending_up</span>
-                <span>{{ __('Active work execution') }}</span>
-            </div>
-        </div>
-
-        <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: var(--ula-space-5); box-shadow: var(--ula-shadow-xs);">
-            <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-3);">
-                <span class="kpi-title" style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary);">{{ __('Under Review') }}</span>
-                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(214, 162, 58, 0.12); color: var(--ula-gold-400); display: flex; align-items: center; justify-content: center;">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">pageview</span>
-                </div>
-            </div>
-            <div class="kpi-value" id="alltasks-kpi-review" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $tasks->whereIn('status', ['review', 'qa'])->count() }}</div>
-            <div class="kpi-trend" style="color: var(--ula-gold-400); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
-                <span class="material-symbols-rounded" style="font-size: 14px;">hourglass_top</span>
-                <span>{{ __('Pending QA / signoff') }}</span>
-            </div>
-        </div>
-
-        <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: var(--ula-space-5); box-shadow: var(--ula-shadow-xs);">
-            <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-3);">
-                <span class="kpi-title" style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary);">{{ __('Completed') }}</span>
-                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(79, 155, 95, 0.12); color: var(--ula-status-success); display: flex; align-items: center; justify-content: center;">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">check_circle</span>
-                </div>
-            </div>
-            <div class="kpi-value" id="alltasks-kpi-done" style="font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $tasks->where('status', 'done')->count() }}</div>
-            <div class="kpi-trend" style="color: var(--ula-status-success); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
-                <span class="material-symbols-rounded" style="font-size: 14px;">verified</span>
-                <span>{{ __('Delivered features') }}</span>
-            </div>
-        </div>
-
-        <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: var(--ula-space-5); box-shadow: var(--ula-shadow-xs);">
-            <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-3);">
-                <span class="kpi-title" style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary);">{{ __('Estimated Effort') }}</span>
-                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: var(--ula-surface-accent-soft); color: var(--ula-accent-default); display: flex; align-items: center; justify-content: center;">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">schedule</span>
-                </div>
-            </div>
-            <div class="kpi-value" style="font-size: var(--ula-size-body-lg); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $tasks->sum('estimated_hours') }}h / {{ round($projects->sum(fn($p) => $p->actualHours()), 1) }}h</div>
-            <div class="kpi-trend" style="color: var(--ula-accent-default); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
-                <span class="material-symbols-rounded" style="font-size: 14px;">analytics</span>
-                <span>{{ __('Planned vs Tracked') }}</span>
-            </div>
-        </div>
+    <!-- Task KPIs (x-kpi-card; ids feed the live counters in scripts.blade.php) -->
+    <div class="ula-kpi-row">
+        <x-kpi-card id="alltasks-kpi-total" density="default" icon="assignment" iconColor="emerald" :title="__('Total Tasks')" :value="$tasks->count()" :caption="__('Across active projects')" />
+        <x-kpi-card id="alltasks-kpi-in-progress" density="default" icon="bolt" iconColor="gold" :title="__('In Progress')" :value="$tasks->where('status', 'in_progress')->count()" :caption="__('Active work execution')" />
+        <x-kpi-card id="alltasks-kpi-review" density="default" icon="pageview" iconColor="terracotta" :title="__('Under Review')" :value="$tasks->whereIn('status', ['review', 'qa'])->count()" :caption="__('Pending QA / signoff')" />
+        <x-kpi-card id="alltasks-kpi-done" density="default" icon="check_circle" iconColor="sage" :title="__('Completed')" :value="$tasks->where('status', 'done')->count()" :caption="__('Delivered features')" />
+        <x-kpi-card density="default" icon="schedule" iconColor="muted" :title="__('Estimated Effort')" :value="$tasks->sum('estimated_hours') . 'h'" :caption="__('Planned vs Tracked') . ': ' . round($projects->sum(fn ($p) => $p->actualHours()), 1) . 'h'" />
     </div>
 
     <!-- Filter Toolbar -->

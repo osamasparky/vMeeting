@@ -1,8 +1,8 @@
 <div id="tab-departments" class="tab-view">
     <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
         <div style="display: flex; flex-direction: column; gap: 2px;">
-            <h2 style="font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ula-text-primary); margin: 0;">{{ __('Departments & Teams Structure') }}</h2>
-            <span style="font-family: 'IBM Plex Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--ula-text-secondary);">Departments &amp; Teams Structure</span>
+            <h2 class="ula-headline-ar" style="font-size: var(--ula-size-h1); margin: 0;">{{ __('page.departments') }}</h2>
+            @if(app()->getLocale() === 'ar')<span class="ula-headline-en" style="font-size: var(--ula-size-h4);">Departments &amp; Teams</span>@endif
         </div>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <x-btn variant="primary" size="md" onclick="openDepartmentModal()" icon="add">
@@ -29,7 +29,7 @@
                             </div>
                             <div>
                                 <h3 style="font-size: var(--ula-size-body); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); margin-bottom: 2px;">{{ $dept->name }}</h3>
-                                <span style="font-size: var(--ula-size-xs); color: var(--ula-text-muted); font-weight: var(--ula-weight-semibold); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $dept->teams->count() }} {{ __('Teams') }} • {{ $deptMembers->count() }} {{ __('Members') }}</span>
+                                <span style="font-size: var(--ula-size-xs); color: var(--ula-text-muted); font-weight: var(--ula-weight-semibold); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $dept->teams->count() }} {{ __('Teams') }} · {{ $deptMembers->count() }} {{ __('Members') }}</span>
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 6px;">
@@ -87,7 +87,7 @@
                                         <div>
                                             <span style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary);">{{ $dm->user->name }}</span>
                                             @if($prof?->job_title)
-                                                <span style="font-size: 10px; color: var(--ula-text-muted);"> • {{ $prof->job_title }}</span>
+                                                <span style="font-size: 10px; color: var(--ula-text-muted);"> · {{ $prof->job_title }}</span>
                                             @endif
                                         </div>
                                     </div>

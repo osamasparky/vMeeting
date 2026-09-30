@@ -1,8 +1,8 @@
 <div id="tab-guests" class="tab-view">
     <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
         <div style="display: flex; flex-direction: column; gap: 2px;">
-            <h2 style="font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ula-text-primary); margin: 0;">{{ __('Guest Links & Instant Access') }}</h2>
-            <span style="font-family: 'IBM Plex Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--ula-text-secondary);">Guest Links &amp; Instant Access</span>
+            <h2 class="ula-headline-ar" style="font-size: var(--ula-size-h1); margin: 0;">{{ __('page.guests') }}</h2>
+            @if(app()->getLocale() === 'ar')<span class="ula-headline-en" style="font-size: var(--ula-size-h4);">Guest Meeting Links</span>@endif
         </div>
         <div style="display: flex; justify-content: flex-end; align-items: center; gap: var(--ula-space-4); flex-wrap: wrap;">
             @if($guestInvitations->count() > 0)

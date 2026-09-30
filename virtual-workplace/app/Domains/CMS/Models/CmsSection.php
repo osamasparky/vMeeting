@@ -61,4 +61,25 @@ class CmsSection extends Model
 
         return $locale === 'ar' ? ($this->badge_ar ?: $this->badge_en) : ($this->badge_en ?: $this->badge_ar);
     }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        if ($this->mediaAsset && $this->mediaAsset->file_path) {
+            return asset(ltrim($this->mediaAsset->file_path, '/'));
+        }
+
+        $customImg = $this->content['image_url'] ?? null;
+        if ($customImg) {
+            return str_starts_with($customImg, 'http') ? $customImg : asset(ltrim($customImg, '/'));
+        }
+
+        return null;
+    }
+
+    public function getContentValue(string $key, mixed $default = null): mixed
+    {
+        $content = $this->content ?? [];
+
+        return data_get($content, $key, $default);
+    }
 }

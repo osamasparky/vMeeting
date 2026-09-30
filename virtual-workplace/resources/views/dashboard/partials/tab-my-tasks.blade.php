@@ -1,8 +1,8 @@
 <div id="tab-my-tasks" class="tab-view">
     <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
         <div style="display: flex; flex-direction: column; gap: 2px;">
-            <h2 style="font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ula-text-primary); margin: 0;">{{ __('My Assigned Tasks & Kanban') }}</h2>
-            <span style="font-family: 'IBM Plex Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--ula-text-secondary);">My Assigned Tasks &amp; Kanban</span>
+            <h2 class="ula-headline-ar" style="font-size: var(--ula-size-h1); margin: 0;">{{ __('page.my_tasks') }}</h2>
+            @if(app()->getLocale() === 'ar')<span class="ula-headline-en" style="font-size: var(--ula-size-h4);">My Tasks &amp; Action Items</span>@endif
         </div>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
             <x-btn variant="primary" size="md" onclick="openNewTaskModal()" icon="add">
@@ -12,7 +12,8 @@
     </div>
 
     <!-- Task Status Columns Grid (5-Column Kanban matching All Tasks) -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--ula-space-5);">
+    <div class="ula-kanban-5">
+
         @php
             $myKanbanCols = [
                 'backlog' => ['title' => __('Backlog'), 'icon' => 'inventory_2', 'color' => 'var(--ula-text-secondary)', 'border' => 'var(--ula-border-subtle)'],

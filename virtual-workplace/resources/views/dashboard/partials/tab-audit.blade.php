@@ -1,8 +1,8 @@
 <div id="tab-audit" class="tab-view">
     <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
         <div style="display: flex; flex-direction: column; gap: 2px;">
-            <h2 style="font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ula-text-primary); margin: 0;">{{ __('Security Audit Trail & Compliance Logs') }}</h2>
-            <span style="font-family: 'IBM Plex Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--ula-text-secondary);">Security Audit Trail &amp; Compliance Logs</span>
+            <h2 class="ula-headline-ar" style="font-size: var(--ula-size-h1); margin: 0;">{{ __('page.audit') }}</h2>
+            @if(app()->getLocale() === 'ar')<span class="ula-headline-en" style="font-size: var(--ula-size-h4);">Audit Logs</span>@endif
         </div>
         @if($auditLogs->count() > 0)
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
@@ -37,13 +37,37 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @php
+                        $auditUserNames = $members->mapWithKeys(fn ($m) => [$m->user_id => $m->user->name ?? null])->filter();
+                    @endphp
                     @forelse($auditLogs as $log)
+                        @php
+                            // Tone by verb: removals warn, creations confirm, edits notice (design-reference 20).
+                            $auditVerb = \Illuminate\Support\Str::afterLast($log->action, '.');
+                            $auditTone = match (true) {
+                                in_array($auditVerb, ['deleted', 'leave', 'company_status_toggled']) => 'terracotta',
+                                in_array($auditVerb, ['created', 'enter']) => 'palm',
+                                in_array($auditVerb, ['updated', 'company_plan_updated']) => 'gold',
+                                default => 'stone',
+                            };
+                            $auditActionKey = 'audit.' . $log->action;
+                            $auditActionLabel = __($auditActionKey) === $auditActionKey ? \Illuminate\Support\Str::headline($log->action) : __($auditActionKey);
+                            $auditUserName = $auditUserNames[$log->user_id] ?? ($log->user_id ? __('Member') : __('audit.system'));
+                        @endphp
                         <tr style="border-bottom: 1px solid var(--ula-border-subtle);">
                             <td style="padding: 14px 16px;">
-                                <span class="nav-badge-pill" style="background: var(--ula-surface-accent-soft); color: var(--ula-accent-default); font-weight: var(--ula-weight-bold); font-size: 11px;">{{ $log->action }}</span>
+                                <span class="ula-hub-tag ula-hub-tag--{{ $auditTone }}">{{ $auditActionLabel }}</span>
                             </td>
-                            <td style="padding: 14px 16px; font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-size: var(--ula-size-sm);">{{ class_basename($log->auditable_type) }}</td>
-                            <td style="padding: 14px 16px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: var(--ula-size-xs); color: var(--ula-text-primary);">{{ substr($log->user_id ?? 'System', 0, 8) }}</td>
+                            @php
+                                $auditType = $log->auditable_type ? class_basename($log->auditable_type) : null;
+                                $auditTypeKey = 'audit.type.' . $auditType;
+                            @endphp
+                            <td style="padding: 14px 16px; font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); font-size: var(--ula-size-sm);">{{ $auditType ? (__($auditTypeKey) === $auditTypeKey ? \Illuminate\Support\Str::headline($auditType) : __($auditTypeKey)) : '—' }}</td>
+                            <td style="padding: 14px 16px; font-size: var(--ula-size-sm); color: var(--ula-text-primary);">
+                                <span style="display: inline-flex; align-items: center; gap: var(--ula-space-3);">
+                                    <span class="ula-hub-avatar" aria-hidden="true">{{ mb_substr($auditUserName, 0, 1) }}</span>{{ $auditUserName }}
+                                </span>
+                            </td>
                             <td style="padding: 14px 16px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: var(--ula-size-xs); color: var(--ula-text-muted);">{{ $log->ip_address ?? '127.0.0.1' }}</td>
                             <td style="padding: 14px 16px; font-size: var(--ula-size-xs); color: var(--ula-text-muted); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $log->created_at->format('Y-m-d H:i:s') }}</td>
                         </tr>

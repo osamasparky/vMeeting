@@ -4,8 +4,8 @@
             <!-- Header Toolbar -->
             <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
                 <div style="display: flex; flex-direction: column; gap: 2px;">
-                    <h2 style="font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ula-text-primary); margin: 0;">{{ __('Meeting Rooms & Spatial Office Distribution') }}</h2>
-                    <span style="font-family: 'IBM Plex Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--ula-text-secondary);">Meeting Rooms &amp; Spatial Office Distribution</span>
+                    <h2 class="ula-headline-ar" style="font-size: var(--ula-size-h1); margin: 0;">{{ __('page.rooms') }}</h2>
+                    @if(app()->getLocale() === 'ar')<span class="ula-headline-en" style="font-size: var(--ula-size-h4);">Meeting Rooms &amp; Spatial Office Distribution</span>@endif
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <x-btn variant="outline" size="md" href="{{ route('editor') }}" icon="auto_awesome">
@@ -21,76 +21,12 @@
             </div>
 
             <!-- Top Metric Stats Cards -->
-            <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 16px; margin-bottom: 24px;">
-                <!-- Total Rooms -->
-                <div class="kpi-card" style="padding: 18px; border-radius: var(--ula-radius-xl); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
-                    <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
-                        <span style="font-size: 14px; font-weight: 600; color: var(--ula-text-secondary);">{{ __('Total Configured Rooms') }}</span>
-                        <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: 999px; background: var(--ula-control-tone-palm-fill); color: var(--ula-palm-700); display: inline-flex; align-items: center; justify-content: center;">
-                            <span class="material-symbols-rounded" style="font-size: 18px;">meeting_room</span>
-                        </span>
-                    </div>
-                    <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
-                        <span style="font-size: 32px; font-weight: 400; line-height: 1.1; font-family: 'IBM Plex Mono', monospace;">{{ $rooms->count() }}</span>
-                        <span style="font-size: 12px; color: var(--ula-text-muted);">{{ __('Across all office branches') }}</span>
-                    </div>
-                </div>
-
-                <!-- Active Branches -->
-                <div class="kpi-card" style="padding: 18px; border-radius: var(--ula-radius-xl); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
-                    <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
-                        <span style="font-size: 14px; font-weight: 600; color: var(--ula-text-secondary);">{{ __('Workplace Branches') }}</span>
-                        <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: 999px; background: var(--ula-control-tone-gold-fill); color: var(--ula-gold-700); display: inline-flex; align-items: center; justify-content: center;">
-                            <span class="material-symbols-rounded" style="font-size: 18px;">apartment</span>
-                        </span>
-                    </div>
-                    <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
-                        <span style="font-size: 32px; font-weight: 400; line-height: 1.1; font-family: 'IBM Plex Mono', monospace;">{{ $offices->count() }}</span>
-                        <span style="font-size: 12px; color: var(--ula-text-muted);">{{ __('Physical & virtual locations') }}</span>
-                    </div>
-                </div>
-
-                <!-- Seating Capacity -->
-                <div class="kpi-card" style="padding: 18px; border-radius: var(--ula-radius-xl); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
-                    <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
-                        <span style="font-size: 14px; font-weight: 600; color: var(--ula-text-secondary);">{{ __('Total Seating Capacity') }}</span>
-                        <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: 999px; background: var(--ula-surface-page-alt); color: var(--ula-text-primary); display: inline-flex; align-items: center; justify-content: center;">
-                            <span class="material-symbols-rounded" style="font-size: 18px;">chair</span>
-                        </span>
-                    </div>
-                    <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
-                        <span style="font-size: 32px; font-weight: 400; line-height: 1.1; font-family: 'IBM Plex Mono', monospace;">{{ $rooms->sum('capacity') }}</span>
-                        <span style="font-size: 12px; color: var(--ula-text-muted);">{{ __('Simultaneous room seats') }}</span>
-                    </div>
-                </div>
-
-                <!-- Public / Open Rooms -->
-                <div class="kpi-card" style="padding: 18px; border-radius: var(--ula-radius-xl); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
-                    <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
-                        <span style="font-size: 14px; font-weight: 600; color: var(--ula-text-secondary);">{{ __('Open Access Rooms') }}</span>
-                        <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: 999px; background: var(--ula-control-tone-palm-fill); color: var(--ula-palm-700); display: inline-flex; align-items: center; justify-content: center;">
-                            <span class="material-symbols-rounded" style="font-size: 18px;">lock_open</span>
-                        </span>
-                    </div>
-                    <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
-                        <span style="font-size: 32px; font-weight: 400; line-height: 1.1; font-family: 'IBM Plex Mono', monospace;">{{ $rooms->where('access_mode', '!=', 'private')->count() }}</span>
-                        <span style="font-size: 12px; color: var(--ula-status-success);">{{ __('Public & walk-in spaces') }}</span>
-                    </div>
-                </div>
-
-                <!-- Private / Locked Rooms -->
-                <div class="kpi-card" style="padding: 18px; border-radius: var(--ula-radius-xl); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
-                    <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
-                        <span style="font-size: 14px; font-weight: 600; color: var(--ula-text-secondary);">{{ __('Private & Locked') }}</span>
-                        <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: 999px; background: var(--ula-control-tone-terracotta-fill); color: var(--ula-terracotta-700); display: inline-flex; align-items: center; justify-content: center;">
-                            <span class="material-symbols-rounded" style="font-size: 18px;">lock</span>
-                        </span>
-                    </div>
-                    <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
-                        <span style="font-size: 32px; font-weight: 400; line-height: 1.1; font-family: 'IBM Plex Mono', monospace;">{{ $rooms->where('access_mode', 'private')->count() }}</span>
-                        <span style="font-size: 12px; color: var(--ula-status-danger);">{{ __('Knock-to-enter access') }}</span>
-                    </div>
-                </div>
+            <div class="ula-kpi-row">
+                <x-kpi-card density="default" icon="meeting_room" iconColor="sage" :title="__('Total Configured Rooms')" :value="$rooms->count()" :caption="__('Across all office branches')" />
+                <x-kpi-card density="default" icon="apartment" iconColor="gold" :title="__('Workplace Branches')" :value="$offices->count()" :caption="__('Physical & virtual locations')" />
+                <x-kpi-card density="default" icon="chair" iconColor="muted" :title="__('Total Seating Capacity')" :value="$rooms->sum('capacity')" :caption="__('Simultaneous room seats')" />
+                <x-kpi-card density="default" icon="lock_open" iconColor="sage" :title="__('Open Access Rooms')" :value="$rooms->where('access_mode', '!=', 'private')->count()" :caption="__('Public & walk-in spaces')" />
+                <x-kpi-card density="default" icon="lock" iconColor="terracotta" :title="__('Private & Locked')" :value="$rooms->where('access_mode', 'private')->count()" :caption="__('Knock-to-enter access')" />
             </div>
 
             <!-- Smart Office / Branch Navigation Tabs & Filter Ribbon -->

@@ -66,11 +66,11 @@
                                 <span>{{ $comp->name }}</span>
                             </strong>
                         </a>
-                        <div style="font-size: 11px; color: var(--ula-text-muted); font-family: 'IBM Plex Mono', monospace; margin-inline-start: 38px;">{{ $comp->slug }}</div>
+                        <div style="font-size: 11px; color: var(--ula-text-muted); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; white-space: nowrap; margin-inline-start: 38px;">{{ $comp->slug }}</div>
                     </td>
                     <td style="padding: 14px 20px;">
                         <div style="font-weight: 700; color: var(--ula-text-primary); font-size: 13px;">{{ $owner?->name ?? 'Administrator' }}</div>
-                        <div style="font-size: 11px; color: var(--ula-text-muted); font-family: 'IBM Plex Mono', monospace;">{{ $owner?->email }}</div>
+                        <div style="font-size: 11px; color: var(--ula-text-muted); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; white-space: nowrap;">{{ $owner?->email }}</div>
                     </td>
                     <td style="padding: 14px 20px;">
                         <span class="badge-status badge-plan" style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 8px; border-radius: 6px; background: rgba(211,165,83,0.12); color: var(--ula-gold-600); font-weight: 700;">

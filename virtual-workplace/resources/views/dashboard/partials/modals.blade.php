@@ -724,9 +724,9 @@
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; font-size: 12px; color: var(--ula-text-secondary);">
                             <span id="mp-job-title" style="font-weight: 700; color: var(--ula-text-primary);">Senior Engineer</span>
-                            <span>•</span>
+                            <span>·</span>
                             <span id="mp-dept-team">Engineering Team</span>
-                            <span>•</span>
+                            <span>·</span>
                             <span id="mp-work-mode" class="nav-badge-pill" style="font-size: 10px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">home</span> Remote</span>
                         </div>
                     </div>
@@ -981,7 +981,7 @@
                             <button type="button" onclick="copyModalGuestLink(this)" id="btn-copy-link" style="flex: 1; background: var(--ula-palm-900); color: white; font-weight: 700; border: none; border-radius: 6px; padding: 8px; cursor: pointer; font-size: 12px;">
                                 <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">checklist</span> {{ __('Copy Link') }}
                             </button>
-                            <a id="guest-open-link" href="#" target="_blank" style="background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); color: var(--ula-text-primary); font-weight: 700; text-decoration: none; border-radius: 6px; padding: 8px 12px; font-size: 12px; display: flex; align-items: center;">
+                            <a id="guest-open-link" href="javascript:void(0)" target="_blank" style="background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); color: var(--ula-text-primary); font-weight: 700; text-decoration: none; border-radius: 6px; padding: 8px 12px; font-size: 12px; display: flex; align-items: center;">
                                 <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">visibility</span> {{ __('Open') }}
                             </a>
                         </div>
@@ -1483,7 +1483,7 @@
                             <span id="mp-status-pill" class="nav-badge-pill" style="font-size: 11px;">Active</span>
                         </div>
                         <div id="mp-sub" style="font-size: 12px; color: var(--ula-text-muted); margin-top: 2px;">
-                            Role • Department • Job Title
+                            Role · Department · Job Title
                         </div>
                     </div>
                 </div>

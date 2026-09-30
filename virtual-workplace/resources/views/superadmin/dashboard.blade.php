@@ -4,262 +4,157 @@
 @section('page_title', __('Dashboard'))
 
 @section('content')
-<!-- Header Welcome & Live Health Status -->
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 14px;">
-    <div>
-        <h2 style="font-size: 22px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 4px; display: flex; align-items: center; gap: 8px;">
-            <span class="material-symbols-rounded" style="color: var(--ula-palm-700); font-size: 26px;">analytics</span>
-            <span>{{ __('Platform Overview & SaaS Metrics') }}</span>
-        </h2>
-        <p style="font-size: 13px; color: var(--ula-text-secondary);">
-            {{ __('Real-time multi-tenant health, subscription revenues, and spatial collaboration indicators.') }}
-        </p>
+@php
+    // design-reference "Screen 48 - Super Admin Dashboard"
+    $compact = function ($n) {
+        $n = (float) $n;
+        if (abs($n) >= 1000000) return rtrim(rtrim(number_format($n / 1000000, 1), '0'), '.') . 'M';
+        if (abs($n) >= 1000) return round($n / 1000) . 'K';
+        return number_format($n);
+    };
+    $avgUsers = $stats['total_companies'] > 0 ? round($stats['total_users'] / $stats['total_companies'], 1) : 0;
+    $freeTier = $stats['total_companies'] - $stats['active_subscriptions'];
+
+    // Plan tiers, cheapest first, each with a tone for the stacked bar and legend.
+    $planTones = ['var(--ula-tone-stone-dot)', 'var(--ula-tone-gold-dot)', 'var(--ula-tone-palm-dot)', 'var(--ula-accent-default)'];
+    $planRows = $plans->sortBy('price')->values()->map(function ($plan, $i) use ($stats, $planTones) {
+        return [
+            'name' => $plan->name,
+            'count' => $plan->organizations_count,
+            'pct' => $stats['total_companies'] > 0 ? round($plan->organizations_count / $stats['total_companies'] * 100) : 0,
+            'color' => $planTones[$i % count($planTones)],
+        ];
+    });
+
+    // Audit action → icon + tone (removals warn, upgrades notice, creations/entries confirm).
+    $auditIcon = function (string $action) {
+        $verb = \Illuminate\Support\Str::afterLast($action, '.');
+        return match (true) {
+            in_array($verb, ['deleted', 'leave', 'company_status_toggled']) => ['block', 'terracotta'],
+            in_array($verb, ['company_plan_updated']) => ['upgrade', 'gold'],
+            in_array($verb, ['enter', 'company_impersonated']) => ['login', 'palm'],
+            in_array($verb, ['created']) || str_ends_with($action, '.created') => ['person_add', 'palm'],
+            default => ['key', 'stone'],
+        };
+    };
+@endphp
+
+<!-- Page header -->
+<div class="sa-page-head">
+    <div class="ula-headline-group" style="gap: 2px;">
+        <span style="font-size: var(--ula-size-xs); color: var(--ula-text-secondary);">{{ __('sa.crumb_dashboard') }}</span>
+        <h2 class="ula-headline-ar" style="margin: 0; font-size: var(--ula-size-h1);">{{ __('sa.dashboard_title') }}</h2>
+        @if(app()->getLocale() === 'ar')
+            <span class="ula-headline-en" style="font-size: var(--ula-size-h4);">Platform Overview &amp; SaaS Metrics</span>
+        @endif
     </div>
-    <div style="display: flex; align-items: center; gap: 10px;">
-        <span class="badge-status badge-active" style="padding: 6px 14px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
-            <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-status-success);">check_circle</span>
-            <span>{{ __('System Normal & All Nodes Live') }}</span>
-        </span>
-        <a href="{{ route('superadmin.companies') }}" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;">
-            <span class="material-symbols-rounded" style="font-size: 16px;">domain</span>
-            <span>{{ __('Manage Companies') }}</span>
-        </a>
+    <div class="sa-page-actions">
+        <span class="badge-status badge-active"><span class="ula-hub-tag-dot"></span>{{ __('sa.system_running') }}</span>
+        <x-btn variant="primary" size="md" icon="domain" :href="route('superadmin.companies')">{{ __('Manage Companies') }}</x-btn>
     </div>
 </div>
 
-<!-- Primary SaaS Growth & Revenue Metrics (Tier 1 KPI) -->
-<div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; margin-bottom: 20px;">
-    <!-- Total Companies -->
-    <div class="kpi-card" style="border-radius: var(--ula-radius-xl); padding: 22px; position: relative; overflow: hidden;">
-        <div class="kpi-icon" style="background: rgba(30, 65, 47, 0.12); color: var(--ula-status-success); font-size: 22px; display: flex; align-items: center; justify-content: center;">
-            <span class="material-symbols-rounded">domain</span>
-        </div>
-        <div class="kpi-info" style="flex: 1;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3>{{ __('Total Companies') }}</h3>
-                <span class="nav-badge-pill" style="font-size: 10px; color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
-                    +{{ $stats['new_companies_month'] }} {{ __('this mo') }}
-                </span>
-            </div>
-            <div class="kpi-value" style="margin: 4px 0; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['total_companies'] }}</div>
-            <div style="font-size: 11px; color: var(--ula-text-muted); display: flex; gap: 8px;">
-                <span style="color: var(--ula-status-success); font-weight: 700; display: inline-flex; align-items: center; gap: 3px;">
-                    <span class="material-symbols-rounded" style="font-size: 14px;">check_circle</span>
-                    <span>{{ $stats['active_companies'] }} {{ __('Active') }}</span>
-                </span>
-                @if($stats['suspended_companies'] > 0)
-                    <span style="color: var(--ula-status-danger); font-weight: 700; display: inline-flex; align-items: center; gap: 3px;">
-                        <span class="material-symbols-rounded" style="font-size: 14px;">block</span>
-                        <span>{{ $stats['suspended_companies'] }} {{ __('Suspended') }}</span>
-                    </span>
-                @endif
-            </div>
-        </div>
-    </div>
-
-    <!-- Total Users -->
-    <div class="kpi-card" style="border-radius: var(--ula-radius-xl); padding: 22px; position: relative; overflow: hidden;">
-        <div class="kpi-icon" style="background: rgba(60, 107, 76, 0.12); color: var(--ula-status-success); font-size: 22px; display: flex; align-items: center; justify-content: center;">
-            <span class="material-symbols-rounded">group</span>
-        </div>
-        <div class="kpi-info" style="flex: 1;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3>{{ __('Total Users') }}</h3>
-                <span class="nav-badge-pill" style="font-size: 10px; color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
-                    +{{ $stats['new_users_month'] }} {{ __('new') }}
-                </span>
-            </div>
-            <div class="kpi-value" style="margin: 4px 0; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['total_users'] }}</div>
-            <div style="font-size: 11px; color: var(--ula-text-muted); font-weight: 700;">
-                <span style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['total_companies'] > 0 ? round($stats['total_users'] / $stats['total_companies'], 1) : 0 }}</span> {{ __('avg users / tenant') }}
-            </div>
-        </div>
-    </div>
-
-    <!-- Active Subscriptions -->
-    <div class="kpi-card" style="border-radius: var(--ula-radius-xl); padding: 22px; position: relative; overflow: hidden;">
-        <div class="kpi-icon" style="background: rgba(211, 165, 83, 0.15); color: var(--ula-gold-400); font-size: 22px; display: flex; align-items: center; justify-content: center;">
-            <span class="material-symbols-rounded">workspace_premium</span>
-        </div>
-        <div class="kpi-info" style="flex: 1;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3>{{ __('Paid Subscriptions') }}</h3>
-                <span class="nav-badge-pill" style="font-size: 10px; color: var(--ula-gold-400); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
-                    {{ $stats['conversion_rate'] }}% {{ __('Paid') }}
-                </span>
-            </div>
-            <div class="kpi-value" style="margin: 4px 0; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['active_subscriptions'] }}</div>
-            <div style="font-size: 11px; color: var(--ula-text-muted); font-weight: 700;">
-                <span style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['total_companies'] - $stats['active_subscriptions'] }}</span> {{ __('Free / Starter tier') }}
-            </div>
-        </div>
-    </div>
-
-    <!-- Monthly Recurring Revenue (MRR) -->
-    <div class="kpi-card" style="border-radius: var(--ula-radius-xl); padding: 22px; position: relative; overflow: hidden; border-inline-start: 4px solid var(--ula-palm-900);">
-        <div class="kpi-icon" style="background: rgba(30, 65, 47, 0.15); color: var(--ula-status-success); font-size: 22px; display: flex; align-items: center; justify-content: center;">
-            <span class="material-symbols-rounded">payments</span>
-        </div>
-        <div class="kpi-info" style="flex: 1;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h3>{{ __('Estimated MRR') }}</h3>
-                <span class="nav-badge-pill" style="font-size: 10px; color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
-                    ${{ number_format($stats['estimated_arr'], 0) }} {{ __('ARR') }}
-                </span>
-            </div>
-            <div class="kpi-value" style="margin: 4px 0; color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
-                ${{ number_format($stats['estimated_mrr'], 2) }}
-            </div>
-            <div style="font-size: 11px; color: var(--ula-text-secondary); font-weight: 700;">
-                ≈ <span style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ number_format($stats['estimated_mrr_sar'], 2) }}</span> SAR / {{ __('month') }}
-            </div>
-        </div>
-    </div>
+<!-- KPIs -->
+<div class="sa-kpi-grid">
+    <x-kpi-card icon="domain" iconColor="sage" :title="__('Total Companies')" :value="number_format($stats['total_companies'])">
+        <x-kpi-chip tone="palm" :n="'+' . $stats['new_companies_month']">{{ __('sa.chip_this_month') }}</x-kpi-chip>
+        <x-kpi-chip :n="$stats['active_companies']">{{ __('sa.chip_active') }}</x-kpi-chip>
+        @if($stats['suspended_companies'] > 0)
+            <x-kpi-chip tone="terracotta" :n="$stats['suspended_companies']">{{ __('sa.chip_suspended') }}</x-kpi-chip>
+        @endif
+    </x-kpi-card>
+    <x-kpi-card icon="group" iconColor="gold" :title="__('Total Users')" :value="number_format($stats['total_users'])">
+        <x-kpi-chip tone="palm" :n="'+' . $stats['new_users_month']">{{ __('sa.chip_new') }}</x-kpi-chip>
+        <x-kpi-chip :n="$avgUsers">{{ __('sa.chip_avg_per_company') }}</x-kpi-chip>
+    </x-kpi-card>
+    <x-kpi-card icon="workspace_premium" iconColor="sage" :title="__('Paid Subscriptions')" :value="number_format($stats['active_subscriptions'])">
+        <x-kpi-chip tone="palm" :n="$stats['active_subscriptions']">{{ __('sa.chip_paid') }}</x-kpi-chip>
+        <x-kpi-chip :n="$freeTier">{{ __('sa.chip_free_tier') }}</x-kpi-chip>
+    </x-kpi-card>
+    <x-kpi-card icon="payments" iconColor="gold" :title="__('sa.mrr_title')" :value="'SAR ' . number_format($stats['estimated_mrr_sar'])">
+        <x-kpi-chip tone="gold" :n="'SAR ' . $compact($stats['estimated_mrr_sar'] * 12)">{{ __('sa.chip_yearly') }}</x-kpi-chip>
+    </x-kpi-card>
 </div>
 
-<!-- Secondary Platform Activity & Spatial Health KPI Grid (Tier 2 KPI) -->
-<div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 28px;">
-    <div class="kpi-card" style="padding: 16px 18px; border-radius: var(--ula-radius-lg);">
-        <div class="kpi-icon" style="width: 40px; height: 40px; font-size: 18px; display: flex; align-items: center; justify-content: center;">
-            <span class="material-symbols-rounded">door_front</span>
-        </div>
-        <div class="kpi-info">
-            <h3 style="font-size: 11px;">{{ __('Meeting Rooms') }}</h3>
-            <div class="kpi-value" style="font-size: 19px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['total_rooms'] }}</div>
-        </div>
-    </div>
-
-    <div class="kpi-card" style="padding: 16px 18px; border-radius: var(--ula-radius-lg);">
-        <div class="kpi-icon" style="width: 40px; height: 40px; font-size: 18px; display: flex; align-items: center; justify-content: center;">
-            <span class="material-symbols-rounded">folder</span>
-        </div>
-        <div class="kpi-info">
-            <h3 style="font-size: 11px;">{{ __('Total Projects') }}</h3>
-            <div class="kpi-value" style="font-size: 19px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['total_projects'] }}</div>
-        </div>
-    </div>
-
-    <div class="kpi-card" style="padding: 16px 18px; border-radius: var(--ula-radius-lg);">
-        <div class="kpi-icon" style="width: 40px; height: 40px; font-size: 18px; display: flex; align-items: center; justify-content: center;">
-            <span class="material-symbols-rounded">schedule</span>
-        </div>
-        <div class="kpi-info">
-            <h3 style="font-size: 11px;">{{ __('Logged Hours') }}</h3>
-            <div class="kpi-value" style="font-size: 19px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['total_logged_hours'] }}h</div>
-        </div>
-    </div>
-
-    <div class="kpi-card" style="padding: 16px 18px; border-radius: var(--ula-radius-lg);">
-        <div class="kpi-icon" style="width: 40px; height: 40px; font-size: 18px; display: flex; align-items: center; justify-content: center;">
-            <span class="material-symbols-rounded">security</span>
-        </div>
-        <div class="kpi-info">
-            <h3 style="font-size: 11px;">{{ __('Audit Events') }}</h3>
-            <div class="kpi-value" style="font-size: 19px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['total_audit_events'] }}</div>
-        </div>
-    </div>
+<!-- Secondary stats -->
+<div class="sa-kpi-grid">
+    <x-stat-card icon="meeting_room" :label="__('Meeting Rooms')" :value="number_format($stats['total_rooms'])" />
+    <x-stat-card icon="folder_copy" :label="__('Total Projects')" :value="number_format($stats['total_projects'])" />
+    <x-stat-card icon="schedule" :label="__('Logged Hours')" :value="number_format($stats['total_logged_hours']) . 'h'" />
+    <x-stat-card icon="policy" :label="__('Audit Events')" :value="number_format($stats['total_audit_events'])" />
 </div>
 
-<!-- Plan Distribution & Live Platform Activity -->
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 24px; margin-bottom: 28px;">
-    <!-- Subscription Plan Distribution -->
-    <div class="panel-card" style="margin-bottom: 0; display: flex; flex-direction: column; justify-content: space-between;">
-        <div>
-            <div class="panel-header" style="margin-bottom: 16px; padding-bottom: 12px;">
-                <div class="panel-title" style="display: flex; align-items: center; gap: 8px;">
-                    <span class="material-symbols-rounded" style="color: var(--ula-gold-400);">workspace_premium</span>
-                    <span>{{ __('Plan Tiers Distribution') }}</span>
+<!-- Plans + audit -->
+<div class="sa-split">
+    <section class="sa-card">
+        <div class="sa-card-head">
+            <div class="ula-headline-group" style="gap: 0;">
+                <h3 class="sa-card-title">{{ __('sa.plans_title') }}</h3>
+                @if(app()->getLocale() === 'ar')<span class="ula-headline-en" style="font-size: var(--ula-size-sm);">Plan Tiers Distribution</span>@endif
+            </div>
+            <a href="{{ route('superadmin.plans') }}" class="sa-link">{{ __('Manage Plans') }}</a>
+        </div>
+        <div class="sa-stackbar" role="img" aria-label="{{ __('sa.plans_title') }}">
+            @foreach($planRows as $row)
+                @if($row['pct'] > 0)<span style="width: {{ $row['pct'] }}%; background: {{ $row['color'] }};"></span>@endif
+            @endforeach
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            @foreach($planRows as $row)
+                <div class="sa-legend-row">
+                    <span class="sa-legend-dot" style="background: {{ $row['color'] }};"></span>
+                    <span style="flex: 1; font-size: var(--ula-size-body);">{{ $row['name'] }}</span>
+                    <span class="sa-num" style="font-size: 14px;">{{ $row['count'] }}</span>
+                    <span class="sa-num" style="width: 48px; text-align: start; font-size: var(--ula-size-sm); color: var(--ula-text-muted);">{{ $row['pct'] }}%</span>
                 </div>
-                <a href="{{ route('superadmin.plans') }}" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 11px; text-decoration: none;">
-                    {{ __('Manage Plans') }}
-                </a>
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 14px;">
-                @foreach($plans as $plan)
-                @php
-                    $percentage = $stats['total_companies'] > 0 ? round(($plan->organizations_count / $stats['total_companies']) * 100, 1) : 0;
-                @endphp
-                <div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 13px;">
-                        <span style="font-weight: 700; color: var(--ula-text-primary); display: inline-flex; align-items: center; gap: 6px;">
-                            <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-palm-700);">verified</span>
-                            <span>{{ $plan->name }} (<span style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">${{ number_format($plan->price, 0) }}/mo</span>)</span>
-                        </span>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <span style="font-weight: 800; color: var(--ula-text-primary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $plan->organizations_count }}</span>
-                            <span style="font-size: 11px; color: var(--ula-text-muted); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">({{ $percentage }}%)</span>
-                        </div>
-                    </div>
-                    <div style="width: 100%; height: 8px; background: var(--ula-surface-page-alt); border-radius: 9999px; overflow: hidden; border: 1px solid var(--ula-border-subtle);">
-                        <div style="width: {{ max($percentage, 3) }}%; height: 100%; background: var(--ula-gradient-accent); border-radius: 9999px; transition: width 0.4s ease;"></div>
-                    </div>
-                </div>
-                @endforeach
-            </div>
+            @endforeach
         </div>
-
-        <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; font-size: 12px;">
-            <span style="color: var(--ula-text-secondary); font-weight: 600;">{{ __('Total Active Tenants') }}:</span>
-            <strong style="color: var(--ula-text-primary); font-size: 14px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $stats['total_companies'] }} {{ __('Organizations') }}</strong>
+        <div class="sa-card-foot">
+            {{ __('sa.active_tenants') }}
+            <span class="sa-num" style="font-size: 17px; color: var(--ula-text-primary);">{{ $stats['active_companies'] }}</span>
         </div>
-    </div>
+    </section>
 
-    <!-- Live Platform Activity Logs -->
-    <div class="panel-card" style="margin-bottom: 0;">
-        <div class="panel-header" style="margin-bottom: 16px; padding-bottom: 12px;">
-            <div class="panel-title" style="display: flex; align-items: center; gap: 8px;">
-                <span class="material-symbols-rounded" style="color: var(--ula-text-primary);">security</span>
-                <span>{{ __('Live Security & Audit Trail') }}</span>
+    <section class="sa-card" style="gap: 14px;">
+        <div class="sa-card-head">
+            <div class="ula-headline-group" style="gap: 0;">
+                <h3 class="sa-card-title">{{ __('sa.audit_title') }}</h3>
+                @if(app()->getLocale() === 'ar')<span class="ula-headline-en" style="font-size: var(--ula-size-sm);">Live Security &amp; Audit Trail</span>@endif
             </div>
-            <span class="nav-badge-pill" style="font-size: 10px;">{{ __('Latest Events') }}</span>
+            <span class="badge-status">{{ __('Latest Events') }}</span>
         </div>
-
-        <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; flex-direction: column;">
             @forelse($recentAuditLogs as $log)
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--ula-surface-page-alt); border-radius: var(--ula-radius-sm); border: 1px solid var(--ula-border-subtle); font-size: 12px;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span class="material-symbols-rounded" style="font-size: 18px; color: var(--ula-text-primary);">bolt</span>
-                    <div>
-                        <div style="font-weight: 700; color: var(--ula-text-primary);">
-                            {{ $log->actor?->name ?? 'System' }}
-                            <span style="font-weight: 500; color: var(--ula-text-muted); font-size: 11px;">
-                                ({{ $log->action }})
-                            </span>
-                        </div>
-                        <div style="font-size: 10px; color: var(--ula-text-muted);">
-                            {{ $log->organization?->name ?? 'Global Platform' }}
-                        </div>
+                @php
+                    [$aIcon, $aTone] = $auditIcon($log->action);
+                    $aKey = 'audit.' . $log->action;
+                    $aLabel = __($aKey) === $aKey ? \Illuminate\Support\Str::headline($log->action) : __($aKey);
+                @endphp
+                <div class="sa-feed-row">
+                    <span class="sa-tile sa-tile--{{ $aTone }}"><span class="material-symbols-rounded" aria-hidden="true">{{ $aIcon }}</span></span>
+                    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+                        <span style="font-size: 14px; font-weight: var(--ula-weight-medium);">{{ $aLabel }}</span>
+                        <span style="font-size: var(--ula-size-xs); color: var(--ula-text-muted);">{{ $log->actor?->name ?? __('audit.system') }} · {{ $log->organization?->name ?? __('sa.platform') }}</span>
                     </div>
+                    <span class="sa-num" style="font-size: var(--ula-size-xs); color: var(--ula-text-muted);">{{ $log->created_at?->format('H:i') }}</span>
                 </div>
-                <div style="font-size: 10px; color: var(--ula-text-muted); font-weight: 600; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
-                    {{ $log->created_at?->diffForHumans() }}
-                </div>
-            </div>
             @empty
-            <div style="text-align: center; color: var(--ula-text-muted); padding: 24px; font-size: 13px;">
-                {{ __('No recent audit logs recorded.') }}
-            </div>
+                <div class="sa-empty">{{ __('No recent audit logs recorded.') }}</div>
             @endforelse
         </div>
-    </div>
+    </section>
 </div>
 
-<!-- Pending Subscription Approvals Alert Panel -->
-@if(isset($pendingSubscriptionRequests) && $pendingSubscriptionRequests->count() > 0)
-<div class="panel-card" style="border: 2px solid var(--ula-gold-400); background: var(--ula-surface-card); margin-bottom: 28px;">
-    <div class="panel-header" style="border-bottom: 1px solid rgba(211, 165, 83, 0.3); padding-bottom: 14px; margin-bottom: 16px;">
-        <div class="panel-title" style="color: var(--ula-gold-400); display: flex; align-items: center; gap: 8px;">
-            <span class="material-symbols-rounded">hourglass_top</span>
-            <span>{{ __('Pending Subscription Approvals') }} ({{ $stats['pending_subscriptions_count'] ?? $pendingSubscriptionRequests->count() }})</span>
+<!-- Pending approvals -->
+<section class="sa-card sa-card--table">
+    <div class="sa-card-head sa-card-head--padded">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <h3 class="sa-card-title">{{ __('Pending Subscription Approvals') }}</h3>
+            <x-kpi-chip tone="gold" :n="$pendingSubscriptionRequests->count()">{{ __('sa.requests') }}</x-kpi-chip>
         </div>
-        <a href="{{ route('superadmin.subscriptions', ['status' => 'pending']) }}" class="tactile-btn" style="font-size: 12px; padding: 6px 14px; background: var(--ula-gold-400); color: white; border: 1px solid var(--ula-gold-500); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-            <span>{{ __('Review All Requests') }}</span>
-            <span class="material-symbols-rounded" style="font-size: 14px;">arrow_forward</span>
-        </a>
+        <a href="{{ route('superadmin.subscriptions', ['status' => 'pending']) }}" class="sa-link">{{ __('Review All Requests') }}</a>
     </div>
-
-    <div class="data-table-container">
+    <div class="data-table-container sa-flat-table">
         <table class="data-table">
             <thead>
                 <tr>
@@ -273,75 +168,60 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($pendingSubscriptionRequests as $pReq)
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 6px;">
-                            <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-text-secondary);">domain</span>
-                            <strong style="color: var(--ula-text-primary);">{{ $pReq->organization?->name ?? 'Company' }}</strong>
-                        </div>
-                        <div style="font-size: 11px; color: var(--ula-text-muted); display: flex; align-items: center; gap: 4px; margin-top: 2px;">
-                            <span class="material-symbols-rounded" style="font-size: 13px;">person</span>
-                            <span>{{ $pReq->sender_name }}</span>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="badge-status badge-plan" style="display: inline-flex; align-items: center; gap: 4px;">
-                            <span class="material-symbols-rounded" style="font-size: 14px;">workspace_premium</span>
-                            <span>{{ $pReq->plan?->name ?? 'Plan' }}</span>
-                        </span>
-                    </td>
-                    <td>
-                        <strong style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ number_format($pReq->amount, 2) }} {{ $pReq->currency }}</strong>
-                    </td>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 4px;">
-                            <span class="material-symbols-rounded" style="font-size: 14px; color: var(--ula-text-secondary);">account_balance</span>
-                            <span>{{ $pReq->bank_name }}</span>
-                        </div>
-                        <div style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: 11px; color: var(--ula-text-primary); font-weight: 700;">#{{ $pReq->transfer_reference }}</div>
-                    </td>
-                    <td>
-                        @if($pReq->receipt_path)
-                            <a href="{{ route('superadmin.subscriptions.receipt', $pReq->id) }}" target="_blank" class="tactile-btn" style="padding: 4px 10px; font-size: 11px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
-                                <span class="material-symbols-rounded" style="font-size: 14px;">receipt_long</span>
-                                <span>{{ __('View Receipt') }}</span>
-                            </a>
-                        @else
-                            <span style="color: var(--ula-text-muted); font-size: 11px;">—</span>
-                        @endif
-                    </td>
-                    <td style="font-size: 11px; color: var(--ula-text-muted); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
-                        {{ $pReq->created_at->diffForHumans() }}
-                    </td>
-                    <td>
-                        <a href="{{ route('superadmin.subscriptions') }}" class="tactile-btn btn-primary" style="padding: 6px 12px; font-size: 11px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
-                            <span class="material-symbols-rounded" style="font-size: 14px;">task_alt</span>
-                            <span>{{ __('Review & Approve') }}</span>
-                        </a>
-                    </td>
-                </tr>
-                @endforeach
+                @forelse($pendingSubscriptionRequests as $pReq)
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px; min-width: 0;">
+                                <span class="sa-tile sa-tile--palm">{{ mb_substr($pReq->organization?->name ?? '?', 0, 1) }}</span>
+                                <strong style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $pReq->organization?->name ?? __('Company') }}</strong>
+                            </div>
+                        </td>
+                        <td><span class="badge-status badge-active">{{ $pReq->plan?->name ?? __('Plan') }}</span></td>
+                        <td class="sa-num">{{ $pReq->currency }} {{ number_format($pReq->amount) }}</td>
+                        <td>
+                            <div style="display: flex; flex-direction: column;">
+                                <span>{{ $pReq->bank_name }}</span>
+                                <span class="sa-num" style="font-size: var(--ula-size-xs); color: var(--ula-text-muted);">{{ $pReq->transfer_reference }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            @if($pReq->receipt_path)
+                                <a href="{{ route('superadmin.subscriptions.receipt', $pReq->id) }}" target="_blank" rel="noopener" class="sa-link" style="display: inline-flex; align-items: center; gap: 4px;">
+                                    <span class="material-symbols-rounded" style="font-size: 18px;" aria-hidden="true">receipt_long</span>{{ __('sa.view') }}
+                                </a>
+                            @else
+                                <span style="color: var(--ula-text-muted);">—</span>
+                            @endif
+                        </td>
+                        <td class="sa-num" style="color: var(--ula-text-secondary);">{{ $pReq->created_at->format('d M') }}</td>
+                        <td>
+                            <div style="display: flex; gap: 8px;">
+                                @if($pReq->receipt_path)
+                                    <x-btn variant="outline" size="sm" icon="visibility" :href="route('superadmin.subscriptions.receipt', $pReq->id)" target="_blank" rel="noopener">{{ __('View Receipt') }}</x-btn>
+                                @endif
+                                <x-btn variant="primary" size="sm" icon="task_alt" :href="route('superadmin.subscriptions')">{{ __('Review & Approve') }}</x-btn>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="7">
+                            <div class="sa-empty"><span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-status-success);" aria-hidden="true">check_circle</span>{{ __('sa.no_pending') }}</div>
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
-</div>
-@endif
+</section>
 
-<!-- Recent Companies & Tenant Directory -->
-<div class="panel-card">
-    <div class="panel-header">
-        <div class="panel-title" style="display: flex; align-items: center; gap: 8px;">
-            <span class="material-symbols-rounded" style="color: var(--ula-text-primary);">domain</span>
-            <span>{{ __('Recent Registered Organizations') }}</span>
-        </div>
-        <a href="{{ route('superadmin.companies') }}" class="tactile-btn btn-primary" style="font-size: 12px; padding: 8px 16px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-            <span>{{ __('View All Companies') }}</span>
-            <span class="material-symbols-rounded" style="font-size: 16px;">arrow_forward</span>
-        </a>
+<!-- Recent organizations -->
+<section class="sa-card sa-card--table">
+    <div class="sa-card-head sa-card-head--padded">
+        <h3 class="sa-card-title">{{ __('Recent Registered Organizations') }}</h3>
+        <a href="{{ route('superadmin.companies') }}" class="sa-link">{{ __('View All Companies') }}</a>
     </div>
-
-    <div class="data-table-container">
+    <div class="data-table-container sa-flat-table">
         <table class="data-table">
             <thead>
                 <tr>
@@ -356,65 +236,50 @@
             </thead>
             <tbody>
                 @forelse($recentCompanies as $comp)
-                @php
-                    $seatLimit = $comp->plan?->seat_limit ?? 5;
-                    $memberCount = $comp->members->count();
-                    $isUnlimited = $seatLimit === 0;
-                    $owner = $comp->members->first()?->user;
-                    $isSuspended = $comp->status === 'suspended';
-                @endphp
-                <tr>
-                    <td>
-                        <strong style="color: var(--ula-text-primary); font-size: 14px;">{{ $comp->name }}</strong>
-                        <div style="font-size: 11px; color: var(--ula-text-muted); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $comp->slug }}</div>
-                    </td>
-                    <td>
-                        <div style="font-weight: 700; color: var(--ula-text-primary);">{{ $owner?->name ?? 'Administrator' }}</div>
-                        <div style="font-size: 11px; color: var(--ula-text-muted);">{{ $owner?->email }}</div>
-                    </td>
-                    <td>
-                        <span class="badge-status badge-plan" style="display: inline-flex; align-items: center; gap: 4px;">
-                            <span class="material-symbols-rounded" style="font-size: 14px;">workspace_premium</span>
-                            <span>{{ $comp->plan?->name ?? 'Free' }} (<span style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">${{ number_format($comp->plan?->price ?? 0, 2) }}/mo</span>)</span>
-                        </span>
-                    </td>
-                    <td>
-                        <div style="font-weight: 700; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; color: {{ !$isUnlimited && $memberCount >= $seatLimit ? 'var(--ula-status-danger)' : 'var(--ula-palm-900)' }};">
-                            {{ $memberCount }} / {{ $isUnlimited ? '∞' : $seatLimit }} {{ __('Seats') }}
-                        </div>
-                    </td>
-                    <td>
-                        <span style="font-weight: 700; color: var(--ula-text-secondary); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $comp->rooms->count() }} {{ __('Rooms') }}</span>
-                    </td>
-                    <td>
-                        @if($isSuspended)
-                            <span class="badge-status badge-suspended" style="display: inline-flex; align-items: center; gap: 4px;">
-                                <span class="material-symbols-rounded" style="font-size: 14px;">block</span>
-                                <span>{{ __('Suspended') }}</span>
-                            </span>
-                        @else
-                            <span class="badge-status badge-active" style="display: inline-flex; align-items: center; gap: 4px;">
-                                <span class="material-symbols-rounded" style="font-size: 14px;">check_circle</span>
-                                <span>{{ __('Active') }}</span>
-                            </span>
-                        @endif
-                    </td>
-                    <td>
-                        <a href="{{ route('superadmin.companies') }}" class="tactile-btn btn-secondary" style="padding: 6px 12px; font-size: 11px; text-decoration: none; display: inline-flex; align-items: center; gap: 4px;">
-                            <span class="material-symbols-rounded" style="font-size: 14px;">settings</span>
-                            <span>{{ __('Manage') }}</span>
-                        </a>
-                    </td>
-                </tr>
+                    @php
+                        $seatLimit = $comp->plan?->seat_limit ?? 5;
+                        $memberCount = $comp->members->count();
+                        $isUnlimited = $seatLimit === 0;
+                        $seatPct = $isUnlimited ? min(100, $memberCount * 10) : ($seatLimit > 0 ? min(100, round($memberCount / $seatLimit * 100)) : 0);
+                        $seatFull = ! $isUnlimited && $seatPct >= 95;
+                        $owner = $comp->members->first()?->user;
+                        $isSuspended = $comp->status === 'suspended';
+                    @endphp
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span class="sa-tile sa-tile--gold">{{ mb_substr($comp->name, 0, 1) }}</span>
+                                <strong>{{ $comp->name }}</strong>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; flex-direction: column; min-width: 0;">
+                                <span>{{ $owner?->name ?? __('Administrator') }}</span>
+                                <span class="sa-num" style="font-size: var(--ula-size-xs); color: var(--ula-text-muted); white-space: nowrap;">{{ $owner?->email }}</span>
+                            </div>
+                        </td>
+                        <td>{{ $comp->plan?->name ?? 'Free' }}</td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px; min-width: 140px;">
+                                <div class="sa-seatbar"><div style="width: {{ $seatPct }}%; background: {{ $seatFull ? 'var(--ula-tone-terracotta-dot)' : 'var(--ula-tone-palm-dot)' }};"></div></div>
+                                <span class="sa-num" style="font-size: var(--ula-size-xs); color: var(--ula-text-secondary);">{{ $memberCount }}/{{ $isUnlimited ? '∞' : $seatLimit }}</span>
+                            </div>
+                        </td>
+                        <td class="sa-num">{{ $comp->rooms->count() }}</td>
+                        <td>
+                            <span class="badge-status {{ $isSuspended ? 'badge-suspended' : 'badge-active' }}"><span class="ula-hub-tag-dot"></span>{{ $isSuspended ? __('Suspended') : __('Active') }}</span>
+                        </td>
+                        <td>
+                            <a href="{{ route('superadmin.companies.show', $comp->id) }}" class="sa-link" style="display: inline-flex; align-items: center; gap: 4px;">
+                                {{ __('Manage') }}<span class="material-symbols-rounded sa-chevron" style="font-size: 16px;" aria-hidden="true">chevron_left</span>
+                            </a>
+                        </td>
+                    </tr>
                 @empty
-                <tr>
-                    <td colspan="7" style="text-align: center; color: var(--ula-text-muted); padding: 40px;">
-                        {{ __('No organizations registered yet.') }}
-                    </td>
-                </tr>
+                    <tr><td colspan="7"><div class="sa-empty">{{ __('No organizations registered yet.') }}</div></td></tr>
                 @endforelse
             </tbody>
         </table>
     </div>
-</div>
+</section>
 @endsection

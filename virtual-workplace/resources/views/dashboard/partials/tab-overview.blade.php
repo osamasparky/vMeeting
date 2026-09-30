@@ -1,7 +1,7 @@
 <div id="tab-overview" class="tab-view active">
 
     <!-- ── 1. Welcome Hero Banner (Matches 06-Dashboard-Overview) ── -->
-    <div style="display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); border-radius: 20px; border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); background: var(--ula-surface-card); overflow: hidden; box-shadow: var(--ula-shadow-xs); margin-bottom: 24px;">
+    <div class="ula-hero" style="display: grid; grid-template-columns: minmax(0, 1fr) auto; border-radius: 20px; border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); background: var(--ula-surface-card); overflow: hidden; box-shadow: var(--ula-shadow-xs); margin-bottom: 24px;">
         <div style="padding: 28px; display: flex; flex-direction: column; gap: 18px;">
             @php
                 $hour = (int) now()->format('H');
@@ -10,46 +10,46 @@
             <div style="display: flex; flex-direction: column; gap: 2px;">
                 <h1 style="font-size: 30px; font-weight: 600; line-height: 1.3; color: var(--ula-text-primary);" id="nx-hero-dynamic-greeting">
                     @if($isEvening)
-                        {{ __('مساء الخير، :name', ['name' => explode(' ', $user->name)[0]]) }}
+                        {{ __('hero.good_evening', ['name' => explode(' ', $user->name)[0]]) }}
                     @else
-                        {{ __('صباح الخير، :name', ['name' => explode(' ', $user->name)[0]]) }}
+                        {{ __('hero.good_morning', ['name' => explode(' ', $user->name)[0]]) }}
                     @endif
                 </h1>
                 <span style="font-family: var(--ula-font-en); font-size: 18px; font-weight: 300; color: var(--ula-text-secondary);">Ready to Collaborate</span>
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 4px; padding-inline-start: 14px; border-inline-start: 2px solid var(--ula-highlight-default);">
-                <span style="font-size: 21px; font-weight: 600; line-height: 1.4; color: var(--ula-palm-800);">المساحات الأفضل تصنع فرقاً أعظم.</span>
+                <span style="font-size: 21px; font-weight: 600; line-height: 1.4; color: var(--ula-text-primary);">المساحات الأفضل تصنع فرقاً أعظم.</span>
                 <span style="font-family: var(--ula-font-en); font-size: 14px; color: var(--ula-text-secondary);">Better spaces carve greater teams.</span>
             </div>
 
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <a href="{{ route('office') }}" class="tactile-btn btn-primary" style="height: 44px; padding: 0 20px; border-radius: 14px; background: var(--ula-accent-default); color: var(--ula-accent-fg); font-family: var(--ula-font-ar); font-size: 15px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;">
-                    <span class="ms" style="font-size: 20px;">login</span>
-                    <span>{{ __('ادخل مساحة العمل') }}</span>
-                </a>
-                
-                <button type="button" onclick="openScheduleMeetingModal('general')" style="height: 44px; padding: 0 20px; border-radius: 14px; border: var(--ula-border-width-hairline) solid var(--ula-border-strong); background: var(--ula-surface-card); color: var(--ula-palm-800); font-family: var(--ula-font-ar); font-size: 15px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; white-space: nowrap;">
-                    <span class="ms" style="font-size: 20px;">event</span>
-                    <span>{{ __('جدولة اجتماع') }}</span>
-                </button>
-
+                <x-btn variant="primary" size="md" icon="login" :href="route('office')">{{ __('hero.enter_workspace') }}</x-btn>
+                <x-btn variant="secondary" size="md" icon="event" onclick="openScheduleMeetingModal('general')">{{ __('hero.schedule_meeting') }}</x-btn>
                 @if($membership->hasPermission('maps.manage'))
-                    <a href="{{ route('editor') }}" style="height: 44px; padding: 0 20px; border-radius: 14px; border: var(--ula-border-width-hairline) solid transparent; background: transparent; color: var(--ula-accent-hover); font-family: var(--ula-font-ar); font-size: 15px; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; text-decoration: none;">
-                        <span class="ms" style="font-size: 20px;">architecture</span>
-                        <span>{{ __('محرر الخريطة') }}</span>
-                    </a>
+                    <x-btn variant="ghost" size="md" icon="architecture" :href="route('editor')">{{ __('nav.editor') }}</x-btn>
                 @endif
             </div>
         </div>
 
-        <div style="min-height: 220px; background: repeating-linear-gradient(135deg, var(--ula-sand-400) 0 12px, var(--ula-sand-500) 12px 24px); display: flex; align-items: flex-end; justify-content: center; padding: 14px;">
-            <span style="font-family: var(--ula-font-mono); font-size: 11px; color: var(--ula-text-primary); background: rgba(251,248,242,0.72); padding: 6px 10px; border-radius: var(--ula-radius-pill); direction: ltr; unicode-bidi: isolate;">welcome-photo.jpg</span>
+        {{-- Profile + today tiles (design 06, replaces the welcome photo). Clock/date are kept live by initOverviewLiveClock(). --}}
+        @php
+            $heroNow = now()->locale(app()->getLocale());
+        @endphp
+        <div class="ula-hero-tiles">
+            <button type="button" class="ula-hero-tile ula-hero-tile--profile" onclick="switchAdminTab('profile')" aria-label="{{ __('nav.profile') }}" title="{{ __('nav.profile') }}">
+                @if($user->avatar_url)
+                    <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}">
+                @else
+                    <span class="ula-hero-initial" aria-hidden="true">{{ mb_substr($user->name, 0, 1) }}</span>
+                @endif
+            </button>
+            <div class="ula-hero-tile ula-hero-tile--time" role="timer" aria-live="off">
+                <span id="nx-hero-live-clock" class="ula-hero-clock">{{ $heroNow->format('H:i') }}</span>
+                <span id="nx-hero-live-date" class="ula-hero-date">{{ $heroNow->translatedFormat('l') }}<br><span class="ula-hero-date-num">{{ $heroNow->format('j') }}</span> {{ $heroNow->translatedFormat('F') }}</span>
+            </div>
         </div>
     </div>
-
-    <!-- Hidden clock ID hook to preserve script updates -->
-    <span id="nx-hero-live-clock" style="display: none;"></span>
 
     <!-- ── 2. Stat Cards Grid (4 Columns · Weight 300 Numbers) ── -->
     @php
@@ -59,70 +59,11 @@
         $activeMembersCount = $stats['members'] ?? 1;
     @endphp
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 16px; margin-bottom: 24px;">
-        <!-- 1. Active Presence -->
-        <div style="padding: 18px; border-radius: 20px; border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
-            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
-                <span style="font-size: 15px; font-weight: 500; color: var(--ula-text-secondary);">{{ __('متصلون الآن') }}</span>
-                <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: var(--ula-radius-pill); background: var(--ula-tone-palm-bg); color: var(--ula-tone-palm-fg); display: inline-flex; align-items: center; justify-content: center;">
-                    <span class="ms" style="font-size: 18px;">person</span>
-                </span>
-            </div>
-            <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
-                <span style="font-size: 34px; font-weight: 300; line-height: 1.1; direction: ltr; unicode-bidi: isolate; font-family: var(--ula-font-mono);">
-                    {{ $activeMembersCount }}
-                </span>
-                <span style="font-size: 12px; color: var(--ula-text-muted);">{{ __('من فريقك متصلون الآن') }}</span>
-            </div>
-        </div>
-
-        <!-- 2. Today's Meetings -->
-        <div style="padding: 18px; border-radius: 20px; border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
-            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
-                <span style="font-size: 15px; font-weight: 500; color: var(--ula-text-secondary);">{{ __('اجتماعات اليوم') }}</span>
-                <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: var(--ula-radius-pill); background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg); display: inline-flex; align-items: center; justify-content: center;">
-                    <span class="ms" style="font-size: 18px;">event</span>
-                </span>
-            </div>
-            <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
-                <span style="font-size: 34px; font-weight: 300; line-height: 1.1; direction: ltr; unicode-bidi: isolate; font-family: var(--ula-font-mono);">
-                    {{ $todayMeetings->count() }}
-                </span>
-                <span style="font-size: 12px; color: var(--ula-text-muted);">{{ __('مجدولة لهذا اليوم') }}</span>
-            </div>
-        </div>
-
-        <!-- 3. Active Workspaces -->
-        <div style="padding: 18px; border-radius: 20px; border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
-            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
-                <span style="font-size: 15px; font-weight: 500; color: var(--ula-text-secondary);">{{ __('مساحات نشطة') }}</span>
-                <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: var(--ula-radius-pill); background: var(--ula-tone-palm-bg); color: var(--ula-tone-palm-fg); display: inline-flex; align-items: center; justify-content: center;">
-                    <span class="ms" style="font-size: 18px;">meeting_room</span>
-                </span>
-            </div>
-            <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
-                <span style="font-size: 34px; font-weight: 300; line-height: 1.1; direction: ltr; unicode-bidi: isolate; font-family: var(--ula-font-mono);">
-                    {{ $openRooms }}
-                </span>
-                <span style="font-size: 12px; color: var(--ula-text-muted);">{{ __('مفتوحة للعمل') }}</span>
-            </div>
-        </div>
-
-        <!-- 4. Pending Invitations -->
-        <div style="padding: 18px; border-radius: 20px; border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
-            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
-                <span style="font-size: 15px; font-weight: 500; color: var(--ula-text-secondary);">{{ __('دعوات معلقة') }}</span>
-                <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: var(--ula-radius-pill); background: var(--ula-tone-terracotta-bg); color: var(--ula-tone-terracotta-fg); display: inline-flex; align-items: center; justify-content: center;">
-                    <span class="ms" style="font-size: 18px;">mail</span>
-                </span>
-            </div>
-            <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
-                <span style="font-size: 34px; font-weight: 300; line-height: 1.1; direction: ltr; unicode-bidi: isolate; font-family: var(--ula-font-mono);">
-                    {{ $pendingGuests }}
-                </span>
-                <span style="font-size: 12px; color: var(--ula-text-muted);">{{ __('بانتظار الانضمام') }}</span>
-            </div>
-        </div>
+    <div class="ula-kpi-row">
+        <x-kpi-card density="default" icon="person" iconColor="sage" :title="__('متصلون الآن')" :value="$activeMembersCount" :caption="__('من فريقك متصلون الآن')" />
+        <x-kpi-card density="default" icon="event" iconColor="gold" :title="__('اجتماعات اليوم')" :value="$todayMeetings->count()" :caption="__('مجدولة لهذا اليوم')" />
+        <x-kpi-card density="default" icon="meeting_room" iconColor="sage" :title="__('مساحات نشطة')" :value="$openRooms" :caption="__('مفتوحة للعمل')" />
+        <x-kpi-card density="default" icon="mail" iconColor="terracotta" :title="__('دعوات معلقة')" :value="$pendingGuests" :caption="__('بانتظار الانضمام')" />
     </div>
 
     <!-- ── 3. Bottom Panels Grid (Matches 06-Dashboard-Overview: 1.4fr 1fr) ── -->
@@ -223,7 +164,7 @@
                         <span style="font-size: 15px; font-weight: 600; color: var(--ula-text-primary);">{{ __('إدارة الغرف') }}</span>
                     </button>
 
-                    <button type="button" onclick="openCreateTaskModal()" style="padding: 16px; border-radius: 16px; border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); background: var(--ula-surface-page); display: flex; flex-direction: column; align-items: flex-start; gap: 12px; cursor: pointer; font-family: var(--ula-font-ar); text-align: start;">
+                    <button type="button" onclick="openNewTaskModal()" style="padding: 16px; border-radius: 16px; border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); background: var(--ula-surface-page); display: flex; flex-direction: column; align-items: flex-start; gap: 12px; cursor: pointer; font-family: var(--ula-font-ar); text-align: start;">
                         <span style="width: 40px; height: 40px; border-radius: 12px; background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg); display: inline-flex; align-items: center; justify-content: center;">
                             <span class="ms" style="font-size: 24px;">add_task</span>
                         </span>

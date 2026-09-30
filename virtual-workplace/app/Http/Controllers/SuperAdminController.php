@@ -353,7 +353,7 @@ class SuperAdminController extends Controller
     public function plans()
     {
         $user = Auth::user();
-        $plans = Plan::withCount('organizations')->orderBy('price', 'asc')->get();
+        $plans = Plan::withCount(['organizations', 'subscriptions'])->orderBy('price', 'asc')->get();
 
         return view('superadmin.plans', compact('user', 'plans'));
     }
@@ -443,13 +443,13 @@ class SuperAdminController extends Controller
      */
     public function deletePlan(Plan $plan)
     {
-        if ($plan->organizations()->count() > 0) {
-            return back()->with('error', 'Cannot delete plan assigned to active organizations.');
+        if ($plan->organizations()->count() > 0 || $plan->subscriptions()->count() > 0) {
+            return back()->with('error', __('Cannot delete plan assigned to active organizations or subscriptions.'));
         }
 
         $plan->delete();
 
-        return back()->with('success', 'Plan deleted successfully.');
+        return back()->with('success', __('Plan deleted successfully.'));
     }
 
     /**
@@ -1634,7 +1634,7 @@ class SuperAdminController extends Controller
      */
     public function updateCmsSection(Request $request, CmsSection $section)
     {
-        $section->update([
+        $data = [
             'title_en' => $request->input('title_en'),
             'title_ar' => $request->input('title_ar'),
             'subtitle_en' => $request->input('subtitle_en'),
@@ -1642,16 +1642,47 @@ class SuperAdminController extends Controller
             'badge_en' => $request->input('badge_en'),
             'badge_ar' => $request->input('badge_ar'),
             'is_active' => $request->has('is_active'),
-            'display_order' => (int) $request->input('display_order', 0),
+            'display_order' => (int) $request->input('display_order', $section->display_order),
             'media_asset_id' => $request->input('media_asset_id') ?: null,
-        ]);
+        ];
+
+        // Direct image upload for section
+        if ($request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            $extension = strtolower($file->getClientOriginalExtension());
+            if (! $rejection = FileUploadService::rejectionReasonFor($file, $extension)) {
+                $destDir = public_path('uploads/cms');
+                $stored = FileUploadService::moveToPublicUploads($file, $destDir, 'section_'.$section->section_key, $extension);
+                $filePath = '/uploads/cms/'.$stored['filename'];
+
+                $asset = CmsMediaAsset::create([
+                    'name' => ($section->title_en ?: $section->section_key).' Image',
+                    'asset_type' => 'image',
+                    'file_path' => $filePath,
+                    'version_tag' => 'v'.time(),
+                    'tags' => ['section', $section->section_key],
+                    'is_active' => true,
+                ]);
+
+                $data['media_asset_id'] = $asset->id;
+            }
+        }
+
+        // Merge content fields
+        $content = $section->content ?? [];
+        if ($request->has('content') && is_array($request->input('content'))) {
+            $content = array_replace_recursive($content, $request->input('content'));
+        }
 
         if ($request->has('content_json')) {
             $decoded = json_decode($request->input('content_json'), true);
-            if (json_last_error() === JSON_ERROR_NONE) {
-                $section->update(['content' => $decoded]);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $content = array_replace_recursive($content, $decoded);
             }
         }
+
+        $data['content'] = $content;
+        $section->update($data);
 
         return back()->with('success', __('CMS Section updated successfully!'));
     }
@@ -1733,11 +1764,11 @@ class SuperAdminController extends Controller
     {
         $tokens = ThemeEngineService::getThemeTokens();
         $navItems = CmsThemeSetting::getByKey('main_navigation', [
-            ['label_en' => 'Platform', 'label_ar' => 'المنصة', 'url' => '#hero-spatial'],
-            ['label_en' => 'Spatial Presence', 'label_ar' => 'التواجد المكاني', 'url' => '#spatial-presence'],
-            ['label_en' => 'AI Office', 'label_ar' => 'مكتب الذكاء الاصطناعي', 'url' => '#ai-generator'],
-            ['label_en' => 'Collaboration', 'label_ar' => 'التعاون والإنتاجية', 'url' => '#collaboration'],
-            ['label_en' => 'Pricing', 'label_ar' => 'الباقات والأسعار', 'url' => '#pricing'],
+            ['label_en' => 'Spaces', 'label_ar' => 'المساحات الذكية', 'url' => '#spaces'],
+            ['label_en' => 'Benefits', 'label_ar' => 'مميزات النظام', 'url' => '#benefits'],
+            ['label_en' => 'Meetings', 'label_ar' => 'الاجتماعات', 'url' => '#meetings'],
+            ['label_en' => 'Heritage', 'label_ar' => 'عن المنصة', 'url' => '#identity'],
+            ['label_en' => 'Pricing', 'label_ar' => 'الباقات والاشتراكات', 'url' => '#pricing'],
         ]);
 
         return view('superadmin.cms.theme', compact('tokens', 'navItems'));

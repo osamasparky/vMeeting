@@ -6,8 +6,7 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
-/* The former blue/violet HSL palette (--brand-*, --bg-base, --text-*, --radius-*,
-   --shadow-*, --ease-*) has been retired. Every reference was rewritten to the
+/* The former blue/violet HSL palette and its token names have been retired. Every reference was rewritten to the
    UlaSpace tokens in ulaspace-tokens.css, which are generated from the Figma file. */
 
 /* Tailwind theme bridge — utility classes resolve to UlaSpace tokens */

@@ -21,7 +21,7 @@
 
     <!-- Health Telemetry Grid -->
     <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
-        <div class="metric-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 20px; box-shadow: var(--ula-shadow-sm); border-top: 4px solid var(--ula-status-success);">
+        <div class="metric-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 20px; box-shadow: var(--ula-shadow-sm);">
             <div class="metric-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <span class="metric-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Primary Database') }}</span>
                 <div class="metric-icon-badge" style="width: 32px; height: 32px; border-radius: 8px; background: rgba(60, 107, 76, 0.12); color: var(--ula-status-success); display: flex; align-items: center; justify-content: center;">
@@ -32,11 +32,11 @@
                 {{ __('Healthy') }}
             </div>
             <div class="metric-trend" style="font-size: 11px; color: var(--ula-text-muted); font-family: 'IBM Plex Mono', monospace;">
-                <span>MySQL 8.0</span> • <span>Latency: 1.2ms</span>
+                <span>MySQL 8.0</span> · <span>Latency: 1.2ms</span>
             </div>
         </div>
 
-        <div class="metric-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 20px; box-shadow: var(--ula-shadow-sm); border-top: 4px solid var(--ula-status-success);">
+        <div class="metric-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 20px; box-shadow: var(--ula-shadow-sm);">
             <div class="metric-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <span class="metric-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('WebRTC SFU') }}</span>
                 <div class="metric-icon-badge" style="width: 32px; height: 32px; border-radius: 8px; background: rgba(60, 107, 76, 0.12); color: var(--ula-status-success); display: flex; align-items: center; justify-content: center;">
@@ -47,11 +47,11 @@
                 {{ __('Operational') }}
             </div>
             <div class="metric-trend" style="font-size: 11px; color: var(--ula-text-muted); font-family: 'IBM Plex Mono', monospace;">
-                <span>LiveKit SFU</span> • <span>Port 7880 Active</span>
+                <span>LiveKit SFU</span> · <span>Port 7880 Active</span>
             </div>
         </div>
 
-        <div class="metric-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 20px; box-shadow: var(--ula-shadow-sm); border-top: 4px solid var(--ula-status-success);">
+        <div class="metric-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 20px; box-shadow: var(--ula-shadow-sm);">
             <div class="metric-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <span class="metric-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Spatial WebSockets') }}</span>
                 <div class="metric-icon-badge" style="width: 32px; height: 32px; border-radius: 8px; background: rgba(60, 107, 76, 0.12); color: var(--ula-status-success); display: flex; align-items: center; justify-content: center;">
@@ -62,11 +62,11 @@
                 {{ __('Active') }}
             </div>
             <div class="metric-trend" style="font-size: 11px; color: var(--ula-text-muted); font-family: 'IBM Plex Mono', monospace;">
-                <span>Port 8080</span> • <span>Interpolation Running</span>
+                <span>Port 8080</span> · <span>Interpolation Running</span>
             </div>
         </div>
 
-        <div class="metric-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 20px; box-shadow: var(--ula-shadow-sm); border-top: 4px solid var(--ula-status-success);">
+        <div class="metric-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 20px; box-shadow: var(--ula-shadow-sm);">
             <div class="metric-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <span class="metric-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('AI Blueprint Engine') }}</span>
                 <div class="metric-icon-badge" style="width: 32px; height: 32px; border-radius: 8px; background: rgba(60, 107, 76, 0.12); color: var(--ula-status-success); display: flex; align-items: center; justify-content: center;">
@@ -77,7 +77,7 @@
                 {{ __('Ready') }}
             </div>
             <div class="metric-trend" style="font-size: 11px; color: var(--ula-text-muted); font-family: 'IBM Plex Mono', monospace;">
-                <span>GPT Image 1 Mini</span> • <span>DALL-E Ready</span>
+                <span>GPT Image 1 Mini</span> · <span>DALL-E Ready</span>
             </div>
         </div>
     </div>

@@ -897,193 +897,12 @@
 </head>
 <body>
 
-    <!-- ── 1. COLLAPSIBLE WORKSPACE SIDEBAR NAVIGATION ── -->
-    <aside id="sidebar-main" class="app-sidebar">
-        <div class="sidebar-brand-box">
-            <div class="brand-logo-area">
-                <div class="brand-emblem"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">eco</span></div>
-                <div class="brand-title-wrap">
-                    <div class="brand-title">{{ $organization->name }}</div>
-                    <div class="brand-sub">{{ __('Virtual Workplace') }}</div>
-                </div>
-            </div>
-            <button onclick="toggleSidebarCollapse()" class="tactile-btn btn-secondary" style="padding: 4px 8px; font-size: 11px; background: transparent; border: 1px solid var(--ula-border-on-dark); color: var(--ula-text-on-dark-muted);" title="{{ __('Toggle Slim Sidebar') }}">
-                ↔
-            </button>
-        </div>
-
-        <ul class="sidebar-nav-list">
-            <!-- Overview & Office -->
-            <li class="nav-category-title">{{ __('Workspace') }}</li>
-            <li>
-                <a href="{{ route('dashboard') }}#overview" class="sidebar-link-btn">
-                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bar_chart</span></span>
-                    <span class="nav-label-text">{{ __('Dashboard') }}</span>
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('office') }}" class="sidebar-link-btn" style="background: rgba(79, 155, 95, 0.18); color: var(--ula-status-success);">
-                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">rocket_launch</span></span>
-                    <span class="nav-label-text">{{ __('Enter Office') }}</span>
-                    <span class="sidebar-badge-pill">مباشر</span>
-                </a>
-            </li>
-
-            <!-- Projects & Execution -->
-            <li class="nav-category-title">{{ __('Projects & Tasks') }}</li>
-            <li>
-                <a href="{{ route('dashboard') }}#projects" class="sidebar-link-btn active">
-                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span></span>
-                    <span class="nav-label-text">{{ __('Projects Portfolio') }}</span>
-                    <span class="sidebar-badge-pill">{{ $stats['total_projects'] ?? 0 }}</span>
-                </a>
-            </li>
-            @if($membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || $membership->role?->slug === 'company_admin')
-            <li>
-                <a href="{{ route('dashboard') }}#all-tasks" class="sidebar-link-btn">
-                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bookmark</span></span>
-                    <span class="nav-label-text">{{ __('All Tasks') }}</span>
-                    <span class="sidebar-badge-pill">{{ $stats['total_tasks'] ?? 0 }}</span>
-                </a>
-            </li>
-            @endif
-            <li>
-                <a href="{{ route('dashboard') }}#my-tasks" class="sidebar-link-btn">
-                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span></span>
-                    <span class="nav-label-text">{{ __('My Tasks') }}</span>
-                    <span class="sidebar-badge-pill">{{ $myTasks->count() }}</span>
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('dashboard') }}#chat" class="sidebar-link-btn">
-                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">chat</span></span>
-                    <span class="nav-label-text">{{ __('Team Chat & DMs') }}</span>
-                    <span class="sidebar-badge-pill">مباشر</span>
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('dashboard') }}#timesheets" class="sidebar-link-btn">
-                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span></span>
-                    <span class="nav-label-text">{{ __('Timesheets & Time') }}</span>
-                </a>
-            </li>
-            <li>
-                <a href="{{ route('dashboard') }}#meetings" class="sidebar-link-btn">
-                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span></span>
-                    <span class="nav-label-text">{{ __('Meetings & Schedule') }}</span>
-                    <span class="sidebar-badge-pill">{{ $upcomingProjectMeetings->count() }}</span>
-                </a>
-            </li>
-
-            <!-- Administration -->
-            @php
-                $canSeeAdmin = $membership->hasPermission('members.view') || $membership->hasPermission('rooms.manage') || $membership->hasPermission('departments.manage') || $membership->hasPermission('organizations.manage') || $membership->role?->slug === 'company_admin';
-            @endphp
-            @if($canSeeAdmin)
-            <li class="nav-category-title">{{ __('Administration') }}</li>
-            @if($membership->hasPermission('members.view') || $membership->hasPermission('members.manage'))
-            <li>
-                <a href="{{ route('dashboard') }}#members" class="sidebar-link-btn">
-                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">group</span></span>
-                    <span class="nav-label-text">{{ __('Team Members') }}</span>
-                    <span class="sidebar-badge-pill">{{ $stats['active_members'] ?? 0 }}</span>
-                </a>
-            </li>
-            @endif
-            @if($membership->hasPermission('rooms.manage'))
-            <li>
-                <a href="{{ route('dashboard') }}#rooms" class="sidebar-link-btn">
-                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span></span>
-                    <span class="nav-label-text">{{ __('Meeting Rooms') }}</span>
-                    <span class="sidebar-badge-pill">{{ $stats['total_rooms'] ?? 0 }}</span>
-                </a>
-            </li>
-            @endif
-            @if($membership->hasPermission('departments.manage') || $membership->hasPermission('teams.manage'))
-            <li>
-                <a href="{{ route('dashboard') }}#departments" class="sidebar-link-btn">
-                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">account_balance</span></span>
-                    <span class="nav-label-text">{{ __('Departments') }}</span>
-                    <span class="sidebar-badge-pill">{{ $stats['total_departments'] ?? 0 }}</span>
-                </a>
-            </li>
-            @endif
-            @if($membership->hasPermission('organizations.manage'))
-            <li>
-                <a href="{{ route('dashboard') }}#settings" class="sidebar-link-btn">
-                    <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">settings</span></span>
-                    <span class="nav-label-text">{{ __('Workspace Settings') }}</span>
-                </a>
-            </li>
-            @endif
-            @endif
-
-            @if($user->is_superadmin ?? false)
-                <li class="nav-category-title" style="color: var(--ula-gold-400);">{{ __('Super Admin') }}</li>
-                <li>
-                    <a href="{{ route('superadmin.dashboard') }}" class="sidebar-link-btn" style="color: var(--ula-gold-400);">
-                        <span class="nav-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">workspace_premium</span></span>
-                        <span class="nav-label-text">{{ __('Super Admin Portal') }}</span>
-                    </a>
-                </li>
-            @endif
-        </ul>
-
-        <div class="sidebar-footer">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--ula-gradient-accent); color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900;">
-                    {{ strtoupper(substr($user->name, 0, 2)) }}
-                </div>
-                <div class="user-info-text">
-                    <div style="font-size: 12px; font-weight: 800; color: var(--ula-text-primary);">{{ $user->name }}</div>
-                    <div style="font-size: 10px; color: var(--ula-text-muted);">{{ $membership->role->name ?? 'Member' }}</div>
-                </div>
-            </div>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" style="background: transparent; border: none; color: var(--ula-text-muted); cursor: pointer; font-size: 14px;" title="{{ __('Logout') }}">
-                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span>
-                </button>
-            </form>
-        </div>
-    </aside>
+    @include('partials.app-sidebar', ['shellActive' => 'projects', 'shellMode' => 'links'])
 
     <!-- ── 2. MAIN APP CONTENT CONTAINER ── -->
     <div class="app-main-layout">
 
-        <!-- Top Sticky Header -->
-        <header class="hub-header-bar">
-            <div style="display: flex; align-items: center; gap: 14px;">
-                <button onclick="toggleMobileSidebar()" class="tactile-btn btn-secondary" style="display: none; padding: 6px 10px; font-size: 14px;" id="btn-mobile-sidebar-toggle">
-                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">menu</span>
-                </button>
-
-                <div class="breadcrumb-trail">
-                    <a href="{{ route('dashboard') }}#overview"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">eco</span> {{ __('Workspace') }}</a>
-                    <span class="breadcrumb-separator">/</span>
-                    <a href="{{ route('dashboard') }}#projects"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> {{ __('Projects') }}</a>
-                    <span class="breadcrumb-separator">/</span>
-                    <span style="color: var(--ula-text-primary); font-weight: 900;">{{ $project->name }} ({{ $project->code }})</span>
-                </div>
-            </div>
-
-            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                <!-- Language Switcher -->
-                <a href="{{ route('lang.switch', app()->getLocale() === 'ar' ? 'en' : 'ar') }}" class="tactile-btn btn-secondary" style="padding: 7px 12px; font-size: 12px;">
-                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">public</span> {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
-                </a>
-
-                <!-- Theme Toggle -->
-                <button onclick="toggleThemeMode()" class="tactile-btn btn-secondary" style="padding: 7px 12px; font-size: 12px;" title="{{ __('Toggle Dark / Light Mode') }}">
-                    <span class="theme-toggle-icon-label"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">dark_mode</span></span>
-                </button>
-
-                <!-- Office Shortcut -->
-                <a href="{{ route('office') }}" class="tactile-btn btn-primary" style="padding: 7px 14px; font-size: 12px;">
-                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">rocket_launch</span> {{ __('Enter Office') }}
-                </a>
-            </div>
-        </header>
+        @include('partials.app-topbar', ['shellMode' => 'links', 'shellSearch' => 'hubGlobalSearch'])
 
         <main class="hub-main-container">
 
@@ -1096,7 +915,7 @@
                         </div>
                         <div>
                             <div style="font-size: 11px; font-weight: 800; color: var(--ula-text-primary); text-transform: uppercase;">
-                                {{ __('Active Timer Running') }} • {{ $activeTimer->project->name ?? 'Project' }}
+                                {{ __('Active Timer Running') }} · {{ $activeTimer->project->name ?? 'Project' }}
                             </div>
                             <div style="font-size: 14px; font-weight: 800; color: var(--ula-text-primary);">
                                 {{ $activeTimer->task->title ?? ($activeTimer->description ?? 'Work Session') }}
@@ -1112,183 +931,89 @@
                 </div>
             @endif
 
-            <!-- ── 3. PROJECT HERO BANNER CARD ── -->
-            <div class="hero-banner-card">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
-                    <div style="max-width: 720px;">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
-                            <span class="badge-pill badge-neutral" style="font-family: monospace; font-size: 12px; font-weight: 900;">
-                                {{ $project->code }}
+            <!-- ── 3. PROJECT HEADER (design-reference 35) ── -->
+            @php
+                $hubCompact = function ($n) {
+                    $n = (float) $n;
+                    if (abs($n) >= 1000000) return rtrim(rtrim(number_format($n / 1000000, 1), '0'), '.') . 'M';
+                    if (abs($n) >= 1000) return round($n / 1000) . 'K';
+                    return number_format($n);
+                };
+                $hubStatusTone = in_array($project->status, ['active', 'completed']) ? 'palm' : ($project->status === 'on_hold' ? 'gold' : 'stone');
+                $hubPriorityTone = $project->priority === 'urgent' ? 'terracotta' : ($project->priority === 'high' ? 'gold' : 'stone');
+                $hubPlanned = (float) ($kpis['planned_hours'] ?? 0);
+                $hubActual = (float) ($kpis['actual_hours'] ?? 0);
+                $hubHoursPct = $hubPlanned > 0 ? round(($hubActual - $hubPlanned) / $hubPlanned * 100) : 0;
+                $hubBudget = (float) ($kpis['budget'] ?? $kpis['budget_amount'] ?? 0);
+                $hubBudgetLeft = (float) ($kpis['budget_variance'] ?? 0);
+                $hubTabs = [
+                    ['kanban', 'view_kanban', 'hub.tab_kanban'], ['tasks', 'table_rows', 'hub.tab_list'],
+                    ['gantt', 'timeline', 'hub.tab_gantt'], ['workload', 'stacked_bar_chart', 'hub.tab_workload'],
+                    ['docs', 'article', 'hub.tab_docs'], ['goals', 'flag', 'hub.tab_goals'],
+                    ['timelog', 'payments', 'hub.tab_time'], ['meetings', 'videocam', 'hub.tab_meetings'],
+                    ['team', 'group', 'hub.tab_team'], ['files', 'folder', 'hub.tab_files'],
+                    ['milestones', 'route', 'hub.tab_roadmap'],
+                ];
+            @endphp
+
+            <nav class="ula-hub-crumbs" aria-label="{{ __('nav.projects') }}">
+                <a href="{{ route('dashboard') }}#projects">{{ __('nav.projects') }}</a>
+                <span class="material-symbols-rounded ula-hub-crumb-sep" aria-hidden="true">chevron_left</span>
+                <span aria-current="page">{{ $project->name }}</span>
+            </nav>
+
+            <div class="ula-hub-head">
+                <div class="ula-hub-identity">
+                    <span class="ula-hub-code">{{ $project->code }}</span>
+                    <div class="ula-hub-identity-text">
+                        <div class="ula-hub-title-row">
+                            <h1 class="ula-hub-title">{{ $project->name }}</h1>
+                            <span class="ula-hub-tag ula-hub-tag--{{ $hubStatusTone }}"><span class="ula-hub-tag-dot"></span>{{ __(\Illuminate\Support\Str::headline($project->status)) }}</span>
+                            <span class="ula-hub-tag ula-hub-tag--{{ $hubPriorityTone }}">{{ __(ucfirst($project->priority)) }}</span>
+                        </div>
+                        <div class="ula-hub-meta">
+                            <span><span class="material-symbols-rounded">person</span>{{ __('hub.manager') }}: {{ $project->manager->name ?? __('Unassigned') }}</span>
+                            <span><span class="material-symbols-rounded">account_tree</span>{{ __('hub.department') }}: {{ $project->department->name ?? __('General') }}</span>
+                            <span><span class="material-symbols-rounded">event</span>{{ __('hub.due') }}:
+                                @if($project->end_date)
+                                    <span class="ula-hub-num">{{ $project->end_date->format('d M Y') }}</span>
+                                @else
+                                    {{ __('hub.no_deadline') }}
+                                @endif
                             </span>
-                            <h1 style="font-size: 26px; font-weight: 900; color: var(--ula-text-primary); margin: 0; line-height: 1.2;">
-                                {{ $project->name }}
-                            </h1>
-                            <span class="badge-pill {{ $project->status === 'completed' ? 'badge-green' : ($project->status === 'active' ? 'badge-green' : 'badge-gold') }}">
-                                {{ ucfirst($project->status) }}
-                            </span>
-                            <span class="badge-pill {{ $project->priority === 'urgent' ? 'badge-danger' : ($project->priority === 'high' ? 'badge-gold' : 'badge-neutral') }}">
-                                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ ucfirst($project->priority) }}
+                            <span class="ula-hub-team" title="{{ $project->members->count() }} {{ __('Members') }}">
+                                <span class="material-symbols-rounded">group</span>
+                                <span class="ula-hub-avatars">
+                                    @foreach($project->members->take(5) as $member)
+                                        <span class="ula-hub-avatar">{{ mb_substr($member->user->name ?? $member->name ?? '?', 0, 1) }}</span>
+                                    @endforeach
+                                </span>
                             </span>
                         </div>
-
-                        <p style="font-size: 13px; color: var(--ula-text-secondary); margin-bottom: 16px; line-height: 1.6;">
-                            {{ $project->description ?? __('Collaborative workspace project for cross-functional execution, task delivery, timesheets, and team meetings.') }}
-                        </p>
-
-                        <div style="display: flex; align-items: center; gap: 20px; font-size: 12px; color: var(--ula-text-muted); flex-wrap: wrap;">
-                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">person</span> {{ __('Manager') }}: <strong style="color: var(--ula-text-primary);">{{ $project->manager->name ?? __('Unassigned') }}</strong></span>
-                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">account_balance</span> {{ __('Department') }}: <strong style="color: var(--ula-text-primary);">{{ $project->department->name ?? __('General') }}</strong></span>
-                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Due Date') }}: <strong style="color: var(--ula-text-primary);">{{ $project->end_date ? $project->end_date->format('M d, Y') : __('No deadline') }}</strong></span>
-                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">group</span> {{ __('Project Team') }}: <strong style="color: var(--ula-text-primary);">{{ $project->members->count() }} {{ __('Members') }}</strong></span>
-                        </div>
                     </div>
-
-                    <!-- Action Toolbar -->
-                    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                        <button onclick="openNewTaskModal()" class="tactile-btn btn-primary">
-                            <span>+</span> {{ __('Create Task') }}
-                        </button>
-                        <button onclick="openManualTimeModal()" class="tactile-btn btn-secondary">
-                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span></span> {{ __('Log Manual Time Entry') }}
-                        </button>
-                        <button onclick="openScheduleProjectMeetingModal()" class="tactile-btn btn-secondary">
-                            <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span></span> {{ __('Schedule Project Meeting') }}
-                        </button>
-                    </div>
+                </div>
+                <div class="ula-hub-actions">
+                    <x-btn variant="outline" size="md" icon="videocam" onclick="openScheduleProjectMeetingModal()">{{ __('hub.meeting') }}</x-btn>
+                    <x-btn variant="outline" size="md" icon="more_time" onclick="openManualTimeModal()">{{ __('hub.log_time') }}</x-btn>
+                    <x-btn variant="primary" size="md" icon="add" onclick="openNewTaskModal()">{{ __('hub.create_task') }}</x-btn>
                 </div>
             </div>
 
-            <!-- ── 4. 6 HIGH-DEPTH 3D KPI METRICS ── -->
-            <div class="kpi-grid">
-                <!-- 1. Progress -->
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <span class="kpi-title">{{ __('Task Progress') }}</span>
-                        <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bar_chart</span></div>
-                    </div>
-                    <div class="kpi-value" style="color: var(--ula-text-primary);">{{ $kpis['progress_pct'] ?? 0 }}%</div>
-                    <div style="width: 100%; background: var(--ula-surface-page-alt); height: 7px; border-radius: 9999px; overflow: hidden; margin-bottom: 6px;">
-                        <div style="width: {{ $kpis['progress_pct'] ?? 0 }}%; height: 100%; background: var(--ula-palm-900); border-radius: 9999px;"></div>
-                    </div>
-                    <div style="font-size: 11px; color: var(--ula-text-muted); display: flex; justify-content: space-between;">
-                        <span>{{ $kpis['completed_tasks'] ?? 0 }} / {{ $kpis['total_tasks'] ?? 0 }} {{ __('done') }}</span>
-                        @if(($kpis['overdue_tasks'] ?? 0) > 0)
-                            <span style="color: var(--ula-status-danger); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">warning</span> {{ $kpis['overdue_tasks'] }} {{ __('overdue') }}</span>
-                        @endif
-                    </div>
-                </div>
-
-                <!-- 2. Hours & Effort -->
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <span class="kpi-title">{{ __('Actual vs Planned') }}</span>
-                        <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span></div>
-                    </div>
-                    <div class="kpi-value">{{ $kpis['actual_hours'] ?? 0 }}h</div>
-                    <div style="font-size: 11px; color: var(--ula-text-secondary); margin-bottom: 4px;">
-                        {{ __('Planned') }}: <strong>{{ $kpis['planned_hours'] ?? 0 }}h</strong>
-                    </div>
-                    <div style="font-size: 11px; color: {{ ($kpis['hours_variance'] ?? 0) < 0 ? 'var(--ula-status-danger)' : 'var(--ula-palm-900)' }}; font-weight: 800;">
-                        {{ ($kpis['hours_variance'] ?? 0) >= 0 ? '+' : '' }}{{ $kpis['hours_variance'] ?? 0 }}h {{ __('variance') }}
-                    </div>
-                </div>
-
-                <!-- 3. Financials & Budget -->
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <span class="kpi-title">{{ __('Budget & Cost') }}</span>
-                        <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">payments</span></div>
-                    </div>
-                    <div class="kpi-value">{{ number_format($kpis['labor_cost'] ?? 0, 2) }} <span style="font-size: 13px; font-weight: 600; color: var(--ula-text-muted);">{{ __('SAR') }}</span></div>
-                    <div style="font-size: 11px; color: var(--ula-text-secondary); margin-bottom: 4px;">
-                        {{ __('Budget') }}: <strong>{{ number_format($kpis['budget'] ?? $kpis['budget_amount'] ?? 0, 2) }} {{ __('SAR') }}</strong>
-                    </div>
-                    <div style="font-size: 11px; color: {{ ($kpis['budget_variance'] ?? 0) < 0 ? 'var(--ula-status-danger)' : 'var(--ula-palm-900)' }}; font-weight: 800;">
-                        {{ ($kpis['budget_variance'] ?? 0) >= 0 ? __('Remaining') : __('Over') }}: {{ number_format(abs($kpis['budget_variance'] ?? 0), 2) }} {{ __('SAR') }}
-                    </div>
-                </div>
-
-                <!-- 4. Revenue & Margin -->
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <span class="kpi-title">{{ __('Revenue & Margin') }}</span>
-                        <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">trending_up</span></div>
-                    </div>
-                    <div class="kpi-value" style="color: var(--ula-text-primary);">{{ number_format($kpis['billable_revenue'] ?? 0, 2) }} <span style="font-size: 13px; font-weight: 600; color: var(--ula-text-muted);">{{ __('SAR') }}</span></div>
-                    <div style="font-size: 11px; color: var(--ula-text-secondary); margin-bottom: 4px;">
-                        {{ __('Gross Margin') }}: <strong>{{ number_format($kpis['gross_margin'] ?? 0, 2) }} {{ __('SAR') }}</strong>
-                    </div>
-                    <div style="font-size: 11px; color: var(--ula-status-success); font-weight: 800;">
-                        {{ $kpis['gross_margin_pct'] ?? 0 }}% {{ __('Margin Rate') }}
-                    </div>
-                </div>
-
-                <!-- 5. Sprint Workload -->
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <span class="kpi-title">{{ __('Sprint Workload') }}</span>
-                        <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span></div>
-                    </div>
-                    <div class="kpi-value">{{ ($kpis['in_progress_tasks'] ?? 0) + ($kpis['review_tasks'] ?? 0) }}</div>
-                    <div style="font-size: 11px; color: var(--ula-text-secondary); margin-bottom: 4px;">
-                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> {{ $kpis['in_progress_tasks'] ?? 0 }} {{ __('in progress') }} • <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span> {{ $kpis['review_tasks'] ?? 0 }} {{ __('in review') }}
-                    </div>
-                    <div style="font-size: 11px; color: var(--ula-text-muted); font-weight: 700;">
-                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">push_pin</span> {{ $kpis['backlog_tasks'] ?? 0 }} {{ __('in backlog/ready') }}
-                    </div>
-                </div>
-
-                <!-- 6. Team Meetings -->
-                <div class="kpi-card">
-                    <div class="kpi-header">
-                        <span class="kpi-title">{{ __('Team Meetings') }}</span>
-                        <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span></div>
-                    </div>
-                    <div class="kpi-value">{{ $upcomingProjectMeetings->count() }}</div>
-                    <div style="font-size: 11px; color: var(--ula-text-primary); margin-bottom: 4px; font-weight: 800;">
-                        <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">circle</span> {{ __('Ready for collaboration') }}
-                    </div>
-                    <div style="font-size: 11px; color: var(--ula-text-muted);">
-                        {{ $projectMeetings->count() }} {{ __('total sessions held') }}
-                    </div>
-                </div>
+            <!-- ── 4. KPI ROW (x-kpi-card, design-reference 35) ── -->
+            <div class="ula-kpi-row">
+                <x-kpi-card density="default" icon="task_alt" iconColor="sage" :title="__('hub.kpi_progress')" :value="($kpis['progress_pct'] ?? 0) . '%'" :caption="__('hub.kpi_done', ['count' => $kpis['completed_tasks'] ?? 0]) . ' · ' . __('hub.kpi_overdue', ['count' => $kpis['overdue_tasks'] ?? 0])" />
+                <x-kpi-card density="default" icon="schedule" iconColor="gold" :title="__('hub.kpi_hours')" :value="($hubActual + 0) . 'h'" :caption="__('hub.kpi_of') . ' ' . ($hubPlanned + 0) . 'h · ' . ($hubHoursPct > 0 ? '+' : '') . $hubHoursPct . '%'" />
+                <x-kpi-card density="default" icon="payments" iconColor="muted" :title="__('hub.kpi_budget')" :value="'SAR ' . $hubCompact(abs($hubBudgetLeft))" :caption="__($hubBudgetLeft >= 0 ? 'hub.kpi_remaining' : 'hub.kpi_over', ['amount' => $hubCompact($hubBudget)])" />
+                <x-kpi-card density="default" icon="trending_up" iconColor="sage" :title="__('hub.kpi_margin')" :value="($kpis['gross_margin_pct'] ?? 0) . '%'" :caption="__('hub.kpi_margin_sub')" />
             </div>
 
-            <!-- ── 5. CLICKUP-GRADE MULTI-VIEWS NAVIGATION BAR ── -->
-            <div class="hub-tabs-nav">
-                <button onclick="switchHubSection('kanban')" id="hub-nav-btn-kanban" class="hub-tab-btn active">
-                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">push_pin</span> {{ __('Kanban Board') }} (<span id="count-total-kanban">{{ $tasks->count() }}</span>)
-                </button>
-                <button onclick="switchHubSection('tasks')" id="hub-nav-btn-tasks" class="hub-tab-btn">
-                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">assignment</span> {{ __('List View & Custom Fields') }}
-                </button>
-                <button onclick="switchHubSection('gantt')" id="hub-nav-btn-gantt" class="hub-tab-btn">
-                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bar_chart</span> {{ __('Gantt / Timeline') }}
-                </button>
-                <button onclick="switchHubSection('workload')" id="hub-nav-btn-workload" class="hub-tab-btn">
-                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">trending_up</span> {{ __('Workload Matrix') }}
-                </button>
-                <button onclick="switchHubSection('docs')" id="hub-nav-btn-docs" class="hub-tab-btn">
-                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">menu_book</span> {{ __('Docs & Wiki') }} ({{ $project->documents->count() }})
-                </button>
-                <button onclick="switchHubSection('goals')" id="hub-nav-btn-goals" class="hub-tab-btn">
-                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">track_changes</span> {{ __('Goals & Targets') }} ({{ $project->goals->count() }})
-                </button>
-                <button onclick="switchHubSection('timelog')" id="hub-nav-btn-timelog" class="hub-tab-btn">
-                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span> {{ __('Time & Margin') }} ({{ $project->timeEntries->count() }})
-                </button>
-                <button onclick="switchHubSection('meetings')" id="hub-nav-btn-meetings" class="hub-tab-btn">
-                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Meetings') }} ({{ $upcomingProjectMeetings->count() }})
-                </button>
-                <button onclick="switchHubSection('team')" id="hub-nav-btn-team" class="hub-tab-btn">
-                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">group</span> {{ __('Team Roster') }} ({{ $project->members->count() }})
-                </button>
-                <button onclick="switchHubSection('files')" id="hub-nav-btn-files" class="hub-tab-btn">
-                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> {{ __('Files & Docs') }} (<span id="count-total-files">{{ $project->files->count() }}</span>)
-                </button>
-                <button onclick="switchHubSection('milestones')" id="hub-nav-btn-milestones" class="hub-tab-btn">
-                    <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">flag</span> {{ __('Roadmap') }} ({{ $project->milestones->count() }})
-                </button>
+            <!-- ── 5. VIEW TABS (underline, design-reference 35) ── -->
+            <div class="hub-tabs-nav ula-hub-tabs" role="tablist">
+                @foreach($hubTabs as [$tabKey, $tabIcon, $tabLabel])
+                    <button type="button" role="tab" onclick="switchHubSection('{{ $tabKey }}')" id="hub-nav-btn-{{ $tabKey }}" class="hub-tab-btn ula-hub-tab{{ $loop->first ? ' active' : '' }}">
+                        <span class="material-symbols-rounded">{{ $tabIcon }}</span>{{ __($tabLabel) }}
+                    </button>
+                @endforeach
             </div>
 
             <!-- ── 6. SUB-TAB VIEWS ── -->
@@ -2221,7 +1946,7 @@
                                             {{ $file->file_name }}
                                         </div>
                                         <div style="font-size: 11px; color: var(--ula-text-muted); margin-top: 2px;">
-                                            {{ $file->formatted_size }} • {{ $file->created_at->format('M d, Y') }}
+                                            {{ $file->formatted_size }} · {{ $file->created_at->format('M d, Y') }}
                                         </div>
                                         <div style="font-size: 11px; color: var(--ula-text-secondary); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
                                             <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">person</span></span>
@@ -2282,6 +2007,8 @@
             document.querySelectorAll('.theme-toggle-icon-label').forEach(el => {
                 el.innerHTML = (activeTheme === 'dark') ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">light_mode</span>' : '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">dark_mode</span>';
             });
+            const themeIcon = document.querySelector('#theme-toggle-btn .material-symbols-rounded');
+            if (themeIcon) themeIcon.textContent = (activeTheme === 'dark') ? 'light_mode' : 'dark_mode';
             localStorage.setItem('vw_theme', activeTheme);
         }
 
@@ -2297,23 +2024,32 @@
         })();
 
         // Sidebar Collapse Engine
+        // Shared shell (partials/app-sidebar): same element and storage key as the dashboard.
         function toggleSidebarCollapse() {
-            const sb = document.getElementById('sidebar-main');
+            const sb = document.getElementById('dashboardSidebar');
             if (!sb) return;
-            sb.classList.toggle('collapsed');
-            localStorage.setItem('sidebar_collapsed', sb.classList.contains('collapsed'));
+            sb.classList.toggle('sidebar-collapsed');
+            localStorage.setItem('vw_sidebar_collapsed', sb.classList.contains('sidebar-collapsed') ? '1' : '0');
         }
 
-        function toggleMobileSidebar() {
-            const sb = document.getElementById('sidebar-main');
-            if (sb) sb.classList.toggle('mobile-open');
+        function toggleDashboardSidebar() {
+            document.getElementById('dashboardSidebar')?.classList.toggle('open');
         }
+        const toggleMobileSidebar = toggleDashboardSidebar;
 
         (function() {
-            if (localStorage.getItem('sidebar_collapsed') === 'true') {
-                document.getElementById('sidebar-main')?.classList.add('collapsed');
+            if (localStorage.getItem('vw_sidebar_collapsed') === '1') {
+                document.getElementById('dashboardSidebar')?.classList.add('sidebar-collapsed');
             }
         })();
+
+        // Top bar search drives the board's own task search.
+        function hubGlobalSearch(value) {
+            const input = document.getElementById('hub-task-search-input');
+            if (!input) return;
+            input.value = value;
+            filterHubTasks();
+        }
 
         // ClickUp Docs Modal Handlers
         function openNewDocModal() {
@@ -2543,6 +2279,10 @@
 
             if (target) target.style.display = 'block';
             if (btn) btn.classList.add('active');
+
+            // Task search/filters only apply to the task views (design-reference 35/36).
+            const filterBar = document.querySelector('.hub-filter-bar');
+            if (filterBar) filterBar.style.display = (tab === 'kanban' || tab === 'tasks') ? '' : 'none';
 
             if (window.history && window.history.pushState) {
                 window.history.pushState(null, null, '#' + tab);
@@ -3535,7 +3275,6 @@
 
         // ── TASK INSPECTOR / DETAILS DRAWER (UNIFIED) ──
         let activeInspectorTaskId = null;
-        let activeInspectedTaskId = null; // compatibility alias
         let currentInspectorTask = null;
 
         function openTaskDetails(taskId) {
@@ -3990,7 +3729,7 @@
                         const uploader = att.user ? att.user.name : '{{ __("Member") }}';
                         card.innerHTML = `
                             <div style="font-weight: 700; font-size: 12.5px; color: var(--ula-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><span class="material-symbols-rounded" style="font-size: 16px; vertical-align: text-bottom; color: var(--ula-palm-700);">description</span> ${att.file_name}</div>
-                            <div style="font-size: 11px; color: var(--ula-text-muted);"><span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom;">person</span> ${uploader} • ${(att.file_size / 1024).toFixed(1)} KB</div>
+                            <div style="font-size: 11px; color: var(--ula-text-muted);"><span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom;">person</span> ${uploader} · ${(att.file_size / 1024).toFixed(1)} KB</div>
                             <div style="display: flex; gap: 6px; margin-top: 4px;">
                                 <a href="${att.file_url || ('/uploads/tasks/' + t.id + '/' + att.file_name)}" target="_blank" download class="ula-btn ula-btn--secondary ula-btn--sm" style="flex: 1; height: 32px; min-height: 32px; font-size: 11px;"><span class="material-symbols-rounded ula-btn__icon">download</span> {{ __("Download") }}</a>
                                 <button type="button" onclick="deleteTaskAttachmentAction('${att.id}')" class="ula-icon-btn ula-icon-btn--danger ula-icon-btn--sm" style="width: 32px; height: 32px; min-width: 32px;"><span class="material-symbols-rounded">delete</span></button>

@@ -107,8 +107,8 @@
             {{ $memberCount }} <span style="font-size: 14px; color: var(--ula-text-muted); font-weight: 600;">/ {{ $isUnlimited ? '∞' : $seatLimit }}</span>
         </div>
         <div class="metric-trend" style="color: var(--ula-text-secondary); font-size: 11px; margin-top: 4px;">
-            <span>{{ $stats['active_members'] }} {{ __('Active') }}</span> • 
-            <span>{{ $stats['invited_members'] }} {{ __('Invited') }}</span> • 
+            <span>{{ $stats['active_members'] }} {{ __('Active') }}</span> · 
+            <span>{{ $stats['invited_members'] }} {{ __('Invited') }}</span> · 
             <span>{{ $stats['suspended_members'] }} {{ __('Suspended') }}</span>
         </div>
     </div>
@@ -137,7 +137,7 @@
             {{ $stats['rooms_count'] }} <span style="font-size: 14px; color: var(--ula-text-muted); font-weight: 600;">{{ __('Rooms') }}</span>
         </div>
         <div class="metric-trend" style="color: var(--ula-text-secondary); font-size: 11px; margin-top: 4px;">
-            <span>{{ $organization->floors->count() }} {{ __('Floor(s)') }} • {{ $organization->maps->count() }} {{ __('Map(s)') }}</span>
+            <span>{{ $organization->floors->count() }} {{ __('Floor(s)') }} · {{ $organization->maps->count() }} {{ __('Map(s)') }}</span>
         </div>
     </div>
 
@@ -692,27 +692,6 @@
 @endsection
 
 @section('scripts')
-<style>
-    .tab-nav-btn {
-        background: transparent;
-        color: var(--ula-text-muted);
-        border: none;
-        border-radius: var(--ula-radius-pill);
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
-    .tab-nav-btn:hover {
-        background: var(--ula-surface-page-alt);
-        color: var(--ula-text-primary);
-    }
-    .tab-nav-btn.active-tab {
-        background: var(--ula-palm-900);
-        color: white !important;
-        box-shadow: var(--ula-shadow-sm);
-    }
-</style>
-
 <script nonce="{{ $cspNonce ?? '' }}">
     function switchTab(tabId) {
         document.querySelectorAll('.tab-pane').forEach(el => el.style.display = 'none');

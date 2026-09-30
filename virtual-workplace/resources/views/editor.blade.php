@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script>
         (function() {
-            const saved = localStorage.getItem('vw_theme') || 'dark';
+            const saved = localStorage.getItem('vw_theme') || 'light';
             document.documentElement.setAttribute('data-theme', saved);
             if (saved === 'dark') {
                 document.documentElement.classList.add('dark');
@@ -31,19 +31,17 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-        /* The old :root[data-theme] blocks here only ever declared a
-           retired-prefix primary-hover variable, which nothing
-           in this file references. Removed rather than kept unused. */
+        /* ══ Map editor — light chrome (design-reference 33, re-toned light) ══════════════
+           Semantic tokens only, so the dark theme still follows data-theme / prefers-color-scheme.
+           The .nx-* toolbar classes come from ulaspace-office.css (the live office keeps its dark
+           capsule chrome); they are re-skinned here only inside .nx-editor-screen. */
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-        }
+        @layer base { * { margin: 0; padding: 0; box-sizing: border-box; } }
+        body * { user-select: none; }
+        body input, body textarea, body select { user-select: text; }
 
         body {
-            font-family: 'Cairo', 'IBM Plex Sans Arabic', 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: var(--ula-font-ar), var(--ula-font-en), sans-serif;
             background: var(--ula-surface-page);
             color: var(--ula-text-primary);
             height: 100vh;
@@ -53,650 +51,621 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        .nx-office-viewport-container { background: var(--ula-surface-page); padding: 0 !important; }
+
         .nx-editor-screen {
-            width: 95%;
-            max-width: 1720px;
-            height: calc(100vh - 24px);
-            background: radial-gradient(circle at center, var(--ula-palm-950) 0%, var(--ula-black) 100%);
-            border: 2px solid rgba(237, 230, 217, 0.16);
-            border-radius: 28px;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), inset 0 0 80px rgba(0, 0, 0, 0.6);
+            width: 100%;
+            height: 100vh;
+            background: var(--ula-surface-page);
             display: flex;
             flex-direction: column;
             overflow: hidden;
             position: relative;
         }
 
-        .editor-workspace {
-            flex: 1;
-            display: flex;
-            position: relative;
-            overflow: hidden;
-            height: calc(100% - 56px);
+        /* ── Top toolbar ── */
+        .nx-editor-screen .nx-map-toolbar {
+            height: 64px;
+            min-height: 64px;
+            padding: 0 var(--ula-space-5);
+            gap: var(--ula-space-4);
+            background: var(--ula-surface-card);
+            backdrop-filter: none;
+            border-bottom: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
+            box-shadow: var(--ula-shadow-xs);
+            z-index: 100;
         }
+        .nx-editor-screen .nx-toolbar-group { gap: var(--ula-space-2); min-width: 0; }
+        .ed-toolbar-sep { width: 1px; height: 28px; background: var(--ula-border-subtle); flex-shrink: 0; }
 
-        .canvas-viewport {
-            flex: 1;
-            height: 100%;
-            position: relative;
-            background: transparent;
-            overflow: hidden;
-            cursor: default;
-        }
-
-        #editor-canvas {
-            display: block;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* ── Tools Bar & Buttons ── */
-        .segmented-tool-pill {
-            display: flex;
-            align-items: center;
-            background: rgba(11, 20, 16, 0.9);
-            border: 1px solid var(--ula-border-default);
-            border-radius: 12px;
-            padding: 3px;
-            gap: 2px;
-        }
-
-        .tool-btn {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
-            background: transparent;
-            border: 1px solid transparent;
-            border-radius: 9px;
-            color: var(--ula-text-muted);
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .tool-btn:hover {
-            background: rgba(60, 107, 76, 0.2);
+        .nx-editor-screen .nx-toolbar-btn {
+            height: 40px;
+            padding: 0 var(--ula-space-4);
+            gap: var(--ula-space-2);
+            border-radius: var(--ula-radius-sm);
+            background: var(--ula-surface-card);
+            border: var(--ula-border-width-hairline) solid var(--ula-border-default);
             color: var(--ula-text-primary);
+            font-family: inherit;
+            font-size: var(--ula-size-sm);
+            font-weight: var(--ula-weight-semibold);
+            transition: background-color var(--ula-duration-fast) var(--ula-ease-out), border-color var(--ula-duration-fast) var(--ula-ease-out), color var(--ula-duration-fast) var(--ula-ease-out);
         }
-        .tool-btn.active {
-            background: rgba(60, 107, 76, 0.35);
-            border-color: rgba(134, 239, 172, 0.4);
-            color: var(--ula-status-success);
-            box-shadow: 0 2px 8px rgba(60, 107, 76, 0.3);
-        }
-
-        .tool-icon-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 34px;
-            height: 34px;
-            background: var(--ula-surface-page);
-            border: 1px solid var(--ula-border-default);
-            border-radius: 10px;
-            color: var(--ula-text-muted);
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.18s;
-        }
-        .tool-icon-btn:hover {
-            background: rgba(60, 107, 76, 0.2);
-            border-color: var(--ula-palm-900);
+        .nx-editor-screen .nx-toolbar-btn:hover {
+            background: var(--ula-surface-hover);
+            border-color: var(--ula-border-strong);
             color: var(--ula-text-primary);
-            transform: scale(1.05);
+            transform: none;
         }
-        .tool-icon-btn.danger:hover {
-            background: rgba(239, 68, 68, 0.15);
-            border-color: rgba(239, 68, 68, 0.5);
-            color: var(--ula-status-danger);
+        .nx-editor-screen .nx-toolbar-btn:focus-visible,
+        .tool-btn:focus-visible, .view-btn:focus-visible, .drawer-tab:focus-visible,
+        .cat-pill:focus-visible, .furn-card:focus-visible, .rot-btn:focus-visible { outline: none; box-shadow: var(--ula-focus-ring); }
+        .nx-editor-screen .nx-toolbar-btn .material-symbols-rounded { font-size: 20px; }
+        .nx-editor-screen .nx-toolbar-btn.ed-icon-only { width: 40px; padding: 0; justify-content: center; }
+        .nx-editor-screen .nx-toolbar-btn.ed-danger { color: var(--ula-text-danger); }
+        .nx-editor-screen .nx-toolbar-btn.ed-danger:hover { background: var(--ula-tone-terracotta-bg); border-color: var(--ula-border-danger); color: var(--ula-text-danger); }
+        /* Green acts: publish is the one filled action. */
+        .nx-editor-screen .nx-toolbar-btn.ed-primary { background: var(--ula-accent-default); border-color: var(--ula-accent-default); color: var(--ula-accent-fg); }
+        .nx-editor-screen .nx-toolbar-btn.ed-primary:hover { background: var(--ula-accent-hover); border-color: var(--ula-accent-hover); color: var(--ula-accent-fg); }
+        /* Gold notices: the AI entry point keeps a gold icon, never a gold fill. */
+        .nx-editor-screen .nx-toolbar-btn.btn-accent { background: var(--ula-surface-card); border-color: var(--ula-border-default); color: var(--ula-text-primary); }
+        .nx-editor-screen .nx-toolbar-btn.btn-accent .material-symbols-rounded { color: var(--ula-highlight-default); }
+        .nx-editor-screen .nx-toolbar-btn.btn-accent:hover { background: var(--ula-surface-gold-soft); border-color: var(--ula-highlight-default); }
+        .nx-editor-screen .nx-toolbar-btn.ed-branch .material-symbols-rounded:first-child { color: var(--ula-icon-accent); }
+
+        .nx-editor-screen .nx-brand-capsule {
+            height: 40px;
+            padding: 0 var(--ula-space-3);
+            gap: var(--ula-space-3);
+            border-radius: var(--ula-radius-sm);
+            background: transparent;
+            border: 0;
+            color: var(--ula-text-primary);
+            font-size: var(--ula-size-body);
+            font-weight: var(--ula-weight-semibold);
+        }
+        .nx-editor-screen .nx-brand-capsule:hover { background: var(--ula-surface-hover); }
+        .ed-brand-logo { width: 32px; height: 32px; border-radius: var(--ula-radius-xs); background: var(--ula-brand-mark-ivory); border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); display: inline-flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+        .ed-brand-logo img { width: 100%; height: 100%; object-fit: contain; padding: 2px; }
+        .ed-brand-logo .material-symbols-rounded { font-size: 20px; color: var(--ula-brand-mark-green); }
+        .ed-brand-text { display: flex; flex-direction: column; line-height: 1.2; min-width: 0; }
+        .ed-brand-text strong { font-size: var(--ula-size-body-en); font-weight: var(--ula-weight-semibold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+        .ed-brand-text span { font-size: var(--ula-size-xs); font-weight: var(--ula-weight-medium); color: var(--ula-text-secondary); }
+        .nx-editor-screen .nx-presence-dot { box-shadow: none; }
+
+        .nx-editor-screen .nx-presence-capsule {
+            height: 28px;
+            padding: 0 var(--ula-space-3);
+            border-radius: var(--ula-radius-pill);
+            background: var(--ula-tone-palm-bg);
+            border: 0;
+            color: var(--ula-tone-palm-fg);
+            font-family: var(--ula-font-mono);
+            font-size: var(--ula-size-xs);
+            direction: ltr;
+            unicode-bidi: isolate;
         }
 
-        /* ── Editor Dropdowns ── */
-        .editor-dropdown-menu {
+        /* Pop-over menus (burger + branch switcher) */
+        .ed-menu {
+            display: none;
             position: absolute;
             top: calc(100% + 8px);
             inset-inline-start: 0;
-            background: rgba(14, 25, 19, 0.98);
-            backdrop-filter: blur(24px);
-            border: 1px solid rgba(237, 230, 217, 0.20);
-            border-radius: 14px;
-            box-shadow: 0 16px 36px rgba(0,0,0,0.65);
-            padding: 6px;
+            min-width: 260px;
+            padding: var(--ula-space-2);
+            background: var(--ula-surface-raised);
+            border: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
+            border-radius: var(--ula-radius-md);
+            box-shadow: var(--ula-shadow-lg);
             z-index: 100000;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            animation: fadeInDown 0.15s ease;
         }
-        @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-4px); }
-            to { opacity: 1; transform: translateY(0); }
+        .ed-menu-head { display: flex; align-items: center; gap: var(--ula-space-3); padding: var(--ula-space-2) var(--ula-space-3) var(--ula-space-3); border-bottom: var(--ula-border-width-hairline) solid var(--ula-border-subtle); margin-bottom: var(--ula-space-2); }
+        .ed-menu-head strong { display: block; font-size: var(--ula-size-sm); color: var(--ula-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ed-menu-head span { font-size: var(--ula-size-xs); color: var(--ula-text-secondary); }
+        .ed-menu-label { font-size: var(--ula-size-xs); font-weight: var(--ula-weight-semibold); color: var(--ula-text-muted); padding: var(--ula-space-2) var(--ula-space-3); display: flex; align-items: center; gap: var(--ula-space-2); }
+        .ed-menu-divider { height: 1px; background: var(--ula-border-subtle); margin: var(--ula-space-2) 0; }
+        .more-menu-item, .ed-menu-item {
+            width: 100%;
+            min-height: 40px;
+            padding: 0 var(--ula-space-3);
+            display: flex;
+            align-items: center;
+            gap: var(--ula-space-3);
+            border: 0;
+            border-radius: var(--ula-radius-sm);
+            background: transparent;
+            color: var(--ula-text-primary);
+            font-family: inherit;
+            font-size: var(--ula-size-sm);
+            font-weight: var(--ula-weight-medium);
+            text-align: start;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color var(--ula-duration-fast) var(--ula-ease-out);
+        }
+        .more-menu-item .material-symbols-rounded, .ed-menu-item .material-symbols-rounded { font-size: 20px; color: var(--ula-text-secondary); }
+        .more-menu-item:hover, .ed-menu-item:hover { background: var(--ula-surface-hover); color: var(--ula-text-primary); }
+        .more-menu-item.ed-accent, .more-menu-item.ed-accent .material-symbols-rounded { color: var(--ula-accent-default); }
+        .ed-menu-item { justify-content: space-between; }
+        .ed-menu-item.active { background: var(--ula-surface-accent-soft); color: var(--ula-accent-default); font-weight: var(--ula-weight-semibold); }
+        .ed-menu-item.active .material-symbols-rounded { color: var(--ula-accent-default); }
+        .ed-menu-item-meta { font-size: var(--ula-size-xs); color: var(--ula-accent-default); font-weight: var(--ula-weight-semibold); }
+
+        /* Tool selector */
+        .segmented-tool-pill {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            padding: 3px;
+            background: var(--ula-surface-page-alt);
+            border: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
+            border-radius: var(--ula-radius-md);
+        }
+        .tool-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--ula-space-2);
+            height: 34px;
+            padding: 0 var(--ula-space-4);
+            background: transparent;
+            border: var(--ula-border-width-hairline) solid transparent;
+            border-radius: var(--ula-radius-sm);
+            color: var(--ula-text-secondary);
+            font-family: inherit;
+            font-size: var(--ula-size-sm);
+            font-weight: var(--ula-weight-semibold);
+            cursor: pointer;
+            transition: background-color var(--ula-duration-fast) var(--ula-ease-out), color var(--ula-duration-fast) var(--ula-ease-out);
+        }
+        .tool-btn .material-symbols-rounded { font-size: 20px; }
+        /* Icon-only like the reference; the label stays in the title tooltip. */
+        .segmented-tool-pill .tool-btn { width: 40px; padding: 0; justify-content: center; }
+        .segmented-tool-pill .tool-btn > span:not(.material-symbols-rounded) { display: none; }
+        .tool-btn:hover { background: var(--ula-surface-hover); color: var(--ula-text-primary); }
+        .tool-btn.active {
+            background: var(--ula-surface-raised);
+            border-color: var(--ula-border-subtle);
+            color: var(--ula-accent-default);
+            box-shadow: var(--ula-shadow-xs);
+        }
+
+        .tool-icon-btn {
+            display: flex; align-items: center; justify-content: center;
+            width: 36px; height: 36px;
+            background: var(--ula-surface-card);
+            border: var(--ula-border-width-hairline) solid var(--ula-border-default);
+            border-radius: var(--ula-radius-sm);
+            color: var(--ula-text-secondary);
+            cursor: pointer;
+        }
+        .tool-icon-btn:hover { background: var(--ula-surface-hover); color: var(--ula-text-primary); }
+        .tool-icon-btn.danger:hover { background: var(--ula-tone-terracotta-bg); border-color: var(--ula-border-danger); color: var(--ula-text-danger); }
+
+        /* Legacy dropdown hooks still used by scripts */
+        .editor-dropdown-menu {
+            position: absolute; top: calc(100% + 8px); inset-inline-start: 0;
+            background: var(--ula-surface-raised);
+            border: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
+            border-radius: var(--ula-radius-md);
+            box-shadow: var(--ula-shadow-lg);
+            padding: var(--ula-space-2);
+            z-index: 100000;
+            display: flex; flex-direction: column; gap: 2px;
         }
         .editor-dropdown-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            padding: 8px 12px;
-            border-radius: 8px;
-            text-decoration: none;
-            background: transparent;
-            border: none;
-            color: var(--ula-text-primary);
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            text-align: start;
-            transition: background 0.15s ease;
+            display: flex; align-items: center; justify-content: space-between; gap: var(--ula-space-3);
+            padding: var(--ula-space-2) var(--ula-space-3);
+            border-radius: var(--ula-radius-sm);
+            text-decoration: none; background: transparent; border: 0;
+            color: var(--ula-text-primary); font-family: inherit; font-size: var(--ula-size-sm); font-weight: var(--ula-weight-medium);
+            cursor: pointer; width: 100%; text-align: start;
         }
-        .editor-dropdown-item:hover {
-            background: rgba(60, 107, 76, 0.25);
-            color: var(--ula-status-success);
-        }
-        .editor-dropdown-item.active {
-            background: rgba(60, 107, 76, 0.4);
-            color: var(--ula-status-success);
-        }
-
-        .more-menu-item {
-            background: transparent;
-            border: none;
-            color: var(--ula-text-primary);
-            padding: 9px 12px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            text-align: start;
-            transition: all 0.15s ease;
-        }
-        .more-menu-item:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--ula-status-success);
-        }
+        .editor-dropdown-item:hover { background: var(--ula-surface-hover); }
+        .editor-dropdown-item.active { background: var(--ula-surface-accent-soft); color: var(--ula-accent-default); }
 
         .act-btn {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 7px 12px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            text-decoration: none;
+            display: flex; align-items: center; gap: var(--ula-space-2);
+            height: 36px; padding: 0 var(--ula-space-4);
+            border-radius: var(--ula-radius-sm);
+            font-family: inherit; font-size: var(--ula-size-sm); font-weight: var(--ula-weight-semibold);
+            cursor: pointer; border: var(--ula-border-width-hairline) solid transparent; text-decoration: none;
         }
-        .act-btn-emerald {
-            background: linear-gradient(135deg, var(--ula-status-success), var(--ula-status-success));
-            color: white;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-        .act-btn-emerald:hover {
-            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.45);
-            transform: translateY(-1px);
-        }
-        .act-btn-secondary {
-            background: var(--ula-surface-page);
-            border: 1px solid var(--ula-border-default);
-            color: var(--ula-text-primary);
-        }
-        .act-btn-secondary:hover {
-            border-color: var(--ula-palm-900);
-            color: var(--ula-text-primary);
-        }
+        .act-btn-emerald { background: var(--ula-accent-default); color: var(--ula-accent-fg); }
+        .act-btn-emerald:hover { background: var(--ula-accent-hover); }
+        .act-btn-secondary { background: var(--ula-surface-card); border-color: var(--ula-border-default); color: var(--ula-text-primary); }
+        .act-btn-secondary:hover { background: var(--ula-surface-hover); border-color: var(--ula-border-strong); }
 
-        /* Floating View Nav Overlay */
+        /* ── Workspace: canvas + catalog drawer ── */
+        .editor-workspace { flex: 1; min-height: 0; display: flex; position: relative; overflow: hidden; }
+        .canvas-viewport {
+            flex: 1; height: 100%; position: relative; overflow: hidden; cursor: default;
+            background-color: var(--ula-surface-page-alt);
+        }
+        #editor-canvas { display: block; width: 100%; height: 100%; }
+
+        /* Floating zoom / grid controls */
         .viewport-controls {
             position: absolute;
-            bottom: 20px;
-            inset-inline-start: 20px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(14, 25, 19, 0.95);
-            backdrop-filter: blur(14px);
-            border: 1px solid var(--ula-border-default);
-            padding: 6px 10px;
-            border-radius: 14px;
+            bottom: var(--ula-space-5);
+            inset-inline-start: var(--ula-space-5);
+            display: flex; align-items: center; gap: var(--ula-space-1);
+            padding: var(--ula-space-1);
+            background: var(--ula-surface-raised);
+            border: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
+            border-radius: var(--ula-radius-md);
             box-shadow: var(--ula-shadow-md);
             z-index: 10;
         }
         .view-btn {
-            background: var(--ula-surface-page);
-            border: 1px solid var(--ula-border-subtle);
-            color: var(--ula-text-primary);
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            min-width: 36px; height: 36px; padding: 0 var(--ula-space-2);
+            display: flex; align-items: center; justify-content: center; gap: var(--ula-space-1);
+            background: transparent; border: 0; border-radius: var(--ula-radius-sm);
+            color: var(--ula-text-secondary);
+            font-family: inherit; font-size: var(--ula-size-xs); font-weight: var(--ula-weight-semibold);
             cursor: pointer;
-            font-size: 13px;
-            font-weight: 800;
-            transition: all 0.15s;
+            transition: background-color var(--ula-duration-fast) var(--ula-ease-out), color var(--ula-duration-fast) var(--ula-ease-out);
         }
-        .view-btn:hover {
-            border-color: var(--ula-palm-900);
-            color: var(--ula-text-primary);
-            transform: scale(1.05);
-        }
+        .view-btn .material-symbols-rounded { font-size: 20px; }
+        .view-btn:hover { background: var(--ula-surface-hover); color: var(--ula-text-primary); }
+        .view-btn.ed-mono { font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; color: var(--ula-text-primary); }
+        .ed-zoom-sep { width: 1px; height: 22px; background: var(--ula-border-subtle); margin: 0 var(--ula-space-1); }
 
-        /* Floating Action Bar on Selected Item */
+        /* Selected-object quick actions */
         .floating-item-actions {
             position: absolute;
             transform: translate(-50%, -100%);
             margin-top: -12px;
-            background: rgba(13, 27, 20, 0.95);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--ula-palm-900);
-            border-radius: 10px;
-            padding: 4px 8px;
-            display: none;
-            align-items: center;
-            gap: 6px;
+            background: var(--ula-surface-raised);
+            border: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
+            border-radius: var(--ula-radius-sm);
+            padding: var(--ula-space-1);
+            display: none; align-items: center; gap: var(--ula-space-1);
             z-index: 50;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+            box-shadow: var(--ula-shadow-md);
         }
         .float-act-btn {
-            background: var(--ula-surface-page);
-            border: 1px solid var(--ula-border-subtle);
-            color: var(--ula-text-primary);
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 700;
+            height: 30px; padding: 0 var(--ula-space-3);
+            display: inline-flex; align-items: center; gap: var(--ula-space-1);
+            background: transparent; border: 0; border-radius: var(--ula-radius-xs);
+            color: var(--ula-text-primary); font-family: inherit; font-size: var(--ula-size-xs); font-weight: var(--ula-weight-semibold);
             cursor: pointer;
-            transition: all 0.15s;
         }
-        .float-act-btn:hover {
-            background: rgba(60, 107, 76, 0.25);
-            border-color: var(--ula-palm-900);
-            color: var(--ula-status-success);
-        }
+        .float-act-btn:hover { background: var(--ula-surface-hover); }
+        .float-act-btn.ed-danger { color: var(--ula-text-danger); }
+        .float-act-btn.ed-danger:hover { background: var(--ula-tone-terracotta-bg); }
 
-        /* ── Right Customizer Drawer ── */
+        /* ── Catalog / inspector drawer ── */
         .customizer-drawer {
             width: 380px;
             height: 100%;
-            background: rgba(14, 25, 19, 0.96);
-            backdrop-filter: blur(28px);
-            border-inline-start: 1px solid var(--ula-border-default);
-            display: flex;
-            flex-direction: column;
+            background: var(--ula-surface-card);
+            border-inline-start: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
+            display: flex; flex-direction: column;
             z-index: 20;
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: var(--ula-shadow-md);
+            transition: transform var(--ula-duration-base) var(--ula-ease-out), margin var(--ula-duration-base) var(--ula-ease-out);
         }
-        .customizer-drawer.collapsed {
-            transform: translateX(100%);
-            margin-inline-end: -380px;
-        }
-        [dir="rtl"] .customizer-drawer.collapsed {
-            transform: translateX(-100%);
-            margin-inline-end: -380px;
-        }
+        .customizer-drawer.collapsed { transform: translateX(100%); margin-inline-end: -380px; }
+        [dir="rtl"] .customizer-drawer.collapsed { transform: translateX(-100%); margin-inline-end: -380px; }
 
         .drawer-header {
-            padding: 14px 18px;
-            border-bottom: 1px solid var(--ula-border-default);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            padding: var(--ula-space-4) var(--ula-space-5);
+            display: flex; align-items: center; justify-content: space-between;
         }
-        .drawer-title {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--ula-text-primary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .drawer-title { font-size: var(--ula-size-body); font-weight: var(--ula-weight-semibold); color: var(--ula-text-primary); display: flex; align-items: center; gap: var(--ula-space-2); }
+        .drawer-title .material-symbols-rounded { font-size: 20px; color: var(--ula-highlight-default); }
+        .ed-drawer-close {
+            width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center;
+            background: transparent; border: 0; border-radius: var(--ula-radius-sm);
+            color: var(--ula-text-muted); cursor: pointer;
         }
+        .ed-drawer-close:hover { background: var(--ula-surface-hover); color: var(--ula-text-primary); }
 
         .drawer-tabs {
-            display: flex;
-            background: var(--ula-surface-page);
-            padding: 4px;
-            margin: 10px 14px;
-            border-radius: 12px;
-            gap: 4px;
-            border: 1px solid var(--ula-border-subtle);
+            display: flex; gap: 2px;
+            margin: 0 var(--ula-space-5) var(--ula-space-4);
+            padding: 3px;
+            background: var(--ula-surface-page-alt);
+            border-radius: var(--ula-radius-md);
         }
         .drawer-tab {
             flex: 1;
-            text-align: center;
-            padding: 8px 4px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--ula-text-muted);
-            cursor: pointer;
-            transition: all 0.18s;
+            min-height: 36px;
+            padding: var(--ula-space-1) var(--ula-space-2);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+            border-radius: var(--ula-radius-sm);
+            font-size: var(--ula-size-xs); font-weight: var(--ula-weight-semibold);
+            color: var(--ula-text-secondary);
+            text-align: center; cursor: pointer;
+            transition: background-color var(--ula-duration-fast) var(--ula-ease-out), color var(--ula-duration-fast) var(--ula-ease-out);
         }
-        .drawer-tab:hover {
-            color: var(--ula-text-primary);
-        }
-        .drawer-tab.active {
-            background: var(--ula-palm-900);
-            color: white;
-            box-shadow: 0 2px 8px rgba(60, 107, 76, 0.4);
-        }
+        .drawer-tab:hover { color: var(--ula-text-primary); }
+        .drawer-tab.active { background: var(--ula-accent-default); color: var(--ula-accent-fg); box-shadow: var(--ula-shadow-xs); }
+        .drawer-tab .ed-tab-sub { font-size: var(--ula-size-label); font-weight: var(--ula-weight-medium); opacity: 0.8; }
 
         .drawer-body {
-            flex: 1;
-            overflow-y: auto;
-            padding: 0 14px 20px 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            flex: 1; overflow-y: auto;
+            padding: 0 var(--ula-space-5) var(--ula-space-6);
+            display: flex; flex-direction: column; gap: var(--ula-space-3);
+            scrollbar-width: thin;
+            scrollbar-color: var(--ula-border-strong) transparent;
         }
 
-        /* ── Search & Category Filter Navigation ── */
-        .search-box-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
+        .search-box-wrapper { position: relative; display: flex; align-items: center; }
+        .search-box-wrapper::before {
+            content: 'search';
+            font-family: 'Material Symbols Rounded';
+            position: absolute; inset-inline-start: 12px;
+            font-size: 20px; color: var(--ula-text-muted); pointer-events: none;
         }
         .search-box {
-            width: 100%;
+            width: 100%; height: 44px;
+            padding-inline: 40px 36px;
             background: var(--ula-surface-page);
-            border: 1px solid var(--ula-border-default);
-            border-radius: 10px;
-            padding: 9px 36px 9px 12px;
+            border: var(--ula-border-width-hairline) solid var(--ula-border-default);
+            border-radius: var(--ula-radius-md);
             color: var(--ula-text-primary);
-            font-size: 12px;
-            font-weight: 600;
+            font-family: inherit; font-size: var(--ula-size-sm);
             outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
+            transition: border-color var(--ula-duration-fast) var(--ula-ease-out), box-shadow var(--ula-duration-fast) var(--ula-ease-out);
         }
-        [dir="rtl"] .search-box {
-            padding: 9px 12px 9px 36px;
-        }
-        .search-box:focus {
-            border-color: var(--ula-palm-900);
-            box-shadow: 0 0 10px rgba(60, 107, 76, 0.3);
-        }
+        .search-box::placeholder { color: var(--ula-text-muted); }
+        .search-box:focus { border-color: var(--ula-border-focus); box-shadow: var(--ula-focus-ring); }
         .search-clear-btn {
-            position: absolute;
-            inset-inline-end: 10px;
-            background: none;
-            border: none;
-            color: var(--ula-text-muted);
-            cursor: pointer;
-            font-size: 13px;
-            display: none;
-            padding: 2px 4px;
+            position: absolute; inset-inline-end: 8px;
+            background: none; border: 0; color: var(--ula-text-muted); cursor: pointer;
+            display: none; padding: var(--ula-space-1);
         }
-        .search-clear-btn:hover {
-            color: var(--ula-text-primary);
-        }
+        .search-clear-btn:hover { color: var(--ula-text-primary); }
+
+        .ed-catalog-meta { display: flex; justify-content: space-between; align-items: center; font-size: var(--ula-size-xs); color: var(--ula-text-secondary); }
+        .ed-catalog-meta strong { font-family: var(--ula-font-mono); font-weight: var(--ula-weight-medium); color: var(--ula-text-primary); direction: ltr; unicode-bidi: isolate; }
+        .ed-link-btn { background: none; border: 0; color: var(--ula-accent-default); font-family: inherit; font-size: var(--ula-size-xs); font-weight: var(--ula-weight-semibold); cursor: pointer; }
+        .ed-link-btn:hover { text-decoration: underline; }
 
         .category-filter-bar {
-            display: flex;
-            gap: 6px;
+            display: flex; gap: var(--ula-space-2);
             overflow-x: auto;
-            padding: 2px 2px 6px 2px;
+            padding: 2px 0 var(--ula-space-2);
             scrollbar-width: thin;
-            scrollbar-color: rgba(60, 107, 76, 0.4) transparent;
-        }
-        .category-filter-bar::-webkit-scrollbar {
-            height: 3px;
-        }
-        .category-filter-bar::-webkit-scrollbar-thumb {
-            background: rgba(60, 107, 76, 0.4);
-            border-radius: 3px;
+            scrollbar-color: var(--ula-border-strong) transparent;
         }
         .cat-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 5px 10px;
-            background: var(--ula-surface-page);
-            border: 1px solid var(--ula-border-subtle);
-            border-radius: 18px;
-            color: var(--ula-text-muted);
-            font-size: 11px;
-            font-weight: 700;
-            white-space: nowrap;
-            cursor: pointer;
-            transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
-            user-select: none;
-            flex-shrink: 0;
+            display: inline-flex; align-items: center; gap: var(--ula-space-1);
+            height: 32px; padding: 0 var(--ula-space-3);
+            background: var(--ula-surface-card);
+            border: var(--ula-border-width-hairline) solid var(--ula-border-default);
+            border-radius: var(--ula-radius-pill);
+            color: var(--ula-text-secondary);
+            font-family: inherit; font-size: var(--ula-size-xs); font-weight: var(--ula-weight-semibold);
+            white-space: nowrap; cursor: pointer; flex-shrink: 0;
+            transition: background-color var(--ula-duration-fast) var(--ula-ease-out), border-color var(--ula-duration-fast) var(--ula-ease-out), color var(--ula-duration-fast) var(--ula-ease-out);
         }
-        .cat-pill:hover {
-            border-color: var(--ula-palm-900);
-            color: var(--ula-text-primary);
-            background: rgba(60, 107, 76, 0.2);
-            transform: translateY(-1px);
-        }
-        .cat-pill.active {
-            background: linear-gradient(135deg, rgba(60, 107, 76, 0.4), rgba(30, 65, 47, 0.4));
-            border-color: var(--ula-palm-900);
-            color: var(--ula-status-success);
-            box-shadow: 0 2px 8px rgba(60, 107, 76, 0.3);
-        }
+        .cat-pill .material-symbols-rounded { font-size: 16px; }
+        .cat-pill:hover { border-color: var(--ula-border-strong); color: var(--ula-text-primary); background: var(--ula-surface-hover); }
+        .cat-pill.active { background: var(--ula-accent-default); border-color: var(--ula-accent-default); color: var(--ula-accent-fg); }
         .cat-pill-count {
-            font-size: 9px;
-            padding: 1px 5px;
-            border-radius: 8px;
-            background: rgba(0, 0, 0, 0.4);
-            color: var(--ula-status-success);
+            font-family: var(--ula-font-mono); font-size: var(--ula-size-label);
+            padding: 0 var(--ula-space-1); border-radius: var(--ula-radius-pill);
+            background: var(--ula-surface-page-alt); color: var(--ula-text-secondary);
+            direction: ltr; unicode-bidi: isolate;
         }
+        .cat-pill.active .cat-pill-count { background: var(--ula-surface-accent-soft); color: var(--ula-accent-default); }
 
         .category-group {
             background: var(--ula-surface-page);
-            border: 1px solid var(--ula-border-subtle);
-            border-radius: 12px;
+            border: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
+            border-radius: var(--ula-radius-md);
             overflow: hidden;
-            transition: border-color 0.2s;
-        }
-        .category-group:hover {
-            border-color: rgba(60, 107, 76, 0.4);
         }
         .category-title-bar {
-            padding: 9px 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 12px;
-            font-weight: 700;
+            min-height: 44px; padding: 0 var(--ula-space-4);
+            display: flex; align-items: center; justify-content: space-between; gap: var(--ula-space-2);
+            font-size: var(--ula-size-sm); font-weight: var(--ula-weight-semibold);
             color: var(--ula-text-primary);
-            cursor: pointer;
-            background: rgba(255, 255, 255, 0.02);
-            transition: background 0.15s;
+            cursor: pointer; background: transparent;
         }
-        .category-title-bar:hover {
-            background: rgba(60, 107, 76, 0.12);
-        }
-        .cat-chevron {
-            font-size: 11px;
-            color: var(--ula-text-muted);
-            transition: transform 0.2s;
-        }
+        .category-title-bar:hover { background: var(--ula-surface-hover); }
+        .cat-chevron { font-size: 18px; color: var(--ula-text-muted); transition: transform var(--ula-duration-fast) var(--ula-ease-out); }
 
         .furniture-grid {
-            padding: 8px;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            max-height: 480px;
-            overflow-y: auto;
-        }
-        .furniture-grid::-webkit-scrollbar {
-            width: 4px;
-        }
-        .furniture-grid::-webkit-scrollbar-thumb {
-            background: rgba(60, 107, 76, 0.35);
-            border-radius: 4px;
+            padding: 0 var(--ula-space-3) var(--ula-space-3);
+            display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ula-space-3);
+            max-height: 520px; overflow-y: auto;
         }
 
         .furn-card {
             background: var(--ula-surface-card);
-            border: 1px solid var(--ula-border-subtle);
-            border-radius: 10px;
-            padding: 8px 6px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            cursor: pointer;
-            gap: 5px;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
+            border: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
+            border-radius: var(--ula-radius-md);
+            padding: var(--ula-space-2);
+            display: flex; flex-direction: column; align-items: stretch;
+            text-align: start; gap: var(--ula-space-2);
+            cursor: pointer; position: relative; overflow: hidden;
+            transition: border-color var(--ula-duration-fast) var(--ula-ease-out), box-shadow var(--ula-duration-fast) var(--ula-ease-out);
         }
-        .furn-card:hover {
-            border-color: var(--ula-palm-900);
-            background: rgba(60, 107, 76, 0.2);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4), 0 0 10px rgba(60, 107, 76, 0.3);
-        }
-        .furn-card.active {
-            border-color: var(--ula-status-success);
-            background: rgba(60, 107, 76, 0.35);
-            box-shadow: 0 0 14px rgba(60, 107, 76, 0.5);
-        }
+        .furn-card:hover { border-color: var(--ula-border-strong); box-shadow: var(--ula-shadow-sm); }
+        .furn-card.active, .furn-card.selected { border: 1.5px solid var(--ula-accent-default); box-shadow: var(--ula-shadow-sm); }
 
         .furn-card-top-badges {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 9px;
-            font-weight: 800;
-            padding: 0 2px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: var(--ula-size-label); font-weight: var(--ula-weight-semibold);
         }
         .furn-dim-badge {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--ula-stone-400);
-            padding: 1px 5px;
-            border-radius: 4px;
+            background: var(--ula-surface-page-alt); color: var(--ula-text-secondary);
+            padding: 0 var(--ula-space-1); border-radius: var(--ula-radius-xs);
+            font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;
         }
         .furn-type-badge {
-            background: rgba(60, 107, 76, 0.3);
-            color: var(--ula-status-success);
-            padding: 1px 5px;
-            border-radius: 4px;
+            display: inline-flex; align-items: center; gap: 2px;
+            background: var(--ula-tone-palm-bg); color: var(--ula-tone-palm-fg);
+            padding: 0 var(--ula-space-1); border-radius: var(--ula-radius-xs);
         }
 
         .furn-icon {
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            background: radial-gradient(circle at center, rgba(27, 50, 35, 0.9) 0%, rgba(11, 20, 16, 0.95) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            overflow: hidden;
-            position: relative;
-            padding: 3px;
+            width: 100%; aspect-ratio: 16 / 10; height: auto;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: var(--ula-radius-sm);
+            background: var(--ula-surface-page-alt);
+            overflow: hidden; position: relative; padding: var(--ula-space-2);
+            color: var(--ula-icon-accent);
         }
-        .furn-icon img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5));
-            transition: transform 0.2s ease;
-        }
-        .furn-card:hover .furn-icon img {
-            transform: scale(1.1);
-        }
+        .furn-icon .material-symbols-rounded { font-size: 28px; }
+        .furn-icon img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform var(--ula-duration-fast) var(--ula-ease-out); }
+        .furn-card:hover .furn-icon img { transform: scale(1.06); }
         .furn-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--ula-text-primary);
-            line-height: 1.25;
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
+            font-size: var(--ula-size-sm); font-weight: var(--ula-weight-semibold);
+            color: var(--ula-text-primary); line-height: 1.3;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
 
-        /* ── Inspector Controls ── */
+        /* ── Inspector ── */
         .prop-section {
             background: var(--ula-surface-page);
-            border: 1px solid var(--ula-border-subtle);
-            border-radius: 12px;
-            padding: 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            border: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
+            border-radius: var(--ula-radius-md);
+            padding: var(--ula-space-4);
+            display: flex; flex-direction: column; gap: var(--ula-space-3);
         }
-        .prop-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--ula-text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-        }
+        .prop-label { font-size: var(--ula-size-xs); font-weight: var(--ula-weight-semibold); color: var(--ula-text-secondary); }
         .prop-input {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.35);
-            border: 1px solid var(--ula-border-default);
-            border-radius: 8px;
-            padding: 8px 12px;
-            color: var(--ula-text-primary);
-            font-size: 12px;
-            font-weight: 600;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-        .prop-input:focus {
-            border-color: var(--ula-palm-900);
-        }
-
-        .rotation-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-        }
-        .rot-btn {
-            padding: 6px 0;
-            text-align: center;
+            width: 100%; height: 40px; padding: 0 var(--ula-space-3);
             background: var(--ula-surface-card);
-            border: 1px solid var(--ula-border-subtle);
-            border-radius: 6px;
-            color: var(--ula-text-primary);
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.15s;
+            border: var(--ula-border-width-hairline) solid var(--ula-border-default);
+            border-radius: var(--ula-radius-sm);
+            color: var(--ula-text-primary); font-family: inherit; font-size: var(--ula-size-sm);
+            outline: none;
         }
-        .rot-btn:hover, .rot-btn.active {
-            background: var(--ula-palm-900);
-            color: white;
+        textarea.prop-input { height: auto; padding: var(--ula-space-2) var(--ula-space-3); }
+        .prop-input:focus { border-color: var(--ula-border-focus); box-shadow: var(--ula-focus-ring); }
+        .ed-box {
+            display: flex; flex-direction: column; gap: var(--ula-space-2);
+            padding: var(--ula-space-3); border-radius: var(--ula-radius-sm);
+            background: var(--ula-surface-accent-soft);
+        }
+        .ed-box--gold { background: var(--ula-tone-gold-bg); }
+        .ed-box--stone { background: var(--ula-tone-stone-bg); }
+        .ed-box--terracotta { background: var(--ula-tone-terracotta-bg); }
+        .ed-box-title { font-size: var(--ula-size-sm); font-weight: var(--ula-weight-semibold); color: var(--ula-text-primary); display: inline-flex; align-items: center; gap: var(--ula-space-1); }
+
+        .rotation-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--ula-space-2); }
+        .rot-btn {
+            height: 34px; text-align: center;
+            background: var(--ula-surface-card);
+            border: var(--ula-border-width-hairline) solid var(--ula-border-default);
+            border-radius: var(--ula-radius-sm);
+            color: var(--ula-text-primary); font-family: var(--ula-font-mono); font-size: var(--ula-size-xs); font-weight: var(--ula-weight-medium);
+            cursor: pointer;
+        }
+        .rot-btn:hover { background: var(--ula-surface-hover); }
+        .rot-btn.active { background: var(--ula-accent-default); border-color: var(--ula-accent-default); color: var(--ula-accent-fg); }
+
+        #drawer-view-floors .tool-btn { height: auto; min-height: 60px; padding: var(--ula-space-2) var(--ula-space-1); line-height: 1.3; }
+        .ed-floor-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--ula-space-2); padding: var(--ula-space-2); background: var(--ula-surface-page-alt); border-radius: var(--ula-radius-md); }
+
+
+        @media (max-width: 1180px) {
+            .nx-editor-screen .nx-toolbar-btn.ed-collapsible span:not(.material-symbols-rounded) { display: none; }
+            .ed-brand-text { display: none; }
         }
 
-        /* ── Toast Notifications ── */
+        /* ── Door picker (room inspector) ── */
+        .ed-door-picker {
+            direction: ltr;
+            display: grid;
+            grid-template-columns: 36px 1fr 36px;
+            grid-template-rows: 36px 88px 36px;
+            grid-template-areas: ". top ." "left room right" ". bottom .";
+            gap: var(--ula-space-1);
+            margin-top: var(--ula-space-2);
+            padding: var(--ula-space-2);
+            background: var(--ula-surface-page-alt);
+            border-radius: var(--ula-radius-md);
+        }
+        .ed-door-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            border: var(--ula-border-width-hairline) solid var(--ula-border-default);
+            border-radius: var(--ula-radius-sm);
+            background: var(--ula-surface-card);
+            color: var(--ula-text-secondary);
+            cursor: pointer;
+            transition: background-color var(--ula-duration-fast) var(--ula-ease-out), color var(--ula-duration-fast) var(--ula-ease-out), border-color var(--ula-duration-fast) var(--ula-ease-out);
+        }
+        .ed-door-btn .material-symbols-rounded { font-size: 20px; }
+        .ed-door-btn:hover { background: var(--ula-surface-hover); color: var(--ula-text-primary); border-color: var(--ula-border-strong); }
+        .ed-door-btn:focus-visible { outline: none; box-shadow: var(--ula-focus-ring); }
+        .ed-door-btn.active { background: var(--ula-accent-default); border-color: var(--ula-accent-default); color: var(--ula-accent-fg); }
+        .ed-door-btn--top { grid-area: top; justify-self: center; width: 56px; }
+        .ed-door-btn--bottom { grid-area: bottom; justify-self: center; width: 56px; }
+        .ed-door-btn--left { grid-area: left; align-self: center; height: 56px; }
+        .ed-door-btn--right { grid-area: right; align-self: center; height: 56px; }
+        .ed-door-room {
+            grid-area: room;
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid var(--ula-border-strong);
+            border-radius: var(--ula-radius-xs);
+            background: var(--ula-surface-card);
+        }
+        .ed-door-btn--auto { width: 40px; height: 40px; border-style: dashed; }
+        /* The door itself, placed on the chosen wall at the offset from the slider below. */
+        .ed-door-mark {
+            position: absolute;
+            display: none;
+            background: var(--ula-accent-default);
+            border-radius: var(--ula-radius-pill);
+            box-shadow: 0 0 0 2px var(--ula-surface-card);
+        }
+        .ed-door-mark[data-side="top"], .ed-door-mark[data-side="bottom"] { display: block; width: 24px; height: 5px; transform: translateX(-50%); }
+        .ed-door-mark[data-side="left"], .ed-door-mark[data-side="right"] { display: block; width: 5px; height: 24px; transform: translateY(-50%); }
+        .ed-door-mark[data-side="top"] { top: -4px; }
+        .ed-door-mark[data-side="bottom"] { bottom: -4px; }
+        .ed-door-mark[data-side="left"] { left: -4px; }
+        .ed-door-mark[data-side="right"] { right: -4px; }
+        .ed-door-caption { margin-top: var(--ula-space-2); font-size: var(--ula-size-xs); font-weight: var(--ula-weight-semibold); color: var(--ula-text-secondary); text-align: center; }
+
+        /* ── Notification toast ── */
         .toast-bubble {
             position: fixed;
-            bottom: 24px;
-            inset-inline-start: 24px;
-            background: rgba(60, 107, 76, 0.95);
-            backdrop-filter: blur(12px);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 14px;
-            font-size: 13px;
-            font-weight: 700;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            inset-inline: 0;
+            bottom: var(--ula-space-6);
+            margin-inline: auto;
+            width: max-content;
+            min-width: 260px;
+            max-width: min(440px, calc(100vw - 32px));
             display: none;
+            align-items: center;
+            gap: var(--ula-space-3);
+            padding: var(--ula-space-3) var(--ula-space-4);
+            padding-inline-end: var(--ula-space-5);
+            background: var(--ula-surface-raised);
+            border: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
+            border-radius: var(--ula-radius-md);
+            box-shadow: var(--ula-shadow-lg);
+            color: var(--ula-text-primary);
+            font-size: var(--ula-size-sm);
+            font-weight: var(--ula-weight-medium);
+            line-height: 1.5;
             z-index: 100000;
-            animation: popToast 0.3s ease;
+            transform: none;
         }
-        @keyframes popToast {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .toast-bubble.show { display: flex; animation: edToastIn var(--ula-duration-base) var(--ula-ease-out); }
+        .toast-icon {
+            width: 32px; height: 32px; flex-shrink: 0;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: var(--ula-radius-sm);
+        }
+        .toast-icon .material-symbols-rounded { font-size: 20px; }
+        .toast-bubble[data-tone="ok"] .toast-icon { background: var(--ula-tone-palm-bg); color: var(--ula-tone-palm-fg); }
+        .toast-bubble[data-tone="error"] .toast-icon { background: var(--ula-tone-terracotta-bg); color: var(--ula-tone-terracotta-fg); }
+        .toast-bubble[data-tone="busy"] .toast-icon { background: var(--ula-tone-stone-bg); color: var(--ula-tone-stone-fg); }
+        .toast-bubble[data-tone="busy"] .toast-icon .material-symbols-rounded { animation: edSpin 1s linear infinite; }
+        .toast-bubble[data-tone="info"] .toast-icon { background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg); }
+        .toast-text { min-width: 0; overflow-wrap: anywhere; unicode-bidi: plaintext; }
+        @keyframes edToastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        @keyframes edSpin { to { transform: rotate(360deg); } }
+        @media (prefers-reduced-motion: reduce) {
+            .toast-bubble.show, .toast-bubble[data-tone="busy"] .toast-icon .material-symbols-rounded { animation: none; }
         }
     </style>
 </head>
@@ -706,192 +675,192 @@
         
         <div class="nx-editor-screen">
             
-            <!-- ── Top Map & Editor Toolbar (UlaSpace Figma Standard) ── -->
-            <header class="nx-map-toolbar" style="position: relative; top: 0; inset-inline: 0; border-radius: 0; border-inline: none; border-block-start: none; background: rgba(14, 25, 19, 0.95); backdrop-filter: blur(24px); border-block-end: 1px solid rgba(237, 230, 217, 0.15); padding: 10px 16px; margin: 0; display: flex; align-items: center; justify-content: space-between; z-index: 100;">
-                
-                <!-- 1. Start Group (Top Right on RTL): Burger Menu + Brand Capsule + Branch Switcher + Version -->
+            <!-- ── Top toolbar (design-reference 33, light) ── -->
+            <header class="nx-map-toolbar">
+
+                <!-- 1. Start: menu, brand, branch switcher, version -->
                 <div class="nx-toolbar-group">
-                    <!-- Main Burger Dropdown -->
-                    <div style="position: relative; display: inline-block;">
-                        <button type="button" onclick="toggleEditorMainMenu(event)" class="nx-toolbar-btn" style="padding: 6px 10px;" title="{{ __('Menu') }}">
-                            <span class="material-symbols-rounded" style="font-size: 20px;">menu</span>
+                    <div style="position: relative;">
+                        <button type="button" onclick="toggleEditorMainMenu(event)" class="nx-toolbar-btn ed-icon-only" title="{{ __('Menu') }}" aria-label="{{ __('Menu') }}">
+                            <span class="material-symbols-rounded">menu</span>
                         </button>
-                        
-                        <div id="editor-main-menu-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); inset-inline-start: 0; min-width: 260px; background: rgba(14, 25, 19, 0.98); backdrop-filter: blur(24px); border: 1px solid rgba(237, 230, 217, 0.20); border-radius: 16px; box-shadow: 0 16px 40px rgba(0,0,0,0.65); padding: 8px; z-index: 100000;">
-                            <!-- Header Info -->
-                            <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px 12px; border-bottom: 1px solid rgba(237, 230, 217, 0.12); margin-bottom: 6px;">
-                                @if(!empty($organization->logo_url))
-                                    <img src="{{ $organization->logo_url }}" alt="{{ $organization->name }}" style="height: 24px; width: auto; object-fit: contain;">
-                                @else
-                                    <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 24px;">apartment</span>
-                                @endif
-                                <div style="overflow: hidden;">
-                                    <strong style="display: block; font-size: 13px; color: var(--ula-text-on-dark); white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">{{ $organization->name }}</strong>
-                                    <span style="font-size: 11px; color: var(--ula-text-on-dark-subtle);">{{ __('Floor Map Designer') }}</span>
+
+                        <div id="editor-main-menu-dropdown" class="ed-menu">
+                            <div class="ed-menu-head">
+                                <span class="ed-brand-logo">
+                                    @if(!empty($organization->logo_url))
+                                        <img src="{{ $organization->logo_url }}" alt="{{ $organization->name }}">
+                                    @else
+                                        <span class="material-symbols-rounded">apartment</span>
+                                    @endif
+                                </span>
+                                <div style="min-width: 0;">
+                                    <strong>{{ $organization->name }}</strong>
+                                    <span>{{ __('Floor Map Designer') }}</span>
                                 </div>
                             </div>
 
-                            <!-- Actions -->
-                            <a href="{{ route('dashboard') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--ula-white); font-size: 12px; font-weight: 600;">
-                                <span class="material-symbols-rounded" style="font-size: 18px; color: var(--ula-highlight-default);">dashboard</span>
+                            <a href="{{ route('dashboard') }}" class="more-menu-item">
+                                <span class="material-symbols-rounded">dashboard</span>
                                 <span>{{ __('Dashboard') }}</span>
                             </a>
-
-                            <a href="{{ route('office', ['office' => $floor->id]) }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--ula-status-success); font-size: 12px; font-weight: 600;">
-                                <span class="material-symbols-rounded" style="font-size: 18px;">meeting_room</span>
+                            <a href="{{ route('office', ['office' => $floor->id]) }}" class="more-menu-item ed-accent">
+                                <span class="material-symbols-rounded">meeting_room</span>
                                 <span>{{ __('Enter Live Office') }}</span>
                             </a>
 
                             @if(session('superadmin_impersonator_id'))
                             <form method="POST" action="{{ route('impersonate.leave') }}" style="margin: 0;">
                                 @csrf
-                                <button type="submit" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: var(--ula-accent-default); font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
-                                    <span class="material-symbols-rounded" style="font-size: 18px;">shield</span>
+                                <button type="submit" class="more-menu-item ed-accent">
+                                    <span class="material-symbols-rounded">shield</span>
                                     <span>{{ __('Return to Super Admin') }}</span>
                                 </button>
                             </form>
                             @endif
 
-                            <div style="height: 1px; background: rgba(237, 230, 217, 0.12); margin: 6px 0;"></div>
+                            <div class="ed-menu-divider"></div>
 
-                            <button type="button" onclick="toggleAppTheme(); closeEditorMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: var(--ula-white); font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
-                                <span class="material-symbols-rounded" style="font-size: 18px;">light_mode</span>
+                            <button type="button" onclick="toggleAppTheme(); closeEditorMainMenu();" class="more-menu-item">
+                                <span class="material-symbols-rounded">contrast</span>
                                 <span>{{ __('Toggle Theme') }}</span>
                             </button>
-
                             @if(app()->getLocale() === 'ar')
-                                <a href="{{ route('lang.switch', 'en') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--ula-white); font-size: 12px; font-weight: 600;">
-                                    <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
+                                <a href="{{ route('lang.switch', 'en') }}" class="more-menu-item">
+                                    <span class="material-symbols-rounded">language</span>
                                     <span>English (EN)</span>
                                 </a>
                             @else
-                                <a href="{{ route('lang.switch', 'ar') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--ula-white); font-size: 12px; font-weight: 600;">
-                                    <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
+                                <a href="{{ route('lang.switch', 'ar') }}" class="more-menu-item">
+                                    <span class="material-symbols-rounded">language</span>
                                     <span>العربية (AR)</span>
                                 </a>
                             @endif
                         </div>
                     </div>
 
-                    <!-- Brand Capsule with Logo -->
                     <div class="nx-brand-capsule" onclick="toggleEditorMainMenu(event)" style="cursor: pointer;" title="{{ __('Click to open menu') }}">
-                        <span class="nx-presence-dot"></span>
-                        @if(!empty($organization->logo_url))
-                            <img src="{{ $organization->logo_url }}" alt="{{ $organization->name }}" style="height: 18px; width: auto; object-fit: contain;">
-                        @else
-                            <span class="material-symbols-rounded" style="color: var(--ula-highlight-default); font-size: 18px;">apartment</span>
-                        @endif
-                        <span>{{ $organization->name }}</span>
+                        <span class="ed-brand-logo">
+                            @if(!empty($organization->logo_url))
+                                <img src="{{ $organization->logo_url }}" alt="{{ $organization->name }}">
+                            @else
+                                <span class="material-symbols-rounded">apartment</span>
+                            @endif
+                        </span>
+                        <span class="ed-brand-text">
+                            <strong>{{ __('Floor Map Designer') }}</strong>
+                            <span>{{ $organization->name }}</span>
+                        </span>
                     </div>
 
-                    <!-- Branch Switcher -->
-                    <div style="position: relative; display: inline-block;">
-                        <button type="button" onclick="toggleBranchDropdown(event)" class="nx-toolbar-btn" style="color: var(--ula-highlight-default); border-color: rgba(211, 165, 83, 0.35); font-weight: 600;" title="{{ __('Switch Office Branch') }}">
-                            <span class="material-symbols-rounded" style="font-size: 18px;">domain</span>
-                            <span style="max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $floor->name }}</span>
-                            <span class="material-symbols-rounded" style="font-size: 16px;">arrow_drop_down</span>
+                    <div style="position: relative;">
+                        <button type="button" onclick="toggleBranchDropdown(event)" class="nx-toolbar-btn ed-branch" title="{{ __('Switch Office Branch') }}">
+                            <span class="material-symbols-rounded">domain</span>
+                            <span style="max-width: 160px; overflow: hidden; text-overflow: ellipsis;">{{ $floor->name }}</span>
+                            <span class="material-symbols-rounded" style="font-size: 18px; color: var(--ula-text-muted);">expand_more</span>
                         </button>
-                        <div id="branch-select-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); inset-inline-start: 0; min-width: 250px; background: rgba(14, 25, 19, 0.98); backdrop-filter: blur(18px); border: 1px solid rgba(237, 230, 217, 0.20); border-radius: 14px; box-shadow: 0 16px 36px rgba(0,0,0,0.65); padding: 6px; z-index: 100000;">
-                            <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 4px;">
-                                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> {{ __('Select Office Branch') }}
+                        <div id="branch-select-dropdown" class="ed-menu" style="min-width: 250px;">
+                            <div class="ed-menu-label">
+                                <span class="material-symbols-rounded" style="font-size: 16px;">apartment</span> {{ __('Select Office Branch') }}
                             </div>
                             @foreach($floors as $f)
-                            <a href="{{ route('editor', ['office' => $f->id]) }}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: {{ $f->id === $floor->id ? 'var(--ula-status-success)' : 'var(--ula-text-on-dark)' }}; background: {{ $f->id === $floor->id ? 'rgba(36, 92, 58, 0.45)' : 'transparent' }}; font-weight: 700; font-size: 12px; transition: background 0.15s ease;">
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <span class="material-symbols-rounded" style="font-size: 16px;">apartment</span>
+                            <a href="{{ route('editor', ['office' => $f->id]) }}" class="ed-menu-item {{ $f->id === $floor->id ? 'active' : '' }}">
+                                <span style="display: flex; align-items: center; gap: 8px; min-width: 0;">
+                                    <span class="material-symbols-rounded" style="font-size: 18px;">apartment</span>
                                     <span>{{ $f->name }}</span>
-                                </div>
+                                </span>
                                 @if($f->id === $floor->id)
-                                    <span style="font-size: 10px; color: var(--ula-status-success); font-weight: 800;">● {{ __('Editing') }}</span>
+                                    <span class="ed-menu-item-meta">{{ __('Editing') }}</span>
                                 @endif
                             </a>
                             @endforeach
                         </div>
                     </div>
 
-                    <span class="nx-presence-capsule" id="header-version-badge" style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; padding: 4px 10px;" title="Map version and status">
-                        v{{ $map->version }} • {{ ucfirst($map->status) }}
+                    <span class="nx-presence-capsule" id="header-version-badge" title="{{ __('Map version and status') }}">
+                        v{{ $map->version }} · {{ ucfirst($map->status) }}
                     </span>
                 </div>
 
-                <!-- 2. Center: Tools Selector & Quick Actions -->
-                <div class="nx-toolbar-group" style="gap: 8px;">
-                    <div class="segmented-tool-pill" style="background: rgba(11, 20, 16, 0.90); border: 1px solid rgba(237, 230, 217, 0.15); border-radius: 14px; padding: 3px; display: flex; gap: 2px;">
+                <!-- 2. Center: tools + selection actions -->
+                <div class="nx-toolbar-group">
+                    <div class="segmented-tool-pill">
                         <button class="tool-btn active" id="tool-select" onclick="setTool('select')" title="{{ __('Select & Move Objects (V)') }}">
-                            <span class="material-symbols-rounded" style="font-size: 16px;">pan_tool_alt</span>
+                            <span class="material-symbols-rounded">near_me</span>
                             <span>{{ __('Select') }}</span>
                         </button>
                         <button class="tool-btn" id="tool-room" onclick="setTool('room')" title="{{ __('Draw Meeting / Private Rooms (R)') }}">
-                            <span class="material-symbols-rounded" style="font-size: 16px;">meeting_room</span>
+                            <span class="material-symbols-rounded">crop_square</span>
                             <span>{{ __('Room') }}</span>
                         </button>
                         <button class="tool-btn" id="tool-object" onclick="setTool('object')" title="{{ __('Place Furniture & Decor (F)') }}">
-                            <span class="material-symbols-rounded" style="font-size: 16px;">chair</span>
+                            <span class="material-symbols-rounded">chair</span>
                             <span>{{ __('Furniture') }}</span>
                         </button>
                     </div>
 
-                    <div style="display: flex; gap: 4px; align-items: center;">
-                        <button class="nx-toolbar-btn" onclick="rotateSelectedItem(90)" title="{{ __('Rotate 90° (R)') }}" style="width: 34px; height: 34px; padding: 0; justify-content: center;">
-                            <span class="material-symbols-rounded" style="font-size: 18px;">rotate_right</span>
-                        </button>
-                        <button class="nx-toolbar-btn" onclick="duplicateSelectedItem()" title="{{ __('Clone / Duplicate') }}" style="width: 34px; height: 34px; padding: 0; justify-content: center;">
-                            <span class="material-symbols-rounded" style="font-size: 18px;">content_copy</span>
-                        </button>
-                        <button class="nx-toolbar-btn" onclick="deleteSelectedItem()" title="{{ __('Delete Selected (Del)') }}" style="width: 34px; height: 34px; padding: 0; justify-content: center; color: var(--ula-status-danger); border-color: rgba(239, 68, 68, 0.3);">
-                            <span class="material-symbols-rounded" style="font-size: 18px;">delete</span>
-                        </button>
-                    </div>
+                    <span class="ed-toolbar-sep" aria-hidden="true"></span>
+
+                    <button class="nx-toolbar-btn ed-icon-only" onclick="rotateSelectedItem(90)" title="{{ __('Rotate 90° (R)') }}" aria-label="{{ __('Rotate 90° (R)') }}">
+                        <span class="material-symbols-rounded">rotate_right</span>
+                    </button>
+                    <button class="nx-toolbar-btn ed-icon-only" onclick="duplicateSelectedItem()" title="{{ __('Clone / Duplicate') }}" aria-label="{{ __('Clone / Duplicate') }}">
+                        <span class="material-symbols-rounded">content_copy</span>
+                    </button>
+                    <button class="nx-toolbar-btn ed-icon-only ed-danger" onclick="deleteSelectedItem()" title="{{ __('Delete Selected (Del)') }}" aria-label="{{ __('Delete Selected (Del)') }}">
+                        <span class="material-symbols-rounded">delete</span>
+                    </button>
                 </div>
 
-                <!-- 3. End Group (Top Left on RTL): AI Generator + Save + Publish + Catalog Drawer -->
+                <!-- 3. End: AI, save, publish, catalog -->
                 <div class="nx-toolbar-group">
                     <input type="file" id="floorplan-file-input" accept="image/jpeg,image/png,image/webp,image/jpg" style="display:none;" onchange="handleFloorplanUpload(this)">
 
-                    <button type="button" onclick="openAiGeneratorModal()" class="nx-toolbar-btn btn-accent" style="font-weight: 700; background: linear-gradient(135deg, rgba(211, 165, 83, 0.35), rgba(184, 137, 50, 0.35)); border-color: rgba(211, 165, 83, 0.6); color: var(--ula-gold-500);" title="{{ __('Generate 3D Isometric Office Floorplan & Rooms with AI') }}">
-                        <span class="material-symbols-rounded" style="font-size: 18px;">auto_awesome</span>
+                    <button type="button" onclick="openAiGeneratorModal()" class="nx-toolbar-btn btn-accent ed-collapsible" title="{{ __('Generate 3D Isometric Office Floorplan & Rooms with AI') }}">
+                        <span class="material-symbols-rounded">auto_awesome</span>
                         <span>{{ __('AI Generator') }}</span>
                     </button>
 
-                    <button class="nx-toolbar-btn" onclick="saveMapDraft()" title="{{ __('Save Map Draft') }}">
-                        <span class="material-symbols-rounded" style="font-size: 18px;">save</span>
+                    <span class="ed-toolbar-sep" aria-hidden="true"></span>
+
+                    <button class="nx-toolbar-btn ed-collapsible" onclick="saveMapDraft()" title="{{ __('Save Map Draft') }}">
+                        <span class="material-symbols-rounded">save</span>
                         <span>{{ __('Save') }}</span>
                     </button>
-
-                    <button class="nx-toolbar-btn" onclick="publishMap()" style="background: rgba(60, 107, 76, 0.4); border-color: var(--ula-palm-500); color: var(--ula-status-success); font-weight: 700;" title="{{ __('Publish Map to Live Office') }}">
-                        <span class="material-symbols-rounded" style="font-size: 18px;">rocket_launch</span>
+                    <button class="nx-toolbar-btn ed-primary ed-collapsible" onclick="publishMap()" title="{{ __('Publish Map to Live Office') }}">
+                        <span class="material-symbols-rounded">publish</span>
                         <span>{{ __('Publish') }}</span>
                     </button>
-
-                    <button class="nx-toolbar-btn" onclick="toggleCustomizerDrawer()" title="{{ __('Toggle 3D Catalog & Inspector') }}" style="background: rgba(255, 255, 255, 0.08);">
-                        <span class="material-symbols-rounded" style="font-size: 18px;">dashboard_customize</span>
-                        <span>{{ __('Catalog') }}</span>
+                    <button class="nx-toolbar-btn ed-icon-only" onclick="toggleCustomizerDrawer()" title="{{ __('Toggle 3D Catalog & Inspector') }}" aria-label="{{ __('Toggle 3D Catalog & Inspector') }}">
+                        <span class="material-symbols-rounded">dock_to_left</span>
                     </button>
                 </div>
             </header>
 
             <!-- ── Main Workspace ── -->
             <div class="editor-workspace">
-        
+
         <!-- Canvas Viewport -->
         <div class="canvas-viewport" id="canvas-container">
             <canvas id="editor-canvas"></canvas>
 
             <!-- Floating Selected Object Actions -->
             <div class="floating-item-actions" id="floating-actions">
-                <button class="float-act-btn" onclick="rotateSelectedItem(90)"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">rotate_right</span> +90°</button>
-                <button class="float-act-btn" onclick="duplicateSelectedItem()"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">content_copy</span> {{ __('Clone') }}</button>
-                <button class="float-act-btn" onclick="deleteSelectedItem()" style="color: var(--ula-status-danger);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">delete</span></button>
+                <button class="float-act-btn" onclick="rotateSelectedItem(90)"><span class="material-symbols-rounded" style="font-size: 16px;">rotate_right</span><span class="ed-mono-num">+90°</span></button>
+                <button class="float-act-btn" onclick="duplicateSelectedItem()"><span class="material-symbols-rounded" style="font-size: 16px;">content_copy</span> {{ __('Clone') }}</button>
+                <button class="float-act-btn ed-danger" onclick="deleteSelectedItem()" aria-label="{{ __('Delete Selected (Del)') }}"><span class="material-symbols-rounded" style="font-size: 16px;">delete</span></button>
             </div>
 
             <!-- View Navigation Controls -->
             <div class="viewport-controls">
-                <button class="view-btn" onclick="toggleCustomizerDrawer()" title="{{ __('Toggle Catalog Drawer') }}"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">chair</span></button>
-                <button class="view-btn" onclick="zoomIn()" title="{{ __('Zoom In') }}"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">add</span></button>
-                <button class="view-btn" onclick="zoomOut()" title="{{ __('Zoom Out') }}"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">remove</span></button>
-                <button class="view-btn" onclick="resetView()" title="{{ __('Reset View (100%)') }}"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">home</span></button>
-                <button class="view-btn" onclick="toggleGrid()" title="{{ __('Toggle Grid') }}"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">grid_on</span></button>
-                <button class="view-btn" id="btn-grid-snap" onclick="cycleGridSnap()" style="font-size: 10px; font-weight: 800; font-family: 'IBM Plex Mono', monospace; width: auto; padding: 0 8px;" title="{{ __('Grid Snap Precision') }}"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">target</span> 4px</button>
+                <button class="view-btn" onclick="zoomOut()" title="{{ __('Zoom Out') }}" aria-label="{{ __('Zoom Out') }}"><span class="material-symbols-rounded">remove</span></button>
+                <button class="view-btn" onclick="zoomIn()" title="{{ __('Zoom In') }}" aria-label="{{ __('Zoom In') }}"><span class="material-symbols-rounded">add</span></button>
+                <button class="view-btn" onclick="resetView()" title="{{ __('Reset View (100%)') }}" aria-label="{{ __('Reset View (100%)') }}"><span class="material-symbols-rounded">fit_screen</span></button>
+                <span class="ed-zoom-sep" aria-hidden="true"></span>
+                <button class="view-btn" onclick="toggleGrid()" title="{{ __('Toggle Grid') }}" aria-label="{{ __('Toggle Grid') }}"><span class="material-symbols-rounded">grid_4x4</span></button>
+                <button class="view-btn ed-mono" id="btn-grid-snap" onclick="cycleGridSnap()" title="{{ __('Grid Snap Precision') }}"><span class="material-symbols-rounded" style="font-size: 18px;">target</span> 4px</button>
+                <span class="ed-zoom-sep" aria-hidden="true"></span>
+                <button class="view-btn" onclick="toggleCustomizerDrawer()" title="{{ __('Toggle Catalog Drawer') }}" aria-label="{{ __('Toggle Catalog Drawer') }}"><span class="material-symbols-rounded">chair</span></button>
             </div>
         </div>
 
@@ -899,24 +868,23 @@
         <aside class="customizer-drawer" id="customizer-drawer">
             <div class="drawer-header">
                 <div class="drawer-title">
-                    <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">auto_awesome</span></span>
+                    <span class="material-symbols-rounded" aria-hidden="true">auto_awesome</span>
                     <span>{{ __('Customize Floor & Furniture') }}</span>
                 </div>
-                <button onclick="toggleCustomizerDrawer()" style="background:none; border:none; color:var(--ula-text-muted); font-size:18px; cursor:pointer;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">close</span></button>
+                <button type="button" class="ed-drawer-close" onclick="toggleCustomizerDrawer()" aria-label="{{ __('Close') }}"><span class="material-symbols-rounded">close</span></button>
             </div>
 
-            <div class="drawer-tabs">
-                <div class="drawer-tab active" id="tab-btn-furniture" onclick="switchDrawerTab('furniture')">
+            <div class="drawer-tabs" role="tablist">
+                <div class="drawer-tab active" id="tab-btn-furniture" onclick="switchDrawerTab('furniture')" role="tab" tabindex="0">
                     {{ __('3D Furniture') }}
                 </div>
-                <div class="drawer-tab" id="tab-btn-floors" onclick="switchDrawerTab('floors')" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 4px 6px;">
-                    <span style="font-size: 11px; font-weight: 700;">Floor Styles</span>
-                    <span style="font-size: 9px; opacity: 0.85; font-family: 'IBM Plex Sans Arabic', sans-serif;">الأرضيات</span>
+                <div class="drawer-tab" id="tab-btn-floors" onclick="switchDrawerTab('floors')" role="tab" tabindex="0">
+                    {{ __('Floor Styles') }}
                 </div>
-                <div class="drawer-tab" id="tab-btn-inspector" onclick="switchDrawerTab('inspector')">
+                <div class="drawer-tab" id="tab-btn-inspector" onclick="switchDrawerTab('inspector')" role="tab" tabindex="0">
                     {{ __('Selected Item') }}
                 </div>
-                <div class="drawer-tab" id="tab-btn-rooms" onclick="switchDrawerTab('rooms')">
+                <div class="drawer-tab" id="tab-btn-rooms" onclick="switchDrawerTab('rooms')" role="tab" tabindex="0">
                     {{ __('Rooms') }}
                 </div>
             </div>
@@ -1192,14 +1160,14 @@
                             </div>
                             <div>
                                 <label class="prop-label">{{ __('Interaction') }}</label>
-                                <div id="prop-interaction-badge" style="font-size: 11px; font-weight: 700; color: var(--ula-text-primary); padding: 4px 8px; background: rgba(16,185,129,0.1); border-radius: 6px; display: inline-block;">NONE</div>
+                                <div id="prop-interaction-badge" style="font-size: 11px; font-weight: 700; color: var(--ula-text-primary); padding: 4px 8px; background: var(--ula-surface-accent-soft); border-radius: 6px; display: inline-block;">NONE</div>
                             </div>
 
                             <!-- <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> 1. Company Logo / Branding Inspector Box -->
-                            <div id="inspector-branding-box" style="display: none; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(52, 211, 153, 0.25); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
+                            <div id="inspector-branding-box" style="display: none; background: var(--ula-surface-accent-soft); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
                                     <span style="font-size: 12px; font-weight: 800; color: var(--ula-status-success);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> {{ __('Company Logo') }}</span>
-                                    <span class="furn-type-badge" style="background: rgba(16, 185, 129, 0.2); color: var(--ula-status-success);">Logo</span>
+                                    <span class="furn-type-badge" style="background: var(--ula-tone-palm-bg); color: var(--ula-status-success);">Logo</span>
                                 </div>
                                 <div style="font-size: 11px; color: var(--ula-text-muted); line-height: 1.4;">
                                     {{ __('Displays your company logo on the workplace floor or reception.') }}
@@ -1222,10 +1190,10 @@
                             </div>
 
                             <!-- <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">edit_note</span> 2. Sticky Note Inspector Box -->
-                            <div id="inspector-stickynote-box" style="display: none; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
+                            <div id="inspector-stickynote-box" style="display: none; background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 12px; font-weight: 800; color: #FBBF24;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">edit_note</span> {{ __('Sticky Note') }}</span>
-                                    <span class="furn-type-badge" style="background: rgba(245, 158, 11, 0.2); color: #FCD34D;">Note</span>
+                                    <span style="font-size: 12px; font-weight: 800; color: var(--ula-tone-gold-fg);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">edit_note</span> {{ __('Sticky Note') }}</span>
+                                    <span class="furn-type-badge" style="background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg);">Note</span>
                                 </div>
                                 <div>
                                     <label class="prop-label">{{ __('Note Text') }}</label>
@@ -1244,10 +1212,10 @@
                             </div>
 
                             <!-- <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">link</span> 3. Custom Link Inspector Box -->
-                            <div id="inspector-link-box" style="display: none; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
+                            <div id="inspector-link-box" style="display: none; background: var(--ula-tone-stone-bg); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
                                     <span style="font-size: 12px; font-weight: 800; color: var(--ula-accent-default);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">link</span> {{ __('Interactive Web Link') }}</span>
-                                    <span class="furn-type-badge" style="background: rgba(59, 130, 246, 0.2); color: var(--ula-accent-default);">URL</span>
+                                    <span class="furn-type-badge" style="background: var(--ula-tone-stone-bg); color: var(--ula-accent-default);">URL</span>
                                 </div>
                                 <div>
                                     <label class="prop-label">{{ __('Target URL') }}</label>
@@ -1259,15 +1227,15 @@
                                 </div>
                                 <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 4px;">
                                     <span style="font-size: 11px; color: var(--ula-text-secondary);">{{ __('Open in New Browser Tab') }}</span>
-                                    <input type="checkbox" id="prop-link-newtab" checked onchange="updateSelectedLinkProp('openInNewTab', this.checked)" style="accent-color: var(--ula-palm-900); cursor: pointer; width: 16px; height: 16px;">
+                                    <input type="checkbox" id="prop-link-newtab" checked onchange="updateSelectedLinkProp('openInNewTab', this.checked)" style="accent-color: var(--ula-accent-default); cursor: pointer; width: 16px; height: 16px;">
                                 </div>
                             </div>
 
                             <!-- <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">image</span> 4. Custom Image Inspector Box -->
-                            <div id="inspector-customimage-box" style="display: none; background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
+                            <div id="inspector-customimage-box" style="display: none; background: var(--ula-tone-terracotta-bg); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 12px; flex-direction: column; gap: 8px; margin-top: 4px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                                    <span style="font-size: 12px; font-weight: 800; color: var(--ula-terracotta-600);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">image</span> {{ __('Custom Image / Banner') }}</span>
-                                    <span class="furn-type-badge" style="background: rgba(139, 92, 246, 0.2); color: var(--ula-terracotta-300);">Image</span>
+                                    <span style="font-size: 12px; font-weight: 800; color: var(--ula-tone-terracotta-fg);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">image</span> {{ __('Custom Image / Banner') }}</span>
+                                    <span class="furn-type-badge" style="background: var(--ula-tone-terracotta-bg); color: var(--ula-tone-terracotta-fg);">Image</span>
                                 </div>
                                 <div>
                                     <label class="prop-label">{{ __('Image URL') }}</label>
@@ -1301,30 +1269,37 @@
                             </div>
                             
                             <!-- Acoustic Isolation Box -->
-                            <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+                            <div style="background: var(--ula-surface-accent-soft); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
                                     <span style="font-size: 12px; font-weight: 800; color: var(--ula-status-success);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">mic</span> {{ __('Acoustic Isolation') }}</span>
-                                    <input type="checkbox" id="prop-room-isolation" onchange="updateRoomProp('audio_isolation', this.checked)" style="width: 18px; height: 18px; accent-color: var(--ula-palm-900); cursor: pointer;">
+                                    <input type="checkbox" id="prop-room-isolation" onchange="updateRoomProp('audio_isolation', this.checked)" style="width: 18px; height: 18px; accent-color: var(--ula-accent-default); cursor: pointer;">
                                 </div>
                                 <span style="font-size: 11px; color: var(--ula-text-muted);" id="prop-room-bounds-label"></span>
                             </div>
 
                             <div>
-                                <label class="prop-label">{{ __('Door Placement') }}</label>
-                                <select class="prop-input" id="prop-room-door-side" onchange="updateRoomProp('doorSide', this.value)">
-                                    <option value="auto">{{ __('Auto Corridor') }}</option>
-                                    <option value="bottom">{{ __('Bottom Wall') }}</option>
-                                    <option value="top">{{ __('Top Wall') }}</option>
-                                    <option value="left">{{ __('Left Wall') }}</option>
-                                    <option value="right">{{ __('Right Wall') }}</option>
-                                </select>
+                                <label class="prop-label" id="door-picker-label">{{ __('Door Placement') }}</label>
+                                {{-- Visual door picker: an arrow on each wall of a mini room. Map directions are physical
+                                     (the canvas is never mirrored), so the diagram is laid out LTR in both languages. --}}
+                                <input type="hidden" id="prop-room-door-side" value="auto">
+                                <div class="ed-door-picker" role="radiogroup" aria-labelledby="door-picker-label">
+                                    <button type="button" class="ed-door-btn ed-door-btn--top" data-side="top" role="radio" onclick="setDoorSide('top')" title="{{ __('Top Wall') }}" aria-label="{{ __('Top Wall') }}"><span class="material-symbols-rounded">arrow_upward</span></button>
+                                    <button type="button" class="ed-door-btn ed-door-btn--left" data-side="left" role="radio" onclick="setDoorSide('left')" title="{{ __('Left Wall') }}" aria-label="{{ __('Left Wall') }}"><span class="material-symbols-rounded">arrow_back</span></button>
+                                    <div class="ed-door-room">
+                                        <span class="ed-door-mark" id="door-picker-mark" aria-hidden="true"></span>
+                                        <button type="button" class="ed-door-btn ed-door-btn--auto" data-side="auto" role="radio" onclick="setDoorSide('auto')" title="{{ __('Auto Corridor') }}" aria-label="{{ __('Auto Corridor') }}"><span class="material-symbols-rounded">auto_mode</span></button>
+                                    </div>
+                                    <button type="button" class="ed-door-btn ed-door-btn--right" data-side="right" role="radio" onclick="setDoorSide('right')" title="{{ __('Right Wall') }}" aria-label="{{ __('Right Wall') }}"><span class="material-symbols-rounded">arrow_forward</span></button>
+                                    <button type="button" class="ed-door-btn ed-door-btn--bottom" data-side="bottom" role="radio" onclick="setDoorSide('bottom')" title="{{ __('Bottom Wall') }}" aria-label="{{ __('Bottom Wall') }}"><span class="material-symbols-rounded">arrow_downward</span></button>
+                                </div>
+                                <div class="ed-door-caption" id="door-picker-caption">{{ __('Auto Corridor') }}</div>
                             </div>
 
                             <div>
                                 <label class="prop-label">{{ __('Door Position on Wall') }}</label>
                                 <div style="display: flex; align-items: center; gap: 8px;">
-                                    <input type="range" class="prop-input" id="prop-room-door-offset" min="15" max="85" value="50" step="5" oninput="updateRoomProp('doorOffset', this.value / 100); document.getElementById('door-offset-val').textContent = this.value + '%';">
-                                    <span id="door-offset-val" style="font-size: 11px; font-weight: 800; color: var(--ula-text-primary); min-width: 32px;">50%</span>
+                                    <input type="range" class="prop-input" id="prop-room-door-offset" min="15" max="85" value="50" step="5" oninput="updateRoomProp('doorOffset', this.value / 100); document.getElementById('door-offset-val').textContent = this.value + '%'; syncDoorPicker();">
+                                    <span id="door-offset-val" style="font-family: var(--ula-font-mono); font-size: var(--ula-size-xs); color: var(--ula-text-primary); min-width: 36px; direction: ltr; unicode-bidi: isolate;">50%</span>
                                 </div>
                             </div>
 
@@ -1353,22 +1328,22 @@
                 <!-- 4. FLOORS & BACKGROUNDS TAB -->
                 <div id="drawer-view-floors" style="display: none; flex-direction: column; gap: 12px;">
                     <!-- Quick Action Tools Bar (Moved from Burger Menu) -->
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 6px; background: rgba(0,0,0,0.35); border: 1px solid var(--ula-border-default); border-radius: 12px;">
-                        <label class="tool-btn" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; margin: 0; background: rgba(255,255,255,0.05);" title="{{ __('Upload Custom Floorplan') }}">
-                            <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-gold-500);">upload_file</span>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 6px; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-default); border-radius: 12px;">
+                        <label class="tool-btn" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; margin: 0;" title="{{ __('Upload Custom Floorplan') }}">
+                            <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-highlight-default);">upload_file</span>
                             <span style="font-weight: 700;">{{ __('Upload') }}</span>
                             <span style="font-size: 9px; opacity: 0.8; font-family: 'IBM Plex Sans Arabic', sans-serif;">رفع مخصص</span>
                             <input type="file" accept="image/*" style="display:none;" onchange="handleCustomFloorUpload(this)">
                         </label>
 
-                        <button type="button" class="tool-btn" onclick="deleteFloorplan()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; color: var(--ula-status-danger); background: rgba(239,68,68,0.1); border-color: rgba(239,68,68,0.3);" title="{{ __('Reset to Default Floorplan') }}">
+                        <button type="button" class="tool-btn" onclick="deleteFloorplan()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; color: var(--ula-status-danger); background: var(--ula-tone-terracotta-bg); border-color: var(--ula-border-danger);" title="{{ __('Reset to Default Floorplan') }}">
                             <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-status-danger);">restart_alt</span>
                             <span style="font-weight: 700;">{{ __('Reset') }}</span>
                             <span style="font-size: 9px; opacity: 0.8; font-family: 'IBM Plex Sans Arabic', sans-serif;">استعادة</span>
                         </button>
 
-                        <button type="button" class="tool-btn" onclick="clearWorkspace()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; color: var(--ula-gold-400); background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.3);" title="{{ __('Clear All Placed Furniture') }}">
-                            <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-gold-400);">cleaning_services</span>
+                        <button type="button" class="tool-btn" onclick="clearWorkspace()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 6px 2px; font-size: 10px; text-align: center; color: var(--ula-highlight-default); background: var(--ula-tone-gold-bg); border-color: var(--ula-border-subtle);" title="{{ __('Clear All Placed Furniture') }}">
+                            <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-highlight-default);">cleaning_services</span>
                             <span style="font-weight: 700;">{{ __('Clear') }}</span>
                             <span style="font-size: 9px; opacity: 0.8; font-family: 'IBM Plex Sans Arabic', sans-serif;">تفريغ الأثاث</span>
                         </button>
@@ -1383,12 +1358,12 @@
                         {{ __('اختر نمط الأرضية لتطبيقه فوراً كخلفية للمكتب بمقاس 1200×708 بكسل:') }}
                     </div>
 
-                    <div id="floors-catalog-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-height: calc(100vh - 360px); overflow-y: auto; padding-inline-end: 4px;">
+                    <div id="floors-catalog-grid" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: max-content; gap: var(--ula-space-3); flex-shrink: 0;">
                         <!-- Injected via JavaScript -->
                     </div>
 
                     <div style="padding-top: 8px; border-top: 1px solid var(--ula-border-default); display: flex; justify-content: space-between; align-items: center;">
-                        <button type="button" class="tool-btn" onclick="clearCurrentFloorBackground()" style="color: var(--ula-status-danger); border-color: rgba(239,68,68,0.3); font-size: 11px; width: 100%; justify-content: center;">
+                        <button type="button" class="tool-btn" onclick="clearCurrentFloorBackground()" style="color: var(--ula-status-danger); border-color: var(--ula-border-danger); font-size: 11px; width: 100%; justify-content: center;">
                             <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">delete</span> {{ __('Remove Floor Background') }}
                         </button>
                     </div>
@@ -1573,11 +1548,11 @@
             grid.innerHTML = FLOOR_CATALOG.map(f => {
                 const isActive = currentBg.includes(f.id);
                 return `
-                    <div class="furn-card ${isActive ? 'selected' : ''}" style="display:flex; flex-direction:column; gap:4px; padding:6px; cursor:pointer; position:relative; border-radius:12px; border:1px solid ${isActive ? 'var(--ula-palm-900)' : 'var(--ula-border-subtle)'}; background:var(--ula-surface-page);" onclick="applyFloorBackground('${f.url}', 1200, 708)">
-                        <div style="position:relative; width:100%; height:75px; border-radius:8px; overflow:hidden; background:var(--ula-palm-950);">
+                    <div class="furn-card ${isActive ? 'selected' : ''}" style="display:flex; flex-direction:column; gap:4px; padding:6px; cursor:pointer; position:relative; border-radius:12px; border:1px solid ${isActive ? 'var(--ula-accent-default)' : 'var(--ula-border-subtle)'}; background:var(--ula-surface-page);" onclick="applyFloorBackground('${f.url}', 1200, 708)">
+                        <div style="position:relative; width:100%; height:75px; border-radius:8px; overflow:hidden; background: var(--ula-surface-page-alt);">
                             <img src="${f.thumb}" alt="${f.name_en}" style="width:100%; height:100%; object-fit:cover;">
-                            <span style="position:absolute; bottom:3px; inset-inline-end:3px; background:rgba(0,0,0,0.7); font-size:9px; font-family:monospace; padding:1px 4px; border-radius:4px; color:var(--ula-status-success);">1200×708</span>
-                            ${isActive ? '<span style="position:absolute; top:3px; inset-inline-start:3px; background:var(--ula-status-success); font-size:9px; font-weight:800; padding:1px 6px; border-radius:4px; color:var(--ula-white);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check</span> نشط</span>' : ''}
+                            <span style="position:absolute; bottom:3px; inset-inline-end:3px; background: var(--ula-surface-raised); font-size:9px; font-family:var(--ula-font-mono); padding:1px 4px; border-radius:4px; color:var(--ula-text-secondary); direction:ltr; unicode-bidi:isolate;">1200×708</span>
+                            ${isActive ? '<span style="position:absolute; top:3px; inset-inline-start:3px; background:var(--ula-accent-default); font-size:9px; font-weight:800; padding:1px 6px; border-radius:4px; color:var(--ula-accent-fg);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check</span> نشط</span>' : ''}
                         </div>
                         <div style="font-size:11px; font-weight:700; color:var(--ula-text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:start;">
                             ${isAr ? f.name_ar : f.name_en}
@@ -2158,6 +2133,52 @@
             }
         });
 
+        // ── Canvas palette from the design tokens ──
+        // A canvas can't resolve var(--…), so the token values are read once here and again on theme change.
+        const ED = {};
+        const edProbe = document.createElement('canvas').getContext('2d');
+        function edColor(name) {
+            const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+            edProbe.fillStyle = '#000';
+            if (v) edProbe.fillStyle = v;
+            return edProbe.fillStyle;
+        }
+        function edAlpha(col, a) {
+            if (col.startsWith('#')) {
+                const n = parseInt(col.slice(1), 16);
+                return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
+            }
+            const m = col.match(/[\d.]+/g);
+            return m ? `rgba(${m[0]}, ${m[1]}, ${m[2]}, ${a})` : col;
+        }
+        function refreshEditorPalette() {
+            const accent = edColor('--ula-accent-default');
+            const gold = edColor('--ula-highlight-default');
+            const raised = edColor('--ula-surface-raised');
+            Object.assign(ED, {
+                mapBg: edColor('--ula-surface-card'),
+                blueprintBg: edColor('--ula-surface-page-alt'),
+                gridMinor: edAlpha(accent, 0.06),
+                gridMajor: edAlpha(accent, 0.16),
+                mapBorder: edColor('--ula-border-strong'),
+                roomWash: edAlpha(accent, 0.06),
+                roomLine: edAlpha(accent, 0.5),
+                label: raised,
+                labelLine: edColor('--ula-border-default'),
+                labelText: edColor('--ula-text-primary'),
+                accent,
+                accentWash: edAlpha(accent, 0.14),
+                accentFill: edAlpha(accent, 0.18),
+                open: gold,
+                openWash: edAlpha(gold, 0.14),
+                knob: raised,
+                objDefault: edAlpha(accent, 0.35),
+                objLine: edAlpha(raised, 0.5),
+            });
+        }
+        refreshEditorPalette();
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { refreshEditorPalette(); if (typeof draw === 'function') draw(); });
+
         // ── Main Live Canvas Draw Loop (60 FPS Butter Smooth) ──
         function draw() {
             // Guarantee complete clean buffer wipe without transform accumulation
@@ -2172,18 +2193,18 @@
 
             // 1. Draw Background Blueprint Layer
             if (hasBlueprint) {
-                ctx.fillStyle = '#ECE8DB';
+                ctx.fillStyle = ED.blueprintBg;
                 ctx.fillRect(0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
                 ctx.drawImage(BLUEPRINT_IMAGE, 0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
             } else {
-                ctx.fillStyle = '#0F1E16';
+                ctx.fillStyle = ED.mapBg;
                 ctx.fillRect(0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
             }
 
             // Grid Overlay (Fine micro-grid for precision object control)
             if (showGrid) {
                 // Micro 4px sub-grid lines
-                ctx.strokeStyle = hasBlueprint ? 'rgba(0, 0, 0, 0.04)' : 'rgba(79, 155, 95, 0.05)';
+                ctx.strokeStyle = ED.gridMinor;
                 ctx.lineWidth = 0.5;
                 const microStep = (gridSnapStep === 0.125 || gridSnapStep === 0.25) ? 4 : 8;
                 for (let x = 0; x <= MAP_WIDTH_PX; x += microStep) {
@@ -2196,7 +2217,7 @@
                 }
 
                 // Major 16px tile grid lines
-                ctx.strokeStyle = hasBlueprint ? 'rgba(45, 92, 62, 0.16)' : 'rgba(79, 155, 95, 0.16)';
+                ctx.strokeStyle = ED.gridMajor;
                 ctx.lineWidth = 1;
                 for (let x = 0; x <= MAP_WIDTH_PX; x += TILE_SIZE) {
                     ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, MAP_HEIGHT_PX); ctx.stroke();
@@ -2206,7 +2227,7 @@
                 }
             }
 
-            ctx.strokeStyle = '#2D5C3E';
+            ctx.strokeStyle = ED.mapBorder;
             ctx.lineWidth = 2.5;
             ctx.strokeRect(0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
 
@@ -2221,34 +2242,34 @@
                 const rh = r.bounds.height * TILE_SIZE;
 
                 // Subtle transparent wash & dashed boundary
-                ctx.fillStyle = 'rgba(79, 155, 95, 0.06)';
+                ctx.fillStyle = ED.roomWash;
                 ctx.fillRect(rx, ry, rw, rh);
 
-                ctx.strokeStyle = 'rgba(79, 155, 95, 0.45)';
+                ctx.strokeStyle = ED.roomLine;
                 ctx.lineWidth = 1.2;
                 ctx.setLineDash([4, 4]);
                 ctx.strokeRect(rx, ry, rw, rh);
                 ctx.setLineDash([]);
 
                 // Sleek Dark Glass Floating Room Pill Tag
-                const labelText = `🏢 ${r.name.split(' - ')[0]}`;
+                const labelText = r.name.split(' - ')[0];
                 ctx.font = 'bold 9px Cairo, Inter, sans-serif';
                 const textWidth = ctx.measureText(labelText).width;
                 const badgeW = Math.min(rw - 8, textWidth + 14);
 
                 if (badgeW > 16 && rw > 20 && rh > 18) {
-                    ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+                    ctx.fillStyle = ED.label;
                     if (ctx.roundRect) ctx.roundRect(rx + 4, ry + 4, badgeW, 18, 6);
                     else ctx.rect(rx + 4, ry + 4, badgeW, 18);
                     ctx.fill();
 
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+                    ctx.strokeStyle = ED.labelLine;
                     ctx.lineWidth = 1;
                     if (ctx.roundRect) ctx.roundRect(rx + 4, ry + 4, badgeW, 18, 6);
                     else ctx.rect(rx + 4, ry + 4, badgeW, 18);
                     ctx.stroke();
 
-                    ctx.fillStyle = '#F8FAFC';
+                    ctx.fillStyle = ED.labelText;
                     ctx.textAlign = 'left';
                     ctx.textBaseline = 'middle';
                     ctx.fillText(labelText, rx + 10, ry + 13);
@@ -2264,8 +2285,8 @@
                 else if (doorSide === 'right') { dX = rx + rw; dY = ry + rh * doorOffset; }
 
                 ctx.save();
-                ctx.fillStyle = 'var(--ula-status-success)';
-                ctx.strokeStyle = 'var(--ula-white)';
+                ctx.fillStyle = ED.accent;
+                ctx.strokeStyle = ED.knob;
                 ctx.lineWidth = 1.5;
                 if (doorSide === 'top' || doorSide === 'bottom') {
                     ctx.fillRect(dX - dW/2, dY - 3, dW, 6);
@@ -2289,13 +2310,13 @@
                 const isIsolated = r.metadata.audio_isolation !== false;
 
                 // Acoustic Aura Backdrop
-                ctx.fillStyle = isIsolated ? 'rgba(79, 155, 95, 0.22)' : 'rgba(59, 130, 246, 0.15)';
+                ctx.fillStyle = isIsolated ? ED.accentWash : ED.openWash;
                 if (ctx.roundRect) ctx.roundRect(rx - 6, ry - 6, rw + 12, rh + 12, 10);
                 else ctx.rect(rx - 6, ry - 6, rw + 12, rh + 12);
                 ctx.fill();
 
                 // Acoustic Sound Boundary Border
-                ctx.strokeStyle = isIsolated ? 'rgba(79, 155, 95, 0.90)' : 'rgba(59, 130, 246, 0.80)';
+                ctx.strokeStyle = isIsolated ? ED.accent : ED.open;
                 ctx.lineWidth = 2.5;
                 ctx.setLineDash([8, 6]);
                 if (ctx.roundRect) ctx.roundRect(rx - 2, ry - 2, rw + 4, rh + 4, 8);
@@ -2311,35 +2332,35 @@
                     { x: rx - 2, y: ry + rh + 2 }
                 ];
                 corners.forEach(c => {
-                    ctx.fillStyle = '#4F9B5F';
+                    ctx.fillStyle = ED.accent;
                     ctx.beginPath();
                     ctx.arc(c.x, c.y, 4, 0, Math.PI * 2);
                     ctx.fill();
-                    ctx.strokeStyle = 'var(--ula-white)';
+                    ctx.strokeStyle = ED.knob;
                     ctx.lineWidth = 1.5;
                     ctx.stroke();
                 });
 
                 // Acoustic Badge Indicator
-                const badgeText = isIsolated ? `🎙️ ${r.name || 'Room'} (Acoustic Boundary)` : `🔊 ${r.name || 'Room'} (Open Area)`;
+                const badgeText = isIsolated ? `${r.name || 'Room'} · ${@json(__('Acoustic Boundary'))}` : `${r.name || 'Room'} · ${@json(__('Open Area'))}`;
                 ctx.font = 'bold 11px Cairo, Inter, sans-serif';
                 const bMetrics = ctx.measureText(badgeText);
                 const bW = bMetrics.width + 22;
                 const badgeX = rx + rw / 2 - bW / 2;
                 const badgeY = ry - 30;
 
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
-                if (ctx.roundRect) ctx.roundRect(badgeX, badgeY, badgeW, 24, 6);
-                else ctx.rect(badgeX, badgeY, badgeW, 24);
+                ctx.fillStyle = ED.label;
+                if (ctx.roundRect) ctx.roundRect(badgeX, badgeY, bW, 24, 6);
+                else ctx.rect(badgeX, badgeY, bW, 24);
                 ctx.fill();
 
-                ctx.strokeStyle = isIsolated ? '#4F9B5F' : '#3B82F6';
+                ctx.strokeStyle = isIsolated ? ED.accent : ED.open;
                 ctx.lineWidth = 1.5;
-                if (ctx.roundRect) ctx.roundRect(badgeX, badgeY, badgeW, 24, 6);
-                else ctx.rect(badgeX, badgeY, badgeW, 24);
+                if (ctx.roundRect) ctx.roundRect(badgeX, badgeY, bW, 24, 6);
+                else ctx.rect(badgeX, badgeY, bW, 24);
                 ctx.stroke();
 
-                ctx.fillStyle = isIsolated ? '#7EE092' : '#93C5FD';
+                ctx.fillStyle = ED.labelText;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(badgeText, rx + rw / 2, ry - 18);
@@ -2371,7 +2392,7 @@
                 if (hasBlueprint && !imgUrl) {
                     if (isSelected) {
                         ctx.save();
-                        ctx.strokeStyle = 'var(--ula-status-success)';
+                        ctx.strokeStyle = ED.accent;
                         ctx.lineWidth = 1.5;
                         ctx.setLineDash([4, 4]);
                         ctx.strokeRect(ox, oy, objW, objH);
@@ -2399,17 +2420,17 @@
                         ctx.drawImage(sprImg, -objW / 2, -objH / 2, objW, objH);
                     } else if (isSelected) {
                         // Subtle emerald placeholder box only when actively selected
-                        ctx.fillStyle = 'rgba(16, 185, 129, 0.15)';
+                        ctx.fillStyle = ED.accentWash;
                         if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
                         else ctx.rect(-objW / 2, -objH / 2, objW, objH);
                         ctx.fill();
                     }
                 } else if (obj.is_custom || obj.color) {
-                    ctx.fillStyle = obj.color ? (obj.color.length === 7 ? obj.color + '99' : obj.color) : 'rgba(59, 130, 246, 0.35)';
+                    ctx.fillStyle = obj.color ? (obj.color.length === 7 ? obj.color + '99' : obj.color) : ED.objDefault;
                     if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
                     else ctx.rect(-objW / 2, -objH / 2, objW, objH);
                     ctx.fill();
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+                    ctx.strokeStyle = ED.objLine;
                     ctx.lineWidth = 1;
                     if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
                     else ctx.rect(-objW / 2, -objH / 2, objW, objH);
@@ -2417,7 +2438,7 @@
                 }
 
                 if (isSelected) {
-                    ctx.strokeStyle = 'var(--ula-status-success)';
+                    ctx.strokeStyle = ED.accent;
                     ctx.lineWidth = 2;
                     ctx.setLineDash([4, 4]);
                     if (ctx.roundRect) ctx.roundRect(-objW / 2 - 2, -objH / 2 - 2, objW + 4, objH + 4, 4);
@@ -2433,11 +2454,11 @@
                         { x: hw, y: hh }, { x: -hw, y: hh }
                     ];
                     grabPoints.forEach(p => {
-                        ctx.fillStyle = 'var(--ula-status-success)';
+                        ctx.fillStyle = ED.accent;
                         ctx.beginPath();
                         ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
                         ctx.fill();
-                        ctx.strokeStyle = 'var(--ula-white)';
+                        ctx.strokeStyle = ED.knob;
                         ctx.lineWidth = 1.2;
                         ctx.stroke();
                     });
@@ -2453,9 +2474,9 @@
                 const dw = currentRect.width * TILE_SIZE;
                 const dh = currentRect.height * TILE_SIZE;
 
-                ctx.fillStyle = 'rgba(16, 185, 129, 0.18)';
+                ctx.fillStyle = ED.accentFill;
                 ctx.fillRect(dx, dy, dw, dh);
-                ctx.strokeStyle = 'var(--ula-status-success)';
+                ctx.strokeStyle = ED.accent;
                 ctx.lineWidth = 2;
                 ctx.setLineDash([4, 4]);
                 ctx.strokeRect(dx, dy, dw, dh);
@@ -2551,6 +2572,7 @@
                 const currentDoorOffset = Math.round((typeof bounds.doorOffset === 'number' ? bounds.doorOffset : 0.5) * 100);
                 document.getElementById('prop-room-door-offset').value = currentDoorOffset;
                 document.getElementById('door-offset-val').textContent = currentDoorOffset + '%';
+                syncDoorPicker();
             }
         }
 
@@ -2815,7 +2837,7 @@
                     <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; display: flex; align-items: center; justify-content: space-between;">
                         <div style="display: flex; flex-direction: column; gap: 2px;">
                             <strong style="font-size: 12px; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> ${r.name}</strong>
-                            <span style="font-size: 10px; color: var(--ula-text-muted);">${r.type || 'meeting'} • ${r.capacity || 10} seats</span>
+                            <span style="font-size: 10px; color: var(--ula-text-muted);">${r.type || 'meeting'} · ${r.capacity || 10} seats</span>
                         </div>
                         <button onclick="selectRoomByIndex(${idx})" class="tool-btn" style="padding: 4px 8px; font-size: 11px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span></button>
                     </div>
@@ -3115,7 +3137,9 @@
                 if (document.body) document.body.classList.remove('dark-mode');
             }
             localStorage.setItem('vw_theme', next);
-            showToast(next === 'dark' ? '🌙 {{ __("Dark mode active") }}' : '☀️ {{ __("Light mode active") }}');
+            refreshEditorPalette();
+            if (typeof draw === 'function') draw();
+            showToast(next === 'dark' ? '{{ __("Dark mode active") }}' : '{{ __("Light mode active") }}');
         }
 
         document.addEventListener('click', (e) => {
@@ -3133,12 +3157,75 @@
             }
         });
 
+        // Notification toast. Callers still prefix messages with an emoji; it only picks the tone and is stripped.
+        let toastTimer = null;
         function showToast(msg) {
             const t = document.getElementById('toast-bubble');
-            t.textContent = msg;
-            t.style.display = 'block';
-            setTimeout(() => { t.style.display = 'none'; }, 3200);
+            if (!t) return;
+            const raw = String(msg || '').trim();
+            let tone = 'info', icon = 'info';
+            if (/^(✅|🎉)/u.test(raw)) { tone = 'ok'; icon = 'check_circle'; }
+            else if (/^❌/u.test(raw)) { tone = 'error'; icon = 'error'; }
+            else if (/^(⏳|💾|🚀|🧹)/u.test(raw)) { tone = 'busy'; icon = 'progress_activity'; }
+            else if (/^🗑/u.test(raw)) { tone = 'info'; icon = 'delete'; }
+            const text = raw.replace(/[\p{Extended_Pictographic}‍️]+\s*/gu, '').trim();
+
+            const iconBox = document.createElement('span');
+            iconBox.className = 'toast-icon';
+            const glyph = document.createElement('span');
+            glyph.className = 'material-symbols-rounded';
+            glyph.setAttribute('aria-hidden', 'true');
+            glyph.textContent = icon;
+            iconBox.append(glyph);
+            const label = document.createElement('span');
+            label.className = 'toast-text';
+            label.textContent = text;
+
+            t.dataset.tone = tone;
+            t.setAttribute('role', tone === 'error' ? 'alert' : 'status');
+            t.replaceChildren(iconBox, label);
+            t.classList.remove('show');
+            void t.offsetWidth; // restart the entry animation
+            t.classList.add('show');
+            // One timer: a newer toast must not be hidden by an older one's timeout.
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.remove('show'), tone === 'error' ? 5000 : 3200);
         }
+
+        // Door picker in the room inspector
+        const DOOR_SIDE_LABELS = {
+            auto: @json(__('Auto Corridor')),
+            top: @json(__('Top Wall')),
+            bottom: @json(__('Bottom Wall')),
+            left: @json(__('Left Wall')),
+            right: @json(__('Right Wall')),
+        };
+        function syncDoorPicker() {
+            const side = document.getElementById('prop-room-door-side')?.value || 'auto';
+            const offset = Number(document.getElementById('prop-room-door-offset')?.value || 50);
+            document.querySelectorAll('.ed-door-btn').forEach(b => {
+                const on = b.dataset.side === side;
+                b.classList.toggle('active', on);
+                b.setAttribute('aria-checked', on ? 'true' : 'false');
+            });
+            const mark = document.getElementById('door-picker-mark');
+            if (mark) {
+                // 'auto' draws on the bottom wall (see draw()), so preview it there.
+                const drawn = side === 'auto' ? 'bottom' : side;
+                mark.dataset.side = drawn;
+                mark.style.left = (drawn === 'top' || drawn === 'bottom') ? offset + '%' : '';
+                mark.style.top = (drawn === 'left' || drawn === 'right') ? offset + '%' : '';
+            }
+            const caption = document.getElementById('door-picker-caption');
+            if (caption) caption.textContent = DOOR_SIDE_LABELS[side] || side;
+        }
+        function setDoorSide(side) {
+            const input = document.getElementById('prop-room-door-side');
+            if (input) input.value = side;
+            updateRoomProp('doorSide', side);
+            syncDoorPicker();
+        }
+
 
         // ── AI Workplace Generator Logic ──
         const PLAN_ROOM_LIMIT = {{ $plan && $plan->room_limit > 0 ? $plan->room_limit : 9999 }};
@@ -3162,8 +3249,8 @@
             const sel = document.getElementById('ai-style-' + styleKey);
             if (sel) {
                 sel.classList.add('active');
-                sel.style.borderColor = 'var(--ula-palm-900)';
-                sel.style.background = 'rgba(16, 185, 129, 0.1)';
+                sel.style.borderColor = 'var(--ula-accent-default)';
+                sel.style.background = 'var(--ula-surface-accent-soft)';
             }
             const radio = document.querySelector(`input[name="ai_style"][value="${styleKey}"]`);
             if (radio) radio.checked = true;
@@ -3333,13 +3420,13 @@
     </script>
 
     <!-- ── AI Office & Floorplan Generator Modal ── -->
-    <div id="ai-generator-modal" style="display: none; position: fixed; inset: 0; background: rgba(6, 13, 9, 0.85); backdrop-filter: blur(14px); z-index: 99999; align-items: center; justify-content: center; padding: 20px;">
-        <div style="background: var(--ula-surface-capsule-strong); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); width: 100%; max-width: 820px; max-height: 90vh; overflow-y: auto; box-shadow: var(--ula-shadow-xl); display: flex; flex-direction: column;">
+    <div id="ai-generator-modal" style="display: none; position: fixed; inset: 0; background: var(--ula-surface-overlay); backdrop-filter: blur(14px); z-index: 99999; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: var(--ula-surface-page); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); width: 100%; max-width: 820px; max-height: 90vh; overflow-y: auto; box-shadow: var(--ula-shadow-xl); display: flex; flex-direction: column;">
             
             <!-- Modal Header -->
             <div style="padding: 22px 26px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center; background: var(--ula-surface-card);">
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <div style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, var(--ula-status-success), var(--ula-status-success)); color: var(--ula-white); display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);">
+                    <div style="width: 42px; height: 42px; border-radius: 12px; background: var(--ula-accent-default); color: var(--ula-accent-fg); display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 12px var(--ula-border-subtle);">
                         <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">auto_awesome</span>
                     </div>
                     <div>
@@ -3356,7 +3443,7 @@
 
             <!-- Loading State Overlay -->
             <div id="ai-modal-loading-box" style="display: none; flex-direction: column; align-items: center; justify-content: center; padding: 60px 30px; text-align: center; gap: 18px;">
-                <div style="width: 64px; height: 64px; border: 4px solid rgba(16, 185, 129, 0.2); border-top-color: var(--ula-status-success); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                <div style="width: 64px; height: 64px; border: 4px solid var(--ula-border-subtle); border-top-color: var(--ula-status-success); border-radius: 50%; animation: spin 1s linear infinite;"></div>
                 <h3 style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary);">
                     <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">auto_awesome</span> {{ __('Generating 3D Isometric Office Blueprint...') }}
                 </h3>
@@ -3397,9 +3484,9 @@
                     </label>
                     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
                         @foreach($aiStyles as $key => $style)
-                        <div class="ai-style-card {{ $loop->first ? 'active' : '' }}" id="ai-style-{{ $key }}" onclick="selectAiStyle('{{ $key }}')" style="background: {{ $loop->first ? 'rgba(16, 185, 129, 0.1)' : 'var(--ula-surface-card)' }}; border: 1px solid {{ $loop->first ? 'var(--ula-palm-900)' : 'var(--ula-border-subtle)' }}; border-radius: var(--ula-radius-sm); padding: 12px; cursor: pointer; transition: all 0.2s ease;">
+                        <div class="ai-style-card {{ $loop->first ? 'active' : '' }}" id="ai-style-{{ $key }}" onclick="selectAiStyle('{{ $key }}')" style="background: {{ $loop->first ? 'var(--ula-surface-accent-soft)' : 'var(--ula-surface-card)' }}; border: 1px solid {{ $loop->first ? 'var(--ula-accent-default)' : 'var(--ula-border-subtle)' }}; border-radius: var(--ula-radius-sm); padding: 12px; cursor: pointer; transition: all 0.2s ease;">
                             <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer;">
-                                <input type="radio" name="ai_style" value="{{ $key }}" {{ $loop->first ? 'checked' : '' }} style="margin-top: 3px; accent-color: var(--ula-palm-900);">
+                                <input type="radio" name="ai_style" value="{{ $key }}" {{ $loop->first ? 'checked' : '' }} style="margin-top: 3px; accent-color: var(--ula-accent-default);">
                                 <div>
                                     <strong style="font-size: 12px; color: var(--ula-text-primary); display: block;">{{ $style['name'] }}</strong>
                                     <span style="font-size: 10px; color: var(--ula-text-muted); line-height: 1.3; display: block; margin-top: 2px;">{{ $style['name_ar'] }}</span>
@@ -3422,7 +3509,7 @@
                         <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-sm); padding: 12px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                 <div>
-                                    <strong style="font-size: 12px; color: var(--ula-terracotta-600); display: block;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> {{ __('Meeting Boardrooms') }}</strong>
+                                    <strong style="font-size: 12px; color: var(--ula-tone-terracotta-fg); display: block;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> {{ __('Meeting Boardrooms') }}</strong>
                                     <span style="font-size: 10px; color: var(--ula-text-muted);">{{ __('غرف اجتماعات زجاجية') }}</span>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 6px;">
@@ -3475,7 +3562,7 @@
                         <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-sm); padding: 12px;">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div>
-                                    <strong style="font-size: 12px; color: var(--ula-terracotta-500); display: block;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">weekend</span> {{ __('Rest & Gaming Lounge') }}</strong>
+                                    <strong style="font-size: 12px; color: var(--ula-tone-terracotta-fg); display: block;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">weekend</span> {{ __('Rest & Gaming Lounge') }}</strong>
                                     <span style="font-size: 10px; color: var(--ula-text-muted);">{{ __('صالة الاستراحة والترفيه') }}</span>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 6px;">
@@ -3502,7 +3589,7 @@
                         </div>
 
                         <!-- Default Amenities Card -->
-                        <div style="background: rgba(16, 185, 129, 0.08); border: 1px dashed rgba(52, 211, 153, 0.35); border-radius: var(--ula-radius-sm); padding: 12px; display: flex; flex-direction: column; justify-content: center;">
+                        <div style="background: var(--ula-surface-accent-soft); border: 1px dashed var(--ula-border-subtle); border-radius: var(--ula-radius-sm); padding: 12px; display: flex; flex-direction: column; justify-content: center;">
                             <strong style="font-size: 11px; color: var(--ula-status-success); display: flex; align-items: center; gap: 6px;">
                                 <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">coffee</span></span> {{ __('Coffee Corner & Reception') }}
                             </strong>
@@ -3514,16 +3601,12 @@
                 </div>
 
                 <!-- Live Quota Warning Box -->
-                <div id="ai-quota-warning-box" style="display: none; background: rgba(217, 107, 95, 0.15); border: 1px solid rgba(217, 107, 95, 0.35); border-radius: 10px; padding: 12px 16px; font-size: 12px; color: var(--ula-status-danger); font-weight: 700;"></div>
+                <div id="ai-quota-warning-box" style="display: none; background: var(--ula-tone-terracotta-bg); border: 1px solid var(--ula-border-danger); border-radius: 10px; padding: 12px 16px; font-size: 12px; color: var(--ula-status-danger); font-weight: 700;"></div>
 
                 <!-- Action Buttons -->
                 <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--ula-border-subtle);">
-                    <button type="button" onclick="closeAiGeneratorModal()" class="tactile-btn" style="padding: 10px 20px; font-size: 13px;">
-                        {{ __('Cancel') }}
-                    </button>
-                    <button type="button" onclick="generateAiOfficeOnCanvas()" id="btn-ai-submit-generate" class="tactile-btn btn-primary" style="padding: 12px 28px; font-size: 14px; font-weight: 900; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);">
-                        <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">auto_awesome</span></span> {{ __('Generate Office with AI') }}
-                    </button>
+                    <x-btn variant="secondary" size="md" onclick="closeAiGeneratorModal()">{{ __('Cancel') }}</x-btn>
+                    <x-btn variant="primary" size="md" icon="auto_awesome" id="btn-ai-submit-generate" onclick="generateAiOfficeOnCanvas()">{{ __('Generate Office with AI') }}</x-btn>
                 </div>
             </div>
         </div>

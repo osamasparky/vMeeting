@@ -70,7 +70,7 @@
             <!-- Center: Blueprint Status -->
             <div style="font-size: 12px; font-weight: 800; color: var(--ula-text-primary); display: flex; align-items: center; gap: 8px;">
                 <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">architecture</span> {{ $template->width }}x{{ $template->height }} Grid</span>
-                <span style="color: var(--ula-text-muted);">•</span>
+                <span style="color: var(--ula-text-muted);">·</span>
                 <span id="canvas-rooms-count">{{ count($template->rooms_data ?: []) }} {{ __('Rooms Configured') }}</span>
             </div>
 
@@ -572,7 +572,7 @@
             emptyBox.style.display = 'none';
             formBox.style.display = 'flex';
             const r = defaultRooms[index];
-            headerTitle.textContent = `🚪 ${r.name || 'Room'}`;
+            headerTitle.textContent = `${r.name || 'Room'}`;
             updateInspectorInputs();
         }
         renderRosterTable();
@@ -600,7 +600,7 @@
         if (selectedRoomIndex === null || !defaultRooms[selectedRoomIndex]) return;
         defaultRooms[selectedRoomIndex][prop] = value;
         if (prop === 'name') {
-            document.getElementById('inspector-header-title').textContent = `🚪 ${value || 'Room'}`;
+            document.getElementById('inspector-header-title').textContent = `${value || 'Room'}`;
         }
         renderRosterTable();
         drawCanvas();
@@ -761,7 +761,7 @@
             }
 
             // Room Name Tag (Floating Glass Badge)
-            const label = `🚪 ${r.name || 'Room'}`;
+            const label = `${r.name || 'Room'}`;
             ctx.font = 'bold 11px Cairo, Inter, sans-serif';
             const tw = ctx.measureText(label).width;
             const badgeW = Math.min(rw - 8, tw + 20);
@@ -802,7 +802,7 @@
 
             ctx.fillStyle = '#10B981';
             ctx.font = 'bold 12px Cairo, Inter, sans-serif';
-            ctx.fillText(`📐 ${currentDragRect.width}x${currentDragRect.height}`, dx + 8, dy + 20);
+            ctx.fillText(`${currentDragRect.width}x${currentDragRect.height}`, dx + 8, dy + 20);
         }
 
         ctx.restore();
@@ -831,13 +831,13 @@
 
             const data = await res.json();
             if (res.ok && data.success) {
-                alert('🎉 ' + data.message);
+                alert('' + data.message);
             } else {
-                alert('❌ ' + (data.message || 'Failed to save rooms.'));
+                alert('' + (data.message || 'Failed to save rooms.'));
             }
         } catch (err) {
             console.error(err);
-            alert('❌ Network error while saving rooms.');
+            alert('Network error while saving rooms.');
         } finally {
             btn.disabled = false;
             btn.innerHTML = origText;

@@ -1,8 +1,8 @@
 <div id="tab-projects" class="tab-view">
     <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
         <div style="display: flex; flex-direction: column; gap: 2px;">
-            <h2 style="font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ula-text-primary); margin: 0;">{{ __('Projects Portfolio & Strategic Initiatives') }}</h2>
-            <span style="font-family: 'IBM Plex Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--ula-text-secondary);">Projects Portfolio &amp; Strategic Initiatives</span>
+            <h2 class="ula-headline-ar" style="font-size: var(--ula-size-h1); margin: 0;">{{ __('page.projects') }}</h2>
+            @if(app()->getLocale() === 'ar')<span class="ula-headline-en" style="font-size: var(--ula-size-h4);">Projects Portfolio</span>@endif
         </div>
         @if($membership->hasPermission('projects.manage') || $membership->role?->slug === 'company_admin')
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
@@ -14,55 +14,11 @@
     </div>
 
     <!-- Project KPI Metrics -->
-    <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 16px; margin-bottom: 24px;">
-        <div class="kpi-card" style="padding: 18px; border-radius: var(--ula-radius-xl); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
-            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
-                <span style="font-size: 14px; font-weight: 600; color: var(--ula-text-secondary);">{{ __('Total Projects') }}</span>
-                <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: 999px; background: var(--ula-control-tone-palm-fill); color: var(--ula-palm-700); display: inline-flex; align-items: center; justify-content: center;">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">folder</span>
-                </span>
-            </div>
-            <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
-                <span style="font-size: 32px; font-weight: 400; line-height: 1.1; font-family: 'IBM Plex Mono', monospace;">{{ $projects->count() }}</span>
-                <span style="font-size: 12px; color: var(--ula-status-success);">{{ $projects->where('status', 'active')->count() }} {{ __('Active initiatives') }}</span>
-            </div>
-        </div>
-        <div class="kpi-card" style="padding: 18px; border-radius: var(--ula-radius-xl); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
-            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
-                <span style="font-size: 14px; font-weight: 600; color: var(--ula-text-secondary);">{{ __('Total Tasks') }}</span>
-                <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: 999px; background: var(--ula-control-tone-gold-fill); color: var(--ula-gold-700); display: inline-flex; align-items: center; justify-content: center;">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">task_alt</span>
-                </span>
-            </div>
-            <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
-                <span style="font-size: 32px; font-weight: 400; line-height: 1.1; font-family: 'IBM Plex Mono', monospace;">{{ $tasks->count() }}</span>
-                <span style="font-size: 12px; color: var(--ula-text-muted);">{{ $tasks->where('status', '!=', 'done')->count() }} {{ __('In progress / Backlog') }}</span>
-            </div>
-        </div>
-        <div class="kpi-card" style="padding: 18px; border-radius: var(--ula-radius-xl); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
-            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
-                <span style="font-size: 14px; font-weight: 600; color: var(--ula-text-secondary);">{{ __('Logged Hours') }}</span>
-                <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: 999px; background: var(--ula-surface-page-alt); color: var(--ula-text-primary); display: inline-flex; align-items: center; justify-content: center;">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">timer</span>
-                </span>
-            </div>
-            <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
-                <span style="font-size: 32px; font-weight: 400; line-height: 1.1; font-family: 'IBM Plex Mono', monospace;">{{ round($projects->sum(fn($p) => $p->actualHours()), 1) }}h</span>
-                <span style="font-size: 12px; color: var(--ula-status-success);">{{ __('Tracked across all tasks') }}</span>
-            </div>
-        </div>
-        <div class="kpi-card" style="padding: 18px; border-radius: var(--ula-radius-xl); border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card); box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 12px;">
-            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;">
-                <span style="font-size: 14px; font-weight: 600; color: var(--ula-text-secondary);">{{ __('Total Budget') }}</span>
-                <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: 999px; background: var(--ula-control-tone-palm-fill); color: var(--ula-palm-700); display: inline-flex; align-items: center; justify-content: center;">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">attach_money</span>
-                </span>
-            </div>
-            <div style="display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;">
-                <span style="font-size: 32px; font-weight: 400; line-height: 1.1; font-family: 'IBM Plex Mono', monospace;">${{ number_format($projects->sum('budget_amount'), 0) }}</span>
-                <span style="font-size: 12px; color: var(--ula-status-success);">{{ __('Allocated capital') }}</span>
-            </div>
-        </div>
+    <div class="ula-kpi-row">
+        <x-kpi-card density="default" icon="folder" iconColor="sage" :title="__('Total Projects')" :value="$projects->count()" :caption="$projects->where('status', 'active')->count() . ' ' . __('Active initiatives')" />
+        <x-kpi-card density="default" icon="task_alt" iconColor="gold" :title="__('Total Tasks')" :value="$tasks->count()" :caption="$tasks->where('status', '!=', 'done')->count() . ' ' . __('In progress / Backlog')" />
+        <x-kpi-card density="default" icon="timer" iconColor="muted" :title="__('Logged Hours')" :value="round($projects->sum(fn ($p) => $p->actualHours()), 1) . 'h'" :caption="__('Tracked across all tasks')" />
+        <x-kpi-card density="default" icon="payments" iconColor="sage" :title="__('Total Budget')" :value="'$' . number_format($projects->sum('budget_amount'), 0)" :caption="__('Allocated capital')" />
     </div>
 
     <!-- Projects Table -->

@@ -23,7 +23,7 @@
 <!-- Plan Cards Grid -->
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 32px;">
     @foreach($plans as $plan)
-    <div class="panel-card" style="position: relative; display: flex; flex-direction: column; justify-content: space-between; border-radius: var(--ula-radius-xl); padding: 24px; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-top: 4px solid var(--ula-palm-900); box-shadow: var(--ula-shadow-sm);">
+    <div class="panel-card" style="position: relative; display: flex; flex-direction: column; justify-content: space-between; border-radius: var(--ula-radius-xl); padding: 24px; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-sm);">
         <div>
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
                 <div>
@@ -117,14 +117,18 @@
                 <span class="material-symbols-rounded" style="font-size: 15px;">edit</span>
                 <span>{{ __('Edit Plan') }}</span>
             </button>
-            @if($plan->organizations_count === 0 && !in_array($plan->slug, ['free', 'starter', 'business', 'enterprise']))
-            <form method="POST" action="{{ route('superadmin.plans.delete', $plan) }}" onsubmit="return confirm('Are you sure you want to delete this plan?');" style="margin: 0;">
+            @if($plan->canBeDeleted())
+            <form method="POST" action="{{ route('superadmin.plans.delete', $plan) }}" onsubmit="return confirm('{{ __('Are you sure you want to delete this plan?') }}');" style="margin: 0;">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="tactile-btn" style="color: var(--ula-status-danger); padding: 8px 12px; font-size: 12px; display: inline-flex; align-items: center; justify-content: center;" title="{{ __('Delete Plan') }}">
+                <button type="submit" class="tactile-btn" style="color: var(--ula-status-danger); background: rgba(217, 107, 95, 0.1); border: 1px solid rgba(217, 107, 95, 0.25); padding: 8px 12px; font-size: 12px; border-radius: var(--ula-radius-md); display: inline-flex; align-items: center; justify-content: center; cursor: pointer;" title="{{ __('Delete Unused Plan') }}">
                     <span class="material-symbols-rounded" style="font-size: 16px;">delete</span>
                 </button>
             </form>
+            @else
+            <button type="button" disabled class="tactile-btn" style="opacity: 0.45; cursor: not-allowed; padding: 8px 12px; font-size: 12px; border-radius: var(--ula-radius-md); display: inline-flex; align-items: center; justify-content: center; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); color: var(--ula-text-muted);" title="{{ __('Plan is in use by :count active organization(s) and cannot be deleted', ['count' => $plan->organizations_count]) }}">
+                <span class="material-symbols-rounded" style="font-size: 16px;">lock</span>
+            </button>
             @endif
         </div>
     </div>

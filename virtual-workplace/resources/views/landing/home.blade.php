@@ -5,511 +5,115 @@
 
 @section('styles')
 <style>
-    /* ── 1. Hero Block (Matches 01-Landing) ── */
-    .ula-hero-section {
-        position: relative;
-        background: var(--ula-surface-dark);
-        color: var(--ula-text-on-dark);
-        overflow: hidden;
-    }
+    /* Landing — design-reference/01-Landing.html. Tokens only; logical properties only. */
+    .lp-section { padding: 48px 32px; }
+    .lp-section--alt { background: var(--ula-surface-page-alt); }
+    .lp-en { font-family: var(--ula-font-en); direction: ltr; unicode-bidi: isolate; }
+    .lp-num { font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; }
+    .lp-eyebrow { font-family: var(--ula-font-en); font-size: var(--ula-size-label); font-weight: var(--ula-weight-medium); line-height: 1.5; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ula-tone-gold-fg); }
+    .lp-h2 { margin: 0; font-size: var(--ula-size-h2); font-weight: var(--ula-weight-semibold); line-height: 1.4; color: var(--ula-text-primary); text-wrap: pretty; }
+    .lp-lead-en { font-family: var(--ula-font-en); font-size: var(--ula-size-body); line-height: 1.5; color: var(--ula-text-secondary); }
+    .lp-body { font-size: 14px; line-height: 1.6; color: var(--ula-text-body); }
+    .lp-head { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
 
-    .ula-hero-stripes {
-        position: absolute;
-        inset: 0;
-        background: repeating-linear-gradient(135deg, var(--ula-media-stripe-a) 0 14px, var(--ula-media-stripe-b) 14px 28px);
-    }
+    /* Photo placeholders: stripes until a real image is uploaded in the CMS */
+    .lp-media { position: relative; overflow: hidden; background: repeating-linear-gradient(135deg, var(--ula-media-stripe-a) 0 18px, var(--ula-media-stripe-b) 18px 36px); background-size: cover; background-position: center; }
+    .lp-media-label { position: absolute; padding: 8px; background: var(--ula-media-label-bg); color: var(--ula-media-label-fg); font-family: var(--ula-font-mono); font-size: 10px; line-height: 1.4; direction: ltr; }
 
-    .ula-hero-scrim {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(to left, rgba(14,28,23,0.94) 0%, rgba(14,28,23,0.72) 50%, rgba(14,28,23,0.35) 100%);
-        pointer-events: none;
-    }
+    /* Hero */
+    .lp-hero { height: 520px; }
+    .lp-hero-scrim { position: absolute; inset: 0; background: var(--ula-scrim-hero); }
+    .lp-hero-label { bottom: 8px; inset-inline-end: 8px; }
+    .lp-hero-card { position: absolute; top: 32px; inset-inline-end: 32px; width: 380px; max-width: calc(100% - 64px); box-sizing: border-box; padding: 34px 30px 26px; background: var(--ula-surface-card); display: flex; flex-direction: column; align-items: flex-start; }
+    .lp-hero-card .lp-eyebrow { margin-bottom: 12px; direction: ltr; }
+    .lp-hero-title { margin: 0; font-size: 30px; font-weight: var(--ula-weight-semibold); line-height: 1.3; color: var(--ula-text-primary); text-wrap: pretty; }
+    .lp-hero-sub { margin: 0; padding: 12px 0; font-size: 14px; line-height: 1.6; color: var(--ula-text-body); }
+    .lp-hero-en { padding: 10px 0; font-size: 14px; line-height: 1.5; color: var(--ula-text-secondary); align-self: stretch; text-align: end; }
+    .lp-hero-actions { padding: 20px 0 0; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+    .lp-hero-actions-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .lp-hero-tagline { position: absolute; bottom: 0; inset-inline-start: 0; padding: 32px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+    .lp-hero-tagline strong { font-size: var(--ula-size-h2); font-weight: var(--ula-weight-semibold); line-height: 1.4; color: var(--ula-text-on-dark); }
+    .lp-hero-tagline span { font-size: var(--ula-size-body); line-height: 1.5; color: var(--ula-media-stripe-a); text-align: end; }
 
-    .ula-hero-grid {
-        position: relative;
-        z-index: 2;
-        max-width: var(--ula-layout-container-max);
-        margin-inline: auto;
-        padding: 96px 64px 88px;
-        display: grid;
-        grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-        gap: 64px;
-        align-items: center;
-    }
+    /* Feature strip */
+    .lp-features { padding: 36px 32px; background: var(--ula-surface-page); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px; }
+    .lp-feature { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+    .lp-feature .ms { font-size: 32px; color: var(--ula-icon-highlight); }
+    .lp-feature strong { font-size: 14px; font-weight: var(--ula-weight-medium); line-height: 1.6; color: var(--ula-text-primary); }
+    .lp-feature span.lp-en { font-size: var(--ula-size-xs); line-height: 1.5; color: var(--ula-text-secondary); }
 
-    .ula-hero-copy {
-        display: flex;
-        flex-direction: column;
-        gap: 28px;
-        align-items: flex-start;
-    }
+    /* Identity + spaces: two equal columns */
+    .lp-split { display: flex; align-items: center; gap: 24px; }
+    .lp-split > * { flex: 1; min-width: 0; }
+    .lp-identity-media { height: 260px; border-radius: var(--ula-radius-lg); }
+    .lp-identity-media::after { content: ''; position: absolute; inset: 0; background: var(--ula-scrim-caption); }
+    .lp-identity-media .lp-media-label { top: 8px; inset-inline-end: 8px; z-index: 1; }
+    .lp-identity-caption { position: absolute; bottom: 16px; inset-inline-start: 20px; z-index: 1; display: flex; flex-direction: column; align-items: flex-start; }
+    .lp-identity-caption strong { font-size: var(--ula-size-body); font-weight: var(--ula-weight-medium); line-height: 1.6; color: var(--ula-text-on-dark); }
+    .lp-identity-caption span { font-size: var(--ula-size-xs); line-height: 1.5; color: var(--ula-media-stripe-a); }
 
-    .ula-hero-eyebrow {
-        align-self: flex-start;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        height: 32px;
-        padding: 0 14px;
-        border-radius: var(--ula-radius-pill);
-        background: var(--ula-surface-gold-soft);
-        color: var(--ula-tone-gold-fg);
-        font-family: var(--ula-font-en);
-        font-size: 12px;
-        font-weight: 500;
-        letter-spacing: var(--ula-tracking-brand);
-        text-transform: uppercase;
-    }
+    .lp-spaces { align-items: stretch; }
+    .lp-space-tile { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--ula-radius-md); background: var(--ula-surface-card); border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); }
+    .lp-tile-icon { width: 36px; height: 36px; flex-shrink: 0; border-radius: var(--ula-radius-sm); background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg); display: inline-flex; align-items: center; justify-content: center; }
+    .lp-tile-icon .ms { font-size: 20px; }
 
-    .ula-hero-title {
-        font-size: 56px;
-        font-weight: 600;
-        line-height: 1.25;
-        color: var(--ula-text-on-dark);
-    }
+    .lp-floor { border-radius: var(--ula-radius-lg); background: var(--ula-surface-dark); padding: 20px; display: flex; flex-direction: column; gap: 14px; color: var(--ula-text-on-dark); }
+    .lp-floor-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .lp-live { height: 29px; padding: 0 12px; flex-shrink: 0; border-radius: var(--ula-radius-pill); background: var(--ula-control-dark-fill-strong); color: var(--ula-status-success-on-dark); font-size: var(--ula-size-sm); font-weight: var(--ula-weight-medium); display: inline-flex; align-items: center; gap: 6px; }
+    .lp-live-dot { width: 7px; height: 7px; border-radius: var(--ula-radius-pill); background: var(--ula-status-info); }
+    .lp-floor-preview { height: 150px; border-radius: var(--ula-radius-md); background: repeating-linear-gradient(135deg, var(--ula-surface-dark-alt) 0 12px, var(--ula-surface-map-canvas) 12px 24px); background-size: cover; background-position: center; }
+    .lp-floor-preview .lp-media-label { bottom: 8px; inset-inline-end: 8px; }
+    .lp-room { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--ula-radius-md); background: var(--ula-control-dark-fill); border: var(--ula-border-width-hairline) solid var(--ula-border-on-dark-subtle); }
+    .lp-room-icon { width: 36px; height: 36px; flex-shrink: 0; border-radius: var(--ula-radius-sm); background: var(--ula-control-dark-fill-strong); color: var(--ula-highlight-default); display: inline-flex; align-items: center; justify-content: center; }
 
-    .ula-hero-subtitle {
-        font-family: var(--ula-font-en);
-        font-size: 20px;
-        font-weight: 300;
-        line-height: 1.5;
-        color: var(--ula-text-on-dark-muted);
-        max-width: 560px;
-    }
+    /* Capabilities */
+    .lp-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+    .lp-card { border-radius: var(--ula-radius-lg); background: var(--ula-surface-card); border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); padding: 20px; display: flex; flex-direction: column; gap: 12px; box-shadow: var(--ula-shadow-xs); }
+    .lp-card-icon { width: 44px; height: 44px; border-radius: var(--ula-radius-sm); background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg); display: inline-flex; align-items: center; justify-content: center; }
+    .lp-card h3 { margin: 0; font-size: var(--ula-size-h4); font-weight: var(--ula-weight-semibold); line-height: 1.4; color: var(--ula-text-primary); }
 
-    .ula-hero-actions {
-        display: flex;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
+    /* Quote */
+    .lp-quote { display: flex; justify-content: center; }
+    .lp-quote-box { max-width: 880px; padding-inline-start: 24px; border-inline-start: 3px solid var(--ula-highlight-default); display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+    .lp-quote-box blockquote { margin: 0; font-size: var(--ula-size-h2); font-weight: var(--ula-weight-semibold); line-height: 1.5; color: var(--ula-text-primary); text-wrap: pretty; }
+    .lp-quote-box .lp-eyebrow { color: var(--ula-text-secondary); }
 
-    .ula-btn-hero-primary {
-        height: 52px;
-        padding: 0 26px;
-        border-radius: var(--ula-radius-lg);
-        border: 0;
-        background: var(--ula-surface-raised);
-        color: var(--ula-text-primary);
-        font-family: var(--ula-font-ar);
-        font-size: 17px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-        cursor: pointer;
-        transition: all var(--ula-duration-fast) var(--ula-ease-out);
-    }
+    /* Pricing */
+    .lp-grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+    .lp-plan { padding: 20px; border-radius: var(--ula-radius-lg); background: var(--ula-surface-card); border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); display: flex; flex-direction: column; gap: 14px; box-shadow: var(--ula-shadow-xs); }
+    .lp-plan--featured { border: 2px solid var(--ula-accent-default); }
+    .lp-plan-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .lp-plan-name { font-size: var(--ula-size-h4); font-weight: var(--ula-weight-semibold); line-height: 1.4; }
+    .lp-popular { height: 29px; padding: 0 12px; border-radius: var(--ula-radius-pill); background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg); font-size: var(--ula-size-sm); font-weight: var(--ula-weight-medium); display: inline-flex; align-items: center; white-space: nowrap; }
+    .lp-price { display: flex; align-items: baseline; gap: 6px; direction: ltr; justify-content: flex-end; }
+    .lp-price-num { font-family: var(--ula-font-mono); font-size: var(--ula-size-h1); font-weight: var(--ula-weight-medium); color: var(--ula-text-primary); }
+    .lp-price-per { font-family: var(--ula-font-en); font-size: var(--ula-size-sm); color: var(--ula-text-muted); }
+    .lp-plan-line { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ula-text-body); }
+    .lp-plan-line .ms { font-size: 18px; color: var(--ula-icon-accent); }
+    .lp-plan .ula-btn { width: 100%; }
 
-    .ula-btn-hero-primary:hover {
-        background: var(--ula-surface-page-alt);
-        color: var(--ula-text-primary);
-    }
-
-    .ula-btn-hero-secondary {
-        height: 52px;
-        padding: 0 26px;
-        border-radius: var(--ula-radius-lg);
-        border: var(--ula-border-width-hairline) solid var(--ula-border-on-dark);
-        background: var(--ula-control-dark-fill);
-        color: var(--ula-text-on-dark);
-        font-family: var(--ula-font-ar);
-        font-size: 17px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-        cursor: pointer;
-        transition: all var(--ula-duration-fast) var(--ula-ease-out);
-    }
-
-    .ula-btn-hero-secondary:hover {
-        background: var(--ula-control-dark-fill-hover);
-        color: var(--ula-text-on-dark);
-    }
-
-    /* Hero Glass Panel */
-    .ula-hero-panel {
-        position: relative;
-        border-radius: 28px;
-        background: var(--ula-surface-capsule-strong);
-        border: var(--ula-border-width-hairline) solid var(--ula-border-on-dark);
-        padding: 24px;
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        box-shadow: var(--ula-shadow-xl);
-    }
-
-    .ula-hero-panel-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .ula-hero-panel-title-ar {
-        font-size: 17px;
-        font-weight: 600;
-        color: var(--ula-text-on-dark);
-    }
-
-    .ula-hero-panel-title-en {
-        font-family: var(--ula-font-en);
-        font-size: 12px;
-        color: var(--ula-text-on-dark-subtle);
-    }
-
-    .ula-hero-live-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        height: 29px;
-        padding: 0 12px;
-        border-radius: var(--ula-radius-pill);
-        background: var(--ula-tone-palm-bg);
-        color: var(--ula-tone-palm-fg);
-        font-size: 13px;
-        font-weight: 500;
-    }
-
-    .ula-hero-live-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: var(--ula-radius-pill);
-        background: var(--ula-palm-400);
-    }
-
-    .ula-hero-preview-box {
-        height: 220px;
-        border-radius: 20px;
-        background: repeating-linear-gradient(135deg, var(--ula-palm-800) 0 12px, var(--ula-palm-900) 12px 24px);
-        position: relative;
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        padding: 12px;
-        overflow: hidden;
-    }
-
-    .ula-caption-pill {
-        font-family: var(--ula-font-mono);
-        font-size: 11px;
-        color: var(--ula-text-primary);
-        background: rgba(251,248,242,0.72);
-        padding: 6px 10px;
-        border-radius: var(--ula-radius-pill);
-        direction: ltr;
-        unicode-bidi: isolate;
-    }
-
-    .ula-hero-room-card {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 12px 14px;
-        border-radius: 14px;
-        background: var(--ula-control-dark-fill);
-        border: var(--ula-border-width-hairline) solid var(--ula-border-on-dark-subtle);
-    }
-
-    .ula-hero-room-icon-box {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        background: var(--ula-control-dark-fill-strong);
-        color: var(--ula-icon-highlight);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    /* ── 2. Spaces Section (Matches 01-Landing) ── */
-    .ula-spaces-section {
-        padding: 80px 64px;
-        max-width: var(--ula-layout-container-max);
-        margin-inline: auto;
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        gap: 64px;
-        align-items: center;
-    }
-
-    .ula-spaces-visual-box {
-        height: 420px;
-        border-radius: 28px;
-        background: repeating-linear-gradient(135deg, var(--ula-sand-400) 0 14px, var(--ula-sand-500) 14px 28px);
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        padding: 16px;
-        overflow: hidden;
-        border: var(--ula-border-width-hairline) solid var(--ula-border-default);
-    }
-
-    .ula-spaces-content {
-        display: flex;
-        flex-direction: column;
-        gap: 24px;
-    }
-
-    .ula-eyebrow-gold {
-        font-family: var(--ula-font-en);
-        font-size: 11px;
-        font-weight: 500;
-        letter-spacing: var(--ula-tracking-brand);
-        text-transform: uppercase;
-        color: var(--ula-tone-gold-fg);
-    }
-
-    .ula-section-heading {
-        font-size: 34px;
-        font-weight: 600;
-        line-height: 1.25;
-        color: var(--ula-text-primary);
-    }
-
-    .ula-section-subtext {
-        font-family: var(--ula-font-en);
-        font-size: 17px;
-        font-weight: 300;
-        line-height: 1.6;
-        color: var(--ula-text-secondary);
-    }
-
-    .ula-space-tile {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        padding: 14px 16px;
-        border-radius: 16px;
-        background: var(--ula-surface-card);
-        border: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
-    }
-
-    .ula-space-tile-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
-        background: var(--ula-tone-gold-bg);
-        color: var(--ula-tone-gold-fg);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    /* ── 3. Platform Capabilities Grid ── */
-    .ula-capabilities-section {
-        padding: 80px 64px;
-        background: var(--ula-surface-sunken);
-        border-top: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
-        border-bottom: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
-    }
-
-    .ula-capabilities-container {
-        max-width: var(--ula-layout-container-max);
-        margin-inline: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 40px;
-    }
-
-    .ula-capabilities-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 24px;
-    }
-
-    .ula-feature-card {
-        border-radius: 20px;
-        background: var(--ula-surface-card);
-        border: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        box-shadow: var(--ula-shadow-xs);
-    }
-
-    .ula-feature-media {
-        height: 180px;
-        background: repeating-linear-gradient(135deg, var(--ula-sand-400) 0 12px, var(--ula-sand-500) 12px 24px);
-    }
-
-    .ula-feature-body {
-        padding: 24px;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .ula-feature-icon-box {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        background: var(--ula-tone-gold-bg);
-        color: var(--ula-tone-gold-fg);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        margin-top: -46px;
-        box-shadow: 0 0 0 4px var(--ula-surface-card);
-    }
-
-    /* ── 4. Quote Section (Heritage) ── */
-    .ula-quote-section {
-        padding: 80px 64px;
-        max-width: var(--ula-layout-container-max);
-        margin-inline: auto;
-        display: flex;
-        justify-content: center;
-    }
-
-    .ula-quote-box {
-        max-width: 880px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 16px;
-        text-align: center;
-    }
-
-    .ula-quote-text {
-        font-size: 30px;
-        font-weight: 600;
-        line-height: 1.5;
-        color: var(--ula-palm-800);
-    }
-
-    /* ── 5. Pricing Section (Matches 01-Landing) ── */
-    .ula-pricing-section {
-        padding: 80px 64px;
-        background: var(--ula-surface-sunken);
-        border-top: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
-    }
-
-    .ula-pricing-container {
-        max-width: var(--ula-layout-container-max);
-        margin-inline: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 40px;
-    }
-
-    .ula-pricing-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 20px;
-        align-items: stretch;
-    }
-
-    .ula-plan-card {
-        position: relative;
-        padding: 28px 24px;
-        border-radius: 20px;
-        background: var(--ula-surface-card);
-        border: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        box-shadow: var(--ula-shadow-xs);
-    }
-
-    .ula-plan-card.featured {
-        border: 2px solid var(--ula-accent-default);
-        box-shadow: var(--ula-shadow-md);
-    }
-
-    .ula-plan-popular-badge {
-        position: absolute;
-        top: -14px;
-        inset-inline-start: 24px;
-        height: 28px;
-        padding: 0 12px;
-        border-radius: var(--ula-radius-pill);
-        background: var(--ula-highlight-default);
-        color: var(--ula-text-primary);
-        font-size: 12px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-    }
-
-    .ula-plan-price-num {
-        font-family: var(--ula-font-mono);
-        font-size: 40px;
-        font-weight: 500;
-        color: var(--ula-text-primary);
-    }
-
-    .ula-btn-plan {
-        height: 44px;
-        border-radius: 14px;
-        font-family: var(--ula-font-ar);
-        font-size: 15px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        cursor: pointer;
-        transition: all var(--ula-duration-fast) var(--ula-ease-out);
-    }
-
-    .ula-btn-plan-outline {
-        border: var(--ula-border-width-hairline) solid var(--ula-border-default);
-        background: transparent;
-        color: var(--ula-text-primary);
-    }
-
-    .ula-btn-plan-outline:hover {
-        background: var(--ula-surface-page-alt);
-    }
-
-    .ula-btn-plan-primary {
-        border: var(--ula-border-width-hairline) solid var(--ula-accent-default);
-        background: var(--ula-accent-default);
-        color: var(--ula-accent-fg);
-    }
-
-    .ula-btn-plan-primary:hover {
-        background: var(--ula-accent-hover);
-    }
-
-    /* ── 6. Bottom Banner CTA ── */
-    .ula-bottom-cta-wrap {
-        padding: 80px 64px;
-        max-width: var(--ula-layout-container-max);
-        margin-inline: auto;
-    }
-
-    .ula-bottom-cta-banner {
-        padding: 64px;
-        border-radius: 28px;
-        background: var(--ula-surface-dark);
-        color: var(--ula-text-on-dark);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 40px;
-    }
+    /* CTA band */
+    .lp-cta { padding: 40px; border-radius: var(--ula-radius-xl); background: var(--ula-surface-dark); display: flex; align-items: center; justify-content: space-between; gap: 32px; }
+    .lp-cta h2 { margin: 0; font-size: var(--ula-size-h2); font-weight: var(--ula-weight-semibold); line-height: 1.4; color: var(--ula-text-on-dark); }
+    .lp-cta p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--ula-media-stripe-a); }
+    .lp-cta-actions { display: flex; flex-wrap: wrap; gap: 12px; flex-shrink: 0; }
+    .lp-btn-on-dark { height: 52px; padding: 0 26px; border-radius: var(--ula-radius-lg); border: var(--ula-border-width-hairline) solid var(--ula-border-on-dark); background: transparent; color: var(--ula-text-on-dark); font-family: inherit; font-size: var(--ula-size-body-lg); font-weight: var(--ula-weight-semibold); display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+    .lp-btn-on-dark:hover { background: var(--ula-control-dark-fill); color: var(--ula-text-on-dark); text-decoration: none; }
+    .lp-btn-on-dark:focus-visible { outline: none; box-shadow: var(--ula-focus-ring-on-dark); }
 
     @media (max-width: 1024px) {
-        .ula-hero-grid { grid-template-columns: 1fr; padding: 64px 32px 48px; }
-        .ula-spaces-section { grid-template-columns: 1fr; padding: 64px 32px; }
-        .ula-capabilities-section { padding: 64px 32px; }
-        .ula-capabilities-grid { grid-template-columns: 1fr; }
-        .ula-pricing-section { padding: 64px 32px; }
-        .ula-pricing-grid { grid-template-columns: repeat(2, 1fr); }
-        .ula-bottom-cta-banner { flex-direction: column; text-align: center; padding: 48px 32px; }
+        .lp-section, .lp-features { padding-inline: 20px; }
+        .lp-features, .lp-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .lp-grid-3 { grid-template-columns: minmax(0, 1fr); }
+        .lp-split { flex-direction: column; align-items: stretch; }
+        .lp-cta { flex-direction: column; align-items: flex-start; }
     }
-
     @media (max-width: 640px) {
-        .ula-hero-title { font-size: 38px; }
-        .ula-hero-grid { padding: 48px 20px 36px; }
-        .ula-spaces-section { padding: 48px 20px; }
-        .ula-pricing-grid { grid-template-columns: 1fr; }
-        .ula-bottom-cta-wrap { padding: 48px 20px; }
+        .lp-hero { height: auto; min-height: 560px; }
+        .lp-hero-card { inset-inline: 16px; top: 16px; width: auto; max-width: none; padding: 24px 20px; }
+        .lp-hero-tagline { display: none; }
+        .lp-features, .lp-grid-4 { grid-template-columns: minmax(0, 1fr); }
+        .lp-cta { padding: 28px 20px; }
     }
 </style>
 @endsection
@@ -518,295 +122,245 @@
 
     @php
         $heroSec = $sections->get('home_hero');
-        $spatialSec = $sections->get('home_spatial_presence');
-        $spacesSec = $sections->get('home_floorplan_editor') ?? $sections->get('home_spaces');
-        $benefitsSec = $sections->get('home_collaboration') ?? $sections->get('home_benefits');
-        $meetingsSec = $sections->get('home_meetings');
         $identitySec = $sections->get('home_company_workspace') ?? $sections->get('home_identity');
+        $spacesSec = $sections->get('home_floorplan_editor') ?? $sections->get('home_spaces');
+        $capabilitiesSec = $sections->get('home_collaboration') ?? $sections->get('home_benefits');
         $pricingSec = $sections->get('home_pricing');
         $ctaSec = $sections->get('home_cta');
+
+        $planNameAr = ['free' => 'مجاني', 'starter' => 'مبتدئ', 'business' => 'أعمال', 'enterprise' => 'مؤسسات'];
+        $featureAr = [
+            'basic_chat' => 'دردشة نصية', 'basic_presence' => 'التواجد المباشر', 'basic_audio' => 'صوت أساسي',
+            'video' => 'مكالمات فيديو', 'screen_share' => 'مشاركة الشاشة', 'file_sharing' => 'مشاركة الملفات',
+            'guest_access' => 'دعوة الضيوف', 'analytics' => 'تحليلات الأداء', 'custom_branding' => 'علامة تجارية مخصصة',
+            'sso' => 'دخول موحد (SSO)', 'api_access' => 'وصول عبر API', 'priority_support' => 'دعم ذو أولوية',
+            'advanced_analytics' => 'تحليلات متقدمة',
+        ];
+        $mediaStyle = fn ($sec) => $sec?->image_url ? "background-image: url('" . e($sec->image_url) . "');" : '';
     @endphp
 
-    <!-- ── 01. Hero Section (Screen 01) ── -->
-    <section id="hero" class="ula-hero-section">
-        @if(!$heroSec?->image_url)
-            <div class="ula-hero-stripes"></div>
-        @endif
-        <div class="ula-hero-scrim"></div>
+    <!-- ── Hero ── -->
+    <section class="lp-media lp-hero" style="{{ $mediaStyle($heroSec) }}">
+        <div class="lp-hero-scrim"></div>
+        @unless($heroSec?->image_url)
+            <span class="lp-media-label lp-hero-label">alula-canyon.jpg</span>
+        @endunless
 
-        <div class="ula-hero-grid">
-            <!-- Copy column -->
-            <div class="ula-hero-copy">
-                <span class="ula-hero-eyebrow">
-                    <span class="ms" style="font-size: 16px;">auto_awesome</span>
-                    Next-Generation Spatial Virtual Workplace
-                </span>
-
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <h1 class="ula-hero-title">
-                        {{ $heroSec?->title_ar ?: 'مساحات عمل افتراضية ذكية تجمع الفرق عن بُعد بانسيابية تامة.' }}
-                    </h1>
-                    <p class="ula-hero-subtitle">
-                        {{ $heroSec?->title_en ?: 'Next-generation spatial virtual workplaces where distributed teams meet, collaborate, and build culture naturally.' }}
-                    </p>
-                </div>
-
-                <div class="ula-hero-actions">
-                    @auth
-                        <a href="{{ route('office') }}" class="ula-btn-hero-primary">
-                            <span class="ms" style="font-size: 22px;">login</span>
-                            <span>{{ __('ادخل إلى المكتب') }}</span>
-                        </a>
-                        <a href="{{ route('dashboard') }}" class="ula-btn-hero-secondary">
-                            <span class="ms" style="font-size: 22px;">dashboard</span>
-                            <span>{{ __('لوحة التحكم') }}</span>
-                        </a>
-                    @else
-                        <a href="{{ $heroSec?->getContentValue('cta_primary_link', route('register')) }}" class="ula-btn-hero-primary">
-                            <span class="ms" style="font-size: 22px;">login</span>
-                            <span>{{ app()->getLocale() === 'ar' ? ($heroSec?->getContentValue('cta_primary_text_ar') ?: 'ادخل إلى المكتب') : ($heroSec?->getContentValue('cta_primary_text_en') ?: 'Enter Workplace') }}</span>
-                        </a>
-                        <a href="{{ $heroSec?->getContentValue('cta_secondary_link', route('login')) }}" class="ula-btn-hero-secondary">
-                            <span class="ms" style="font-size: 22px;">dashboard</span>
-                            <span>{{ app()->getLocale() === 'ar' ? ($heroSec?->getContentValue('cta_secondary_text_ar') ?: 'تسجيل الدخول') : ($heroSec?->getContentValue('cta_secondary_text_en') ?: 'Sign In') }}</span>
-                        </a>
-                    @endauth
+        <div class="lp-hero-card">
+            <span class="lp-eyebrow">{{ $heroSec?->badge_en ?: 'Next-Generation Virtual Workplace' }}</span>
+            <h1 class="lp-hero-title">{{ $heroSec?->title_ar ?: 'اجمع فريقك في مساحة واحدة ذكية' }}</h1>
+            <p class="lp-hero-sub">{{ $heroSec?->subtitle_ar ?: 'مكاتب افتراضية نابضة بالحياة بالصوت والصورة والمحادثات. اجتماعات سهلة، ومشاركة أقرب.' }}</p>
+            <span class="lp-en lp-hero-en">{{ $heroSec?->title_en ?: 'A more human way to work together.' }}</span>
+            <div class="lp-hero-actions">
+                @auth
+                    <x-btn variant="primary" size="md" :href="route('office')">{{ $heroSec?->getContentValue('cta_primary_text_ar') ?: 'ادخل إلى مساحتك' }}</x-btn>
+                @else
+                    <x-btn variant="primary" size="md" :href="$heroSec?->getContentValue('cta_primary_link', route('register')) ?? route('register')">{{ $heroSec?->getContentValue('cta_primary_text_ar') ?: 'ادخل إلى مساحتك' }}</x-btn>
+                @endauth
+                <div class="lp-hero-actions-row">
+                    <x-btn variant="secondary" size="md" href="#spaces">{{ $heroSec?->getContentValue('cta_secondary_text_ar') ?: 'شاهد العرض' }}</x-btn>
+                    <x-btn variant="ghost" size="md" icon="dashboard" :href="auth()->check() ? route('dashboard') : route('login')">لوحة التحكم</x-btn>
                 </div>
             </div>
+        </div>
 
-            <!-- Floor Preview Glass Panel -->
-            <div class="ula-hero-panel">
-                <div class="ula-hero-panel-header">
-                    <div style="display: flex; flex-direction: column; gap: 2px;">
-                        <span class="ula-hero-panel-title-ar">الطابق الأول · المقر الرئيسي</span>
-                        <span class="ula-hero-panel-title-en">Floor 1 · Main Headquarters</span>
-                    </div>
-                    <span class="ula-hero-live-badge">
-                        <span class="ula-hero-live-dot"></span>
-                        <span style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">18</span>
-                        <span>عضواً متصلاً</span>
-                    </span>
-                </div>
+        <div class="lp-hero-tagline">
+            <strong>أكثر من<br>مكان العمل</strong>
+            <span class="lp-en">A more human<br>place to work.</span>
+        </div>
+    </section>
 
-                <div class="ula-hero-preview-box">
-                    <span class="ula-caption-pill">floor-preview.png</span>
+    <!-- ── Feature strip ── -->
+    <section id="features" class="lp-features">
+        @foreach([
+            ['apartment', 'مكاتب افتراضية حية', 'Live Virtual Offices'],
+            ['videocam', 'اجتماعات سلسة', 'Seamless Meetings'],
+            ['person_add', 'دعوات بضغطة واحدة', '1-Click Guest Access'],
+            ['palette', 'تصميم مرن لمكتبك', 'Design Your Space'],
+        ] as [$icon, $ar, $en])
+            <div class="lp-feature">
+                <span class="ms" aria-hidden="true">{{ $icon }}</span>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                    <strong>{{ $ar }}</strong>
+                    <span class="lp-en">{{ $en }}</span>
                 </div>
+            </div>
+        @endforeach
+    </section>
 
-                <!-- Room 1 -->
-                <div class="ula-hero-room-card">
-                    <span class="ula-hero-room-icon-box">
-                        <span class="ms" style="font-size: 20px;">meeting_room</span>
-                    </span>
-                    <div style="flex: 1; display: flex; flex-direction: column;">
-                        <span style="font-size: 15px; font-weight: 600;">قاعة النخيل</span>
-                        <span style="font-family: var(--ula-font-en); font-size: 12px; color: var(--ula-text-on-dark-subtle);">Palm Boardroom · 4 In Call</span>
-                    </div>
-                    <span style="font-size: 13px; color: var(--ula-palm-300);">في مكالمة</span>
-                </div>
-
-                <!-- Room 2 -->
-                <div class="ula-hero-room-card">
-                    <span class="ula-hero-room-icon-box">
-                        <span class="ms" style="font-size: 20px;">chair</span>
-                    </span>
-                    <div style="flex: 1; display: flex; flex-direction: column;">
-                        <span style="font-size: 15px; font-weight: 600;">مساحة الابتكار</span>
-                        <span style="font-family: var(--ula-font-en); font-size: 12px; color: var(--ula-text-on-dark-subtle);">Innovation Lounge · 2 Desks</span>
-                    </div>
-                    <span style="font-size: 13px; color: var(--ula-gold-300);">مكتبان متاحان</span>
-                </div>
+    <!-- ── Identity ── -->
+    <section id="identity" class="lp-section lp-section--alt lp-split">
+        <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 16px;">
+            <div class="lp-head">
+                <h2 class="lp-h2" style="font-size: 30px; line-height: 1.3;">{{ $identitySec?->title_ar ?: 'مستقبل العمل.. بروح سعودية' }}</h2>
+                <span class="lp-en lp-lead-en">{{ $identitySec?->title_en ?: 'The future of work. A Saudi spirit.' }}</span>
+            </div>
+            <p class="lp-body" style="margin: 0; max-width: 420px;">{{ $identitySec?->subtitle_ar ?: 'صُمّمت UlaSpace بإلهام من العلا لفرق تعمل من كل مكان: ضيافة سعودية في التفاصيل، وهندسة عالمية في الأداء.' }}</p>
+        </div>
+        <div class="lp-media lp-identity-media" style="{{ $mediaStyle($identitySec) }}">
+            @unless($identitySec?->image_url)
+                <span class="lp-media-label">majlis-warm-light.jpg</span>
+            @endunless
+            <div class="lp-identity-caption">
+                <strong>{{ $identitySec?->badge_ar ?: 'من السعودية … إلى العالم' }}</strong>
+                <span class="lp-en">{{ $identitySec?->badge_en ?: 'From Saudi Arabia, to the world.' }}</span>
             </div>
         </div>
     </section>
 
-    <!-- ── 02. Spaces Section (#spaces) ── -->
-    <section id="spaces" class="ula-spaces-section">
-        <div class="ula-spaces-visual-box">
-            <span class="ula-caption-pill">office-floor.jpg</span>
-        </div>
-
-        <div class="ula-spaces-content">
-            <span class="ula-eyebrow-gold">{{ $spacesSec?->badge ?: 'المساحات الذكية' }}</span>
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-                <h2 class="ula-section-heading">{{ $spacesSec?->title_ar ?: 'مكتب افتراضي يشبه مكتبك الحقيقي' }}</h2>
-                <p class="ula-section-subtext">{{ $spacesSec?->title_en ?: 'Design your floor once, and every teammate walks in to the same place — desks, meeting rooms, lounges, and quiet corners, all where you put them.' }}</p>
+    <!-- ── Smart spaces + live floor preview ── -->
+    <section id="spaces" class="lp-section lp-split lp-spaces">
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div class="lp-head">
+                <span class="lp-eyebrow">{{ $spacesSec?->badge_ar ?: 'المساحات الذكية' }}</span>
+                <h2 class="lp-h2">{{ $spacesSec?->title_ar ?: 'مكتب افتراضي يشبه مكتبك الحقيقي' }}</h2>
+                <span class="lp-en lp-lead-en" style="max-width: 560px; text-align: end;">{{ $spacesSec?->subtitle_en ?: 'Design your floor once, and every teammate walks in to the same place — desks, meeting rooms, lounges, and quiet corners.' }}</span>
             </div>
-
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                <div class="ula-space-tile">
-                    <span class="ula-space-tile-icon"><span class="ms" style="font-size: 22px;">chair</span></span>
-                    <div style="display: flex; flex-direction: column;">
-                        <span style="font-size: 15px; font-weight: 600;">مكاتب فردية ومساحات عمل مشتركة</span>
-                        <span style="font-family: var(--ula-font-en); font-size: 13px; color: var(--ula-text-secondary);">Private desks and open collaboration zones</span>
-                    </div>
-                </div>
-
-                <div class="ula-space-tile">
-                    <span class="ula-space-tile-icon"><span class="ms" style="font-size: 22px;">meeting_room</span></span>
-                    <div style="display: flex; flex-direction: column;">
-                        <span style="font-size: 15px; font-weight: 600;">قاعات اجتماعات قابلة للقفل</span>
-                        <span style="font-family: var(--ula-font-en); font-size: 13px; color: var(--ula-text-secondary);">Lockable meeting rooms with knock-to-enter</span>
-                    </div>
-                </div>
-
-                <div class="ula-space-tile">
-                    <span class="ula-space-tile-icon"><span class="ms" style="font-size: 22px;">workspaces</span></span>
-                    <div style="display: flex; flex-direction: column;">
-                        <span style="font-size: 15px; font-weight: 600;">صالات استراحة وزوايا هادئة</span>
-                        <span style="font-family: var(--ula-font-en); font-size: 13px; color: var(--ula-text-secondary);">Lounges and quiet corners for focus work</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ── 03. Platform Capabilities (#benefits) ── -->
-    <section id="benefits" class="ula-capabilities-section">
-        <div class="ula-capabilities-container">
-            <div style="display: flex; flex-direction: column; gap: 8px; max-width: 760px;">
-                <span class="ula-eyebrow-gold">Platform Capabilities</span>
-                <h2 class="ula-section-heading">{{ $benefitsSec?->title_ar ?: 'مصمم لبيئات العمل الحديثة التي تجمع بين التراث والابتكار' }}</h2>
-                <p class="ula-section-subtext">{{ $benefitsSec?->title_en ?: 'Everything you need to run a high-trust, collaborative virtual headquarters.' }}</p>
-            </div>
-
-            <div class="ula-capabilities-grid">
-                <!-- Feature 1 -->
-                <div class="ula-feature-card">
-                    <div class="ula-feature-media"></div>
-                    <div class="ula-feature-body">
-                        <span class="ula-feature-icon-box"><span class="ms" style="font-size: 24px;">graphic_eq</span></span>
-                        <h3 style="font-size: 21px; font-weight: 600; line-height: 1.4;">الصوت والفيديو المكاني (Spatial Audio)</h3>
-                        <p style="font-size: 15px; line-height: 1.6; color: var(--ula-text-body);">تواصل تلقائي يحاكي الواقع تماماً، حيث يقوى الصوت تدريجياً كلما اقتربت من زملائك على خريطة المقر دون الحاجة لروابط مكالمات معقدة.</p>
-                        <span style="font-family: var(--ula-font-en); font-size: 13px; color: var(--ula-text-muted);">Proximity-based WebRTC Mesh</span>
-                    </div>
-                </div>
-
-                <!-- Feature 2 -->
-                <div class="ula-feature-card">
-                    <div class="ula-feature-media"></div>
-                    <div class="ula-feature-body">
-                        <span class="ula-feature-icon-box"><span class="ms" style="font-size: 24px;">lock</span></span>
-                        <h3 style="font-size: 21px; font-weight: 600; line-height: 1.4;">قاعات اجتماعات ذكية وأبواب خاصة</h3>
-                        <p style="font-size: 15px; line-height: 1.6; color: var(--ula-text-body);">أبواب غرف قابلة للقفل مع جرس استئذان ومشاركة شاشة بدقة فائقة وعزل صوتي كامل لضمان سرية المحادثات الاستراتيجية.</p>
-                        <span style="font-family: var(--ula-font-en); font-size: 13px; color: var(--ula-text-muted);">Isolated Audio Zones & Knocking</span>
-                    </div>
-                </div>
-
-                <!-- Feature 3 -->
-                <div class="ula-feature-card">
-                    <div class="ula-feature-media"></div>
-                    <div class="ula-feature-body">
-                        <span class="ula-feature-icon-box"><span class="ms" style="font-size: 24px;">architecture</span></span>
-                        <h3 style="font-size: 21px; font-weight: 600; line-height: 1.4;">محرر الخرائط ومكتبة الأثاث التفاعلي</h3>
-                        <p style="font-size: 15px; line-height: 1.6; color: var(--ula-text-body);">صمم مخطط مكتبك بالكامل بسحب وإفلات المكاتب الفاخرة، والنباتات، والسبورات البيضاء، والشاشات التفاعلية بسهولة.</p>
-                        <span style="font-family: var(--ula-font-en); font-size: 13px; color: var(--ula-text-muted);">Custom Floorplan Architect & Catalog</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ── 04. Quote Section (#identity) ── -->
-    <section id="identity" class="ula-quote-section">
-        <div class="ula-quote-box">
-            <span class="ms" style="font-size: 40px; color: var(--ula-highlight-default);">format_quote</span>
-            <blockquote class="ula-quote-text">
-                "المكان ليس مجرد جدران، بل مساحة تلتقي فيها العقول وتتدفق فيها الأفكار بحرية وشغف."
-            </blockquote>
-            <span style="font-family: var(--ula-font-en); font-size: 14px; color: var(--ula-text-secondary);">
-                UlaSpace — Designed with Heritage & Modern Luxury
-            </span>
-        </div>
-    </section>
-
-    <!-- ── 05. Subscription Plans Section (#pricing) ── -->
-    <section id="pricing" class="ula-pricing-section">
-        <div class="ula-pricing-container">
-            <div style="display: flex; flex-direction: column; gap: 8px; align-items: center; text-align: center;">
-                <h2 class="ula-section-heading">باقة تناسب حجم فريقك</h2>
-                <p class="ula-section-subtext">Start free, upgrade any time as your team grows.</p>
-            </div>
-
-            <div class="ula-pricing-grid">
-                @php
-                    $planNameAr = [
-                        'Free' => 'مجاني',
-                        'Starter' => 'مبتدئ',
-                        'Business' => 'أعمال',
-                        'Enterprise' => 'مؤسسات'
-                    ];
-                @endphp
-
-                @foreach($plans as $plan)
-                    @php
-                        $isPopular = ($plan->slug === 'business' || $plan->slug === 'pro' || strtolower($plan->name) === 'business');
-                    @endphp
-                    <div class="ula-plan-card {{ $isPopular ? 'featured' : '' }}">
-                        @if($isPopular)
-                            <span class="ula-plan-popular-badge">الأكثر شيوعاً</span>
-                        @endif
-
-                        <div style="display: flex; flex-direction: column; gap: 2px;">
-                            <span style="font-size: 21px; font-weight: 600;">{{ $planNameAr[$plan->name] ?? $plan->name }}</span>
-                            <span style="font-family: var(--ula-font-en); font-size: 13px; color: var(--ula-text-muted);">{{ $plan->name }}</span>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                @foreach([
+                    ['chair', 'مكاتب فردية ومساحات عمل مشتركة', 'Private desks and open collaboration zones'],
+                    ['meeting_room', 'قاعات اجتماعات قابلة للقفل', 'Lockable meeting rooms with knock-to-enter'],
+                    ['workspaces', 'صالات استراحة وزوايا هادئة', 'Lounges and quiet corners for focus work'],
+                ] as [$icon, $ar, $en])
+                    <div class="lp-space-tile">
+                        <span class="lp-tile-icon"><span class="ms" aria-hidden="true">{{ $icon }}</span></span>
+                        <div style="display: flex; flex-direction: column; min-width: 0;">
+                            <span style="font-size: var(--ula-size-body); font-weight: var(--ula-weight-semibold); line-height: 1.6;">{{ $ar }}</span>
+                            <span class="lp-en" style="font-size: var(--ula-size-xs); line-height: 1.5; color: var(--ula-text-secondary); text-align: start;">{{ $en }}</span>
                         </div>
-
-                        <div style="display: flex; align-items: baseline; gap: 6px; direction: ltr; justify-content: flex-end;">
-                            <span class="ula-plan-price-num" data-plan-usd="{{ $plan->price }}">${{ $plan->price }}</span>
-                            <span style="font-family: var(--ula-font-en); font-size: 14px; color: var(--ula-text-muted);">/mo</span>
-                        </div>
-
-                        <span style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ula-text-secondary);">
-                            <span class="ms" style="font-size: 18px; color: var(--ula-palm-500);">group</span>
-                            <span style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $plan->isUnlimitedSeats() ? '∞' : $plan->seat_limit }}</span>
-                            <span>مقعداً</span>
-                        </span>
-
-                        <div style="display: flex; flex-direction: column; gap: 10px; flex: 1;">
-                            @if(is_array($plan->features))
-                                @foreach(array_slice($plan->features, 0, 3) as $feature)
-                                    <span style="display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--ula-text-body);">
-                                        <span class="ms" style="font-size: 18px; color: var(--ula-palm-500);">check_circle</span>
-                                        <span>{{ $feature }}</span>
-                                    </span>
-                                @endforeach
-                            @endif
-                        </div>
-
-                        <a href="{{ route('register', ['plan' => $plan->slug]) }}" class="ula-btn-plan {{ $isPopular ? 'ula-btn-plan-primary' : 'ula-btn-plan-outline' }}">
-                            ابدأ الآن
-                        </a>
                     </div>
                 @endforeach
             </div>
         </div>
+
+        <div class="lp-floor">
+            <div class="lp-floor-head">
+                <div style="display: flex; flex-direction: column;">
+                    <span style="font-size: 17px; font-weight: var(--ula-weight-semibold); line-height: 1.5;">الطابق الأول · المقر الرئيسي</span>
+                    <span class="lp-en" style="font-size: var(--ula-size-xs); color: var(--ula-text-on-dark-subtle); text-align: end;">Floor 1 · Main Headquarters</span>
+                </div>
+                <span class="lp-live"><span class="lp-live-dot"></span><span class="lp-num">18</span>عضواً متصلاً</span>
+            </div>
+            <div class="lp-media lp-floor-preview" style="{{ $mediaStyle($spacesSec) }}">
+                @unless($spacesSec?->image_url)
+                    <span class="lp-media-label">floor-preview.png</span>
+                @endunless
+            </div>
+            @foreach([
+                ['meeting_room', 'قاعة النخيل', 'Palm Boardroom · 4 In Call', 'في مكالمة', 'var(--ula-status-success-on-dark)'],
+                ['chair', 'مساحة الابتكار', 'Innovation Lounge · 2 Desks', 'مكتبان متاحان', 'var(--ula-highlight-default)'],
+            ] as [$icon, $name, $en, $status, $color])
+                <div class="lp-room">
+                    <span class="lp-room-icon"><span class="ms" style="font-size: 20px;" aria-hidden="true">{{ $icon }}</span></span>
+                    <div style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
+                        <span style="font-size: 14px; font-weight: var(--ula-weight-semibold);">{{ $name }}</span>
+                        <span class="lp-en" style="font-size: var(--ula-size-xs); color: var(--ula-text-on-dark-subtle); text-align: start;">{{ $en }}</span>
+                    </div>
+                    <span style="font-size: var(--ula-size-sm); color: {{ $color }};">{{ $status }}</span>
+                </div>
+            @endforeach
+        </div>
     </section>
 
-    <!-- Hidden anchor targets to preserve smooth scroll targets without affecting layout -->
-    <div id="spatial-presence" style="display: none;"></div>
-    <div id="meetings" style="display: none;"></div>
+    <!-- ── Capabilities ── -->
+    <section id="capabilities" class="lp-section lp-section--alt" style="display: flex; flex-direction: column; gap: 28px;">
+        <div class="lp-head" style="max-width: 760px;">
+            <span class="lp-eyebrow lp-en">{{ $capabilitiesSec?->badge_en ?: 'Platform Capabilities' }}</span>
+            <h2 class="lp-h2">{{ $capabilitiesSec?->title_ar ?: 'مصمم لبيئات العمل الحديثة التي تجمع بين التراث والابتكار' }}</h2>
+            <span class="lp-en lp-lead-en">{{ $capabilitiesSec?->subtitle_en ?: 'Everything you need to run a high-trust, collaborative virtual headquarters.' }}</span>
+        </div>
+        <div class="lp-grid-3">
+            @foreach([
+                ['graphic_eq', 'الصوت والفيديو المكاني', 'تواصل تلقائي يحاكي الواقع، حيث يقوى الصوت تدريجياً كلما اقتربت من زملائك على خريطة المقر دون روابط مكالمات معقدة.', 'Proximity-based WebRTC Mesh'],
+                ['lock', 'قاعات اجتماعات ذكية وأبواب خاصة', 'أبواب غرف قابلة للقفل مع جرس استئذان ومشاركة شاشة بدقة عالية وعزل صوتي كامل لسرية المحادثات.', 'Isolated Audio Zones & Knocking'],
+                ['architecture', 'محرر الخرائط ومكتبة الأثاث', 'صمم مخطط مكتبك بسحب وإفلات المكاتب والنباتات والسبورات البيضاء والشاشات التفاعلية بسهولة.', 'Custom Floorplan Architect & Catalog'],
+            ] as [$icon, $title, $body, $en])
+                <div class="lp-card">
+                    <span class="lp-card-icon"><span class="ms" style="font-size: 24px;" aria-hidden="true">{{ $icon }}</span></span>
+                    <h3>{{ $title }}</h3>
+                    <p class="lp-body" style="margin: 0;">{{ $body }}</p>
+                    <span class="lp-en" style="font-size: var(--ula-size-xs); line-height: 1.5; color: var(--ula-text-secondary); text-align: start;">{{ $en }}</span>
+                </div>
+            @endforeach
+        </div>
+    </section>
 
-    <!-- ── 06. Bottom Action Banner ── -->
-    <div class="ula-bottom-cta-wrap">
-        <div class="ula-bottom-cta-banner">
-            <div style="display: flex; flex-direction: column; gap: 10px; max-width: 700px;">
-                <h2 style="font-size: 34px; font-weight: 600; line-height: 1.3;">
-                    {{ app()->getLocale() === 'ar' ? ($ctaSec?->title_ar ?: 'جاهز لنقل فريقك إلى بيئة عمل المستقبل؟') : ($ctaSec?->title_en ?: 'Ready to Elevate Your Team’s Workspace?') }}
-                </h2>
-                <p style="font-size: 17px; line-height: 1.6; color: var(--ula-sand-400);">
-                    {{ app()->getLocale() === 'ar' ? ($ctaSec?->subtitle_ar ?: 'انضم إلى المئات من الشركات الرائدة التي تبني ثقافة عمل قوية ومتصلة مع UlaSpace.') : ($ctaSec?->subtitle_en ?: 'Join high-performing distributed teams building real culture and presence with UlaSpace.') }}
-                </p>
+    <!-- ── Quote ── -->
+    <section class="lp-section lp-quote">
+        <div class="lp-quote-box">
+            <blockquote>"المكان ليس مجرد جدران، بل مساحة تلتقي فيها العقول وتتدفق فيها الأفكار بحرية وشغف."</blockquote>
+            <span class="lp-eyebrow lp-en">UlaSpace — Designed with Heritage &amp; Modern Luxury</span>
+        </div>
+    </section>
+
+    <!-- ── Pricing (plans from the database) ── -->
+    <section id="pricing" class="lp-section" style="display: flex; flex-direction: column; gap: 28px;">
+        <div class="lp-head">
+            <h2 class="lp-h2">{{ $pricingSec?->title_ar ?: 'باقة تناسب حجم فريقك' }}</h2>
+            <span class="lp-en lp-lead-en">{{ $pricingSec?->subtitle_en ?: 'Start free, upgrade any time as your team grows.' }}</span>
+        </div>
+        <div class="lp-grid-4">
+            @foreach($plans as $plan)
+                @php
+                    $isPopular = $plan->slug === 'business';
+                    $nameAr = $planNameAr[$plan->slug] ?? $plan->name;
+                    $nameEn = isset($planNameAr[$plan->slug]) ? $plan->name : null;
+                    $highlights = array_slice(is_array($plan->features) ? $plan->features : [], -2);
+                    $price = rtrim(rtrim(number_format((float) $plan->price, 2), '0'), '.');
+                @endphp
+                <div class="lp-plan {{ $isPopular ? 'lp-plan--featured' : '' }}">
+                    <div class="lp-plan-head">
+                        <div style="display: flex; flex-direction: column;">
+                            <span class="lp-plan-name">{{ $nameAr }}</span>
+                            @if($nameEn)
+                                <span class="lp-en" style="font-size: var(--ula-size-xs); color: var(--ula-text-secondary); text-align: start;">{{ $nameEn }}</span>
+                            @endif
+                        </div>
+                        @if($isPopular)
+                            <span class="lp-popular">الأكثر شيوعاً</span>
+                        @endif
+                    </div>
+                    <div class="lp-price">
+                        <span class="lp-price-num">${{ $price }}</span>
+                        <span class="lp-price-per">{{ $plan->isPerSeat() ? '/person/mo' : '/mo' }}</span>
+                    </div>
+                    <span class="lp-plan-line">
+                        <span class="ms" aria-hidden="true">group</span>
+                        @if($plan->isPerSeat())
+                            لكل شخص · <span class="lp-num">{{ $plan->getEffectiveMinSeats() }}</span> كحد أدنى
+                        @else
+                            <span class="lp-num">{{ $plan->isUnlimitedSeats() ? '∞' : $plan->seat_limit }}</span> مقعداً
+                        @endif
+                    </span>
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                        @foreach($highlights as $feature)
+                            <span class="lp-plan-line"><span class="ms" aria-hidden="true">check_circle</span>{{ $featureAr[$feature] ?? \Illuminate\Support\Str::headline($feature) }}</span>
+                        @endforeach
+                    </div>
+                    <x-btn :variant="$isPopular ? 'primary' : 'outline'" size="md" :href="route('register', ['plan' => $plan->slug])">ابدأ الآن</x-btn>
+                </div>
+            @endforeach
+        </div>
+    </section>
+
+    <!-- ── CTA band ── -->
+    <section class="lp-section">
+        <div class="lp-cta">
+            <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px; max-width: 700px;">
+                <h2>{{ $ctaSec?->title_ar ?: 'جاهز لنقل فريقك إلى بيئة عمل المستقبل؟' }}</h2>
+                <p>{{ $ctaSec?->subtitle_ar ?: 'انضم إلى المئات من الشركات الرائدة التي تبني ثقافة عمل قوية ومتصلة مع UlaSpace.' }}</p>
             </div>
-            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                <a href="{{ $ctaSec?->getContentValue('cta_primary_link', route('register')) }}" class="ula-btn-hero-primary">
-                    {{ app()->getLocale() === 'ar' ? ($ctaSec?->getContentValue('cta_primary_text_ar') ?: 'ابدأ التجربة المجانية الآن') : ($ctaSec?->getContentValue('cta_primary_text_en') ?: 'Start Free Trial') }}
-                </a>
-                <a href="{{ $ctaSec?->getContentValue('cta_secondary_link', route('login')) }}" class="ula-btn-hero-secondary">
-                    {{ app()->getLocale() === 'ar' ? ($ctaSec?->getContentValue('cta_secondary_text_ar') ?: 'تسجيل الدخول') : ($ctaSec?->getContentValue('cta_secondary_text_en') ?: 'Sign In') }}
-                </a>
+            <div class="lp-cta-actions">
+                @auth
+                    <x-btn variant="nav-cta" size="lg" :href="route('office')">ادخل إلى مساحتك</x-btn>
+                    <a href="{{ route('dashboard') }}" class="lp-btn-on-dark">لوحة التحكم</a>
+                @else
+                    <x-btn variant="nav-cta" size="lg" :href="$ctaSec?->getContentValue('cta_primary_link', route('register')) ?? route('register')">{{ $ctaSec?->getContentValue('cta_primary_text_ar') ?: 'ابدأ التجربة المجانية الآن' }}</x-btn>
+                    <a href="{{ $ctaSec?->getContentValue('cta_secondary_link', route('login')) ?? route('login') }}" class="lp-btn-on-dark">{{ $ctaSec?->getContentValue('cta_secondary_text_ar') ?: 'تسجيل الدخول' }}</a>
+                @endauth
             </div>
         </div>
-    </div>
+    </section>
 
 @endsection
 

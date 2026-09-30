@@ -1,5 +1,5 @@
 // Screenshot a live page for reference-vs-live comparison.
-// Usage: node scripts/shot.mjs <url> <outPath> [dir] [theme] [auth]
+// Usage: node scripts/shot.mjs <url> <outPath> [dir] [theme] [auth] [clickSelector]
 //   dir:   rtl (default) | ltr   -- also drives the real server-side locale
 //          (ar for rtl, en for ltr) via /lang/{locale}, not just the
 //          HTML dir attribute, so nav/labels actually render in that
@@ -10,10 +10,13 @@
 //          pass "qa" for pages that require auth (dashboard/office/editor/
 //          projects) -- guest-facing pages (landing/auth/guest-join) must
 //          stay logged out to match the reference's guest-state header.
+//   clickSelector: optional CSS selector clicked (once, after the page
+//          settles) before the screenshot -- for modal/dropdown reference
+//          screens that show that state open.
 import { chromium } from 'playwright';
 import { existsSync } from 'fs';
 
-const [, , url, outPath, dir = 'rtl', theme = 'light', auth = 'guest'] = process.argv;
+const [, , url, outPath, dir = 'rtl', theme = 'light', auth = 'guest', clickSelector] = process.argv;
 if (!url || !outPath) {
   console.error('Usage: node scripts/shot.mjs <url> <outPath> [rtl|ltr] [light|dark] [guest|qa]');
   process.exit(1);
@@ -51,6 +54,11 @@ await page.evaluate((theme) => {
 }, theme);
 await page.waitForTimeout(800);
 
+if (clickSelector) {
+  await page.click(clickSelector);
+  await page.waitForTimeout(400);
+}
+
 await page.screenshot({ path: outPath, fullPage: true });
 await browser.close();
-console.log(`saved ${outPath} (${dir}/${locale}, ${theme}, ${auth})`);
+console.log(`saved ${outPath} (${dir}/${locale}, ${theme}, ${auth}${clickSelector ? ', clicked ' + clickSelector : ''})`);

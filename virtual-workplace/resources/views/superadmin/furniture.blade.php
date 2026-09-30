@@ -4,31 +4,11 @@
 @section('page_title', __('Furniture & Assets Catalog'))
 
 @section('content')
-    <!-- KPI Summary Strip -->
-    <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
-        <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-top: 4px solid var(--ula-palm-900);">
-            <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span class="kpi-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Total Assets') }}</span>
-                <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-text-primary);">chair</span>
-            </div>
-            <div class="kpi-value" style="font-size: 26px; font-weight: 800; color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">{{ $stats['total_items'] }}</div>
-        </div>
-
-        <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-top: 4px solid var(--ula-status-success);">
-            <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span class="kpi-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Categories') }}</span>
-                <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-status-success);">category</span>
-            </div>
-            <div class="kpi-value" style="font-size: 26px; font-weight: 800; color: var(--ula-status-success); font-family: 'IBM Plex Mono', monospace;">{{ $stats['total_categories'] }}</div>
-        </div>
-
-        <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-top: 4px solid var(--ula-gold-500);">
-            <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <span class="kpi-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Custom Uploads') }}</span>
-                <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-gold-500);">image</span>
-            </div>
-            <div class="kpi-value" style="font-size: 26px; font-weight: 800; color: var(--ula-gold-600); font-family: 'IBM Plex Mono', monospace;">{{ $stats['custom_uploads'] }}</div>
-        </div>
+    <!-- KPIs (x-kpi-card) -->
+    <div class="ula-kpi-row">
+        <x-kpi-card density="default" icon="chair" iconColor="sage" :title="__('Total Assets')" :value="$stats['total_items']" />
+        <x-kpi-card density="default" icon="category" iconColor="gold" :title="__('Categories')" :value="$stats['total_categories']" />
+        <x-kpi-card density="default" icon="image" iconColor="muted" :title="__('Custom Uploads')" :value="$stats['custom_uploads']" />
     </div>
 
     <!-- Top Action Bar -->

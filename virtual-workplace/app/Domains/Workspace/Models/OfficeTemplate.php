@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 class OfficeTemplate extends Model
 {
@@ -66,7 +67,16 @@ class OfficeTemplate extends Model
     public static function getForPlan(?Plan $plan = null): self
     {
         $slug = $plan ? $plan->slug : 'free';
-        $template = self::where('plan_slug', $slug)->first();
+        if ($plan) {
+            $template = self::where('plan_id', $plan->id)
+                ->orWhere('plan_slug', $slug)
+                ->first();
+        } else {
+            $template = self::where('plan_slug', 'free')
+                ->orWhere('slug', 'template-plan-free')
+                ->orWhere('is_default', true)
+                ->first();
+        }
 
         if ($template) {
             return $template;
@@ -83,7 +93,6 @@ class OfficeTemplate extends Model
                 'width' => 32,
                 'height' => 26,
                 'tile_size' => 32,
-                'is_default' => false,
                 'rooms_data' => [
                     [
                         'name' => 'قاعة الاجتماعات الرئيسية - Main Meeting Room (6 Seats)',
@@ -123,7 +132,6 @@ class OfficeTemplate extends Model
                 'width' => 32,
                 'height' => 26,
                 'tile_size' => 32,
-                'is_default' => false,
                 'rooms_data' => [
                     [
                         'name' => 'مجلس الإدارة - Executive Boardroom (10 Seats)',
@@ -190,7 +198,6 @@ class OfficeTemplate extends Model
                 'width' => 32,
                 'height' => 26,
                 'tile_size' => 32,
-                'is_default' => false,
                 'rooms_data' => [
                     [
                         'name' => 'المدرج الرئيسي للمؤتمرات - Town Hall Auditorium (50 Seats)',
@@ -229,31 +236,31 @@ class OfficeTemplate extends Model
                         'metadata' => ['audio_isolation' => true],
                     ],
                     [
-                        'name' => 'قاعة العملاء والشركاء - Client Partner Suite (8 Seats)',
-                        'type' => 'meeting',
+                        'name' => 'ردهة الاستراحة والقهوة - Central Coffee Breakout',
+                        'type' => 'lounge',
                         'access_mode' => 'public',
                         'capacity' => 8,
                         'color' => '#245C3A',
                         'bounds' => ['x' => 1, 'y' => 20, 'width' => 7, 'height' => 5],
-                        'metadata' => ['audio_isolation' => true],
+                        'metadata' => ['audio_isolation' => false],
                     ],
                     [
-                        'name' => 'كبسولات الخصوصية والمكالمات - Focus & Phone Pods',
-                        'type' => 'private',
+                        'name' => 'غرفة المقابلات - Interview Suite (4 Seats)',
+                        'type' => 'meeting',
                         'access_mode' => 'public',
                         'capacity' => 4,
-                        'color' => '#4F9B5F',
+                        'color' => '#3F7D4F',
                         'bounds' => ['x' => 9, 'y' => 20, 'width' => 7, 'height' => 5],
                         'metadata' => ['audio_isolation' => true],
                     ],
                     [
-                        'name' => 'الاستقبال الفندقي - Grand Executive Reception Desk',
-                        'type' => 'reception',
+                        'name' => 'غرفة العمليات الاستراتيجية - War Room (8 Seats)',
+                        'type' => 'meeting',
                         'access_mode' => 'public',
-                        'capacity' => 10,
-                        'color' => '#3F7D4F',
+                        'capacity' => 8,
+                        'color' => '#D6A23A',
                         'bounds' => ['x' => 17, 'y' => 20, 'width' => 14, 'height' => 5],
-                        'metadata' => ['audio_isolation' => false],
+                        'metadata' => ['audio_isolation' => true],
                     ],
                 ],
             ],
@@ -261,15 +268,14 @@ class OfficeTemplate extends Model
                 'name' => 'المقر الشامل للشركات الكبرى - Mega Campus & Corporate HQ',
                 'slug' => 'template-plan-enterprise',
                 'plan_slug' => 'enterprise',
-                'description' => 'المجمع الرقمي الفاخر والشامل للشركات العالمية والمؤسسات الحكومية والخاصة مع كافة المرافق.',
+                'description' => 'المقر الرقمي الأكبر بسعة غير محدودة مع 10 مناطق مصممة للشركات والمؤسسات العملاقة.',
                 'background_image_url' => '/images/office_floorplan.jpg',
                 'width' => 32,
                 'height' => 26,
                 'tile_size' => 32,
-                'is_default' => false,
                 'rooms_data' => [
                     [
-                        'name' => 'المدرج والمؤتمرات الكبرى - Mega Auditorium (100 Seats)',
+                        'name' => 'المسرح والمدرج العالمي - Global Auditorium (100 Seats)',
                         'type' => 'meeting',
                         'access_mode' => 'public',
                         'capacity' => 100,
@@ -335,12 +341,21 @@ class OfficeTemplate extends Model
             ],
         ];
 
-        $targetDesign = $designs[$slug] ?? $designs['free'];
+        $targetDesign = $designs[$slug] ?? null;
+        if (! $targetDesign) {
+            $targetDesign = $designs['free'];
+            $targetDesign['name'] = ($plan ? $plan->name : 'Custom Plan') . ' — Blueprint';
+        }
+
         $planModel = $plan ?: Plan::where('slug', $slug)->first();
+        $uniqueSlug = 'template-plan-' . ($planModel ? $planModel->id . '-' . Str::slug($planModel->slug) : 'free');
+        if (self::where('slug', $uniqueSlug)->exists()) {
+            $uniqueSlug = 'template-plan-' . ($planModel ? $planModel->id : 'custom') . '-' . Str::random(4);
+        }
 
         return self::create([
             'name' => $targetDesign['name'],
-            'slug' => $targetDesign['slug'],
+            'slug' => $uniqueSlug,
             'plan_id' => $planModel?->id,
             'plan_slug' => $slug,
             'description' => $targetDesign['description'],

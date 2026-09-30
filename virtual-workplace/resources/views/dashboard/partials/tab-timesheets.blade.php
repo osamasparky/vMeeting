@@ -1,8 +1,8 @@
 <div id="tab-timesheets" class="tab-view">
     <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
         <div style="display: flex; flex-direction: column; gap: 2px;">
-            <h2 style="font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ula-text-primary); margin: 0;">{{ __('Timesheets & Realtime Attendance') }}</h2>
-            <span style="font-family: 'IBM Plex Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--ula-text-secondary);">Timesheets &amp; Realtime Attendance</span>
+            <h2 class="ula-headline-ar" style="font-size: var(--ula-size-h1); margin: 0;">{{ __('page.timesheets') }}</h2>
+            @if(app()->getLocale() === 'ar')<span class="ula-headline-en" style="font-size: var(--ula-size-h4);">Timesheets &amp; Time Tracking</span>@endif
         </div>
     </div>
     <!-- Interactive Date & Member Filter Ribbon with Action CTAs -->
@@ -112,82 +112,13 @@
         </div>
     </div>
 
-    <!-- Daily Summary Metric KPI Cards (5-Grid) -->
-    <div class="kpi-grid" style="margin-bottom: var(--ula-space-7); display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--ula-space-5);">
-        <!-- 1. Total Office Time -->
-        <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: var(--ula-space-5); box-shadow: var(--ula-shadow-xs);">
-            <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-3);">
-                <span class="kpi-title" style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary);">{{ __('Time in Virtual Office') }}</span>
-                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: var(--ula-surface-accent-soft); color: var(--ula-accent-default); display: flex; align-items: center; justify-content: center;">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">apartment</span>
-                </div>
-            </div>
-            <div class="kpi-value" id="ts-kpi-office-time" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary);">00:00:00</div>
-            <div class="kpi-trend" style="color: var(--ula-accent-default); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
-                <span class="material-symbols-rounded" style="font-size: 14px;">check_circle</span>
-                <span>{{ __('Automated presence tracking') }}</span>
-            </div>
-        </div>
-
-        <!-- 2. Productive Task Time -->
-        <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: var(--ula-space-5); box-shadow: var(--ula-shadow-xs);">
-            <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-3);">
-                <span class="kpi-title" style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary);">{{ __('Productive Task Work') }}</span>
-                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(79, 155, 95, 0.12); color: var(--ula-status-success); display: flex; align-items: center; justify-content: center;">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">schedule</span>
-                </div>
-            </div>
-            <div class="kpi-value" id="ts-kpi-task-time" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-status-success);">00:00:00</div>
-            <div class="kpi-trend" style="color: var(--ula-status-success); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
-                <span class="material-symbols-rounded" style="font-size: 14px;">trending_up</span>
-                <span>{{ __('Logged against active tasks') }}</span>
-            </div>
-        </div>
-
-        <!-- 3. Total Combined Attendance Time -->
-        <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: var(--ula-space-5); box-shadow: var(--ula-shadow-xs);">
-            <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-3);">
-                <span class="kpi-title" style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary);">{{ __('Total Working Attendance') }}</span>
-                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(36, 92, 58, 0.15); color: var(--ula-palm-800); display: flex; align-items: center; justify-content: center;">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">badge</span>
-                </div>
-            </div>
-            <div class="kpi-value" id="ts-kpi-total-work" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-palm-800);">00:00:00</div>
-            <div class="kpi-trend" style="color: var(--ula-palm-700); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
-                <span class="material-symbols-rounded" style="font-size: 14px;">verified_user</span>
-                <span>{{ __('Office Presence + Task Work') }}</span>
-            </div>
-        </div>
-
-        <!-- 4. Idle / Paused Time -->
-        <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: var(--ula-space-5); box-shadow: var(--ula-shadow-xs);">
-            <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-3);">
-                <span class="kpi-title" style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary);">{{ __('Idle / Paused Time') }}</span>
-                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(214, 162, 58, 0.12); color: var(--ula-gold-400); display: flex; align-items: center; justify-content: center;">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">pause_circle</span>
-                </div>
-            </div>
-            <div class="kpi-value" id="ts-kpi-idle-time" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-gold-400);">00:00:00</div>
-            <div class="kpi-trend" style="color: var(--ula-text-muted); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
-                <span class="material-symbols-rounded" style="font-size: 14px;">hourglass_empty</span>
-                <span>{{ __('Inactivity stops excluded') }}</span>
-            </div>
-        </div>
-
-        <!-- 5. Productivity Ratio -->
-        <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: var(--ula-space-5); box-shadow: var(--ula-shadow-xs);">
-            <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--ula-space-3);">
-                <span class="kpi-title" style="font-size: var(--ula-size-xs); font-weight: var(--ula-weight-bold); color: var(--ula-text-secondary);">{{ __('Productivity Ratio') }}</span>
-                <div class="kpi-icon-box" style="width: 32px; height: 32px; border-radius: var(--ula-radius-md); background: rgba(185, 138, 55, 0.12); color: var(--ula-gold-500); display: flex; align-items: center; justify-content: center;">
-                    <span class="material-symbols-rounded" style="font-size: 18px;">analytics</span>
-                </div>
-            </div>
-            <div class="kpi-value" id="ts-kpi-ratio" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-size: var(--ula-size-h3); font-weight: var(--ula-weight-bold); color: var(--ula-gold-500);">0%</div>
-            <div class="kpi-trend" style="color: var(--ula-accent-default); font-size: var(--ula-size-xs); margin-top: 4px; display: flex; align-items: center; gap: 4px;">
-                <span class="material-symbols-rounded" style="font-size: 14px;">bolt</span>
-                <span>{{ __('Task Time ÷ Office Time') }}</span>
-            </div>
-        </div>
+    <!-- Daily summary KPIs (x-kpi-card; ts-kpi-* ids feed refreshDailyTimesheet()) -->
+    <div class="ula-kpi-row">
+        <x-kpi-card id="ts-kpi-office-time" icon="apartment" iconColor="emerald" :title="__('Time in Virtual Office')" value="00:00:00" :caption="__('Automated presence tracking')" />
+        <x-kpi-card id="ts-kpi-task-time" icon="schedule" iconColor="sage" :title="__('Productive Task Work')" value="00:00:00" :caption="__('Logged against active tasks')" />
+        <x-kpi-card id="ts-kpi-total-work" icon="badge" iconColor="emerald" :title="__('Total Working Attendance')" value="00:00:00" :caption="__('Office Presence + Task Work')" />
+        <x-kpi-card id="ts-kpi-idle-time" icon="pause_circle" iconColor="gold" :title="__('Idle / Paused Time')" value="00:00:00" :caption="__('Inactivity stops excluded')" />
+        <x-kpi-card id="ts-kpi-ratio" icon="analytics" iconColor="muted" :title="__('Productivity Ratio')" value="0%" :caption="__('Task Time ÷ Office Time')" />
     </div>
 
     <!-- Live Active Timer Banner (Dynamic) -->

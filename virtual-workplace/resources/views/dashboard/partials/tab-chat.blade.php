@@ -1,8 +1,8 @@
 <div id="tab-chat" class="tab-view">
     <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
         <div style="display: flex; flex-direction: column; gap: 2px;">
-            <h2 style="font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ula-text-primary); margin: 0;">{{ __('Team Chat & Instant Messaging') }}</h2>
-            <span style="font-family: 'IBM Plex Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--ula-text-secondary);">Team Chat &amp; Instant Messaging</span>
+            <h2 class="ula-headline-ar" style="font-size: var(--ula-size-h1); margin: 0;">{{ __('page.chat') }}</h2>
+            @if(app()->getLocale() === 'ar')<span class="ula-headline-en" style="font-size: var(--ula-size-h4);">Team Chat &amp; Direct Messages</span>@endif
         </div>
     </div>
     <!-- Chat Workspace Split Container (UlaSpace Figma Standard) -->
@@ -94,7 +94,7 @@
                                 <h3 id="chat-active-title" style="font-size: var(--ula-size-sm); font-weight: var(--ula-weight-bold); color: var(--ula-text-primary); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Colleague Name</h3>
                                 <span id="chat-active-badge" class="nav-badge-pill" style="font-size: 10px;">Member</span>
                             </div>
-                            <div id="chat-active-subtitle" style="font-size: 11px; color: var(--ula-text-secondary); margin-top: 1px;">Senior Engineer • Active Now</div>
+                            <div id="chat-active-subtitle" style="font-size: 11px; color: var(--ula-text-secondary); margin-top: 1px;">Senior Engineer · Active Now</div>
                         </div>
                     </div>
                     <div style="display: flex; gap: var(--ula-space-3); align-items: center;">

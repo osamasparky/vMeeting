@@ -1,6 +1,7 @@
 @extends('superadmin.layout')
 
 @section('title', __('Subscription Requests & Payments') . ' — ' . __('Super Admin Portal'))
+@section('page_title', __('Subscription Requests'))
 
 @section('content')
 <!-- Page Header -->
@@ -16,43 +17,12 @@
     </div>
 </div>
 
-<!-- KPI Cards Grid -->
-<div class="kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
-    <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-inline-start: 4px solid var(--ula-status-warning);">
-        <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span class="kpi-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Pending Approvals') }}</span>
-            <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-status-warning);">hourglass_top</span>
-        </div>
-        <div class="kpi-value" style="font-size: 26px; font-weight: 800; color: var(--ula-status-warning); font-family: 'IBM Plex Mono', monospace;">{{ $stats['pending'] }}</div>
-        <div class="kpi-subtext" style="font-size: 11px; color: var(--ula-text-muted); margin-top: 4px;">{{ __('Awaiting SuperAdmin review') }}</div>
-    </div>
-
-    <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-inline-start: 4px solid var(--ula-status-success);">
-        <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span class="kpi-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Approved Subscriptions') }}</span>
-            <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-status-success);">check_circle</span>
-        </div>
-        <div class="kpi-value" style="font-size: 26px; font-weight: 800; color: var(--ula-status-success); font-family: 'IBM Plex Mono', monospace;">{{ $stats['approved'] }}</div>
-        <div class="kpi-subtext" style="font-size: 11px; color: var(--ula-text-muted); margin-top: 4px;">{{ __('Active & plan provisioned') }}</div>
-    </div>
-
-    <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-inline-start: 4px solid var(--ula-status-danger);">
-        <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span class="kpi-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Rejected Requests') }}</span>
-            <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-status-danger);">cancel</span>
-        </div>
-        <div class="kpi-value" style="font-size: 26px; font-weight: 800; color: var(--ula-status-danger); font-family: 'IBM Plex Mono', monospace;">{{ $stats['rejected'] }}</div>
-        <div class="kpi-subtext" style="font-size: 11px; color: var(--ula-text-muted); margin-top: 4px;">{{ __('Declined due to invalid slip') }}</div>
-    </div>
-
-    <div class="kpi-card" style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); padding: 18px 20px; box-shadow: var(--ula-shadow-sm); border-inline-start: 4px solid var(--ula-palm-900);">
-        <div class="kpi-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span class="kpi-title" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ __('Total Requests') }}</span>
-            <span class="material-symbols-rounded" style="font-size: 20px; color: var(--ula-text-primary);">receipt_long</span>
-        </div>
-        <div class="kpi-value" style="font-size: 26px; font-weight: 800; color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">{{ $stats['total'] }}</div>
-        <div class="kpi-subtext" style="font-size: 11px; color: var(--ula-text-muted); margin-top: 4px;">{{ __('All time wire transfer requests') }}</div>
-    </div>
+<!-- KPIs (x-kpi-card) -->
+<div class="ula-kpi-row">
+    <x-kpi-card density="default" icon="hourglass_top" iconColor="gold" :title="__('Pending Approvals')" :value="$stats['pending']" :caption="__('Awaiting SuperAdmin review')" />
+    <x-kpi-card density="default" icon="check_circle" iconColor="sage" :title="__('Approved Subscriptions')" :value="$stats['approved']" :caption="__('Active & plan provisioned')" />
+    <x-kpi-card density="default" icon="cancel" iconColor="terracotta" :title="__('Rejected Requests')" :value="$stats['rejected']" :caption="__('Declined due to invalid slip')" />
+    <x-kpi-card density="default" icon="receipt_long" iconColor="muted" :title="__('Total Requests')" :value="$stats['total']" :caption="__('All time wire transfer requests')" />
 </div>
 
 <!-- Filter Bar & Search -->

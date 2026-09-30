@@ -124,7 +124,8 @@
             border-color: var(--ula-border-subtle);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+        /* Layered like Tailwind's own preflight so component utilities (px-4, ps-10…) can win over it. */
+        @layer base { * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; } }
         body {
             background: var(--ula-surface-page);
             color: var(--ula-text-primary);
@@ -448,36 +449,454 @@
             color: var(--ula-gold-300) !important;
         }
 
-        .org-settings-tabs-nav .org-subtab-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 9px 18px;
-            border-radius: var(--ula-radius-lg);
-            font-size: 13px;
-            font-weight: 800;
-            color: var(--ula-text-secondary);
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+)->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script>
+        (function() {
+            const saved = localStorage.getItem('vw_theme') || 'light';
+            document.documentElement.setAttribute('data-theme', saved);
+            if (saved === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+    <title>{{ $organization->name }} — Workspace Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/ulaspace-tokens.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/modern-design-system.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/ulaspace-dashboard.css') }}">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" nonce="{{ $cspNonce ?? '' }}"></script>
+    <style>
+        /* ═══════════════════════════════════════════════════════════════
+           ULASPACE DESIGN SYSTEM — WORKSPACE DASHBOARD
+           ═══════════════════════════════════════════════════════════════ */
+        :root {
+            --ula-gradient-accent: linear-gradient(135deg, var(--ula-palm-900) 0%, var(--ula-palm-700) 100%);
         }
-        .org-settings-tabs-nav .org-subtab-btn:hover {
-            color: var(--ula-text-primary);
-            background: var(--ula-surface-page-alt);
+
+        html, body, button, input, select, textarea, optgroup, .sidebar, .main-content, .nav-tab-btn {
+            font-family: 'Cairo', 'IBM Plex Sans Arabic', -apple-system, BlinkMacSystemFont, sans-serif !important;
         }
-        .org-settings-tabs-nav .org-subtab-btn.active {
-            color: var(--ula-white);
-            background: var(--ula-palm-900);
-            box-shadow: 0 4px 14px rgba(36, 92, 58, 0.32);
+
+        [dir="rtl"], [lang="ar"] {
+            --font-family: 'Cairo', 'IBM Plex Sans Arabic', sans-serif;
         }
-        .org-subtab-pane {
-            animation: orgSubTabFade 0.2s ease-out;
+
+        [dir="ltr"], [lang="en"] {
+            --font-family: 'IBM Plex Sans', 'Cairo', sans-serif;
         }
-        @keyframes orgSubTabFade {
-            from { opacity: 0; transform: translateY(4px); }
+
+        /* ── Tabs Visibility Enforcement ── */
+        .tab-view {
+            display: none !important;
+        }
+        .tab-view.active {
+            display: block !important;
+            animation: tabViewFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes tabViewFadeIn {
+            from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Dark Theme Tokens */
+        [data-theme="dark"], html.dark, body.dark-mode {
+            --ula-gradient-accent: linear-gradient(135deg, var(--ula-palm-700) 0%, var(--ula-palm-500) 100%);
+        }
+
+        /* Dark Mode specific component refinements */
+        [data-theme="dark"] .sidebar-accordion-header {
+            background: var(--ula-palm-900);
+            border-color: var(--ula-border-subtle);
+            color: var(--ula-text-primary);
+            box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.35);
+        }
+        [data-theme="dark"] .sidebar-accordion-header:hover {
+            background: var(--ula-palm-800);
+            border-color: var(--ula-palm-400);
+            color: var(--ula-palm-300);
+        }
+        [data-theme="dark"] .nav-tab-btn {
+            color: var(--ula-sand-400);
+        }
+        [data-theme="dark"] .nav-tab-btn:hover {
+            background: var(--ula-palm-900);
+            color: var(--ula-sand-100);
+            border-color: var(--ula-border-subtle);
+        }
+        [data-theme="dark"] .nav-icon-tile {
+            background: var(--ula-palm-950);
+            border-color: var(--ula-border-subtle);
+            color: var(--ula-palm-300);
+        }
+        [data-theme="dark"] .nav-badge-pill {
+            background: var(--ula-palm-900);
+            color: var(--ula-palm-300);
+            border-color: var(--ula-border-subtle);
+        }
+        [data-theme="dark"] .go-premium-card {
+            background: linear-gradient(135deg, var(--ula-palm-950) 0%, var(--ula-black) 100%);
+            border-color: var(--ula-gold-600);
+        }
+        [data-theme="dark"] .go-premium-card div {
+            color: var(--ula-gold-300) !important;
+        }
+        [data-theme="dark"] .hero-welcome-card {
+            background: linear-gradient(135deg, var(--ula-palm-900) 0%, var(--ula-palm-950) 100%) !important;
+            border-color: var(--ula-border-subtle) !important;
+        }
+        /* .card already uses var(--ula-surface-card)/var(--ula-border-subtle),
+           both theme-aware, so no separate dark-mode override is needed. */
+        [data-theme="dark"] .data-table thead th {
+            background: var(--ula-palm-900);
+            border-color: var(--ula-border-subtle);
+            color: var(--ula-text-muted);
+        }
+        [data-theme="dark"] .data-table tbody tr {
+            border-color: var(--ula-border-subtle);
+        }
+        [data-theme="dark"] .data-table tbody tr:hover {
+            background: var(--ula-palm-900);
+        }
+        [data-theme="dark"] .modal-card {
+            background: var(--ula-palm-950);
+            border-color: var(--ula-border-subtle);
+        }
+        [data-theme="dark"] .modal-header {
+            border-color: var(--ula-border-subtle);
+        }
+
+        /* Layered like Tailwind's own preflight so component utilities (px-4, ps-10…) can win over it. */
+        @layer base { * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; } }
+        body {
+            background: var(--ula-surface-page);
+            color: var(--ula-text-primary);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* ── Dark Chrome Sidebar (matches the landing nav / auth side panel) ── */
+        .sidebar {
+            width: 270px;
+            background: var(--ula-surface-dark);
+            border-inline-end: 1px solid var(--ula-border-on-dark);
+            padding: 24px 14px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            inset-inline-start: 0;
+            top: 0;
+            height: 100vh;
+            z-index: 50;
+            box-shadow: 4px 0 24px rgba(36, 92, 58, 0.04);
+            transition: width 0.28s cubic-bezier(0.16, 1, 0.3, 1), padding 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow-x: hidden;
+        }
+
+        /* ── Mini / Icon-Only Collapsed Sidebar ── */
+        .sidebar.sidebar-collapsed {
+            width: 76px !important;
+            padding: 20px 8px !important;
+            transform: none !important;
+            align-items: center;
+        }
+
+        .sidebar.sidebar-collapsed .sidebar-logo-text,
+        .sidebar.sidebar-collapsed .sidebar-logo > div > div:last-child {
+            display: none !important;
+        }
+
+        .sidebar.sidebar-collapsed .sidebar-brand-wrapper {
+            flex-direction: column !important;
+            gap: 10px !important;
+            align-items: center !important;
+            margin-bottom: 16px !important;
+            padding: 0 !important;
+        }
+
+        .sidebar.sidebar-collapsed .sidebar-logo {
+            justify-content: center !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .sidebar.sidebar-collapsed .sidebar-profile-card {
+            padding: 8px 4px !important;
+            margin-bottom: 12px !important;
+            border-radius: 14px !important;
+            width: 100% !important;
+        }
+
+        .sidebar.sidebar-collapsed .sidebar-profile-name,
+        .sidebar.sidebar-collapsed .sidebar-profile-email,
+        .sidebar.sidebar-collapsed .sidebar-profile-badge {
+            display: none !important;
+        }
+
+        .sidebar.sidebar-collapsed .sidebar-profile-avatar-wrap {
+            width: 44px !important;
+            height: 44px !important;
+            margin: 0 !important;
+        }
+
+        .sidebar.sidebar-collapsed .sidebar-accordion {
+            width: 100% !important;
+            margin-bottom: 6px !important;
+        }
+
+        .sidebar.sidebar-collapsed .sidebar-accordion-header {
+            padding: 8px 4px !important;
+            justify-content: center !important;
+            border-radius: 10px !important;
+            position: relative;
+        }
+
+        .sidebar.sidebar-collapsed .sidebar-accordion-header > span > span:not(.nav-icon-tile),
+        .sidebar.sidebar-collapsed .sidebar-accordion-chevron {
+            display: none !important;
+        }
+
+        .sidebar.sidebar-collapsed .sidebar-accordion.collapsed .sidebar-accordion-content {
+            max-height: 500px !important;
+            opacity: 1 !important;
+            display: flex !important;
+            pointer-events: auto !important;
+        }
+
+        .sidebar.sidebar-collapsed .nav-tab-btn {
+            padding: 7px 0 !important;
+            justify-content: center !important;
+            width: 100% !important;
+            border-radius: 10px !important;
+            position: relative;
+        }
+
+        .sidebar.sidebar-collapsed .nav-tab-btn > span > span:not(.nav-icon-tile),
+        .sidebar.sidebar-collapsed .nav-tab-btn .nav-badge-pill,
+        .sidebar.sidebar-collapsed .nav-tab-btn > strong {
+            display: none !important;
+        }
+
+        .sidebar.sidebar-collapsed .nav-tab-btn .nav-icon-tile {
+            margin: 0 !important;
+            width: 36px !important;
+            height: 36px !important;
+            font-size: 16px !important;
+        }
+
+        .sidebar.sidebar-collapsed .nav-tab-btn:hover::after,
+        .sidebar.sidebar-collapsed .sidebar-accordion-header:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            inset-inline-start: calc(100% + 12px);
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--ula-palm-900);
+            color: var(--ula-sand-100);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            white-space: nowrap;
+            z-index: 100;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+            pointer-events: none;
+            opacity: 1;
+        }
+
+        .sidebar.sidebar-collapsed .go-premium-card {
+            display: none !important;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 4px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .sidebar-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--ula-gradient-accent);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--ula-white);
+            box-shadow: var(--ula-shadow-sm);
+            flex-shrink: 0;
+        }
+
+        .sidebar-logo-text {
+            font-size: 16px;
+            font-weight: 900;
+            color: var(--ula-text-on-dark);
+            letter-spacing: -0.4px;
+            line-height: 1.2;
+        }
+
+        /* Sidebar Profile Card */
+        .sidebar-profile-card {
+            background: var(--ula-control-dark-fill);
+            border: 1px solid var(--ula-control-dark-border-subtle);
+            border-radius: var(--ula-radius-lg);
+            padding: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            box-shadow: var(--ula-shadow-xs);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .sidebar-profile-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--ula-shadow-md);
+            border-color: var(--ula-highlight-default);
+        }
+
+        .sidebar-profile-avatar-wrap {
+            position: relative;
+            width: 58px;
+            height: 58px;
+            margin-bottom: 8px;
+        }
+        .sidebar-profile-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--ula-white);
+            box-shadow: 0 4px 12px rgba(36, 92, 58, 0.15);
+        }
+        .sidebar-profile-status {
+            position: absolute;
+            bottom: 2px;
+            inset-inline-end: 2px;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: var(--ula-status-success);
+            border: 2px solid var(--ula-white);
+            box-shadow: 0 0 6px rgba(79, 155, 95, 0.6);
+        }
+
+        /* ── Sidebar Accordions (UlaSpace Clean Design) ── */
+        .sidebar-accordion {
+            margin-bottom: 6px;
+        }
+
+        .sidebar-accordion-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--ula-text-on-dark-subtle);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            padding: 8px 10px;
+            border-radius: var(--ula-radius-xs);
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.15s ease;
+            background: transparent;
+            border: 1px solid transparent;
+            margin-bottom: 2px;
+        }
+
+        .sidebar-accordion-header:hover {
+            color: var(--ula-text-on-dark);
+            background: var(--ula-control-dark-fill);
+        }
+
+        .sidebar-accordion-chevron {
+            font-size: 9px;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--ula-text-on-dark-subtle);
+            display: inline-block;
+        }
+
+        .sidebar-accordion.collapsed .sidebar-accordion-chevron {
+            transform: rotate({{ app()->getLocale() === 'ar' ? '90deg' : '-90deg' }});
+        }
+
+        .sidebar-accordion-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+            max-height: 2000px;
+            opacity: 1;
+            padding: 2px 0;
+        }
+
+        .sidebar-accordion.collapsed .sidebar-accordion-content {
+            max-height: 0;
+            opacity: 0;
+            padding-top: 0;
+            pointer-events: none;
+        }
+
+        .nav-tab-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: var(--ula-radius-sm);
+            color: var(--ula-text-on-dark-muted);
+            background: transparent;
+            border: 1px solid transparent;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: start;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            margin-bottom: 2px;
+        }
+
+        .nav-tab-btn:hover {
+            background: var(--ula-control-dark-fill);
+            color: var(--ula-text-on-dark);
+        }
+
+        .nav-tab-btn.active {
+            background: var(--ula-control-dark-fill-strong) !important;
+            color: var(--ula-text-on-dark) !important;
+            border-color: transparent !important;
+            font-weight: 700 !important;
+            box-shadow: inset {{ app()->getLocale() === 'ar' ? '-3px' : '3px' }} 0 0 var(--ula-highlight-default) !important;
+        }
+        .nav-tab-btn.active span,
+        .nav-tab-btn.active strong {
+            color: var(--ula-text-on-dark) !important;
+        }
+        .nav-tab-btn.active .nav-icon-tile {
+            background: rgba(211, 165, 83, 0.22) !important;
+            border-color: var(--ula-gold-400) !important;
+            color: var(--ula-gold-300) !important;
         }
 
         .nav-icon-tile {
@@ -1270,274 +1689,7 @@
 <body>
 
     <!-- Left Admin Sidebar -->
-    <aside class="sidebar" id="dashboardSidebar" style="overflow-y: auto;">
-        <!-- Brand Header -->
-        <div class="sidebar-brand-wrapper" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding: 0 4px;">
-            <a href="javascript:void(0)" onclick="switchAdminTab('overview')" class="sidebar-logo" style="margin-bottom: 0; flex: 1; min-width: 0;">
-                @if($organization->logo_url)
-                    <img id="sidebar-tenant-logo" src="{{ $organization->logo_url }}" alt="{{ $organization->name }}" style="width: 38px; height: 38px; border-radius: 12px; object-fit: cover; box-shadow: var(--ula-shadow-xs); flex-shrink: 0;">
-                @else
-                    <div id="sidebar-tenant-logo-icon" class="sidebar-logo-icon" style="background: var(--ula-control-dark-fill-strong); width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 5px; flex-shrink: 0; box-shadow: var(--ula-shadow-sm);">
-                        <img src="{{ asset('images/ulaspace-icon.png') }}" alt="UlaSpace" style="width: 24px; height: auto; object-fit: contain;">
-                    </div>
-                @endif
-                <div>
-                    <div class="sidebar-logo-text" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $organization->name }}</div>
-                    <div style="font-size: 10px; color: var(--ula-text-on-dark-subtle); font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;">{{ __('Virtual Workplace') }}</div>
-                </div>
-            </a>
-            <button onclick="toggleSidebarCollapse()" class="sidebar-toggle-btn" style="width: 28px; height: 28px; font-size: 11px; padding: 0; flex-shrink: 0; background: var(--ula-control-dark-fill); border: 1px solid var(--ula-control-dark-border); border-radius: 8px; cursor: pointer; color: var(--ula-text-on-dark-muted);" title="{{ __('Toggle Sidebar (Mini / Full)') }}">
-                {{ app()->getLocale() === 'ar' ? '◀' : '▶' }}
-            </button>
-        </div>
-
-        <!-- 1. Workspace Section (Accordion) -->
-        <div class="sidebar-accordion" id="sec-workspace">
-            <div class="sidebar-accordion-header" onclick="toggleSidebarSection('sec-workspace')" data-tooltip="{{ __('Workspace') }}">
-                <span style="display: flex; align-items: center; gap: 8px;">
-                    <span class="material-symbols-rounded text-[18px] text-[var(--ula-highlight-default)]">apartment</span>
-                    <span>{{ __('Workspace') }}</span>
-                </span>
-                <span class="sidebar-accordion-chevron">▼</span>
-            </div>
-            <div class="sidebar-accordion-content">
-                <button class="nav-tab-btn active" id="nav-btn-overview" onclick="switchAdminTab('overview')" data-tooltip="{{ __('Overview') }}">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded text-[18px]">dashboard</span>
-                        <span>{{ __('Overview') }}</span>
-                    </span>
-                </button>
-                <a href="{{ route('office') }}" class="nav-tab-btn" style="text-decoration: none;" data-tooltip="{{ __('Virtual Office') }}">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded text-[18px]">view_in_ar</span>
-                        <span>{{ __('Virtual Office') }}</span>
-                    </span>
-                    <span class="nav-badge-pill">3D</span>
-                </a>
-                <button class="nav-tab-btn" id="nav-btn-chat" onclick="switchAdminTab('chat')" data-tooltip="{{ __('Team Chat & DMs') }}">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded text-[18px]">chat</span>
-                        <span>{{ __('Team Chat & DMs') }}</span>
-                    </span>
-                    <span class="nav-badge-pill">{{ __('مباشر') }}</span>
-                </button>
-                @if($membership->hasPermission('maps.manage'))
-                <a href="{{ route('editor') }}" class="nav-tab-btn" style="text-decoration: none;" data-tooltip="{{ __('Floor Map Editor') }}">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded text-[18px]">draw</span>
-                        <span>{{ __('Floor Map Editor') }}</span>
-                    </span>
-                </a>
-                @endif
-            </div>
-        </div>
-
-        <!-- 2. Project Management Section (Accordion) -->
-        <div class="sidebar-accordion collapsed" id="sec-projects">
-            <div class="sidebar-accordion-header" onclick="toggleSidebarSection('sec-projects')" data-tooltip="{{ __('Project Management') }}">
-                <span style="display: flex; align-items: center; gap: 8px;">
-                    <span class="material-symbols-rounded text-[18px] text-[var(--ula-highlight-default)]">assignment</span>
-                    <span>{{ __('Project Management') }}</span>
-                </span>
-                <span class="sidebar-accordion-chevron">▼</span>
-            </div>
-            <div class="sidebar-accordion-content">
-                <button class="nav-tab-btn" id="nav-btn-projects" onclick="switchAdminTab('projects')" data-tooltip="{{ __('Projects Portfolio') }}">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded text-[18px]">folder</span>
-                        <span>{{ __('Projects Portfolio') }}</span>
-                    </span>
-                    <span class="nav-badge-pill">{{ $projects->count() }}</span>
-                </button>
-                @if($membership->hasPermission('tasks.assign') || $membership->hasPermission('tasks.delete') || $membership->role?->slug === 'company_admin')
-                <button class="nav-tab-btn" id="nav-btn-all-tasks" onclick="switchAdminTab('all-tasks')" data-tooltip="{{ __('All Tasks Manager') }}">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded text-[18px]">list_alt</span>
-                        <span>{{ __('All Tasks Manager') }}</span>
-                    </span>
-                    <span class="nav-badge-pill">{{ $tasks->count() }}</span>
-                </button>
-                @endif
-                <button class="nav-tab-btn" id="nav-btn-my-tasks" onclick="switchAdminTab('my-tasks')" data-tooltip="{{ __('My Tasks') }}">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded text-[18px]">task_alt</span>
-                        <span>{{ __('My Tasks') }}</span>
-                    </span>
-                    <span class="nav-badge-pill">{{ $myTasks->where('status', '!=', 'done')->count() }}</span>
-                </button>
-                <button class="nav-tab-btn" id="nav-btn-timesheets" onclick="switchAdminTab('timesheets')" data-tooltip="{{ __('Timesheets & Time') }}">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded text-[18px]">timer</span>
-                        <span>{{ __('Timesheets & Time') }}</span>
-                    </span>
-                </button>
-                @if($membership->hasPermission('reports.view') || $membership->role?->slug === 'company_admin')
-                <button class="nav-tab-btn" id="nav-btn-workload" onclick="switchAdminTab('workload')" data-tooltip="{{ __('Team Workload') }}">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded text-[18px]">badge</span>
-                        <span>{{ __('Team Workload') }}</span>
-                    </span>
-                </button>
-                @endif
-            </div>
-        </div>
-
-        <!-- 3. Administration Section (Accordion) -->
-        @php
-            $canSeeAdminSec = $membership->hasPermission('members.view') || $membership->hasPermission('rooms.manage') || $membership->hasPermission('guests.invite') || $membership->hasPermission('departments.manage') || $membership->hasPermission('audit.view') || $membership->role?->slug === 'company_admin';
-        @endphp
-        @if($canSeeAdminSec)
-        <div class="sidebar-accordion collapsed" id="sec-admin">
-            <div class="sidebar-accordion-header" onclick="toggleSidebarSection('sec-admin')" data-tooltip="{{ __('Administration') }}">
-                <span style="display: flex; align-items: center; gap: 8px;">
-                    <span class="material-symbols-rounded text-[18px] text-[var(--ula-highlight-default)]">shield</span>
-                    <span>{{ __('Administration') }}</span>
-                </span>
-                <span class="sidebar-accordion-chevron">▼</span>
-            </div>
-            <div class="sidebar-accordion-content">
-                @if($membership->hasPermission('members.view') || $membership->hasPermission('members.manage'))
-                <button class="nav-tab-btn" id="nav-btn-members" onclick="switchAdminTab('members')" data-tooltip="{{ __('Team Members') }}">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded text-[18px]">group</span>
-                        <span>{{ __('Team Members') }}</span>
-                    </span>
-                    <span class="nav-badge-pill">{{ $members->count() }}</span>
-                </button>
-                @endif
-                @if($membership->hasPermission('maps.manage') || $membership->role?->slug === 'company_admin')
-                <button class="nav-tab-btn" id="nav-btn-offices" onclick="switchAdminTab('offices')" data-tooltip="{{ __('Offices & Branches') }}">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded text-[18px]">domain</span>
-                        <span>{{ __('Offices & Branches') }}</span>
-                    </span>
-                    <span class="nav-badge-pill">{{ $offices->count() }}</span>
-                </button>
-                @endif
-                @if($membership->hasPermission('rooms.manage'))
-                <button class="nav-tab-btn" id="nav-btn-rooms" onclick="switchAdminTab('rooms')" data-tooltip="{{ __('Rooms & Doors') }}">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded text-[18px]">meeting_room</span>
-                        <span>{{ __('Rooms & Doors') }}</span>
-                    </span>
-                    <span class="nav-badge-pill">{{ $rooms->count() }}</span>
-                </button>
-                @endif
-                <button class="nav-tab-btn" id="nav-btn-meetings" onclick="switchAdminTab('meetings')" data-tooltip="{{ __('Meetings & Schedule') }}">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded text-[18px]">calendar_month</span>
-                        <span>{{ __('Meetings & Schedule') }}</span>
-                    </span>
-                    <span class="nav-badge-pill">{{ $upcomingMeetings->count() }}</span>
-                </button>
-                @if($membership->hasPermission('guests.invite'))
-                <button class="nav-tab-btn" id="nav-btn-guests" onclick="switchAdminTab('guests')" data-tooltip="{{ __('Guest Links') }}">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded text-[18px]">link</span>
-                        <span>{{ __('Guest Links') }}</span>
-                    </span>
-                    <span class="nav-badge-pill">{{ $guestInvitations->count() }}</span>
-                </button>
-                @endif
-                @if($membership->hasPermission('departments.manage') || $membership->hasPermission('teams.manage'))
-                <button class="nav-tab-btn" id="nav-btn-departments" onclick="switchAdminTab('departments')" data-tooltip="{{ __('Departments & Teams') }}">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded text-[18px]">corporate_fare</span>
-                        <span>{{ __('Departments & Teams') }}</span>
-                    </span>
-                </button>
-                @endif
-                @if($membership->hasPermission('audit.view'))
-                <button class="nav-tab-btn" id="nav-btn-audit" onclick="switchAdminTab('audit')" data-tooltip="{{ __('Audit Logs') }}">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded text-[18px]">history</span>
-                        <span>{{ __('Audit Logs') }}</span>
-                    </span>
-                </button>
-                @endif
-            </div>
-        </div>
-        @else
-        <!-- Standalone Meetings Button for Non-Admins -->
-        <div style="padding: 0 10px; margin-bottom: 8px;">
-            <button class="nav-tab-btn" id="nav-btn-meetings" onclick="switchAdminTab('meetings')" data-tooltip="{{ __('Meetings & Schedule') }}">
-                <span style="display: flex; align-items: center; gap: 8px;">
-                    <span class="material-symbols-rounded text-[18px]">calendar_month</span>
-                    <span>{{ __('Meetings & Schedule') }}</span>
-                </span>
-                <span class="nav-badge-pill">{{ $upcomingMeetings->count() }}</span>
-            </button>
-        </div>
-        @endif
-
-        <!-- 4. Settings & Profile Section (Accordion) -->
-        <div class="sidebar-accordion collapsed" id="sec-settings">
-            <div class="sidebar-accordion-header" onclick="toggleSidebarSection('sec-settings')" data-tooltip="{{ __('Settings & Profile') }}">
-                <span style="display: flex; align-items: center; gap: 8px;">
-                    <span class="material-symbols-rounded text-[18px] text-[var(--ula-highlight-default)]">settings</span>
-                    <span>{{ __('Settings & Profile') }}</span>
-                </span>
-                <span class="sidebar-accordion-chevron">▼</span>
-            </div>
-            <div class="sidebar-accordion-content">
-                <button class="nav-tab-btn" id="nav-btn-profile" onclick="switchAdminTab('profile')" data-tooltip="{{ __('My User Profile') }}">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded text-[18px]">person</span>
-                        <span>{{ __('My User Profile') }}</span>
-                    </span>
-                </button>
-                @if($membership->hasPermission('billing.manage'))
-                <button class="nav-tab-btn" id="nav-btn-billing" onclick="switchAdminTab('billing')" data-tooltip="{{ __('Billing & Subscription') }}">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded text-[18px]">credit_card</span>
-                        <span>{{ __('Billing & Subscription') }}</span>
-                    </span>
-                </button>
-                @endif
-                @if($membership->hasPermission('organizations.manage'))
-                <button class="nav-tab-btn" id="nav-btn-settings" onclick="switchAdminTab('settings')" data-tooltip="{{ __('Workspace Settings') }}">
-                    <span style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded text-[18px]">tune</span>
-                        <span>{{ __('Workspace Settings') }}</span>
-                    </span>
-                </button>
-                @endif
-            </div>
-        </div>
-
-        @if($user->isSuperAdmin())
-        <div style="margin-top: 8px;">
-            <a href="{{ route('superadmin.dashboard') }}" class="nav-tab-btn" data-tooltip="{{ __('Super Admin Portal') }}" style="background: var(--ula-alpha-gold-400-18); color: var(--ula-text-on-dark); border: 1px solid var(--ula-gold-600); text-decoration: none;">
-                <span class="material-symbols-rounded text-[18px]">bolt</span>
-                <strong>{{ __('Super Admin Portal') }}</strong>
-            </a>
-        </div>
-        @endif
-
-        <!-- User Profile Card (Footer) -->
-        <div class="sidebar-user" style="margin-top: auto; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: var(--ula-radius-sm); background: var(--ula-control-dark-fill); border: 1px solid var(--ula-control-dark-border-subtle);" onclick="switchAdminTab('profile')" title="{{ __('View and Edit Profile') }}">
-            @if($user->avatar_url)
-                <img id="sidebar-user-avatar" src="{{ $user->avatar_url }}" alt="{{ $user->name }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1px solid var(--ula-border-on-dark);">
-            @else
-                <div class="sidebar-avatar" style="width: 36px; height: 36px; border-radius: 50%; background: var(--ula-gradient-accent); color: var(--ula-white); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900;">{{ strtoupper(substr($user->name, 0, 2)) }}</div>
-            @endif
-            <div style="flex: 1; min-width: 0;">
-                <div style="font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--ula-text-on-dark);">
-                    {{ $user->name }}
-                    @if($user->nickname)
-                        <span style="font-size: 10px; color: var(--ula-text-on-dark-muted); font-weight: 600;">({{ '@' . $user->nickname }})</span>
-                    @endif
-                </div>
-                <div style="font-size: 10px; color: var(--ula-text-on-dark-subtle);">{{ $membership->role->name ?? 'Company Admin' }}</div>
-            </div>
-            <form method="POST" action="{{ route('logout') }}" style="display:inline;" onclick="event.stopPropagation();">
-                @csrf
-                <button type="submit" style="background: none; border: none; color: var(--ula-text-on-dark-subtle); cursor: pointer; display: flex; align-items: center;" title="{{ __('Logout') }}">
-                    <span class="material-symbols-rounded text-[18px]">logout</span>
-                </button>
-            </form>
-        </div>
-    </aside>
+    @include('partials.app-sidebar', ['shellActive' => 'overview', 'shellMode' => 'tabs'])
 
     <!-- Main Content Area -->
     <main class="main-content">
@@ -1572,107 +1724,7 @@
         </div>
         @endif
 
-        <!-- Top App Bar Navigation Header (Figma App Bar Component 9:16) -->
-        <header class="ulaspace-appbar">
-            <button class="mobile-menu-btn" onclick="toggleDashboardSidebar()">
-                <span class="material-symbols-rounded" style="font-size: 22px;">menu</span>
-            </button>
-
-            <!-- page-primary-title/subtitle: switchAdminTab() rewrites these on every tab
-                 change. The reference app bar (06/07) has no title area -- sidebar
-                 highlighting + the gold accent bar already show the active tab -- so
-                 these stay in the DOM (sr-only) rather than visible chrome. -->
-            <div class="sr-only">
-                <h1 id="page-primary-title" class="appbar-page-title">{{ __('Dashboard') }}</h1>
-                <p id="page-primary-subtitle" class="appbar-page-subtitle">{{ __('Welcome to your virtual workspace') }}</p>
-            </div>
-
-            <!-- Soft Search Bar with Keyboard Shortcut Badge -->
-            <div class="appbar-search-container">
-                <span class="material-symbols-rounded appbar-search-icon">search</span>
-                <input type="text" class="appbar-search-input" placeholder="{{ __('Search people, rooms, files...') }}" id="globalSearchInput" onkeyup="handleGlobalSearch(this.value)">
-                <kbd class="appbar-search-kbd">⌘K</kbd>
-            </div>
-
-            <!-- Header Actions Group -->
-            <div class="appbar-actions-group">
-                <x-btn variant="outline" size="md" onclick="openInviteModal()" icon="group_add" title="{{ __('Invite People') }}">
-                    {{ __('Invite People') }}
-                </x-btn>
-
-                <!-- Notification Center Bell & Dropdown -->
-                <div class="relative inline-block" id="notifWrapper" style="position: relative; display: inline-block;">
-                    <x-icon-btn icon="notifications" onclick="toggleNotificationDropdown()" id="notifBellBtn" title="{{ __('Notifications') }}" size="md" variant="subtle" />
-                    <span class="notification-badge-pulse" id="notifBadge" style="display: none;">0</span>
-
-                    <!-- Dropdown Panel -->
-                    <div class="notification-dropdown-panel" id="notifDropdown">
-                        <!-- Dropdown Header -->
-                        <div style="padding: 14px 18px; background: var(--ula-surface-page-alt); border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center;">
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <span class="material-symbols-rounded" style="font-size: 18px; color: var(--ula-gold-500);">notifications</span>
-                                <strong style="font-size: 13px; color: var(--ula-text-primary); font-family: 'Cairo', sans-serif;">{{ __('Notifications') }}</strong>
-                                <span id="notifHeaderCount" class="badge-status badge-active" style="font-size: 10px; padding: 2px 8px; display: none;">0 new</span>
-                            </div>
-                            <div style="display: flex; gap: 8px; align-items: center;">
-                                <button type="button" onclick="markAllNotificationsAsRead()" style="background: none; border: none; font-size: 11px; font-weight: 700; color: var(--ula-text-primary); cursor: pointer; font-family: 'Cairo', sans-serif;" title="{{ __('Mark all as read') }}">
-                                    {{ __('Mark read') }}
-                                </button>
-                                <button type="button" onclick="clearAllNotificationsFromServer()" style="background: none; border: none; font-size: 11px; font-weight: 700; color: var(--ula-text-muted); cursor: pointer;" title="{{ __('Clear all') }}">
-                                    <span class="material-symbols-rounded" style="font-size: 16px;">delete_sweep</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Filter Tabs -->
-                        <div style="padding: 8px 12px; border-bottom: 1px solid var(--ula-border-subtle); display: flex; gap: 6px; background: var(--ula-surface-card);">
-                            <button type="button" class="notif-tab-btn active" onclick="filterNotifTab('all', this)">{{ __('All') }}</button>
-                            <button type="button" class="notif-tab-btn" onclick="filterNotifTab('task', this)">{{ __('Tasks') }}</button>
-                            <button type="button" class="notif-tab-btn" onclick="filterNotifTab('meeting', this)">{{ __('Meetings') }}</button>
-                            <button type="button" class="notif-tab-btn" onclick="filterNotifTab('spatial', this)">{{ __('Office') }}</button>
-                        </div>
-
-                        <!-- Notifications Scrollable Feed -->
-                        <div id="notifListContainer" style="max-height: 380px; overflow-y: auto; display: flex; flex-direction: column;">
-                            <div id="notifEmptyState" style="padding: 36px 18px; text-align: center; color: var(--ula-text-muted);">
-                                <span class="material-symbols-rounded" style="font-size: 32px; color: var(--ula-text-muted); display: block; margin-bottom: 8px;">celebration</span>
-                                <strong style="display: block; font-size: 13px; color: var(--ula-text-primary); margin-bottom: 4px; font-family: 'Cairo', sans-serif;">{{ __('All caught up!') }}</strong>
-                                <span style="font-size: 12px; font-family: 'Cairo', sans-serif;">{{ __('No new notifications right now.') }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <x-icon-btn id="theme-toggle-btn" icon="dark_mode" onclick="toggleThemeMode()" title="{{ __('Toggle Dark / Light Mode') }}" size="md" variant="subtle" />
-
-                <!-- Language Switcher -->
-                @if(app()->getLocale() === 'ar')
-                    <a href="{{ route('lang.switch', 'en') }}" class="appbar-capsule-btn" title="{{ __('Switch to English') }}">
-                        <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-gold-500);">language</span>
-                        <span>English</span>
-                    </a>
-                @else
-                    <a href="{{ route('lang.switch', 'ar') }}" class="appbar-capsule-btn" title="{{ __('التبديل إلى العربية') }}">
-                        <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-gold-500);">language</span>
-                        <span>العربية</span>
-                    </a>
-                @endif
-
-                <!-- User Profile Capsule (App Bar spec) -->
-                <div onclick="switchAdminTab('profile')" class="appbar-user-capsule" title="{{ __('View Profile') }}">
-                    <div class="appbar-user-avatar">
-                        @if($user->avatar_url)
-                            <img src="{{ $user->avatar_url }}" alt="{{ $user->name }}" style="width: 100%; height: 100%; object-fit: cover;">
-                        @else
-                            <span>{{ strtoupper(substr($user->name, 0, 2)) }}</span>
-                        @endif
-                    </div>
-                    <span class="appbar-user-name">
-                        {{ explode(' ', $user->name)[0] }}
-                    </span>
-                </div>
-            </div>
-        </header>
+        @include('partials.app-topbar', ['shellMode' => 'tabs'])
 
         @if(session('success'))
         <div style="background: rgba(60, 107, 76, 0.12); border: 1px solid rgba(60, 107, 76, 0.3); color: var(--ula-status-success, var(--ula-palm-500)); border-radius: var(--ula-radius-md, 12px); padding: 12px 18px; margin-bottom: 20px; font-weight: 700; font-size: 13px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--ula-shadow-sm);">

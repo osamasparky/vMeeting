@@ -5420,7 +5420,7 @@
                         <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <strong style="font-size: 12px; color: var(--ula-text-primary); display: block;">📄 ${f.name}</strong>
-                                <span style="font-size: 10px; color: var(--ula-text-secondary);">${f.uploader_name} • ${sizeKb} KB • ${new Date(f.created_at).toLocaleDateString()}</span>
+                                <span style="font-size: 10px; color: var(--ula-text-secondary);">${f.uploader_name} · ${sizeKb} KB · ${new Date(f.created_at).toLocaleDateString()}</span>
                             </div>
                             <div style="display: flex; gap: 6px;">
                                 <a href="${f.file_url}" download class="action-link-btn" style="padding: 4px 8px; font-size: 11px;">💾 {{ __("Download") }}</a>
@@ -5957,7 +5957,7 @@
                         <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 12px; padding: 14px; display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <strong style="font-size: 13px; color: var(--ula-text-primary); display: block;">${r.title}</strong>
-                                <span style="font-size: 11px; color: var(--ula-text-secondary);">${new Date(r.created_at).toLocaleString()} • ${Math.round(r.duration_seconds || 0)}s • ${r.recorded_by_name || 'Member'}</span>
+                                <span style="font-size: 11px; color: var(--ula-text-secondary);">${new Date(r.created_at).toLocaleString()} · ${Math.round(r.duration_seconds || 0)}s · ${r.recorded_by_name || 'Member'}</span>
                             </div>
                             <div style="display: flex; gap: 8px;">
                                 <a href="${downloadUrl}" download="meeting_recording.mp4" class="action-link-btn">💾 {{ __("Download MP4") }}</a>
@@ -6235,7 +6235,7 @@
                     const data = await res.json();
                     if (data.user) {
                         nameEl.textContent = data.user.name;
-                        subEl.textContent = `${data.user.role_name} • ${data.user.job_title || ''} ${data.user.department ? '('+data.user.department+')' : ''}`;
+                        subEl.textContent = `${data.user.role_name} · ${data.user.job_title || ''} ${data.user.department ? '('+data.user.department+')' : ''}`;
                         if (data.user.avatar_url) {
                             avBox.innerHTML = `<img src="${data.user.avatar_url}" style="width:100%;height:100%;object-fit:cover;">`;
                             bigAv.innerHTML = `<img src="${data.user.avatar_url}" style="width:100%;height:100%;object-fit:cover;">`;
@@ -6275,7 +6275,7 @@
                                         <span style="font-size: 14px;">${t.status === 'done' ? '✅' : (t.status === 'in_progress' ? '⚡' : '📌')}</span>
                                         <div>
                                             <div style="font-size: 12px; font-weight: 800; color: var(--ula-text-primary); text-decoration: ${t.status === 'done' ? 'line-through' : 'none'};">${t.title}</div>
-                                            <div style="font-size: 10px; color: var(--ula-text-secondary);">${t.project_name} ${t.due_date ? '• 📅 ' + t.due_date : ''}</div>
+                                            <div style="font-size: 10px; color: var(--ula-text-secondary);">${t.project_name} ${t.due_date ? '· 📅 ' + t.due_date : ''}</div>
                                         </div>
                                     </div>
                                     <span class="guest-badge" style="text-transform: uppercase; font-size: 9px;">${t.status.replace('_', ' ')}</span>
@@ -7053,13 +7053,16 @@
                 icon = 'notifications_active';
             }
 
+            // Emoji above are type keys only; the Material Symbol carries the icon on screen.
+            const display = str.replace(/[\p{Extended_Pictographic}‍️]+\s*/gu, '').trim();
+
             card.className = `nx-toast-card nx-toast-${type}`;
             card.innerHTML = `
                 <div class="nx-toast-icon-wrap">
                     <span class="material-symbols-rounded" style="font-size: 18px;">${icon}</span>
                 </div>
                 <div class="nx-toast-content">
-                    <div class="nx-toast-msg">${str}</div>
+                    <div class="nx-toast-msg">${display}</div>
                 </div>
                 <button type="button" class="nx-toast-close" onclick="this.closest('.nx-toast-card').remove()" title="Close">✕</button>
             `;

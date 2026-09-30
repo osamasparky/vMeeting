@@ -9,7 +9,6 @@
 
    Naming mirrors Figma 1:1 — Figma `surface/page` becomes `--ula-surface-page`.
    Theme: prefers-color-scheme is the default; [data-theme] / .dark override it.
-   A legacy bridge for the retired --nx-* / --brand-* names sits at the bottom.
    ========================================================================== */
 
 /* --- FONTS -------------------------------------------------------------- */
@@ -573,13 +572,21 @@ body, button, input, select, textarea, optgroup {
 }
 
 /* Material Symbols */
-.material-symbols-rounded {
+.material-symbols-rounded,
+.ms {
+  font-family: 'Material Symbols Rounded', 'Material Icons Round', 'Material Icons', sans-serif;
+  font-weight: 400;
+  font-style: normal;
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
   vertical-align: middle;
   line-height: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  white-space: nowrap;
+  letter-spacing: normal;
+  text-transform: none;
+  direction: ltr;
 }
 .material-symbols-rounded.filled { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
 [dir="rtl"] .ula-mirror-rtl { transform: scaleX(-1); }
@@ -636,38 +643,6 @@ body, button, input, select, textarea, optgroup {
 }
 .ula-container { max-width: var(--ula-layout-container-max); margin-inline: auto; padding-inline: var(--ula-layout-gutter); }
 .ula-container-narrow { max-width: var(--ula-layout-container-narrow); margin-inline: auto; padding-inline: var(--ula-layout-gutter); }
-
-/* ==========================================================================
-   LEGACY BRIDGE — retired token names mapped onto UlaSpace tokens.
-   Views were swept to the --ula-* names; this block only protects anything
-   generated at runtime or added outside the sweep. Safe to delete once
-   `grep -r "\-\-nx-\|\-\-brand-\|\-\-bg-base" resources/` comes back empty.
-   ========================================================================== */
-:root {
-  --nx-font-ar: var(--ula-font-ar);
-  --nx-font-en: var(--ula-font-en);
-  --nx-font-mono: var(--ula-font-mono);
-  --nx-bg-page: var(--ula-surface-page);
-  --nx-bg-surface: var(--ula-surface-card);
-  --nx-bg-surface-elevated: var(--ula-surface-raised);
-  --nx-bg-surface-hover: var(--ula-surface-hover);
-  --nx-bg-card: var(--ula-surface-card);
-  --nx-bg-capsule: var(--ula-surface-capsule);
-  --nx-text-primary: var(--ula-text-primary);
-  --nx-text-secondary: var(--ula-text-secondary);
-  --nx-text-muted: var(--ula-text-muted);
-  --nx-text-on-dark: var(--ula-text-on-dark);
-  --nx-border-subtle: var(--ula-border-subtle);
-  --nx-border-default: var(--ula-border-default);
-  --nx-border-strong: var(--ula-border-strong);
-  --nx-accent: var(--ula-accent-default);
-  --nx-radius-lg: var(--ula-radius-lg);
-  --nx-radius-pill: var(--ula-radius-pill);
-  --nx-shadow-sm: var(--ula-shadow-sm);
-  --nx-shadow-md: var(--ula-shadow-md);
-  --nx-shadow-lg: var(--ula-shadow-lg);
-  --nx-focus-ring: var(--ula-focus-ring);
-}
 
 /* ══════════════════════════════════════════════════════════════════════════
    ULASPACE BUTTON DESIGN SYSTEM (FIGMA 100% SPEC COMPLIANT)
@@ -782,6 +757,24 @@ body, button, input, select, textarea, optgroup {
   border-color: var(--ula-palm-950, #0f2015) !important;
   transform: translateY(0) !important;
 }
+
+/* Dark: the primitive palm-900 fill above equals --ula-surface-card here, so primary buttons vanished on
+   cards. Switch to the semantic accent, which the dark theme lifts to palm-400 with a dark label. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .ula-btn--primary { background-color: var(--ula-accent-default) !important; border-color: var(--ula-accent-default) !important; color: var(--ula-accent-fg) !important; }
+  :root:not([data-theme="light"]) .ula-btn--primary:hover { background-color: var(--ula-accent-hover) !important; border-color: var(--ula-accent-hover) !important; color: var(--ula-accent-fg) !important; }
+  :root:not([data-theme="light"]) .ula-btn--primary:active { background-color: var(--ula-accent-press) !important; border-color: var(--ula-accent-press) !important; }
+}
+[data-theme="dark"] .ula-btn--primary, .dark .ula-btn--primary { background-color: var(--ula-accent-default) !important; border-color: var(--ula-accent-default) !important; color: var(--ula-accent-fg) !important; }
+[data-theme="dark"] .ula-btn--primary:hover, .dark .ula-btn--primary:hover { background-color: var(--ula-accent-hover) !important; border-color: var(--ula-accent-hover) !important; color: var(--ula-accent-fg) !important; }
+[data-theme="dark"] .ula-btn--primary:active, .dark .ula-btn--primary:active { background-color: var(--ula-accent-press) !important; border-color: var(--ula-accent-press) !important; }
+/* Ghost had the same problem: palm-900 text on the dark page. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .ula-btn--ghost { color: var(--ula-accent-default) !important; }
+  :root:not([data-theme="light"]) .ula-btn--ghost:hover { background-color: var(--ula-surface-hover) !important; color: var(--ula-accent-hover) !important; }
+}
+[data-theme="dark"] .ula-btn--ghost, .dark .ula-btn--ghost { color: var(--ula-accent-default) !important; }
+[data-theme="dark"] .ula-btn--ghost:hover, .dark .ula-btn--ghost:hover { background-color: var(--ula-surface-hover) !important; color: var(--ula-accent-hover) !important; }
 
 /* Secondary: Warm Sand */
 .ula-btn--secondary {

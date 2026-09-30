@@ -1,22 +1,40 @@
+{{--
+    Workspace Settings — design-reference "23 - Workspace Settings".
+    Section nav (260px) beside a stack of cards; the nav scrolls to a card and tracks the one in view.
+    One form: every "save" button posts all four sections to organization.settings.update.
+--}}
+@php
+    $zones = collect(DateTimeZone::listIdentifiers())->mapWithKeys(function ($tz) {
+        $offset = (new DateTimeZone($tz))->getOffset(new DateTime('now', new DateTimeZone('UTC')));
+        $h = intdiv(abs($offset), 3600);
+        $m = intdiv(abs($offset) % 3600, 60);
+        $gmt = 'GMT' . ($offset === 0 ? '' : ($offset > 0 ? '+' : '-') . $h . ($m ? ':' . str_pad($m, 2, '0', STR_PAD_LEFT) : ''));
+        return [$tz => "{$tz} ({$gmt})"];
+    });
+    $currentTz = old('timezone', $organization->timezone ?: 'UTC');
+    $autoAttendance = (bool) old('attendance_auto_enabled', $attendancePolicy['auto_attendance_enabled'] ?? true);
+    $settingsSections = [
+        ['general', 'corporate_fare', 'settings.nav_general'],
+        ['smtp', 'mail', 'settings.nav_smtp'],
+        ['ai', 'auto_awesome', 'settings.nav_ai'],
+        ['attendance', 'timer', 'settings.nav_attendance'],
+    ];
+    $selectClass = 'h-[46px] w-full appearance-none rounded-[var(--ula-radius-md)] border border-[var(--ula-border-default)] bg-[var(--ula-surface-page)] ps-10 pe-10 text-[15px] text-[var(--ula-text-primary)] transition-[border-color,box-shadow] duration-[var(--ula-duration-fast)] ease-[var(--ula-ease-out)] focus:border-[var(--ula-border-focus)] focus:outline-none focus-visible:shadow-[var(--ula-focus-ring)]';
+@endphp
+
 <div id="tab-settings" class="tab-view">
-    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;">
-        <div style="display: flex; flex-direction: column; gap: 2px;">
-            <h2 style="font-size: 30px; font-weight: 700; line-height: 1.25; color: var(--ula-text-primary); margin: 0;">{{ __('Workspace Configuration & System Settings') }}</h2>
-            <span style="font-family: 'IBM Plex Sans', sans-serif; font-size: 16px; font-weight: 400; color: var(--ula-text-secondary);">Workspace Configuration &amp; System Settings</span>
+    <div class="ula-set-head">
+        <div class="ula-headline-group">
+            <h2 class="ula-headline-ar" style="font-size: var(--ula-size-h1); margin: 0;">{{ __('page.settings') }}</h2>
+            @if(app()->getLocale() === 'ar')<span class="ula-headline-en" style="font-size: var(--ula-size-h4);">Workspace Settings</span>@endif
         </div>
     </div>
 
-
-    @if(session('success'))
-        <div style="background: rgba(60, 107, 76, 0.12); border: 1px solid var(--ula-palm-500); color: var(--ula-palm-700); padding: 14px 18px; border-radius: var(--ula-radius-md); margin-bottom: 20px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 10px;">
-            <span class="material-symbols-rounded" style="font-size: 18px;">check_circle</span>
-            <span>{{ session('success') }}</span>
-        </div>
-    @endif
-
+    {{-- The success flash is shown by the dashboard shell; only validation errors render here. --}}
     @if($errors->any())
-        <div style="background: rgba(201, 116, 58, 0.12); border: 1px solid var(--ula-status-danger); color: var(--ula-status-danger); padding: 14px 18px; border-radius: var(--ula-radius-md); margin-bottom: 20px; font-size: 13px; font-weight: 700;">
-            <ul style="margin: 0; padding-inline-start: 20px;">
+        <div class="ula-set-alert ula-set-alert--error" role="alert">
+            <span class="material-symbols-rounded" aria-hidden="true">error</span>
+            <ul>
                 @foreach($errors->all() as $err)
                     <li>{{ $err }}</li>
                 @endforeach
@@ -24,362 +42,201 @@
         </div>
     @endif
 
-    <!-- Organization Settings Sub-Tabs Header Navigation -->
-    <div class="org-settings-tabs-nav" style="display: flex; gap: 8px; margin-bottom: 20px; background: var(--ula-surface-card); padding: 6px; border-radius: var(--ula-radius-xl); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-sm); width: fit-content; max-width: 100%; overflow-x: auto; scrollbar-width: none;">
-        <button type="button" class="org-subtab-btn active" onclick="switchOrgSettingsTab('general', this)" id="org-subtab-btn-general">
-            <span class="material-symbols-rounded" style="font-size: 16px;">corporate_fare</span>
-            <span>{{ __('General & Branding') }}</span>
-        </button>
-        <button type="button" class="org-subtab-btn" onclick="switchOrgSettingsTab('smtp', this)" id="org-subtab-btn-smtp">
-            <span class="material-symbols-rounded" style="font-size: 16px;">mail</span>
-            <span>{{ __('SMTP Mail Server') }}</span>
-        </button>
-        <button type="button" class="org-subtab-btn" onclick="switchOrgSettingsTab('ai', this)" id="org-subtab-btn-ai">
-            <span class="material-symbols-rounded" style="font-size: 16px;">auto_awesome</span>
-            <span>{{ __('AI Blueprint Engine') }}</span>
-        </button>
-        <button type="button" class="org-subtab-btn" onclick="switchOrgSettingsTab('attendance', this)" id="org-subtab-btn-attendance">
-            <span class="material-symbols-rounded" style="font-size: 16px;">timer</span>
-            <span>{{ __('Attendance & Inactivity Policy') }}</span>
-        </button>
+    <div class="ula-set-layout">
+        <nav class="ula-set-nav" aria-label="{{ __('page.settings') }}">
+            @foreach($settingsSections as [$key, $icon, $label])
+                <button type="button" id="org-subtab-btn-{{ $key }}" class="ula-set-nav-item org-subtab-btn {{ $loop->first ? 'active' : '' }}" onclick="switchOrgSettingsTab('{{ $key }}', this)" @if($loop->first) aria-current="true" @endif>
+                    <span class="material-symbols-rounded" aria-hidden="true">{{ $icon }}</span>
+                    <span>{{ __($label) }}</span>
+                </button>
+            @endforeach
+        </nav>
+
+        <form method="POST" action="{{ route('organization.settings.update') }}" enctype="multipart/form-data" class="ula-set-stack">
+            @csrf
+
+            {{-- 1. General & identity --}}
+            <section id="org-subtab-content-general" class="ula-set-card org-subtab-pane" aria-labelledby="set-h-general">
+                <div class="ula-set-card-head">
+                    <span class="material-symbols-rounded" aria-hidden="true">corporate_fare</span>
+                    <h3 id="set-h-general">{{ __('settings.general_title') }}</h3>
+                </div>
+
+                <div class="ula-set-logo-row">
+                    <div class="ula-set-logo-tile">
+                        <img id="logo-preview-img" src="{{ $organization->logo_url ?: '' }}" alt="{{ $organization->name }}" @unless($organization->logo_url) hidden @endunless>
+                        <svg id="logo-preview-placeholder" role="img" aria-label="UlaSpace" viewBox="-1.2 -1.3 60 40" fill="currentColor" @if($organization->logo_url) hidden @endif><path d="M0 38.734L1.493 30.973L4.179 20.824L6.865 11.869C8.259 7.491 11.94 4.207 17.91 2.018C26.268 -0.569 34.427 -0.669 42.387 1.719C49.153 3.311 54.128 7.292 57.312 13.66L57.312 38.734L26.268 38.734L25.074 27.988C23.482 20.824 21.591 17.242 19.403 17.242C17.214 18.038 15.721 21.819 14.925 28.585L14.328 38.734L0 38.734Z"/></svg>
+                    </div>
+                    <div class="ula-set-logo-text">
+                        <span class="ula-set-label">{{ __('settings.logo_label') }}</span>
+                        <div class="ula-set-logo-actions">
+                            <x-btn variant="secondary" size="sm" icon="upload" onclick="document.getElementById('org-logo-input').click()">{{ __('settings.logo_upload') }}</x-btn>
+                            <x-btn variant="ghost" size="sm" icon="delete" id="btn-remove-logo" onclick="removeCompanyLogo()" :style="$organization->logo_url ? '' : 'display: none;'">{{ __('settings.logo_remove') }}</x-btn>
+                        </div>
+                        <span class="ula-set-help">{{ __('settings.logo_help') }}</span>
+                        <input type="file" name="logo" id="org-logo-input" accept="image/png,image/jpeg,image/gif,image/svg+xml,image/webp" onchange="previewCompanyLogo(this)" data-too-large="{{ __('settings.logo_too_large') }}" class="sr-only" tabindex="-1">
+                        <input type="hidden" name="remove_logo" id="org-remove-logo" value="0">
+                    </div>
+                </div>
+
+                <div class="ula-set-grid">
+                    <x-input name="name" :label="__('settings.name_label')" icon="apartment" :value="old('name', $organization->name)" required />
+                    <x-input id="org-slug" :label="__('settings.slug_label')" icon="link" :value="$organization->slug" :helper="__('settings.slug_help')" readonly style="font-family: var(--ula-font-mono); unicode-bidi: plaintext;" />
+                    <div class="flex flex-col gap-[7px]">
+                        <label for="org-timezone" class="text-[15px] font-medium text-[var(--ula-text-primary)]">{{ __('settings.timezone_label') }}</label>
+                        <div class="ula-set-select">
+                            <span class="ula-set-select-icon" aria-hidden="true"><span class="material-symbols-rounded">schedule</span></span>
+                            <select name="timezone" id="org-timezone" class="{{ $selectClass }}" style="unicode-bidi: plaintext;">
+                                @foreach($zones as $tzKey => $tzLabel)
+                                    <option value="{{ $tzKey }}" @selected($currentTz === $tzKey)>{{ $tzLabel }}</option>
+                                @endforeach
+                            </select>
+                            <span class="ula-set-select-caret" aria-hidden="true"><span class="material-symbols-rounded">expand_more</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ula-set-actions">
+                    <x-btn variant="primary" size="md" type="submit" icon="save">{{ __('settings.save') }}</x-btn>
+                </div>
+            </section>
+
+            {{-- 2. SMTP --}}
+            <section id="org-subtab-content-smtp" class="ula-set-card org-subtab-pane" aria-labelledby="set-h-smtp">
+                <div class="ula-set-card-head">
+                    <span class="material-symbols-rounded" aria-hidden="true">mail</span>
+                    <div>
+                        <h3 id="set-h-smtp">{{ __('settings.smtp_title') }}</h3>
+                        <p>{{ __('settings.smtp_desc') }}</p>
+                    </div>
+                </div>
+
+                <div class="ula-set-grid">
+                    <x-input name="mail_host" id="smtp-host-input" :label="__('settings.smtp_host')" icon="dns" :value="old('mail_host', $smtpSettings['mail_host'] ?? '')" placeholder="smtp.gmail.com" style="unicode-bidi: plaintext;" />
+                    <x-input name="mail_port" id="smtp-port-input" type="number" :label="__('settings.smtp_port')" icon="settings_ethernet" :value="old('mail_port', $smtpSettings['mail_port'] ?? '587')" placeholder="587" min="1" max="65535" style="font-family: var(--ula-font-mono);" />
+                    <x-input name="mail_username" id="smtp-username-input" :label="__('settings.smtp_username')" icon="person" :value="old('mail_username', $smtpSettings['mail_username'] ?? '')" autocomplete="off" style="unicode-bidi: plaintext;" />
+                    <x-input name="mail_password" id="smtp-password-input" type="password" :label="__('settings.smtp_password')" icon="key" :placeholder="!empty($smtpSettings['mail_password']) ? '••••••••••••' : ''" :helper="!empty($smtpSettings['mail_password']) ? __('settings.secret_kept') : null" autocomplete="new-password" />
+                    <div class="flex flex-col gap-[7px]">
+                        <label for="smtp-encryption-input" class="text-[15px] font-medium text-[var(--ula-text-primary)]">{{ __('settings.smtp_encryption') }}</label>
+                        <div class="ula-set-select">
+                            <span class="ula-set-select-icon" aria-hidden="true"><span class="material-symbols-rounded">lock</span></span>
+                            <select name="mail_encryption" id="smtp-encryption-input" class="{{ $selectClass }}">
+                                @foreach(['tls' => 'TLS', 'ssl' => 'SSL', 'none' => __('settings.none')] as $encKey => $encLabel)
+                                    <option value="{{ $encKey }}" @selected(old('mail_encryption', $smtpSettings['mail_encryption'] ?? 'tls') === $encKey)>{{ $encLabel }}</option>
+                                @endforeach
+                            </select>
+                            <span class="ula-set-select-caret" aria-hidden="true"><span class="material-symbols-rounded">expand_more</span></span>
+                        </div>
+                    </div>
+                    <x-input name="mail_from_address" id="smtp-from-email-input" type="email" :label="__('settings.smtp_from_address')" icon="alternate_email" :value="old('mail_from_address', $smtpSettings['mail_from_address'] ?? '')" placeholder="noreply@{{ $organization->slug }}.com" style="unicode-bidi: plaintext;" />
+                    <x-input name="mail_from_name" id="smtp-from-name-input" :label="__('settings.smtp_from_name')" icon="badge" :value="old('mail_from_name', $smtpSettings['mail_from_name'] ?? $organization->name)" />
+                </div>
+
+                <div class="ula-set-inset">
+                    <div class="ula-set-inset-text">
+                        <span class="material-symbols-rounded" aria-hidden="true">mark_email_read</span>
+                        <span>{{ __('settings.smtp_test_to') }} <strong class="ula-set-ltr">{{ $user->email }}</strong></span>
+                    </div>
+                    <x-btn variant="secondary" size="sm" onclick="testSmtpConnectionAction()" id="btn-test-smtp" icon="science">{{ __('settings.smtp_test') }}</x-btn>
+                </div>
+                <div id="smtp-test-result-box" class="ula-set-result" role="status" aria-live="polite" hidden></div>
+
+                <div class="ula-set-actions">
+                    <x-btn variant="primary" size="md" type="submit" icon="save">{{ __('settings.save') }}</x-btn>
+                </div>
+            </section>
+
+            {{-- 3. AI floor-plan engine --}}
+            <section id="org-subtab-content-ai" class="ula-set-card org-subtab-pane" aria-labelledby="set-h-ai">
+                <div class="ula-set-card-head">
+                    <span class="material-symbols-rounded" aria-hidden="true">auto_awesome</span>
+                    <div>
+                        <h3 id="set-h-ai">{{ __('settings.ai_title') }}</h3>
+                        <p>{{ __('settings.ai_desc') }}</p>
+                    </div>
+                </div>
+
+                <div class="ula-set-note">
+                    <span class="material-symbols-rounded" aria-hidden="true">lightbulb</span>
+                    <div>
+                        <strong>{{ __('settings.ai_note_title') }}</strong>
+                        <span>{{ __('settings.ai_note_body') }}</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-[7px]">
+                    <div class="ula-set-key-row">
+                        <x-input name="openai_api_key" id="org-openai-key-input" type="password" :label="__('settings.ai_key')" icon="key" :placeholder="!empty($openAiSettings['api_key']) ? '••••••••••••••••••••••••' : 'sk-proj-…'" :helper="!empty($openAiSettings['api_key']) ? __('settings.secret_kept') : null" autocomplete="new-password" style="font-family: var(--ula-font-mono);" data-has-saved="{{ !empty($openAiSettings['api_key']) ? '1' : '0' }}" />
+                        <x-btn variant="secondary" size="md" onclick="testOrgAiConnectionAction()" id="btn-test-org-ai" icon="bolt">{{ __('settings.ai_test') }}</x-btn>
+                    </div>
+                    <div id="org-ai-test-result-box" class="ula-set-result" role="status" aria-live="polite" hidden></div>
+                </div>
+
+                <div class="ula-set-grid">
+                    <div class="flex flex-col gap-[7px]">
+                        <label for="org-openai-model" class="text-[15px] font-medium text-[var(--ula-text-primary)]">{{ __('settings.ai_model') }}</label>
+                        <div class="ula-set-select">
+                            <span class="ula-set-select-icon" aria-hidden="true"><span class="material-symbols-rounded">image</span></span>
+                            <select name="openai_model" id="org-openai-model" class="{{ $selectClass }}">
+                                @foreach(['gpt-image-1-mini' => 'GPT Image 1 Mini (~$0.015)', 'gpt-image-1' => 'GPT Image 1 (~$0.040)', 'dall-e-2' => 'DALL-E 2 (~$0.020)', 'dall-e-3' => 'DALL-E 3 (~$0.080)'] as $mKey => $mLabel)
+                                    <option value="{{ $mKey }}" @selected(($openAiSettings['model'] ?? 'gpt-image-1-mini') === $mKey)>{{ $mLabel }}</option>
+                                @endforeach
+                            </select>
+                            <span class="ula-set-select-caret" aria-hidden="true"><span class="material-symbols-rounded">expand_more</span></span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-[7px]">
+                        <label for="org-openai-size" class="text-[15px] font-medium text-[var(--ula-text-primary)]">{{ __('settings.ai_size') }}</label>
+                        <div class="ula-set-select">
+                            <span class="ula-set-select-icon" aria-hidden="true"><span class="material-symbols-rounded">aspect_ratio</span></span>
+                            <select name="openai_image_size" id="org-openai-size" class="{{ $selectClass }}">
+                                <option value="1024x1024" @selected(($openAiSettings['image_size'] ?? '1024x1024') === '1024x1024')>1024 × 1024 · 1:1</option>
+                                <option value="1792x1024" @selected(($openAiSettings['image_size'] ?? '') === '1792x1024')>1792 × 1024 · 16:9</option>
+                            </select>
+                            <span class="ula-set-select-caret" aria-hidden="true"><span class="material-symbols-rounded">expand_more</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ula-set-actions">
+                    <x-btn variant="primary" size="md" type="submit" icon="save">{{ __('settings.save') }}</x-btn>
+                </div>
+            </section>
+
+            {{-- 4. Attendance & idle policy --}}
+            <section id="org-subtab-content-attendance" class="ula-set-card org-subtab-pane" aria-labelledby="set-h-attendance">
+                <div class="ula-set-card-head">
+                    <span class="material-symbols-rounded" aria-hidden="true">timer</span>
+                    <h3 id="set-h-attendance">{{ __('settings.attendance_title') }}</h3>
+                </div>
+
+                <div class="ula-set-toggle-row">
+                    <div class="ula-set-toggle-text">
+                        <span id="set-auto-attendance-label" class="ula-set-label">{{ __('settings.auto_attendance') }}</span>
+                        <span class="ula-set-help">{{ __('settings.auto_attendance_help') }}</span>
+                    </div>
+                    {{-- Hidden 0 first so an unchecked switch still posts a value and can turn the policy off. --}}
+                    <input type="hidden" name="attendance_auto_enabled" value="0">
+                    <x-switch name="attendance_auto_enabled" id="set-auto-attendance" :checked="$autoAttendance" aria-labelledby="set-auto-attendance-label" />
+                </div>
+
+                <div class="ula-set-grid">
+                    <x-input name="attendance_idle_prompt_minutes" type="number" :label="__('settings.idle_minutes')" icon="hourglass_empty" :value="old('attendance_idle_prompt_minutes', $attendancePolicy['idle_prompt_minutes'] ?? 15)" min="1" max="120" required :helper="__('settings.idle_minutes_help')" style="font-family: var(--ula-font-mono);" />
+                    <x-input name="attendance_idle_grace_seconds" type="number" :label="__('settings.grace_seconds')" icon="timer" :value="old('attendance_idle_grace_seconds', $attendancePolicy['idle_response_grace_seconds'] ?? 180)" min="30" max="600" required :helper="__('settings.grace_seconds_help')" style="font-family: var(--ula-font-mono);" />
+                </div>
+
+                <div class="ula-set-note">
+                    <span class="material-symbols-rounded" aria-hidden="true">shield</span>
+                    <div>
+                        <strong>{{ __('settings.task_protection_title') }}</strong>
+                        <span>{{ __('settings.task_protection_body') }}</span>
+                    </div>
+                </div>
+
+                <div class="ula-set-actions">
+                    <x-btn variant="primary" size="md" type="submit" icon="save">{{ __('settings.save') }}</x-btn>
+                </div>
+            </section>
+        </form>
     </div>
-
-    <form method="POST" action="{{ route('organization.settings.update') }}" enctype="multipart/form-data">
-        @csrf
-
-        <!-- 1. SUB-TAB: General & Branding -->
-        <div id="org-subtab-content-general" class="org-subtab-pane active" style="display: block;">
-            <div class="card" style="max-width: 720px; border-radius: var(--ula-radius-xl); padding: 26px;">
-                <div style="margin-bottom: 20px;">
-                    <h3 style="font-size: 16px; font-weight: 800; color: var(--ula-text-primary); margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded" style="color: var(--ula-highlight-default);">corporate_fare</span>
-                        <span>{{ __('Workspace Identity & General Info') }}</span>
-                    </h3>
-                    <p style="font-size: 12px; color: var(--ula-text-muted); margin: 0;">
-                        {{ __('Manage your company name, logo icon, URL slug, and default timezone.') }}
-                    </p>
-                </div>
-
-                <div style="display: flex; flex-direction: column; gap: 18px;">
-                    <!-- Company Logo Upload -->
-                    <div>
-                        <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 8px; text-transform: uppercase;">
-                            {{ __('Company Logo / Workspace Icon') }}
-                        </label>
-                        <div style="display: flex; align-items: center; gap: 18px; background: var(--ula-sand-100); padding: 16px; border-radius: var(--ula-radius-md); border: 1px solid var(--ula-border-subtle);">
-                            <div style="width: 64px; height: 64px; border-radius: 16px; background: var(--ula-surface-card); border: 2px dashed var(--ula-border-subtle); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; position: relative; box-shadow: var(--ula-shadow-sm);">
-                                <img id="logo-preview-img" src="{{ $organization->logo_url ? $organization->logo_url : '' }}" alt="Logo" style="width: 100%; height: 100%; object-fit: cover; {{ $organization->logo_url ? '' : 'display: none;' }}">
-                                <div id="logo-preview-placeholder" style="font-size: 28px; {{ $organization->logo_url ? 'display: none;' : '' }}">
-                                    <span class="material-symbols-rounded" style="font-size: 32px; color: var(--ula-highlight-default);">corporate_fare</span>
-                                </div>
-                            </div>
-                            <div style="flex: 1;">
-                                <div style="font-size: 13px; font-weight: 700; color: var(--ula-text-primary); margin-bottom: 4px;">{{ __('Upload Logo Image') }}</div>
-                                <div style="font-size: 11px; color: var(--ula-text-muted); margin-bottom: 10px;">{{ __('Appears in the top sidebar beside the company name. Recommended: PNG, JPG, SVG or WebP up to 4MB.') }}</div>
-                                <input type="file" name="logo" id="org-logo-input" accept="image/*" onchange="previewCompanyLogo(this)" style="font-size: 12px; color: var(--ula-text-secondary);">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Workspace Name -->
-                    <div>
-                        <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px; text-transform: uppercase;">
-                            {{ __('Workspace / Company Name') }}
-                        </label>
-                        <input type="text" name="name" required value="{{ old('name', $organization->name) }}" placeholder="e.g. Acme Corp" style="width: 100%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 11px 14px; color: var(--ula-text-primary); font-size: 13px; font-weight: 500;">
-                    </div>
-
-                    <!-- Workspace Slug (Read-only) -->
-                    <div>
-                        <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px; text-transform: uppercase;">
-                            {{ __('Workspace URL Slug') }}
-                        </label>
-                        <input type="text" value="{{ $organization->slug }}" readonly style="width: 100%; background: var(--ula-sand-200); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 11px 14px; color: var(--ula-text-primary); font-size: 13px; font-family: 'IBM Plex Mono', monospace; font-weight: 600;">
-                        <span style="display: block; font-size: 10px; color: var(--ula-text-muted); margin-top: 4px;">{{ __('Used for organization identification across the workspace.') }}</span>
-                    </div>
-
-                    <!-- Timezone -->
-                    <div>
-                        <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px; text-transform: uppercase;">
-                            {{ __('Timezone') }}
-                        </label>
-                        <select name="timezone" style="width: 100%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 11px 14px; color: var(--ula-text-primary); font-size: 13px; font-weight: 500;">
-                            @php
-                                $commonTimezones = [
-                                    'UTC' => 'UTC (Coordinated Universal Time)',
-                                    'Africa/Cairo' => 'Africa/Cairo (EET / EEST)',
-                                    'Asia/Riyadh' => 'Asia/Riyadh (AST)',
-                                    'Asia/Dubai' => 'Asia/Dubai (GST)',
-                                    'Europe/London' => 'Europe/London (GMT / BST)',
-                                    'Europe/Paris' => 'Europe/Paris (CET / CEST)',
-                                    'America/New_York' => 'America/New_York (EST / EDT)',
-                                    'America/Chicago' => 'America/Chicago (CST / CDT)',
-                                    'America/Los_Angeles' => 'America/Los_Angeles (PST / PDT)',
-                                    'Asia/Singapore' => 'Asia/Singapore (SGT)',
-                                    'Asia/Tokyo' => 'Asia/Tokyo (JST)',
-                                ];
-                            @endphp
-                            @foreach($commonTimezones as $tzKey => $tzLabel)
-                                <option value="{{ $tzKey }}" {{ $organization->timezone === $tzKey ? 'selected' : '' }}>{{ $tzLabel }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </div>
-
-                <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--ula-border-subtle); display: flex; justify-content: flex-end;">
-                    <x-btn variant="primary" size="md" type="submit" icon="save">
-                        {{ __('Save Changes') }}
-                    </x-btn>
-                </div>
-            </div>
-        </div>
-
-        <!-- 2. SUB-TAB: SMTP Mail Server -->
-        <div id="org-subtab-content-smtp" class="org-subtab-pane" style="display: none;">
-            <div class="card" style="max-width: 720px; border-radius: var(--ula-radius-xl); padding: 26px;">
-                <div style="margin-bottom: 20px;">
-                    <h3 style="font-size: 16px; font-weight: 800; color: var(--ula-text-primary); margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded" style="color: var(--ula-highlight-default);">mail</span>
-                        <span>{{ __('Outgoing SMTP Email Server') }}</span>
-                    </h3>
-                    <p style="font-size: 12px; color: var(--ula-text-muted); margin: 0;">
-                        {{ __('Configure your dedicated SMTP mail provider to send meeting invites, reminders, and alerts under your company name.') }}
-                    </p>
-                </div>
-
-                <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px;">
-                        <div>
-                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px; text-transform: uppercase;">
-                                {{ __('SMTP Host / Server') }}
-                            </label>
-                            <input type="text" name="mail_host" id="smtp-host-input" value="{{ old('mail_host', $smtpSettings['mail_host'] ?? '') }}" placeholder="e.g. smtp.gmail.com or smtp.mailgun.org" style="width: 100%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); font-size: 13px; font-weight: 500;">
-                        </div>
-                        <div>
-                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px; text-transform: uppercase;">
-                                {{ __('Port') }}
-                            </label>
-                            <input type="number" name="mail_port" id="smtp-port-input" value="{{ old('mail_port', $smtpSettings['mail_port'] ?? '587') }}" placeholder="587" style="width: 100%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); font-size: 13px; font-weight: 500; font-family: 'IBM Plex Mono', monospace;">
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1.2fr 1.2fr 0.8fr; gap: 12px;">
-                        <div>
-                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px; text-transform: uppercase;">
-                                {{ __('SMTP Username') }}
-                            </label>
-                            <input type="text" name="mail_username" id="smtp-username-input" value="{{ old('mail_username', $smtpSettings['mail_username'] ?? '') }}" placeholder="api / user@domain.com" style="width: 100%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); font-size: 13px; font-weight: 500;">
-                        </div>
-                        <div>
-                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px; text-transform: uppercase;">
-                                {{ __('SMTP Password') }}
-                            </label>
-                            <input type="password" name="mail_password" id="smtp-password-input" placeholder="{{ !empty($smtpSettings['mail_password']) ? '••••••••••••' : 'App Password / Secret' }}" style="width: 100%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); font-size: 13px; font-weight: 500;">
-                        </div>
-                        <div>
-                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px; text-transform: uppercase;">
-                                {{ __('Encryption') }}
-                            </label>
-                            <select name="mail_encryption" id="smtp-encryption-input" style="width: 100%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); font-size: 13px; font-weight: 500;">
-                                <option value="tls" {{ ($smtpSettings['mail_encryption'] ?? 'tls') === 'tls' ? 'selected' : '' }}>TLS</option>
-                                <option value="ssl" {{ ($smtpSettings['mail_encryption'] ?? '') === 'ssl' ? 'selected' : '' }}>SSL</option>
-                                <option value="none" {{ ($smtpSettings['mail_encryption'] ?? '') === 'none' ? 'selected' : '' }}>None</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                        <div>
-                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px; text-transform: uppercase;">
-                                {{ __('Sender Email (From)') }}
-                            </label>
-                            <input type="email" name="mail_from_address" id="smtp-from-email-input" value="{{ old('mail_from_address', $smtpSettings['mail_from_address'] ?? 'noreply@' . $organization->slug . '.com') }}" placeholder="noreply@domain.com" style="width: 100%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); font-size: 13px; font-weight: 500;">
-                        </div>
-                        <div>
-                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px; text-transform: uppercase;">
-                                {{ __('Sender Display Name') }}
-                            </label>
-                            <input type="text" name="mail_from_name" id="smtp-from-name-input" value="{{ old('mail_from_name', $smtpSettings['mail_from_name'] ?? $organization->name) }}" placeholder="{{ $organization->name }}" style="width: 100%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); font-size: 13px; font-weight: 500;">
-                        </div>
-                    </div>
-
-                    <!-- Test SMTP Box -->
-                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--ula-sand-100); border: 1px solid var(--ula-border-subtle); border-radius: 12px; padding: 12px 16px; flex-wrap: wrap;">
-                        <div style="font-size: 12px; color: var(--ula-text-secondary); display: flex; align-items: center; gap: 6px;">
-                            <span class="material-symbols-rounded" style="font-size: 16px;">mark_email_read</span>
-                            <span>{{ __('Send a test email to') }} <strong>{{ $user->email }}</strong></span>
-                        </div>
-                        <x-btn variant="secondary" size="sm" type="button" onclick="testSmtpConnectionAction()" id="btn-test-smtp" icon="science">
-                            {{ __('Test SMTP Connection') }}
-                        </x-btn>
-                    </div>
-                    <div id="smtp-test-result-box" style="display: none; padding: 10px 14px; border-radius: 10px; font-size: 12px; font-weight: 700;"></div>
-                </div>
-
-                <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--ula-border-subtle); display: flex; justify-content: flex-end;">
-                    <x-btn variant="primary" size="md" type="submit" icon="save">
-                        {{ __('Save SMTP Changes') }}
-                    </x-btn>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. SUB-TAB: AI Floorplan Engine (OpenAI) -->
-        <div id="org-subtab-content-ai" class="org-subtab-pane" style="display: none;">
-            <div class="card" style="max-width: 720px; border-radius: var(--ula-radius-xl); padding: 26px;">
-                <div style="margin-bottom: 20px;">
-                    <h3 style="font-size: 16px; font-weight: 800; color: var(--ula-text-primary); margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded" style="color: var(--ula-highlight-default);">auto_awesome</span>
-                        <span>{{ __('OpenAI & AI Floorplan Generator') }}</span>
-                    </h3>
-                    <p style="font-size: 12px; color: var(--ula-text-muted); margin: 0;">
-                        {{ __('Add your company OpenAI API key to generate bespoke 2D architectural office blueprints directly from the editor without platform rate limits.') }}
-                    </p>
-                </div>
-
-                <!-- Cost Optimization Notice -->
-                <div style="background: rgba(60, 107, 76, 0.08); border: 1px solid var(--ula-palm-500); border-radius: 12px; padding: 14px 16px; margin-bottom: 18px; font-size: 12px; line-height: 1.5; color: var(--ula-text-primary);">
-                    <div style="font-weight: 700; color: var(--ula-palm-700); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
-                        <span class="material-symbols-rounded" style="font-size: 16px;">lightbulb</span>
-                        <span>{{ __('Token & Cost Optimization Enabled') }}</span>
-                    </div>
-                    <span style="color: var(--ula-text-secondary); font-size: 11px;">
-                        {{ __('Prompts are ultra-compressed to ~60 tokens. Choosing GPT Image 1 Mini or DALL-E 2 with 1024x1024 reduces your cost to approx $0.015 - $0.02 per generated floorplan.') }}
-                    </span>
-                </div>
-
-                <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <!-- API Key Input -->
-                    <div>
-                        <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px; text-transform: uppercase;">
-                            {{ __('Company OpenAI Secret Key (sk-...)') }}
-                        </label>
-                        <div style="display: flex; gap: 8px;">
-                            <input type="password" name="openai_api_key" id="org-openai-key-input" placeholder="{{ !empty($openAiSettings['api_key']) ? '••••••••••••••••••••••••••••••••' : 'sk-proj-... / sk-svcacct-...' }}" style="flex: 1; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); font-size: 13px; font-family: 'IBM Plex Mono', monospace; font-weight: 500;">
-                            <x-btn variant="secondary" size="sm" type="button" onclick="testOrgAiConnectionAction()" id="btn-test-org-ai" icon="bolt" style="white-space: nowrap;">
-                                {{ __('Test Key') }}
-                            </x-btn>
-                        </div>
-                        <div id="org-ai-test-result-box" style="display: none; margin-top: 8px; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 700;"></div>
-                    </div>
-
-                    <!-- Generation Model & Image Dimensions -->
-                    <div style="display: grid; grid-template-columns: 1.4fr 1fr; gap: 12px;">
-                        <div>
-                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px; text-transform: uppercase;">
-                                {{ __('Image Generation Model') }}
-                            </label>
-                            <select name="openai_model" style="width: 100%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); font-size: 12px; font-weight: 600;">
-                                <option value="gpt-image-1-mini" {{ ($openAiSettings['model'] ?? 'gpt-image-1-mini') === 'gpt-image-1-mini' ? 'selected' : '' }}>
-                                    GPT Image 1 Mini (Low Cost ~$0.015)
-                                </option>
-                                <option value="gpt-image-1" {{ ($openAiSettings['model'] ?? '') === 'gpt-image-1' ? 'selected' : '' }}>
-                                    GPT Image 1 (High Quality Standard ~$0.040)
-                                </option>
-                                <option value="dall-e-2" {{ ($openAiSettings['model'] ?? '') === 'dall-e-2' ? 'selected' : '' }}>
-                                    DALL-E 2 (Economy Legacy ~$0.020)
-                                </option>
-                                <option value="dall-e-3" {{ ($openAiSettings['model'] ?? '') === 'dall-e-3' ? 'selected' : '' }}>
-                                    DALL-E 3 (High Definition Art ~$0.080)
-                                </option>
-                            </select>
-                        </div>
-                        <div>
-                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px; text-transform: uppercase;">
-                                {{ __('Floorplan Dimensions') }}
-                            </label>
-                            <select name="openai_image_size" style="width: 100%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); font-size: 12px; font-weight: 600;">
-                                <option value="1024x1024" {{ ($openAiSettings['image_size'] ?? '1024x1024') === '1024x1024' ? 'selected' : '' }}>
-                                    1024 × 1024 (Square 1:1 - Low Cost)
-                                </option>
-                                <option value="1792x1024" {{ ($openAiSettings['image_size'] ?? '') === '1792x1024' ? 'selected' : '' }}>
-                                    1792 × 1024 (Widescreen 16:9)
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--ula-border-subtle); display: flex; justify-content: flex-end;">
-                    <x-btn variant="primary" size="md" type="submit" icon="save">
-                        {{ __('Save AI Settings') }}
-                    </x-btn>
-                </div>
-            </div>
-        </div>
-
-        <!-- 4. SUB-TAB: Attendance & Time Tracking Policy -->
-        <div id="org-subtab-content-attendance" class="org-subtab-pane" style="display: none;">
-            <div class="card" style="max-width: 720px; border-radius: var(--ula-radius-xl); padding: 26px;">
-                <div style="margin-bottom: 20px;">
-                    <h3 style="font-size: 16px; font-weight: 800; color: var(--ula-text-primary); margin: 0 0 4px 0; display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-rounded" style="color: var(--ula-highlight-default);">timer</span>
-                        <span>{{ __('Attendance & Smart Inactivity Policy') }}</span>
-                    </h3>
-                    <p style="font-size: 12px; color: var(--ula-text-muted); margin: 0;">
-                        {{ __('Configure automated virtual office presence recording, task execution rules, and smart idle prompts.') }}
-                    </p>
-                </div>
-
-                <div style="display: flex; flex-direction: column; gap: 18px;">
-                    <!-- Auto Attendance Toggle -->
-                    <div style="display: flex; align-items: center; justify-content: space-between; background: var(--ula-sand-100); padding: 16px; border-radius: var(--ula-radius-md); border: 1px solid var(--ula-border-subtle);">
-                        <div>
-                            <div style="font-size: 13px; font-weight: 700; color: var(--ula-text-primary); margin-bottom: 2px;">
-                                {{ __('Automatic Office Attendance Recording') }}
-                            </div>
-                            <div style="font-size: 11px; color: var(--ula-text-muted);">
-                                {{ __('Automatically start tracking user attendance time when they enter the 3D virtual office.') }}
-                            </div>
-                        </div>
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                            <input type="checkbox" name="attendance_auto_enabled" value="1" {{ ($attendancePolicy['auto_attendance_enabled'] ?? true) ? 'checked' : '' }} style="width: 18px; height: 18px; accent-color: var(--ula-palm-900);">
-                            <span style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary);">{{ __('Enabled') }}</span>
-                        </label>
-                    </div>
-
-                    <!-- Inactivity Check Interval & Grace Period -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
-                        <div>
-                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px; text-transform: uppercase;">
-                                {{ __('Idle Check Interval (Minutes)') }}
-                            </label>
-                            <input type="number" name="attendance_idle_prompt_minutes" min="1" max="120" value="{{ $attendancePolicy['idle_prompt_minutes'] ?? 15 }}" style="width: 100%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); font-size: 13px; font-weight: 600; font-family: 'IBM Plex Mono', monospace;">
-                            <span style="font-size: 10px; color: var(--ula-text-muted); margin-top: 4px; display: block;">
-                                {{ __('If user is idle without a running task, system asks "Are you still online?" after this time.') }}
-                            </span>
-                        </div>
-
-                        <div>
-                            <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px; text-transform: uppercase;">
-                                {{ __('Confirmation Grace Period (Seconds)') }}
-                            </label>
-                            <input type="number" name="attendance_idle_grace_seconds" min="30" max="600" value="{{ $attendancePolicy['idle_response_grace_seconds'] ?? 180 }}" style="width: 100%; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); font-size: 13px; font-weight: 600; font-family: 'IBM Plex Mono', monospace;">
-                            <span style="font-size: 10px; color: var(--ula-text-muted); margin-top: 4px; display: block;">
-                                {{ __('Countdown window to answer before attendance time is automatically paused.') }}
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Active Task Protection Note -->
-                    <div style="background: rgba(60, 107, 76, 0.08); border: 1px solid var(--ula-palm-500); border-radius: 12px; padding: 14px 16px; font-size: 12px; line-height: 1.5; color: var(--ula-text-primary);">
-                        <div style="font-weight: 700; color: var(--ula-palm-700); margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
-                            <span class="material-symbols-rounded" style="font-size: 16px;">shield</span>
-                            <span>{{ __('Smart Active Task Protection') }}</span>
-                        </div>
-                        <span style="color: var(--ula-text-secondary); font-size: 11px;">
-                            {{ __('When a member has an active running task in the office, idle prompts are automatically bypassed so deep work is never interrupted.') }}
-                        </span>
-                    </div>
-                </div>
-
-                <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--ula-border-subtle); display: flex; justify-content: flex-end;">
-                    <x-btn variant="primary" size="md" type="submit" icon="save">
-                        {{ __('Save Attendance Policy') }}
-                    </x-btn>
-                </div>
-            </div>
-        </div>
-    </form>
 </div>
-        

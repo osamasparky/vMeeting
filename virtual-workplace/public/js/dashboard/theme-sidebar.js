@@ -38,24 +38,15 @@ function toggleThemeMode() {
     applyTheme(savedTheme);
 })();
 
+// The toggle button's icon flips via CSS (.sidebar-collapsed), so only the class changes here.
 function toggleSidebarCollapse() {
     const sidebar = document.getElementById('dashboardSidebar');
     const mainContent = document.querySelector('.main-content');
-    const toggleBtn = document.querySelector('.sidebar-toggle-btn');
-    const isRtl = document.documentElement.dir === 'rtl' || document.documentElement.lang === 'ar';
 
     if (sidebar) sidebar.classList.toggle('sidebar-collapsed');
     if (mainContent) mainContent.classList.toggle('sidebar-collapsed');
     const isCollapsed = sidebar && sidebar.classList.contains('sidebar-collapsed');
     localStorage.setItem('vw_sidebar_collapsed', isCollapsed ? '1' : '0');
-
-    if (toggleBtn) {
-        if (isRtl) {
-            toggleBtn.textContent = isCollapsed ? '▶' : '◀';
-        } else {
-            toggleBtn.textContent = isCollapsed ? '◀' : '▶';
-        }
-    }
 }
 
 // Mobile drawer toggle
@@ -71,18 +62,9 @@ if (localStorage.getItem('vw_sidebar_collapsed') === '1') {
     document.addEventListener('DOMContentLoaded', () => {
         const sidebar = document.getElementById('dashboardSidebar');
         const mainContent = document.querySelector('.main-content');
-        const toggleBtn = document.querySelector('.sidebar-toggle-btn');
-        const isRtl = document.documentElement.dir === 'rtl' || document.documentElement.lang === 'ar';
 
         if (sidebar) sidebar.classList.add('sidebar-collapsed');
         if (mainContent) mainContent.classList.add('sidebar-collapsed');
-        if (toggleBtn) {
-            if (isRtl) {
-                toggleBtn.textContent = '▶';
-            } else {
-                toggleBtn.textContent = '◀';
-            }
-        }
     });
 }
 
@@ -104,21 +86,29 @@ function toggleSidebarSection(sectionId) {
 }
 
 function previewCompanyLogo(input) {
-    if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const previewImg = document.getElementById('logo-preview-img');
-            const placeholder = document.getElementById('logo-preview-placeholder');
-            if (previewImg) {
-                previewImg.src = e.target.result;
-                previewImg.style.display = 'block';
-            }
-            if (placeholder) {
-                placeholder.style.display = 'none';
-            }
-        };
-        reader.readAsDataURL(input.files[0]);
+    if (!(input.files && input.files[0])) return;
+    const file = input.files[0];
+    // Same limit the server enforces (max:4096 KB) - fail here instead of after the upload.
+    if (file.size > 4 * 1024 * 1024) {
+        alert(input.dataset.tooLarge || 'Logo must be 4 MB or smaller.');
+        input.value = '';
+        return;
     }
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        const previewImg = document.getElementById('logo-preview-img');
+        const placeholder = document.getElementById('logo-preview-placeholder');
+        if (previewImg) {
+            previewImg.src = e.target.result;
+            previewImg.hidden = false;
+        }
+        if (placeholder) placeholder.hidden = true;
+        const removeFlag = document.getElementById('org-remove-logo');
+        if (removeFlag) removeFlag.value = '0';
+        const removeBtn = document.getElementById('btn-remove-logo');
+        if (removeBtn) removeBtn.style.display = '';
+    };
+    reader.readAsDataURL(file);
 }
 
 function previewUserAvatar(input) {

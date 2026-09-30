@@ -44,6 +44,27 @@ class Plan extends Model
         return $this->hasMany(Organization::class);
     }
 
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function subscriptionRequests(): HasMany
+    {
+        return $this->hasMany(SubscriptionRequest::class);
+    }
+
+    public function isUsed(): bool
+    {
+        return ($this->organizations_count ?? $this->organizations()->count()) > 0
+            || ($this->subscriptions_count ?? $this->subscriptions()->count()) > 0;
+    }
+
+    public function canBeDeleted(): bool
+    {
+        return ! $this->isUsed();
+    }
+
     public function isPerSeat(): bool
     {
         return (bool) ($this->is_per_seat ?? false);

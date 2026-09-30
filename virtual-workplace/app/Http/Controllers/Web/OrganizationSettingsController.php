@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class OrganizationSettingsController extends Controller
@@ -848,8 +849,9 @@ class OrganizationSettingsController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'timezone' => 'required|string|max:100',
+            'timezone' => 'required|timezone:all',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:4096',
+            'remove_logo' => 'nullable|boolean',
             'mail_driver' => 'nullable|string|max:50',
             'mail_host' => 'nullable|string|max:255',
             'mail_port' => 'nullable|numeric',
@@ -858,17 +860,29 @@ class OrganizationSettingsController extends Controller
             'mail_encryption' => 'nullable|string|max:50',
             'mail_from_address' => 'nullable|email|max:255',
             'mail_from_name' => 'nullable|string|max:255',
+            'openai_api_key' => 'nullable|string|max:500',
+            'openai_model' => 'nullable|in:gpt-image-1-mini,gpt-image-1,dall-e-2,dall-e-3',
+            'openai_image_size' => 'nullable|in:1024x1024,1792x1024',
+            'attendance_auto_enabled' => 'nullable|boolean',
+            'attendance_idle_prompt_minutes' => 'nullable|integer|min:1|max:120',
+            'attendance_idle_grace_seconds' => 'nullable|integer|min:30|max:600',
         ]);
 
         $organization = $membership->organization;
         $organization->name = $validated['name'];
         $organization->timezone = $validated['timezone'];
 
+        $previousLogo = $organization->logo_url;
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
             $filename = 'org_logo_'.$organization->id.'_'.time().'.'.$file->getClientOriginalExtension();
             $path = $file->storeAs('logos', $filename, 'public');
             $organization->logo_url = '/storage/'.$path;
+        } elseif ($request->boolean('remove_logo')) {
+            $organization->logo_url = null;
+        }
+        if ($previousLogo && $previousLogo !== $organization->logo_url && str_starts_with($previousLogo, '/storage/logos/')) {
+            Storage::disk('public')->delete(substr($previousLogo, strlen('/storage/')));
         }
 
         $organization->save();
@@ -883,7 +897,9 @@ class OrganizationSettingsController extends Controller
         ]);
 
         $currentSmtp = $orgSettings->smtp_settings ?? [];
-        $newSmtp = array_merge($currentSmtp, array_filter([
+        // Blank fields clear the value (so a workspace can fall back to platform mail), except the
+        // password, which is never echoed back to the form: blank there keeps the stored one.
+        $newSmtp = array_merge($currentSmtp, [
             'mail_driver' => $request->input('mail_driver', 'smtp'),
             'mail_host' => $request->input('mail_host'),
             'mail_port' => $request->input('mail_port'),
@@ -892,9 +908,7 @@ class OrganizationSettingsController extends Controller
             'mail_encryption' => $request->input('mail_encryption', 'tls'),
             'mail_from_address' => $request->input('mail_from_address'),
             'mail_from_name' => $request->input('mail_from_name'),
-        ], function ($val) {
-            return ! is_null($val);
-        }));
+        ]);
 
         $orgSettings->smtp_settings = $newSmtp;
 
@@ -913,9 +927,9 @@ class OrganizationSettingsController extends Controller
         // Update Organization Attendance & Inactivity Policies
         $currentPolicies = $orgSettings->policies ?? [];
         $currentPolicies['attendance'] = [
-            'auto_attendance_enabled' => $request->has('attendance_auto_enabled') || $request->input('attendance_auto_enabled', '1') === '1',
-            'idle_prompt_minutes' => max(1, (int) $request->input('attendance_idle_prompt_minutes', 15)),
-            'idle_response_grace_seconds' => max(30, (int) $request->input('attendance_idle_grace_seconds', 180)),
+            'auto_attendance_enabled' => $request->boolean('attendance_auto_enabled', $currentPolicies['attendance']['auto_attendance_enabled'] ?? true),
+            'idle_prompt_minutes' => (int) $request->input('attendance_idle_prompt_minutes', $currentPolicies['attendance']['idle_prompt_minutes'] ?? 15),
+            'idle_response_grace_seconds' => (int) $request->input('attendance_idle_grace_seconds', $currentPolicies['attendance']['idle_response_grace_seconds'] ?? 180),
             'allow_in_office_task_tracking' => true,
         ];
         $orgSettings->policies = $currentPolicies;
@@ -959,7 +973,7 @@ class OrganizationSettingsController extends Controller
                 ->get('https://api.openai.com/v1/models');
 
             if ($response->successful()) {
-                return response()->json(['success' => true, 'message' => __('✅ Connection to OpenAI API successful! Your organization key is valid and active.')]);
+                return response()->json(['success' => true, 'message' => __('Connection to OpenAI API successful! Your organization key is valid and active.')]);
             } else {
                 $err = $response->json();
                 $errMsg = $err['error']['message'] ?? $response->body();
@@ -1001,6 +1015,9 @@ class OrganizationSettingsController extends Controller
         if (! $membership) {
             abort(403);
         }
+        if ($this->memberLacksPermission($membership, 'organizations.manage')) {
+            return response()->json(['success' => false, 'message' => __('Unauthorized: insufficient permissions.')], 403);
+        }
         $organization = $membership->organization;
 
         $validated = $request->validate([
@@ -1019,7 +1036,8 @@ class OrganizationSettingsController extends Controller
             'mail.mailers.smtp.port' => (int) $validated['mail_port'],
             'mail.mailers.smtp.encryption' => ! empty($validated['mail_encryption']) && $validated['mail_encryption'] !== 'none' ? $validated['mail_encryption'] : null,
             'mail.mailers.smtp.username' => $validated['mail_username'] ?? null,
-            'mail.mailers.smtp.password' => $validated['mail_password'] ?? null,
+            // The saved password is never sent back to the page, so an empty field means "use the stored one".
+            'mail.mailers.smtp.password' => ($validated['mail_password'] ?? null) ?: ($organization->settings?->smtp_settings['mail_password'] ?? null),
             'mail.from.address' => $validated['mail_from_address'],
             'mail.from.name' => $validated['mail_from_name'] ?? $organization->name,
         ]);

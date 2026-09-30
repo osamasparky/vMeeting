@@ -35,12 +35,6 @@
     --text-dim: #8B9B8F;
 
     /* Core Brand Green & Accents */
-    --brand-forest: #245C3A;        /* Primary Forest Green */
-    --brand-workspace: #3F7D4F;     /* Mid Workspace Green */
-    --brand-sage: #4F9B5F;          /* Sage Accent */
-    --brand-leaf: #4F9B5F;
-    --brand-soft-sage: #BFD4B8;
-    --brand-gold: #D6A23A;          /* Warm Gold */
     --accent-gold: #D6A23A;
     --status-warning: #D6A23A;
     --status-danger: #D96B5F;        /* Soft Coral / Crimson */
@@ -106,11 +100,6 @@
     --text-muted: #88A690;
     --text-dim: #5F7D67;
 
-    --brand-forest: #4F9B5F;
-    --brand-workspace: #5CB87A;
-    --brand-sage: #5CB87A;
-    --brand-leaf: #6CC989;
-    --brand-gold: #E5B54F;
     --status-danger: #E27B70;
     --status-warning: #E5B54F;
     --status-success: #5CB87A;
@@ -567,7 +556,7 @@ html[dir="ltr"] .ctx-item:hover {
 .kpi-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-elevated);
-    border-color: var(--brand-forest);
+    border-color: var(--ula-border-hover);
 }
 
 .kpi-header {

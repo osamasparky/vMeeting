@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
+{{-- The marketing site is designed light-only (design-reference 01); pin it so a dark OS setting doesn't flip the tokens. --}}
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,7 +34,7 @@
         }
 
         section[id], div[id] {
-            scroll-margin-top: 80px;
+            scroll-margin-top: 73px;
         }
 
         body {
@@ -71,13 +72,12 @@
             top: 0;
             inset-inline: 0;
             z-index: 1000;
-            height: 80px;
-            padding: 0 64px;
+            height: 73px;
+            padding: 16px 28px;
             display: flex;
             align-items: center;
-            gap: 32px;
+            gap: 24px;
             background: var(--ula-surface-dark);
-            border-bottom: var(--ula-border-width-hairline) solid var(--ula-border-on-dark);
             transition: box-shadow var(--ula-duration-base) var(--ula-ease-in-out), background var(--ula-duration-base) var(--ula-ease-in-out);
         }
 
@@ -109,15 +109,16 @@
         .ula-nav-links {
             display: flex;
             align-items: center;
-            gap: 28px;
-            font-size: 15px;
+            gap: 22px;
+            font-size: 14px;
             list-style: none;
         }
 
         .ula-nav-links a {
-            color: var(--ula-text-on-dark-muted);
+            color: var(--ula-text-on-dark-subtle);
             text-decoration: none;
-            font-size: 15px;
+            font-size: 14px;
+            line-height: 22px;
             transition: color var(--ula-duration-fast) var(--ula-ease-out);
         }
 
@@ -137,40 +138,41 @@
         }
 
         .ula-nav-lang-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: var(--ula-radius-sm);
-            border: var(--ula-border-width-hairline) solid var(--ula-control-dark-border);
-            background: var(--ula-control-dark-fill);
+            height: var(--ula-size-touch-target);
+            padding: 0 4px;
+            border: 0;
+            background: transparent;
             color: var(--ula-text-on-dark-subtle);
             display: inline-flex;
             align-items: center;
-            justify-content: center;
+            gap: 6px;
+            font-family: var(--ula-font-en);
+            font-size: var(--ula-size-sm);
+            font-weight: var(--ula-weight-medium);
             text-decoration: none;
             cursor: pointer;
-            transition: all var(--ula-duration-fast) var(--ula-ease-out);
         }
 
         .ula-nav-lang-btn:hover {
-            background: var(--ula-control-dark-fill-hover);
             color: var(--ula-text-on-dark);
+            text-decoration: none;
         }
 
         .ula-nav-login-btn {
-            height: 44px;
-            padding: 0 18px;
-            border-radius: var(--ula-radius-md);
-            border: var(--ula-border-width-hairline) solid var(--ula-control-dark-border);
+            height: var(--ula-size-touch-target);
+            padding: 10px 18px;
+            border-radius: var(--ula-radius-sm);
+            border: var(--ula-border-width-hairline) solid var(--ula-border-on-dark);
             background: transparent;
             color: var(--ula-text-on-dark);
             font-family: var(--ula-font-ar);
-            font-size: 15px;
-            font-weight: var(--ula-weight-semibold);
+            font-size: 14px;
+            font-weight: var(--ula-weight-medium);
             display: inline-flex;
             align-items: center;
             text-decoration: none;
             cursor: pointer;
-            transition: all var(--ula-duration-fast) var(--ula-ease-out);
+            transition: background-color var(--ula-duration-fast) var(--ula-ease-out);
         }
 
         .ula-nav-login-btn:hover {
@@ -180,24 +182,25 @@
         }
 
         .ula-nav-cta-btn {
-            height: 44px;
-            padding: 0 22px;
-            border-radius: var(--ula-radius-md);
+            height: var(--ula-size-touch-target);
+            padding: 10px 22px;
+            border-radius: var(--ula-radius-sm);
             border: 0;
-            background: var(--ula-surface-raised);
+            background: var(--ula-control-cta-on-dark);
             color: var(--ula-text-primary);
             font-family: var(--ula-font-ar);
-            font-size: 15px;
-            font-weight: var(--ula-weight-semibold);
+            font-size: 14px;
+            font-weight: var(--ula-weight-medium);
             display: inline-flex;
             align-items: center;
             text-decoration: none;
             cursor: pointer;
-            transition: all var(--ula-duration-fast) var(--ula-ease-out);
+            box-shadow: var(--ula-shadow-xs);
+            transition: background-color var(--ula-duration-fast) var(--ula-ease-out);
         }
 
         .ula-nav-cta-btn:hover {
-            background: var(--ula-surface-page-alt);
+            background: var(--ula-control-cta-on-dark-hover);
             color: var(--ula-text-primary);
             text-decoration: none;
         }
@@ -219,7 +222,7 @@
         .ula-mobile-drawer {
             display: none;
             position: fixed;
-            top: 80px;
+            top: 73px;
             inset-inline: var(--ula-space-5);
             background: var(--ula-surface-map-chrome);
             border: var(--ula-border-width-hairline) solid var(--ula-border-on-dark);
@@ -245,19 +248,19 @@
         }
 
         .ula-main-wrap {
-            padding-top: 80px;
+            padding-top: 73px;
             width: 100%;
         }
 
         /* ── Landing Footer (Matches 01-Landing: 32px 64px, top border) ── */
         .ula-landing-footer {
-            padding: 32px 64px;
-            border-top: var(--ula-border-width-hairline) solid var(--ula-border-subtle);
-            background: var(--ula-surface-page);
+            min-height: 76px;
+            padding: 28px 32px;
+            background: var(--ula-surface-dark);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 24px;
+            gap: 20px;
             flex-wrap: wrap;
         }
 
@@ -266,43 +269,36 @@
             align-items: center;
             gap: 10px;
             text-decoration: none;
-            color: var(--ula-accent-default);
+            color: var(--ula-brand-mark-ivory);
         }
 
         .ula-footer-brand-name {
             font-family: var(--ula-font-en);
             font-size: 16px;
-            font-weight: 500;
-            color: var(--ula-text-primary);
+            font-weight: var(--ula-weight-medium);
+            color: var(--ula-text-on-dark);
         }
 
         .ula-footer-copy {
-            font-family: var(--ula-font-mono);
-            font-size: 12px;
-            color: var(--ula-text-muted);
+            font-family: var(--ula-font-en);
+            font-size: var(--ula-size-label);
+            font-weight: var(--ula-weight-medium);
+            line-height: 1.5;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--ula-text-on-dark-subtle);
             direction: ltr;
             unicode-bidi: isolate;
         }
 
-        .ula-footer-currency {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--ula-space-2);
-            background: var(--ula-surface-page-alt);
-            border: var(--ula-border-width-hairline) solid var(--ula-border-default);
-            border-radius: var(--ula-radius-sm);
-            padding: 4px 10px;
-        }
-
-        .ula-footer-currency select {
-            background: transparent;
-            color: var(--ula-text-primary);
-            border: none;
+        .ula-nav-login-btn:focus-visible,
+        .ula-nav-cta-btn:focus-visible,
+        .ula-nav-lang-btn:focus-visible,
+        .ula-nav-links a:focus-visible,
+        .ula-footer-brand:focus-visible {
             outline: none;
-            font-family: var(--ula-font-ar);
-            font-size: var(--ula-size-xs);
-            font-weight: var(--ula-weight-semibold);
-            cursor: pointer;
+            border-radius: var(--ula-radius-sm);
+            box-shadow: var(--ula-focus-ring-on-dark);
         }
 
         @media (max-width: 1024px) {
@@ -331,9 +327,9 @@
 
         @php
             $siteNavItems = \App\Domains\CMS\Models\CmsThemeSetting::getByKey('main_navigation', [
-                ['label_en' => 'Features', 'label_ar' => 'المزايا', 'url' => '#benefits'],
-                ['label_en' => 'Spaces', 'label_ar' => 'المساحات', 'url' => '#spaces'],
-                ['label_en' => 'Meetings', 'label_ar' => 'الاجتماعات', 'url' => '#meetings'],
+                ['label_en' => 'Solutions', 'label_ar' => 'الحلول', 'url' => '#features'],
+                ['label_en' => 'Product', 'label_ar' => 'المنتج', 'url' => '#spaces'],
+                ['label_en' => 'Resources', 'label_ar' => 'الموارد', 'url' => '#identity'],
                 ['label_en' => 'Pricing', 'label_ar' => 'الأسعار', 'url' => '#pricing'],
             ]);
         @endphp
@@ -356,17 +352,21 @@
 
         <!-- Header Actions -->
         <div class="ula-nav-actions">
-            <!-- Language Switcher -->
-            <a href="{{ route('lang.switch', app()->getLocale() === 'ar' ? 'en' : 'ar') }}" class="ula-nav-lang-btn" title="Toggle Language" aria-label="Toggle Language">
-                <span class="ms" style="font-size: 20px;">language</span>
+            @auth
+                <a href="{{ route('dashboard') }}" class="ula-nav-login-btn">{{ __('لوحة التحكم') }}</a>
+            @else
+                <a href="{{ route('login') }}" class="ula-nav-login-btn">{{ __('تسجيل الدخول') }}</a>
+            @endauth
+
+            <!-- Language switcher: shows the current language, links to the other -->
+            <a href="{{ route('lang.switch', app()->getLocale() === 'ar' ? 'en' : 'ar') }}" class="ula-nav-lang-btn" title="{{ __('nav.language') }}" aria-label="{{ __('nav.language') }}">
+                {{ strtoupper(app()->getLocale()) }}<span class="ms" style="font-size: 16px;" aria-hidden="true">expand_more</span>
             </a>
 
             @auth
-                <a href="{{ route('dashboard') }}" class="ula-nav-login-btn">{{ __('لوحة التحكم') }}</a>
                 <a href="{{ route('office') }}" class="ula-nav-cta-btn">{{ __('ادخل إلى المكتب') }}</a>
             @else
-                <a href="{{ route('login') }}" class="ula-nav-login-btn">{{ __('تسجيل الدخول') }}</a>
-                <a href="{{ route('register') }}" class="ula-nav-cta-btn">{{ __('احجز عرضاً توضيحياً') }}</a>
+                <a href="{{ route('register') }}" class="ula-nav-cta-btn">{{ __('تجربة الآن') }}</a>
             @endauth
 
             <button type="button" class="ula-mobile-toggle" onclick="toggleNav()" aria-label="Menu">
@@ -392,7 +392,7 @@
                 <a href="{{ route('office') }}" style="color: var(--ula-accent-default); font-weight: 700;">{{ __('ادخل إلى المكتب') }}</a>
             @else
                 <a href="{{ route('login') }}">{{ __('تسجيل الدخول') }}</a>
-                <a href="{{ route('register') }}" style="color: var(--ula-tone-gold-fg); font-weight: 700;">{{ __('احجز عرضاً توضيحياً') }}</a>
+                <a href="{{ route('register') }}" style="color: var(--ula-tone-gold-fg); font-weight: 700;">{{ __('تجربة الآن') }}</a>
             @endauth
         </div>
     </header>
@@ -402,68 +402,17 @@
         @yield('content')
     </main>
 
-    <!-- ── Footer (Matching 01-Landing) ── -->
+    <!-- ── Footer (design-reference 01: dark band, lockup · tagline · copyright) ── -->
     <footer class="ula-landing-footer">
         <a href="{{ route('landing.home') }}" class="ula-footer-brand">
-            <svg role="img" aria-label="UlaSpace" width="38" height="25" viewBox="-1.2 -1.3 60 40" fill="var(--ula-brand-mark-green)" style="flex-shrink: 0; display: block"><path d="M0 38.734L1.493 30.973L4.179 20.824L6.865 11.869C8.259 7.491 11.94 4.207 17.91 2.018C26.268 -0.569 34.427 -0.669 42.387 1.719C49.153 3.311 54.128 7.292 57.312 13.66L57.312 38.734L26.268 38.734L25.074 27.988C23.482 20.824 21.591 17.242 19.403 17.242C17.214 18.038 15.721 21.819 14.925 28.585L14.328 38.734L0 38.734Z"></path></svg>
+            <svg role="img" aria-label="UlaSpace" width="30" height="20" viewBox="-1.2 -1.3 60 40" fill="currentColor" style="flex-shrink: 0; display: block"><path d="M0 38.734L1.493 30.973L4.179 20.824L6.865 11.869C8.259 7.491 11.94 4.207 17.91 2.018C26.268 -0.569 34.427 -0.669 42.387 1.719C49.153 3.311 54.128 7.292 57.312 13.66L57.312 38.734L26.268 38.734L25.074 27.988C23.482 20.824 21.591 17.242 19.403 17.242C17.214 18.038 15.721 21.819 14.925 28.585L14.328 38.734L0 38.734Z"></path></svg>
             <span class="ula-footer-brand-name">UlaSpace</span>
         </a>
-
-        <!-- Currency Selector Widget -->
-        <div class="ula-footer-currency">
-            <span class="ms" style="font-size: 16px; color: var(--ula-icon-highlight);">payments</span>
-            <select id="footerCurrencySelect" onchange="setSiteCurrency(this.value)" aria-label="Select Currency">
-                <option value="SAR" selected>🇸🇦 ريال سعودي (ر.س)</option>
-                <option value="USD">🇺🇸 دولار أمريكي ($ USD)</option>
-                <option value="AED">🇦🇪 درهم إماراتي (د.إ)</option>
-                <option value="EGP">🇪🇬 جنيه مصري (ج.م)</option>
-            </select>
-        </div>
-
-        <span class="ula-footer-copy">© {{ date('Y') }} UlaSpace</span>
+        <span class="ula-footer-copy">Spaces carved, not built.</span>
+        <span class="ula-footer-copy">© {{ date('Y') }} · AlUla · Saudi Arabia · The world</span>
     </footer>
 
     <script nonce="{{ $cspNonce ?? '' }}">
-        // Currency conversion rates (Default: SAR)
-        const CURRENCY_RATES = {
-            'SAR': { rate: 3.75, symbol: 'ر.س', label: 'ر.س', pos: 'after' },
-            'USD': { rate: 1.0, symbol: '$', label: '$', pos: 'before' },
-            'AED': { rate: 3.67, symbol: 'د.إ', label: 'د.إ', pos: 'after' },
-            'EGP': { rate: 48.5, symbol: 'ج.م', label: 'ج.م', pos: 'after' }
-        };
-
-        function setSiteCurrency(curr) {
-            if (!CURRENCY_RATES[curr]) curr = 'SAR';
-            localStorage.setItem('ulaspace_currency', curr);
-
-            const select = document.getElementById('footerCurrencySelect');
-            if (select && select.value !== curr) {
-                select.value = curr;
-            }
-
-            const info = CURRENCY_RATES[curr];
-            document.querySelectorAll('[data-plan-usd]').forEach(el => {
-                const usd = parseFloat(el.getAttribute('data-plan-usd')) || 0;
-                if (usd === 0) {
-                    el.innerText = '0';
-                } else {
-                    const converted = Math.round(usd * info.rate);
-                    el.innerText = converted.toLocaleString();
-                }
-            });
-
-            document.querySelectorAll('.nx-currency-symbol').forEach(el => {
-                el.innerText = info.symbol;
-            });
-
-            window.dispatchEvent(new CustomEvent('currencyChanged', { detail: { currency: curr, info } }));
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const saved = localStorage.getItem('ulaspace_currency') || 'SAR';
-            setSiteCurrency(saved);
-        });
-
         function toggleNav() {
             const drawer = document.getElementById('mobileDrawer');
             if (drawer) {

@@ -420,7 +420,7 @@
 
             const toast = document.createElement('div');
             toast.className = 'toast-popup';
-            toast.innerHTML = message;
+            toast.innerHTML = String(message || '').replace(/[\p{Extended_Pictographic}‍️]+\s*/gu, '').trim();
             container.appendChild(toast);
 
             setTimeout(() => {
@@ -1505,9 +1505,10 @@
             const reviewCnt = document.querySelectorAll('.global-kanban-card[data-status="review"], .global-kanban-card[data-status="qa"]').length;
             const doneCnt = document.querySelectorAll('.global-kanban-card[data-status="done"]').length;
 
-            const kpiInProg = document.getElementById('alltasks-kpi-in-progress');
-            const kpiReview = document.getElementById('alltasks-kpi-review');
-            const kpiDone = document.getElementById('alltasks-kpi-done');
+            // The ids sit on the x-kpi-card element; the figure itself is its [data-kpi-value] child.
+            const kpiInProg = document.querySelector('#alltasks-kpi-in-progress [data-kpi-value]');
+            const kpiReview = document.querySelector('#alltasks-kpi-review [data-kpi-value]');
+            const kpiDone = document.querySelector('#alltasks-kpi-done [data-kpi-value]');
 
             if (kpiInProg) kpiInProg.textContent = inProgressCnt;
             if (kpiReview) kpiReview.textContent = reviewCnt;
@@ -2333,7 +2334,7 @@
                         const uploader = att.user ? att.user.name : '{{ __("Member") }}';
                         card.innerHTML = `
                             <div style="font-weight: 700; font-size: 12.5px; color: var(--ula-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><span class="material-symbols-rounded" style="font-size: 16px; vertical-align: text-bottom; color: var(--ula-palm-700);">description</span> ${att.file_name}</div>
-                            <div style="font-size: 11px; color: var(--ula-text-muted);"><span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom;">person</span> ${uploader} • ${(att.file_size / 1024).toFixed(1)} KB</div>
+                            <div style="font-size: 11px; color: var(--ula-text-muted);"><span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom;">person</span> ${uploader} · ${(att.file_size / 1024).toFixed(1)} KB</div>
                             <div style="display: flex; gap: 6px; margin-top: 4px;">
                                 <a href="${att.file_url || ('/uploads/tasks/' + t.id + '/' + att.file_name)}" target="_blank" download class="ula-btn ula-btn--secondary ula-btn--sm" style="flex: 1; height: 32px; min-height: 32px; font-size: 11px;"><span class="material-symbols-rounded ula-btn__icon">download</span> {{ __("Download") }}</a>
                                 <button type="button" onclick="deleteTaskAttachmentAction('${att.id}')" class="ula-icon-btn ula-icon-btn--danger ula-icon-btn--sm" style="width: 32px; height: 32px; min-width: 32px;"><span class="material-symbols-rounded">delete</span></button>
@@ -2421,6 +2422,8 @@
                             <td style="font-weight: 800; color: var(--ula-text-primary); font-family: var(--ula-font-mono);">${hrs} {{ __("h") }}</td>
                             <td style="font-size: 12px;">${e.description || '{{ __("Work session") }}'}</td>
                             <td><span class="ula-badge ula-badge--sm ${e.status === 'approved' ? 'ula-badge--live' : 'ula-badge--default'}">${e.status === 'approved' ? '{{ __("Approved") }}' : '{{ __("Pending") }}'}</span></td>
+                        `;
+                        timeBody.appendChild(tr);
                     });
                 }
             }
@@ -2600,79 +2603,129 @@
             }
         }
 
-        // SMTP Connection Test AJAX
-        function testSmtpConnectionAction() {
-            const btn = document.getElementById('btn-test-smtp');
-            const resultBox = document.getElementById('smtp-test-result-box');
-            if (!btn || !resultBox) return;
+        // ── Workspace Settings (tab-settings) ──
+        // Result line under the SMTP / OpenAI test buttons. Server messages go in as text, never HTML.
+        function showSettingsResult(box, tone, icon, message) {
+            if (!box) return;
+            box.hidden = false;
+            box.className = 'ula-set-result ula-set-result--' + tone;
+            box.replaceChildren();
+            const i = document.createElement('span');
+            i.className = 'material-symbols-rounded';
+            i.setAttribute('aria-hidden', 'true');
+            i.textContent = icon;
+            const t = document.createElement('span');
+            t.textContent = message;
+            box.append(i, t);
+        }
 
-            const host = document.getElementById('smtp-host-input')?.value;
-            const port = document.getElementById('smtp-port-input')?.value;
-            const username = document.getElementById('smtp-username-input')?.value;
-            const password = document.getElementById('smtp-password-input')?.value;
-            const encryption = document.getElementById('smtp-encryption-input')?.value;
-            const fromAddr = document.getElementById('smtp-from-email-input')?.value;
-            const fromName = document.getElementById('smtp-from-name-input')?.value;
-
-            if (!host || !fromAddr) {
-                resultBox.style.display = 'block';
-                resultBox.style.background = 'rgba(217, 107, 95, 0.15)';
-                resultBox.style.color = 'var(--ula-status-danger)';
-                resultBox.style.border = '1px solid rgba(217, 107, 95, 0.3)';
-                resultBox.innerHTML = '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">warning</span> {{ __('Please enter SMTP Host and Sender From Email address.') }}';
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">hourglass_empty</span> {{ __('Testing Connection...') }}';
-            resultBox.style.display = 'block';
-            resultBox.style.background = 'var(--ula-surface-page-alt)';
-            resultBox.style.color = 'var(--ula-text-secondary)';
-            resultBox.style.border = '1px solid var(--ula-border-subtle)';
-            resultBox.innerHTML = '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">refresh</span> {{ __('Connecting to mail server and sending test packet...') }}';
-
-            fetch("{{ route('organization.smtp.test') }}", {
+        async function postSettingsTest(url, payload) {
+            const res = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
                     'Accept': 'application/json',
                 },
-                body: JSON.stringify({
-                    mail_host: host,
-                    mail_port: port,
-                    mail_username: username,
-                    mail_password: password,
-                    mail_encryption: encryption,
-                    mail_from_address: fromAddr,
-                    mail_from_name: fromName,
-                }),
-            })
-            .then(res => res.json().then(data => ({ status: res.status, body: data })))
-            .then(({ status, body }) => {
-                btn.disabled = false;
-                btn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">science</span> {{ __('Test SMTP Connection') }}';
-                if (status === 200 && body.success) {
-                    resultBox.style.background = 'rgba(79, 155, 95, 0.15)';
-                    resultBox.style.color = 'var(--ula-status-success)';
-                    resultBox.style.border = '1px solid rgba(79, 155, 95, 0.35)';
-                    resultBox.innerHTML = `<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check_circle</span> <strong>${body.message}</strong>`;
-                } else {
-                    resultBox.style.background = 'rgba(217, 107, 95, 0.15)';
-                    resultBox.style.color = 'var(--ula-status-danger)';
-                    resultBox.style.border = '1px solid rgba(217, 107, 95, 0.35)';
-                    resultBox.innerHTML = `<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">cancel</span> <strong>${body.message || 'SMTP Connection Error'}</strong>`;
-                }
-            })
-            .catch(err => {
-                btn.disabled = false;
-                btn.innerHTML = '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">science</span> {{ __('Test SMTP Connection') }}';
-                resultBox.style.background = 'rgba(217, 107, 95, 0.15)';
-                resultBox.style.color = 'var(--ula-status-danger)';
-                resultBox.style.border = '1px solid rgba(217, 107, 95, 0.35)';
-                resultBox.innerHTML = `<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">cancel</span> <strong>{{ __('Network error during SMTP test:') }} ${err.message}</strong>`;
+                body: JSON.stringify(payload),
+            });
+            let body = {};
+            try { body = await res.json(); } catch (e) { /* non-JSON error page */ }
+            if (res.status === 422 && body.errors) {
+                body.message = Object.values(body.errors).flat().join(' ');
+            }
+            return { ok: res.ok && body.success, message: body.message };
+        }
+
+        async function testSmtpConnectionAction() {
+            const btn = document.getElementById('btn-test-smtp');
+            const box = document.getElementById('smtp-test-result-box');
+            const val = id => document.getElementById(id)?.value.trim() || '';
+            const payload = {
+                mail_host: val('smtp-host-input'),
+                mail_port: val('smtp-port-input'),
+                mail_username: val('smtp-username-input'),
+                mail_password: val('smtp-password-input'),
+                mail_encryption: val('smtp-encryption-input'),
+                mail_from_address: val('smtp-from-email-input'),
+                mail_from_name: val('smtp-from-name-input'),
+            };
+            if (!payload.mail_host || !payload.mail_port || !payload.mail_from_address) {
+                showSettingsResult(box, 'error', 'warning', @json(__('settings.smtp_test_missing')));
+                return;
+            }
+            if (btn) btn.disabled = true;
+            showSettingsResult(box, 'busy', 'progress_activity', @json(__('settings.smtp_testing')));
+            try {
+                const r = await postSettingsTest(@json(route('organization.smtp.test')), payload);
+                showSettingsResult(box, r.ok ? 'ok' : 'error', r.ok ? 'check_circle' : 'cancel', r.message || @json(__('settings.test_failed')));
+            } catch (e) {
+                showSettingsResult(box, 'error', 'cancel', @json(__('settings.test_network')) + ' ' + e.message);
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        async function testOrgAiConnectionAction() {
+            const input = document.getElementById('org-openai-key-input');
+            const box = document.getElementById('org-ai-test-result-box');
+            const btn = document.getElementById('btn-test-org-ai');
+            const apiKey = input ? input.value.trim() : '';
+            // Blank field + a saved key: the server tests the saved key.
+            if (!apiKey && input?.dataset.hasSaved !== '1') {
+                showSettingsResult(box, 'error', 'warning', @json(__('settings.ai_key_missing')));
+                return;
+            }
+            if (btn) btn.disabled = true;
+            showSettingsResult(box, 'busy', 'progress_activity', @json(__('settings.ai_testing')));
+            try {
+                const r = await postSettingsTest(@json(route('organization.ai.test')), { api_key: apiKey });
+                showSettingsResult(box, r.ok ? 'ok' : 'error', r.ok ? 'check_circle' : 'cancel', r.message || @json(__('settings.test_failed')));
+            } catch (e) {
+                showSettingsResult(box, 'error', 'cancel', @json(__('settings.test_network')) + ' ' + e.message);
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        function removeCompanyLogo() {
+            const img = document.getElementById('logo-preview-img');
+            const placeholder = document.getElementById('logo-preview-placeholder');
+            const input = document.getElementById('org-logo-input');
+            if (img) { img.hidden = true; img.removeAttribute('src'); }
+            if (placeholder) placeholder.hidden = false;
+            if (input) input.value = '';
+            const flag = document.getElementById('org-remove-logo');
+            if (flag) flag.value = '1';
+            const btn = document.getElementById('btn-remove-logo');
+            if (btn) btn.style.display = 'none';
+        }
+
+        // Section nav: every card is on the page, so the nav scrolls to one and tracks the card in view.
+        function setOrgSettingsNavActive(subtabKey) {
+            document.querySelectorAll('.ula-set-nav-item').forEach(b => {
+                const on = b.id === 'org-subtab-btn-' + subtabKey;
+                b.classList.toggle('active', on);
+                if (on) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
             });
         }
+
+        function switchOrgSettingsTab(subtabKey) {
+            const section = document.getElementById('org-subtab-content-' + subtabKey);
+            if (!section) return;
+            setOrgSettingsNavActive(subtabKey);
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        (function trackOrgSettingsSections() {
+            const sections = document.querySelectorAll('#tab-settings .org-subtab-pane');
+            if (!sections.length || !('IntersectionObserver' in window)) return;
+            const io = new IntersectionObserver(entries => {
+                const visible = entries.filter(e => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+                if (visible.length) setOrgSettingsNavActive(visible[0].target.id.replace('org-subtab-content-', ''));
+            }, { rootMargin: '0px 0px -60% 0px' });
+            sections.forEach(s => io.observe(s));
+        })();
 
         // Harmonic Sound Synthesizer via Web Audio API
         function playMeetingChime() {
@@ -2725,7 +2778,7 @@
                             <span style="font-size: 24px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">notifications</span></span>
                             <div style="flex: 1;">
                                 <div style="font-size: 13px; font-weight: 900; color: var(--ula-text-primary);">${m.title}</div>
-                                <div style="font-size: 11px; color: var(--ula-text-secondary);">${m.project_name ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> ' + m.project_name + ' • ' : ''}<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span> ${m.room_name} (${timeLabel})</div>
+                                <div style="font-size: 11px; color: var(--ula-text-secondary);">${m.project_name ? '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> ' + m.project_name + ' · ' : ''}<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">door_front</span> ${m.room_name} (${timeLabel})</div>
                             </div>
                             <a href="{{ route('office') }}" class="tactile-btn btn-primary" style="padding: 5px 12px; font-size: 11px; text-decoration: none;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">rocket_launch</span> {{ __('Join') }}</a>
                         </div>
@@ -2913,12 +2966,12 @@
                 const memberObj = cachedChatMembers.find(m => m.user_id == targetUserId);
                 if (memberObj) {
                     activeChatMemberId = memberObj.id;
-                    if (subtitleEl) subtitleEl.textContent = `${memberObj.job_title} • ${memberObj.role}`;
+                    if (subtitleEl) subtitleEl.textContent = `${memberObj.job_title} · ${memberObj.role}`;
                 }
                 if (avatarInitials) avatarInitials.textContent = (channelName || 'U').substring(0, 2).toUpperCase();
                 if (profileBtn) profileBtn.style.display = 'inline-flex';
             } else {
-                if (subtitleEl) subtitleEl.textContent = `Company Channel • All Members`;
+                if (subtitleEl) subtitleEl.textContent = `Company Channel · All Members`;
                 if (avatarInitials) avatarInitials.textContent = '#';
                 if (profileBtn) profileBtn.style.display = 'none';
             }
@@ -3080,7 +3133,7 @@
                 document.getElementById('mp-user-nickname').textContent = m.nickname ? `@${m.nickname}` : `@${m.name.toLowerCase().replace(/\\s+/g, '')}`;
                 document.getElementById('mp-user-role').textContent = m.role_name;
                 document.getElementById('mp-job-title').textContent = p.job_title || m.role_name;
-                document.getElementById('mp-dept-team').textContent = `${p.department_name || '{{ __('General') }}'} • ${p.team_name || '{{ __('Core Team') }}'}`;
+                document.getElementById('mp-dept-team').textContent = `${p.department_name || '{{ __('General') }}'} · ${p.team_name || '{{ __('Core Team') }}'}`;
                 
                 const workModePill = document.getElementById('mp-work-mode');
                 if (workModePill) {
@@ -3178,8 +3231,8 @@
                                             <div style="font-weight: 800; font-size: 13px; color: var(--ula-text-primary);">${escapeHtml(t.title)}</div>
                                             <div style="display: flex; align-items: center; gap: 8px; margin-top: 2px; font-size: 11px; color: var(--ula-text-secondary);">
                                                 <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">folder</span> ${escapeHtml(t.project ? t.project.name : 'General')}</span>
-                                                ${t.due_date ? `<span>• <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> ${t.due_date} ${t.is_overdue ? '<span style="color:var(--ula-status-danger);font-weight:800;">({{ __('Overdue') }})</span>' : ''}</span>` : ''}
-                                                ${t.checklist_count ? `<span>• <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check_box</span> ${t.checklist_done}/${t.checklist_count}</span>` : ''}
+                                                ${t.due_date ? `<span>· <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> ${t.due_date} ${t.is_overdue ? '<span style="color:var(--ula-status-danger);font-weight:800;">({{ __('Overdue') }})</span>' : ''}</span>` : ''}
+                                                ${t.checklist_count ? `<span>· <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check_box</span> ${t.checklist_done}/${t.checklist_count}</span>` : ''}
                                             </div>
                                         </div>
                                     </div>
@@ -3258,75 +3311,6 @@
             }
         }
 
-        async function testOrgAiConnectionAction() {
-            const keyInput = document.getElementById('org-openai-key-input');
-            const resultBox = document.getElementById('org-ai-test-result-box');
-            const btn = document.getElementById('btn-test-org-ai');
-            const apiKey = keyInput ? keyInput.value.trim() : '';
-
-            if (!apiKey && (!keyInput.placeholder || keyInput.placeholder.includes('sk-'))) {
-                resultBox.style.display = 'block';
-                resultBox.style.background = 'rgba(239, 68, 68, 0.15)';
-                resultBox.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-                resultBox.style.color = 'var(--ula-status-danger)';
-                resultBox.innerText = '{{ __("Please enter an OpenAI API key first.") }}';
-                return;
-            }
-
-            resultBox.style.display = 'block';
-            resultBox.style.background = 'rgba(59, 130, 246, 0.15)';
-            resultBox.style.border = '1px solid rgba(59, 130, 246, 0.3)';
-            resultBox.style.color = 'var(--ula-accent-default)';
-            resultBox.innerText = '⚡ {{ __("Testing OpenAI API key connectivity...") }}';
-            if (btn) btn.disabled = true;
-
-            try {
-                const res = await fetch('{{ route("organization.ai.test") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ api_key: apiKey })
-                });
-                const data = await res.json();
-                if (res.ok && data.success) {
-                    resultBox.style.background = 'rgba(16, 185, 129, 0.15)';
-                    resultBox.style.border = '1px solid rgba(16, 185, 129, 0.3)';
-                    resultBox.style.color = 'var(--ula-status-success)';
-                    resultBox.innerText = data.message || '{{ __("✅ Key is valid and active!") }}';
-                } else {
-                    resultBox.style.background = 'rgba(239, 68, 68, 0.15)';
-                    resultBox.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-                    resultBox.style.color = 'var(--ula-status-danger)';
-                    resultBox.innerText = '❌ ' + (data.message || '{{ __("Connection failed.") }}');
-                }
-            } catch (e) {
-                resultBox.style.background = 'rgba(239, 68, 68, 0.15)';
-                resultBox.style.border = '1px solid rgba(239, 68, 68, 0.3)';
-                resultBox.style.color = 'var(--ula-status-danger)';
-                resultBox.innerText = '❌ Network error: ' + e.message;
-            } finally {
-                if (btn) btn.disabled = false;
-            }
-        }
-
-        function switchOrgSettingsTab(subtabKey, btnElement) {
-            document.querySelectorAll('.org-subtab-pane').forEach(p => p.style.display = 'none');
-            document.querySelectorAll('.org-subtab-btn').forEach(b => b.classList.remove('active'));
-
-            const targetPane = document.getElementById('org-subtab-content-' + subtabKey);
-            if (targetPane) targetPane.style.display = 'block';
-
-            if (btnElement) {
-                btnElement.classList.add('active');
-            } else {
-                const defaultBtn = document.getElementById('org-subtab-btn-' + subtabKey);
-                if (defaultBtn) defaultBtn.classList.add('active');
-            }
-        }
-
         // ── DUAL-SECTION DAILY TIMESHEETS & ATTENDANCE ENGINE ──
         let currentTimesheetDate = document.getElementById('ts-filter-date')?.value || new Date().toISOString().split('T')[0];
         let currentTimesheetUserId = document.getElementById('ts-filter-user')?.value || '{{ $user->id }}';
@@ -3393,11 +3377,12 @@
                 const data = await res.json();
 
                 // 1. Update KPI Summary Cards
-                const officeEl = document.getElementById('ts-kpi-office-time');
-                const taskEl = document.getElementById('ts-kpi-task-time');
-                const totalWorkEl = document.getElementById('ts-kpi-total-work');
-                const idleEl = document.getElementById('ts-kpi-idle-time');
-                const ratioEl = document.getElementById('ts-kpi-ratio');
+                // The ids sit on the x-kpi-card element; the figure itself is its [data-kpi-value] child.
+                const officeEl = document.querySelector('#ts-kpi-office-time [data-kpi-value]');
+                const taskEl = document.querySelector('#ts-kpi-task-time [data-kpi-value]');
+                const totalWorkEl = document.querySelector('#ts-kpi-total-work [data-kpi-value]');
+                const idleEl = document.querySelector('#ts-kpi-idle-time [data-kpi-value]');
+                const ratioEl = document.querySelector('#ts-kpi-ratio [data-kpi-value]');
 
                 const officeSec = data.total_office_seconds || 0;
                 const taskSec = data.total_task_seconds || 0;
@@ -3712,7 +3697,7 @@
                     const actData = await actRes.json();
                     const u = actData.user;
                     if (nameEl) nameEl.textContent = u.name;
-                    if (subEl) subEl.textContent = `${u.role_name || 'Member'} • ${u.department || 'General'} • ${u.job_title || ''}`;
+                    if (subEl) subEl.textContent = `${u.role_name || 'Member'} · ${u.department || 'General'} · ${u.job_title || ''}`;
                     if (statusPill) {
                         statusPill.textContent = u.status || 'Active';
                         statusPill.style.background = u.status === 'active' ? 'rgba(79, 155, 95, 0.2)' : 'var(--ula-surface-page-alt)';
@@ -3807,14 +3792,33 @@
                 if (clockEl) {
                     const hours = String(now.getHours()).padStart(2, '0');
                     const minutes = String(now.getMinutes()).padStart(2, '0');
-                    const seconds = String(now.getSeconds()).padStart(2, '0');
-                    clockEl.textContent = `${hours}:${minutes}:${seconds}`;
+                    const text = `${hours}:${minutes}`;
+                    if (clockEl.textContent !== text) clockEl.textContent = text;
+                }
+
+                // Today tile: weekday, then day number (mono, isolated) + month, in the page language.
+                const dateEl = document.getElementById('nx-hero-live-date');
+                if (dateEl) {
+                    const lang = document.documentElement.getAttribute('lang') === 'ar' ? 'ar-u-ca-gregory-nu-latn' : 'en';
+                    const key = now.toDateString() + lang;
+                    if (dateEl.dataset.key !== key) {
+                        dateEl.dataset.key = key;
+                        const num = document.createElement('span');
+                        num.className = 'ula-hero-date-num';
+                        num.textContent = now.getDate();
+                        dateEl.replaceChildren(
+                            new Intl.DateTimeFormat(lang, { weekday: 'long' }).format(now),
+                            document.createElement('br'),
+                            num,
+                            ' ' + new Intl.DateTimeFormat(lang, { month: 'long' }).format(now)
+                        );
+                    }
                 }
 
                 if (greetingEl) {
                     const hour = now.getHours();
                     const isPM = hour >= 12;
-                    const userName = '{{ addslashes(Auth::user()->name ?? "User") }}';
+                    const userName = @json(explode(' ', Auth::user()->name ?? 'User')[0]);
                     const isArabic = document.documentElement.getAttribute('dir') === 'rtl' || document.documentElement.getAttribute('lang') === 'ar';
                     if (isArabic) {
                         greetingEl.textContent = isPM ? `مساء الخير، ${userName}!` : `صباح الخير، ${userName}!`;
