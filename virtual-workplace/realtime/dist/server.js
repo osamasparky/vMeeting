@@ -365,6 +365,38 @@ wss.on('connection', (ws, req) => {
                     }
                     break;
                 }
+                case 'user.ring':
+                case 'call.invite':
+                case 'call.accept':
+                case 'call.decline':
+                case 'call.cancel':
+                case 'dm.notify': {
+                    const user = conn.user;
+                    const p = event.payload || {};
+                    const targetUserId = typeof p.targetUserId === 'string' ? p.targetUserId : '';
+                    if (!targetUserId || targetUserId === user.userId)
+                        break;
+                    const targetWs = presence.findUserSocket(targetUserId);
+                    const target = targetWs ? presence.getClient(targetWs) : undefined;
+                    // Never relay across organizations.
+                    if (!targetWs || !target || target.user.organizationId !== user.organizationId)
+                        break;
+                    const clip = (v, max) => (typeof v === 'string' ? v.slice(0, max) : undefined);
+                    presence.send(targetWs, {
+                        type: event.type,
+                        payload: {
+                            targetUserId,
+                            senderUserId: user.userId,
+                            senderName: user.name,
+                            senderAvatarUrl: user.avatarUrl,
+                            callId: clip(p.callId, 64),
+                            reason: clip(p.reason, 32),
+                            channelId: clip(p.channelId, 64),
+                            preview: clip(p.preview, 140),
+                        },
+                    });
+                    break;
+                }
                 case 'user.sit': {
                     const user = conn.user;
                     if (!user.mapId)

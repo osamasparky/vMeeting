@@ -194,7 +194,37 @@ export interface InboundMapSync {
   };
 }
 
+// ── One-to-one relays: calls, direct-message notices and the legacy ring ──
+// The server forwards these only to a target in the sender's organization, and
+// always stamps the sender itself (clients never supply senderUserId/senderName).
+export type DirectRelayType = 'user.ring' | 'call.invite' | 'call.accept' | 'call.decline' | 'call.cancel' | 'dm.notify';
+
+export interface InboundDirectRelay {
+  type: DirectRelayType;
+  payload: {
+    targetUserId: string;
+    callId?: string;
+    reason?: string;
+    channelId?: string;
+    preview?: string;
+  };
+}
+
+export interface OutboundDirectRelay {
+  type: DirectRelayType;
+  payload: {
+    targetUserId: string;
+    senderUserId: string;
+    senderName: string;
+    senderAvatarUrl?: string;
+    callId?: string;
+    reason?: string;
+    channelId?: string;
+    preview?: string;
+  };
+}
 export type InboundEvent =
+  | InboundDirectRelay
   | InboundJoinMap
   | InboundMapSync
   | InboundPositionUpdate
@@ -450,6 +480,7 @@ export interface OutboundMapOccupancy {
 }
 
 export type OutboundEvent =
+  | OutboundDirectRelay
   | OutboundWelcome
   | OutboundMapOccupantsSync
   | OutboundUserJoined

@@ -103,11 +103,13 @@ class RecordingController extends Controller
             abort(404, 'Recording file not found');
         }
 
+        // Browsers record WebM (Firefox, most Chrome builds) or MP4 (Safari); keep the real type.
+        $ext = strtolower(pathinfo($recording->file_path, PATHINFO_EXTENSION)) === 'mp4' ? 'mp4' : 'webm';
         $safeTitle = Str::slug($recording->title) ?: 'session_recording';
-        $downloadName = "{$safeTitle}.mp4";
+        $downloadName = "{$safeTitle}.{$ext}";
 
         return Storage::download($recording->file_path, $downloadName, [
-            'Content-Type' => 'video/mp4',
+            'Content-Type' => "video/{$ext}",
         ]);
     }
 }

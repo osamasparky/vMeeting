@@ -1,112 +1,130 @@
     <!-- ── Modals & Overlays ── -->
 
-    <!-- 0a. Device Settings & Pre-Join Test Modal -->
+    <!-- 0a. Device settings — design-reference 27 -->
     <div id="device-settings-modal" class="modal-overlay">
-        <div class="modal-card" style="max-width: 540px;">
-            <div class="modal-header">
-                <div class="modal-title"><span><span class="material-symbols-rounded">settings</span></span> {{ __('Audio & Video Device Settings') }}</div>
-                <button onclick="closeDeviceSettingsModal()" style="background:none; border:none; color:var(--ula-text-muted); font-size:20px; cursor:pointer;"><span class="material-symbols-rounded">close</span></button>
-            </div>
-            
-            <!-- Video Preview Box -->
-            <div style="position: relative; width: 100%; height: 200px; background: var(--ula-palm-950); border-radius: 12px; overflow: hidden; border: 1px solid var(--ula-border-subtle); display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
-                <video id="device-preview-video" autoplay playsinline muted style="width: 100%; height: 100%; object-fit: cover;"></video>
-                <div id="device-no-preview" style="display: none; color: var(--ula-text-muted); font-size: 12px; font-weight: 700;"><span class="material-symbols-rounded">photo_camera</span> {{ __('Camera Preview Inactive') }}</div>
-            </div>
-
-            <!-- Mic Volume Level Meter -->
-            <div style="margin-bottom: 14px;">
-                <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px;">
-                    <span><span class="material-symbols-rounded">mic</span> {{ __('Microphone Input Test') }}</span>
-                    <span id="mic-level-val">0%</span>
+        <div class="modal-card ula-dlg" role="dialog" aria-modal="true" aria-labelledby="dlg-device-title">
+            <div class="ula-dlg-head">
+                <span class="ula-dlg-icon" aria-hidden="true"><span class="material-symbols-rounded">settings</span></span>
+                <div class="ula-dlg-titles">
+                    <h2 class="ula-dlg-title" id="dlg-device-title">{{ __('office.device_title') }}</h2>
+                    @if(app()->getLocale() === 'ar')<span class="ula-dlg-sub">Audio &amp; Video Device Settings</span>@endif
                 </div>
-                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
-                    <div id="mic-level-bar" style="width: 0%; height: 100%; background: var(--ula-status-success); transition: width 0.08s ease;"></div>
+                <button type="button" class="ula-dlg-close" onclick="closeDeviceSettingsModal()" aria-label="{{ __('Close') }}"><span class="material-symbols-rounded">close</span></button>
+            </div>
+
+            <div class="ula-dlg-body">
+                <div class="ula-dlg-preview">
+                    <video id="device-preview-video" autoplay playsinline muted></video>
+                    <div id="device-no-preview" class="ula-dlg-preview-empty" style="display: none;">
+                        <span class="material-symbols-rounded" aria-hidden="true">videocam_off</span> {{ __('office.camera_preview_off') }}
+                    </div>
+                </div>
+
+                <div class="ula-dlg-field">
+                    <div class="ula-dlg-meter-head">
+                        <span class="ula-dlg-label" id="dlg-mic-meter-label">{{ __('office.mic_test') }}</span>
+                        <span id="mic-level-val" class="ula-dlg-meter-val">0%</span>
+                    </div>
+                    <div class="ula-dlg-meter" role="meter" aria-labelledby="dlg-mic-meter-label" aria-valuemin="0" aria-valuemax="100"><div id="mic-level-bar" style="width: 0%;"></div></div>
+                </div>
+
+                <div class="ula-dlg-field">
+                    <label class="ula-dlg-label" for="select-video-input">{{ __('office.camera') }}</label>
+                    <div class="ula-dlg-control">
+                        <span class="ula-dlg-control-icon" aria-hidden="true"><span class="material-symbols-rounded">videocam</span></span>
+                        <select class="ula-dlg-input" id="select-video-input" onchange="onCameraDeviceChanged(this.value)">
+                            <option value="default">{{ __('office.default_camera') }}</option>
+                        </select>
+                        <span class="ula-dlg-control-caret" aria-hidden="true"><span class="material-symbols-rounded">expand_more</span></span>
+                    </div>
+                </div>
+                <div class="ula-dlg-field">
+                    <label class="ula-dlg-label" for="select-audio-input">{{ __('office.microphone') }}</label>
+                    <div class="ula-dlg-control">
+                        <span class="ula-dlg-control-icon" aria-hidden="true"><span class="material-symbols-rounded">mic</span></span>
+                        <select class="ula-dlg-input" id="select-audio-input" onchange="onMicDeviceChanged(this.value)">
+                            <option value="default">{{ __('office.default_microphone') }}</option>
+                        </select>
+                        <span class="ula-dlg-control-caret" aria-hidden="true"><span class="material-symbols-rounded">expand_more</span></span>
+                    </div>
+                </div>
+                <div class="ula-dlg-field">
+                    <label class="ula-dlg-label" for="select-audio-output">{{ __('office.speaker') }}</label>
+                    <div class="ula-dlg-control">
+                        <span class="ula-dlg-control-icon" aria-hidden="true"><span class="material-symbols-rounded">volume_up</span></span>
+                        <select class="ula-dlg-input" id="select-audio-output" onchange="onSpeakerDeviceChanged(this.value)">
+                            <option value="default">{{ __('office.default_speaker') }}</option>
+                        </select>
+                        <span class="ula-dlg-control-caret" aria-hidden="true"><span class="material-symbols-rounded">expand_more</span></span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Selectors -->
-            <div class="input-group">
-                <label class="input-label"><span class="material-symbols-rounded">videocam</span> {{ __('Camera Device') }}</label>
-                <select class="styled-input" id="select-video-input" onchange="onCameraDeviceChanged(this.value)">
-                    <option value="default">{{ __('Default Camera') }}</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label class="input-label"><span class="material-symbols-rounded">mic</span> {{ __('Microphone Device') }}</label>
-                <select class="styled-input" id="select-audio-input" onchange="onMicDeviceChanged(this.value)">
-                    <option value="default">{{ __('Default Microphone') }}</option>
-                </select>
-            </div>
-            <div class="input-group">
-                <label class="input-label"><span class="material-symbols-rounded">volume_up</span> {{ __('Audio Output Speaker') }}</label>
-                <select class="styled-input" id="select-audio-output" onchange="onSpeakerDeviceChanged(this.value)">
-                    <option value="default">{{ __('Default Speaker') }}</option>
-                </select>
-            </div>
-
-            <div style="display: flex; gap: 8px; margin-top: 8px;">
-                <button onclick="closeDeviceSettingsModal()" class="action-link-btn" style="flex: 1; background: var(--ula-palm-900); color: var(--ula-white); justify-content: center; padding: 10px;">
-                    <span class="material-symbols-rounded">check</span> {{ __('Done & Save Settings') }}
-                </button>
+            <div class="ula-dlg-foot">
+                <x-btn variant="primary" size="md" icon="check" onclick="closeDeviceSettingsModal()">{{ __('office.device_save') }}</x-btn>
             </div>
         </div>
     </div>
 
-    <!-- 0b. WebRTC & Network Diagnostics Modal -->
+    <!-- 0b. Connection diagnostics — design-reference 28 -->
     <div id="diagnostics-modal" class="modal-overlay">
-        <div class="modal-card" style="max-width: 600px;">
-            <div class="modal-header">
-                <div class="modal-title"><span><span class="material-symbols-rounded">stethoscope</span></span> {{ __('WebRTC & Media Diagnostics') }}</div>
-                <button onclick="closeDiagnosticsModal()" style="background:none; border:none; color:var(--ula-text-muted); font-size:20px; cursor:pointer;"><span class="material-symbols-rounded">close</span></button>
+        <div class="modal-card ula-dlg" role="dialog" aria-modal="true" aria-labelledby="dlg-diag-title">
+            <div class="ula-dlg-head">
+                <span class="ula-dlg-icon" aria-hidden="true"><span class="material-symbols-rounded">monitor_heart</span></span>
+                <div class="ula-dlg-titles">
+                    <h2 class="ula-dlg-title" id="dlg-diag-title">{{ __('office.diag_title') }}</h2>
+                    @if(app()->getLocale() === 'ar')<span class="ula-dlg-sub">WebRTC &amp; Media Diagnostics</span>@endif
+                </div>
+                <button type="button" class="ula-dlg-close" onclick="closeDiagnosticsModal()" aria-label="{{ __('Close') }}"><span class="material-symbols-rounded">close</span></button>
             </div>
 
-            <div id="diag-loading" style="text-align: center; padding: 20px; color: var(--ula-text-muted); font-size: 13px;">
-                ⏳ {{ __('Running automated WebRTC & STUN/TURN checks...') }}
+            <div class="ula-dlg-body">
+                <div id="diag-loading" class="ula-dlg-loading" role="status">
+                    <span class="material-symbols-rounded" aria-hidden="true">progress_activity</span> {{ __('office.diag_running') }}
+                </div>
+
+                <div id="diag-content" style="display: none; flex-direction: column; gap: var(--ula-space-3);">
+                    <div id="diag-overall-box" class="ula-dlg-banner" data-tone="ok">
+                        <span class="ula-dlg-banner-icon" aria-hidden="true"><span class="material-symbols-rounded" id="diag-overall-badge">signal_cellular_alt</span></span>
+                        <div>
+                            <div class="ula-dlg-banner-label">{{ __('office.diag_overall') }}</div>
+                            <div id="diag-overall-text" class="ula-dlg-banner-value">—</div>
+                        </div>
+                    </div>
+
+                    <div class="ula-dlg-row">
+                        <span class="material-symbols-rounded" aria-hidden="true">videocam</span>
+                        <span class="ula-dlg-row-label">{{ __('office.diag_camera') }}</span>
+                        <span id="diag-cam-status" class="ula-dlg-chip" data-tone="busy">—</span>
+                    </div>
+                    <div class="ula-dlg-row">
+                        <span class="material-symbols-rounded" aria-hidden="true">mic</span>
+                        <span class="ula-dlg-row-label">{{ __('office.diag_microphone') }}</span>
+                        <span id="diag-mic-status" class="ula-dlg-chip" data-tone="busy">—</span>
+                    </div>
+                    <div class="ula-dlg-row">
+                        <span class="material-symbols-rounded" aria-hidden="true">speed</span>
+                        <span class="ula-dlg-row-label">{{ __('office.diag_rtt') }}</span>
+                        <span id="diag-ping-status" class="ula-dlg-chip ula-dlg-mono" data-tone="busy">—</span>
+                    </div>
+                    <div class="ula-dlg-row">
+                        <span class="material-symbols-rounded" aria-hidden="true">hub</span>
+                        <span class="ula-dlg-row-label">{{ __('office.diag_turn') }}</span>
+                        <span id="diag-turn-status" class="ula-dlg-chip" data-tone="busy">—</span>
+                    </div>
+
+                    <div class="ula-dlg-telemetry">
+                        <span>{{ __('office.diag_sfu') }}</span><span id="diag-livekit-host">—</span>
+                        <span>{{ __('office.diag_packet_loss') }}</span><span id="diag-packet-loss">—</span>
+                        <span>{{ __('office.diag_jitter') }}</span><span id="diag-jitter">—</span>
+                        <span>{{ __('office.diag_fps') }}</span><span id="diag-fps">—</span>
+                    </div>
+                </div>
             </div>
 
-            <div id="diag-content" style="display: none; flex-direction: column; gap: 12px;">
-                <!-- Overall Status Banner -->
-                <div id="diag-overall-box" style="padding: 12px 16px; border-radius: 12px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(52, 211, 153, 0.3); display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-primary); text-transform: uppercase;">{{ __('Overall Connection Quality') }}</div>
-                        <div id="diag-overall-text" style="font-size: 16px; font-weight: 900; color: var(--ula-status-success);">{{ __('Excellent') }}</div>
-                    </div>
-                    <span id="diag-overall-badge" style="font-size: 24px;"><span class="material-symbols-rounded" style="font-size: 14px;">circle</span></span>
-                </div>
-
-                <!-- Diagnostics Grid -->
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px;">
-                        <div style="font-size: 10px; color: var(--ula-text-muted); font-weight: 800;"><span class="material-symbols-rounded">photo_camera</span> {{ __('Camera Access') }}</div>
-                        <div id="diag-cam-status" style="font-size: 13px; font-weight: 800; color: var(--ula-status-success);"><span class="material-symbols-rounded">check</span> {{ __('Verified') }}</div>
-                    </div>
-                    <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px;">
-                        <div style="font-size: 10px; color: var(--ula-text-muted); font-weight: 800;"><span class="material-symbols-rounded">mic</span> {{ __('Microphone Access') }}</div>
-                        <div id="diag-mic-status" style="font-size: 13px; font-weight: 800; color: var(--ula-status-success);"><span class="material-symbols-rounded">check</span> {{ __('Verified') }}</div>
-                    </div>
-                    <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px;">
-                        <div style="font-size: 10px; color: var(--ula-text-muted); font-weight: 800;"><span class="material-symbols-rounded">bolt</span> {{ __('Internet Ping (RTT)') }}</div>
-                        <div id="diag-ping-status" style="font-size: 13px; font-weight: 800; color: var(--ula-status-success);">32 ms</div>
-                    </div>
-                    <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px;">
-                        <div style="font-size: 10px; color: var(--ula-text-muted); font-weight: 800;"><span class="material-symbols-rounded">public</span> {{ __('STUN & TURN Relay') }}</div>
-                        <div id="diag-turn-status" style="font-size: 13px; font-weight: 800; color: var(--ula-status-success);"><span class="material-symbols-rounded">check</span> {{ __('Active (Coturn)') }}</div>
-                    </div>
-                </div>
-
-                <!-- Telemetry Stats Table -->
-                <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 12px; font-family: monospace; font-size: 11px; line-height: 1.6; color: var(--ula-text-secondary);">
-                    <div style="display: flex; justify-content: space-between;"><span>SFU Host:</span> <span id="diag-livekit-host" style="color: var(--ula-accent-default);">wss://nextspace.munazzah.com/livekit</span></div>
-                    <div style="display: flex; justify-content: space-between;"><span>Packet Loss:</span> <span id="diag-packet-loss" style="color: var(--ula-status-success);">0.0%</span></div>
-                    <div style="display: flex; justify-content: space-between;"><span>Jitter:</span> <span id="diag-jitter" style="color: var(--ula-status-success);">4 ms</span></div>
-                    <div style="display: flex; justify-content: space-between;"><span>Framerate (FPS):</span> <span id="diag-fps" style="color: var(--ula-status-success);">30 FPS</span></div>
-                </div>
-
-                <div style="display: flex; gap: 8px;">
-                    <button onclick="runDiagnosticsCheck()" class="action-link-btn" style="flex: 1; justify-content: center;"><span class="material-symbols-rounded">refresh</span> {{ __('Re-run Check') }}</button>
-                    <button onclick="copyDiagnosticsReport()" class="action-link-btn" style="flex: 1; background: var(--ula-highlight-default); color: var(--ula-white); justify-content: center;"><span class="material-symbols-rounded">content_copy</span> {{ __('Copy Report for Support') }}</button>
-                </div>
+            <div class="ula-dlg-foot">
+                <x-btn variant="primary" size="md" icon="refresh" onclick="runDiagnosticsCheck()">{{ __('office.diag_rerun') }}</x-btn>
+                <x-btn variant="secondary" size="md" icon="content_copy" onclick="copyDiagnosticsReport()">{{ __('office.diag_copy') }}</x-btn>
             </div>
         </div>
     </div>
@@ -184,33 +202,45 @@
         </div>
     </div>
 
-    <!-- 2. Instant Guest Link Modal -->
+    <!-- 2. Instant guest link — design-reference 30 -->
     <div id="guest-modal" class="modal-overlay">
-        <div class="modal-card">
-            <div class="modal-header">
-                <div class="modal-title"><span><span class="material-symbols-rounded">bolt</span></span> {{ __('Instant Guest Invitation Link') }}</div>
-                <button onclick="closeGuestModal()" style="background:none; border:none; color:var(--ula-text-muted); font-size:18px; cursor:pointer;"><span class="material-symbols-rounded">close</span></button>
+        <div class="modal-card ula-dlg" role="dialog" aria-modal="true" aria-labelledby="dlg-guest-title">
+            <div class="ula-dlg-head">
+                <span class="ula-dlg-icon" aria-hidden="true"><span class="material-symbols-rounded">person_add</span></span>
+                <div class="ula-dlg-titles">
+                    <h2 class="ula-dlg-title" id="dlg-guest-title">{{ __('office.guest_title') }}</h2>
+                    @if(app()->getLocale() === 'ar')<span class="ula-dlg-sub">Instant Guest Invitation Link</span>@endif
+                </div>
+                <button type="button" class="ula-dlg-close" onclick="closeGuestModal()" aria-label="{{ __('Close') }}"><span class="material-symbols-rounded">close</span></button>
             </div>
-            <div class="input-group">
-                <label class="input-label">{{ __('Select Target Meeting Room') }}</label>
-                <select class="styled-input" id="invite-room-select">
-                    @foreach($map->rooms as $r)
-                        <option value="{{ $r->id }}">{{ $r->name }} ({{ ucfirst($r->type) }})</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="input-group">
-                <label class="input-label">{{ __('Guest Label / Name') }}</label>
-                <input type="text" class="styled-input" id="invite-guest-name" value="Investor / Partner">
-            </div>
-            <button onclick="generateGuestLink()" class="action-link-btn" style="background: var(--ula-palm-900); color: var(--ula-white); justify-content: center; padding: 12px; font-size: 13px;">
-                <span class="material-symbols-rounded">bolt</span> {{ __('Generate Instant Guest Link') }}
-            </button>
-            <div id="guest-link-result" style="display: none; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--ula-border-subtle); border-radius: 12px; padding: 12px; flex-direction: column; gap: 8px;">
-                <input type="text" id="guest-link-input" readonly class="styled-input" style="font-family: monospace; font-size: 11px;">
-                <div style="display: flex; gap: 8px;">
-                    <button onclick="copyGuestLink()" class="action-link-btn" style="flex: 1; justify-content: center;"><span class="material-symbols-rounded">content_copy</span> {{ __('Copy Link') }}</button>
-                    <button onclick="openGuestInNewWindow()" class="action-link-btn" style="flex: 1; background: var(--ula-highlight-default); color: var(--ula-white); justify-content: center;"><span class="material-symbols-rounded">rocket_launch</span> {{ __('Open Guest') }}</button>
+
+            <div class="ula-dlg-body">
+                <div class="ula-dlg-field">
+                    <label class="ula-dlg-label" for="invite-room-select">{{ __('office.guest_room') }}</label>
+                    <div class="ula-dlg-control">
+                        <span class="ula-dlg-control-icon" aria-hidden="true"><span class="material-symbols-rounded">meeting_room</span></span>
+                        <select class="ula-dlg-input" id="invite-room-select">
+                            @foreach($map->rooms as $r)
+                                <option value="{{ $r->id }}">{{ $r->name }}</option>
+                            @endforeach
+                        </select>
+                        <span class="ula-dlg-control-caret" aria-hidden="true"><span class="material-symbols-rounded">expand_more</span></span>
+                    </div>
+                </div>
+                <div class="ula-dlg-field">
+                    <label class="ula-dlg-label" for="invite-guest-name">{{ __('office.guest_name') }}</label>
+                    <div class="ula-dlg-control">
+                        <span class="ula-dlg-control-icon" aria-hidden="true"><span class="material-symbols-rounded">badge</span></span>
+                        <input type="text" class="ula-dlg-input" id="invite-guest-name" placeholder="{{ __('office.guest_name_placeholder') }}">
+                    </div>
+                </div>
+
+                <x-btn variant="primary" size="lg" icon="add_link" onclick="generateGuestLink()" style="width: 100%;">{{ __('office.guest_create') }}</x-btn>
+
+                <div id="guest-link-result" class="ula-dlg-link" style="display: none;">
+                    <input type="text" id="guest-link-input" readonly aria-label="{{ __('office.guest_link') }}">
+                    <x-btn variant="secondary" size="sm" icon="content_copy" onclick="copyGuestLink()">{{ __('office.guest_copy') }}</x-btn>
+                    <x-btn variant="ghost" size="sm" icon="open_in_new" onclick="openGuestInNewWindow()">{{ __('office.guest_open') }}</x-btn>
                 </div>
             </div>
         </div>
@@ -229,26 +259,29 @@
         </div>
     </div>
 
-    <!-- 3. Room Persistent Files Modal -->
+    <!-- 3. Room files — design-reference 32 -->
     <div id="room-files-modal" class="modal-overlay">
-        <div class="modal-card">
-            <div class="modal-header">
-                <div class="modal-title"><span><span class="material-symbols-rounded">folder</span></span> <span id="room-files-title">{{ __('Room Documents & Assets') }}</span></div>
-                <button onclick="closeRoomFilesModal()" style="background:none; border:none; color:var(--ula-text-muted); font-size:18px; cursor:pointer;"><span class="material-symbols-rounded">close</span></button>
-            </div>
-            
-            <!-- Upload Box -->
-            <div style="background: var(--ula-surface-page); border: 2px dashed var(--ula-border-subtle); border-radius: 14px; padding: 18px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;">
-                <input type="file" id="room-file-input" style="display:none;" onchange="handleRoomFileUpload(this)">
-                <span style="font-size: 28px;"><span class="material-symbols-rounded">upload</span></span>
-                <span style="font-size: 12px; font-weight: 700;">{{ __('Upload PDF, Slides, or Images to this Room Repository') }}</span>
-                <button onclick="document.getElementById('room-file-input').click()" class="action-link-btn" style="background: var(--ula-palm-900); color: var(--ula-white);">
-                    <span>⬆️</span> {{ __('Choose File to Upload') }}
-                </button>
+        <div class="modal-card ula-dlg ula-dlg--wide" role="dialog" aria-modal="true" aria-labelledby="room-files-title">
+            <div class="ula-dlg-head">
+                <span class="ula-dlg-icon" aria-hidden="true"><span class="material-symbols-rounded">folder</span></span>
+                <div class="ula-dlg-titles">
+                    <h2 class="ula-dlg-title" id="room-files-title">{{ __('office.files_title') }}</h2>
+                    <span class="ula-dlg-sub" id="room-files-subtitle">Room Documents &amp; Assets</span>
+                </div>
+                <button type="button" class="ula-dlg-close" onclick="closeRoomFilesModal()" aria-label="{{ __('Close') }}"><span class="material-symbols-rounded">close</span></button>
             </div>
 
-            <!-- Files List -->
-            <div id="room-files-list" style="max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;"></div>
+            <div class="ula-dlg-body">
+                <div class="ula-dlg-drop" id="room-files-drop">
+                    <span class="material-symbols-rounded" aria-hidden="true">cloud_upload</span>
+                    <span class="ula-dlg-drop-text">{{ __('office.files_drop') }}</span>
+                    <input type="file" id="room-file-input" class="sr-only" onchange="handleRoomFileUpload(this)">
+                    <x-btn variant="secondary" size="sm" icon="upload" onclick="document.getElementById('room-file-input').click()">{{ __('office.files_choose') }}</x-btn>
+                    <span class="ula-dlg-drop-hint">{{ __('office.files_hint') }}</span>
+                </div>
+
+                <div id="room-files-list" class="ula-dlg-files" aria-live="polite"></div>
+            </div>
         </div>
     </div>
 
@@ -375,7 +408,7 @@
     </div>
 
     <!-- ── 7. In-Office My Tasks Drawer & Quick Time Tracker ── -->
-    <div class="task-drawer" id="my-task-drawer">
+    <div class="task-drawer ula-on-dark" id="my-task-drawer">
         <div style="padding: 16px; background: var(--ula-surface-card); border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center;">
             <div style="font-size: 14px; font-weight: 900; color: var(--ula-text-primary); display: flex; align-items: center; gap: 8px;">
                 <span><span class="material-symbols-rounded">edit_note</span></span> <span>{{ __('My Tasks & Time Tracker') }}</span>

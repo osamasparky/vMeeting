@@ -451,7 +451,9 @@ body, button, input, select, textarea, optgroup {
 }
 
 /* Explicit dark: [data-theme="dark"] or .dark — same block, attribute wins */
-[data-theme="dark"], .dark {
+/* .ula-on-dark: a region that always uses dark-theme tokens (e.g. the office drawers,
+   which sit on the dark office chrome in both themes). */
+[data-theme="dark"], .dark, .ula-on-dark {
   --ula-surface-page:        var(--ula-palm-950);
   --ula-surface-page-alt:    var(--ula-palm-900);
   --ula-surface-card:        var(--ula-palm-900);

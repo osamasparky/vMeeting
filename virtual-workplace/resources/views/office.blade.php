@@ -438,6 +438,7 @@
             overflow: hidden;
         }
         .chat-header {
+            color: var(--ula-text-primary);
             padding: 14px 16px;
             border-bottom: 1px solid var(--ula-border-subtle);
             display: flex;
@@ -486,9 +487,11 @@
             flex-direction: column;
             gap: 3px;
         }
+        .msg-bubble { color: var(--ula-text-primary); }
         .msg-bubble.self {
-            border-color: rgba(16, 185, 129, 0.4);
-            background: rgba(16, 185, 129, 0.12);
+            border-color: transparent;
+            background: var(--ula-tone-palm-bg);
+            color: var(--ula-tone-palm-fg);
         }
         .msg-meta {
             display: flex;
@@ -530,7 +533,7 @@
         .more-menu-item {
             background: transparent;
             border: none;
-            color: var(--ula-text-primary);
+            color: var(--ula-text-on-dark);
             padding: 9px 12px;
             border-radius: 10px;
             display: flex;
@@ -544,10 +547,11 @@
             transition: all 0.15s ease;
         }
         .more-menu-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--ula-status-success);
-            transform: translateX(3px);
+            background: var(--ula-control-dark-fill-hover);
+            color: var(--ula-text-on-dark);
         }
+        .more-menu-item .material-symbols-rounded { color: var(--ula-icon-on-dark); }
+        .more-menu-item:focus-visible { outline: none; box-shadow: var(--ula-focus-ring-on-dark); }
 
         /* ── In-Office Task Drawer & Quick Timer ── */
         .task-drawer {
@@ -933,7 +937,7 @@
 
                 @if(!empty($user->is_guest))
                     <span class="nx-toolbar-btn btn-accent guest-access-pill" style="font-weight: 700;" title="{{ __('Guest Access') }}">
-                        <span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom;">shield</span> {{ __('Guest Access') }} ({{ $user->name }})
+                        <span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom;">shield</span> {{ __('Guest Access') }} ({{ preg_replace('/\s*\(Guest\)$/u', '', $user->name) }})
                     </span>
                 @endif
             </div>
@@ -1026,7 +1030,7 @@
     </div>
 
     <!-- ── Sliding Chat & File Sharing Drawer ── -->
-    <div class="chat-drawer" id="chat-drawer">
+    <div class="chat-drawer ula-on-dark" id="chat-drawer">
         <div class="chat-header">
             <strong style="font-size: 13px; display: flex; align-items: center; gap: 6px;"><span class="material-symbols-rounded" style="font-size: 16px;">chat</span> {{ __('Office & Room Chat') }}</strong>
             <div style="display: flex; align-items: center; gap: 6px;">
@@ -1038,6 +1042,7 @@
         </div>
         <div class="chat-tabs">
             <div class="chat-tab active" id="chat-tab-room" onclick="switchChatScope('room')"><span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom;">apartment</span> {{ __('Room Chat') }}</div>
+            <div class="chat-tab chat-tab--dm" id="chat-tab-dm" onclick="switchChatScope('dm')"><span class="material-symbols-rounded" style="font-size: 14px;" aria-hidden="true">person</span> <span id="chat-tab-dm-name"></span></div>
             <div class="chat-tab" id="chat-tab-global" onclick="switchChatScope('global')"><span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom;">public</span> {{ __('Global Chat') }}</div>
         </div>
         <div class="chat-messages" id="chat-messages-container">
@@ -1052,6 +1057,35 @@
             <input type="text" id="chat-msg-input" placeholder="{{ __('Type your message here...') }}" class="styled-input" style="padding: 8px 10px; font-size: 12px;" onkeydown="if(event.key==='Enter') sendChatMessage()">
             <button onclick="sendChatMessage()" class="action-link-btn" style="background: var(--ula-palm-900); color: var(--ula-white); padding: 6px 12px;"><span class="material-symbols-rounded" style="font-size: 15px;">send</span></button>
         </div>
+    </div>
+
+
+    <!-- ── People panel (design-reference 24): who is in the office + call / message ── -->
+    <aside class="ula-people ula-on-dark" id="occupants-panel" aria-labelledby="people-title" hidden>
+        <div class="ula-people-head">
+            <h2 class="ula-people-title" id="people-title">{{ __('office.people_title') }}</h2>
+            <span class="ula-people-count"><b id="people-count">1</b> {{ __('office.people_online') }}</span>
+            <button type="button" class="ula-people-btn" onclick="closeOccupantsModal()" aria-label="{{ __('Close') }}"><span class="material-symbols-rounded">close</span></button>
+        </div>
+        <div class="ula-people-list" id="people-list" role="list"></div>
+        <div class="ula-people-foot">
+            <button type="button" class="ula-people-invite" onclick="closeOccupantsModal(); openGuestInviteModal();">
+                <span class="material-symbols-rounded" aria-hidden="true">person_add</span> {{ __('office.people_invite') }}
+            </button>
+        </div>
+    </aside>
+
+    <!-- ── Call card (design-reference 29): incoming answer / decline / wave, outgoing cancel ── -->
+    <div class="ula-call ula-on-dark" id="call-card" role="alertdialog" aria-labelledby="call-name" aria-describedby="call-status" hidden>
+        <div class="ula-call-top">
+            <span class="ula-call-avatar" id="call-avatar" aria-hidden="true"></span>
+            <div class="ula-call-text">
+                <strong class="ula-call-name" id="call-name"></strong>
+                <span class="ula-call-status" id="call-status"></span>
+            </div>
+            <span class="ula-call-timer" id="call-timer"></span>
+        </div>
+        <div class="ula-call-actions" id="call-actions"></div>
     </div>
 
     <!-- ── Bottom Meeting Control Bar (All Tools Restored & Styled) ── -->
@@ -1127,7 +1161,7 @@
     </nav>
 
     <!-- ── Floating More Tools & Settings Popover Menu ── -->
-    <div id="floating-more-popover" style="display: none; position: absolute; bottom: 85px; left: 65%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.96); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.18); border-radius: 18px; padding: 8px; flex-direction: column; gap: 4px; box-shadow: 0 16px 36px rgba(0,0,0,0.6); z-index: 100000; min-width: 220px;">
+    <div id="floating-more-popover" style="display: none; position: absolute; bottom: 85px; left: 65%; transform: translateX(-50%); background: var(--ula-surface-map-chrome); backdrop-filter: blur(20px); border: 1px solid var(--ula-border-on-dark-subtle); border-radius: 18px; padding: 8px; flex-direction: column; gap: 4px; box-shadow: 0 16px 36px rgba(0,0,0,0.6); z-index: 100000; min-width: 220px;">
         <button class="more-menu-item" onclick="toggleCameraGalleryModal(); closeMoreMenu();">
             <span class="material-symbols-rounded" style="font-size: 18px;">grid_view</span> <span>{{ __('Live Camera Grid') }}</span>
         </button>
@@ -1497,29 +1531,6 @@
             };
         }
 
-        function updateDebugOverlay(info) {
-            let el = document.getElementById('fit-map-debug-overlay');
-            if (!el) {
-                el = document.createElement('div');
-                el.id = 'fit-map-debug-overlay';
-                el.style.cssText = 'position:fixed;top:70px;inset-inline-start:16px;background:rgba(11,20,16,0.92);backdrop-filter:blur(16px);border:1px solid rgba(211,165,83,0.5);border-radius:12px;padding:10px 14px;color:var(--ula-sand-100);font-family:IBM Plex Mono,monospace;font-size:11px;z-index:99999;pointer-events:none;line-height:1.5;box-shadow:0 12px 30px rgba(0,0,0,0.7);';
-                document.body.appendChild(el);
-            }
-            el.innerHTML = `
-                <div style="color:var(--ula-gold-400);font-weight:700;margin-bottom:4px;border-bottom:1px solid rgba(211,165,83,0.3);padding-bottom:2px;">
-                    📐 FIT TO CANVAS RUNTIME INSPECTION
-                </div>
-                <div><b>Viewport / Canvas:</b> ${info['canvas.clientWidth']} × ${info['canvas.clientHeight']} (Rect: ${info['canvas.getBoundingClientRect().width']} × ${info['canvas.getBoundingClientRect().height']})</div>
-                <div><b>Container:</b> ${info['map wrapper (#canvas-container) width']} × ${info['map wrapper (#canvas-container) height']}</div>
-                <div><b>Floor:</b> ${info['floorBounds.width']} × ${info['floorBounds.height']} [(${info['floorBounds.minX']},${info['floorBounds.minY']}) to (${info['floorBounds.maxX']},${info['floorBounds.maxY']})]</div>
-                <div><b>Scale / Zoom:</b> ${Number(info['camera.zoomLevel']).toFixed(4)}</div>
-                <div><b>Camera Offset:</b> X: ${info['camera.offsetX']}, Y: ${info['camera.offsetY']}</div>
-                <div><b>DPR:</b> ${info['devicePixelRatio']}</div>
-            `;
-            setTimeout(() => { if (el) el.style.display = 'none'; }, 8000);
-            el.style.display = 'block';
-        }
-
         function centerCamera() {
             if (!canvas || !container) return;
             width = canvas.width = container.clientWidth || window.innerWidth;
@@ -1527,8 +1538,8 @@
 
             const floor = getFloorBounds();
 
-            // Symmetrical padding around complete floor boundary (32px)
-            const padding = 32;
+            // Small symmetrical margin around the floor so it fills the canvas.
+            const padding = 16;
             const availableWidth = Math.max(100, width - (padding * 2));
             const availableHeight = Math.max(100, height - (padding * 2));
 
@@ -1547,46 +1558,6 @@
         function fitMapToCanvas() {
             centerCamera();
             if (typeof draw === 'function') draw();
-
-            const mainContainer = document.querySelector('.nx-office-viewport-container');
-            const screenContainer = document.querySelector('.nx-floor-map-screen');
-            const rect = canvas ? canvas.getBoundingClientRect() : { width: 0, height: 0 };
-            const floor = getFloorBounds();
-            const dpr = window.devicePixelRatio || 1;
-
-            const debugInfo = {
-                'window.innerWidth': window.innerWidth,
-                'document.documentElement.clientWidth': document.documentElement.clientWidth,
-                'main office container (.nx-floor-map-screen) width': screenContainer ? screenContainer.clientWidth : 'N/A',
-                'main office container (.nx-floor-map-screen) height': screenContainer ? screenContainer.clientHeight : 'N/A',
-                'viewport wrapper (.nx-office-viewport-container) width': mainContainer ? mainContainer.clientWidth : 'N/A',
-                'map wrapper (#canvas-container) width': container ? container.clientWidth : 'N/A',
-                'map wrapper (#canvas-container) height': container ? container.clientHeight : 'N/A',
-                'canvas.clientWidth': canvas ? canvas.clientWidth : 0,
-                'canvas.clientHeight': canvas ? canvas.clientHeight : 0,
-                'canvas.getBoundingClientRect().width': rect.width,
-                'canvas.getBoundingClientRect().height': rect.height,
-                'canvas.width': canvas ? canvas.width : 0,
-                'canvas.height': canvas ? canvas.height : 0,
-                'devicePixelRatio': dpr,
-                'floorBounds.minX': floor.minX,
-                'floorBounds.minY': floor.minY,
-                'floorBounds.maxX': floor.maxX,
-                'floorBounds.maxY': floor.maxY,
-                'floorBounds.width': floor.width,
-                'floorBounds.height': floor.height,
-                'floorBounds.centerX': floor.centerX,
-                'floorBounds.centerY': floor.centerY,
-                'camera.zoomLevel': zoomLevel,
-                'camera.offsetX': cameraOffset.x,
-                'camera.offsetY': cameraOffset.y
-            };
-
-            console.log('═══════════════ FIT MAP TO CANVAS RUNTIME METRICS ═══════════════');
-            console.table(debugInfo);
-            window.__FIT_MAP_DEBUG = debugInfo;
-
-            updateDebugOverlay(debugInfo);
             showToast('📐 ' + __('Fit Map to Canvas'));
         }
 
@@ -1733,6 +1704,9 @@
         let panCamStartX = 0;
         let panCamStartY = 0;
         let hasMovedMouseDuringDrag = false;
+        // A left-button drag pans the map only when it started on the map: dragging on the
+        // whiteboard, a slider or a dialog must not move the map underneath.
+        let mapDragArmed = false;
 
         if (canvas) {
             canvas.addEventListener('mousedown', (e) => {
@@ -1745,6 +1719,7 @@
                     canvas.style.cursor = 'grab';
                     e.preventDefault();
                 } else if (e.button === 0) {
+                    mapDragArmed = true;
                     panStartX = e.clientX;
                     panStartY = e.clientY;
                     panCamStartX = cameraOffset.x;
@@ -1759,7 +1734,7 @@
                     cameraOffset.y = panCamStartY + (e.clientY - panStartY);
                     canvas.style.cursor = 'grabbing';
                     if (typeof draw === 'function') draw();
-                } else if (e.buttons === 1) {
+                } else if (e.buttons === 1 && mapDragArmed) {
                     const dist = Math.hypot(e.clientX - panStartX, e.clientY - panStartY);
                     if (dist > 8) {
                         hasMovedMouseDuringDrag = true;
@@ -1771,6 +1746,7 @@
             });
 
             window.addEventListener('mouseup', (e) => {
+                mapDragArmed = false;
                 if (isPanning) {
                     isPanning = false;
                     canvas.style.cursor = 'default';
@@ -2212,12 +2188,18 @@
 
             // 2. Intelligent Placement Facing the Central Open Walkway & Avoiding Shared Walls
             const mapCenter = { x: MAP_WIDTH_PX / 2, y: MAP_HEIGHT_PX / 2 };
-            const outerMargin = 16; // Authoritative outer map canvas border margin
+            // An automatic door must leave a walkable strip to the map edge (avatar diameter + slack).
+            const outerMargin = 40;
 
             let bestCandidate = null;
             let bestScore = -Infinity;
 
             for (const cand of candidates) {
+                // A0. A door that opens off the map can never be used, even when chosen by hand
+                //     (rooms drawn before the floor image changed can overhang it).
+                if (cand.exitOutsideX < 0 || cand.exitOutsideY < 0 || cand.exitOutsideX > MAP_WIDTH_PX || cand.exitOutsideY > MAP_HEIGHT_PX) {
+                    continue;
+                }
                 // A. Disqualify outer exterior building walls touching outer map canvas border (unless explicitly chosen)
                 if (!explicitSide || explicitSide === 'auto') {
                     if (cand.exitOutsideX < outerMargin || cand.exitOutsideX > MAP_WIDTH_PX - outerMargin ||
@@ -2272,6 +2254,12 @@
                     bestScore = score;
                     bestCandidate = cand;
                 }
+            }
+
+            // The chosen door wall is blocked by a neighbouring room (rooms may share walls):
+            // a door there would lead into the other room, so fall back to the automatic choice.
+            if (!bestCandidate && explicitSide && explicitSide !== 'auto') {
+                return getRoomDoorPortal({ ...r, doorSide: null, door_side: null, bounds: { ...r.bounds, doorSide: 'auto', door_side: null, doorOffset: undefined } });
             }
 
             // Fallback (strictly prioritize candidates NOT inside other rooms)
@@ -3575,6 +3563,23 @@
         }
 
 
+        // Canvas colours from design tokens. A canvas can't resolve var(--…) and silently keeps the previous
+        // colour (black at first), so every token is resolved to a real colour here, cached per theme.
+        const OC = (() => {
+            const probe = document.createElement('canvas').getContext('2d');
+            let cache = new Map();
+            const fn = name => {
+                if (cache.has(name)) return cache.get(name);
+                const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+                probe.fillStyle = '#000';
+                if (v) probe.fillStyle = v;
+                cache.set(name, probe.fillStyle);
+                return probe.fillStyle;
+            };
+            fn.reset = () => { cache = new Map(); window._floorDotPattern = null; };
+            return fn;
+        })();
+
         function draw() {
             if (container && container.clientWidth > 0 && container.clientHeight > 0) {
                 if (canvas.width !== container.clientWidth || canvas.height !== container.clientHeight) {
@@ -3596,34 +3601,34 @@
 
             // 1. Draw Blueprint / Procedural Floor Background (Warm Sand Diagonal Stripes matching Figma)
             if (hasBlueprint) {
-                ctx.fillStyle = 'var(--ula-sand-300)';
+                ctx.fillStyle = OC('--ula-sand-300');
                 ctx.fillRect(0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
                 ctx.drawImage(BLUEPRINT_IMAGE, 0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
             } else {
-                // Pre-rendered Warm Sand with subtle diagonal striped texture
-                if (!window._floorSandPattern) {
+                // Design 24: dark map-chrome floor slab with rounded corners and a faint dot grid.
+                if (!window._floorDotPattern) {
                     const pCan = document.createElement('canvas');
-                    pCan.width = 32;
-                    pCan.height = 32;
+                    pCan.width = 24;
+                    pCan.height = 24;
                     const pCtx = pCan.getContext('2d');
-                    pCtx.fillStyle = 'var(--ula-sand-300)';
-                    pCtx.fillRect(0, 0, 32, 32);
-                    pCtx.strokeStyle = '#E1D8CA';
-                    pCtx.lineWidth = 4.5;
+                    pCtx.fillStyle = OC('--ula-surface-map-chrome');
+                    pCtx.fillRect(0, 0, 24, 24);
+                    pCtx.fillStyle = OC('--ula-border-on-dark-subtle');
                     pCtx.beginPath();
-                    pCtx.moveTo(-8, 8); pCtx.lineTo(8, -8);
-                    pCtx.moveTo(0, 32); pCtx.lineTo(32, 0);
-                    pCtx.moveTo(24, 40); pCtx.lineTo(40, 24);
-                    pCtx.stroke();
-                    window._floorSandPattern = ctx.createPattern(pCan, 'repeat');
+                    pCtx.arc(12, 12, 1, 0, Math.PI * 2);
+                    pCtx.fill();
+                    window._floorDotPattern = ctx.createPattern(pCan, 'repeat');
                 }
-                ctx.fillStyle = window._floorSandPattern || 'var(--ula-sand-300)';
-                ctx.fillRect(0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
-
-                // Subtle Outer Floor Border
-                ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
+                ctx.save();
+                ctx.beginPath();
+                if (ctx.roundRect) ctx.roundRect(0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX, 28);
+                else ctx.rect(0, 0, MAP_WIDTH_PX, MAP_HEIGHT_PX);
+                ctx.fillStyle = window._floorDotPattern || OC('--ula-surface-map-chrome');
+                ctx.fill();
+                ctx.strokeStyle = OC('--ula-border-on-dark-subtle');
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+                ctx.restore();
             }
 
             // 1b. Draw Placed Furniture & Decor Objects Layer (Rendered with 3D Elevation Depth Sorting)
@@ -3660,17 +3665,20 @@
                         ctx.drawImage(sprImg, -objW / 2, -objH / 2, objW, objH);
                     } else {
                         ctx.fillStyle = obj.color || 'rgba(59, 130, 246, 0.45)';
+                        ctx.beginPath();
                         if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
                         else ctx.rect(-objW / 2, -objH / 2, objW, objH);
                         ctx.fill();
                     }
                 } else if (!hasBlueprint && (obj.color || obj.is_custom || (obj.interaction_config && obj.interaction_config.is_custom))) {
                     ctx.fillStyle = obj.color ? (obj.color.length === 7 ? obj.color + '99' : obj.color) : 'rgba(59, 130, 246, 0.45)';
+                    ctx.beginPath();
                     if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
                     else ctx.rect(-objW / 2, -objH / 2, objW, objH);
                     ctx.fill();
-                    ctx.strokeStyle = 'var(--ula-white)';
+                    ctx.strokeStyle = OC('--ula-white');
                     ctx.lineWidth = 1;
+                    ctx.beginPath();
                     if (ctx.roundRect) ctx.roundRect(-objW / 2, -objH / 2, objW, objH, 4);
                     else ctx.rect(-objW / 2, -objH / 2, objW, objH);
                     ctx.stroke();
@@ -3744,7 +3752,7 @@
                 ctx.fillStyle = isLocked ? '#B91C1C' : '#334F40';
                 ctx.fillRect(cx - halfT + 1, cy - halfT + 1, thickness - 2, thickness - 2);
 
-                ctx.strokeStyle = isLocked ? 'var(--ula-status-danger)' : 'rgba(237, 230, 217, 0.35)';
+                ctx.strokeStyle = isLocked ? OC('--ula-status-danger') : 'rgba(237, 230, 217, 0.35)';
                 ctx.lineWidth = 1;
                 ctx.strokeRect(cx - halfT + 0.5, cy - halfT + 0.5, thickness - 1, thickness - 1);
                 ctx.restore();
@@ -3831,7 +3839,7 @@
                     // 1. Floor Threshold Plate (Warm Brass transition strip)
                     ctx.fillStyle = isLocked ? 'rgba(239, 68, 68, 0.30)' : 'rgba(211, 165, 83, 0.32)';
                     ctx.fillRect(-halfW - 2, -5, door.width + 4, 10);
-                    ctx.strokeStyle = isLocked ? 'var(--ula-status-danger)' : 'var(--ula-gold-400)';
+                    ctx.strokeStyle = isLocked ? OC('--ula-status-danger') : OC('--ula-gold-400');
                     ctx.lineWidth = 1.2;
                     ctx.strokeRect(-halfW - 2, -5, door.width + 4, 10);
 
@@ -3841,7 +3849,7 @@
                     // Left Post
                     ctx.fillStyle = isLocked ? '#7F1D1D' : '#0B1C13';
                     ctx.fillRect(-halfW - jambW, -jambD / 2, jambW, jambD);
-                    ctx.fillStyle = isLocked ? 'var(--ula-status-danger)' : 'var(--ula-gold-400)';
+                    ctx.fillStyle = isLocked ? OC('--ula-status-danger') : OC('--ula-gold-400');
                     ctx.fillRect(-halfW - jambW, -jambD / 2 - 2, jambW, 3);
                     ctx.strokeStyle = 'rgba(237, 230, 217, 0.3)';
                     ctx.strokeRect(-halfW - jambW, -jambD / 2, jambW, jambD);
@@ -3849,7 +3857,7 @@
                     // Right Post
                     ctx.fillStyle = isLocked ? '#7F1D1D' : '#0B1C13';
                     ctx.fillRect(halfW, -jambD / 2, jambW, jambD);
-                    ctx.fillStyle = isLocked ? 'var(--ula-status-danger)' : 'var(--ula-gold-400)';
+                    ctx.fillStyle = isLocked ? OC('--ula-status-danger') : OC('--ula-gold-400');
                     ctx.fillRect(halfW, -jambD / 2 - 2, jambW, 3);
                     ctx.strokeRect(halfW, -jambD / 2, jambW, jambD);
 
@@ -3879,13 +3887,15 @@
 
                     const leafW = door.width * 0.94;
                     ctx.fillStyle = isLocked ? '#991B1B' : (openProg > 0.4 ? '#245C3A' : '#1A3828');
+                    ctx.beginPath();
                     if (ctx.roundRect) ctx.roundRect(0, -doorThick / 2, leafW, doorThick, 2);
                     else ctx.rect(0, -doorThick / 2, leafW, doorThick);
                     ctx.fill();
 
                     ctx.shadowColor = 'transparent';
-                    ctx.strokeStyle = isLocked ? 'var(--ula-status-danger)' : (openProg > 0.4 ? 'var(--ula-status-success)' : 'var(--ula-gold-400)');
+                    ctx.strokeStyle = isLocked ? OC('--ula-status-danger') : (openProg > 0.4 ? OC('--ula-status-success') : OC('--ula-gold-400'));
                     ctx.lineWidth = 1.2;
+                    ctx.beginPath();
                     if (ctx.roundRect) ctx.roundRect(0, -doorThick / 2, leafW, doorThick, 2);
                     else ctx.rect(0, -doorThick / 2, leafW, doorThick);
                     ctx.stroke();
@@ -3956,6 +3966,7 @@
 
                 // Dark high-contrast background matching Figma
                 ctx.fillStyle = isLocked ? 'rgba(127, 29, 29, 0.95)' : 'rgba(10, 24, 18, 0.94)';
+                ctx.beginPath();
                 if (ctx.roundRect) ctx.roundRect(cardX, cardY, cardW, cardH, cardRadius);
                 else ctx.rect(cardX, cardY, cardW, cardH);
                 ctx.fill();
@@ -3963,6 +3974,7 @@
                 ctx.shadowColor = 'transparent';
                 ctx.strokeStyle = isLocked ? 'rgba(239, 68, 68, 0.80)' : 'rgba(211, 165, 83, 0.70)';
                 ctx.lineWidth = 1.2;
+                ctx.beginPath();
                 if (ctx.roundRect) ctx.roundRect(cardX, cardY, cardW, cardH, cardRadius);
                 else ctx.rect(cardX, cardY, cardW, cardH);
                 ctx.stroke();
@@ -3974,7 +3986,7 @@
                 ctx.shadowBlur = 0;
                 ctx.shadowOffsetX = 0;
                 ctx.shadowOffsetY = 0;
-                ctx.fillStyle = 'var(--ula-white)';
+                ctx.fillStyle = OC('--ula-white');
                 ctx.font = '700 11px ' + (CURRENT_LOCALE === 'ar' ? '"IBM Plex Sans Arabic", sans-serif' : '"IBM Plex Sans", sans-serif');
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -4005,6 +4017,7 @@
             ctx.shadowOffsetY = 3;
 
             ctx.fillStyle = 'rgba(20, 36, 28, 0.90)';
+            ctx.beginPath();
             if (ctx.roundRect) ctx.roundRect(sX, sY, sW, sH, 13);
             else ctx.rect(sX, sY, sW, sH);
             ctx.fill();
@@ -4015,6 +4028,7 @@
             ctx.shadowOffsetY = 0;
             ctx.strokeStyle = 'rgba(237, 230, 217, 0.18)';
             ctx.lineWidth = 1;
+            ctx.beginPath();
             if (ctx.roundRect) ctx.roundRect(sX, sY, sW, sH, 13);
             else ctx.rect(sX, sY, sW, sH);
             ctx.stroke();
@@ -4025,7 +4039,7 @@
             ctx.shadowBlur = 0;
             ctx.shadowOffsetX = 0;
             ctx.shadowOffsetY = 0;
-            ctx.fillStyle = 'var(--ula-white)';
+            ctx.fillStyle = OC('--ula-white');
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(statusBadgeText, sX + sW / 2, sY + sH / 2);
@@ -4061,14 +4075,15 @@
                 const bh = bubble.emoji ? 32 : 22;
 
                 ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
-                ctx.strokeStyle = 'var(--ula-status-success)';
+                ctx.strokeStyle = OC('--ula-status-success');
                 ctx.lineWidth = 1.5;
+                ctx.beginPath();
                 if (ctx.roundRect) ctx.roundRect(bx - (bw / 2), by - bh, bw, bh, 8);
                 else ctx.rect(bx - (bw / 2), by - bh, bw, bh);
                 ctx.fill();
                 ctx.stroke();
 
-                ctx.fillStyle = 'var(--ula-white)';
+                ctx.fillStyle = OC('--ula-white');
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(text, bx, by - (bh / 2));
@@ -4100,7 +4115,7 @@
                 ctx.fill();
 
                 // Clear, crisp circular boundary ring for voice range
-                ctx.strokeStyle = isSelf ? 'var(--ula-status-success)' : '#3B82F6';
+                ctx.strokeStyle = isSelf ? OC('--ula-status-success') : '#3B82F6';
                 ctx.lineWidth = 1.8;
                 ctx.setLineDash([5, 4]);
                 ctx.beginPath();
@@ -4113,7 +4128,7 @@
             const isSpeaking = isSelf ? (micActive && localAvatar.isSpeaking) : (av.micActive && av.isSpeaking);
             if (isSpeaking) {
                 const pulse = (Math.sin(Date.now() / 120) + 1) / 2;
-                ctx.strokeStyle = 'var(--ula-status-success)';
+                ctx.strokeStyle = OC('--ula-status-success');
                 ctx.lineWidth = 2.5 + pulse * 2.5;
                 ctx.beginPath();
                 ctx.arc(x, y, radius + 4 + pulse * 4, 0, Math.PI * 2);
@@ -4166,8 +4181,8 @@
                 // Draw Modern Gradient Monogram with User's Initials
                 const bgGrad = ctx.createLinearGradient(x - radius, y - radius, x + radius, y + radius);
                 if (isSelf) {
-                    bgGrad.addColorStop(0, 'var(--ula-palm-500)');
-                    bgGrad.addColorStop(1, 'var(--ula-palm-700)');
+                    bgGrad.addColorStop(0, OC('--ula-palm-500'));
+                    bgGrad.addColorStop(1, OC('--ula-palm-700'));
                 } else {
                     bgGrad.addColorStop(0, '#2563EB');
                     bgGrad.addColorStop(1, '#1E40AF');
@@ -4177,11 +4192,9 @@
 
                 // Initials
                 const nameParts = (av.name || 'User').trim().split(' ');
-                const initials = nameParts.length >= 2 
-                    ? (nameParts[0][0] + nameParts[1][0]).toUpperCase()
-                    : (nameParts[0].substring(0, 2)).toUpperCase();
+                const initials = officeInitials(av.name || 'User'); // same rule as the people panel
                 ctx.font = 'bold 11px "IBM Plex Sans Arabic", "IBM Plex Sans", sans-serif';
-                ctx.fillStyle = 'var(--ula-white)';
+                ctx.fillStyle = OC('--ula-white');
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(initials, x, y);
@@ -4189,7 +4202,7 @@
             ctx.restore();
 
             // 5. Circular Avatar Border Ring
-            ctx.strokeStyle = isSelf ? 'var(--ula-status-success)' : (isCamOn ? '#60A5FA' : 'rgba(237, 230, 217, 0.50)');
+            ctx.strokeStyle = isSelf ? OC('--ula-status-success') : (isCamOn ? '#60A5FA' : 'rgba(237, 230, 217, 0.50)');
             ctx.lineWidth = isSelf ? 2.5 : 1.8;
             ctx.beginPath();
             ctx.arc(x, y, radius, 0, Math.PI * 2);
@@ -4199,15 +4212,15 @@
             const isMicOn = isSelf ? micActive : av.micActive;
             
             // Mic Badge
-            ctx.fillStyle = isMicOn ? 'var(--ula-status-success)' : 'rgba(15, 23, 42, 0.90)';
+            ctx.fillStyle = isMicOn ? OC('--ula-status-success') : 'rgba(15, 23, 42, 0.90)';
             ctx.beginPath();
             ctx.arc(x + radius - 2, y - radius + 3, 5.5, 0, Math.PI * 2);
             ctx.fill();
-            ctx.strokeStyle = 'var(--ula-white)';
+            ctx.strokeStyle = OC('--ula-white');
             ctx.lineWidth = 1;
             ctx.stroke();
             ctx.font = '6px sans-serif';
-            ctx.fillStyle = 'var(--ula-white)';
+            ctx.fillStyle = OC('--ula-white');
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(isMicOn ? '🎙️' : '🔇', x + radius - 2, y - radius + 3);
@@ -4218,11 +4231,11 @@
                 ctx.beginPath();
                 ctx.arc(x + radius - 2, y + radius - 3, 5.5, 0, Math.PI * 2);
                 ctx.fill();
-                ctx.strokeStyle = 'var(--ula-white)';
+                ctx.strokeStyle = OC('--ula-white');
                 ctx.lineWidth = 1;
                 ctx.stroke();
                 ctx.font = '6px sans-serif';
-                ctx.fillStyle = 'var(--ula-white)';
+                ctx.fillStyle = OC('--ula-white');
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText('📷', x + radius - 2, y + radius - 3);
@@ -4230,26 +4243,27 @@
 
             // 7. Small Compact Person Name Pill Under the Circular Avatar
             const isSitting = isSelf ? localAvatar.isSitting : av.isSitting;
-            const displayName = isSelf 
-                ? (isSitting ? `🪑 ${av.name}` : `${av.name}`)
-                : (isSitting ? `🪑 ${av.name}` : av.name);
+            // Short tag (e.g. "SO", "ن‌ق"): full names made the pill too wide. The people panel shows the full name.
+            const displayName = officeShortTag(av.name);
             ctx.font = '600 8.5px "IBM Plex Sans Arabic", "IBM Plex Sans", sans-serif';
             const nameW = ctx.measureText(displayName).width + 10;
             const badgeH = 14;
             const badgeY = y + radius + 3;
 
             ctx.fillStyle = isSitting ? 'rgba(60, 107, 76, 0.95)' : 'rgba(14, 25, 19, 0.92)';
+            ctx.beginPath();
             if (ctx.roundRect) ctx.roundRect(x - nameW / 2, badgeY, nameW, badgeH, 4);
             else ctx.rect(x - nameW / 2, badgeY, nameW, badgeH);
             ctx.fill();
 
             ctx.strokeStyle = isSelf ? 'rgba(134, 239, 172, 0.6)' : 'rgba(237, 230, 217, 0.25)';
             ctx.lineWidth = 0.8;
+            ctx.beginPath();
             if (ctx.roundRect) ctx.roundRect(x - nameW / 2, badgeY, nameW, badgeH, 4);
             else ctx.rect(x - nameW / 2, badgeY, nameW, badgeH);
             ctx.stroke();
 
-            ctx.fillStyle = isSitting ? 'var(--ula-white)' : (isSelf ? 'var(--ula-status-success)' : 'var(--ula-sand-100)');
+            ctx.fillStyle = isSitting ? OC('--ula-text-on-dark') : (isSelf ? OC('--ula-status-success-on-dark') : OC('--ula-text-on-dark'));
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(displayName, x, badgeY + (badgeH / 2));
@@ -4271,7 +4285,7 @@
                 ctx.stroke();
 
                 // Draw bouncing pin icon above head
-                ctx.fillStyle = 'var(--ula-status-success)';
+                ctx.fillStyle = OC('--ula-status-success');
                 ctx.font = 'bold 20px "Material Symbols Rounded", sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'bottom';
@@ -4315,8 +4329,9 @@
                         else ctx.rect(bx, by, bubbleW, bubbleH);
                         ctx.fill();
 
-                        ctx.strokeStyle = isSelf ? 'var(--ula-status-success)' : '#3B82F6';
+                        ctx.strokeStyle = isSelf ? OC('--ula-status-success') : '#3B82F6';
                         ctx.lineWidth = 1.5;
+                        ctx.beginPath();
                         if (ctx.roundRect) ctx.roundRect(bx, by, bubbleW, bubbleH, 10);
                         else ctx.rect(bx, by, bubbleW, bubbleH);
                         ctx.stroke();
@@ -4329,7 +4344,7 @@
                         ctx.lineTo(x + 5, by + bubbleH);
                         ctx.fill();
 
-                        ctx.strokeStyle = isSelf ? 'var(--ula-status-success)' : '#3B82F6';
+                        ctx.strokeStyle = isSelf ? OC('--ula-status-success') : '#3B82F6';
                         ctx.beginPath();
                         ctx.moveTo(x - 5, by + bubbleH);
                         ctx.lineTo(x, by + bubbleH + 6);
@@ -4337,7 +4352,7 @@
                         ctx.stroke();
 
                         // Bubble Text
-                        ctx.fillStyle = 'var(--ula-white)';
+                        ctx.fillStyle = OC('--ula-white');
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
                         ctx.fillText(text.length > 30 ? text.substring(0, 28) + '...' : text, x, by + bubbleH / 2);
@@ -4692,6 +4707,14 @@
                                 showToast(`👋 ${data.payload.senderName || 'A Colleague'} ${__('says HI to you!')}`);
                                 spawnSpeechBubble(data.payload.senderUserId, data.payload.senderName, `👋 ${data.payload.senderName || 'Colleague'} says HI!`, '👋');
                             }
+                        }
+
+                        // 8d-1. One-to-one calls and direct-message notices
+                        else if (typeof data.type === 'string' && data.type.startsWith('call.') && data.payload) {
+                            if (data.payload.targetUserId === localAvatar.id) onCallEvent(data.type, data.payload);
+                        }
+                        else if (data.type === 'dm.notify' && data.payload) {
+                            onDmNotify(data.payload);
                         }
 
                         // 8d-2. Colleague Ring / Attention Call
@@ -5314,51 +5337,90 @@
             }
         }
 
-        function startRecordingSession() {
+        // Screen recording: the person picks a screen, window or tab; their microphone is mixed in.
+        // Works in Chrome, Edge and Firefox (each records the container it supports: WebM or MP4).
+        let recordDisplayStream = null;
+        let recordAudioCtx = null;
+        let recordMime = 'video/webm';
+
+        async function startRecordingSession() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia || typeof MediaRecorder === 'undefined') {
+                showToast('❌ ' + @json(__('office.rec_unsupported')));
+                return;
+            }
+            let display;
             try {
-                const canvasStream = canvas.captureStream(30);
-                if (localMediaStream && localMediaStream.getAudioTracks().length > 0) {
-                    localMediaStream.getAudioTracks().forEach(t => canvasStream.addTrack(t));
+                display = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 30 }, audio: true });
+            } catch (e) {
+                showToast('ℹ️ ' + @json(__('office.rec_cancelled')));
+                return;
+            }
+            try {
+                const tracks = [...display.getVideoTracks()];
+                const audio = [...display.getAudioTracks(), ...(localMediaStream ? localMediaStream.getAudioTracks().filter(t => t.readyState === 'live') : [])];
+                if (audio.length > 1) {
+                    // Mix screen sound and the microphone into one track.
+                    recordAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const dest = recordAudioCtx.createMediaStreamDestination();
+                    audio.forEach(t => recordAudioCtx.createMediaStreamSource(new MediaStream([t])).connect(dest));
+                    tracks.push(...dest.stream.getAudioTracks());
+                } else {
+                    tracks.push(...audio);
                 }
+                const stream = new MediaStream(tracks);
+                const hasAudio = stream.getAudioTracks().length > 0;
+                const candidates = hasAudio
+                    ? ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm', 'video/mp4']
+                    : ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm', 'video/mp4'];
+                const mime = candidates.find(t => MediaRecorder.isTypeSupported(t)) || '';
 
                 recordedChunks = [];
-                const supportedMime = MediaRecorder.isTypeSupported('video/mp4;codecs=avc1') ? 'video/mp4' : (MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus') ? 'video/webm;codecs=vp9,opus' : 'video/webm');
-                mediaRecorder = new MediaRecorder(canvasStream, { mimeType: supportedMime });
-                mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
+                mediaRecorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+                recordMime = (mediaRecorder.mimeType || mime || 'video/webm').split(';')[0];
+                mediaRecorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) recordedChunks.push(e.data); };
                 mediaRecorder.onstop = uploadRecordingToServer;
                 mediaRecorder.start(1000);
+
+                recordDisplayStream = display;
+                // The browser's own "Stop sharing" button ends the recording too.
+                display.getVideoTracks()[0].addEventListener('ended', () => { if (isRecording) stopRecordingSession(); });
 
                 isRecording = true;
                 recordStartTime = Date.now();
                 document.getElementById('btn-record').classList.add('active');
                 document.getElementById('rec-icon').textContent = 'stop_circle';
-                document.getElementById('rec-text').textContent = '{{ __("Stop") }}';
-                showToast('⏺️ {{ __("Recording started...") }}');
-            } catch(e) {
+                document.getElementById('rec-text').textContent = @json(__('Stop'));
+                showToast('⏺️ ' + @json(__('office.rec_started')));
+            } catch (e) {
                 console.error(e);
-                showToast('❌ {{ __("Recording failed to start") }}');
+                display.getTracks().forEach(t => t.stop());
+                showToast('❌ ' + @json(__('office.rec_failed')));
             }
         }
 
         function stopRecordingSession() {
-            if (mediaRecorder && isRecording) {
-                mediaRecorder.stop();
-                isRecording = false;
-                document.getElementById('btn-record').classList.remove('active');
-                document.getElementById('rec-icon').textContent = 'radio_button_checked';
-                document.getElementById('rec-text').textContent = '{{ __("Record") }}';
-                showToast('⏳ {{ __("Processing recording...") }}');
-            }
+            if (!mediaRecorder || !isRecording) return;
+            isRecording = false;
+            try { mediaRecorder.stop(); } catch (e) { /* already stopped */ }
+            // Stop only the screen capture; the microphone belongs to the call.
+            if (recordDisplayStream) recordDisplayStream.getTracks().forEach(t => t.stop());
+            recordDisplayStream = null;
+            if (recordAudioCtx) { recordAudioCtx.close().catch(() => {}); recordAudioCtx = null; }
+            document.getElementById('btn-record').classList.remove('active');
+            document.getElementById('rec-icon').textContent = 'radio_button_checked';
+            document.getElementById('rec-text').textContent = @json(__('Record'));
+            showToast('⏳ ' + @json(__('office.rec_processing')));
         }
 
         async function uploadRecordingToServer() {
             if (recordedChunks.length === 0) return;
-            const blob = new Blob(recordedChunks, { type: 'video/mp4' });
+            const blob = new Blob(recordedChunks, { type: recordMime });
+            const ext = recordMime.includes('mp4') ? 'mp4' : 'webm';
             const duration = Math.max(1, Math.round((Date.now() - recordStartTime) / 1000));
             const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
 
             const formData = new FormData();
-            formData.append('video', blob, `session_${Date.now()}.mp4`);
+            formData.append('video', blob, `session_${Date.now()}.${ext}`);
             formData.append('title', `Office Session ${new Date().toLocaleTimeString()} — ${myRoom ? myRoom.name : 'Main Floor'}`);
             if (myRoom && myRoom.id) formData.append('room_id', myRoom.id);
             formData.append('duration_seconds', duration);
@@ -5390,15 +5452,29 @@
                 showToast('🚫 {{ __("Guests are only permitted to view files in their designated invited room.") }}');
                 return;
             }
-            document.getElementById('room-files-title').textContent = `📁 ${myRoom.name} — {{ __('Documents & Assets') }}`;
+            document.getElementById('room-files-title').textContent = @json(__('office.files_title'));
+            document.getElementById('room-files-subtitle').textContent = myRoom.name || '';
+            bindRoomFilesDrop();
             document.getElementById('room-files-modal').style.display = 'flex';
             await loadRoomFiles(myRoom.id);
         }
         function closeRoomFilesModal() { document.getElementById('room-files-modal').style.display = 'none'; }
 
+        // Drop a file on the dashed area to upload it (same path as the file picker).
+        function bindRoomFilesDrop() {
+            const zone = document.getElementById('room-files-drop');
+            if (!zone || zone.dataset.bound) return;
+            zone.dataset.bound = '1';
+            ['dragenter', 'dragover'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.add('is-over'); }));
+            ['dragleave', 'drop'].forEach(ev => zone.addEventListener(ev, e => { e.preventDefault(); zone.classList.remove('is-over'); }));
+            zone.addEventListener('drop', e => {
+                if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length) handleRoomFileUpload({ files: e.dataTransfer.files });
+            });
+        }
+
         async function loadRoomFiles(roomId) {
             const list = document.getElementById('room-files-list');
-            list.innerHTML = `<div style="text-align:center; padding:20px; color:var(--ula-text-muted);">⏳ {{ __("Loading files...") }}</div>`;
+            list.innerHTML = `<div class="ula-dlg-empty" role="status"><span class="material-symbols-rounded" aria-hidden="true">progress_activity</span>${@json(__('office.files_loading'))}</div>`;
 
             try {
                 const res = await fetch(`/organizations/${CONFIG.org.id}/rooms/${roomId}/files`, {
@@ -5409,29 +5485,37 @@
                 const files = data.files || [];
 
                 if (files.length === 0) {
-                    list.innerHTML = `<div style="text-align:center; padding:30px; color:var(--ula-text-muted);">📂 {{ __("No documents uploaded to this room yet.") }}</div>`;
+                    list.innerHTML = `<div class="ula-dlg-empty"><span class="material-symbols-rounded" aria-hidden="true">folder_open</span>${@json(__('office.files_empty'))}</div>`;
                     return;
                 }
 
+                const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+                const typeIcon = name => {
+                    const ext = String(name).split('.').pop().toLowerCase();
+                    if (ext === 'pdf') return 'picture_as_pdf';
+                    if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'].includes(ext)) return 'image';
+                    if (['ppt', 'pptx', 'key'].includes(ext)) return 'slideshow';
+                    if (['xls', 'xlsx', 'csv'].includes(ext)) return 'table_chart';
+                    return 'description';
+                };
+                const fmtSize = b => b >= 1048576 ? `${(b / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(b / 1024))} KB`;
                 let html = '';
                 files.forEach(f => {
-                    const sizeKb = (f.file_size / 1024).toFixed(1);
                     html += `
-                        <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <strong style="font-size: 12px; color: var(--ula-text-primary); display: block;">📄 ${f.name}</strong>
-                                <span style="font-size: 10px; color: var(--ula-text-secondary);">${f.uploader_name} · ${sizeKb} KB · ${new Date(f.created_at).toLocaleDateString()}</span>
+                        <div class="ula-dlg-file">
+                            <span class="ula-dlg-file-tile" aria-hidden="true"><span class="material-symbols-rounded">${typeIcon(f.name)}</span></span>
+                            <div class="ula-dlg-file-text">
+                                <span class="ula-dlg-file-name">${esc(f.name)}</span>
+                                <span class="ula-dlg-file-meta"><span class="ula-dlg-mono">${fmtSize(Number(f.file_size) || 0)}</span> · ${esc(f.uploader_name)}</span>
                             </div>
-                            <div style="display: flex; gap: 6px;">
-                                <a href="${f.file_url}" download class="action-link-btn" style="padding: 4px 8px; font-size: 11px;">💾 {{ __("Download") }}</a>
-                                <button onclick="deleteRoomFile('${roomId}', '${f.id}')" class="action-link-btn btn-danger" style="padding: 4px 8px; font-size: 11px;">🗑️</button>
-                            </div>
+                            <a href="${esc(f.file_url)}" download class="ula-dlg-iconbtn" title="${esc(@json(__('office.files_download')))}" aria-label="${esc(@json(__('office.files_download')))}"><span class="material-symbols-rounded">download</span></a>
+                            <button type="button" onclick="deleteRoomFile('${esc(roomId)}', '${esc(f.id)}')" class="ula-dlg-iconbtn ula-dlg-iconbtn--danger" title="${esc(@json(__('office.files_delete')))}" aria-label="${esc(@json(__('office.files_delete')))}"><span class="material-symbols-rounded">delete</span></button>
                         </div>
                     `;
                 });
                 list.innerHTML = html;
             } catch(e) {
-                list.innerHTML = `<div style="color:var(--ula-status-danger); text-align:center; padding:20px;">❌ {{ __("Failed to load room files") }}</div>`;
+                list.innerHTML = `<div class="ula-dlg-empty" style="color: var(--ula-text-danger);"><span class="material-symbols-rounded" aria-hidden="true">error</span>${@json(__('office.files_failed'))}</div>`;
             }
         }
 
@@ -5515,15 +5599,9 @@
         function ringSpotlightUser() {
             const modal = document.getElementById('user-spotlight-modal');
             const targetId = modal ? modal.getAttribute('data-active-user-id') : null;
-            if (targetId && ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({
-                    type: 'user.ring',
-                    payload: { targetUserId: targetId, senderUserId: localAvatar.id, senderName: localAvatar.name }
-                }));
-                playRingSound();
-                spawnSpeechBubble(localAvatar.id, localAvatar.name, `🔔 Ringing...`, '🔔');
-                showToast('🔔 ' + __('Ringing colleague for immediate attention...'));
-            }
+            if (!targetId) return;
+            if (typeof closeUserSpotlight === 'function') closeUserSpotlight();
+            startCall(targetId);
         }
 
         let currentIncomingRing = null;
@@ -5799,7 +5877,7 @@
                     wbCtx.lineTo(x, y);
                     wbCtx.stroke();
                 } else if (wbTool === 'eraser') {
-                    wbCtx.strokeStyle = 'var(--ula-white)';
+                    wbCtx.strokeStyle = OC('--ula-white');
                     wbCtx.lineWidth = 20;
                     wbCtx.lineTo(x, y);
                     wbCtx.stroke();
@@ -5956,11 +6034,11 @@
                     html += `
                         <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 12px; padding: 14px; display: flex; justify-content: space-between; align-items: center;">
                             <div>
-                                <strong style="font-size: 13px; color: var(--ula-text-primary); display: block;">${r.title}</strong>
+                                <strong style="font-size: 13px; color: var(--ula-text-primary); display: block;">${escapeHtml(r.title)}</strong>
                                 <span style="font-size: 11px; color: var(--ula-text-secondary);">${new Date(r.created_at).toLocaleString()} · ${Math.round(r.duration_seconds || 0)}s · ${r.recorded_by_name || 'Member'}</span>
                             </div>
                             <div style="display: flex; gap: 8px;">
-                                <a href="${downloadUrl}" download="meeting_recording.mp4" class="action-link-btn">💾 {{ __("Download MP4") }}</a>
+                                <a href="${downloadUrl}" download class="action-link-btn"><span class="material-symbols-rounded" style="font-size: 16px;">download</span> {{ __("Download") }}</a>
                                 <button onclick="deleteRecording('${r.id}')" class="action-link-btn btn-danger">🗑️</button>
                             </div>
                         </div>
@@ -6011,6 +6089,10 @@
                     document.getElementById('guest-link-input').value = data.join_url;
                     showToast('⚡ {{ __("Guest link ready!") }}');
                 }
+                else {
+                    // e.g. the plan's limit of active guest links; say why nothing was created.
+                    showToast('❌ ' + escapeHtml(data.message || @json(__('Failed to generate link'))));
+                }
             } catch(e) {
                 showToast('❌ {{ __("Failed to generate link") }}');
             }
@@ -6032,6 +6114,7 @@
 
         // ── Live Online Occupants Modal & Roster ──
         function updateOccupantsCounter() {
+            if (typeof peoplePanelTimer !== 'undefined' && peoplePanelTimer) renderPeoplePanel();
             const total = 1 + remoteAvatars.size;
             const counterEl = document.getElementById('occupants-counter');
             if (counterEl) {
@@ -6039,68 +6122,374 @@
             }
         }
 
-        function openOccupantsModal() {
-            const modal = document.getElementById('occupants-modal');
-            const list = document.getElementById('occupants-list');
-            modal.style.display = 'flex';
+        // ══ People panel, calls and direct messages (design-reference 24 / 29) ══
+        const PEOPLE_T = {
+            you: @json(__('office.people_you')),
+            guest: @json(__('office.people_guest')),
+            openSpace: @json(__('office.people_open_space')),
+            call: @json(__('office.people_call')),
+            message: @json(__('office.people_message')),
+            walk: @json(__('office.people_walk')),
+            alone: @json(__('office.people_alone')),
+            calling: @json(__('office.call_calling')),
+            incoming: @json(__('office.call_incoming')),
+            answer: @json(__('office.call_answer')),
+            decline: @json(__('office.call_decline')),
+            wave: @json(__('office.call_wave')),
+            cancel: @json(__('office.call_cancel')),
+            accepted: @json(__('office.call_accepted')),
+            declined: @json(__('office.call_declined')),
+            busy: @json(__('office.call_busy')),
+            waved: @json(__('office.call_waved')),
+            noAnswer: @json(__('office.call_no_answer')),
+            missed: @json(__('office.call_missed')),
+            offline: @json(__('office.call_offline')),
+            inCall: @json(__('office.call_already')),
+            onTheWay: @json(__('office.call_on_the_way')),
+            dmWith: @json(__('office.dm_with')),
+            dmFrom: @json(__('office.dm_from')),
+            dmFailed: @json(__('office.dm_failed')),
+            dmEmpty: @json(__('office.dm_empty')),
+        };
 
-            const localRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
-            let html = `
-                <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="font-size: 20px;">${userGender === 'female' ? '👩' : '👨'}</span>
-                        <div>
-                            <strong style="font-size: 13px; color: var(--ula-text-primary); display: block;">
-                                ${localAvatar.name} <span style="font-size: 10px; color: var(--ula-status-success); font-weight: 800;">({{ __('You / Host') }})</span>
-                            </strong>
-                            <span style="font-size: 11px; color: var(--ula-text-secondary);">🏢 ${localRoom ? localRoom.name : '{{ __("Open Floor") }}'}</span>
-                        </div>
-                    </div>
-                    <span style="font-size: 10px; background: rgba(16, 185, 129, 0.15); color: var(--ula-status-success); padding: 3px 8px; border-radius: 6px; font-weight: 800;">🟢 {{ __('Active') }}</span>
-                </div>
-            `;
+        function officeInitials(name) {
+            const parts = String(name || '?').replace(/\([^)]*\)/g, '').trim().split(/\s+/).filter(Boolean);
+            if (!parts.length) return '?';
+            // Arabic names show one letter (the design's "ن"); Latin names two ("RQ").
+            if (/[\u0600-\u06FF]/.test(parts[0] || '')) return parts[0][0];
+            return ((parts[0] || '?')[0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+        }
+        // Name tag under an avatar: first letter of the first name + first letter of the last name,
+        // or the first two letters of a single name. "(Super Admin)"-style suffixes are ignored.
+        function officeShortTag(name) {
+            const clean = String(name || '').replace(/\([^)]*\)/g, '').trim();
+            const words = clean.split(/\s+/).filter(Boolean);
+            if (!words.length) return '?';
+            const isArabic = /[؀-ۿ]/.test(clean);
+            const lead = w => (isArabic && w.length > 2 && w.startsWith('ال') ? w.slice(2) : w);
+            let tag = words.length > 1
+                ? lead(words[0])[0] + lead(words[words.length - 1])[0]
+                : Array.from(words[0]).slice(0, 2).join('');
+            // Keep Arabic initials as separate letters instead of joining them into a word.
+            if (isArabic) tag = Array.from(tag).join('‌');
+            return isArabic ? tag : tag.toUpperCase();
+        }
 
-            if (remoteAvatars.size === 0) {
-                html += `
-                    <div style="text-align: center; padding: 24px; color: var(--ula-text-muted); font-size: 12px;">
-                        👥 {{ __("No other colleagues or guests in this office yet.") }}
-                        <div style="margin-top: 10px;">
-                            <button onclick="closeOccupantsModal(); openGuestInviteModal();" class="action-link-btn" style="display: inline-flex; background: var(--ula-palm-900); color: white; padding: 6px 12px; font-size: 11px;">
-                                ⚡ {{ __("Invite a Guest Now") }}
-                            </button>
-                        </div>
-                    </div>
-                `;
-            } else {
-                remoteAvatars.forEach(av => {
-                    const r = getCurrentRoom(av.x, av.y);
-                    const avGender = av.gender || 'male';
-                    html += `
-                        <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center;">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <span style="font-size: 20px;">${avGender === 'female' ? '👩' : '👨'}</span>
-                                <div>
-                                    <strong style="font-size: 13px; color: var(--ula-text-primary); display: block;">
-                                        ${av.name} ${av.isGuest ? '<span style="font-size: 10px; color: var(--ula-gold-500); font-weight: 800;">(Guest)</span>' : ''}
-                                    </strong>
-                                    <span style="font-size: 11px; color: var(--ula-text-secondary);">🏢 ${r ? r.name : '{{ __("Open Floor") }}'}</span>
-                                </div>
-                            </div>
-                            <div style="display: flex; gap: 6px; align-items: center;">
-                                <span style="font-size: 10px; background: rgba(16, 185, 129, 0.15); color: var(--ula-status-success); padding: 3px 8px; border-radius: 6px; font-weight: 800;">🟢 Online</span>
-                                <button onclick="teleportToUser('${av.id}')" class="action-link-btn" style="padding: 4px 8px; font-size: 10px;" title="{{ __('Walk / Teleport to colleague') }}">🎯 {{ __('Go To') }}</button>
-                            </div>
-                        </div>
-                    `;
-                });
+        function officeTone(id) {
+            const tones = ['gold', 'palm', 'stone', 'terracotta'];
+            let h = 0;
+            for (const ch of String(id)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+            return tones[h % tones.length];
+        }
+        function officeAvatarInner(name, url) {
+            return url ? `<img src="${escapeHtml(url)}" alt="">` : escapeHtml(officeInitials(name));
+        }
+        function officeWhere(x, y) {
+            const r = getCurrentRoom(x, y);
+            return r ? getLocalizedRoomName(r) : PEOPLE_T.openSpace;
+        }
+        function wsSend(type, payload) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type, payload }));
+                return true;
             }
+            return false;
+        }
 
+        // ── People panel ──
+        let peoplePanelTimer = null;
+
+        function renderPeoplePanel() {
+            const list = document.getElementById('people-list');
+            const count = document.getElementById('people-count');
+            if (!list) return;
+            if (count) count.textContent = String(1 + remoteAvatars.size);
+
+            const row = (id, name, url, where, extra, actions) => `
+                <div class="ula-people-row" role="listitem">
+                    <span class="ula-people-avatar" data-tone="${officeTone(id)}">${officeAvatarInner(name, url)}<span class="ula-people-dot" data-state="${activeCall && activeCall.peerId === id ? 'busy' : 'on'}"></span></span>
+                    <span class="ula-people-text">
+                        <span class="ula-people-name">${escapeHtml(name)} ${extra}</span>
+                        <span class="ula-people-where">${escapeHtml(where)}</span>
+                    </span>
+                    <span class="ula-people-actions">${actions}</span>
+                </div>`;
+
+            let html = row(localAvatar.id, localAvatar.name, localAvatar.avatarUrl || null, officeWhere(localAvatar.x, localAvatar.y), `<small>(${escapeHtml(PEOPLE_T.you)})</small>`, '');
+
+            const others = [...remoteAvatars.values()].sort((a, b) => String(a.name).localeCompare(String(b.name)));
+            if (!others.length) {
+                html += `<div class="ula-people-empty">${escapeHtml(PEOPLE_T.alone)}</div>`;
+            }
+            others.forEach(av => {
+                const id = escapeHtml(av.id);
+                const btn = (icon, label, fn, disabled = false) =>
+                    `<button type="button" class="ula-people-btn" onclick="${fn}('${id}')" title="${escapeHtml(label)}" aria-label="${escapeHtml(label)} ${escapeHtml(av.name)}" ${disabled ? 'disabled' : ''}><span class="material-symbols-rounded">${icon}</span></button>`;
+                const actions =
+                    btn('near_me', PEOPLE_T.walk, 'teleportToUser') +
+                    // Direct messages are saved member-to-member conversations; guests are not signed-in members.
+                    ((av.isGuest || isGuest) ? '' : btn('chat_bubble', PEOPLE_T.message, 'openDirectMessage')) +
+                    btn('call', PEOPLE_T.call, 'startCall', !!activeCall);
+                html += row(av.id, av.name, av.avatarUrl, officeWhere(av.x, av.y), av.isGuest ? `<small>(${escapeHtml(PEOPLE_T.guest)})</small>` : '', actions);
+            });
             list.innerHTML = html;
         }
 
-        function closeOccupantsModal() {
-            document.getElementById('occupants-modal').style.display = 'none';
+        // Kept under the old names: the dock and header buttons call these.
+        function openOccupantsModal() {
+            const panel = document.getElementById('occupants-panel');
+            if (!panel) return;
+            if (!panel.hidden) { closeOccupantsModal(); return; }
+            panel.hidden = false;
+            renderPeoplePanel();
+            clearInterval(peoplePanelTimer);
+            peoplePanelTimer = setInterval(renderPeoplePanel, 2000); // locations change as people walk
         }
+
+        function closeOccupantsModal() {
+            const panel = document.getElementById('occupants-panel');
+            if (panel) panel.hidden = true;
+            clearInterval(peoplePanelTimer);
+            peoplePanelTimer = null;
+        }
+
+        // ── Calls ──
+        const CALL_TIMEOUT_MS = 30000;
+        let activeCall = null; // { callId, peerId, peerName, peerAvatar, dir: 'out' | 'in', startedAt, ringTimer, timeoutTimer, tickTimer }
+
+        function playRingbackTone() {
+            try {
+                const actx = getAudioContext();
+                if (!actx) return;
+                const now = actx.currentTime;
+                const osc = actx.createOscillator();
+                const gain = actx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(425, now);
+                gain.gain.setValueAtTime(0.0001, now);
+                gain.gain.exponentialRampToValueAtTime(0.12, now + 0.05);
+                gain.gain.setValueAtTime(0.12, now + 0.95);
+                gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.05);
+                osc.connect(gain); gain.connect(actx.destination);
+                osc.start(now); osc.stop(now + 1.1);
+            } catch (e) { /* audio is best-effort */ }
+        }
+
+        function renderCallCard() {
+            const card = document.getElementById('call-card');
+            if (!card || !activeCall) return;
+            document.getElementById('call-avatar').innerHTML = officeAvatarInner(activeCall.peerName, activeCall.peerAvatar);
+            document.getElementById('call-name').textContent = activeCall.peerName || '';
+            document.getElementById('call-status').textContent = activeCall.dir === 'in' ? PEOPLE_T.incoming : PEOPLE_T.calling;
+            const b = (cls, icon, label, fn) => `<button type="button" class="ula-call-btn ${cls}" onclick="${fn}()"><span class="material-symbols-rounded" aria-hidden="true">${icon}</span>${escapeHtml(label)}</button>`;
+            document.getElementById('call-actions').innerHTML = activeCall.dir === 'in'
+                ? b('ula-call-btn--answer', 'call', PEOPLE_T.answer, 'answerCall') + b('ula-call-btn--decline', 'call_end', PEOPLE_T.decline, 'declineCall') + b('ula-call-btn--quiet', 'waving_hand', PEOPLE_T.wave, 'waveInsteadOfCall')
+                : b('ula-call-btn--decline', 'call_end', PEOPLE_T.cancel, 'cancelCall');
+            card.hidden = false;
+            const answer = card.querySelector('.ula-call-btn--answer, .ula-call-btn--decline');
+            if (answer) answer.focus({ preventScroll: true });
+        }
+
+        function beginCallSignals() {
+            const ring = activeCall.dir === 'in' ? playRingSound : playRingbackTone;
+            ring();
+            activeCall.ringTimer = setInterval(ring, activeCall.dir === 'in' ? 2500 : 3000);
+            activeCall.startedAt = Date.now();
+            const timerEl = document.getElementById('call-timer');
+            const tick = () => {
+                if (!activeCall || !timerEl) return;
+                const s = Math.floor((Date.now() - activeCall.startedAt) / 1000);
+                timerEl.textContent = `00:${String(s).padStart(2, '0')}`;
+            };
+            tick();
+            activeCall.tickTimer = setInterval(tick, 1000);
+            activeCall.timeoutTimer = setTimeout(() => {
+                if (!activeCall) return;
+                if (activeCall.dir === 'out') {
+                    wsSend('call.cancel', { targetUserId: activeCall.peerId, callId: activeCall.callId, reason: 'timeout' });
+                    showToast('ℹ️ ' + PEOPLE_T.noAnswer.replace(':name', escapeHtml(activeCall.peerName)));
+                } else {
+                    wsSend('call.decline', { targetUserId: activeCall.peerId, callId: activeCall.callId, reason: 'missed' });
+                    showToast('ℹ️ ' + PEOPLE_T.missed.replace(':name', escapeHtml(activeCall.peerName)));
+                }
+                clearCall();
+            }, CALL_TIMEOUT_MS);
+        }
+
+        function clearCall() {
+            if (activeCall) {
+                clearInterval(activeCall.ringTimer);
+                clearInterval(activeCall.tickTimer);
+                clearTimeout(activeCall.timeoutTimer);
+            }
+            activeCall = null;
+            const card = document.getElementById('call-card');
+            if (card) card.hidden = true;
+            if (peoplePanelTimer) renderPeoplePanel();
+        }
+
+        function startCall(userId) {
+            if (activeCall) { showToast('ℹ️ ' + PEOPLE_T.inCall); return; }
+            const av = remoteAvatars.get(userId);
+            if (!av) return;
+            const callId = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : `c${Date.now()}${Math.random().toString(16).slice(2)}`;
+            if (!wsSend('call.invite', { targetUserId: userId, callId })) {
+                showToast('❌ ' + PEOPLE_T.offline);
+                return;
+            }
+            activeCall = { callId, peerId: userId, peerName: av.name, peerAvatar: av.avatarUrl, dir: 'out' };
+            renderCallCard();
+            beginCallSignals();
+            if (peoplePanelTimer) renderPeoplePanel();
+        }
+
+        function answerCall() {
+            if (!activeCall || activeCall.dir !== 'in') return;
+            const peer = activeCall.peerId;
+            wsSend('call.accept', { targetUserId: peer, callId: activeCall.callId });
+            clearCall();
+            // Answering walks you to the caller; proximity audio connects you when you arrive.
+            teleportToUser(peer);
+            const av = remoteAvatars.get(peer);
+            showToast('✅ ' + PEOPLE_T.onTheWay.replace(':name', escapeHtml(av ? av.name : '')));
+        }
+
+        function declineCall(reason = 'declined') {
+            if (!activeCall || activeCall.dir !== 'in') return;
+            wsSend('call.decline', { targetUserId: activeCall.peerId, callId: activeCall.callId, reason });
+            clearCall();
+        }
+
+        function waveInsteadOfCall() {
+            if (!activeCall || activeCall.dir !== 'in') return;
+            wsSend('user.wave', { targetUserId: activeCall.peerId });
+            if (typeof playWaveSound === 'function') playWaveSound();
+            declineCall('waved');
+        }
+
+        function cancelCall() {
+            if (!activeCall || activeCall.dir !== 'out') return;
+            wsSend('call.cancel', { targetUserId: activeCall.peerId, callId: activeCall.callId, reason: 'cancelled' });
+            clearCall();
+        }
+
+        function onCallEvent(type, p) {
+            if (type === 'call.invite') {
+                if (activeCall) {
+                    wsSend('call.decline', { targetUserId: p.senderUserId, callId: p.callId, reason: 'busy' });
+                    return;
+                }
+                activeCall = { callId: p.callId, peerId: p.senderUserId, peerName: p.senderName, peerAvatar: p.senderAvatarUrl, dir: 'in' };
+                renderCallCard();
+                beginCallSignals();
+                if (peoplePanelTimer) renderPeoplePanel();
+                return;
+            }
+            if (!activeCall || p.callId !== activeCall.callId || p.senderUserId !== activeCall.peerId) return;
+            const name = escapeHtml(activeCall.peerName); // toasts render HTML
+            if (type === 'call.accept' && activeCall.dir === 'out') {
+                clearCall();
+                showToast('✅ ' + PEOPLE_T.accepted.replace(':name', name));
+            } else if (type === 'call.decline' && activeCall.dir === 'out') {
+                clearCall();
+                const msg = p.reason === 'busy' ? PEOPLE_T.busy : (p.reason === 'waved' ? PEOPLE_T.waved : PEOPLE_T.declined);
+                showToast('ℹ️ ' + msg.replace(':name', name));
+            } else if (type === 'call.cancel' && activeCall.dir === 'in') {
+                clearCall();
+                showToast('ℹ️ ' + PEOPLE_T.missed.replace(':name', name));
+            }
+        }
+
+        // ── Direct messages (saved in the same DM channel the dashboard chat uses) ──
+        let dmState = null; // { userId, name, channelId, messages, poll }
+
+        async function openDirectMessage(userId) {
+            const av = remoteAvatars.get(userId);
+            if (!av) return;
+            closeOccupantsModal();
+            try {
+                const res = await fetch(`/chat/dm/${encodeURIComponent(userId)}`, { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' });
+                const data = await res.json();
+                if (!res.ok || !data.channel) throw new Error(data.message || 'dm');
+                if (dmState && dmState.poll) clearInterval(dmState.poll);
+                dmState = { userId, name: av.name, channelId: data.channel.id, messages: [], poll: null };
+            } catch (e) {
+                showToast('❌ ' + PEOPLE_T.dmFailed);
+                return;
+            }
+            const tab = document.getElementById('chat-tab-dm');
+            if (tab) {
+                tab.classList.add('is-open');
+                document.getElementById('chat-tab-dm-name').textContent = dmState.name;
+            }
+            const drawer = document.getElementById('chat-drawer');
+            if (drawer && drawer.style.display !== 'flex') toggleChatDrawer();
+            switchChatScope('dm');
+            await loadDirectMessages();
+            dmState.poll = setInterval(() => {
+                const d = document.getElementById('chat-drawer');
+                if (chatScope === 'dm' && d && d.style.display === 'flex') loadDirectMessages();
+            }, 6000); // fallback when the realtime notice is missed
+        }
+
+        async function loadDirectMessages() {
+            if (!dmState) return;
+            try {
+                const res = await fetch(`/chat/channels/${encodeURIComponent(dmState.channelId)}/messages`, { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' });
+                const data = await res.json();
+                if (!res.ok) return;
+                const before = dmState.messages.length;
+                dmState.messages = data.messages || [];
+                if (chatScope === 'dm' && dmState.messages.length !== before) renderChatMessages();
+            } catch (e) { /* keep what is shown */ }
+        }
+
+        async function sendDirectMessage(text) {
+            if (!dmState) return;
+            try {
+                const res = await fetch(`/chat/channels/${encodeURIComponent(dmState.channelId)}/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CONFIG.csrf },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ body: text }),
+                });
+                const data = await res.json();
+                if (!res.ok || !data.message) throw new Error();
+                dmState.messages.push({ ...data.message, is_mine: true });
+                renderChatMessages();
+                wsSend('dm.notify', { targetUserId: dmState.userId, channelId: dmState.channelId, preview: text.slice(0, 140) });
+            } catch (e) {
+                showToast('❌ ' + PEOPLE_T.dmFailed);
+            }
+        }
+
+        function renderDirectMessages(container) {
+            const head = `<div class="msg-dm-head">${escapeHtml(PEOPLE_T.dmWith.replace(':name', dmState ? dmState.name : ''))}</div>`;
+            const msgs = dmState ? dmState.messages : [];
+            if (!msgs.length) {
+                container.innerHTML = head + `<div style="text-align: center; padding: 24px 10px; color: var(--ula-text-muted); font-size: 12px;">${escapeHtml(PEOPLE_T.dmEmpty)}</div>`;
+                return;
+            }
+            container.innerHTML = head + msgs.map(m => `
+                <div class="msg-bubble ${m.is_mine ? 'self' : ''}">
+                    <div class="msg-meta"><span>${m.is_mine ? escapeHtml(PEOPLE_T.you) : escapeHtml(m.sender ? m.sender.name : '')}</span> <span class="msg-time">${escapeHtml(m.created_at || '')}</span></div>
+                    <span style="word-break: break-word;">${escapeHtml(m.body || '')}</span>
+                </div>`).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function onDmNotify(p) {
+            if (p.targetUserId !== localAvatar.id) return;
+            const drawer = document.getElementById('chat-drawer');
+            const viewing = dmState && dmState.userId === p.senderUserId && chatScope === 'dm' && drawer && drawer.style.display === 'flex';
+            if (viewing) {
+                loadDirectMessages();
+                return;
+            }
+            if (typeof playMessageChime === 'function') playMessageChime();
+            showToast('💬 ' + PEOPLE_T.dmFrom.replace(':name', escapeHtml(p.senderName || '')) + (p.preview ? `: ${escapeHtml(p.preview)}` : ''));
+        }
+
 
         function teleportToUser(userId) {
             const av = remoteAvatars.get(userId);
@@ -6581,6 +6970,8 @@
             const globalTab = document.getElementById('chat-tab-global');
             if (roomTab) roomTab.classList.toggle('active', scope === 'room');
             if (globalTab) globalTab.classList.toggle('active', scope === 'global');
+            const dmTab = document.getElementById('chat-tab-dm');
+            if (dmTab) dmTab.classList.toggle('active', scope === 'dm');
             renderChatMessages();
         }
 
@@ -6588,18 +6979,19 @@
             const container = document.getElementById('chat-messages-container');
             if (!container) return;
 
+            if (chatScope === 'dm') { renderDirectMessages(container); return; }
             const msgs = chatScope === 'global' ? globalMessages : roomMessages;
             const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
 
             let headerHint = '';
             if (chatScope === 'room') {
                 if (myRoom) {
-                    headerHint = `<div style="text-align: center; padding: 4px 8px; margin-bottom: 8px; font-size: 10px; font-weight: 800; color: var(--ula-status-success); background: rgba(16, 185, 129, 0.12); border-radius: 6px;">🏢 {{ __("Acoustic Room Channel:") }} ${escapeHtml(myRoom.name)}</div>`;
+                    headerHint = `<div class="msg-dm-head">🏢 {{ __("Acoustic Room Channel:") }} ${escapeHtml(myRoom.name)}</div>`;
                 } else {
-                    headerHint = `<div style="text-align: center; padding: 4px 8px; margin-bottom: 8px; font-size: 10px; font-weight: 800; color: var(--ula-gold-500); background: rgba(245, 158, 11, 0.12); border-radius: 6px;">🚪 {{ __("Hallway / Open Space (Enter a room to chat with room occupants)") }}</div>`;
+                    headerHint = `<div class="msg-dm-head" style="background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg);">🚪 {{ __("Hallway / Open Space (Enter a room to chat with room occupants)") }}</div>`;
                 }
             } else {
-                headerHint = `<div style="text-align: center; padding: 4px 8px; margin-bottom: 8px; font-size: 10px; font-weight: 800; color: #60A5FA; background: rgba(59, 130, 246, 0.12); border-radius: 6px;">🌐 {{ __("Company-Wide General Office Channel") }}</div>`;
+                headerHint = `<div class="msg-dm-head" style="background: var(--ula-tone-stone-bg); color: var(--ula-tone-stone-fg);">🌐 {{ __("Company-Wide General Office Channel") }}</div>`;
             }
 
             if (!msgs.length) {
@@ -6647,6 +7039,7 @@
             const text = inp.value.trim();
             if (!text) return;
             inp.value = '';
+            if (chatScope === 'dm') { sendDirectMessage(text); return; }
 
             const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
             const activeScope = chatScope;
@@ -6870,6 +7263,8 @@
                         selCam.value = window.VWorkWebRTC.deviceManager.selectedVideoInputId;
                         selMic.value = window.VWorkWebRTC.deviceManager.selectedAudioInputId;
                         selSpk.value = window.VWorkWebRTC.deviceManager.selectedAudioOutputId;
+                        // A saved device id that is no longer plugged in leaves the select blank; fall back to the first device.
+                        [selCam, selMic, selSpk].forEach(sel => { if (sel.selectedIndex < 0 && sel.options.length) sel.selectedIndex = 0; });
                     }
 
                     // Start camera preview & mic meter
@@ -6957,15 +7352,22 @@
                     const results = await window.VWorkWebRTC.diagnostics.runFullDiagnostics(config);
                     latestDiagResults = results;
 
-                    // Populate UI
-                    document.getElementById('diag-overall-text').textContent = `${results.overall}`;
-                    document.getElementById('diag-overall-badge').textContent = results.overall === 'Excellent' ? '🟢' : (results.overall.includes('Good') ? '🟡' : '🔴');
-                    document.getElementById('diag-cam-status').textContent = results.camera.passed ? '✓ Active' : '✗ ' + results.camera.message;
-                    document.getElementById('diag-cam-status').style.color = results.camera.passed ? 'var(--ula-status-success)' : 'var(--ula-status-danger)';
-                    document.getElementById('diag-mic-status').textContent = results.microphone.passed ? '✓ Active' : '✗ ' + results.microphone.message;
-                    document.getElementById('diag-mic-status').style.color = results.microphone.passed ? 'var(--ula-status-success)' : 'var(--ula-status-danger)';
-                    document.getElementById('diag-ping-status').textContent = `${results.internet.latencyMs} ms`;
-                    document.getElementById('diag-turn-status').textContent = results.turn.passed ? '✓ Active (Coturn)' : '✗ Inactive';
+                    // Populate UI: each status is a tone chip (design 28).
+                    const T = {
+                        excellent: @json(__('office.quality_excellent')), good: @json(__('office.quality_good')), poor: @json(__('office.quality_poor')),
+                        verified: @json(__('office.diag_verified')), blocked: @json(__('office.diag_blocked')),
+                        active: @json(__('office.diag_turn_active')), inactive: @json(__('office.diag_turn_inactive')),
+                    };
+                    const chip = (id, tone, text) => { const el = document.getElementById(id); if (el) { el.dataset.tone = tone; el.textContent = text; } };
+                    const overall = String(results.overall || '');
+                    const oTone = overall === 'Excellent' ? 'ok' : (overall.includes('Good') ? 'warn' : 'error');
+                    document.getElementById('diag-overall-box').dataset.tone = oTone;
+                    document.getElementById('diag-overall-text').textContent = oTone === 'ok' ? T.excellent : (oTone === 'warn' ? T.good : T.poor);
+                    chip('diag-cam-status', results.camera.passed ? 'ok' : 'error', results.camera.passed ? T.verified : T.blocked);
+                    chip('diag-mic-status', results.microphone.passed ? 'ok' : 'error', results.microphone.passed ? T.verified : T.blocked);
+                    const ms = Number(results.internet.latencyMs);
+                    chip('diag-ping-status', ms < 150 ? 'ok' : (ms < 400 ? 'warn' : 'error'), `${results.internet.latencyMs}ms`);
+                    chip('diag-turn-status', results.turn.passed ? 'ok' : 'warn', results.turn.passed ? T.active : T.inactive);
                     document.getElementById('diag-livekit-host').textContent = results.livekit.host;
                     document.getElementById('diag-packet-loss').textContent = `${results.networkStats.packetLoss}%`;
                     document.getElementById('diag-jitter').textContent = `${results.networkStats.jitter} ms`;
@@ -7011,6 +7413,7 @@
                 if (document.body) document.body.classList.remove('dark-mode');
             }
             localStorage.setItem('vw_theme', next);
+            if (typeof OC === 'function') OC.reset();
             const themeIcon = document.getElementById('theme-icon');
             if (themeIcon) {
                 themeIcon.textContent = next === 'dark' ? 'light_mode' : 'dark_mode';
@@ -7178,7 +7581,8 @@
         async function logAttendance(action, duration = null, roomId = null) {
             if (isGuest) return; // Only log for registered members
             try {
-                const targetRoom = roomId || (currentRoom ? currentRoom.id : null);
+                const here = (typeof localAvatar !== 'undefined') ? getCurrentRoom(localAvatar.x, localAvatar.y) : null;
+                const targetRoom = roomId || (here ? here.id : null);
                 await fetch('/api/office/attendance/log', {
                     method: 'POST',
                     headers: {
