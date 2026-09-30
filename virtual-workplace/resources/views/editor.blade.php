@@ -595,6 +595,9 @@
         .ed-door-btn:hover { background: var(--ula-surface-hover); color: var(--ula-text-primary); border-color: var(--ula-border-strong); }
         .ed-door-btn:focus-visible { outline: none; box-shadow: var(--ula-focus-ring); }
         .ed-door-btn.active { background: var(--ula-accent-default); border-color: var(--ula-accent-default); color: var(--ula-accent-fg); }
+        .ed-door-btn.blocked { opacity: 0.35; cursor: not-allowed; background: var(--ula-surface-page-alt); }
+        .ed-door-btn.blocked:hover { background: var(--ula-surface-page-alt); color: var(--ula-text-secondary); border-color: var(--ula-border-default); }
+        .ed-door-caption.is-warning { color: var(--ula-text-danger); }
         .ed-door-btn--top { grid-area: top; justify-self: center; width: 56px; }
         .ed-door-btn--bottom { grid-area: bottom; justify-self: center; width: 56px; }
         .ed-door-btn--left { grid-area: left; align-self: center; height: 56px; }
@@ -2050,6 +2053,28 @@
 
             if (isDragging) {
                 isDragging = false;
+                if (selectedItem && selectedItem.type === 'room' && selectedItem.item.bounds) {
+                    const rb = selectedItem.item.bounds;
+                    const before = { x: rb.x, y: rb.y };
+                    const snapped = snapRoomBounds(rb, rooms, 'move');
+                    const inMap = snapped.x >= 0 && snapped.y >= 0 && (snapped.x + snapped.width) * TILE_SIZE <= MAP_WIDTH_PX && (snapped.y + snapped.height) * TILE_SIZE <= MAP_HEIGHT_PX;
+                    if (inMap) { rb.x = snapped.x; rb.y = snapped.y; }
+                    let conflict = roomSpacingConflict(selectedItem.item);
+                    const doorVictim = conflict ? null : blockedNeighbourDoor(selectedItem.item);
+                    if (conflict || doorVictim) { rb.x = dragOrigX; rb.y = dragOrigY; }
+                    const shiftX = rb.x - before.x, shiftY = rb.y - before.y;
+                    (roomContainedObjects || []).forEach(entry => {
+                        if (entry.obj && entry.obj.position) { entry.obj.position.x += shiftX; entry.obj.position.y += shiftY; }
+                    });
+                    if (doorVictim) {
+                        showToast('❌ ' + @json(__('This room would block the door of ":name". Move that room\'s door to another wall first.')).replace(':name', doorVictim === selectedItem.item ? @json(__('this room')) : (doorVictim.name || '')));
+                    } else if (conflict) {
+                        showToast('❌ ' + @json(__('This room must either share a wall with ":name" or be at least :gap tiles away from it, so people can walk between them.')).replace(':name', conflict.name || '').replace(':gap', ROOM_MIN_GAP_TILES));
+                    } else if (shiftX || shiftY) {
+                        showToast('✅ ' + @json(__('Snapped to the neighbouring room wall')));
+                    }
+                    updateInspector();
+                }
                 roomContainedObjects = [];
                 canvas.style.cursor = currentTool === 'select' ? 'default' : 'crosshair';
                 updateFloatingActions();
@@ -2067,16 +2092,35 @@
                         return;
                     }
 
+                    const snappedRect = snapRoomBounds(currentRect, rooms, 'resize');
+                    const didSnap = ['x', 'y', 'width', 'height'].some(k => snappedRect[k] !== currentRect[k]);
                     const newRoom = {
                         name: `${currentRoomType.charAt(0).toUpperCase() + currentRoomType.slice(1)} Room`,
                         type: currentRoomType,
                         access_mode: currentRoomType === 'private' ? 'private' : 'public',
                         capacity: 10,
                         color: currentRoomColor,
-                        bounds: { ...currentRect },
+                        bounds: { ...snappedRect },
                         metadata: { audio_isolation: true }
                     };
+                    const conflict = roomSpacingConflict(newRoom);
+                    if (conflict) {
+                        isDrawing = false;
+                        currentRect = null;
+                        draw();
+                        showToast('❌ ' + @json(__('This room must either share a wall with ":name" or be at least :gap tiles away from it, so people can walk between them.')).replace(':name', conflict.name || '').replace(':gap', ROOM_MIN_GAP_TILES));
+                        return;
+                    }
                     rooms.push(newRoom);
+                    const doorVictim = blockedNeighbourDoor(newRoom);
+                    if (doorVictim) {
+                        rooms.splice(rooms.indexOf(newRoom), 1);
+                        isDrawing = false;
+                        currentRect = null;
+                        draw();
+                        showToast('❌ ' + @json(__('This room would block the door of ":name". Move that room\'s door to another wall first.')).replace(':name', doorVictim === newRoom ? @json(__('this room')) : (doorVictim.name || '')));
+                        return;
+                    }
                     selectedItem = { type: 'room', item: newRoom };
 
                     // Save room to backend
@@ -2099,12 +2143,19 @@
                             bounds: newRoom.bounds,
                             metadata: newRoom.metadata
                         })
-                    }).then(res => res.json()).then(data => {
-                        if (data.room && data.room.id) newRoom.id = data.room.id;
+                    }).then(async res => {
+                        const data = await res.json().catch(() => ({}));
+                        if (res.ok && data.room && data.room.id) { newRoom.id = data.room.id; return; }
+                        // Rejected by the server: take it back off the canvas and say why.
+                        const idx = rooms.indexOf(newRoom);
+                        if (idx > -1) rooms.splice(idx, 1);
+                        if (selectedItem && selectedItem.item === newRoom) { selectedItem = null; updateInspector(); hideFloatingActions(); }
+                        draw();
+                        showToast('❌ ' + (data.message || @json(__('Failed to save room'))));
                     }).catch(console.error);
 
                     switchDrawerTab('inspector');
-                    showToast('🏢 {{ __("Room created!") }}');
+                    showToast(didSnap ? '✅ ' + @json(__('Snapped to the neighbouring room wall')) : '🏢 {{ __("Room created!") }}');
                 }
                 isDrawing = false;
                 currentRect = null;
@@ -2133,6 +2184,135 @@
             }
         });
 
+        // ── Room adjacency ──
+        // Rooms either share a wall or keep a full walking corridor (RoomBoundsGap on the server).
+        // A room drawn or dropped closer than that snaps flush to its neighbour's wall.
+        const ROOM_MIN_GAP_TILES = {{ \App\Domains\Workspace\Support\RoomBoundsGap::minGapTiles($map->tile_size ?: \App\Domains\Workspace\Support\RoomBoundsGap::CANONICAL_TILE_PX) }};
+
+        function roomSeparation(a, b) {
+            const dx = Math.max(b.x - (a.x + a.width), a.x - (b.x + b.width));
+            const dy = Math.max(b.y - (a.y + a.height), a.y - (b.y + b.height));
+            return { dx, dy, gap: Math.max(dx, dy) };
+        }
+
+        function roomGapAllowed(gap) {
+            return Math.abs(gap) < 0.01 || gap >= ROOM_MIN_GAP_TILES;
+        }
+
+        // mode 'resize': move the near edge (a freshly drawn rectangle keeps its far corner).
+        // mode 'move':   shift the whole room (a dragged room keeps its size).
+        function snapRoomBounds(b, others, mode) {
+            const out = { ...b };
+            for (let pass = 0; pass < 4; pass++) {
+                let changed = false;
+                for (const o of others) {
+                    if (!o.bounds || o.bounds === b) continue;
+                    const n = o.bounds;
+                    const { dx, dy } = roomSeparation(out, n);
+                    const near = d => d > 0 && d < ROOM_MIN_GAP_TILES;
+                    // Horizontal neighbour: close on x while rows overlap or are also close.
+                    if (near(dx) && (dy < 0 || near(dy) || Math.abs(dy) < 0.01)) {
+                        if (out.x + out.width <= n.x) {            // neighbour on the right
+                            if (mode === 'move') out.x = n.x - out.width; else out.width = n.x - out.x;
+                        } else {                                     // neighbour on the left
+                            const edge = n.x + n.width;
+                            if (mode === 'move') out.x = edge; else { out.width += out.x - edge; out.x = edge; }
+                        }
+                        changed = true;
+                    }
+                    const again = roomSeparation(out, n);
+                    if (near(again.dy) && (again.dx < 0 || near(again.dx) || Math.abs(again.dx) < 0.01)) {
+                        if (out.y + out.height <= n.y) {           // neighbour below
+                            if (mode === 'move') out.y = n.y - out.height; else out.height = n.y - out.y;
+                        } else {                                     // neighbour above
+                            const edge = n.y + n.height;
+                            if (mode === 'move') out.y = edge; else { out.height += out.y - edge; out.y = edge; }
+                        }
+                        changed = true;
+                    }
+                    // Small overlap: trim (resize) or push out (move) along the shallower axis.
+                    const ov = roomSeparation(out, n);
+                    if (ov.dx < 0 && ov.dy < 0) {
+                        const penX = Math.min(out.x + out.width - n.x, n.x + n.width - out.x);
+                        const penY = Math.min(out.y + out.height - n.y, n.y + n.height - out.y);
+                        if (Math.min(penX, penY) <= ROOM_MIN_GAP_TILES) {
+                            if (penX <= penY) {
+                                const fromLeft = out.x < n.x;
+                                if (mode === 'move') out.x = fromLeft ? n.x - out.width : n.x + n.width;
+                                else if (fromLeft) out.width = n.x - out.x;
+                                else { out.width -= (n.x + n.width) - out.x; out.x = n.x + n.width; }
+                            } else {
+                                const fromTop = out.y < n.y;
+                                if (mode === 'move') out.y = fromTop ? n.y - out.height : n.y + n.height;
+                                else if (fromTop) out.height = n.y - out.y;
+                                else { out.height -= (n.y + n.height) - out.y; out.y = n.y + n.height; }
+                            }
+                            changed = true;
+                        }
+                    }
+                }
+                if (!changed) break;
+            }
+            return (out.width >= 1 && out.height >= 1) ? out : { ...b };
+        }
+
+        // First sibling this room is still too close to (or overlapping) after snapping, if any.
+        function roomSpacingConflict(room) {
+            for (const o of rooms) {
+                if (o === room || !o.bounds) continue;
+                if (!roomGapAllowed(roomSeparation(room.bounds, o.bounds).gap)) return o;
+            }
+            return null;
+        }
+
+        // ── Door geometry, mirrored from office.blade.php getRoomDoorPortal() ──
+        // A door is only usable when its outside step lands on free floor, not inside another room.
+        function doorSideBlocked(room, side, offset) {
+            if (!room || !room.bounds || side === 'auto') return false;
+            const rx = room.bounds.x * TILE_SIZE, ry = room.bounds.y * TILE_SIZE;
+            const rw = room.bounds.width * TILE_SIZE, rh = room.bounds.height * TILE_SIZE;
+            let cx, cy, outX, outY;
+            if (side === 'bottom') { cx = rx + rw * offset; cy = ry + rh; outX = cx; outY = cy + 32; }
+            else if (side === 'top') { cx = rx + rw * offset; cy = ry; outX = cx; outY = cy - 32; }
+            else if (side === 'right') { cx = rx + rw; cy = ry + rh * offset; outX = cx + 32; outY = cy; }
+            else { cx = rx; cy = ry + rh * offset; outX = cx - 32; outY = cy; }
+            if (outX < 0 || outY < 0 || outX > MAP_WIDTH_PX || outY > MAP_HEIGHT_PX) return true;
+            for (const o of rooms) {
+                if (o === room || !o.bounds) continue;
+                const ox = o.bounds.x * TILE_SIZE, oy = o.bounds.y * TILE_SIZE;
+                const ow = o.bounds.width * TILE_SIZE, oh = o.bounds.height * TILE_SIZE;
+                if (outX >= ox - 6 && outX <= ox + ow + 6 && outY >= oy - 6 && outY <= oy + oh + 6) return true;
+            }
+            return false;
+        }
+
+        // Where an 'auto' door will actually go: first wall whose centre opens onto free floor.
+        function autoDoorSide(room) {
+            for (const side of ['bottom', 'top', 'right', 'left']) {
+                if (!doorSideBlocked(room, side, 0.5)) return side;
+            }
+            return 'bottom';
+        }
+
+        // Can this room still be entered? Its chosen door (or, for 'auto', any wall) must open onto free floor.
+        function roomDoorUsable(room) {
+            const side = room.bounds && room.bounds.doorSide;
+            if (side && side !== 'auto') {
+                const off = typeof room.bounds.doorOffset === 'number' ? room.bounds.doorOffset : 0.5;
+                return !doorSideBlocked(room, side, off);
+            }
+            return ['bottom', 'top', 'right', 'left'].some(s => !doorSideBlocked(room, s, 0.5));
+        }
+
+        // A neighbour whose only way in would be covered by this room, if any. Call with the room already in `rooms`.
+        function blockedNeighbourDoor(room) {
+            for (const o of rooms) {
+                if (o === room || !o.bounds) continue;
+                if (!roomGapAllowed(roomSeparation(room.bounds, o.bounds).gap) || roomSeparation(room.bounds, o.bounds).gap > 0.01) continue;
+                if (!roomDoorUsable(o)) return o;
+            }
+            return roomDoorUsable(room) ? null : room;
+        }
         // ── Canvas palette from the design tokens ──
         // A canvas can't resolve var(--…), so the token values are read once here and again on theme change.
         const ED = {};
@@ -2276,7 +2456,7 @@
                 }
 
                 // Visual Door Indicator on Wall
-                const doorSide = (r.bounds && r.bounds.doorSide && r.bounds.doorSide !== 'auto') ? r.bounds.doorSide : 'bottom';
+                const doorSide = (r.bounds && r.bounds.doorSide && r.bounds.doorSide !== 'auto') ? r.bounds.doorSide : autoDoorSide(r);
                 const doorOffset = (r.bounds && typeof r.bounds.doorOffset === 'number') ? r.bounds.doorOffset : 0.5;
                 const dW = Math.min(42, (doorSide === 'top' || doorSide === 'bottom') ? rw * 0.45 : rh * 0.45);
                 let dX = rx + rw * doorOffset, dY = ry + rh;
@@ -3203,23 +3383,37 @@
         function syncDoorPicker() {
             const side = document.getElementById('prop-room-door-side')?.value || 'auto';
             const offset = Number(document.getElementById('prop-room-door-offset')?.value || 50);
+            const room = (selectedItem && selectedItem.type === 'room') ? selectedItem.item : null;
             document.querySelectorAll('.ed-door-btn').forEach(b => {
                 const on = b.dataset.side === side;
+                const blocked = doorSideBlocked(room, b.dataset.side, offset / 100);
                 b.classList.toggle('active', on);
+                b.classList.toggle('blocked', blocked);
                 b.setAttribute('aria-checked', on ? 'true' : 'false');
+                b.setAttribute('aria-disabled', blocked ? 'true' : 'false');
             });
             const mark = document.getElementById('door-picker-mark');
             if (mark) {
                 // 'auto' draws on the bottom wall (see draw()), so preview it there.
-                const drawn = side === 'auto' ? 'bottom' : side;
+                const drawn = side === 'auto' ? autoDoorSide(room) : side;
                 mark.dataset.side = drawn;
                 mark.style.left = (drawn === 'top' || drawn === 'bottom') ? offset + '%' : '';
                 mark.style.top = (drawn === 'left' || drawn === 'right') ? offset + '%' : '';
             }
             const caption = document.getElementById('door-picker-caption');
-            if (caption) caption.textContent = DOOR_SIDE_LABELS[side] || side;
+            if (caption) {
+                const bad = doorSideBlocked(room, side, offset / 100);
+                caption.textContent = bad ? @json(__('This wall is shared with another room — choose a wall that opens onto free floor.')) : (DOOR_SIDE_LABELS[side] || side);
+                caption.classList.toggle('is-warning', bad);
+            }
         }
         function setDoorSide(side) {
+            const room = (selectedItem && selectedItem.type === 'room') ? selectedItem.item : null;
+            const offset = Number(document.getElementById('prop-room-door-offset')?.value || 50) / 100;
+            if (doorSideBlocked(room, side, offset)) {
+                showToast('❌ ' + @json(__('This wall is shared with another room — choose a wall that opens onto free floor.')));
+                return;
+            }
             const input = document.getElementById('prop-room-door-side');
             if (input) input.value = side;
             updateRoomProp('doorSide', side);

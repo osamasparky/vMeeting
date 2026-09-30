@@ -317,7 +317,7 @@ class OrganizationSettingsController extends Controller
                 ],
             ]);
 
-            return back()->with('success', __("Your subscription seats have been successfully updated to :count seats.", ['count' => $newSeats]));
+            return back()->with('success', __('Your subscription seats have been successfully updated to :count seats.', ['count' => $newSeats]));
         }
 
         // If seat increase on paid/per-seat plan: redirect to payment/checkout page to confirm & transfer
@@ -326,7 +326,7 @@ class OrganizationSettingsController extends Controller
                 'plan' => $plan->id,
                 'seats' => $newSeats,
                 'type' => 'seat_increase',
-            ])->with('info', __("Please confirm and submit bank transfer details to activate your additional :count seats.", ['count' => $newSeats - $currentSeats]));
+            ])->with('info', __('Please confirm and submit bank transfer details to activate your additional :count seats.', ['count' => $newSeats - $currentSeats]));
         }
 
         // If free tier or custom plan without per-seat price: apply directly
@@ -334,7 +334,7 @@ class OrganizationSettingsController extends Controller
             $subscription->update(['seats' => $newSeats]);
         }
 
-        return back()->with('success', __("Seats updated to :count successfully.", ['count' => $newSeats]));
+        return back()->with('success', __('Seats updated to :count successfully.', ['count' => $newSeats]));
     }
 
     /**

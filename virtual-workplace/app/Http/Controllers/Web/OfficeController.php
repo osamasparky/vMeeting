@@ -539,7 +539,7 @@ class OfficeController extends Controller
         foreach ($siblings as $sibling) {
             if (! RoomBoundsGap::satisfiesMinGap($bounds, $sibling->bounds, $tilePx)) {
                 return response()->json([
-                    'message' => __('This room must be at least :gap tiles away from ":name" to leave a walkable corridor.', [
+                    'message' => __('This room must either share a wall with ":name" or be at least :gap tiles away from it, so people can walk between them.', [
                         'gap' => RoomBoundsGap::minGapTiles($tilePx),
                         'name' => $sibling->name,
                     ]),
@@ -602,7 +602,7 @@ class OfficeController extends Controller
                 $pairs = array_map(fn ($v) => "{$names[$v[0]]} / {$names[$v[1]]}", array_slice($violations, 0, 5));
 
                 return response()->json([
-                    'message' => __('These rooms are too close together for the avatar to walk between (need at least :gap tiles of clearance): :pairs', [
+                    'message' => __('These rooms must either share a wall or be at least :gap tiles apart: :pairs', [
                         'gap' => RoomBoundsGap::minGapTiles($tilePx),
                         'pairs' => implode(', ', $pairs),
                     ]),

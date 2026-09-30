@@ -3067,5 +3067,12 @@
     "Floor Styles": "أنماط الأرضيات",
     "Map version and status": "إصدار الخريطة وحالتها",
     "Acoustic Boundary": "عزل صوتي",
-    "Open Area": "مساحة مفتوحة"
+    "Open Area": "مساحة مفتوحة",
+    "This room must either share a wall with \":name\" or be at least :gap tiles away from it, so people can walk between them.": "يجب أن تلتصق هذه الغرفة بجدار «:name» أو تبتعد عنها :gap مربعات على الأقل ليتمكن الأشخاص من المرور بينهما.",
+    "These rooms must either share a wall or be at least :gap tiles apart: :pairs": "يجب أن تتلاصق هذه الغرف في جدار واحد أو تتباعد :gap مربعات على الأقل: :pairs",
+    "Snapped to the neighbouring room wall": "تم لصق الغرفة بجدار الغرفة المجاورة",
+    "This wall is shared with another room — choose a wall that opens onto free floor.": "هذا الجدار مشترك مع غرفة أخرى — اختر جداراً يطل على مساحة مفتوحة.",
+    "This room would block the door of \":name\". Move that room's door to another wall first.": "هذه الغرفة ستغلق باب «:name». انقل باب تلك الغرفة إلى جدار آخر أولاً.",
+    "this room": "هذه الغرفة",
+    "تجربة الآن": "Try it now"
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Domains\Administration\Models\Role;
 use App\Domains\Identity\Models\User;
 use App\Domains\Notifications\Services\NotificationService;
 use App\Domains\Projects\Actions\BuildProjectHubViewAction;
@@ -37,7 +38,7 @@ class ProjectHubController extends Controller
             ->first();
 
         if (! $membership && ($user->is_super_admin ?? false)) {
-            $superAdminRole = \App\Domains\Administration\Models\Role::firstOrCreate(
+            $superAdminRole = Role::firstOrCreate(
                 ['organization_id' => $project->organization_id, 'slug' => 'company_admin'],
                 ['name' => 'Company Admin', 'is_default' => false]
             );

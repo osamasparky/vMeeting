@@ -344,13 +344,13 @@ class OfficeTemplate extends Model
         $targetDesign = $designs[$slug] ?? null;
         if (! $targetDesign) {
             $targetDesign = $designs['free'];
-            $targetDesign['name'] = ($plan ? $plan->name : 'Custom Plan') . ' — Blueprint';
+            $targetDesign['name'] = ($plan ? $plan->name : 'Custom Plan').' — Blueprint';
         }
 
         $planModel = $plan ?: Plan::where('slug', $slug)->first();
-        $uniqueSlug = 'template-plan-' . ($planModel ? $planModel->id . '-' . Str::slug($planModel->slug) : 'free');
+        $uniqueSlug = 'template-plan-'.($planModel ? $planModel->id.'-'.Str::slug($planModel->slug) : 'free');
         if (self::where('slug', $uniqueSlug)->exists()) {
-            $uniqueSlug = 'template-plan-' . ($planModel ? $planModel->id : 'custom') . '-' . Str::random(4);
+            $uniqueSlug = 'template-plan-'.($planModel ? $planModel->id : 'custom').'-'.Str::random(4);
         }
 
         return self::create([

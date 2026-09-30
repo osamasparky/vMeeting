@@ -1461,7 +1461,7 @@ class SuperAdminController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => __('These rooms are too close together for the avatar to walk between (need at least :gap tiles of clearance): :pairs', [
+                'message' => __('These rooms must either share a wall or be at least :gap tiles apart: :pairs', [
                     'gap' => RoomBoundsGap::minGapTiles($tilePx),
                     'pairs' => implode(', ', $pairs),
                 ]),

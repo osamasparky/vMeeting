@@ -244,7 +244,7 @@ class ProjectAndTaskApiTest extends TestCase
         $res->assertStatus(200)
             ->assertSee('Project Alpha Hub')
             ->assertSee('PAH')
-            ->assertSee('Kanban Board');
+            ->assertSee(__('hub.tab_kanban'));
 
         // 2. Member of another tenant cannot access
         $resB = $this->actingAs($this->adminB)->get(route('projects.hub', $project->id));

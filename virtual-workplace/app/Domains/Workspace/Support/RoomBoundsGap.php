@@ -5,11 +5,13 @@ namespace App\Domains\Workspace\Support;
 /**
  * Shared geometry primitive for room-to-room spacing checks.
  *
- * The avatar navigation engine (resources/views/office.blade.php) needs a
- * walkable corridor of at least MIN_ROOM_GAP_PX between any two room
- * rectangles on the same map, or its A* pathfinder can never route between
- * them regardless of how good the algorithm is. See RoomLayoutSpacingService
- * for the derivation of the 48px constant.
+ * Two rooms on the same map must either share a wall (gap of exactly 0) or
+ * leave a walkable corridor of at least MIN_ROOM_GAP_PX. A gap in between
+ * looks walkable but is too narrow for the avatar navigation engine
+ * (resources/views/office.blade.php) to route through, and overlapping rooms
+ * are never valid. Rooms that share a wall stay reachable because the office
+ * places each auto door on a wall that opens onto free floor. See
+ * RoomLayoutSpacingService for the derivation of the 48px constant.
  */
 final class RoomBoundsGap
 {
@@ -69,9 +71,22 @@ final class RoomBoundsGap
         return (int) ceil(self::MIN_ROOM_GAP_PX / $tilePx);
     }
 
+    /**
+     * Sub-pixel tolerance for "shares a wall", since bounds may be floats.
+     */
+    public const SHARED_WALL_TOLERANCE_PX = 0.5;
+
     public static function satisfiesMinGap(array $a, array $b, int $tilePx): bool
     {
-        return self::distanceBetween($a, $b, $tilePx) >= self::MIN_ROOM_GAP_PX;
+        return self::gapIsAllowed(self::distanceBetween($a, $b, $tilePx));
+    }
+
+    /**
+     * A gap is allowed when the rooms share a wall or keep a full corridor.
+     */
+    public static function gapIsAllowed(float $gapPx): bool
+    {
+        return abs($gapPx) <= self::SHARED_WALL_TOLERANCE_PX || $gapPx >= self::MIN_ROOM_GAP_PX;
     }
 
     /**
@@ -88,7 +103,7 @@ final class RoomBoundsGap
         for ($i = 0; $i < $count; $i++) {
             for ($j = $i + 1; $j < $count; $j++) {
                 $gap = self::distanceBetween($roomsBounds[$i], $roomsBounds[$j], $tilePx);
-                if ($gap < self::MIN_ROOM_GAP_PX) {
+                if (! self::gapIsAllowed($gap)) {
                     $pairs[] = [$i, $j, $gap];
                 }
             }

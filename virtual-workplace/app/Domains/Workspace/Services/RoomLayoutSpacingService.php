@@ -61,7 +61,7 @@ class RoomLayoutSpacingService
 
             foreach ($pairs as [$i, $j]) {
                 $gap = RoomBoundsGap::distanceBetween($working[$i]['bounds'], $working[$j]['bounds'], $tilePx);
-                if ($gap >= RoomBoundsGap::MIN_ROOM_GAP_PX) {
+                if (RoomBoundsGap::gapIsAllowed($gap)) {
                     continue; // already resolved earlier this pass
                 }
 

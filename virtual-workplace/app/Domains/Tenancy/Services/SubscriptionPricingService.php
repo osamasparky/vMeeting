@@ -15,11 +15,7 @@ class SubscriptionPricingService
     /**
      * Calculate authoritative subscription pricing for a given plan and seat count.
      *
-     * @param  Plan  $plan
-     * @param  int  $seats
-     * @param  string  $billingCycle ('monthly' or 'yearly')
-     * @param  float  $sarRate
-     * @return array
+     * @param  string  $billingCycle  ('monthly' or 'yearly')
      */
     public function calculatePrice(Plan $plan, int $seats = 1, string $billingCycle = 'monthly', float $sarRate = self::DEFAULT_USD_TO_SAR_RATE): array
     {
@@ -65,11 +61,6 @@ class SubscriptionPricingService
 
     /**
      * Calculate the cost adjustment when changing seats on an active subscription.
-     *
-     * @param  Subscription  $subscription
-     * @param  int  $newSeats
-     * @param  float  $sarRate
-     * @return array
      */
     public function calculateSeatAdjustment(Subscription $subscription, int $newSeats, float $sarRate = self::DEFAULT_USD_TO_SAR_RATE): array
     {
@@ -113,9 +104,6 @@ class SubscriptionPricingService
     /**
      * Validate whether a proposed seat count is permitted.
      *
-     * @param  Plan  $plan
-     * @param  int  $requestedSeats
-     * @param  int|null  $activeMembersCount
      * @return array ['valid' => bool, 'message' => string|null]
      */
     public function validateSeatQuantity(Plan $plan, int $requestedSeats, ?int $activeMembersCount = null): array
@@ -125,14 +113,14 @@ class SubscriptionPricingService
             if ($requestedSeats < $min) {
                 return [
                     'valid' => false,
-                    'message' => __("Minimum required seats for this plan is :min seats.", ['min' => $min]),
+                    'message' => __('Minimum required seats for this plan is :min seats.', ['min' => $min]),
                 ];
             }
 
             if ($plan->max_seats && $requestedSeats > $plan->max_seats) {
                 return [
                     'valid' => false,
-                    'message' => __("Maximum allowed seats for this plan is :max seats.", ['max' => $plan->max_seats]),
+                    'message' => __('Maximum allowed seats for this plan is :max seats.', ['max' => $plan->max_seats]),
                 ];
             }
         }
@@ -140,7 +128,7 @@ class SubscriptionPricingService
         if ($activeMembersCount !== null && $requestedSeats < $activeMembersCount) {
             return [
                 'valid' => false,
-                'message' => __("You currently have :count active users. You must remove users before reducing your seats below :count.", ['count' => $activeMembersCount]),
+                'message' => __('You currently have :count active users. You must remove users before reducing your seats below :count.', ['count' => $activeMembersCount]),
             ];
         }
 

@@ -22,8 +22,11 @@ class SeatSubscriptionTest extends TestCase
     use RefreshDatabase;
 
     protected User $admin;
+
     protected Organization $organization;
+
     protected Plan $perSeatPlan;
+
     protected Plan $flatPlan;
 
     protected function setUp(): void
@@ -67,7 +70,7 @@ class SeatSubscriptionTest extends TestCase
 
     public function test_pricing_service_calculates_correct_totals_for_per_seat_plans(): void
     {
-        $service = new SubscriptionPricingService();
+        $service = new SubscriptionPricingService;
 
         // 2 seats monthly (min 2)
         $pricing2 = $service->calculatePrice($this->perSeatPlan, 2, 'monthly');
@@ -95,7 +98,7 @@ class SeatSubscriptionTest extends TestCase
 
     public function test_pricing_service_enforces_minimum_seats(): void
     {
-        $service = new SubscriptionPricingService();
+        $service = new SubscriptionPricingService;
 
         // Requested 1 seat on a plan with min 2 seats -> automatically clamped to min 2
         $pricing = $service->calculatePrice($this->perSeatPlan, 1, 'monthly');

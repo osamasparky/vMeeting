@@ -31,7 +31,7 @@ trait ValidatesRoomSpacing
         foreach ($siblings as $sibling) {
             if (! RoomBoundsGap::satisfiesMinGap($bounds, $sibling->bounds, $tilePx)) {
                 $validator->errors()->add('bounds', __(
-                    'This room must be at least :gap tiles away from ":name" to leave a walkable corridor.',
+                    'This room must either share a wall with ":name" or be at least :gap tiles away from it, so people can walk between them.',
                     ['gap' => RoomBoundsGap::minGapTiles($tilePx), 'name' => $sibling->name]
                 ));
 

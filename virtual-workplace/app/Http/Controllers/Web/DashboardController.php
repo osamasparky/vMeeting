@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Domains\Administration\Models\Role;
 use App\Domains\Meetings\Actions\ScheduleMeetingAction;
 use App\Domains\Meetings\Models\Meeting;
 use App\Domains\Meetings\Requests\ScheduleMeetingRequest;
@@ -45,8 +46,8 @@ class DashboardController extends Controller
 
             $firstOrg = Organization::first();
             if ($firstOrg) {
-                $defaultRole = \App\Domains\Administration\Models\Role::where('organization_id', $firstOrg->id)->where('slug', 'company_admin')->first() 
-                    ?? \App\Domains\Administration\Models\Role::first();
+                $defaultRole = Role::where('organization_id', $firstOrg->id)->where('slug', 'company_admin')->first()
+                    ?? Role::first();
                 $membership = OrganizationMember::firstOrCreate(
                     ['user_id' => $user->id, 'organization_id' => $firstOrg->id],
                     ['role_id' => $defaultRole ? $defaultRole->id : 2, 'status' => 'active']
@@ -54,6 +55,7 @@ class DashboardController extends Controller
                 $membership->load(['organization.plan', 'organization.subscription', 'role']);
             } else {
                 Auth::logout();
+
                 return redirect()->route('login')->with('error', 'No active organization found.');
             }
         }
