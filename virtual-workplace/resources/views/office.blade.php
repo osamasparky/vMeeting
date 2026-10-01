@@ -2028,6 +2028,11 @@
                 if (localAvatar.isSitting) {
                     localAvatar.isSitting = false;
                     localAvatar.sittingFurnitureId = null;
+                    if (localAvatar.standPos) {
+                        localAvatar.x = localAvatar.targetX = localAvatar.standPos.x;
+                        localAvatar.y = localAvatar.targetY = localAvatar.standPos.y;
+                        localAvatar.standPos = null;
+                    }
                     if (ws && ws.readyState === WebSocket.OPEN) {
                         ws.send(JSON.stringify({ type: 'user.sit', payload: { isSitting: false } }));
                     }
@@ -2050,7 +2055,14 @@
                         playDoorSlideSound();
                         showToast(`🎹 ${__("Playing musical note on")} ${item.name}! 🎶`);
                         triggerSpeechReaction('🎶', 'emoji');
+                    } else if (nearbyChair && (
+                        minWallDistance(nearbyChair.x, nearbyChair.y) < AVATAR_COLLISION_RADIUS ||
+                        (getCurrentRoom(nearbyChair.x, nearbyChair.y)?.id || null) !== (getCurrentRoom(localAvatar.x, localAvatar.y)?.id || null)
+                    )) {
+                        // The seat sits on a wall or in another room: sitting there would put the avatar inside a wall.
+                        showToast('ℹ️ ' + @json(__('office.sit_blocked')));
                     } else if (nearbyChair) {
+                        localAvatar.standPos = { x: localAvatar.x, y: localAvatar.y };
                         localAvatar.isSitting = true;
                         localAvatar.sittingFurnitureId = nearbyChair.id;
                         localAvatar.x = nearbyChair.x;
@@ -2566,6 +2578,16 @@
                 }
             }
             return segments;
+        }
+
+        // Distance from a point to the nearest solid wall (Infinity when there are no walls).
+        function minWallDistance(x, y) {
+            let best = Infinity;
+            for (const w of getAllSolidWallSegments()) {
+                const d = distPointToSegment(x, y, w.x1, w.y1, w.x2, w.y2);
+                if (d < best) best = d;
+            }
+            return best;
         }
 
         function checkCapsuleWallCollision(x1, y1, x2, y2, radius = AVATAR_COLLISION_RADIUS) {
@@ -3498,7 +3520,12 @@
             }
 
             // 4. Solid Wall Physics: Block avatar from crossing solid room walls
-            if (checkCapsuleWallCollision(localAvatar.x, localAvatar.y, nextX, nextY, AVATAR_COLLISION_RADIUS)) {
+            const wallNow = minWallDistance(localAvatar.x, localAvatar.y);
+            const stuckInWall = wallNow < AVATAR_COLLISION_RADIUS;
+            const blocked = stuckInWall
+                ? minWallDistance(nextX, nextY) <= wallNow // only moves that step out of the wall
+                : checkCapsuleWallCollision(localAvatar.x, localAvatar.y, nextX, nextY, AVATAR_COLLISION_RADIUS);
+            if (blocked && (nextX !== localAvatar.x || nextY !== localAvatar.y)) {
                 nextX = localAvatar.x;
                 nextY = localAvatar.y;
                 localAvatar.targetX = localAvatar.x;

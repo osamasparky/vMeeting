@@ -3158,5 +3158,6 @@
     "office.rec_processing": "جارٍ حفظ التسجيل…",
     "office.rec_saved_locally": "تم حفظ التسجيل على جهازك بدلاً من ذلك.",
     "office.rec_too_large": "حجم التسجيل (:size ميجابايت) أكبر من المسموح على الخادم (:max ميجابايت).",
-    "office.rec_upload_failed": "تعذّر رفع التسجيل."
+    "office.rec_upload_failed": "تعذّر رفع التسجيل.",
+    "office.sit_blocked": "لا يمكنك الجلوس هنا — هذا المقعد على جدار أو في غرفة أخرى."
 }
