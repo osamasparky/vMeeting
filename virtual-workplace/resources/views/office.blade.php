@@ -34,6 +34,37 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
+        /* ══ Office in light theme ══════════════════════════════════════════════
+           The office chrome is built on the "on-dark" / map tokens. In light theme
+           those are pointed at their light equivalents, so the top bar, dock, panels,
+           drawers, call card and the canvas floor (read through OC()) all turn light.
+           Dark theme keeps the dark office of designs 24–32. */
+        :root[data-theme="light"] {
+            --ula-text-on-dark: var(--ula-text-primary);
+            --ula-text-on-dark-subtle: var(--ula-text-secondary);
+            --ula-text-on-dark-muted: var(--ula-text-muted);
+            --ula-icon-on-dark: var(--ula-text-secondary);
+            --ula-icon-on-dark-subtle: var(--ula-text-muted);
+            --ula-border-on-dark: var(--ula-border-default);
+            --ula-border-on-dark-subtle: var(--ula-border-subtle);
+            --ula-control-dark-fill: var(--ula-surface-page-alt);
+            --ula-control-dark-fill-hover: var(--ula-surface-hover);
+            --ula-control-dark-fill-strong: var(--ula-surface-pressed);
+            --ula-control-dark-fill-strong-hover: var(--ula-surface-pressed);
+            --ula-control-dark-border: var(--ula-border-default);
+            --ula-control-dark-border-subtle: var(--ula-border-subtle);
+            --ula-control-cta-on-dark: var(--ula-accent-default);
+            --ula-control-cta-on-dark-hover: var(--ula-accent-hover);
+            --ula-text-on-cta: var(--ula-accent-fg);
+            --ula-status-success-on-dark: var(--ula-status-success);
+            --ula-focus-ring-on-dark: var(--ula-focus-ring);
+            --ula-surface-map-chrome: var(--ula-surface-card);
+            --ula-surface-map-canvas: var(--ula-surface-page-alt);
+            --ula-surface-capsule: var(--ula-surface-raised);
+            --ula-surface-capsule-strong: var(--ula-surface-card);
+        }
+    </style>
+    <style>
         /* The old :root[data-theme] blocks here only ever declared a
            retired-prefix primary-hover variable, which nothing
            in this file references. Removed rather than kept unused. */
@@ -100,7 +131,7 @@
             height: 24px;
             border-radius: 6px;
             object-fit: contain;
-            background: rgba(255, 255, 255, 0.08);
+            background: var(--ula-control-dark-fill);
             padding: 2px;
         }
 
@@ -108,13 +139,13 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: var(--ula-palm-900);
-            box-shadow: 0 0 10px var(--ula-palm-900);
+            background: var(--ula-accent-default);
+            box-shadow: 0 0 10px var(--ula-accent-default);
         }
 
         .guest-badge {
             background: var(--ula-tone-gold-bg);
-            border: 1px solid var(--ula-gold-400);
+            border: 1px solid var(--ula-highlight-default);
             color: var(--ula-tone-gold-fg);
             font-size: 10px;
             font-weight: 800;
@@ -138,13 +169,13 @@
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .action-link-btn:hover {
-            border-color: var(--ula-palm-900);
+            border-color: var(--ula-accent-default);
             color: var(--ula-text-primary);
             transform: translateY(-1px);
         }
         .action-link-btn.btn-danger {
-            background: rgba(154, 88, 39, 0.15);
-            border-color: rgba(154, 88, 39, 0.35);
+            background: var(--ula-tone-terracotta-bg);
+            border-color: var(--ula-border-danger);
             color: var(--ula-status-danger);
         }
 
@@ -207,19 +238,19 @@
             font-size: 18px;
         }
         .dock-btn:hover {
-            border-color: var(--ula-palm-900);
+            border-color: var(--ula-accent-default);
             color: var(--ula-text-primary);
             transform: translateY(-2px);
         }
         .dock-btn.active {
-            background: rgba(60, 107, 76, 0.18);
-            border-color: var(--ula-palm-900);
+            background: var(--ula-tone-palm-bg);
+            border-color: var(--ula-accent-default);
             color: var(--ula-status-success);
-            box-shadow: 0 0 14px rgba(60, 107, 76, 0.3);
+            box-shadow: 0 0 14px var(--ula-tone-palm-bg);
         }
         .dock-btn.muted {
-            background: rgba(154, 88, 39, 0.14);
-            border-color: rgba(154, 88, 39, 0.35);
+            background: var(--ula-tone-terracotta-bg);
+            border-color: var(--ula-border-danger);
             color: var(--ula-status-danger);
         }
 
@@ -237,7 +268,7 @@
             inset-inline-start: 20px;
             width: 190px;
             height: 125px;
-            background: rgba(10, 22, 16, 0.95);
+            background: var(--ula-surface-capsule-strong);
             border: 2px solid var(--ula-border-subtle);
             border-radius: 14px;
             box-shadow: var(--ula-shadow-lg);
@@ -254,7 +285,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--ula-control-dark-fill);
             user-select: none;
         }
         .local-cam-viewport {
@@ -287,7 +318,7 @@
         .video-card {
             width: 320px;
             height: 200px;
-            background: rgba(10, 22, 16, 0.95);
+            background: var(--ula-surface-capsule-strong);
             border: 2px solid var(--ula-border-subtle);
             border-radius: 16px;
             overflow: hidden;
@@ -332,7 +363,7 @@
             padding: 6px 10px;
             background: rgba(0, 0, 0, 0.82);
             backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--ula-control-dark-fill);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -345,7 +376,7 @@
             gap: 6px;
             font-size: 11px;
             font-weight: 800;
-            color: var(--ula-white);
+            color: var(--ula-text-on-dark);
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -369,9 +400,9 @@
             gap: 3px;
         }
         .v-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            color: var(--ula-white);
+            background: var(--ula-control-dark-fill);
+            border: 1px solid var(--ula-border-on-dark-subtle);
+            color: var(--ula-text-on-dark);
             width: 24px;
             height: 24px;
             border-radius: 6px;
@@ -383,15 +414,15 @@
             transition: all 0.15s ease;
         }
         .v-btn:hover {
-            background: var(--ula-palm-900);
-            border-color: var(--ula-palm-900);
-            color: var(--ula-white);
+            background: var(--ula-accent-default);
+            border-color: var(--ula-accent-default);
+            color: var(--ula-accent-fg);
             transform: translateY(-1px);
         }
         .v-btn.active {
-            background: var(--ula-palm-900);
-            border-color: var(--ula-palm-900);
-            color: white;
+            background: var(--ula-accent-default);
+            border-color: var(--ula-accent-default);
+            color: var(--ula-accent-fg);
         }
         .video-wrapper {
             flex: 1;
@@ -413,7 +444,7 @@
             bottom: 6px;
             inset-inline-start: 8px;
             background: rgba(0, 0, 0, 0.7);
-            color: white;
+            color: var(--ula-text-on-dark);
             font-size: 10px;
             font-weight: 800;
             padding: 2px 8px;
@@ -466,8 +497,8 @@
             transition: all 0.15s;
         }
         .chat-tab.active {
-            background: var(--ula-palm-900);
-            color: white;
+            background: var(--ula-accent-default);
+            color: var(--ula-accent-fg);
         }
         .chat-messages {
             flex: 1;
@@ -524,7 +555,7 @@
         }
         .reaction-emoji-btn:hover {
             transform: scale(1.35) translateY(-2px);
-            background: rgba(255, 255, 255, 0.15);
+            background: var(--ula-border-on-dark-subtle);
         }
         .reaction-emoji-btn:active {
             transform: scale(0.95);
@@ -583,13 +614,13 @@
             transition: all 0.2s ease;
         }
         .task-card-item:hover {
-            border-color: rgba(60, 107, 76, 0.4);
+            border-color: var(--ula-tone-palm-bg);
             transform: translateY(-1px);
         }
         .task-card-item.running {
-            background: rgba(60, 107, 76, 0.14);
+            background: var(--ula-tone-palm-bg);
             border-color: var(--ula-status-success);
-            box-shadow: 0 0 16px rgba(60, 107, 76, 0.25);
+            box-shadow: 0 0 16px var(--ula-tone-palm-bg);
         }
 
         .dock-timer-pill {
@@ -598,14 +629,14 @@
             gap: 8px;
             padding: 6px 14px;
             border-radius: 9999px;
-            background: rgba(60, 107, 76, 0.92);
+            background: var(--ula-accent-default);
             backdrop-filter: blur(14px);
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            color: var(--ula-white);
+            border: 1px solid var(--ula-border-on-dark);
+            color: var(--ula-accent-fg);
             font-size: 11px;
             font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 6px 20px rgba(60, 107, 76, 0.45);
+            box-shadow: 0 6px 20px var(--ula-tone-palm-bg);
             transition: all 0.2s ease;
             animation: pulseGlow 2s infinite alternate;
         }
@@ -614,8 +645,8 @@
         }
 
         @keyframes pulseGlow {
-            from { box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35); }
-            to { box-shadow: 0 6px 24px rgba(16, 185, 129, 0.65); }
+            from { box-shadow: 0 4px 14px var(--ula-tone-palm-bg); }
+            to { box-shadow: 0 6px 24px var(--ula-accent-default); }
         }
 
         /* ── Modals & Drawers ── */
@@ -689,7 +720,7 @@
             outline: none;
         }
         .styled-input:focus {
-            border-color: var(--ula-palm-900);
+            border-color: var(--ula-accent-default);
         }
 
         /* Avatar Picker Grid */
@@ -711,9 +742,9 @@
             transition: all 0.2s;
         }
         .avatar-card-picker:hover, .avatar-card-picker.selected {
-            border-color: var(--ula-palm-900);
-            background: rgba(16, 185, 129, 0.12);
-            box-shadow: 0 0 16px rgba(16, 185, 129, 0.25);
+            border-color: var(--ula-accent-default);
+            background: var(--ula-tone-palm-bg);
+            box-shadow: 0 0 16px var(--ula-tone-palm-bg);
         }
         .avatar-preview-img {
             width: 100px;
@@ -725,8 +756,8 @@
 
         /* ── Knock Alert Dialog ── */
         .knock-alert-box {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(59, 130, 246, 0.15));
-            border: 1px solid var(--ula-palm-900);
+            background: linear-gradient(135deg, var(--ula-tone-palm-bg), var(--ula-tone-stone-bg));
+            border: 1px solid var(--ula-accent-default);
             border-radius: 16px;
             padding: 16px;
             display: flex;
@@ -760,9 +791,9 @@
             transition: all 0.15s;
         }
         .wb-tool-btn:hover, .wb-tool-btn.active {
-            background: var(--ula-palm-900);
-            color: white;
-            border-color: var(--ula-palm-900);
+            background: var(--ula-accent-default);
+            color: var(--ula-accent-fg);
+            border-color: var(--ula-accent-default);
         }
         .color-dot {
             width: 22px;
@@ -774,7 +805,7 @@
         }
         .color-dot:hover, .color-dot.active {
             transform: scale(1.2);
-            border-color: white;
+            border-color: var(--ula-text-on-dark);
         }
 
         /* ── Toast Notifications ── */
@@ -783,9 +814,9 @@
             bottom: 90px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(16, 185, 129, 0.95);
+            background: var(--ula-accent-default);
             backdrop-filter: blur(12px);
-            color: white;
+            color: var(--ula-accent-fg);
             padding: 10px 20px;
             border-radius: 14px;
             font-size: 13px;
@@ -811,9 +842,9 @@
                         <span class="material-symbols-rounded" style="font-size: 20px;">menu</span>
                     </button>
                     
-                    <div id="office-main-menu-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); inset-inline-start: 0; min-width: 260px; background: rgba(14, 25, 19, 0.98); backdrop-filter: blur(24px); border: 1px solid rgba(237, 230, 217, 0.20); border-radius: 16px; box-shadow: 0 16px 40px rgba(0,0,0,0.65); padding: 8px; z-index: 100000;">
+                    <div id="office-main-menu-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); inset-inline-start: 0; min-width: 260px; background: var(--ula-surface-capsule-strong); backdrop-filter: blur(24px); border: 1px solid var(--ula-border-on-dark-subtle); border-radius: 16px; box-shadow: 0 16px 40px rgba(0,0,0,0.65); padding: 8px; z-index: 100000;">
                         <!-- Menu Header with User / Brand Info -->
-                        <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px 12px; border-bottom: 1px solid rgba(237, 230, 217, 0.12); margin-bottom: 6px;">
+                        <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px 12px; border-bottom: 1px solid var(--ula-border-on-dark-subtle); margin-bottom: 6px;">
                             @if(!empty($organization->logo_url))
                                 <img src="{{ $organization->logo_url }}" alt="{{ $organization->name }}" style="height: 24px; width: auto; object-fit: contain;">
                             @else
@@ -827,7 +858,7 @@
 
                         <!-- Menu Actions -->
                         @if(empty($user->is_guest))
-                        <a href="{{ route('dashboard') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--ula-sand-100); font-size: 12px; font-weight: 600; transition: background 0.15s ease;">
+                        <a href="{{ route('dashboard') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--ula-text-on-dark); font-size: 12px; font-weight: 600; transition: background 0.15s ease;">
                             <span class="material-symbols-rounded" style="font-size: 18px; color: var(--ula-highlight-default);">dashboard</span>
                             <span>{{ __('Dashboard') }}</span>
                         </a>
@@ -844,8 +875,8 @@
                         @endif
 
                         @if(!empty($user) && in_array($user->role ?? 'member', ['superadmin', 'company_admin', 'manager', 'admin']))
-                        <label class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; color: var(--ula-gold-500); font-size: 12px; font-weight: 600; cursor: pointer; margin: 0;">
-                            <span class="material-symbols-rounded" style="font-size: 18px; color: var(--ula-gold-500);">upload_file</span>
+                        <label class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; color: var(--ula-tone-gold-fg); font-size: 12px; font-weight: 600; cursor: pointer; margin: 0;">
+                            <span class="material-symbols-rounded" style="font-size: 18px; color: var(--ula-tone-gold-fg);">upload_file</span>
                             <span>{{ __('Upload Floor Image') }}</span>
                             <input type="file" accept="image/*" style="display:none;" onchange="uploadOfficeFloorImage(this); closeOfficeMainMenu();">
                         </label>
@@ -856,28 +887,28 @@
                         </a>
                         @endif
 
-                        <button type="button" onclick="openDiagnosticsModal(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: var(--ula-sand-100); font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                        <button type="button" onclick="openDiagnosticsModal(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: var(--ula-text-on-dark); font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                             <span class="material-symbols-rounded" style="font-size: 18px;">network_check</span>
                             <span>{{ __('Diagnostics') }}</span>
                         </button>
 
-                        <button type="button" onclick="toggleChatDrawer(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: var(--ula-sand-100); font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                        <button type="button" onclick="toggleChatDrawer(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: var(--ula-text-on-dark); font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                             <span class="material-symbols-rounded" style="font-size: 18px;">chat</span>
                             <span>{{ __('Chat & Notes') }}</span>
                         </button>
 
-                        <button type="button" onclick="toggleAppTheme(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: var(--ula-sand-100); font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
+                        <button type="button" onclick="toggleAppTheme(); closeOfficeMainMenu();" class="more-menu-item" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; background: none; border: none; color: var(--ula-text-on-dark); font-size: 12px; font-weight: 600; cursor: pointer; text-align: start;">
                             <span class="material-symbols-rounded" style="font-size: 18px;">light_mode</span>
                             <span>{{ __('Toggle Theme') }}</span>
                         </button>
 
                         @if(app()->getLocale() === 'ar')
-                            <a href="{{ route('lang.switch', 'en') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--ula-sand-100); font-size: 12px; font-weight: 600;">
+                            <a href="{{ route('lang.switch', 'en') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--ula-text-on-dark); font-size: 12px; font-weight: 600;">
                                 <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
                                 <span>English</span>
                             </a>
                         @else
-                            <a href="{{ route('lang.switch', 'ar') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--ula-sand-100); font-size: 12px; font-weight: 600;">
+                            <a href="{{ route('lang.switch', 'ar') }}" class="more-menu-item" style="display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: var(--ula-text-on-dark); font-size: 12px; font-weight: 600;">
                                 <span class="material-symbols-rounded" style="font-size: 18px;">language</span>
                                 <span>العربية</span>
                             </a>
@@ -901,13 +932,13 @@
                 <!-- Branch / Floor Switcher Button -->
                 @if(isset($userAllowedOffices) && $userAllowedOffices->count() > 1 && empty($user->is_guest))
                 <div style="position: relative; display: inline-block;">
-                    <button type="button" onclick="toggleOfficeDropdown(event)" class="nx-toolbar-btn" style="color: var(--ula-highlight-default); border-color: rgba(211, 165, 83, 0.35); font-weight: 600;" title="{{ __('Switch Office Branch') }}">
+                    <button type="button" onclick="toggleOfficeDropdown(event)" class="nx-toolbar-btn" style="color: var(--ula-highlight-default); border-color: var(--ula-tone-gold-bg); font-weight: 600;" title="{{ __('Switch Office Branch') }}">
                         <span class="material-symbols-rounded" style="font-size: 18px;">domain</span>
                         <span>{{ $floor->name }}</span>
                         <span class="material-symbols-rounded" style="font-size: 16px;">arrow_drop_down</span>
                     </button>
-                    <div id="office-switcher-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); inset-inline-start: 0; min-width: 250px; background: rgba(14, 25, 19, 0.98); backdrop-filter: blur(18px); border: 1px solid rgba(237, 230, 217, 0.20); border-radius: 14px; box-shadow: 0 16px 36px rgba(0,0,0,0.65); padding: 6px; z-index: 100000;">
-                        <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.5); padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 4px;">
+                    <div id="office-switcher-dropdown" style="display: none; position: absolute; top: calc(100% + 8px); inset-inline-start: 0; min-width: 250px; background: var(--ula-surface-capsule-strong); backdrop-filter: blur(18px); border: 1px solid var(--ula-border-on-dark-subtle); border-radius: 14px; box-shadow: 0 16px 36px rgba(0,0,0,0.65); padding: 6px; z-index: 100000;">
+                        <div style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ula-border-on-dark); padding: 6px 10px; border-bottom: 1px solid var(--ula-control-dark-fill); margin-bottom: 4px;">
                             <span class="material-symbols-rounded" style="font-size: 12px; vertical-align: text-bottom;">apartment</span> {{ __('Office Branches') }}
                         </div>
                         @foreach($userAllowedOffices as $off)
@@ -915,14 +946,14 @@
                             $offMap = $off->activeMap ?: $off->maps->first();
                             $offMapId = $offMap ? $offMap->id : '';
                         @endphp
-                        <a href="{{ route('office', ['office' => $off->id]) }}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: {{ $off->id === $floor->id ? 'var(--ula-status-success)' : 'var(--ula-white)' }}; background: {{ $off->id === $floor->id ? 'rgba(36, 92, 58, 0.45)' : 'transparent' }}; font-weight: 700; font-size: 12px; transition: background 0.15s ease;">
+                        <a href="{{ route('office', ['office' => $off->id]) }}" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; border-radius: 8px; text-decoration: none; color: {{ $off->id === $floor->id ? 'var(--ula-status-success)' : 'var(--ula-white)' }}; background: {{ $off->id === $floor->id ? 'var(--ula-tone-palm-bg)' : 'transparent' }}; font-weight: 700; font-size: 12px; transition: background 0.15s ease;">
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <span class="material-symbols-rounded" style="font-size: 16px;">apartment</span>
                                 <span>{{ $off->name }}</span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 6px;">
-                                <span class="branch-occupants-badge" data-map-id="{{ $offMapId }}" style="font-size: 10px; padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.05); color: var(--ula-stone-400); font-weight: 700;">
-                                    <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: {{ $off->id === $floor->id ? 'var(--ula-status-success)' : 'var(--ula-stone-400)' }}; margin-inline-end: 4px;"></span>
+                                <span class="branch-occupants-badge" data-map-id="{{ $offMapId }}" style="font-size: 10px; padding: 2px 6px; border-radius: 6px; background: var(--ula-control-dark-fill); color: var(--ula-text-on-dark-subtle); font-weight: 700;">
+                                    <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: {{ $off->id === $floor->id ? 'var(--ula-status-success)' : 'var(--ula-text-on-dark-subtle)' }}; margin-inline-end: 4px;"></span>
                                     {{ $off->id === $floor->id ? __('Current') : __('0 active') }}
                                 </span>
                                 @if($off->id === $floor->id)
@@ -944,7 +975,7 @@
 
             <!-- 2. Center: Active Room Scrim Capsule (Room Name, Room Files, Door Lock) -->
             <div class="nx-map-room-label" id="room-status-pill" style="display: none;">
-                <span id="current-room-name" style="font-weight: 600; font-size: 12px; color: var(--ula-white); display: flex; align-items: center; gap: 6px;">
+                <span id="current-room-name" style="font-weight: 600; font-size: 12px; color: var(--ula-text-on-dark); display: flex; align-items: center; gap: 6px;">
                     <span class="material-symbols-rounded" style="font-size: 18px;">meeting_room</span>
                     <span>{{ __('Meeting Room') }}</span>
                 </span>
@@ -966,14 +997,14 @@
             <div class="nx-toolbar-group">
                 <!-- Live Office Attendance Timer -->
                 @if(empty($user->is_guest))
-                <div id="office-attendance-timer-pill" class="nx-toolbar-btn" style="background: rgba(60, 107, 76, 0.25); border-color: rgba(60, 107, 76, 0.5); color: var(--ula-status-success); font-weight: 600; cursor: pointer;" onclick="openMyTaskDrawer()" title="{{ __('Your active time in the virtual office today') }}">
+                <div id="office-attendance-timer-pill" class="nx-toolbar-btn" style="background: var(--ula-tone-palm-bg); border-color: var(--ula-tone-palm-bg); color: var(--ula-status-success); font-weight: 600; cursor: pointer;" onclick="openMyTaskDrawer()" title="{{ __('Your active time in the virtual office today') }}">
                     <span class="nx-presence-dot"></span>
                     <span class="material-symbols-rounded" style="font-size: 16px;">schedule</span>
                     <span id="office-attendance-clock" style="font-family: 'IBM Plex Mono', monospace; font-size: 12px;">00:00:00</span>
                 </div>
                 @endif
 
-                <button onclick="openOccupantsModal()" class="nx-presence-capsule" id="btn-occupants-pill" title="{{ __('Office Occupants') }}" style="cursor: pointer; border: 1px solid rgba(60, 107, 76, 0.4);">
+                <button onclick="openOccupantsModal()" class="nx-presence-capsule" id="btn-occupants-pill" title="{{ __('Office Occupants') }}" style="cursor: pointer; border: 1px solid var(--ula-tone-palm-bg);">
                     <span class="nx-presence-dot"></span>
                     <span class="material-symbols-rounded" style="font-size: 16px;">group</span>
                     <span id="occupants-counter">1 {{ __('Online') }}</span>
@@ -1013,7 +1044,7 @@
     <!-- ── Floating Local Self Camera PiP ── -->
     <div class="local-cam-card" id="local-video-card" style="display: none;">
         <div class="local-cam-header">
-            <span style="font-size: 10px; font-weight: 800; color: var(--ula-white); display: flex; align-items: center; gap: 4px;">
+            <span style="font-size: 10px; font-weight: 800; color: var(--ula-text-on-dark); display: flex; align-items: center; gap: 4px;">
                 <span class="live-dot" style="width: 6px; height: 6px;"></span>
                 <span class="material-symbols-rounded" style="font-size: 12px;">videocam</span> {{ $user->name ?? __('You') }}
             </span>
@@ -1030,11 +1061,11 @@
     </div>
 
     <!-- ── Sliding Chat & File Sharing Drawer ── -->
-    <div class="chat-drawer ula-on-dark" id="chat-drawer">
+    <div class="chat-drawer" id="chat-drawer">
         <div class="chat-header">
             <strong style="font-size: 13px; display: flex; align-items: center; gap: 6px;"><span class="material-symbols-rounded" style="font-size: 16px;">chat</span> {{ __('Office & Room Chat') }}</strong>
             <div style="display: flex; align-items: center; gap: 6px;">
-                <button onclick="focusActiveScreenShare()" class="action-link-btn" id="btn-chat-focus-screen" style="display: none; padding: 3px 8px; font-size: 10px; color: var(--ula-status-success); border-color: rgba(60, 107, 76, 0.4);" title="{{ __('View Screen Share') }}">
+                <button onclick="focusActiveScreenShare()" class="action-link-btn" id="btn-chat-focus-screen" style="display: none; padding: 3px 8px; font-size: 10px; color: var(--ula-status-success); border-color: var(--ula-tone-palm-bg);" title="{{ __('View Screen Share') }}">
                     <span class="material-symbols-rounded" style="font-size: 13px;">screen_share</span> {{ __('Screen') }}
                 </button>
                 <button onclick="toggleChatDrawer()" style="background:none; border:none; color:var(--ula-text-muted); font-size:16px; cursor:pointer;"><span class="material-symbols-rounded" style="font-size: 16px;">close</span></button>
@@ -1055,13 +1086,13 @@
             <input type="file" id="chat-file-input" style="display:none;" onchange="handleChatFileUpload(this)">
             <button onclick="document.getElementById('chat-file-input').click()" class="action-link-btn" style="padding: 6px 8px;" title="{{ __('Attach File') }}"><span class="material-symbols-rounded" style="font-size: 15px;">attach_file</span></button>
             <input type="text" id="chat-msg-input" placeholder="{{ __('Type your message here...') }}" class="styled-input" style="padding: 8px 10px; font-size: 12px;" onkeydown="if(event.key==='Enter') sendChatMessage()">
-            <button onclick="sendChatMessage()" class="action-link-btn" style="background: var(--ula-palm-900); color: var(--ula-white); padding: 6px 12px;"><span class="material-symbols-rounded" style="font-size: 15px;">send</span></button>
+            <button onclick="sendChatMessage()" class="action-link-btn" style="background: var(--ula-accent-default); color: var(--ula-accent-fg); padding: 6px 12px;"><span class="material-symbols-rounded" style="font-size: 15px;">send</span></button>
         </div>
     </div>
 
 
     <!-- ── People panel (design-reference 24): who is in the office + call / message ── -->
-    <aside class="ula-people ula-on-dark" id="occupants-panel" aria-labelledby="people-title" hidden>
+    <aside class="ula-people" id="occupants-panel" aria-labelledby="people-title" hidden>
         <div class="ula-people-head">
             <h2 class="ula-people-title" id="people-title">{{ __('office.people_title') }}</h2>
             <span class="ula-people-count"><b id="people-count">1</b> {{ __('office.people_online') }}</span>
@@ -1076,7 +1107,7 @@
     </aside>
 
     <!-- ── Call card (design-reference 29): incoming answer / decline / wave, outgoing cancel ── -->
-    <div class="ula-call ula-on-dark" id="call-card" role="alertdialog" aria-labelledby="call-name" aria-describedby="call-status" hidden>
+    <div class="ula-call" id="call-card" role="alertdialog" aria-labelledby="call-name" aria-describedby="call-status" hidden>
         <div class="ula-call-top">
             <span class="ula-call-avatar" id="call-avatar" aria-hidden="true"></span>
             <div class="ula-call-text">
@@ -1143,7 +1174,7 @@
         </button>
 
         <!-- Floating Live Task Timer Pill In Dock -->
-        <div id="floating-task-timer-pill" class="nx-toolbar-btn" style="display: none; background: rgba(211, 165, 83, 0.2); border-color: var(--ula-highlight-default); color: var(--ula-highlight-default); height: 46px; padding: 4px 10px; cursor: pointer; border-radius: 12px; flex-direction: column; justify-content: center; gap: 2px;" onclick="openMyTaskDrawer()" title="{{ __('Click to manage active task') }}">
+        <div id="floating-task-timer-pill" class="nx-toolbar-btn" style="display: none; background: var(--ula-tone-gold-bg); border-color: var(--ula-highlight-default); color: var(--ula-highlight-default); height: 46px; padding: 4px 10px; cursor: pointer; border-radius: 12px; flex-direction: column; justify-content: center; gap: 2px;" onclick="openMyTaskDrawer()" title="{{ __('Click to manage active task') }}">
             <div style="display: flex; align-items: center; gap: 4px;">
                 <span class="material-symbols-rounded" style="font-size: 15px;">timer</span>
                 <span id="dock-timer-task-name" style="max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; font-weight: 700;">{{ __('Task') }}</span>
@@ -1171,11 +1202,11 @@
     </div>
 
     <!-- ── Floating In-World Contextual Prompts & Menus ── -->
-    <div id="furniture-sit-prompt" style="display: none; position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); background: rgba(14, 25, 19, 0.94); backdrop-filter: blur(20px); border: 1px solid rgba(211, 165, 83, 0.45); border-radius: 24px; padding: 6px 18px; color: var(--ula-sand-100, var(--ula-sand-100)); font-size: 12px; font-weight: 700; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5); z-index: 9999; pointer-events: none; transition: opacity 0.2s ease;">
-        <span id="furniture-sit-prompt-text"><span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom;">chair</span> {{ __('Press') }} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-gold-400);">E</kbd> {{ __('to Sit at Desk') }}</span>
+    <div id="furniture-sit-prompt" style="display: none; position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); background: var(--ula-surface-capsule-strong); backdrop-filter: blur(20px); border: 1px solid var(--ula-highlight-default); border-radius: 24px; padding: 6px 18px; color: var(--ula-text-on-dark)); font-size: 12px; font-weight: 700; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5); z-index: 9999; pointer-events: none; transition: opacity 0.2s ease;">
+        <span id="furniture-sit-prompt-text"><span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom;">chair</span> {{ __('Press') }} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> {{ __('to Sit at Desk') }}</span>
     </div>
 
-    <div id="floating-reaction-popover" style="display: none; position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); background: rgba(15, 23, 42, 0.96); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.18); border-radius: 32px; padding: 6px 14px; align-items: center; gap: 8px; box-shadow: 0 16px 36px rgba(0,0,0,0.6); z-index: 100000;">
+    <div id="floating-reaction-popover" style="display: none; position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); background: var(--ula-surface-capsule-strong); backdrop-filter: blur(20px); border: 1px solid var(--ula-border-on-dark-subtle); border-radius: 32px; padding: 6px 14px; align-items: center; gap: 8px; box-shadow: 0 16px 36px rgba(0,0,0,0.6); z-index: 100000;">
         <button class="reaction-emoji-btn" onclick="sendEmojiReaction('👋')" title="{{ __('Wave') }}">👋</button>
         <button class="reaction-emoji-btn" onclick="sendEmojiReaction('👍')" title="{{ __('Thumbs Up') }}">👍</button>
         <button class="reaction-emoji-btn" onclick="sendEmojiReaction('☕')" title="{{ __('Coffee Break') }}">☕</button>
@@ -2095,19 +2126,19 @@
                 if (found) {
                     promptEl.style.display = 'block';
                     if (found.interaction_type === 'drink') {
-                        promptEl.innerHTML = `<span>☕ ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-gold-400);">E</kbd> ${__('to Grab Drink')}</span>`;
+                        promptEl.innerHTML = `<span>☕ ${__('Press')} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> ${__('to Grab Drink')}</span>`;
                     } else if (found.interaction_type === 'whiteboard') {
-                        promptEl.innerHTML = `<span>📋 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-gold-400);">E</kbd> ${__('to Open Whiteboard')}</span>`;
+                        promptEl.innerHTML = `<span>📋 ${__('Press')} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> ${__('to Open Whiteboard')}</span>`;
                     } else if (found.interaction_type === 'youtube') {
-                        promptEl.innerHTML = `<span>📺 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-gold-400);">E</kbd> ${__('to Watch Stream')}</span>`;
+                        promptEl.innerHTML = `<span>📺 ${__('Press')} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> ${__('to Watch Stream')}</span>`;
                     } else if (found.interaction_type === 'soundEffect') {
-                        promptEl.innerHTML = `<span>🔔 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-gold-400);">E</kbd> ${__('to Ring Bell')}</span>`;
+                        promptEl.innerHTML = `<span>🔔 ${__('Press')} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> ${__('to Ring Bell')}</span>`;
                     } else if (found.interaction_type === 'instrument' || found.interaction_type === 'staticMusic') {
-                        promptEl.innerHTML = `<span>🎹 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-gold-400);">E</kbd> ${__('to Play Music')}</span>`;
+                        promptEl.innerHTML = `<span>🎹 ${__('Press')} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> ${__('to Play Music')}</span>`;
                     } else if (found.interaction_type === 'stickyNote') {
-                        promptEl.innerHTML = `<span>📝 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-gold-400);">E</kbd> ${__('to Read Note')}</span>`;
+                        promptEl.innerHTML = `<span>📝 ${__('Press')} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> ${__('to Read Note')}</span>`;
                     } else {
-                        promptEl.innerHTML = `<span>🪑 ${__('Press')} <kbd style="background: rgba(211, 165, 83, 0.25); border: 1px solid rgba(211, 165, 83, 0.4); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-gold-400);">E</kbd> ${__('to Sit at Desk')}</span>`;
+                        promptEl.innerHTML = `<span>🪑 ${__('Press')} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> ${__('to Sit at Desk')}</span>`;
                     }
                 } else {
                     promptEl.style.display = 'none';
@@ -3201,7 +3232,7 @@
                             card.style.color = '#0C4A6E';
                         } else {
                             card.style.background = '#FEF3C7';
-                            card.style.borderColor = 'var(--ula-gold-500)';
+                            card.style.borderColor = 'var(--ula-highlight-default)';
                             card.style.color = '#78350F';
                         }
                     }
@@ -4853,11 +4884,11 @@
                 if (count > 0) {
                     badge.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--ula-status-success); margin-inline-end: 4px;"></span>${count} {{ __("active") }}`;
                     badge.style.color = 'var(--ula-status-success)';
-                    badge.style.background = 'rgba(16, 185, 129, 0.18)';
+                    badge.style.background = 'var(--ula-tone-palm-bg)';
                 } else {
                     badge.innerHTML = `<span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--ula-icon-muted); margin-inline-end: 4px;"></span>0 {{ __("active") }}`;
                     badge.style.color = 'var(--ula-text-muted)';
-                    badge.style.background = 'rgba(255, 255, 255, 0.05)';
+                    badge.style.background = 'var(--ula-control-dark-fill)';
                 }
             });
         }
@@ -6828,10 +6859,10 @@
             }
 
             const priorityColors = {
-                'urgent': 'background: rgba(217, 107, 95, 0.15); color: #D96B5F; border: 1px solid rgba(217, 107, 95, 0.3);',
-                'high': 'background: rgba(214, 162, 58, 0.15); color: #D6A23A; border: 1px solid rgba(214, 162, 58, 0.3);',
-                'normal': 'background: rgba(79, 155, 95, 0.15); color: #4F9B5F; border: 1px solid rgba(79, 155, 95, 0.3);',
-                'low': 'background: rgba(148, 163, 184, 0.15); color: #64748B; border: 1px solid rgba(148, 163, 184, 0.3);'
+                'urgent': 'background: var(--ula-tone-terracotta-bg); color: #D96B5F; border: 1px solid var(--ula-tone-terracotta-bg);',
+                'high': 'background: var(--ula-tone-gold-bg); color: #D6A23A; border: 1px solid var(--ula-tone-gold-bg);',
+                'normal': 'background: var(--ula-tone-palm-bg); color: #4F9B5F; border: 1px solid var(--ula-tone-palm-bg);',
+                'low': 'background: var(--ula-tone-stone-bg); color: #64748B; border: 1px solid var(--ula-tone-stone-bg);'
             };
 
             listEl.innerHTML = tasks.map(t => {
@@ -6858,7 +6889,7 @@
                         <!-- Status Selector & Action Row -->
                         <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--ula-border-subtle);">
                             <div style="display: flex; align-items: center; gap: 6px;">
-                                <select onchange="updateOfficeTaskStatus('${t.id}', this.value)" style="background: rgba(15, 23, 42, 0.75); border: 1px solid var(--ula-border-subtle); color: var(--ula-text-primary); border-radius: 6px; padding: 3px 6px; font-size: 10px; font-weight: 800; cursor: pointer; outline: none;">
+                                <select onchange="updateOfficeTaskStatus('${t.id}', this.value)" style="background: var(--ula-surface-capsule); border: 1px solid var(--ula-border-subtle); color: var(--ula-text-primary); border-radius: 6px; padding: 3px 6px; font-size: 10px; font-weight: 800; cursor: pointer; outline: none;">
                                     <option value="backlog" ${t.status === 'backlog' ? 'selected' : ''}>📋 {{ __('Backlog') }}</option>
                                     <option value="ready" ${t.status === 'ready' ? 'selected' : ''}>📌 {{ __('Ready') }}</option>
                                     <option value="in_progress" ${t.status === 'in_progress' ? 'selected' : ''}>⚡ {{ __('In Progress') }}</option>
@@ -6872,11 +6903,11 @@
                             </div>
 
                             ${isRunning ? `
-                                <button type="button" onclick="stopActiveOfficeTask()" class="tactile-btn" style="background: rgba(239, 68, 68, 0.2); color: #F87171; border: 1px solid rgba(239, 68, 68, 0.4); padding: 4px 10px; font-size: 11px; font-weight: 800;">
+                                <button type="button" onclick="stopActiveOfficeTask()" class="tactile-btn" style="background: var(--ula-tone-terracotta-bg); color: #F87171; border: 1px solid var(--ula-border-danger); padding: 4px 10px; font-size: 11px; font-weight: 800;">
                                     ⏹️ {{ __('Stop') }}
                                 </button>
                             ` : `
-                                <button type="button" onclick="startTaskTimerInOffice('${t.id}', '${t.project_id}', '${escapeAttr(t.title)}', '${escapeAttr(t.project_name || 'Project')}')" class="tactile-btn" style="background: rgba(16, 185, 129, 0.18); color: var(--ula-status-success); border: 1px solid rgba(52, 211, 153, 0.4); padding: 4px 10px; font-size: 11px; font-weight: 800;">
+                                <button type="button" onclick="startTaskTimerInOffice('${t.id}', '${t.project_id}', '${escapeAttr(t.title)}', '${escapeAttr(t.project_name || 'Project')}')" class="tactile-btn" style="background: var(--ula-tone-palm-bg); color: var(--ula-status-success); border: 1px solid var(--ula-tone-palm-bg); padding: 4px 10px; font-size: 11px; font-weight: 800;">
                                     ▶ {{ __('Start') }}
                                 </button>
                             `}
@@ -7160,7 +7191,7 @@
 
             // Local user card
             const selfCard = document.createElement('div');
-            selfCard.style.cssText = 'position: relative; height: 200px; background: #08120D; border-radius: 14px; overflow: hidden; border: 2px solid var(--ula-palm-900); display: flex; align-items: center; justify-content: center; cursor: pointer;';
+            selfCard.style.cssText = 'position: relative; height: 200px; background: #08120D; border-radius: 14px; overflow: hidden; border: 2px solid var(--ula-accent-default); display: flex; align-items: center; justify-content: center; cursor: pointer;';
             const localSrc = localMediaStream || (localAvatar.videoEl ? localAvatar.videoEl.srcObject : null);
             if (camActive && localSrc) {
                 const selfVid = document.createElement('video');
@@ -7172,7 +7203,7 @@
                 selfCard.appendChild(selfVid);
             } else {
                 const init = (localAvatar.name || 'You').substring(0, 2).toUpperCase();
-                selfCard.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; gap:8px;"><div style="width:52px;height:52px;border-radius:50%;background:rgba(16,185,129,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#6EE7B7;">${init}</div><span style="font-size:11px;color:var(--ula-text-muted);">{{ __("Camera Off") }}</span></div>`;
+                selfCard.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; gap:8px;"><div style="width:52px;height:52px;border-radius:50%;background:var(--ula-tone-palm-bg);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#6EE7B7;">${init}</div><span style="font-size:11px;color:var(--ula-text-muted);">{{ __("Camera Off") }}</span></div>`;
             }
             const selfLabel = document.createElement('div');
             selfLabel.style.cssText = 'position: absolute; bottom: 8px; inset-inline-start: 8px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; color: #6EE7B7;';
@@ -7235,10 +7266,10 @@
                     } else {
                         statusHtml = `<span style="font-size:11px; color:var(--ula-text-muted);">${av.camActive ? '🟢 {{ __("Camera Active") }}' : '{{ __("Camera Off") }}'}</span>`;
                     }
-                    rCard.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; padding:10px;"><div style="width:52px;height:52px;border-radius:50%;background:rgba(59,130,246,0.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--ula-accent-default);">${init}</div>${statusHtml}</div>`;
+                    rCard.innerHTML = `<div style="display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; padding:10px;"><div style="width:52px;height:52px;border-radius:50%;background:var(--ula-tone-stone-bg);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--ula-accent-default);">${init}</div>${statusHtml}</div>`;
                 }
                 const rLabel = document.createElement('div');
-                rLabel.style.cssText = 'position: absolute; bottom: 8px; inset-inline-start: 8px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; color: var(--ula-white);';
+                rLabel.style.cssText = 'position: absolute; bottom: 8px; inset-inline-start: 8px; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; color: var(--ula-text-on-dark);';
                 rLabel.textContent = `${av.name} ${av.micActive ? '🎙️' : '🔇'}`;
                 rCard.appendChild(rLabel);
                 rCard.onclick = () => openUserSpotlight(av.id);
@@ -7422,7 +7453,7 @@
                 const dot = document.getElementById('webrtc-quality-dot');
                 const text = document.getElementById('webrtc-quality-text');
                 if (dot && text) {
-                    dot.style.background = quality === 'excellent' ? 'var(--ula-status-success)' : (quality === 'good' || quality === 'fair' ? 'var(--ula-gold-500)' : 'var(--ula-status-danger)');
+                    dot.style.background = quality === 'excellent' ? 'var(--ula-status-success)' : (quality === 'good' || quality === 'fair' ? 'var(--ula-highlight-default)' : 'var(--ula-status-danger)');
                     text.textContent = quality === 'excellent' ? '{{ __("Excellent") }}' : (quality === 'good' ? '{{ __("Good") }}' : quality.toUpperCase());
                 }
             });

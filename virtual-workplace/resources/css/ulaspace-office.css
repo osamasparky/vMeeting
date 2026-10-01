@@ -60,7 +60,7 @@ body {
     background: var(--ula-surface-map-canvas);
     border-radius: 24px;
     border: 1px solid var(--ula-alpha-ivory-30);
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(237, 230, 217, 0.08);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--ula-control-dark-fill);
     position: relative;
     overflow: hidden;
     display: flex;
@@ -112,7 +112,7 @@ body {
     padding: 6px 12px;
     height: 36px;
     border-radius: 9999px;
-    background: rgba(20, 43, 36, 0.65);
+    background: var(--ula-surface-capsule);
     border: 1px solid var(--ula-border-on-dark);
     color: var(--ula-text-on-dark);
     font-size: 12px;
@@ -124,19 +124,19 @@ body {
     white-space: nowrap;
 }
 .nx-toolbar-btn:hover {
-    background: rgba(27, 50, 35, 0.90);
+    background: var(--ula-surface-capsule-strong);
     border-color: var(--ula-highlight-default);
     color: var(--ula-text-on-dark);
     transform: translateY(-1px);
 }
 
 .nx-toolbar-btn.btn-accent {
-    background: rgba(211, 165, 83, 0.18);
-    border-color: rgba(211, 165, 83, 0.45);
-    color: var(--ula-highlight-default);
+    background: var(--ula-tone-gold-bg);
+    border-color: var(--ula-highlight-default);
+    color: var(--ula-tone-gold-fg);
 }
 .nx-toolbar-btn.btn-accent:hover {
-    background: rgba(211, 165, 83, 0.28);
+    background: var(--ula-tone-gold-bg);
     border-color: var(--ula-highlight-default);
 }
 
@@ -147,7 +147,7 @@ body {
     gap: 8px;
     padding: 6px 14px;
     border-radius: 9999px;
-    background: rgba(20, 43, 36, 0.75);
+    background: var(--ula-surface-capsule);
     border: 1px solid var(--ula-border-on-dark);
     font-size: 13px;
     font-weight: 600;
@@ -162,8 +162,8 @@ body {
     gap: 6px;
     padding: 6px 12px;
     border-radius: 9999px;
-    background: rgba(60, 107, 76, 0.20);
-    border: 1px solid rgba(60, 107, 76, 0.40);
+    background: var(--ula-tone-palm-bg);
+    border: 1px solid var(--ula-tone-palm-bg);
     color: var(--ula-status-success);
     font-size: 12px;
     font-weight: 500;
@@ -191,9 +191,9 @@ body {
     gap: 10px;
     padding: 6px 16px;
     border-radius: 9999px;
-    background: rgba(20, 43, 36, 0.85);
+    background: var(--ula-surface-capsule-strong);
     backdrop-filter: blur(14px);
-    border: 1px solid rgba(211, 165, 83, 0.35);
+    border: 1px solid var(--ula-tone-gold-bg);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
     white-space: nowrap;
 }
@@ -253,7 +253,7 @@ body {
     flex-shrink: 0;
     height: 48px;
     border-radius: 12px;
-    background: rgba(20, 43, 36, 0.55);
+    background: var(--ula-surface-capsule);
     border: 1px solid var(--ula-border-on-dark);
     color: var(--ula-text-on-dark);
     font-size: 10px;
@@ -269,20 +269,20 @@ body {
     line-height: 1;
 }
 .nx-dock-btn:hover {
-    background: rgba(27, 50, 35, 0.95);
+    background: var(--ula-surface-capsule-strong);
     border-color: var(--ula-highlight-default);
     color: var(--ula-text-on-dark);
     transform: translateY(-2px);
 }
 .nx-dock-btn.active {
-    background: rgba(60, 107, 76, 0.35);
+    background: var(--ula-tone-palm-bg);
     border-color: var(--ula-status-success);
     color: var(--ula-status-success);
-    box-shadow: 0 0 12px rgba(60, 107, 76, 0.3);
+    box-shadow: 0 0 12px var(--ula-tone-palm-bg);
 }
 .nx-dock-btn.muted {
-    background: rgba(217, 107, 95, 0.18);
-    border-color: rgba(217, 107, 95, 0.40);
+    background: var(--ula-tone-terracotta-bg);
+    border-color: var(--ula-border-danger);
     color: var(--ula-status-danger);
 }
 
@@ -296,16 +296,16 @@ body {
 /* Leave Button (Terracotta / Orange Accent matching Figma) */
 .nx-dock-btn-leave {
     background: var(--ula-status-danger) !important;
-    border-color: rgba(237, 230, 217, 0.3) !important;
-    color: var(--ula-text-on-dark) !important;
+    border-color: var(--ula-border-on-dark) !important;
+    color: var(--ula-text-on-accent) !important;
     margin-inline-start: 6px;
 }
 .nx-dock-btn-leave:hover {
-    background: #C96636 !important;
-    border-color: var(--ula-sand-300) !important;
-    color: var(--ula-text-on-dark) !important;
+    background: var(--ula-status-danger-hover) !important;
+    border-color: var(--ula-border-on-dark) !important;
+    color: var(--ula-text-on-accent) !important;
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(184, 93, 48, 0.5);
+    box-shadow: 0 4px 16px var(--ula-border-danger);
 }
 
 /* ── 4. Drawers & Modals (Dark Spatial Theme) ── */
@@ -323,7 +323,7 @@ body {
 }
 
 .modal-card, .nx-dark-card {
-    background: rgba(16, 28, 21, 0.96) !important;
+    background: var(--ula-surface-capsule-strong) !important;
     backdrop-filter: blur(24px) !important;
     border: 1px solid var(--ula-alpha-ivory-30) !important;
     border-radius: 20px !important;
@@ -358,7 +358,7 @@ body {
     width: 100%;
     height: 40px;
     border-radius: 10px;
-    background: rgba(11, 20, 16, 0.85);
+    background: var(--ula-surface-capsule-strong);
     border: 1px solid var(--ula-border-on-dark);
     color: var(--ula-text-on-dark);
     padding: 0 12px;
@@ -370,7 +370,7 @@ body {
 }
 .styled-input:focus {
     border-color: var(--ula-highlight-default);
-    box-shadow: 0 0 0 3px rgba(211, 165, 83, 0.2);
+    box-shadow: 0 0 0 3px var(--ula-tone-gold-bg);
 }
 
 .input-group {
@@ -393,7 +393,7 @@ body {
     gap: 6px;
     padding: 6px 14px;
     border-radius: 9999px;
-    background: rgba(20, 43, 36, 0.65);
+    background: var(--ula-surface-capsule);
     border: 1px solid var(--ula-border-on-dark);
     color: var(--ula-text-on-dark);
     font-size: 12px;
@@ -404,19 +404,19 @@ body {
     box-sizing: border-box;
 }
 .action-link-btn:hover {
-    background: rgba(27, 50, 35, 0.95);
+    background: var(--ula-surface-capsule-strong);
     border-color: var(--ula-highlight-default);
     color: var(--ula-text-on-dark);
 }
 .action-link-btn.btn-danger {
-    background: rgba(217, 107, 95, 0.2);
-    border-color: rgba(217, 107, 95, 0.4);
+    background: var(--ula-tone-terracotta-bg);
+    border-color: var(--ula-border-danger);
     color: var(--ula-status-danger);
 }
 .action-link-btn.btn-danger:hover {
-    background: rgba(217, 107, 95, 0.4);
-    border-color: #D96B5F;
-    color: var(--ula-text-on-dark);
+    background: var(--ula-border-danger);
+    border-color: var(--ula-border-danger);
+    color: var(--ula-text-on-accent);
 }
 
 /* Chat Drawer */
@@ -426,7 +426,7 @@ body {
     inset-inline-end: -360px;
     width: 340px;
     height: calc(100% - 56px);
-    background: rgba(11, 20, 16, 0.96);
+    background: var(--ula-surface-capsule-strong);
     backdrop-filter: blur(24px);
     border-inline-start: 1px solid var(--ula-border-on-dark);
     box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
@@ -450,7 +450,7 @@ body {
 .chat-tabs {
     display: flex;
     border-bottom: 1px solid var(--ula-border-on-dark);
-    background: rgba(20, 43, 36, 0.4);
+    background: var(--ula-control-dark-fill);
 }
 .chat-tab {
     flex: 1;
@@ -465,7 +465,7 @@ body {
 .chat-tab.active {
     color: var(--ula-highlight-default);
     border-bottom: 2px solid var(--ula-highlight-default);
-    background: rgba(20, 43, 36, 0.8);
+    background: var(--ula-surface-capsule);
 }
 
 .chat-messages {
@@ -478,7 +478,7 @@ body {
 }
 
 .msg-bubble {
-    background: rgba(20, 43, 36, 0.7);
+    background: var(--ula-surface-capsule);
     border: 1px solid var(--ula-border-on-dark);
     border-radius: 12px;
     padding: 10px 12px;
@@ -500,12 +500,12 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: rgba(11, 20, 16, 0.9);
+    background: var(--ula-surface-capsule-strong);
 }
 
 /* ── 5. Remote Peer Video Card ── */
 .nx-video-card {
-    background: rgba(11, 20, 16, 0.95);
+    background: var(--ula-surface-capsule-strong);
     border: 1px solid var(--ula-alpha-ivory-30);
     border-radius: 14px;
     overflow: hidden;
@@ -520,7 +520,7 @@ body {
     inset-inline-end: 20px;
     width: 200px;
     height: 125px;
-    background: rgba(11, 20, 16, 0.95);
+    background: var(--ula-surface-capsule-strong);
     border: 1px solid var(--ula-alpha-ivory-30);
     border-radius: 14px;
     overflow: hidden;
@@ -532,7 +532,7 @@ body {
 
 .local-cam-header {
     padding: 6px 10px;
-    background: rgba(20, 43, 36, 0.85);
+    background: var(--ula-surface-capsule-strong);
     border-bottom: 1px solid var(--ula-border-on-dark);
     display: flex;
     align-items: center;
@@ -556,9 +556,9 @@ body {
     bottom: 85px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(60, 107, 76, 0.95);
+    background: var(--ula-accent-default);
     backdrop-filter: blur(14px);
-    color: var(--ula-text-on-dark);
+    color: var(--ula-accent-fg);
     padding: 10px 22px;
     border-radius: 9999px;
     font-size: 12px;
@@ -566,7 +566,7 @@ body {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
     display: none;
     z-index: 100000;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--ula-border-on-dark-subtle);
 }
 
 /* ── Floating Viewport Zoom & Pan Controls (Floating Glass) ── */
@@ -578,7 +578,7 @@ body {
     flex-direction: column;
     gap: 6px;
     z-index: 65;
-    background: rgba(14, 25, 19, 0.88);
+    background: var(--ula-surface-capsule-strong);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border: 1px solid var(--ula-border-on-dark);
@@ -591,7 +591,7 @@ body {
     width: 36px;
     height: 36px;
     border-radius: 10px;
-    background: rgba(20, 43, 36, 0.6);
+    background: var(--ula-surface-capsule);
     border: 1px solid transparent;
     color: var(--ula-text-on-dark);
     display: flex;
@@ -602,7 +602,7 @@ body {
 }
 
 .nx-viewport-ctrl-btn:hover {
-    background: rgba(60, 107, 76, 0.45);
+    background: var(--ula-tone-palm-bg);
     border-color: var(--ula-highlight-default);
     color: var(--ula-text-on-dark);
     transform: scale(1.05);
@@ -638,7 +638,7 @@ body {
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    background: rgba(14, 25, 19, 0.96);
+    background: var(--ula-surface-capsule-strong);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border: 1px solid var(--ula-alpha-ivory-30);
@@ -658,8 +658,8 @@ body {
     width: 34px;
     height: 34px;
     border-radius: 10px;
-    background: rgba(60, 107, 76, 0.28);
-    border: 1px solid rgba(60, 107, 76, 0.50);
+    background: var(--ula-tone-palm-bg);
+    border: 1px solid var(--ula-tone-palm-bg);
     color: var(--ula-status-success);
     display: flex;
     align-items: center;
@@ -668,14 +668,14 @@ body {
 }
 
 .nx-toast-card.nx-toast-warning .nx-toast-icon-wrap {
-    background: rgba(211, 165, 83, 0.25);
-    border-color: rgba(211, 165, 83, 0.50);
+    background: var(--ula-tone-gold-bg);
+    border-color: var(--ula-highlight-default);
     color: var(--ula-highlight-default);
 }
 
 .nx-toast-card.nx-toast-error .nx-toast-icon-wrap {
-    background: rgba(217, 107, 95, 0.25);
-    border-color: rgba(217, 107, 95, 0.50);
+    background: var(--ula-tone-terracotta-bg);
+    border-color: var(--ula-border-danger);
     color: var(--ula-status-danger);
 }
 
@@ -1084,7 +1084,7 @@ body {
 .ula-call-btn .material-symbols-rounded { font-size: 20px; }
 .ula-call-btn--answer { background: var(--ula-control-cta-on-dark); color: var(--ula-text-on-cta); }
 .ula-call-btn--answer:hover { background: var(--ula-control-cta-on-dark-hover); }
-.ula-call-btn--decline { background: var(--ula-status-danger); color: var(--ula-text-on-dark); }
+.ula-call-btn--decline { background: var(--ula-status-danger); color: var(--ula-text-on-accent); }
 .ula-call-btn--decline:hover { background: var(--ula-status-danger-hover); }
 .ula-call-btn--quiet { background: transparent; border-color: var(--ula-control-dark-border); color: var(--ula-text-on-dark); }
 .ula-call-btn--quiet:hover { background: var(--ula-control-dark-fill); }

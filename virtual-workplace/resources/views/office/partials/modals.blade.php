@@ -142,10 +142,10 @@
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <button id="spotlight-ring-btn" onclick="ringSpotlightUser()" class="action-link-btn" style="background: rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.4); color: var(--ula-gold-400); font-size: 11px; padding: 4px 10px;">
+                    <button id="spotlight-ring-btn" onclick="ringSpotlightUser()" class="action-link-btn" style="background: var(--ula-tone-gold-bg); border-color: var(--ula-highlight-default); color: var(--ula-tone-gold-fg); font-size: 11px; padding: 4px 10px;">
                         <span><span class="material-symbols-rounded">notifications</span></span> {{ __('Ring') }}
                     </button>
-                    <button id="spotlight-wave-btn" onclick="sendWaveToSpotlightUser()" class="action-link-btn" style="background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.4); color: var(--ula-accent-default); font-size: 11px; padding: 4px 10px;">
+                    <button id="spotlight-wave-btn" onclick="sendWaveToSpotlightUser()" class="action-link-btn" style="background: var(--ula-tone-stone-bg); border-color: var(--ula-tone-stone-bg); color: var(--ula-accent-default); font-size: 11px; padding: 4px 10px;">
                         <span><span class="material-symbols-rounded">front_hand</span></span> {{ __('Wave') }}
                     </button>
                     <button onclick="closeUserSpotlight()" style="background:none; border:none; color:var(--ula-text-muted); font-size:20px; cursor:pointer;"><span class="material-symbols-rounded">close</span></button>
@@ -153,10 +153,10 @@
             </div>
 
             <!-- Spotlight Video Viewport -->
-            <div id="spotlight-video-container" style="position: relative; width: 100%; height: 320px; background: var(--ula-palm-950); border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid var(--ula-border-subtle); box-shadow: inset 0 0 40px rgba(0,0,0,0.8);">
+            <div id="spotlight-video-container" style="position: relative; width: 100%; height: 320px; background: var(--ula-surface-map-canvas); border-radius: 16px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid var(--ula-border-subtle); box-shadow: inset 0 0 40px rgba(0,0,0,0.8);">
                 <video id="spotlight-video-player" autoplay playsinline style="width: 100%; height: 100%; object-fit: contain; display: none;"></video>
                 <div id="spotlight-no-video" style="display: flex; flex-direction: column; align-items: center; gap: 12px; color: var(--ula-text-muted);">
-                    <div id="spotlight-big-avatar" style="width: 86px; height: 86px; border-radius: 24px; background: rgba(16, 185, 129, 0.15); border: 2px solid var(--ula-palm-900); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; color: var(--ula-status-success); overflow: hidden;">
+                    <div id="spotlight-big-avatar" style="width: 86px; height: 86px; border-radius: 24px; background: var(--ula-tone-palm-bg); border: 2px solid var(--ula-accent-default); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; color: var(--ula-status-success); overflow: hidden;">
                     </div>
                     <span style="font-size: 13px; font-weight: 700;">{{ __('Live camera stream is currently offline') }}</span>
                 </div>
@@ -164,7 +164,7 @@
 
             <!-- Live Work Activity & Task List Section -->
             <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 4px;">
-                <div id="spotlight-active-timer-box" style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(52, 211, 153, 0.25); border-radius: 12px; padding: 12px; display: none; align-items: center; justify-content: space-between;">
+                <div id="spotlight-active-timer-box" style="background: var(--ula-tone-palm-bg); border: 1px solid var(--ula-tone-palm-bg); border-radius: 12px; padding: 12px; display: none; align-items: center; justify-content: space-between;">
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <span style="font-size: 22px;">⏱️</span>
                         <div>
@@ -179,7 +179,7 @@
                 <div>
                     <div style="font-size: 11px; font-weight: 900; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
                         <span><span class="material-symbols-rounded">assignment</span> {{ __('Assigned Tasks & Progress') }}</span>
-                        <span id="spotlight-tasks-count" class="guest-badge" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(52, 211, 153, 0.3); color: var(--ula-status-success);">0 Tasks</span>
+                        <span id="spotlight-tasks-count" class="guest-badge" style="background: var(--ula-tone-palm-bg); border-color: var(--ula-tone-palm-bg); color: var(--ula-status-success);">0 Tasks</span>
                     </div>
                     <div id="spotlight-tasks-list" style="display: flex; flex-direction: column; gap: 6px; max-height: 180px; overflow-y: auto;">
                         <!-- Injected dynamically via JS -->
@@ -396,10 +396,10 @@
                 <strong id="knock-requester-name" style="font-size: 14px; color: var(--ula-text-primary);">A colleague is knocking...</strong>
                 <span style="font-size: 12px; color: var(--ula-text-secondary);">{{ __('They are requesting permission to enter this locked private room.') }}</span>
                 <div style="display: flex; gap: 10px; margin-top: 6px;">
-                    <button onclick="respondToKnock(true)" class="action-link-btn" style="flex: 1; justify-content: center; background: var(--ula-palm-900); color: var(--ula-white);">
+                    <button onclick="respondToKnock(true)" class="action-link-btn" style="flex: 1; justify-content: center; background: var(--ula-accent-default); color: var(--ula-accent-fg);">
                         <span class="material-symbols-rounded">check_circle</span> {{ __('Let In') }}
                     </button>
-                    <button onclick="respondToKnock(false)" class="action-link-btn" style="flex: 1; justify-content: center; background: rgba(239, 68, 68, 0.15); color: var(--ula-status-danger);">
+                    <button onclick="respondToKnock(false)" class="action-link-btn" style="flex: 1; justify-content: center; background: var(--ula-tone-terracotta-bg); color: var(--ula-status-danger);">
                         <span class="material-symbols-rounded">close</span> {{ __('Decline') }}
                     </button>
                 </div>
@@ -408,7 +408,7 @@
     </div>
 
     <!-- ── 7. In-Office My Tasks Drawer & Quick Time Tracker ── -->
-    <div class="task-drawer ula-on-dark" id="my-task-drawer">
+    <div class="task-drawer" id="my-task-drawer">
         <div style="padding: 16px; background: var(--ula-surface-card); border-bottom: 1px solid var(--ula-border-subtle); display: flex; justify-content: space-between; align-items: center;">
             <div style="font-size: 14px; font-weight: 900; color: var(--ula-text-primary); display: flex; align-items: center; gap: 8px;">
                 <span><span class="material-symbols-rounded">edit_note</span></span> <span>{{ __('My Tasks & Time Tracker') }}</span>
@@ -417,7 +417,7 @@
         </div>
 
         <!-- Active Running Task Hero Card -->
-        <div id="office-active-timer-hero" style="display: none; padding: 14px 16px; background: rgba(16, 185, 129, 0.12); border-bottom: 1px solid rgba(52, 211, 153, 0.3);">
+        <div id="office-active-timer-hero" style="display: none; padding: 14px 16px; background: var(--ula-tone-palm-bg); border-bottom: 1px solid var(--ula-tone-palm-bg);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                 <span style="font-size: 10px; font-weight: 800; color: var(--ula-text-primary); text-transform: uppercase; display: flex; align-items: center; gap: 4px;">
                     <span class="live-dot" style="width: 6px; height: 6px;"></span>
@@ -428,7 +428,7 @@
             <div id="office-timer-title" style="font-size: 13px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 4px;"></div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span id="office-timer-project" style="font-size: 11px; font-weight: 700; color: var(--ula-text-secondary);"></span>
-                <button onclick="stopActiveOfficeTask()" class="tactile-btn" style="background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: var(--ula-status-danger); padding: 4px 12px; font-size: 11px;">
+                <button onclick="stopActiveOfficeTask()" class="tactile-btn" style="background: var(--ula-tone-terracotta-bg); border-color: var(--ula-border-danger); color: var(--ula-status-danger); padding: 4px 12px; font-size: 11px;">
                     ⏹️ {{ __('Stop Task') }}
                 </button>
             </div>
@@ -449,9 +449,9 @@
 
     <!-- ── 8. Smart Inactivity / Idle Check Modal ("Are you still online?") ── -->
     <div id="office-idle-check-modal" class="modal-overlay" style="display: none; z-index: 1000005;">
-        <div class="modal-card" style="max-width: 440px; text-align: center; padding: 28px 24px; border: 2px solid rgba(214, 162, 58, 0.5); box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 30px rgba(214, 162, 58, 0.25);">
+        <div class="modal-card" style="max-width: 440px; text-align: center; padding: 28px 24px; border: 2px solid var(--ula-highlight-default); box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 30px var(--ula-tone-gold-bg);">
             <div style="font-size: 44px; margin-bottom: 10px;">⏰</div>
-            <h3 style="font-size: 17px; font-weight: 900; color: var(--ula-gold-500); margin-bottom: 8px;">
+            <h3 style="font-size: 17px; font-weight: 900; color: var(--ula-tone-gold-fg); margin-bottom: 8px;">
                 {{ __('Are you still online?') }}
             </h3>
             <p style="font-size: 13px; color: var(--ula-text-secondary); line-height: 1.6; margin-bottom: 16px;">
@@ -462,22 +462,22 @@
             <div style="margin-bottom: 20px;">
                 <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; color: var(--ula-text-muted); margin-bottom: 6px;">
                     <span>⏳ {{ __('Auto-pause in:') }}</span>
-                    <span id="idle-countdown-clock" style="font-family: monospace; font-weight: 900; color: var(--ula-gold-500); font-size: 14px;">03:00</span>
+                    <span id="idle-countdown-clock" style="font-family: monospace; font-weight: 900; color: var(--ula-tone-gold-fg); font-size: 14px;">03:00</span>
                 </div>
-                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
-                    <div id="idle-countdown-bar" style="width: 100%; height: 100%; background: linear-gradient(90deg, var(--ula-gold-500), var(--ula-status-danger)); transition: width 1s linear;"></div>
+                <div style="width: 100%; height: 8px; background: var(--ula-control-dark-fill); border-radius: 4px; overflow: hidden;">
+                    <div id="idle-countdown-bar" style="width: 100%; height: 100%; background: linear-gradient(90deg, var(--ula-highlight-default), var(--ula-status-danger)); transition: width 1s linear;"></div>
                 </div>
             </div>
 
-            <button type="button" onclick="confirmUserPresence()" class="tactile-btn btn-primary" style="width: 100%; padding: 12px 24px; font-size: 14px; justify-content: center; background: var(--ula-status-success); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);">
+            <button type="button" onclick="confirmUserPresence()" class="tactile-btn btn-primary" style="width: 100%; padding: 12px 24px; font-size: 14px; justify-content: center; background: var(--ula-status-success); box-shadow: 0 6px 20px var(--ula-tone-palm-bg);">
                 <span class="material-symbols-rounded" style="font-size: 14px;">circle</span> {{ __("Yes, I'm Online") }}
             </button>
         </div>
     </div>
 
     <!-- ── 9. Inactivity Paused Fullscreen Overlay ── -->
-    <div id="office-idle-paused-overlay" class="modal-overlay" style="display: none; z-index: 1000006; background: rgba(5, 12, 8, 0.95); backdrop-filter: blur(20px);">
-        <div class="modal-card" style="max-width: 480px; text-align: center; padding: 32px 24px; border: 1px solid rgba(52, 211, 153, 0.3);">
+    <div id="office-idle-paused-overlay" class="modal-overlay" style="display: none; z-index: 1000006; background: var(--ula-surface-capsule-strong); backdrop-filter: blur(20px);">
+        <div class="modal-card" style="max-width: 480px; text-align: center; padding: 32px 24px; border: 1px solid var(--ula-tone-palm-bg);">
             <div style="font-size: 52px; margin-bottom: 12px;">⏸️</div>
             <h3 style="font-size: 18px; font-weight: 900; color: var(--ula-text-primary); margin-bottom: 10px;">
                 {{ __('Office Time Tracking Paused') }}
@@ -494,19 +494,19 @@
 
     <!-- ── 10. Direct Ring Attention Alert Modal (Incoming Ring) ── -->
     <div id="incoming-ring-modal" class="modal-overlay" style="display: none; z-index: 1000007;">
-        <div class="modal-card" style="max-width: 440px; text-align: center; padding: 26px 22px; border: 2px solid var(--ula-gold-500); box-shadow: 0 20px 60px rgba(0,0,0,0.85), 0 0 40px rgba(245, 158, 11, 0.4); animation: pulseRing 1.2s infinite ease-in-out;">
+        <div class="modal-card" style="max-width: 440px; text-align: center; padding: 26px 22px; border: 2px solid var(--ula-highlight-default); box-shadow: 0 20px 60px rgba(0,0,0,0.85), 0 0 40px var(--ula-highlight-default); animation: pulseRing 1.2s infinite ease-in-out;">
             <div style="font-size: 54px; margin-bottom: 8px;"><span class="material-symbols-rounded">notifications</span></div>
-            <h3 id="incoming-ring-title" style="font-size: 18px; font-weight: 900; color: var(--ula-gold-400); margin-bottom: 6px;">
+            <h3 id="incoming-ring-title" style="font-size: 18px; font-weight: 900; color: var(--ula-tone-gold-fg); margin-bottom: 6px;">
                 {{ __('Incoming Ring Call') }}
             </h3>
             <p id="incoming-ring-desc" style="font-size: 13px; color: var(--ula-text-secondary); line-height: 1.6; margin-bottom: 20px;">
                 {{ __('A colleague is ringing you for immediate attention.') }}
             </p>
             <div style="display: flex; gap: 10px;">
-                <button type="button" onclick="acceptIncomingRing()" class="action-link-btn" style="flex: 1; justify-content: center; background: var(--ula-status-success); color: var(--ula-white); padding: 12px; font-size: 14px; font-weight: 800;">
+                <button type="button" onclick="acceptIncomingRing()" class="action-link-btn" style="flex: 1; justify-content: center; background: var(--ula-status-success); color: var(--ula-text-on-dark); padding: 12px; font-size: 14px; font-weight: 800;">
                     <span class="material-symbols-rounded">call</span> {{ __('Answer & Focus') }}
                 </button>
-                <button type="button" onclick="dismissIncomingRing()" class="action-link-btn" style="flex: 1; justify-content: center; background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.4); color: var(--ula-status-danger); padding: 12px; font-size: 14px; font-weight: 800;">
+                <button type="button" onclick="dismissIncomingRing()" class="action-link-btn" style="flex: 1; justify-content: center; background: var(--ula-tone-terracotta-bg); border-color: var(--ula-border-danger); color: var(--ula-status-danger); padding: 12px; font-size: 14px; font-weight: 800;">
                     <span class="material-symbols-rounded">close</span> {{ __('Dismiss') }}
                 </button>
             </div>
@@ -523,7 +523,7 @@
     <!-- ── 11. Interactive Sticky Note Viewer Modal ── -->
     <div id="sticky-note-modal" class="modal-overlay" style="display: none; z-index: 1000008; background: rgba(5, 12, 8, 0.75); backdrop-filter: blur(12px);">
         <div id="sticky-note-card" class="modal-card" style="max-width: 420px; background: #FEF3C7; color: #78350F; border: 2px solid #F59E0B; box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px rgba(245,158,11,0.25); border-radius: 16px; padding: 24px; position: relative; transform: rotate(-1deg);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px dashed rgba(120, 53, 15, 0.3); padding-bottom: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px dashed var(--ula-tone-terracotta-bg); padding-bottom: 8px;">
                 <div style="display: flex; align-items: center; gap: 6px; font-weight: 900; font-size: 14px;">
                     <span style="font-size: 20px;"><span class="material-symbols-rounded">push_pin</span></span>
                     <span id="sticky-modal-title">{{ __('Workplace Sticky Note') }}</span>
@@ -542,7 +542,7 @@
 
     <!-- ── 12. Interactive Custom Image Lightbox Modal ── -->
     <div id="custom-image-modal" class="modal-overlay" style="display: none; z-index: 1000008; background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(16px);" onclick="closeCustomImageModal()">
-        <div class="modal-card" style="max-width: 85vw; max-height: 85vh; padding: 12px; background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255,255,255,0.15); display: flex; flex-direction: column; align-items: center;" onclick="event.stopPropagation()">
+        <div class="modal-card" style="max-width: 85vw; max-height: 85vh; padding: 12px; background: var(--ula-surface-capsule-strong); border: 1px solid var(--ula-border-on-dark-subtle); display: flex; flex-direction: column; align-items: center;" onclick="event.stopPropagation()">
             <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 6px 12px 10px;">
                 <span id="custom-image-modal-title" style="font-size: 14px; font-weight: 800; color: var(--ula-text-primary);"><span class="material-symbols-rounded">image</span> {{ __('Image Viewer') }}</span>
                 <button type="button" onclick="closeCustomImageModal()" style="background: none; border: none; font-size: 22px; color: var(--ula-text-muted); cursor: pointer;"><span class="material-symbols-rounded">close</span></button>
@@ -554,19 +554,19 @@
     </div>
 
     <!-- ── 13. Interactive Custom Link Modal ── -->
-    <div id="custom-link-modal" class="modal-overlay" style="display: none; z-index: 1000008; background: rgba(5, 12, 8, 0.8); backdrop-filter: blur(14px);">
-        <div class="modal-card" style="max-width: 460px; text-align: center; padding: 28px 24px; border: 1px solid rgba(59, 130, 246, 0.4);">
+    <div id="custom-link-modal" class="modal-overlay" style="display: none; z-index: 1000008; background: var(--ula-surface-capsule); backdrop-filter: blur(14px);">
+        <div class="modal-card" style="max-width: 460px; text-align: center; padding: 28px 24px; border: 1px solid var(--ula-tone-stone-bg);">
             <div style="font-size: 48px; margin-bottom: 10px;"><span class="material-symbols-rounded">link</span></div>
             <h3 id="custom-link-modal-title" style="font-size: 17px; font-weight: 900; color: var(--ula-accent-default); margin-bottom: 8px;">
                 {{ __('Open Interactive Portal') }}
             </h3>
-            <p id="custom-link-modal-url" style="font-size: 13px; color: var(--ula-text-muted); margin-bottom: 22px; word-break: break-all; background: rgba(15, 23, 42, 0.6); padding: 10px; border-radius: 8px; border: 1px solid var(--ula-border-subtle); font-family: monospace;">
+            <p id="custom-link-modal-url" style="font-size: 13px; color: var(--ula-text-muted); margin-bottom: 22px; word-break: break-all; background: var(--ula-surface-capsule); padding: 10px; border-radius: 8px; border: 1px solid var(--ula-border-subtle); font-family: monospace;">
             </p>
             <div style="display: flex; gap: 10px;">
-                <a id="custom-link-modal-btn" href="javascript:void(0)" target="_blank" rel="noopener noreferrer" class="action-link-btn" style="flex: 1; justify-content: center; background: var(--ula-accent-default); color: var(--ula-white); padding: 12px; font-size: 13px; font-weight: 800; text-decoration: none;">
+                <a id="custom-link-modal-btn" href="javascript:void(0)" target="_blank" rel="noopener noreferrer" class="action-link-btn" style="flex: 1; justify-content: center; background: var(--ula-accent-default); color: var(--ula-text-on-dark); padding: 12px; font-size: 13px; font-weight: 800; text-decoration: none;">
                     <span class="material-symbols-rounded">rocket_launch</span> {{ __('Visit Link') }}
                 </a>
-                <button type="button" onclick="closeCustomLinkModal()" class="action-link-btn" style="background: rgba(255,255,255,0.1); color: var(--ula-text-muted); padding: 12px 18px; font-size: 13px; font-weight: 800;">
+                <button type="button" onclick="closeCustomLinkModal()" class="action-link-btn" style="background: var(--ula-control-dark-fill); color: var(--ula-text-muted); padding: 12px 18px; font-size: 13px; font-weight: 800;">
                     <span class="material-symbols-rounded">close</span> {{ __('Cancel') }}
                 </button>
             </div>
