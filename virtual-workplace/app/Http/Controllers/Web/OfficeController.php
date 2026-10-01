@@ -609,10 +609,13 @@ class OfficeController extends Controller
                 ], 422);
             }
 
-            Room::where('map_id', $map->id)->delete();
+            // Update rooms in place. Deleting and re-creating them (the old approach) cascaded to
+            // guest invitations, room files and room access rules on every save.
+            $existing = Room::where('map_id', $map->id)->get()->keyBy('id');
+            $keptIds = [];
             foreach ($validated['rooms'] as $r) {
-                Room::create([
-                    'id' => (! empty($r['id']) && strlen($r['id']) === 36 && str_contains($r['id'], '-')) ? $r['id'] : (string) Str::uuid(),
+                $id = (! empty($r['id']) && strlen($r['id']) === 36 && str_contains($r['id'], '-')) ? $r['id'] : null;
+                $attributes = [
                     'organization_id' => $map->organization_id,
                     'map_id' => $map->id,
                     'name' => $r['name'] ?? 'Meeting Room',
@@ -622,8 +625,17 @@ class OfficeController extends Controller
                     'color' => $r['color'] ?? '#4F9B5F',
                     'bounds' => $r['bounds'] ?? ['x' => 1, 'y' => 1, 'width' => 8, 'height' => 6],
                     'metadata' => $r['metadata'] ?? [],
-                ]);
+                ];
+                if ($id && $existing->has($id)) {
+                    $existing[$id]->update($attributes);
+                } else {
+                    $id = $id && ! Room::whereKey($id)->exists() ? $id : (string) Str::uuid();
+                    Room::create(['id' => $id] + $attributes);
+                }
+                $keptIds[] = $id;
             }
+            // Only rooms removed in the editor are deleted (their dependants go with them, as intended).
+            Room::where('map_id', $map->id)->whereNotIn('id', $keptIds)->delete();
         }
 
         if (isset($validated['objects'])) {

@@ -34,7 +34,7 @@ class RecordingController extends Controller
     public function store(Request $request, Organization $organization): JsonResponse
     {
         $request->validate([
-            'video' => 'required|file|max:204800', // max 200MB
+            'video' => 'required|file|max:524288', // 512 MB, matching the site's PHP upload limit
             'title' => 'nullable|string|max:255',
             'room_id' => 'nullable|string',
             'duration_seconds' => 'nullable|numeric',

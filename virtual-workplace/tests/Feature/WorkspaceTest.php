@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Domains\Guests\Models\GuestInvitation;
 use App\Domains\Identity\Models\User;
 use App\Domains\Tenancy\Actions\CreateOrganizationAction;
 use App\Domains\Tenancy\Models\Organization;
@@ -175,5 +176,45 @@ class WorkspaceTest extends TestCase
         $response->assertStatus(200)
             ->assertSee('Map Editor')
             ->assertSee('Acme Corp');
+    }
+
+    public function test_saving_the_map_updates_rooms_in_place_and_keeps_their_guest_links(): void
+    {
+        $this->actingAs($this->user);
+
+        $floor = Floor::create(['organization_id' => $this->organization->id, 'name' => 'HQ']);
+        $map = Map::create(['organization_id' => $this->organization->id, 'floor_id' => $floor->id, 'name' => 'HQ Map', 'status' => 'published']);
+        $room = Room::create([
+            'organization_id' => $this->organization->id,
+            'map_id' => $map->id,
+            'name' => 'Board Room',
+            'type' => 'meeting',
+            'bounds' => ['x' => 2, 'y' => 2, 'width' => 8, 'height' => 6],
+        ]);
+        $invite = GuestInvitation::create([
+            'organization_id' => $this->organization->id,
+            'room_id' => $room->id,
+            'invited_by' => $this->user->id,
+            'guest_name' => 'Visitor',
+            'token' => str_repeat('a', 40),
+            'status' => 'pending',
+            'expires_at' => now()->addDay(),
+        ]);
+
+        $payload = fn (array $rooms) => ['name' => 'HQ Map', 'layout_data' => [], 'rooms' => $rooms, 'objects' => []];
+
+        // Move the door and save: the room keeps its id and its guest link survives.
+        $this->postJson("/editor/maps/{$map->id}/save", $payload([[
+            'id' => $room->id, 'name' => 'Board Room', 'type' => 'meeting',
+            'bounds' => ['x' => 2, 'y' => 2, 'width' => 8, 'height' => 6, 'doorSide' => 'top', 'doorOffset' => 0.4],
+        ]]))->assertSuccessful();
+
+        $this->assertSame('top', $room->fresh()->bounds['doorSide']);
+        $this->assertNotNull($invite->fresh(), 'saving the map must not cascade-delete guest links');
+
+        // Removing the room in the editor does delete it (and its dependants).
+        $this->postJson("/editor/maps/{$map->id}/save", $payload([]))->assertSuccessful();
+        $this->assertNull($room->fresh());
+        $this->assertNull($invite->fresh());
     }
 }

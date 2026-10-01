@@ -3155,5 +3155,8 @@
     "office.rec_cancelled": "Recording cancelled — no screen was selected.",
     "office.rec_started": "Recording your screen…",
     "office.rec_failed": "The recording could not start.",
-    "office.rec_processing": "Saving the recording…"
+    "office.rec_processing": "Saving the recording…",
+    "office.rec_saved_locally": "The recording was saved to this computer instead.",
+    "office.rec_too_large": "The recording (:size MB) is larger than the server allows (:max MB).",
+    "office.rec_upload_failed": "The recording could not be uploaded."
 }

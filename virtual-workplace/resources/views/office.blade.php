@@ -5375,7 +5375,8 @@
                 const mime = candidates.find(t => MediaRecorder.isTypeSupported(t)) || '';
 
                 recordedChunks = [];
-                mediaRecorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+                const bitrates = { videoBitsPerSecond: 1400000, audioBitsPerSecond: 96000 };
+                mediaRecorder = mime ? new MediaRecorder(stream, { mimeType: mime, ...bitrates }) : new MediaRecorder(stream, bitrates);
                 recordMime = (mediaRecorder.mimeType || mime || 'video/webm').split(';')[0];
                 mediaRecorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) recordedChunks.push(e.data); };
                 mediaRecorder.onstop = uploadRecordingToServer;
@@ -5412,16 +5413,40 @@
             showToast('⏳ ' + @json(__('office.rec_processing')));
         }
 
+        // Largest upload the server accepts (the lower of PHP's upload_max_filesize and post_max_size).
+        const MAX_UPLOAD_BYTES = {{ (int) min(ini_parse_quantity(ini_get('upload_max_filesize') ?: '2M'), ini_parse_quantity(ini_get('post_max_size') ?: '8M')) }};
+
+        // A recording is never thrown away: if it cannot be uploaded it is saved to this computer.
+        function saveRecordingLocally(blob, filename, reason) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 60000);
+            showToast('ℹ️ ' + escapeHtml(reason) + ' ' + @json(__('office.rec_saved_locally')));
+        }
+
         async function uploadRecordingToServer() {
             if (recordedChunks.length === 0) return;
             const blob = new Blob(recordedChunks, { type: recordMime });
+            recordedChunks = [];
             const ext = recordMime.includes('mp4') ? 'mp4' : 'webm';
+            const filename = `session_${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.${ext}`;
             const duration = Math.max(1, Math.round((Date.now() - recordStartTime) / 1000));
             const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
 
+            if (MAX_UPLOAD_BYTES > 0 && blob.size > MAX_UPLOAD_BYTES - 64 * 1024) {
+                const mb = n => (n / 1048576).toFixed(0);
+                saveRecordingLocally(blob, filename, @json(__('office.rec_too_large')).replace(':size', mb(blob.size)).replace(':max', mb(MAX_UPLOAD_BYTES)));
+                return;
+            }
+
             const formData = new FormData();
-            formData.append('video', blob, `session_${Date.now()}.${ext}`);
-            formData.append('title', `Office Session ${new Date().toLocaleTimeString()} — ${myRoom ? myRoom.name : 'Main Floor'}`);
+            formData.append('video', blob, filename);
+            formData.append('title', `${myRoom ? myRoom.name : @json(__('office.people_open_space'))} — ${new Date().toLocaleString()}`);
             if (myRoom && myRoom.id) formData.append('room_id', myRoom.id);
             formData.append('duration_seconds', duration);
             formData.append('recorded_by_name', localAvatar.name || 'Member');
@@ -5435,12 +5460,14 @@
                 });
                 if (res.ok) {
                     showToast('✅ {{ __("Session recording saved to gallery!") }}');
-                } else {
-                    showToast('❌ {{ __("Failed to save recording") }}');
+                    return;
                 }
-            } catch(e) {
+                let message = '';
+                try { const data = await res.json(); message = data.message || ''; } catch (e) { message = `HTTP ${res.status}`; }
+                saveRecordingLocally(blob, filename, (@json(__('office.rec_upload_failed')) + ' ' + message).trim());
+            } catch (e) {
                 console.error(e);
-                showToast('❌ {{ __("Upload error") }}');
+                saveRecordingLocally(blob, filename, @json(__('office.rec_upload_failed')));
             }
         }
 
