@@ -57,5 +57,6 @@
         }
         pmOriginalSwitchSection(tab);
         if (tab === 'calendar' && window.pmRenderCalendar) pmRenderCalendar();
+        document.dispatchEvent(new CustomEvent('pm:tab-shown', { detail: tab }));
     };
 </script>

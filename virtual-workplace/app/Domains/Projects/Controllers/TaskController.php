@@ -551,7 +551,7 @@ class TaskController extends Controller
         $this->authorizeTaskEdit($organization, $task);
 
         $validated = $request->validate([
-            'sprint_id' => ['nullable', Rule::exists('project_sprints', 'id')->where('project_id', $task->project_id)],
+            'sprint_id' => ['nullable', Rule::exists('project_sprints', 'id')->where('project_id', $task->project_id)->whereNotIn('status', ['completed', 'closed'])],
             'story_points' => 'nullable|integer|min:0',
         ]);
 

@@ -16,6 +16,7 @@
         'members' => $allMembers->filter(fn ($m) => $m->user)->map(fn ($m) => ['id' => $m->user_id, 'name' => $m->user->name])->values(),
         'tones' => \App\Domains\Projects\Models\ProjectLabel::TONES,
         'locale' => app()->getLocale(),
+        'statusLabels' => ['backlog' => __('Backlog'), 'ready' => __('Ready'), 'in_progress' => __('In Progress'), 'review' => __('Review'), 'qa' => __('QA'), 'done' => __('Done')],
         // Calendar data: one row per task with the attributes the shared filter reads.
         'tasks' => $tasks->map(fn ($t) => [
             'id' => $t->id,
@@ -30,6 +31,8 @@
             'labels' => $t->labels->pluck('id')->implode(','),
             'milestone' => $t->milestone_id ?? 'none',
             'canEdit' => $user->can('update', $t),
+            'sprint' => $t->sprint_id,
+            'points' => $t->story_points,
         ])->values(),
     ];
 @endphp
@@ -125,3 +128,4 @@
 @include('projects.partials.pm.list-scripts')
 @include('projects.partials.pm.views-scripts')
 @include('projects.partials.pm.calendar-scripts')
+@include('projects.partials.pm.sprints-scripts')

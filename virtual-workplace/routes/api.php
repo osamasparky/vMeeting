@@ -14,6 +14,7 @@ use App\Domains\Projects\Controllers\ProjectController;
 use App\Domains\Projects\Controllers\TaskController;
 use App\Domains\Projects\Controllers\TimesheetController;
 use App\Domains\Projects\Controllers\SavedViewController;
+use App\Domains\Projects\Controllers\SprintController;
 use App\Domains\Projects\Controllers\TaskLabelController;
 use App\Domains\Projects\Controllers\TimeTrackingController;
 use App\Domains\Tenancy\Controllers\BillingApiController;
@@ -285,6 +286,18 @@ Route::prefix('v1')->group(function () {
                     ->middleware('permission:tasks.edit');
                 Route::put('/tasks/{task}/assignees', [TaskLabelController::class, 'setTaskAssignees'])
                     ->middleware('permission:tasks.assign');
+
+                // ── Sprint lifecycle ──
+                Route::get('/projects/{project}/sprints/{sprint}', [SprintController::class, 'show'])
+                    ->middleware('permission:projects.view');
+                Route::patch('/projects/{project}/sprints/{sprint}', [SprintController::class, 'update'])
+                    ->middleware('permission:projects.edit');
+                Route::post('/projects/{project}/sprints/{sprint}/start', [SprintController::class, 'start'])
+                    ->middleware('permission:projects.edit');
+                Route::post('/projects/{project}/sprints/{sprint}/complete', [SprintController::class, 'complete'])
+                    ->middleware('permission:projects.edit');
+                Route::delete('/projects/{project}/sprints/{sprint}', [SprintController::class, 'destroy'])
+                    ->middleware('permission:projects.edit');
 
                 // ── Saved views ──
                 Route::get('/projects/{project}/views', [SavedViewController::class, 'index'])
