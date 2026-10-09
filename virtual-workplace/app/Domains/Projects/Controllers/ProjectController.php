@@ -224,7 +224,7 @@ class ProjectController extends Controller
 
         $milestones = $project->milestones()->get()->map(fn ($m) => [
             'id' => $m->id,
-            'title' => '🚩 '.$m->title,
+            'title' => '🚩 '.$m->name,
             'target_date' => $m->due_date ? $m->due_date->format('Y-m-d') : null,
             'status' => $m->status,
         ]);

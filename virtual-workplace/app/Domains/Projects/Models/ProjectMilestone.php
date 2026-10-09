@@ -53,14 +53,22 @@ class ProjectMilestone extends Model
         return $this->name ?? '';
     }
 
+    // These are $appends, so they run for every serialized milestone: reuse a
+    // withCount() column or the loaded tasks before falling back to a query.
     public function getTasksCountAttribute(): int
     {
-        return $this->tasks()->count();
+        if (array_key_exists('tasks_count', $this->attributes)) {
+            return (int) $this->attributes['tasks_count'];
+        }
+
+        return $this->relationLoaded('tasks') ? $this->tasks->count() : $this->tasks()->count();
     }
 
     public function getCompletedTasksCountAttribute(): int
     {
-        return $this->tasks()->where('status', 'done')->count();
+        return $this->relationLoaded('tasks')
+            ? $this->tasks->where('status', 'done')->count()
+            : $this->tasks()->where('status', 'done')->count();
     }
 
     public function getProgressPercentageAttribute(): float

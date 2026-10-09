@@ -567,7 +567,14 @@ class TaskController extends Controller
         ]);
         $clone->title = $task->title.' (Copy)';
         $clone->reporter_id = $user->id;
+        $clone->task_number = Task::where('project_id', $task->project_id)->max('task_number') + 1;
         $clone->order = Task::where('project_id', $task->project_id)->max('order') + 1;
+        // A copy starts its own review and recurrence history.
+        $clone->approval_status = 'none';
+        $clone->approved_by = null;
+        $clone->approved_at = null;
+        $clone->rejection_reason = null;
+        $clone->last_recurred_at = null;
         $clone->save();
 
         // Replicate checklist items if any
