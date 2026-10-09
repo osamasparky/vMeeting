@@ -479,7 +479,7 @@ class AttendanceService
             }
 
             $tasks = Task::where('organization_id', $effectiveOrgId)
-                ->where('assignee_id', $targetUser->id)
+                ->assignedTo($targetUser->id)
                 ->whereNotIn('status', ['done', 'completed', 'cancelled'])
                 ->with(['project'])
                 ->orderBy('priority', 'desc')

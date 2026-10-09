@@ -32,7 +32,8 @@ class CreateTaskAction
                 'task_type' => $data['task_type'] ?? 'task',
                 'status' => $data['status'] ?? Task::STATUS_BACKLOG,
                 'priority' => $data['priority'] ?? Task::PRIORITY_MEDIUM,
-                'assignee_id' => $data['assignee_id'] ?? null,
+                // With several assignees the first is the primary one.
+                'assignee_id' => $data['assignee_ids'][0] ?? $data['assignee_id'] ?? null,
                 'reporter_id' => $creator->id,
                 'team_id' => $data['team_id'] ?? null,
                 'start_date' => $data['start_date'] ?? null,
@@ -45,11 +46,18 @@ class CreateTaskAction
                 'recurrence_ends_at' => $data['recurrence_ends_at'] ?? null,
             ]);
 
-            if (! empty($data['assignee_id'])) {
-                NotificationService::notifyTaskAssigned($task, $data['assignee_id'], $creator);
+            if (! empty($data['assignee_ids'])) {
+                $task->assignees()->syncWithoutDetaching(array_values(array_unique($data['assignee_ids'])));
+            }
+            if (! empty($data['label_ids'])) {
+                $task->labels()->sync($data['label_ids']);
             }
 
-            return $task->load(['project', 'assignee', 'reporter', 'phase', 'milestone', 'team', 'parentTask']);
+            foreach ($task->assignees()->pluck('users.id') as $assigneeId) {
+                NotificationService::notifyTaskAssigned($task, $assigneeId, $creator);
+            }
+
+            return $task->load(['project', 'assignee', 'assignees:id,name,email', 'labels', 'reporter', 'phase', 'milestone', 'team', 'parentTask']);
         });
     }
 }

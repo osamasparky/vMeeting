@@ -161,6 +161,11 @@ class Project extends Model
         return $this->hasMany(ProjectSprint::class)->latest('start_date');
     }
 
+    public function labels(): HasMany
+    {
+        return $this->hasMany(ProjectLabel::class)->orderBy('name');
+    }
+
     public function progressPercentage(): int
     {
         $total = $this->tasks()->count();

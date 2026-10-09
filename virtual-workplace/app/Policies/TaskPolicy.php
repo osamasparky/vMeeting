@@ -38,7 +38,7 @@ class TaskPolicy
             || $membership->hasPermission('tasks.assign')
             || $membership->hasPermission('tasks.delete')
             || ($task->project && $task->project->manager_id === $user->id)
-            || $task->assignee_id === $user->id
+            || $task->isAssignedTo($user->id)
             || $task->reporter_id === $user->id;
     }
 

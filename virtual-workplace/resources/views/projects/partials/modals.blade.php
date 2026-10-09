@@ -80,6 +80,19 @@
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Description / Specifications') }}</label>
                     <textarea name="description" rows="3" placeholder="Task requirements..." class="form-input" style="resize: vertical;"></textarea>
                 </div>
+                @if($project->labels->isNotEmpty())
+                    <fieldset style="border: 0; padding: 0; margin: 0;">
+                        <legend style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('pm.labels') }}</legend>
+                        <div class="pm-labels">
+                            @foreach($project->labels as $newTaskLabel)
+                                <label class="pm-row" style="gap: var(--ula-space-2); min-block-size: var(--ula-size-touch-target); cursor: pointer;">
+                                    <input type="checkbox" name="label_ids[]" value="{{ $newTaskLabel->id }}">
+                                    <span class="pm-label pm-label--{{ $newTaskLabel->tone }}">{{ $newTaskLabel->name }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                    </fieldset>
+                @endif
                 <button type="submit" class="tactile-btn btn-primary" style="margin-top: 8px; padding: 12px; font-size: 14px;">
                     <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">save</span> {{ __('Create Task') }}
                 </button>
@@ -321,6 +334,8 @@
             <div style="flex: 1; overflow-y: auto; padding-inline-end: 4px;">
                 <!-- 1. Details -->
                 <div id="task-inspector-details" style="display: block;">
+                    {{-- Filled by projects/partials/pm/task-extras: assignees, labels, followers, relations --}}
+                    <div id="pm-task-extras" class="pm-extras"></div>
                     <div style="margin-bottom: 14px;">
                         <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); text-transform: uppercase; margin-bottom: 6px;">{{ __('Description') }}</label>
                         <div id="task-modal-description" style="background: var(--ula-surface-page-alt); padding: 16px; border-radius: 12px; font-size: 13.5px; color: var(--ula-text-primary); line-height: 1.6; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs); white-space: pre-wrap;">

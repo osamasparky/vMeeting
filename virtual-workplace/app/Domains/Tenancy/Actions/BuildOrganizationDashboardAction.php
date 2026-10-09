@@ -118,8 +118,8 @@ class BuildOrganizationDashboardAction
 
         // Project Management entities
         $projects = $organization->projects()->with(['owner', 'manager', 'department'])->withCount('tasks')->latest()->get();
-        $tasks = $organization->tasks()->with(['project', 'assignee', 'reporter', 'phase', 'milestone'])->orderBy('order')->latest()->get();
-        $myTasks = $tasks->where('assignee_id', $user->id)->values();
+        $tasks = $organization->tasks()->with(['project', 'assignee', 'assignees:id,name', 'labels', 'reporter', 'phase', 'milestone'])->orderBy('order')->latest()->get();
+        $myTasks = $tasks->filter(fn ($t) => $t->assignee_id === $user->id || $t->assignees->contains('id', $user->id))->values();
         $activeTimer = ActiveTimer::where('user_id', $user->id)->with(['project', 'task'])->first();
         $recentTimeEntries = $organization->timeEntries()->where('user_id', $user->id)->with(['project', 'task'])->latest()->take(30)->get();
         $allTimesheets = $organization->timesheets()->with(['user', 'reviewer'])->latest()->take(15)->get();

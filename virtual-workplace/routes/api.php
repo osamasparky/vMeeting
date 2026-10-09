@@ -13,6 +13,7 @@ use App\Domains\People\Controllers\ProfileController;
 use App\Domains\Projects\Controllers\ProjectController;
 use App\Domains\Projects\Controllers\TaskController;
 use App\Domains\Projects\Controllers\TimesheetController;
+use App\Domains\Projects\Controllers\TaskLabelController;
 use App\Domains\Projects\Controllers\TimeTrackingController;
 use App\Domains\Tenancy\Controllers\BillingApiController;
 use App\Domains\Tenancy\Controllers\OrganizationController;
@@ -269,6 +270,20 @@ Route::prefix('v1')->group(function () {
                     ->middleware('permission:tasks.edit');
                 Route::patch('/tasks/{task}/sprint', [TaskController::class, 'setSprint'])
                     ->middleware('permission:tasks.edit');
+
+                // ── Labels & multiple assignees ──
+                Route::get('/projects/{project}/labels', [TaskLabelController::class, 'index'])
+                    ->middleware('permission:projects.view');
+                Route::post('/projects/{project}/labels', [TaskLabelController::class, 'store'])
+                    ->middleware('permission:projects.edit');
+                Route::patch('/projects/{project}/labels/{label}', [TaskLabelController::class, 'update'])
+                    ->middleware('permission:projects.edit');
+                Route::delete('/projects/{project}/labels/{label}', [TaskLabelController::class, 'destroy'])
+                    ->middleware('permission:projects.edit');
+                Route::put('/tasks/{task}/labels', [TaskLabelController::class, 'setTaskLabels'])
+                    ->middleware('permission:tasks.edit');
+                Route::put('/tasks/{task}/assignees', [TaskLabelController::class, 'setTaskAssignees'])
+                    ->middleware('permission:tasks.assign');
 
                 // ── Time Tracking & Live Timers ──
                 Route::get('/time/active-timer', [TimeTrackingController::class, 'getActiveTimer'])

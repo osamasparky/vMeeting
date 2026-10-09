@@ -33,9 +33,12 @@ class BuildProjectHubViewAction
             'goals.targets',
             'sprints.tasks',
             'files.user',
+            'labels',
             'tasks' => function ($q) {
                 $q->with([
                     'assignee.profiles',
+                    'assignees:id,name',
+                    'labels',
                     'subtasks',
                     'checklistItems',
                     'dependencies.dependsOnTask',
@@ -104,7 +107,7 @@ class BuildProjectHubViewAction
         // Workload Matrix Calculation
         $allMembers = $organization->members()->with(['user.profiles', 'role'])->get();
         $workloadMatrix = $allMembers->map(function ($m) use ($tasks) {
-            $assignedTasks = $tasks->where('assignee_id', $m->user_id);
+            $assignedTasks = $tasks->filter(fn ($t) => $t->assignee_id === $m->user_id || $t->assignees->contains('id', $m->user_id));
             $totalEstHours = (float) $assignedTasks->sum('estimated_hours');
             $capacity = (float) ($m->weekly_capacity_hours ?? 40.0);
             $utilization = $capacity > 0 ? round(($totalEstHours / $capacity) * 100, 1) : 0;
@@ -195,7 +198,7 @@ class BuildProjectHubViewAction
         $allProjects = $organization->projects()->select('id', 'name', 'code', 'status')->latest()->get();
         $departments = $organization->departments()->withCount('teams')->get();
         $teams = $organization->teams()->with('department')->get();
-        $myTasks = $organization->tasks()->where('assignee_id', $user->id)->get();
+        $myTasks = $organization->tasks()->assignedTo($user->id)->get();
 
         return [
             'user' => $user,
@@ -215,6 +218,8 @@ class BuildProjectHubViewAction
             'teams' => $teams,
             'myTasks' => $myTasks,
             'workloadMatrix' => $workloadMatrix,
+            // The bulk-assign menu reads $projectMembers; it was never passed, so it rendered empty.
+            'projectMembers' => $allMembers,
             'ganttTasks' => $ganttTasks,
         ];
     }

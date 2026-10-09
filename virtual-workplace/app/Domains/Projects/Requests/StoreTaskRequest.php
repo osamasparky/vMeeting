@@ -5,6 +5,7 @@ namespace App\Domains\Projects\Requests;
 use App\Domains\Projects\Models\Task;
 use App\Domains\Projects\Requests\Concerns\ScopesToOrganization;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreTaskRequest extends FormRequest
 {
@@ -37,6 +38,10 @@ class StoreTaskRequest extends FormRequest
             'recurrence_rule' => ['nullable', 'string', 'in:'.implode(',', Task::RECURRENCE_RULES)],
             'recurrence_interval' => ['nullable', 'integer', 'min:1'],
             'recurrence_ends_at' => ['nullable', 'date', 'after_or_equal:due_date'],
+            'assignee_ids' => ['nullable', 'array', 'max:20'],
+            'assignee_ids.*' => ['string', $this->organizationMember()],
+            'label_ids' => ['nullable', 'array', 'max:20'],
+            'label_ids.*' => ['integer', Rule::exists('project_labels', 'id')->where('project_id', $this->input('project_id'))],
         ];
     }
 }

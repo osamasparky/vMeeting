@@ -36,7 +36,7 @@ class TaskController extends Controller
     public function index(Request $request, Organization $organization): JsonResponse
     {
         $query = Task::forOrganization($organization->id)
-            ->with(['project:id,name,code', 'assignee:id,name,email', 'reporter:id,name,email', 'phase:id,name', 'milestone:id,name']);
+            ->with(['project:id,name,code', 'assignee:id,name,email', 'assignees:id,name', 'labels', 'reporter:id,name,email', 'phase:id,name', 'milestone:id,name']);
 
         if ($request->filled('project_id')) {
             $query->where('project_id', $request->query('project_id'));
@@ -51,7 +51,11 @@ class TaskController extends Controller
         }
 
         if ($request->filled('assignee_id')) {
-            $query->where('assignee_id', $request->query('assignee_id'));
+            $query->assignedTo((string) $request->query('assignee_id'));
+        }
+
+        if ($request->filled('label_id')) {
+            $query->whereHas('labels', fn ($q) => $q->where('project_labels.id', $request->integer('label_id')));
         }
 
         if ($request->boolean('root_only', false)) {
@@ -76,8 +80,8 @@ class TaskController extends Controller
         $user = Auth::user();
 
         $query = Task::forOrganization($organization->id)
-            ->where('assignee_id', $user->id)
-            ->with(['project:id,name,code', 'phase:id,name', 'milestone:id,name']);
+            ->assignedTo($user->id)
+            ->with(['project:id,name,code', 'phase:id,name', 'milestone:id,name', 'labels', 'assignees:id,name']);
 
         $allTasks = $query->orderBy('due_date', 'asc')->get();
 
@@ -138,6 +142,8 @@ class TaskController extends Controller
             'comments.user:id,name',
             'attachments.user:id,name',
             'dependencies.dependsOnTask:id,title,status',
+            'labels',
+            'assignees:id,name,email',
         ]);
 
         $auditLogs = $this->getTaskActivityLog($task, 30);

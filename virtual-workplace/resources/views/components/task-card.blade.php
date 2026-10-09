@@ -22,6 +22,13 @@
     $totalChecklist = $task->checklistItems ? $task->checklistItems->count() : 0;
     $completedChecklist = $totalChecklist > 0 ? $task->checklistItems->where('is_completed', true)->count() : 0;
     
+    // Labels and the full assignee list (only when the caller eager-loaded them)
+    $cardLabels = $task->relationLoaded('labels') ? $task->labels : collect();
+    $cardAssignees = $task->relationLoaded('assignees') ? $task->assignees : collect();
+    $extraAssignees = $cardAssignees->where('id', '!=', $task->assignee_id)->values();
+    $assigneeIdsAttr = $cardAssignees->pluck('id')->push($task->assignee_id)->filter()->unique()->implode(',');
+    $labelIdsAttr = $cardLabels->pluck('id')->implode(',');
+
     // Logged hours
     $loggedHours = round($task->logged_hours ?? $task->actual_hours ?? 0, 1);
 @endphp
@@ -69,6 +76,8 @@
          data-project-id="{{ $p->id ?? $task->project_id }}"
          data-status="{{ $task->status }}"
          data-assignee="{{ $task->assignee_id ?? 'unassigned' }}"
+         data-assignees="{{ $assigneeIdsAttr }}"
+         data-labels="{{ $labelIdsAttr }}"
          data-assignee-id="{{ $task->assignee_id ?? '' }}"
          data-priority="{{ $task->priority ?? 'medium' }}"
          data-milestone="{{ $task->milestone_id ?? 'none' }}"
@@ -135,6 +144,14 @@
         </div>
     @endif
 
+    @if($cardLabels->isNotEmpty())
+        <div class="pm-labels">
+            @foreach($cardLabels as $cardLabel)
+                <span class="pm-label pm-label--{{ $cardLabel->tone }}">{{ $cardLabel->name }}</span>
+            @endforeach
+        </div>
+    @endif
+
     <!-- 4. Approval Status Warning Banners -->
     @if($task->approval_status === 'pending_approval')
         <div style="background: var(--ula-surface-warning-soft, rgba(214, 162, 58, 0.12)); border: 1px solid rgba(214, 162, 58, 0.35); color: var(--ula-gold-500); font-size: 11px; font-weight: 700; padding: 6px 10px; border-radius: 8px; display: flex; align-items: center; justify-content: space-between;">
@@ -171,6 +188,16 @@
                     </div>
                     <span style="max-width: 65px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $assigneeFirstName }}</span>
                 </div>
+            @endif
+            @if($extraAssignees->isNotEmpty())
+                <span class="pm-avatars" title="{{ $extraAssignees->pluck('name')->implode('، ') }}">
+                    @foreach($extraAssignees->take(2) as $extra)
+                        <span class="pm-avatar">{{ mb_substr($extra->name, 0, 1) }}</span>
+                    @endforeach
+                    @if($extraAssignees->count() > 2)
+                        <span class="pm-avatar pm-avatar--more pm-num">+{{ $extraAssignees->count() - 2 }}</span>
+                    @endif
+                </span>
             @endif
 
             @if($task->due_date)

@@ -30,7 +30,7 @@ class BuildMemberProfileDetailsAction
 
         // Fetch tasks assigned to this member in this organization
         $tasks = Task::where('organization_id', $member->organization_id)
-            ->where('assignee_id', $targetUser->id)
+            ->assignedTo($targetUser->id)
             ->with(['project:id,name,code', 'checklistItems'])
             ->orderBy('due_date')
             ->latest()

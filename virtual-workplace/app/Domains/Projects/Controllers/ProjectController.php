@@ -246,10 +246,10 @@ class ProjectController extends Controller
         }
 
         $members = $organization->members()->with(['user:id,name,email', 'role'])->get();
-        $tasks = $project->tasks()->where('status', '!=', 'done')->get();
+        $tasks = $project->tasks()->where('status', '!=', 'done')->with('assignees:id')->get();
 
         $workload = $members->map(function ($m) use ($tasks) {
-            $assignedTasks = $tasks->where('assignee_id', $m->user_id);
+            $assignedTasks = $tasks->filter(fn ($t) => $t->assignee_id === $m->user_id || $t->assignees->contains('id', $m->user_id));
             $totalEstHours = (float) $assignedTasks->sum('estimated_hours');
             $capacity = $m->weekly_capacity_hours ?? 40.0;
             $utilization = $capacity > 0 ? round(($totalEstHours / $capacity) * 100, 1) : 0;

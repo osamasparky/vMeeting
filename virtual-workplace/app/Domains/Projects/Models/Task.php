@@ -255,6 +255,62 @@ class Task extends Model
         return $this->hasMany(TaskCustomFieldValue::class, 'task_id')->with('definition');
     }
 
+    public function labels(): BelongsToMany
+    {
+        return $this->belongsToMany(ProjectLabel::class, 'task_labels', 'task_id', 'label_id')->orderBy('name');
+    }
+
+    /**
+     * Everyone working on the task. assignee_id is the primary (first) one and
+     * is always part of this list — see booted().
+     */
+    public function assignees(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'task_assignees', 'task_id', 'user_id')->withTimestamps();
+    }
+
+    /**
+     * Tasks a user is assigned to, as primary or additional assignee.
+     */
+    public function scopeAssignedTo($query, string $userId)
+    {
+        return $query->where(function ($q) use ($userId) {
+            $q->where($q->qualifyColumn('assignee_id'), $userId)
+                ->orWhereHas('assignees', fn ($a) => $a->where('users.id', $userId));
+        });
+    }
+
+    public function isAssignedTo(string $userId): bool
+    {
+        return $this->assignee_id === $userId
+            || $this->assignees()->where('users.id', $userId)->exists();
+    }
+
+    protected static function booted(): void
+    {
+        // Keep the assignee list in step with the primary assignee when it is
+        // set through the single-assignee paths (create, assign, bulk, office).
+        static::created(function (Task $task) {
+            if ($task->assignee_id) {
+                $task->assignees()->syncWithoutDetaching([$task->assignee_id]);
+            }
+        });
+
+        static::updated(function (Task $task) {
+            if (! $task->wasChanged('assignee_id')) {
+                return;
+            }
+            // Original values are still pre-save inside `updated`.
+            $previous = $task->getOriginal('assignee_id');
+            if ($previous) {
+                $task->assignees()->detach($previous);
+            }
+            if ($task->assignee_id) {
+                $task->assignees()->syncWithoutDetaching([$task->assignee_id]);
+            }
+        });
+    }
+
     public function activeTimers(): HasMany
     {
         return $this->hasMany(ActiveTimer::class);

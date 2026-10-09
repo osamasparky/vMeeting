@@ -152,7 +152,7 @@ class AttendanceController extends Controller
 
         // 2. Assigned tasks for this user in this organization
         $tasks = Task::where('organization_id', $organizationId)
-            ->where('assignee_id', $user->id)
+            ->assignedTo($user->id)
             ->whereNotIn('status', ['done', 'completed', 'cancelled'])
             ->with(['project:id,name,color,code'])
             ->orderBy('priority', 'desc')

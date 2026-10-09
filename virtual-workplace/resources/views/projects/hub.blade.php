@@ -954,6 +954,7 @@
                     ['timelog', 'payments', 'hub.tab_time'], ['meetings', 'videocam', 'hub.tab_meetings'],
                     ['team', 'group', 'hub.tab_team'], ['files', 'folder', 'hub.tab_files'],
                     ['milestones', 'route', 'hub.tab_roadmap'],
+                    ['settings', 'tune', 'pm.settings'],
                 ];
             @endphp
 
@@ -1068,6 +1069,16 @@
                         <option value="none">— {{ __('No Milestone') }} —</option>
                         @foreach($project->milestones as $pms)
                             <option value="{{ $pms->id }}">{{ $pms->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Label Filter -->
+                <div style="min-width: 130px;">
+                    <select id="hub-filter-label" onchange="filterHubTasks()" class="custom-select-control" style="width: 100%;" aria-label="{{ __('pm.labels') }}">
+                        <option value="">{{ __('pm.all_labels') }}</option>
+                        @foreach($project->labels as $filterLabel)
+                            <option value="{{ $filterLabel->id }}">{{ $filterLabel->name }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -1189,6 +1200,12 @@
                                         oncontextmenu="event.preventDefault(); event.stopPropagation(); openTaskContextMenu(event, '{{ $t->id }}', '{{ $project->id }}', '{{ addslashes($t->title) }}')"
                                         data-task-id="{{ $t->id }}"
                                         data-milestone="{{ $t->milestone_id ?? 'none' }}"
+                                        data-title="{{ mb_strtolower($t->title) }} #{{ $t->task_number }}"
+                                        data-assignee="{{ $t->assignee_id ?? 'unassigned' }}"
+                                        data-assignees="{{ $t->assignees->pluck('id')->implode(',') }}"
+                                        data-labels="{{ $t->labels->pluck('id')->implode(',') }}"
+                                        data-priority="{{ $t->priority ?? 'medium' }}"
+                                        data-due="{{ $t->due_date ? $t->due_date->format('Y-m-d') : '' }}"
                                         style="cursor: pointer; transition: background 0.15s;">
                                         <td onclick="event.stopPropagation();" style="width: 36px;">
                                             <input type="checkbox" class="task-bulk-checkbox" value="{{ $t->id }}"
@@ -1214,6 +1231,13 @@
                                                     </span>
                                                 @endif
                                             </div>
+                                            @if($t->labels->isNotEmpty())
+                                                <div class="pm-labels" style="margin-block-start: var(--ula-space-2);">
+                                                    @foreach($t->labels as $rowLabel)
+                                                        <span class="pm-label pm-label--{{ $rowLabel->tone }}">{{ $rowLabel->name }}</span>
+                                                    @endforeach
+                                                </div>
+                                            @endif
                                             @if($t->description)
                                                 <div style="font-size: 11px; color: var(--ula-text-muted); margin-top: 2px;">{{ Str::limit($t->description, 50) }}</div>
                                             @endif
@@ -1262,6 +1286,10 @@
                                                     {{ strtoupper(substr($t->assignee->name ?? 'U', 0, 2)) }}
                                                 </div>
                                                 <span style="font-weight: 700; font-size: 12px; color: var(--ula-text-primary);">{{ $t->assignee->name ?? __('Unassigned') }}</span>
+                                                @php $rowExtras = $t->assignees->where('id', '!=', $t->assignee_id); @endphp
+                                                @if($rowExtras->isNotEmpty())
+                                                    <span class="pm-avatar pm-avatar--more pm-num" title="{{ $rowExtras->pluck('name')->implode('، ') }}">+{{ $rowExtras->count() }}</span>
+                                                @endif
                                             </div>
                                         </td>
                                         <td style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-weight: 700; font-size: 12px;">
@@ -1981,6 +2009,9 @@
                 </div>
             </div>
 
+            {{-- ── Project-management feature tabs ── --}}
+            @include('projects.partials.pm.section-settings')
+
         </main>
     </div>
 
@@ -2454,7 +2485,10 @@
             e.preventDefault();
             const form = e.target;
             const formData = new FormData(form);
-            const payload = Object.fromEntries(formData.entries());
+            const payload = Object.fromEntries([...formData.entries()].filter(([k]) => !k.endsWith('[]')));
+            // Multi-value fields (labels) arrive as name[] entries.
+            const labelIds = formData.getAll('label_ids[]').map(Number);
+            if (labelIds.length) payload.label_ids = labelIds;
 
             try {
                 const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks`, {
@@ -2841,87 +2875,80 @@
         }
 
         // ── LIVE MULTI-CRITERIA SEARCH & FILTER ENGINE ──
-        function filterHubTasks() {
-            const searchInput = document.getElementById('hub-task-search-input');
-            const assigneeSelect = document.getElementById('hub-filter-assignee');
-            const prioritySelect = document.getElementById('hub-filter-priority');
-            const dueSelect = document.getElementById('hub-filter-due');
-            const milestoneSelect = document.getElementById('hub-filter-milestone');
-            const clearBtn = document.getElementById('hub-clear-filters-btn');
+        // ── Task filters: one predicate for the board, the list and the calendar ──
+        const HUB_FILTER_FIELDS = {
+            q: 'hub-task-search-input',
+            assignee: 'hub-filter-assignee',
+            priority: 'hub-filter-priority',
+            due: 'hub-filter-due',
+            milestone: 'hub-filter-milestone',
+            label: 'hub-filter-label',
+        };
 
-            const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
-            const assignee = assigneeSelect ? assigneeSelect.value : '';
-            const priority = prioritySelect ? prioritySelect.value : '';
-            const dueFilter = dueSelect ? dueSelect.value : '';
-            const milestoneFilter = milestoneSelect ? milestoneSelect.value : '';
-
-            const hasActiveFilters = query || assignee || priority || dueFilter || milestoneFilter;
-            if (clearBtn) clearBtn.style.display = hasActiveFilters ? 'flex' : 'none';
-
-            const todayStr = new Date().toISOString().slice(0, 10);
-
-            // Filter Kanban Cards
-            document.querySelectorAll('.kanban-card').forEach(card => {
-                const cardTitle = card.getAttribute('data-title') || '';
-                const cardAssignee = card.getAttribute('data-assignee') || '';
-                const cardPriority = card.getAttribute('data-priority') || '';
-                const cardMilestone = card.getAttribute('data-milestone') || 'none';
-                const cardDue = card.getAttribute('data-due') || '';
-
-                let matches = true;
-
-                if (query && !cardTitle.includes(query)) {
-                    matches = false;
-                }
-                if (assignee && cardAssignee !== assignee) {
-                    matches = false;
-                }
-                if (priority && cardPriority !== priority) {
-                    matches = false;
-                }
-                if (milestoneFilter && cardMilestone !== milestoneFilter) {
-                    matches = false;
-                }
-                if (dueFilter) {
-                    if (dueFilter === 'overdue' && (!cardDue || cardDue >= todayStr)) matches = false;
-                    else if (dueFilter === 'today' && cardDue !== todayStr) matches = false;
-                    else if (dueFilter === 'has_due' && !cardDue) matches = false;
-                    else if (dueFilter === 'no_due' && cardDue) matches = false;
-                }
-
-                card.style.display = matches ? 'block' : 'none';
+        function getHubFilterState() {
+            const state = {};
+            Object.entries(HUB_FILTER_FIELDS).forEach(([key, id]) => {
+                const el = document.getElementById(id);
+                state[key] = el ? el.value.trim() : '';
             });
+            return state;
+        }
 
-            // Filter Task Table Rows (List View)
-            document.querySelectorAll('#hub-section-tasks tbody tr').forEach(row => {
-                const rowText = (row.textContent || '').toLowerCase();
-                const rowMilestone = row.getAttribute('data-milestone') || 'none';
-                let matches = (!query || rowText.includes(query));
-                if (milestoneFilter && rowMilestone !== milestoneFilter) {
-                    matches = false;
-                }
-                row.style.display = matches ? '' : 'none';
+        function setHubFilterState(state) {
+            Object.entries(HUB_FILTER_FIELDS).forEach(([key, id]) => {
+                const el = document.getElementById(id);
+                if (el) el.value = (state && state[key]) || '';
+            });
+            filterHubTasks();
+        }
+
+        function hubTaskMatches(el, f) {
+            const todayStr = new Date().toISOString().slice(0, 10);
+            const title = (el.getAttribute('data-title') || el.textContent || '').toLowerCase();
+            const assignees = (el.getAttribute('data-assignees') || '').split(',').filter(Boolean);
+            const primary = el.getAttribute('data-assignee') || '';
+            const labels = (el.getAttribute('data-labels') || '').split(',').filter(Boolean);
+            const priority = el.getAttribute('data-priority') || '';
+            const milestone = el.getAttribute('data-milestone') || 'none';
+            const due = el.getAttribute('data-due') || '';
+
+            if (f.q && !title.includes(f.q.toLowerCase())) return false;
+            if (f.assignee === 'unassigned' && (assignees.length || (primary && primary !== 'unassigned'))) return false;
+            if (f.assignee && f.assignee !== 'unassigned' && !assignees.includes(f.assignee) && primary !== f.assignee) return false;
+            if (f.priority && priority !== f.priority) return false;
+            if (f.milestone && milestone !== f.milestone) return false;
+            if (f.label && !labels.includes(f.label)) return false;
+            if (f.due) {
+                const weekEnd = new Date(); weekEnd.setDate(weekEnd.getDate() + (7 - weekEnd.getDay()));
+                const weekEndStr = weekEnd.toISOString().slice(0, 10);
+                if (f.due === 'overdue' && (!due || due >= todayStr)) return false;
+                if (f.due === 'today' && due !== todayStr) return false;
+                if (f.due === 'this_week' && (!due || due < todayStr || due > weekEndStr)) return false;
+                if (f.due === 'has_due' && !due) return false;
+                if (f.due === 'no_due' && due) return false;
+            }
+            return true;
+        }
+
+        function filterHubTasks() {
+            const f = getHubFilterState();
+            const active = Object.values(f).some(Boolean);
+            const clearBtn = document.getElementById('hub-clear-filters-btn');
+            if (clearBtn) clearBtn.style.display = active ? 'flex' : 'none';
+
+            document.querySelectorAll('.kanban-card').forEach(card => {
+                card.style.display = hubTaskMatches(card, f) ? 'block' : 'none';
+            });
+            document.querySelectorAll('#hub-section-tasks tbody tr[data-task-id]').forEach(row => {
+                row.style.display = hubTaskMatches(row, f) ? '' : 'none';
             });
 
             updateKanbanBadgeCounts();
+            document.dispatchEvent(new CustomEvent('hub:filters-changed', { detail: f }));
         }
 
         function clearHubTaskFilters() {
-            const searchInput = document.getElementById('hub-task-search-input');
-            const assigneeSelect = document.getElementById('hub-filter-assignee');
-            const prioritySelect = document.getElementById('hub-filter-priority');
-            const dueSelect = document.getElementById('hub-filter-due');
-            const milestoneSelect = document.getElementById('hub-filter-milestone');
-            const clearBtn = document.getElementById('hub-clear-filters-btn');
-
-            if (searchInput) searchInput.value = '';
-            if (assigneeSelect) assigneeSelect.value = '';
-            if (prioritySelect) prioritySelect.value = '';
-            if (dueSelect) dueSelect.value = '';
-            if (milestoneSelect) milestoneSelect.value = '';
-            if (clearBtn) clearBtn.style.display = 'none';
-
-            filterHubTasks();
+            setHubFilterState({});
         }
 
         // ── BULK ACTIONS ENGINE ──────────────────────────────────────────────
@@ -3577,6 +3604,8 @@
         }
 
         function renderHubTaskDetails(t) {
+            // Feature panels (labels, assignees, followers, relations…) render from this event.
+            setTimeout(() => document.dispatchEvent(new CustomEvent('hub:task-rendered', { detail: t })));
             const statusLabels = {
                 'backlog': '{{ __("Backlog") }}',
                 'ready': '{{ __("Ready") }}',
@@ -3867,5 +3896,8 @@
             updateHubClock();
         @endif
     </script>
+
+    {{-- Project-management feature scripts (labels, views, sprints, intake, …) --}}
+    @include('projects.partials.pm.scripts')
 </body>
 </html>

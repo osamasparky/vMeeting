@@ -1,0 +1,211 @@
+/* ══════════════════════════════════════════════════════════════════════
+   UlaSpace — project-management features (labels, assignees, calendar,
+   sprints, intake, settings…). Tokens only: every colour is a semantic or
+   tone token so light/dark and RTL/LTR follow the design system.
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Labels ───────────────────────────────────────────────────────────── */
+.pm-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ula-space-1);
+  max-inline-size: 100%;
+  padding-block: var(--ula-space-1);
+  padding-inline: var(--ula-space-3);
+  border-radius: var(--ula-radius-pill);
+  font-size: var(--ula-size-label);
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: var(--ula-tone-stone-bg);
+  color: var(--ula-tone-stone-fg);
+}
+.pm-label--palm { background: var(--ula-tone-palm-bg); color: var(--ula-tone-palm-fg); }
+.pm-label--gold { background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg); }
+.pm-label--terracotta { background: var(--ula-tone-terracotta-bg); color: var(--ula-tone-terracotta-fg); }
+.pm-label--sand { background: var(--ula-tone-sand-bg); color: var(--ula-tone-sand-fg); }
+.pm-label--stone { background: var(--ula-tone-stone-bg); color: var(--ula-tone-stone-fg); }
+.pm-labels { display: flex; flex-wrap: wrap; gap: var(--ula-space-2); }
+
+/* ── Avatar stack (several assignees) ─────────────────────────────────── */
+.pm-avatars { display: inline-flex; align-items: center; }
+.pm-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 24px;
+  block-size: 24px;
+  border-radius: var(--ula-radius-pill);
+  background: var(--ula-accent-default);
+  color: var(--ula-accent-fg);
+  font-size: var(--ula-size-label);
+  font-weight: 800;
+  border: 2px solid var(--ula-surface-card);
+}
+.pm-avatar + .pm-avatar { margin-inline-start: calc(var(--ula-space-3) * -1); }
+.pm-avatar--more { background: var(--ula-surface-sunken); color: var(--ula-text-secondary); }
+
+/* ── Section scaffolding used by the new hub tabs ────────────────────── */
+.pm-panel {
+  background: var(--ula-surface-card);
+  border: 1px solid var(--ula-border-subtle);
+  border-radius: var(--ula-radius-lg);
+  padding: var(--ula-space-6);
+}
+.pm-panel + .pm-panel { margin-block-start: var(--ula-space-5); }
+.pm-panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ula-space-4);
+  flex-wrap: wrap;
+  margin-block-end: var(--ula-space-5);
+}
+.pm-panel-head .ula-headline-ar { font-size: var(--ula-size-h4); margin: 0; }
+.pm-panel-head .ula-headline-en { font-size: var(--ula-size-xs); }
+.pm-muted { color: var(--ula-text-muted); font-size: var(--ula-size-xs); }
+.pm-num { font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; }
+.pm-empty {
+  padding: var(--ula-space-7);
+  text-align: center;
+  color: var(--ula-text-muted);
+  font-size: var(--ula-size-sm);
+  border: 1px dashed var(--ula-border-subtle);
+  border-radius: var(--ula-radius-md);
+}
+
+/* ── Form controls shared by the new panels ───────────────────────────── */
+.pm-field {
+  min-block-size: var(--ula-size-touch-target);
+  padding-inline: var(--ula-space-4);
+  border-radius: var(--ula-radius-sm);
+  border: 1px solid var(--ula-border-default);
+  background: var(--ula-surface-page);
+  color: var(--ula-text-primary);
+  font-size: var(--ula-size-sm);
+}
+.pm-field:focus-visible { outline: none; border-color: var(--ula-border-focus); box-shadow: var(--ula-focus-ring); }
+textarea.pm-field { padding-block: var(--ula-space-3); }
+.pm-row { display: flex; align-items: center; gap: var(--ula-space-3); flex-wrap: wrap; }
+.pm-grow { flex: 1; min-inline-size: 160px; }
+
+/* ── Picker (multi-select popover for labels / assignees) ─────────────── */
+.pm-picker { position: relative; display: inline-block; }
+.pm-picker-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ula-space-2);
+  min-block-size: var(--ula-size-touch-target);
+  padding-inline: var(--ula-space-4);
+  border-radius: var(--ula-radius-sm);
+  border: 1px dashed var(--ula-border-default);
+  background: transparent;
+  color: var(--ula-text-secondary);
+  font-size: var(--ula-size-xs);
+  font-weight: 700;
+  cursor: pointer;
+}
+.pm-picker-trigger:hover { border-color: var(--ula-border-hover); color: var(--ula-text-primary); }
+.pm-picker-trigger:focus-visible { outline: none; box-shadow: var(--ula-focus-ring); }
+.pm-picker-menu {
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-start: calc(100% + var(--ula-space-2));
+  z-index: 60;
+  min-inline-size: 240px;
+  max-block-size: 300px;
+  overflow-y: auto;
+  padding: var(--ula-space-2);
+  background: var(--ula-surface-raised);
+  border: 1px solid var(--ula-border-subtle);
+  border-radius: var(--ula-radius-md);
+  box-shadow: var(--ula-shadow-lg);
+}
+.pm-picker-option {
+  display: flex;
+  align-items: center;
+  gap: var(--ula-space-3);
+  inline-size: 100%;
+  min-block-size: var(--ula-size-touch-target);
+  padding-inline: var(--ula-space-3);
+  border: 0;
+  border-radius: var(--ula-radius-xs);
+  background: transparent;
+  color: var(--ula-text-primary);
+  font-size: var(--ula-size-sm);
+  text-align: start;
+  cursor: pointer;
+}
+.pm-picker-option:hover, .pm-picker-option:focus-visible { background: var(--ula-surface-hover); outline: none; }
+.pm-picker-option .material-symbols-rounded { font-size: 18px; color: var(--ula-accent-default); }
+
+/* ── Inspector extras block (labels / assignees / followers / relations) */
+.pm-extras { display: grid; gap: var(--ula-space-4); margin-block-end: var(--ula-space-5); }
+.pm-extras-row { display: grid; grid-template-columns: 120px 1fr; align-items: center; gap: var(--ula-space-3); }
+.pm-extras-label {
+  font-size: var(--ula-size-label);
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--ula-text-secondary);
+}
+@media (max-width: 640px) {
+  .pm-extras-row { grid-template-columns: 1fr; }
+}
+
+/* ── Tone swatches (label colour choice) ─────────────────────────────── */
+.pm-swatches { display: inline-flex; gap: var(--ula-space-2); }
+.pm-swatch {
+  inline-size: var(--ula-size-touch-target);
+  block-size: var(--ula-size-touch-target);
+  border-radius: var(--ula-radius-pill);
+  border: 2px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.pm-swatch span { inline-size: 20px; block-size: 20px; border-radius: var(--ula-radius-pill); }
+.pm-swatch[aria-pressed="true"] { border-color: var(--ula-border-focus); }
+.pm-swatch:focus-visible { outline: none; box-shadow: var(--ula-focus-ring); }
+.pm-swatch--palm span { background: var(--ula-tone-palm-fg); }
+.pm-swatch--gold span { background: var(--ula-tone-gold-fg); }
+.pm-swatch--terracotta span { background: var(--ula-tone-terracotta-fg); }
+.pm-swatch--sand span { background: var(--ula-tone-sand-fg); }
+.pm-swatch--stone span { background: var(--ula-tone-stone-fg); }
+
+/* ── Simple list rows used by settings / archive / intake ─────────────── */
+.pm-list { display: flex; flex-direction: column; gap: var(--ula-space-2); }
+.pm-list-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ula-space-4);
+  min-block-size: var(--ula-size-touch-target);
+  padding-block: var(--ula-space-3);
+  padding-inline: var(--ula-space-4);
+  border: 1px solid var(--ula-border-subtle);
+  border-radius: var(--ula-radius-md);
+  background: var(--ula-surface-page);
+}
+.pm-list-row > .pm-grow { min-inline-size: 0; }
+
+/* ── Sub-navigation inside a hub tab (settings) ───────────────────────── */
+.pm-subnav { display: flex; gap: var(--ula-space-2); flex-wrap: wrap; margin-block-end: var(--ula-space-5); }
+.pm-subnav button {
+  min-block-size: var(--ula-size-touch-target);
+  padding-inline: var(--ula-space-5);
+  border-radius: var(--ula-radius-pill);
+  border: 1px solid var(--ula-border-subtle);
+  background: transparent;
+  color: var(--ula-text-secondary);
+  font-size: var(--ula-size-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+.pm-subnav button[aria-selected="true"] {
+  background: var(--ula-surface-accent-soft);
+  border-color: var(--ula-accent-default);
+  color: var(--ula-text-primary);
+}
+.pm-subnav button:focus-visible { outline: none; box-shadow: var(--ula-focus-ring); }
