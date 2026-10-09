@@ -244,10 +244,6 @@ class TaskController extends Controller
 
         $updated = $action->execute($task, $request->validated('status'));
 
-        // Check Milestone completion and auto-recalculate project goals
-        $updated->milestone?->checkAndUpdateStatus();
-        $updated->project?->goals->each->recalculateProgress();
-
         return response()->json([
             'message' => 'Task status updated.',
             'task' => $updated,

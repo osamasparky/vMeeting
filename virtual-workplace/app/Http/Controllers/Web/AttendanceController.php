@@ -7,12 +7,14 @@ use App\Domains\Identity\Models\User;
 use App\Domains\People\Services\AttendanceService;
 use App\Domains\Projects\Actions\StartTimerAction;
 use App\Domains\Projects\Actions\StopTimerAction;
+use App\Domains\Projects\Actions\UpdateTaskStatusAction;
 use App\Domains\Projects\Models\ActiveTimer;
 use App\Domains\Projects\Models\Task;
 use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class AttendanceController extends Controller
 {
@@ -196,7 +198,8 @@ class AttendanceController extends Controller
         ]);
 
         $task = Task::where('organization_id', $membership->organization_id)->findOrFail($validated['task_id']);
-        $projectId = $validated['project_id'] ?? $task->project_id;
+        // Time always books to the task's own project (never a caller-supplied one).
+        $projectId = $task->project_id;
 
         $timer = $action->execute([
             'task_id' => $task->id,
@@ -256,11 +259,10 @@ class AttendanceController extends Controller
             'status' => 'required|string|in:backlog,ready,in_progress,review,qa,done,completed',
         ]);
 
+        Gate::authorize('update', $task);
+
         $newStatus = $validated['status'] === 'completed' ? 'done' : $validated['status'];
-        $task->update([
-            'status' => $newStatus,
-            'completed_at' => $newStatus === 'done' ? now() : null,
-        ]);
+        $task = app(UpdateTaskStatusAction::class)->execute($task, $newStatus);
 
         return response()->json([
             'success' => true,

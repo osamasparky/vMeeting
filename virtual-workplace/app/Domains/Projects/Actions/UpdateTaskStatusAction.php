@@ -2,12 +2,18 @@
 
 namespace App\Domains\Projects\Actions;
 
+use App\Domains\Identity\Models\User;
 use App\Domains\Notifications\Services\NotificationService;
 use App\Domains\Projects\Models\Task;
 use App\Domains\Tenancy\Models\OrganizationMember;
 use Illuminate\Support\Facades\Auth;
 use InvalidArgumentException;
 
+/**
+ * The single entry point for changing a task's status. Every surface — API,
+ * hub, bulk edit, the virtual office — goes through here so the approval
+ * workflow, milestone completion, goal progress and recurrence stay in step.
+ */
 class UpdateTaskStatusAction
 {
     public function execute(Task $task, string $newStatus): Task
@@ -17,20 +23,10 @@ class UpdateTaskStatusAction
         }
 
         $user = Auth::user();
-        $isManager = false;
-
-        if ($user) {
-            $membership = OrganizationMember::where('organization_id', $task->organization_id)
-                ->where('user_id', $user->id)
-                ->first();
-
-            $isManager = $user->isSuperAdmin()
-                || ($membership && ($membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign')))
-                || ($task->project && $task->project->manager_id === $user->id);
-        }
+        $wasDone = $task->status === Task::STATUS_DONE;
 
         if ($newStatus === Task::STATUS_DONE) {
-            if ($isManager) {
+            if ($this->canApprove($task, $user)) {
                 // Direct Manager / Admin completion
                 $task->update([
                     'status' => Task::STATUS_DONE,
@@ -41,8 +37,8 @@ class UpdateTaskStatusAction
                     'rejection_reason' => null,
                 ]);
 
-                // ── Automatically generate next recurring cycle task ──
-                if ($task->isRecurring()) {
+                // ── Automatically generate next recurring cycle task (once) ──
+                if (! $wasDone && $task->isRecurring()) {
                     app(ProcessRecurringTaskAction::class)->execute($task);
                 }
             } else {
@@ -67,20 +63,42 @@ class UpdateTaskStatusAction
                 }
             }
         } else {
+            $leavesApproval = $wasDone || ($task->approval_status === 'pending_approval' && $newStatus !== Task::STATUS_REVIEW);
+
             $task->update([
                 'status' => $newStatus,
-                'approval_status' => ($task->approval_status === 'pending_approval' && $newStatus !== Task::STATUS_REVIEW) ? 'none' : $task->approval_status,
+                'approval_status' => $leavesApproval ? 'none' : $task->approval_status,
                 'completed_at' => null,
             ]);
         }
 
-        $task = $task->fresh(['project', 'assignee', 'reporter', 'approver']);
+        $task = $task->fresh(['project', 'assignee', 'reporter', 'approver', 'milestone']);
 
-        // ── Auto-recalculate project goals (tasks/milestones/hours targets) ──
+        // ── Milestone completion and goal progress follow every transition ──
+        $task->milestone?->checkAndUpdateStatus();
         if ($task->project) {
             $task->project->goals->each->recalculateProgress();
         }
 
         return $task;
+    }
+
+    /**
+     * Who may close a task outright (and approve a member's request): super
+     * admins, company admins, team leads (tasks.assign) and the project manager.
+     */
+    public function canApprove(Task $task, ?User $user): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        $membership = OrganizationMember::where('organization_id', $task->organization_id)
+            ->where('user_id', $user->id)
+            ->first();
+
+        return $user->isSuperAdmin()
+            || ($membership && ($membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign')))
+            || ($task->project && $task->project->manager_id === $user->id);
     }
 }

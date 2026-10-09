@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Web;
 
 use App\Domains\Administration\Models\Role;
-use App\Domains\Identity\Models\User;
 use App\Domains\Notifications\Services\NotificationService;
 use App\Domains\Projects\Actions\BuildProjectHubViewAction;
 use App\Domains\Projects\Actions\PostTaskCommentWithNotificationsAction;
+use App\Domains\Projects\Actions\UpdateTaskStatusAction;
 use App\Domains\Projects\Models\Project;
 use App\Domains\Projects\Models\ProjectFile;
 use App\Domains\Projects\Models\Task;
@@ -17,6 +17,7 @@ use App\Services\FileUploadService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class ProjectHubController extends Controller
@@ -69,6 +70,8 @@ class ProjectHubController extends Controller
      */
     public function uploadProjectFile(Request $request, Project $project)
     {
+        $this->authorizeProjectMember($project);
+
         $request->validate([
             'file' => 'required|file|max:102400', // 100MB max
             'category' => 'nullable|string|max:50',
@@ -127,6 +130,8 @@ class ProjectHubController extends Controller
      */
     public function deleteProjectFile(Project $project, ProjectFile $file)
     {
+        abort_unless($file->project_id === $project->id, 404);
+
         $user = Auth::user();
         $membership = OrganizationMember::where('organization_id', $project->organization_id)->where('user_id', $user->id)->first();
 
@@ -159,6 +164,8 @@ class ProjectHubController extends Controller
      */
     public function uploadTaskAttachment(Request $request, Task $task)
     {
+        Gate::authorize('view', $task);
+
         $request->validate([
             'file' => 'required|file|max:102400', // 100MB
         ]);
@@ -205,6 +212,13 @@ class ProjectHubController extends Controller
      */
     public function deleteTaskAttachment(Task $task, TaskAttachment $attachment)
     {
+        abort_unless($attachment->task_id === $task->id, 404);
+        // The uploader may remove their own file; otherwise it takes edit rights on the task.
+        abort_unless(
+            ($attachment->user_id === Auth::id() && Gate::allows('view', $task)) || Gate::allows('update', $task),
+            403
+        );
+
         if ($attachment->file_path && file_exists($attachment->file_path)) {
             @unlink($attachment->file_path);
         }
@@ -218,6 +232,8 @@ class ProjectHubController extends Controller
      */
     public function getTaskComments(Task $task): JsonResponse
     {
+        Gate::authorize('view', $task);
+
         $comments = $task->comments()->with('user:id,name,email')->orderBy('created_at', 'asc')->get();
 
         return response()->json([
@@ -239,6 +255,8 @@ class ProjectHubController extends Controller
      */
     public function storeTaskComment(Request $request, Task $task, PostTaskCommentWithNotificationsAction $postComment)
     {
+        Gate::authorize('view', $task);
+
         $user = Auth::user();
         $validated = $request->validate([
             'body' => 'required|string|max:3000',
@@ -254,42 +272,32 @@ class ProjectHubController extends Controller
     }
 
     /**
-     * Whether the given user may approve/reject work on this task: a
-     * Super Admin, a company admin, anyone with the tasks.assign
-     * permission, or the task's project manager.
+     * Project uploads are for members of the project's organization.
      */
-    private function isTaskManager(Task $task, User $user): bool
+    private function authorizeProjectMember(Project $project): void
     {
-        $membership = OrganizationMember::where('organization_id', $task->organization_id)->where('user_id', $user->id)->first();
+        $user = Auth::user();
+        $isMember = OrganizationMember::where('organization_id', $project->organization_id)
+            ->where('user_id', $user->id)
+            ->exists();
 
-        return $user->isSuperAdmin()
-            || ($membership && ($membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign')))
-            || ($task->project && $task->project->manager_id === $user->id);
+        abort_unless($isMember || $user->isSuperAdmin(), 403);
     }
 
     /**
      * Approve a task as completed (by Project Manager / Admin).
      */
-    public function approveTask(Request $request, Task $task)
+    public function approveTask(Request $request, Task $task, UpdateTaskStatusAction $updateStatus)
     {
         $user = Auth::user();
 
-        if (! $this->isTaskManager($task, $user)) {
+        if (! $updateStatus->canApprove($task, $user)) {
             return response()->json(['message' => __('Only Project Managers or Admins can approve tasks.')], 403);
         }
 
-        $task->update([
-            'status' => 'done',
-            'approval_status' => 'approved',
-            'approved_by' => $user->id,
-            'approved_at' => now(),
-            'completed_at' => now(),
-            'rejection_reason' => null,
-        ]);
-
-        // Auto-recalculate milestone and goals
-        $task->milestone?->checkAndUpdateStatus();
-        $task->project?->goals->each->recalculateProgress();
+        // Same path as any other completion: milestones, goals and the next
+        // recurring cycle all follow.
+        $task = $updateStatus->execute($task, 'done');
 
         if ($task->assignee_id && $task->assignee_id !== $user->id) {
             NotificationService::notifyCustom(
@@ -312,11 +320,11 @@ class ProjectHubController extends Controller
     /**
      * Reject / Request changes on a task (by Project Manager / Admin).
      */
-    public function rejectTask(Request $request, Task $task)
+    public function rejectTask(Request $request, Task $task, UpdateTaskStatusAction $updateStatus)
     {
         $user = Auth::user();
 
-        if (! $this->isTaskManager($task, $user)) {
+        if (! $updateStatus->canApprove($task, $user)) {
             return response()->json(['message' => __('Only Project Managers or Admins can review tasks.')], 403);
         }
 
