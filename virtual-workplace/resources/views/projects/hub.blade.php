@@ -380,9 +380,10 @@
             white-space: nowrap;
         }
 
-        .badge-green { background: rgba(79, 155, 95, 0.15); color: var(--ula-status-success); border: 1px solid rgba(79, 155, 95, 0.25); }
-        .badge-gold { background: rgba(214, 162, 58, 0.15); color: var(--ula-gold-400); border: 1px solid rgba(214, 162, 58, 0.25); }
-        .badge-danger { background: rgba(217, 107, 95, 0.15); color: var(--ula-status-danger); border: 1px solid rgba(217, 107, 95, 0.25); }
+        /* Tone tokens flip with the theme; the raw rgba/status colours sank into the dark card. */
+        .badge-green { background: var(--ula-tone-palm-bg); color: var(--ula-tone-palm-fg); border: 1px solid var(--ula-border-subtle); }
+        .badge-gold { background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg); border: 1px solid var(--ula-border-subtle); }
+        .badge-danger { background: var(--ula-tone-terracotta-bg); color: var(--ula-tone-terracotta-fg); border: 1px solid var(--ula-border-subtle); }
         .badge-neutral { background: var(--ula-surface-page-alt); color: var(--ula-text-secondary); border: 1px solid var(--ula-border-subtle); }
 
         /* KPI Grid (Enhanced Spatial Depth) */
@@ -1083,10 +1084,10 @@
                     @php
                         $columns = [
                             'backlog' => ['title' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">push_pin</span> ' . __('Backlog'), 'color' => 'var(--ula-text-secondary)'],
-                            'ready' => ['title' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">track_changes</span> ' . __('Ready'), 'color' => 'var(--ula-palm-500)'],
-                            'in_progress' => ['title' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> ' . __('In Progress'), 'color' => 'var(--ula-palm-900)'],
+                            'ready' => ['title' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">track_changes</span> ' . __('Ready'), 'color' => 'var(--ula-tone-palm-fg)'],
+                            'in_progress' => ['title' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> ' . __('In Progress'), 'color' => 'var(--ula-text-primary)'],
                             'review' => ['title' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span> ' . __('Review / QA'), 'color' => 'var(--ula-status-warning)'],
-                            'done' => ['title' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">celebration</span> ' . __('Done'), 'color' => 'var(--ula-palm-900)'],
+                            'done' => ['title' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">celebration</span> ' . __('Done'), 'color' => 'var(--ula-tone-palm-fg)'],
                         ];
                         $isProjectManager = ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || ($project && $project->manager_id === $user->id));
                     @endphp
