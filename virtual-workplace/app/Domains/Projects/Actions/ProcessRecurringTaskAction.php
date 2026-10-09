@@ -24,7 +24,7 @@ class ProcessRecurringTaskAction
         // Calculate next start date with same duration offset
         $nextStartDate = null;
         if ($task->start_date && $task->due_date) {
-            $durationDays = $task->start_date->diffInDays($task->due_date);
+            $durationDays = (int) $task->start_date->diffInDays($task->due_date);
             $nextStartDate = $nextDueDate->copy()->subDays($durationDays);
         }
 

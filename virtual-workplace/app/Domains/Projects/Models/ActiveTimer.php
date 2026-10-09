@@ -48,6 +48,6 @@ class ActiveTimer extends Model
 
     public function elapsedSeconds(): int
     {
-        return max(0, now()->diffInSeconds($this->started_at));
+        return max(0, (int) $this->started_at->diffInSeconds(now()));
     }
 }

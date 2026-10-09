@@ -68,7 +68,7 @@ class AttendanceSession extends Model
         $now = now();
         $this->ended_at = $now;
         $this->status = 'idle_paused';
-        $this->duration_seconds = max(0, $now->diffInSeconds($this->started_at));
+        $this->duration_seconds = max(0, (int) $this->started_at->diffInSeconds($now));
         $this->save();
 
         return $this;
@@ -79,7 +79,7 @@ class AttendanceSession extends Model
         $now = now();
         $this->ended_at = $now;
         $this->status = $status;
-        $this->duration_seconds = max(0, $now->diffInSeconds($this->started_at));
+        $this->duration_seconds = max(0, (int) $this->started_at->diffInSeconds($now));
         $this->save();
 
         return $this;

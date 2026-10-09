@@ -4,10 +4,8 @@ namespace App\Domains\Projects\Actions;
 
 use App\Domains\Identity\Models\User;
 use App\Domains\Projects\Models\ActiveTimer;
-use App\Domains\Projects\Models\ProjectMember;
 use App\Domains\Projects\Models\TimeEntry;
 use App\Domains\Tenancy\Models\Organization;
-use App\Domains\Tenancy\Models\OrganizationMember;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -22,8 +20,8 @@ class StopTimerAction
                 throw new InvalidArgumentException('No active running timer found to stop.');
             }
 
-            $elapsed = max(1, now()->diffInSeconds($activeTimer->started_at));
-            $rates = $this->resolveRates($organization, $activeTimer->project_id, $user);
+            $elapsed = max(1, (int) $activeTimer->started_at->diffInSeconds(now()));
+            $rates = app(ResolveTimeRatesAction::class)->execute($organization, $activeTimer->project_id, $user);
 
             $entry = TimeEntry::create([
                 'organization_id' => $activeTimer->organization_id,
@@ -45,23 +43,5 @@ class StopTimerAction
 
             return $entry->load(['project', 'task']);
         });
-    }
-
-    private function resolveRates(Organization $organization, string $projectId, User $user): array
-    {
-        $projectMember = ProjectMember::where('project_id', $projectId)->where('user_id', $user->id)->first();
-        if ($projectMember && ($projectMember->cost_rate > 0 || $projectMember->billing_rate > 0)) {
-            return [
-                'cost_rate' => $projectMember->cost_rate ?? 0.00,
-                'billing_rate' => $projectMember->billing_rate ?? 0.00,
-            ];
-        }
-
-        $orgMember = OrganizationMember::where('organization_id', $organization->id)->where('user_id', $user->id)->first();
-
-        return [
-            'cost_rate' => $orgMember->cost_rate ?? 0.00,
-            'billing_rate' => $orgMember->billing_rate ?? 0.00,
-        ];
     }
 }

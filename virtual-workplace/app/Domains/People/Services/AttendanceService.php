@@ -104,7 +104,7 @@ class AttendanceService
                 $sessionDuration = max($session->duration_seconds, $durationSeconds);
                 $update['duration_seconds'] = $sessionDuration;
             } else {
-                $update['duration_seconds'] = max(0, now()->diffInSeconds($session->started_at));
+                $update['duration_seconds'] = max(0, (int) $session->started_at->diffInSeconds(now()));
             }
             $session->update($update);
         } else {
@@ -173,7 +173,7 @@ class AttendanceService
 
         $totalSeconds = $sessions->sum(function ($s) {
             if ($s->isActive()) {
-                return max($s->duration_seconds ?? 0, now()->diffInSeconds($s->started_at));
+                return max($s->duration_seconds ?? 0, (int) $s->started_at->diffInSeconds(now()));
             }
 
             return $s->duration_seconds ?? 0;
@@ -194,7 +194,7 @@ class AttendanceService
                     'session_count' => 0,
                 ];
             }
-            $dur = $s->isActive() ? now()->diffInSeconds($s->started_at) : ($s->duration_seconds ?? 0);
+            $dur = $s->isActive() ? (int) $s->started_at->diffInSeconds(now()) : ($s->duration_seconds ?? 0);
             $daily[$dayKey]['duration_seconds'] += $dur;
             $daily[$dayKey]['hours'] = round($daily[$dayKey]['duration_seconds'] / 3600, 2);
             $daily[$dayKey]['session_count']++;
@@ -281,7 +281,7 @@ class AttendanceService
 
         $totalTaskSeconds = $taskEntries->sum(function ($entry) {
             if (! $entry->ended_at && $entry->started_at) {
-                return max(0, now()->diffInSeconds($entry->started_at));
+                return max(0, (int) $entry->started_at->diffInSeconds(now()));
             }
 
             return $entry->duration_seconds ?? 0;
@@ -301,7 +301,7 @@ class AttendanceService
 
         $totalOfficeSeconds = $attendanceSessions->sum(function ($session) {
             if ($session->isActive()) {
-                return max($session->duration_seconds ?? 0, now()->diffInSeconds($session->started_at));
+                return max($session->duration_seconds ?? 0, (int) $session->started_at->diffInSeconds(now()));
             }
 
             return $session->duration_seconds ?? 0;
@@ -349,7 +349,7 @@ class AttendanceService
         $formattedTaskEntries = $taskEntries->map(function ($te) {
             $sec = $te->duration_seconds ?? 0;
             if (! $te->ended_at && $te->started_at) {
-                $sec = max(0, now()->diffInSeconds($te->started_at));
+                $sec = max(0, (int) $te->started_at->diffInSeconds(now()));
             }
             $durFormatted = sprintf('%02dh %02dm', floor($sec / 3600), floor(($sec % 3600) / 60));
             if ($sec < 3600) {
@@ -379,7 +379,7 @@ class AttendanceService
         $formattedAttendanceSessions = $attendanceSessions->map(function ($s) {
             $sec = $s->duration_seconds ?? 0;
             if ($s->isActive()) {
-                $sec = max(0, now()->diffInSeconds($s->started_at));
+                $sec = max(0, (int) $s->started_at->diffInSeconds(now()));
             }
 
             $durFormatted = sprintf('%02dh %02dm %02ds', floor($sec / 3600), floor(($sec % 3600) / 60), $sec % 60);
@@ -473,7 +473,7 @@ class AttendanceService
                         'task_title' => $openEntry->task?->title ?? ($openEntry->description ?? 'Focused Work Session'),
                         'task_number' => $openEntry->task?->task_number ?? '',
                         'started_at' => $openEntry->started_at?->toIso8601String(),
-                        'duration_seconds' => $openEntry->started_at ? now()->diffInSeconds($openEntry->started_at) : 0,
+                        'duration_seconds' => $openEntry->started_at ? (int) $openEntry->started_at->diffInSeconds(now()) : 0,
                     ];
                 }
             }
@@ -591,7 +591,7 @@ class AttendanceService
 
             $totalOfficeSec = $userTodaySessions->sum(function ($s) {
                 if ($s->isActive()) {
-                    return max($s->duration_seconds ?? 0, now()->diffInSeconds($s->started_at));
+                    return max($s->duration_seconds ?? 0, (int) $s->started_at->diffInSeconds(now()));
                 }
 
                 return $s->duration_seconds ?? 0;
@@ -599,7 +599,7 @@ class AttendanceService
 
             $totalTaskSec = $userTodayTasks->sum(function ($te) {
                 if (! $te->ended_at && $te->started_at) {
-                    return max(0, now()->diffInSeconds($te->started_at));
+                    return max(0, (int) $te->started_at->diffInSeconds(now()));
                 }
 
                 return $te->duration_seconds ?? 0;

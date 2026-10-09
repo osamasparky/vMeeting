@@ -17,6 +17,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use InvalidArgumentException;
 
 class TimeTrackingController extends Controller
 {
@@ -44,18 +45,7 @@ class TimeTrackingController extends Controller
         Organization $organization,
         StartTimerAction $action
     ): JsonResponse {
-        $targetUser = Auth::user();
-        if ($request->filled('user_id') && $request->input('user_id') !== $targetUser->id) {
-            $membership = OrganizationMember::where('organization_id', $organization->id)
-                ->where('user_id', $targetUser->id)
-                ->first();
-            $isPrivileged = $targetUser->isSuperAdmin()
-                || ($membership && ($membership->role?->slug === 'company_admin' || $membership->hasPermission('time.create') || $membership->hasPermission('tasks.assign')));
-
-            if ($isPrivileged) {
-                $targetUser = User::findOrFail($request->input('user_id'));
-            }
-        }
+        $targetUser = $this->resolveTargetUser($request, $organization);
 
         $timer = $action->execute($request->validated(), $organization, $targetUser);
 
@@ -73,25 +63,49 @@ class TimeTrackingController extends Controller
         Organization $organization,
         StopTimerAction $action
     ): JsonResponse {
-        $targetUser = Auth::user();
-        if ($request->filled('user_id') && $request->input('user_id') !== $targetUser->id) {
-            $membership = OrganizationMember::where('organization_id', $organization->id)
-                ->where('user_id', $targetUser->id)
-                ->first();
-            $isPrivileged = $targetUser->isSuperAdmin()
-                || ($membership && ($membership->role?->slug === 'company_admin' || $membership->hasPermission('time.create')));
+        $targetUser = $this->resolveTargetUser($request, $organization);
 
-            if ($isPrivileged) {
-                $targetUser = User::findOrFail($request->input('user_id'));
-            }
+        try {
+            $entry = $action->execute($organization, $targetUser, $request->input('description'));
+        } catch (InvalidArgumentException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
         }
-
-        $entry = $action->execute($organization, $targetUser, $request->input('description'));
 
         return response()->json([
             'message' => 'Timer stopped and time entry logged.',
             'time_entry' => $entry,
         ]);
+    }
+
+    /**
+     * The user a timer call acts for. Acting for someone else needs
+     * team-lead rights and a target who is a member of this organization.
+     */
+    private function resolveTargetUser(Request $request, Organization $organization): User
+    {
+        $actor = Auth::user();
+        $targetId = $request->input('user_id');
+
+        if (! $targetId || $targetId === $actor->id) {
+            return $actor;
+        }
+
+        abort_unless($this->canManageOthersTime($request, $actor), 403, 'You cannot track time for another member.');
+
+        $isMember = OrganizationMember::where('organization_id', $organization->id)
+            ->where('user_id', $targetId)
+            ->exists();
+        abort_unless($isMember, 403, 'That user is not a member of this organization.');
+
+        return User::findOrFail($targetId);
+    }
+
+    private function canManageOthersTime(Request $request, User $actor): bool
+    {
+        $membership = $request->get('current_membership');
+
+        return $actor->isSuperAdmin()
+            || ($membership && ($membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign')));
     }
 
     /**
@@ -102,7 +116,11 @@ class TimeTrackingController extends Controller
         Organization $organization,
         LogManualTimeAction $action
     ): JsonResponse {
-        $entry = $action->execute($request->validated(), $organization, Auth::user());
+        try {
+            $entry = $action->execute($request->validated(), $organization, Auth::user());
+        } catch (InvalidArgumentException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
 
         return response()->json([
             'message' => 'Time logged successfully.',
@@ -171,7 +189,20 @@ class TimeTrackingController extends Controller
             ], 422);
         }
 
-        $timeEntry->update($request->validated());
+        $this->authorizeEntryOwner($request, $timeEntry);
+
+        $data = $request->validated();
+        $timeEntry->fill($data);
+
+        // Keep the stored duration in step with an edited start/end window.
+        if (! isset($data['duration_seconds']) && $timeEntry->isDirty(['started_at', 'ended_at']) && $timeEntry->ended_at) {
+            if ($timeEntry->ended_at->lessThanOrEqualTo($timeEntry->started_at)) {
+                return response()->json(['message' => 'End time must be strictly after start time.'], 422);
+            }
+            $timeEntry->duration_seconds = (int) $timeEntry->started_at->diffInSeconds($timeEntry->ended_at);
+        }
+
+        $timeEntry->save();
 
         return response()->json([
             'message' => 'Time entry updated successfully.',
@@ -182,7 +213,7 @@ class TimeTrackingController extends Controller
     /**
      * Delete an unlocked time entry.
      */
-    public function destroy(Organization $organization, TimeEntry $timeEntry): JsonResponse
+    public function destroy(Request $request, Organization $organization, TimeEntry $timeEntry): JsonResponse
     {
         if ($timeEntry->organization_id !== $organization->id) {
             return response()->json(['message' => 'Time entry not found.'], 404);
@@ -194,10 +225,26 @@ class TimeTrackingController extends Controller
             ], 422);
         }
 
+        $this->authorizeEntryOwner($request, $timeEntry);
+
         $timeEntry->delete();
 
         return response()->json([
             'message' => 'Time entry deleted successfully.',
         ]);
+    }
+
+    /**
+     * Members manage their own time; team leads may correct anyone's.
+     */
+    private function authorizeEntryOwner(Request $request, TimeEntry $timeEntry): void
+    {
+        $actor = Auth::user();
+
+        abort_unless(
+            $timeEntry->user_id === $actor->id || $this->canManageOthersTime($request, $actor),
+            403,
+            'You can only change your own time entries.'
+        );
     }
 }
