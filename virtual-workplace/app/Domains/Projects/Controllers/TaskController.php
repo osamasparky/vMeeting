@@ -3,11 +3,11 @@
 namespace App\Domains\Projects\Controllers;
 
 use App\Domains\Administration\Models\AuditLog;
-use App\Domains\Projects\Actions\AddTaskCommentAction;
 use App\Domains\Projects\Actions\AddTaskDependencyAction;
 use App\Domains\Projects\Actions\AssignTaskAction;
 use App\Domains\Projects\Actions\CreateTaskAction;
 use App\Domains\Projects\Actions\ManageTaskChecklistAction;
+use App\Domains\Projects\Actions\PostTaskCommentWithNotificationsAction;
 use App\Domains\Projects\Actions\UpdateTaskAction;
 use App\Domains\Projects\Actions\UpdateTaskStatusAction;
 use App\Domains\Projects\Models\Project;
@@ -144,6 +144,7 @@ class TaskController extends Controller
             'dependencies.dependsOnTask:id,title,status',
             'labels',
             'assignees:id,name,email',
+            'watchers:id,name',
         ]);
 
         $auditLogs = $this->getTaskActivityLog($task, 30);
@@ -425,15 +426,15 @@ class TaskController extends Controller
         Request $request,
         Organization $organization,
         Task $task,
-        AddTaskCommentAction $action
+        PostTaskCommentWithNotificationsAction $action
     ): JsonResponse {
         if ($task->organization_id !== $organization->id) {
             return response()->json(['message' => 'Task not found.'], 404);
         }
 
         $body = $request->input('body') ?? $request->input('content');
-        if (empty($body)) {
-            return response()->json(['message' => 'Comment body is required.'], 422);
+        if (empty($body) || mb_strlen($body) > 3000) {
+            return response()->json(['message' => 'Comment body is required (max 3000 characters).'], 422);
         }
 
         $comment = $action->execute($task, Auth::user(), $body);

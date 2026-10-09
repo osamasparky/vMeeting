@@ -7,8 +7,8 @@ use App\Domains\Meetings\Models\Meeting;
 use App\Domains\Notifications\Services\NotificationService;
 use App\Domains\Tenancy\Models\Organization;
 use App\Mail\MeetingInvitationMail;
+use App\Support\OrganizationMailer;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -126,19 +126,6 @@ class ScheduleMeetingAction
      */
     private function applyOrganizationSmtp(Organization $organization): void
     {
-        $smtp = $organization->settings?->smtp_settings ?? [];
-        // Settings → SMTP saves mail_* keys; the bare names are read too for rows saved before that.
-        $get = fn (string $key) => $smtp['mail_'.$key] ?? $smtp[$key] ?? null;
-        if (! empty($get('host'))) {
-            $encryption = $get('encryption') ?? 'tls';
-            Config::set('mail.default', 'smtp');
-            Config::set('mail.mailers.smtp.host', $get('host'));
-            Config::set('mail.mailers.smtp.port', (int) ($get('port') ?? 587));
-            Config::set('mail.mailers.smtp.encryption', $encryption === 'none' ? null : $encryption);
-            Config::set('mail.mailers.smtp.username', $get('username'));
-            Config::set('mail.mailers.smtp.password', $get('password'));
-            Config::set('mail.from.address', $get('from_address') ?? config('mail.from.address'));
-            Config::set('mail.from.name', $get('from_name') ?? $organization->name);
-        }
+        OrganizationMailer::apply($organization);
     }
 }

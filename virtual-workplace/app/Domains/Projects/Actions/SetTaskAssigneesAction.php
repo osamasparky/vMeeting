@@ -29,6 +29,7 @@ class SetTaskAssigneesAction
                 $task->saveQuietly();
             }
             $task->assignees()->sync($userIds);
+            $task->addWatchers($userIds);
         });
 
         foreach (array_diff($userIds, $before) as $added) {

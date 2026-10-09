@@ -7,6 +7,7 @@ use App\Domains\Meetings\Models\Meeting;
 use App\Domains\Notifications\Models\WorkplaceNotification;
 use App\Domains\Projects\Models\Task;
 use App\Domains\Workspace\Models\Room;
+use App\Support\TaskMailDispatcher;
 use Illuminate\Support\Facades\Log;
 
 class NotificationService
@@ -31,7 +32,7 @@ class NotificationService
                 return null;
             }
 
-            return WorkplaceNotification::create([
+            $notification = WorkplaceNotification::create([
                 'user_id' => $targetUserId,
                 'organization_id' => $orgId,
                 'type' => $type,
@@ -42,6 +43,11 @@ class NotificationService
                 'data' => $data,
                 'is_read' => false,
             ]);
+
+            // Task notifications also go out by email when the user wants them.
+            TaskMailDispatcher::queue($notification);
+
+            return $notification;
         } catch (\Throwable $e) {
             Log::error('Failed to send WorkplaceNotification: '.$e->getMessage());
 
@@ -72,7 +78,7 @@ class NotificationService
             'project' => $projectName,
         ]);
 
-        $actionUrl = '/projects/hub?project='.($task->project_id ?? '').'&task='.$task->id;
+        $actionUrl = self::taskUrl($task->project_id, $task->id);
 
         return self::send(
             $targetUserId,
@@ -115,7 +121,7 @@ class NotificationService
             'new' => ucfirst(str_replace('_', ' ', $newStatus)),
         ]);
 
-        $actionUrl = '/projects/hub?project='.($task->project_id ?? '').'&task='.$task->id;
+        $actionUrl = self::taskUrl($task->project_id, $task->id);
 
         return self::send(
             $task->assignee_id,
@@ -256,7 +262,7 @@ class NotificationService
         }
 
         if (! empty($data['task_id']) && empty($actionUrl)) {
-            $actionUrl = '/dashboard#all-tasks';
+            $actionUrl = ! empty($data['project_id']) ? self::taskUrl($data['project_id'], $data['task_id']) : '/dashboard#all-tasks';
         }
 
         return self::send(
@@ -269,5 +275,11 @@ class NotificationService
             $icon,
             $orgId
         );
+    }
+
+    /** Link that opens the project hub with the task inspector showing. */
+    public static function taskUrl(?string $projectId, string $taskId): string
+    {
+        return $projectId ? '/projects/'.$projectId.'?task='.$taskId : '/dashboard#all-tasks';
     }
 }

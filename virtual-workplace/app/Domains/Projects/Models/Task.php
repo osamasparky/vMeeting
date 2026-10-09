@@ -280,6 +280,20 @@ class Task extends Model
         });
     }
 
+    /** People following the task — told about status changes and comments. */
+    public function watchers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'task_watchers', 'task_id', 'user_id')->withTimestamps();
+    }
+
+    public function addWatchers(array $userIds): void
+    {
+        $ids = array_values(array_unique(array_filter($userIds)));
+        if ($ids) {
+            $this->watchers()->syncWithoutDetaching($ids);
+        }
+    }
+
     public function isAssignedTo(string $userId): bool
     {
         return $this->assignee_id === $userId
@@ -294,6 +308,8 @@ class Task extends Model
             if ($task->assignee_id) {
                 $task->assignees()->syncWithoutDetaching([$task->assignee_id]);
             }
+            // The reporter and the assignee follow the task from the start.
+            $task->addWatchers([$task->reporter_id, $task->assignee_id]);
         });
 
         static::updated(function (Task $task) {
@@ -307,6 +323,7 @@ class Task extends Model
             }
             if ($task->assignee_id) {
                 $task->assignees()->syncWithoutDetaching([$task->assignee_id]);
+                $task->addWatchers([$task->assignee_id]);
             }
         });
     }

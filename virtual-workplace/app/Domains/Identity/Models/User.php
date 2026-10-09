@@ -75,6 +75,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_super_admin' => 'boolean',
             'two_factor_recovery_codes' => 'array',
+            'notification_preferences' => 'array',
         ];
     }
 

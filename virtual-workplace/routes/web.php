@@ -51,6 +51,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/organization/settings', [OrganizationSettingsController::class, 'updateOrganizationSettings'])->name('organization.settings.update');
     Route::post('/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
     Route::post('/profile/password', [AuthController::class, 'updatePassword'])->name('profile.password.update');
+    Route::post('/profile/notifications', [\App\Http\Controllers\Web\NotificationPreferencesController::class, 'update'])->name('profile.notifications.update');
     Route::get('/office', [OfficeController::class, 'office'])->name('office');
     Route::get('/editor', [OfficeController::class, 'editor'])->name('editor');
     Route::post('/editor/maps/{map}/background', [OfficeController::class, 'uploadMapBackground'])->middleware('throttle:uploads')->name('editor.maps.background');

@@ -245,6 +245,25 @@
                 </form>
             </div>
 
+            <!-- Email notification preferences -->
+            @php $pmPrefs = \App\Support\NotificationPreferences::for($user); @endphp
+            <div class="card" style="margin-bottom: 0; border-radius: var(--ula-radius-xl); padding: 24px; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-sm);">
+                <div class="ula-headline-group" style="margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--ula-border-subtle);">
+                    <h3 class="ula-headline-ar" style="font-size: var(--ula-size-h4); margin: 0;">{{ __('pm.prefs_title') }}</h3>
+                    @if(app()->getLocale() === 'ar')<span class="ula-headline-en" style="font-size: var(--ula-size-xs);">Email notifications</span>@endif
+                    <span class="pm-muted">{{ __('pm.prefs_help') }}</span>
+                </div>
+                <form method="POST" action="{{ route('profile.notifications.update') }}" style="display: flex; flex-direction: column; gap: 14px;">
+                    @csrf
+                    @foreach(['assigned', 'comments', 'mentions', 'status', 'approvals', 'due'] as $prefKey)
+                        <x-switch name="email_{{ $prefKey }}" id="pm-pref-{{ $prefKey }}" :checked="$pmPrefs[$prefKey]" :label="__('pm.pref_' . $prefKey)" />
+                    @endforeach
+                    <div style="padding-top: 12px; border-top: 1px solid var(--ula-border-subtle);">
+                        <x-btn variant="primary" size="md" type="submit" icon="notifications">{{ __('pm.prefs_save') }}</x-btn>
+                    </div>
+                </form>
+            </div>
+
             <!-- Security & Password Change Card -->
             <div class="card" style="margin-bottom: 0; border-radius: var(--ula-radius-xl, 20px); padding: 24px; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-sm);">
                 <h3 style="font-size: 16px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; padding-bottom: 12px; border-bottom: 1px solid var(--ula-border-subtle);">

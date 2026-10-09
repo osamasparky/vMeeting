@@ -7,6 +7,7 @@ use App\Domains\Notifications\Services\NotificationService;
 use App\Domains\Projects\Models\Task;
 use App\Domains\Tenancy\Models\OrganizationMember;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 /**
@@ -23,7 +24,8 @@ class UpdateTaskStatusAction
         }
 
         $user = Auth::user();
-        $wasDone = $task->status === Task::STATUS_DONE;
+        $statusBefore = $task->status;
+        $wasDone = $statusBefore === Task::STATUS_DONE;
 
         if ($newStatus === Task::STATUS_DONE) {
             if ($this->canApprove($task, $user)) {
@@ -73,6 +75,21 @@ class UpdateTaskStatusAction
         }
 
         $task = $task->fresh(['project', 'assignee', 'reporter', 'approver', 'milestone']);
+
+        // ── Followers hear about real status changes ──
+        if ($statusBefore !== $task->status) {
+            app(NotifyTaskWatchersAction::class)->execute(
+                $task,
+                'task_status',
+                __('🔄 ":task" is now :status', ['task' => $task->title, 'status' => __(Str::headline($task->status))]),
+                __(':actor changed the status from :old to :new.', [
+                    'actor' => $user?->name ?? __('A team member'),
+                    'old' => __(Str::headline($statusBefore)),
+                    'new' => __(Str::headline($task->status)),
+                ]),
+                $user,
+            );
+        }
 
         // ── Milestone completion and goal progress follow every transition ──
         $task->milestone?->checkAndUpdateStatus();

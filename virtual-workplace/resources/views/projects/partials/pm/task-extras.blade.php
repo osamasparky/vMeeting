@@ -94,7 +94,38 @@
         } catch (err) { showHubToast(pmEsc(err.message)); }
     }
 
+    // ── Followers: who hears about status changes and comments ──
+    PM.extraRows.push(t => {
+        const watchers = t.watchers || [];
+        const following = watchers.some(w => w.id === PM.userId);
+        const people = watchers.length
+            ? `<span class="pm-avatars" title="${pmEsc(watchers.map(w => w.name).join('، '))}">${watchers.slice(0, 5).map(w => `<span class="pm-avatar">${pmInitial(w.name)}</span>`).join('')}${watchers.length > 5 ? `<span class="pm-avatar pm-avatar--more pm-num">+${watchers.length - 5}</span>` : ''}</span>
+               <span class="pm-muted"><span class="pm-num">${watchers.length}</span> {{ __('pm.followers_count') }}</span>`
+            : `<span class="pm-muted">{{ __('pm.no_followers') }}</span>`;
+        const btn = `<button type="button" class="pm-picker-trigger" style="border-style: solid;" aria-pressed="${following}" onclick="pmToggleWatch()">
+                <span class="material-symbols-rounded" aria-hidden="true">${following ? 'notifications_off' : 'notifications_active'}</span>
+                ${following ? @json(__('pm.unfollow')) : @json(__('pm.follow'))}</button>`;
+        return pmExtrasRow(@json(__('pm.followers')), people + btn);
+    });
+
+    async function pmToggleWatch() {
+        const t = PM.currentTask;
+        const following = (t.watchers || []).some(w => w.id === PM.userId);
+        try {
+            const data = await pmApi(following ? 'DELETE' : 'POST', `/tasks/${t.id}/watch`);
+            t.watchers = data.watchers;
+            pmRenderTaskExtras(t);
+            showHubToast(following ? @json(__('pm.unfollowed')) : @json(__('pm.followed')));
+        } catch (e) { showHubToast(pmEsc(e.message)); }
+    }
+
     document.addEventListener('hub:task-rendered', e => pmRenderTaskExtras(e.detail));
+
+    // Links from notifications and emails open the task: /projects/{id}?task={taskId}
+    document.addEventListener('DOMContentLoaded', () => {
+        const linked = new URLSearchParams(window.location.search).get('task');
+        if (linked) openTaskInspector(linked);
+    });
 
     // Board cards and list rows are server-rendered: refresh once the inspector
     // closes if anything shown on them changed.

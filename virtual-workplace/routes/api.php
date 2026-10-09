@@ -16,6 +16,7 @@ use App\Domains\Projects\Controllers\TimesheetController;
 use App\Domains\Projects\Controllers\SavedViewController;
 use App\Domains\Projects\Controllers\SprintController;
 use App\Domains\Projects\Controllers\TaskLabelController;
+use App\Domains\Projects\Controllers\TaskWatcherController;
 use App\Domains\Projects\Controllers\TimeTrackingController;
 use App\Domains\Tenancy\Controllers\BillingApiController;
 use App\Domains\Tenancy\Controllers\OrganizationController;
@@ -286,6 +287,12 @@ Route::prefix('v1')->group(function () {
                     ->middleware('permission:tasks.edit');
                 Route::put('/tasks/{task}/assignees', [TaskLabelController::class, 'setTaskAssignees'])
                     ->middleware('permission:tasks.assign');
+
+                // ── Following tasks ──
+                Route::post('/tasks/{task}/watch', [TaskWatcherController::class, 'store'])
+                    ->middleware('permission:tasks.view');
+                Route::delete('/tasks/{task}/watch', [TaskWatcherController::class, 'destroy'])
+                    ->middleware('permission:tasks.view');
 
                 // ── Sprint lifecycle ──
                 Route::get('/projects/{project}/sprints/{sprint}', [SprintController::class, 'show'])
