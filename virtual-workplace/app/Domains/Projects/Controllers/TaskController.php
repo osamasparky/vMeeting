@@ -587,7 +587,7 @@ class TaskController extends Controller
 
         $validated = $request->validate([
             'project_id' => 'required|exists:projects,id',
-            'milestone_id' => 'nullable|exists:milestones,id',
+            'milestone_id' => 'nullable|exists:project_milestones,id',
             'phase_id' => 'nullable|exists:project_phases,id',
         ]);
 

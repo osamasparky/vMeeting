@@ -14,6 +14,7 @@ class ProjectGoalTarget extends Model
         'goal_id',
         'title',
         'target_type',
+        'auto_track',
         'start_value',
         'target_value',
         'current_value',
@@ -25,8 +26,11 @@ class ProjectGoalTarget extends Model
         'start_value' => 'decimal:2',
         'target_value' => 'decimal:2',
         'current_value' => 'decimal:2',
+        'auto_track' => 'boolean',
         'is_completed' => 'boolean',
     ];
+
+    public const AUTO_TYPES = ['tasks', 'milestones', 'hours'];
 
     public function goal(): BelongsTo
     {

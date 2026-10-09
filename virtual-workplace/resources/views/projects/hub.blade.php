@@ -2994,7 +2994,7 @@
         async function executeBulkAction(payload, successMsg) {
             const orgId = '{{ $project->organization_id }}';
             try {
-                const response = await fetch(`/api/organizations/${orgId}/tasks/bulk`, {
+                const response = await fetch(`/api/v1/organizations/${orgId}/tasks/bulk`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -3170,7 +3170,10 @@
                     const data = await res.json();
                     const targetType = payload.target_type || 'tasks';
                     let targetTitle = 'Project Delivery';
-                    let targetVal = parseFloat(payload.target_value) || 100;
+                    // Auto-tracked types send 0 so the server derives the target
+                    // (task/milestone counts, or the project's planned hours).
+                    const isAutoTarget = ['tasks', 'milestones', 'hours'].includes(targetType);
+                    let targetVal = isAutoTarget ? 0 : (parseFloat(payload.target_value) || 100);
                     let targetUnit = payload.unit || '%';
 
                     if (targetType === 'tasks') {
@@ -3185,7 +3188,7 @@
                     }
 
                     if (data.goal && data.goal.id) {
-                        await fetch(`/api/v1/organizations/${ORG_ID}/projects/{{ $project->id }}/goals/${data.goal.id}/targets`, {
+                        const targetRes = await fetch(`/api/v1/organizations/${ORG_ID}/projects/{{ $project->id }}/goals/${data.goal.id}/targets`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -3199,6 +3202,11 @@
                                 unit: targetUnit
                             })
                         });
+                        if (!targetRes.ok) {
+                            const targetErr = await targetRes.json().catch(() => ({}));
+                            alert(targetErr.message || 'Error adding the goal target.');
+                            return;
+                        }
                     }
 
                     showHubToast('🎯 {{ __("Strategic goal created successfully!") }}');
@@ -3379,7 +3387,7 @@
         async function toggleTaskChecklistItem(itemId) {
             if (!activeInspectorTaskId) return;
             try {
-                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${activeInspectorTaskId}/checklist/${itemId}/toggle`, {
+                const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${activeInspectorTaskId}/checklist/${itemId}`, {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
                     credentials: 'same-origin'

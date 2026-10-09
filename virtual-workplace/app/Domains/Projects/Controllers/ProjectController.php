@@ -444,7 +444,7 @@ class ProjectController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'target_type' => 'required|string|in:number,currency,tasks,percentage,boolean',
+            'target_type' => 'required|string|in:number,currency,tasks,milestones,hours,percentage,boolean',
             'start_value' => 'nullable|numeric',
             'target_value' => 'required|numeric',
             'current_value' => 'nullable|numeric',

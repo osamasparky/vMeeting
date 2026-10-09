@@ -82,6 +82,7 @@ class Task extends Model
     protected $fillable = [
         'organization_id',
         'project_id',
+        'sprint_id',
         'phase_id',
         'milestone_id',
         'parent_task_id',
@@ -98,6 +99,7 @@ class Task extends Model
         'due_date',
         'completed_at',
         'estimated_hours',
+        'story_points',
         'is_billable',
         'order',
         'metadata',
@@ -121,6 +123,7 @@ class Task extends Model
         'completed_at' => 'datetime',
         'approved_at' => 'datetime',
         'estimated_hours' => 'decimal:2',
+        'story_points' => 'integer',
         'is_billable' => 'boolean',
         'order' => 'integer',
         'metadata' => 'array',

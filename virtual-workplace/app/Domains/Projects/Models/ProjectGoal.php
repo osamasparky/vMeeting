@@ -74,7 +74,14 @@ class ProjectGoal extends Model
                 $currentVal = (float) $target->current_value;
                 $startVal = (float) $target->start_value;
 
-                if ($target->target_type === 'tasks' && $targetVal <= 0) {
+                // 'tasks'/'milestones' created with target_value <= 0 derive from
+                // the project and stay auto (auto_track) after the first pass
+                // writes real counts back; an explicit value ("complete 20 tasks")
+                // is tracked manually. 'hours' always reads logged time.
+                $isAuto = $target->auto_track || $targetVal <= 0;
+
+                if ($target->target_type === 'tasks' && $isAuto) {
+                    $target->auto_track = true;
                     $taskCounts ??= $this->taskCounts($project);
                     [$totalTasks, $doneTasks] = $taskCounts;
                     $target->target_value = max(1, $totalTasks);
@@ -84,7 +91,8 @@ class ProjectGoal extends Model
                     $target->save();
                     $ratio = $totalTasks > 0 ? min(1.0, $doneTasks / $totalTasks) : 0.0;
                     $totalProgress += $ratio;
-                } elseif ($target->target_type === 'milestones' && $targetVal <= 0) {
+                } elseif ($target->target_type === 'milestones' && $isAuto) {
+                    $target->auto_track = true;
                     $milestoneCounts ??= $this->milestoneCounts($project);
                     [$totalMilestones, $completedMilestones] = $milestoneCounts;
                     $target->target_value = max(1, $totalMilestones);
@@ -94,7 +102,13 @@ class ProjectGoal extends Model
                     $target->save();
                     $ratio = $totalMilestones > 0 ? min(1.0, $completedMilestones / $totalMilestones) : 0.0;
                     $totalProgress += $ratio;
-                } elseif ($target->target_type === 'hours' && $targetVal <= 0) {
+                } elseif ($target->target_type === 'hours') {
+                    $target->auto_track = true;
+                    // target_value is the hours budget; fall back to the project's plan.
+                    if ($targetVal <= 0) {
+                        $targetVal = (float) ($project->planned_hours ?? 0);
+                        $target->target_value = $targetVal;
+                    }
                     $loggedHours = $project->actualHours();
                     $target->current_value = $loggedHours;
                     $target->unit = $target->unit ?: 'Hours';
