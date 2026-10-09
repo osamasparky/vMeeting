@@ -2,10 +2,13 @@
 
 namespace App\Domains\Projects\Requests;
 
+use App\Domains\Projects\Requests\Concerns\ScopesToOrganization;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateProjectRequest extends FormRequest
 {
+    use ScopesToOrganization;
+
     public function authorize(): bool
     {
         return true;
@@ -17,8 +20,8 @@ class UpdateProjectRequest extends FormRequest
             'name' => ['sometimes', 'required', 'string', 'max:255'],
             'code' => ['nullable', 'string', 'max:32'],
             'description' => ['nullable', 'string'],
-            'manager_id' => ['nullable', 'exists:users,id'],
-            'department_id' => ['nullable', 'exists:departments,id'],
+            'manager_id' => ['nullable', $this->organizationMember()],
+            'department_id' => ['nullable', $this->existsInOrganization('departments')],
             'status' => ['nullable', 'string', 'in:planning,active,on_hold,completed,cancelled'],
             'priority' => ['nullable', 'string', 'in:low,medium,high,urgent'],
             'start_date' => ['nullable', 'date'],

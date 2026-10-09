@@ -2,10 +2,13 @@
 
 namespace App\Domains\Projects\Requests;
 
+use App\Domains\Projects\Requests\Concerns\ScopesToOrganization;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreProjectRequest extends FormRequest
 {
+    use ScopesToOrganization;
+
     public function authorize(): bool
     {
         return true; // Authorized via EnsurePermission middleware
@@ -17,8 +20,8 @@ class StoreProjectRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'code' => ['nullable', 'string', 'max:32'],
             'description' => ['nullable', 'string'],
-            'manager_id' => ['nullable', 'exists:users,id'],
-            'department_id' => ['nullable', 'exists:departments,id'],
+            'manager_id' => ['nullable', $this->organizationMember()],
+            'department_id' => ['nullable', $this->existsInOrganization('departments')],
             'status' => ['nullable', 'string', 'in:planning,active,on_hold,completed,cancelled'],
             'priority' => ['nullable', 'string', 'in:low,medium,high,urgent'],
             'start_date' => ['nullable', 'date'],
@@ -27,7 +30,7 @@ class StoreProjectRequest extends FormRequest
             'planned_hours' => ['nullable', 'numeric', 'min:0'],
             'color' => ['nullable', 'string', 'max:16'],
             'members' => ['nullable', 'array'],
-            'members.*.user_id' => ['required', 'exists:users,id'],
+            'members.*.user_id' => ['required', $this->organizationMember()],
             'members.*.project_role' => ['nullable', 'string', 'in:manager,lead,contributor,viewer'],
             'members.*.cost_rate' => ['nullable', 'numeric', 'min:0'],
             'members.*.billing_rate' => ['nullable', 'numeric', 'min:0'],

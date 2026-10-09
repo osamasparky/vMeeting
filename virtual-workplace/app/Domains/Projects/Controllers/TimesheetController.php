@@ -117,6 +117,8 @@ class TimesheetController extends Controller
         Timesheet $timesheet,
         ApproveTimesheetAction $action
     ): JsonResponse {
+        $this->authorizeOwner($request);
+
         $approved = $action->execute($organization, $timesheet, Auth::user());
 
         return response()->json([
@@ -134,6 +136,8 @@ class TimesheetController extends Controller
         Timesheet $timesheet,
         RejectTimesheetAction $action
     ): JsonResponse {
+        $this->authorizeOwner($request);
+
         $rejected = $action->execute(
             $organization,
             $timesheet,
@@ -145,5 +149,19 @@ class TimesheetController extends Controller
             'message' => 'Timesheet rejected and returned for revisions.',
             'timesheet' => $rejected,
         ]);
+    }
+
+    /**
+     * Approving or rejecting time is the company owner's call alone.
+     */
+    private function authorizeOwner(Request $request): void
+    {
+        $membership = $request->get('current_membership');
+
+        abort_unless(
+            Auth::user()->isSuperAdmin() || $membership?->isCompanyOwner(),
+            403,
+            'Only the company owner can approve or reject timesheets.'
+        );
     }
 }

@@ -287,10 +287,14 @@ Route::prefix('v1')->group(function () {
                     ->middleware('permission:time.delete');
 
                 // ── Time Entries Route Aliases ──
-                Route::post('/time-entries/timer/start', [TimeTrackingController::class, 'startTimer']);
-                Route::post('/time-entries/timer/stop', [TimeTrackingController::class, 'stopTimer']);
-                Route::post('/time-entries/manual', [TimeTrackingController::class, 'logManual']);
-                Route::get('/time-entries', [TimeTrackingController::class, 'index']);
+                Route::post('/time-entries/timer/start', [TimeTrackingController::class, 'startTimer'])
+                    ->middleware('permission:time.create');
+                Route::post('/time-entries/timer/stop', [TimeTrackingController::class, 'stopTimer'])
+                    ->middleware('permission:time.create');
+                Route::post('/time-entries/manual', [TimeTrackingController::class, 'logManual'])
+                    ->middleware('permission:time.create');
+                Route::get('/time-entries', [TimeTrackingController::class, 'index'])
+                    ->middleware('permission:time.view');
 
                 // ── Timesheets Domain ──
                 Route::get('/timesheets', [TimesheetController::class, 'index'])

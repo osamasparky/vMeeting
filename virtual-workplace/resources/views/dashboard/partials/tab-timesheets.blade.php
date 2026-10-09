@@ -284,7 +284,7 @@
                                 @endif
                             </td>
                             <td style="padding: 14px 16px;">
-                                @if($ts->status === 'submitted' && ($membership->hasPermission('timesheets.approve') || $user->isSuperAdmin()))
+                                @if($ts->status === 'submitted' && ($membership->isCompanyOwner() || $user->isSuperAdmin()))
                                     <div style="display: flex; gap: 6px;">
                                         <button onclick="approveTimesheet('{{ $ts->id }}')" class="tactile-btn" style="background: rgba(79, 155, 95, 0.15); color: var(--ula-accent-default); border: 1px solid rgba(79, 155, 95, 0.3); padding: 4px 10px; font-size: 11px; display: inline-flex; align-items: center; gap: 2px; border-radius: var(--ula-radius-md);">
                                             <span class="material-symbols-rounded" style="font-size: 13px;">check</span>

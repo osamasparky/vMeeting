@@ -2,10 +2,13 @@
 
 namespace App\Domains\Projects\Requests;
 
+use App\Domains\Projects\Requests\Concerns\ScopesToOrganization;
 use Illuminate\Foundation\Http\FormRequest;
 
 class LogManualTimeRequest extends FormRequest
 {
+    use ScopesToOrganization;
+
     public function authorize(): bool
     {
         return true;
@@ -14,8 +17,8 @@ class LogManualTimeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'project_id' => ['required', 'exists:projects,id'],
-            'task_id' => ['nullable', 'exists:tasks,id'],
+            'project_id' => ['required', $this->existsInOrganization('projects')],
+            'task_id' => ['nullable', $this->existsInOrganization('tasks')],
             'started_at' => ['required', 'date'],
             'ended_at' => ['required', 'date', 'after:started_at'],
             'duration_seconds' => ['nullable', 'integer', 'min:1'],

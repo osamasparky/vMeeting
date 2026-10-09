@@ -16,6 +16,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class ProjectController extends Controller
 {
@@ -340,7 +341,7 @@ class ProjectController extends Controller
             'content' => 'nullable|string',
             'icon' => 'nullable|string|max:30',
             'is_pinned' => 'boolean',
-            'parent_document_id' => 'nullable|exists:project_documents,id',
+            'parent_document_id' => ['nullable', Rule::exists('project_documents', 'id')->where('project_id', $project->id)],
         ]);
 
         $doc = $project->documents()->create([

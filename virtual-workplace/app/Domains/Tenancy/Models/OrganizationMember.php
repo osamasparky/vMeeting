@@ -74,6 +74,16 @@ class OrganizationMember extends Model
         ]);
     }
 
+    /**
+     * The company owner — the company_admin role the organization's creator
+     * receives. Some powers (approving timesheets) belong to the owner alone,
+     * whatever permissions other roles are granted.
+     */
+    public function isCompanyOwner(): bool
+    {
+        return $this->role?->slug === 'company_admin';
+    }
+
     public function hasPermission(string $permissionKey): bool
     {
         if (! $this->role) {

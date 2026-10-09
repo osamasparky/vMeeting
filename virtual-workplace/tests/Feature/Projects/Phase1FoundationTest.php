@@ -341,7 +341,7 @@ class Phase1FoundationTest extends TestCase
 
         // Manager has timesheet approval and projects view/create
         $this->assertTrue($manager->hasPermission('projects.create'));
-        $this->assertTrue($manager->hasPermission('timesheets.approve'));
+        $this->assertFalse($manager->hasPermission('timesheets.approve')); // owner-only since 2026-10-10
         $this->assertFalse($manager->hasPermission('reports.financials'));
 
         // Employee has personal task, time and timesheet submission

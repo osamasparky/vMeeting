@@ -26,6 +26,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class TaskController extends Controller
 {
@@ -280,6 +281,8 @@ class TaskController extends Controller
             return response()->json(['message' => 'Task not found.'], 404);
         }
 
+        Gate::authorize('delete', $task);
+
         $task->delete();
 
         return response()->json([
@@ -297,7 +300,10 @@ class TaskController extends Controller
             'task_ids.*' => ['required', 'string'],
             'action' => ['required', 'string', 'in:update_status,assign,delete'],
             'status' => ['required_if:action,update_status', 'string', 'in:backlog,ready,in_progress,review,qa,done'],
-            'assignee_id' => ['required_if:action,assign', 'nullable', 'string'],
+            'assignee_id' => [
+                'required_if:action,assign', 'nullable', 'string',
+                Rule::exists('organization_members', 'user_id')->where('organization_id', $organization->id),
+            ],
         ]);
 
         $tasks = Task::where('organization_id', $organization->id)
@@ -309,12 +315,25 @@ class TaskController extends Controller
         }
 
         $action = $validated['action'];
+
+        // All-or-nothing: the same rules as editing each task one by one.
+        $membership = $request->get('current_membership');
+        if ($action === 'delete') {
+            abort_unless($membership?->hasPermission('tasks.delete'), 403);
+            $tasks->each(fn (Task $task) => Gate::authorize('delete', $task));
+        } else {
+            if ($action === 'assign') {
+                abort_unless($membership?->hasPermission('tasks.assign'), 403);
+            }
+            $tasks->each(fn (Task $task) => Gate::authorize('update', $task));
+        }
+
         $affected = 0;
 
         if ($action === 'delete') {
             $affected = $tasks->count();
             Task::where('organization_id', $organization->id)
-                ->whereIn('id', $validated['task_ids'])
+                ->whereIn('id', $tasks->pluck('id'))
                 ->delete();
         } elseif ($action === 'update_status') {
             $statusAction = app(UpdateTaskStatusAction::class);
@@ -323,9 +342,9 @@ class TaskController extends Controller
                 $affected++;
             }
         } elseif ($action === 'assign') {
-            $assigneeId = $validated['assignee_id'] ?: null;
+            $assignAction = app(AssignTaskAction::class);
             foreach ($tasks as $task) {
-                $task->update(['assignee_id' => $assigneeId]);
+                $assignAction->execute($task, $validated['assignee_id'] ?: null);
                 $affected++;
             }
         }
@@ -473,7 +492,10 @@ class TaskController extends Controller
         $this->authorizeTaskEdit($organization, $task);
 
         $validated = $request->validate([
-            'custom_field_definition_id' => 'required|exists:custom_field_definitions,id',
+            // The field must be this project's, or an organization-wide one.
+            'custom_field_definition_id' => ['required', Rule::exists('custom_field_definitions', 'id')
+                ->where('organization_id', $organization->id)
+                ->where(fn ($q) => $q->where('project_id', $task->project_id)->orWhereNull('project_id'))],
             'value_text' => 'nullable|string',
             'value_number' => 'nullable|numeric',
             'value_date' => 'nullable|date',
@@ -513,7 +535,7 @@ class TaskController extends Controller
         $this->authorizeTaskEdit($organization, $task);
 
         $validated = $request->validate([
-            'sprint_id' => 'nullable|exists:project_sprints,id',
+            'sprint_id' => ['nullable', Rule::exists('project_sprints', 'id')->where('project_id', $task->project_id)],
             'story_points' => 'nullable|integer|min:0',
         ]);
 
@@ -582,9 +604,10 @@ class TaskController extends Controller
         $this->authorizeTaskEdit($organization, $task);
 
         $validated = $request->validate([
-            'project_id' => 'required|exists:projects,id',
-            'milestone_id' => 'nullable|exists:project_milestones,id',
-            'phase_id' => 'nullable|exists:project_phases,id',
+            'project_id' => ['required', Rule::exists('projects', 'id')->where('organization_id', $organization->id)],
+            // Milestone and phase must belong to the destination project.
+            'milestone_id' => ['nullable', Rule::exists('project_milestones', 'id')->where('project_id', $request->input('project_id'))],
+            'phase_id' => ['nullable', Rule::exists('project_phases', 'id')->where('project_id', $request->input('project_id'))],
         ]);
 
         // Verify project belongs to same organization
@@ -616,7 +639,7 @@ class TaskController extends Controller
         $this->authorizeTaskEdit($organization, $task);
 
         $validated = $request->validate([
-            'milestone_id' => 'nullable|exists:project_milestones,id',
+            'milestone_id' => ['nullable', Rule::exists('project_milestones', 'id')->where('project_id', $task->project_id)],
         ]);
 
         $oldMilestone = $task->milestone;

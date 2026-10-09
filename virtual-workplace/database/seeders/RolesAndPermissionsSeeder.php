@@ -113,7 +113,7 @@ class RolesAndPermissionsSeeder extends Seeder
                     'projects.view', 'projects.create', 'projects.edit', 'projects.manage',
                     'tasks.view', 'tasks.create', 'tasks.edit', 'tasks.assign', 'tasks.delete',
                     'time.view', 'time.create', 'time.edit', 'time.delete',
-                    'timesheets.view', 'timesheets.submit', 'timesheets.approve',
+                    'timesheets.view', 'timesheets.submit',
                     'reports.view',
                 ],
             ],
