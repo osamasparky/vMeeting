@@ -27,8 +27,8 @@
             ? `<span class="pm-picker"><button type="button" class="pm-picker-trigger" aria-haspopup="listbox" aria-expanded="false" onclick="pmPickLabels(this)"><span class="material-symbols-rounded" aria-hidden="true">sell</span>{{ __('pm.edit_labels') }}</button></span>`
             : '';
 
-        box.innerHTML = pmExtrasRow('{{ __('pm.assignees') }}', assigneeHtml + assigneeBtn)
-            + pmExtrasRow('{{ __('pm.labels') }}', labelHtml + labelBtn)
+        box.innerHTML = pmExtrasRow(@json(__('pm.assignees')), assigneeHtml + assigneeBtn)
+            + pmExtrasRow(@json(__('pm.labels')), labelHtml + labelBtn)
             + PM.extraRows.map(fn => fn(t)).join('');
     }
 

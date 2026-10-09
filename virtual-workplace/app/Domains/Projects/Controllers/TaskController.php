@@ -226,7 +226,17 @@ class TaskController extends Controller
 
         $this->authorizeTaskEdit($organization, $task);
 
-        $updated = $action->execute($task, $request->validated());
+        // Reassigning is a team-lead action, same as PATCH /tasks/{task}/assign.
+        $validated = $request->validated();
+        if (array_key_exists('assignee_id', $validated) && $validated['assignee_id'] !== $task->assignee_id) {
+            abort_unless(
+                Auth::user()->isSuperAdmin() || $request->get('current_membership')?->hasPermission('tasks.assign'),
+                403,
+                'You cannot reassign tasks.'
+            );
+        }
+
+        $updated = $action->execute($task, $validated);
 
         return response()->json([
             'message' => 'Task updated successfully.',

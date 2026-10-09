@@ -15,6 +15,22 @@
         'labels' => $project->labels->map(fn ($l) => ['id' => $l->id, 'name' => $l->name, 'tone' => $l->tone])->values(),
         'members' => $allMembers->filter(fn ($m) => $m->user)->map(fn ($m) => ['id' => $m->user_id, 'name' => $m->user->name])->values(),
         'tones' => \App\Domains\Projects\Models\ProjectLabel::TONES,
+        'locale' => app()->getLocale(),
+        // Calendar data: one row per task with the attributes the shared filter reads.
+        'tasks' => $tasks->map(fn ($t) => [
+            'id' => $t->id,
+            'number' => $t->task_number,
+            'title' => $t->title,
+            'status' => $t->status,
+            'priority' => $t->priority,
+            'due' => $t->due_date?->format('Y-m-d'),
+            'start' => $t->start_date?->format('Y-m-d'),
+            'assignee' => $t->assignee_id ?? 'unassigned',
+            'assignees' => $t->assignees->pluck('id')->implode(','),
+            'labels' => $t->labels->pluck('id')->implode(','),
+            'milestone' => $t->milestone_id ?? 'none',
+            'canEdit' => $user->can('update', $t),
+        ])->values(),
     ];
 @endphp
 <script nonce="{{ $cspNonce ?? '' }}">
@@ -106,3 +122,6 @@
 
 @include('projects.partials.pm.task-extras')
 @include('projects.partials.pm.settings-scripts')
+@include('projects.partials.pm.list-scripts')
+@include('projects.partials.pm.views-scripts')
+@include('projects.partials.pm.calendar-scripts')

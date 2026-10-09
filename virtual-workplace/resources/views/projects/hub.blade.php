@@ -949,6 +949,7 @@
                 $hubBudgetLeft = (float) ($kpis['budget_variance'] ?? 0);
                 $hubTabs = [
                     ['kanban', 'view_kanban', 'hub.tab_kanban'], ['tasks', 'table_rows', 'hub.tab_list'],
+                    ['calendar', 'calendar_month', 'pm.calendar'],
                     ['gantt', 'timeline', 'hub.tab_gantt'], ['workload', 'stacked_bar_chart', 'hub.tab_workload'],
                     ['docs', 'article', 'hub.tab_docs'], ['goals', 'flag', 'hub.tab_goals'],
                     ['timelog', 'payments', 'hub.tab_time'], ['meetings', 'videocam', 'hub.tab_meetings'],
@@ -1022,6 +1023,15 @@
 
             <!-- ── MULTI-CRITERIA TASK SEARCH & FILTER TOOLBAR ── -->
             <div class="hub-filter-bar">
+                <!-- Saved views -->
+                <span class="pm-picker">
+                    <button type="button" id="pm-views-btn" class="pm-picker-trigger" aria-haspopup="menu" aria-expanded="false" onclick="pmOpenViewsMenu(this)" style="border-style: solid;">
+                        <span class="material-symbols-rounded" aria-hidden="true">bookmarks</span>
+                        <span id="pm-views-current">{{ __('pm.views') }}</span>
+                        <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                    </button>
+                </span>
+
                 <!-- Search Input -->
                 <div style="position: relative; flex: 1; min-width: 200px;">
                     <span style="position: absolute; inset-inline-start: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--ula-text-muted); pointer-events: none;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span></span>
@@ -1252,32 +1262,26 @@
                                                 <span style="font-size: 11px; color: var(--ula-text-muted);">—</span>
                                             @endif
                                         </td>
-                                        <td>
-                                            @php
-                                                $statusBadgeClass = match($t->status) {
-                                                    'done' => 'ula-badge--live',
-                                                    'in_progress' => 'ula-badge--scheduled',
-                                                    'review', 'qa' => 'ula-badge--attention',
-                                                    default => 'ula-badge--default',
-                                                };
-                                            @endphp
-                                            <span class="ula-badge {{ $statusBadgeClass }} ula-badge--sm">
-                                                {{ ucfirst(str_replace('_', ' ', $t->status)) }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            @if($t->priority === 'urgent')
-                                                <span class="ula-badge ula-badge--live ula-badge--sm" style="background: var(--ula-surface-danger-soft); color: var(--ula-status-danger); border-color: rgba(154, 88, 39, 0.3); gap: 3px;">
-                                                    <span class="material-symbols-rounded" style="font-size: 13px;">local_fire_department</span>
-                                                    <span>{{ __('Urgent') }}</span>
-                                                </span>
-                                            @elseif($t->priority === 'high')
-                                                <span class="ula-badge ula-badge--attention ula-badge--sm" style="gap: 3px;">
-                                                    <span class="material-symbols-rounded" style="font-size: 13px;">bolt</span>
-                                                    <span>{{ __('High') }}</span>
-                                                </span>
+                                        <td onclick="event.stopPropagation();">
+                                            @if($user->can('update', $t))
+                                                <select class="pm-cell-select" aria-label="{{ __('Status') }}" onchange="pmInlineUpdate('{{ $t->id }}', 'status', this.value, this)">
+                                                    @foreach(['backlog' => __('Backlog'), 'ready' => __('Ready'), 'in_progress' => __('In Progress'), 'review' => __('Review'), 'qa' => __('QA'), 'done' => __('Done')] as $stKey => $stLabel)
+                                                        <option value="{{ $stKey }}" @selected($t->status === $stKey)>{{ $stLabel }}</option>
+                                                    @endforeach
+                                                </select>
                                             @else
-                                                <span class="ula-badge ula-badge--default ula-badge--sm">{{ ucfirst($t->priority) }}</span>
+                                                <span class="ula-badge ula-badge--default ula-badge--sm">{{ __(\Illuminate\Support\Str::headline($t->status)) }}</span>
+                                            @endif
+                                        </td>
+                                        <td onclick="event.stopPropagation();">
+                                            @if($user->can('update', $t))
+                                                <select class="pm-cell-select" aria-label="{{ __('Priority') }}" onchange="pmInlineUpdate('{{ $t->id }}', 'priority', this.value, this)">
+                                                    @foreach(['low' => __('Low'), 'medium' => __('Medium'), 'high' => __('High'), 'urgent' => __('Urgent')] as $prKey => $prLabel)
+                                                        <option value="{{ $prKey }}" @selected($t->priority === $prKey)>{{ $prLabel }}</option>
+                                                    @endforeach
+                                                </select>
+                                            @else
+                                                <span class="ula-badge ula-badge--default ula-badge--sm">{{ __(ucfirst($t->priority)) }}</span>
                                             @endif
                                         </td>
                                         <td>
@@ -1285,7 +1289,16 @@
                                                 <div class="task-avatar-circle">
                                                     {{ strtoupper(substr($t->assignee->name ?? 'U', 0, 2)) }}
                                                 </div>
-                                                <span style="font-weight: 700; font-size: 12px; color: var(--ula-text-primary);">{{ $t->assignee->name ?? __('Unassigned') }}</span>
+                                                @if($user->isSuperAdmin() || $membership->hasPermission('tasks.assign'))
+                                                    <select class="pm-cell-select" aria-label="{{ __('Assignee') }}" onclick="event.stopPropagation();" onchange="pmInlineUpdate('{{ $t->id }}', 'assignee_id', this.value || null, this)">
+                                                        <option value="">{{ __('Unassigned') }}</option>
+                                                        @foreach($allMembers as $am)
+                                                            <option value="{{ $am->user_id }}" @selected($t->assignee_id === $am->user_id)>{{ $am->user->name ?? '' }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                @else
+                                                    <span style="font-weight: 700; font-size: 12px; color: var(--ula-text-primary);">{{ $t->assignee->name ?? __('Unassigned') }}</span>
+                                                @endif
                                                 @php $rowExtras = $t->assignees->where('id', '!=', $t->assignee_id); @endphp
                                                 @if($rowExtras->isNotEmpty())
                                                     <span class="pm-avatar pm-avatar--more pm-num" title="{{ $rowExtras->pluck('name')->implode('، ') }}">+{{ $rowExtras->count() }}</span>
@@ -1311,10 +1324,13 @@
                                                 <span style="font-size: 11px; color: var(--ula-text-muted);">—</span>
                                             @endif
                                         </td>
-                                        <td>
-                                            <span style="font-size: 12px; font-weight: 700; color: {{ $t->due_date && $t->due_date->isPast() && $t->status !== 'done' ? 'var(--ula-status-danger)' : 'var(--ula-text-secondary)' }}; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
-                                                {{ $t->due_date ? $t->due_date->format('M d, Y') : '—' }}
-                                            </span>
+                                        <td onclick="event.stopPropagation();">
+                                            @if($user->can('update', $t))
+                                                <input type="date" class="pm-cell-select pm-num" aria-label="{{ __('Due Date') }}" value="{{ $t->due_date?->format('Y-m-d') }}"
+                                                       onchange="pmInlineUpdate('{{ $t->id }}', 'due_date', this.value || null, this)">
+                                            @else
+                                                <span class="pm-num" style="font-size: 12px; font-weight: 700; color: var(--ula-text-secondary);">{{ $t->due_date ? $t->due_date->format('Y-m-d') : '—' }}</span>
+                                            @endif
                                         </td>
                                         <td onclick="event.stopPropagation();">
                                             <div style="display: flex; gap: 6px; align-items: center;">
@@ -2010,6 +2026,7 @@
             </div>
 
             {{-- ── Project-management feature tabs ── --}}
+            @include('projects.partials.pm.section-calendar')
             @include('projects.partials.pm.section-settings')
 
         </main>
@@ -2314,7 +2331,7 @@
 
             // Task search/filters only apply to the task views (design-reference 35/36).
             const filterBar = document.querySelector('.hub-filter-bar');
-            if (filterBar) filterBar.style.display = (tab === 'kanban' || tab === 'tasks') ? '' : 'none';
+            if (filterBar) filterBar.style.display = ['kanban', 'tasks', 'calendar'].includes(tab) ? '' : 'none';
 
             if (window.history && window.history.pushState) {
                 window.history.pushState(null, null, '#' + tab);

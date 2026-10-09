@@ -13,6 +13,7 @@ use App\Domains\People\Controllers\ProfileController;
 use App\Domains\Projects\Controllers\ProjectController;
 use App\Domains\Projects\Controllers\TaskController;
 use App\Domains\Projects\Controllers\TimesheetController;
+use App\Domains\Projects\Controllers\SavedViewController;
 use App\Domains\Projects\Controllers\TaskLabelController;
 use App\Domains\Projects\Controllers\TimeTrackingController;
 use App\Domains\Tenancy\Controllers\BillingApiController;
@@ -284,6 +285,16 @@ Route::prefix('v1')->group(function () {
                     ->middleware('permission:tasks.edit');
                 Route::put('/tasks/{task}/assignees', [TaskLabelController::class, 'setTaskAssignees'])
                     ->middleware('permission:tasks.assign');
+
+                // ── Saved views ──
+                Route::get('/projects/{project}/views', [SavedViewController::class, 'index'])
+                    ->middleware('permission:projects.view');
+                Route::post('/projects/{project}/views', [SavedViewController::class, 'store'])
+                    ->middleware('permission:projects.view');
+                Route::patch('/projects/{project}/views/{view}', [SavedViewController::class, 'update'])
+                    ->middleware('permission:projects.view');
+                Route::delete('/projects/{project}/views/{view}', [SavedViewController::class, 'destroy'])
+                    ->middleware('permission:projects.view');
 
                 // ── Time Tracking & Live Timers ──
                 Route::get('/time/active-timer', [TimeTrackingController::class, 'getActiveTimer'])

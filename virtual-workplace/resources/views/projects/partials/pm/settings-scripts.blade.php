@@ -48,7 +48,7 @@
             PM.labels.sort((a, b) => a.name.localeCompare(b.name));
             e.target.reset();
             pmRenderLabelList();
-            showHubToast('{{ __('pm.label_created') }}');
+            showHubToast(@json(__('pm.label_created')));
         } catch (err) { showHubToast(pmEsc(err.message)); }
     }
 
@@ -62,7 +62,7 @@
 
     async function pmRenameLabel(id) {
         const label = PM.labels.find(l => l.id === id);
-        const name = prompt('{{ __('pm.rename_label') }}', label.name);
+        const name = prompt(@json(__('pm.rename_label')), label.name);
         if (!name || name.trim() === label.name) return;
         try {
             await pmApi('PATCH', `/projects/${PM.projectId}/labels/${id}`, { name: name.trim() });
@@ -72,7 +72,7 @@
     }
 
     async function pmDeleteLabel(id) {
-        if (!confirm('{{ __('pm.delete_label_confirm') }}')) return;
+        if (!confirm(@json(__('pm.delete_label_confirm')))) return;
         try {
             await pmApi('DELETE', `/projects/${PM.projectId}/labels/${id}`);
             PM.labels = PM.labels.filter(l => l.id !== id);
