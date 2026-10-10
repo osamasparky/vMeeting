@@ -1148,6 +1148,10 @@
                             <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">assignment</span> {{ __('Project Task Inventory & Sprints') }} ({{ $tasks->count() }})</h3>
                             <p style="font-size: 12px; color: var(--ula-text-muted); margin-top: 2px;">{{ __('Filter and inspect all deliverable tasks, checklist completion, and predecessor dependencies.') }}</p>
                         </div>
+                        <span class="pm-row">
+                            <x-btn variant="outline" size="sm" icon="table_view" onclick="pmExport('tasks', 'xlsx')">{{ __('pm.export_excel') }}</x-btn>
+                            <x-btn variant="outline" size="sm" icon="csv" onclick="pmExport('tasks', 'csv')">{{ __('pm.export_csv') }}</x-btn>
+                        </span>
                         <button onclick="openNewTaskModal()" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px;">
                             + {{ __('Create Task') }}
                         </button>
@@ -1366,6 +1370,10 @@
                             <h3 style="font-size: 16px; font-weight: 900; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">timer</span> {{ __('Work Sessions & Time Tracking Log') }} ({{ $project->timeEntries->count() }})</h3>
                             <p style="font-size: 12px; color: var(--ula-text-muted); margin-top: 2px;">{{ __('Chronological presence log of all billable and non-billable labor recorded on this project.') }}</p>
                         </div>
+                        <span class="pm-row">
+                            <x-btn variant="outline" size="sm" icon="table_view" onclick="pmExport('time', 'xlsx')">{{ __('pm.export_excel') }}</x-btn>
+                            <x-btn variant="outline" size="sm" icon="csv" onclick="pmExport('time', 'csv')">{{ __('pm.export_csv') }}</x-btn>
+                        </span>
                         <button onclick="openManualTimeModal()" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px;">
                             + {{ __('Log Manual Time Entry') }}
                         </button>

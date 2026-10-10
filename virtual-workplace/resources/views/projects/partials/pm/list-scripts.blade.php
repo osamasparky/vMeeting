@@ -47,6 +47,23 @@
         }
     }
 
+    /** Download tasks (with the current filters) or this project's time entries. */
+    function pmExport(kind, format) {
+        const params = new URLSearchParams({ format, lang: PM.locale });
+        let path;
+        if (kind === 'tasks') {
+            const f = getHubFilterState();
+            if (f.priority) params.set('priority', f.priority);
+            if (f.label) params.set('label_id', f.label);
+            if (f.assignee && f.assignee !== 'unassigned') params.set('assignee_id', f.assignee);
+            path = `/projects/${PM.projectId}/export/tasks`;
+        } else {
+            params.set('project_id', PM.projectId);
+            path = '/time/entries/export';
+        }
+        window.location.href = `/api/v1/organizations/${PM.orgId}${path}?${params}`;
+    }
+
     // The board is server-rendered: after edits elsewhere, opening it reloads once.
     const pmOriginalSwitchSection = switchHubSection;
     switchHubSection = function (tab) {

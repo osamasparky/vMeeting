@@ -14,6 +14,7 @@ use App\Domains\Projects\Controllers\ProjectController;
 use App\Domains\Projects\Controllers\TaskController;
 use App\Domains\Projects\Controllers\TimesheetController;
 use App\Domains\Projects\Controllers\ArchiveController;
+use App\Domains\Projects\Controllers\ExportController;
 use App\Domains\Projects\Controllers\SavedViewController;
 use App\Domains\Projects\Controllers\SprintController;
 use App\Domains\Projects\Controllers\TaskLabelController;
@@ -303,6 +304,14 @@ Route::prefix('v1')->group(function () {
                     ->middleware('permission:projects.delete');
                 Route::delete('/archive/projects/{project}', [ArchiveController::class, 'forceDeleteProject'])
                     ->middleware('permission:projects.delete');
+
+                // ── CSV / Excel exports (registered before /timesheets/{timesheet}) ──
+                Route::get('/projects/{project}/export/tasks', [ExportController::class, 'tasks'])
+                    ->middleware('permission:tasks.view');
+                Route::get('/time/entries/export', [ExportController::class, 'timeEntries'])
+                    ->middleware('permission:time.view');
+                Route::get('/timesheets/export', [ExportController::class, 'timesheets'])
+                    ->middleware('permission:timesheets.view');
 
                 // ── Task relations ──
                 Route::get('/tasks/{task}/relations', [TaskRelationController::class, 'index'])
