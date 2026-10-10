@@ -13,10 +13,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Task extends Model
 {
-    use Auditable, BelongsToOrganization, HasFactory, HasUuid;
+    use Auditable, BelongsToOrganization, HasFactory, HasUuid, SoftDeletes;
+
+    /** "Deleting" archives the task; forceDelete() removes it for good. */
+    public const DELETED_AT = 'archived_at';
 
     protected $keyType = 'string';
 
@@ -294,6 +298,26 @@ class Task extends Model
         }
     }
 
+    /** Set while restoring so subtasks archived together come back too. */
+    public $archivedAtBeforeRestore = null;
+
+    /** Milestone completion and goal progress after the task set changed. */
+    public function refreshRollups(): void
+    {
+        $this->milestone?->checkAndUpdateStatus();
+        $this->project?->goals->each->recalculateProgress();
+    }
+
+    public function relations(): HasMany
+    {
+        return $this->hasMany(TaskRelation::class, 'task_id');
+    }
+
+    public function inverseRelations(): HasMany
+    {
+        return $this->hasMany(TaskRelation::class, 'related_task_id');
+    }
+
     public function isAssignedTo(string $userId): bool
     {
         return $this->assignee_id === $userId
@@ -310,6 +334,43 @@ class Task extends Model
             }
             // The reporter and the assignee follow the task from the start.
             $task->addWatchers([$task->reporter_id, $task->assignee_id]);
+        });
+
+        // Archiving a task archives its subtasks with it; restoring brings back
+        // the ones archived in the same action. Rollups follow either way.
+        static::deleted(function (Task $task) {
+            if ($task->isForceDeleting()) {
+                return;
+            }
+            // Same timestamp as the parent, at every depth, so restore can match them.
+            $parentIds = [$task->id];
+            while ($parentIds) {
+                $children = Task::whereIn('parent_task_id', $parentIds)->pluck('id')->all();
+                if ($children) {
+                    Task::whereIn('id', $children)->update([self::DELETED_AT => $task->archived_at]);
+                }
+                $parentIds = $children;
+            }
+            $task->refreshRollups();
+        });
+        static::restoring(function (Task $task) {
+            $task->archivedAtBeforeRestore = $task->archived_at;
+        });
+        static::restored(function (Task $task) {
+            if ($task->archivedAtBeforeRestore) {
+                $parentIds = [$task->id];
+                while ($parentIds) {
+                    $children = Task::onlyTrashed()
+                        ->whereIn('parent_task_id', $parentIds)
+                        ->where(self::DELETED_AT, $task->archivedAtBeforeRestore)
+                        ->pluck('id')->all();
+                    if ($children) {
+                        Task::onlyTrashed()->whereIn('id', $children)->update([self::DELETED_AT => null]);
+                    }
+                    $parentIds = $children;
+                }
+            }
+            $task->refreshRollups();
         });
 
         static::updated(function (Task $task) {

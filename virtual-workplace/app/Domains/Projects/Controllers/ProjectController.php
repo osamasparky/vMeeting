@@ -185,7 +185,8 @@ class ProjectController extends Controller
         $project->delete();
 
         return response()->json([
-            'message' => 'Project deleted successfully.',
+            // Archived (soft delete): restorable from the archive until removed for good.
+            'message' => 'Project archived.',
         ]);
     }
 

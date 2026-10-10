@@ -1177,7 +1177,7 @@
                             </select>
                             <!-- Bulk Delete -->
                             <button onclick="bulkDeleteTasks()" style="padding: 5px 12px; border-radius: 6px; background: rgba(239,68,68,0.25); border: 1px solid rgba(239,68,68,0.5); color: var(--ula-status-danger); font-size: 11px; font-weight: 800; cursor: pointer;">
-                                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">delete</span> {{ __('Delete Selected') }}
+                                <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">inventory_2</span> {{ __('pm.archive_selected') }}
                             </button>
                         </div>
                         <button onclick="clearBulkSelection()" style="margin-inline-start: auto; padding: 5px 10px; border-radius: 6px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); font-size: 11px; cursor: pointer;">
@@ -2760,7 +2760,7 @@
 
         async function ctxActionDelete() {
             closeTaskContextMenu();
-            if (!confirm('{{ __('Are you sure you want to delete this task?') }}')) return;
+            if (!confirm(@json(__('pm.archive_task_confirm')))) return;
 
             try {
                 const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${activeCtxTaskId}`, {
@@ -2771,7 +2771,7 @@
                     alert('Error deleting task.');
                     return;
                 }
-                showHubToast('🗑️ ' + "{{ __('Task deleted.') }}");
+                showHubToast('🗑️ ' + @json(__('pm.task_archived')));
                 setTimeout(() => window.location.reload(), 400);
             } catch (err) {
                 alert('Network error deleting task.');
@@ -3092,7 +3092,7 @@
             const taskIds = getSelectedTaskIds();
             if (taskIds.length === 0) return;
 
-            if (!confirm(`{{ __('Are you sure you want to permanently delete') }} ${taskIds.length} {{ __('selected tasks?') }}`)) {
+            if (!confirm(@json(__('pm.archive_selected_confirm')).replace(':n', taskIds.length))) {
                 return;
             }
 

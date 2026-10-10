@@ -2,6 +2,7 @@
 @php
     $pmSettingsPanels = [
         ['labels', 'sell', __('pm.labels')],
+        ['archive', 'inventory_2', __('pm.archive')],
     ];
 @endphp
 <div id="hub-section-settings" class="hub-section-content" style="display: none;">
@@ -34,6 +35,28 @@
         @endif
 
         <div id="pm-label-list" class="pm-list"></div>
+    </section>
+
+    {{-- Archive --}}
+    <section id="pm-settings-archive" class="pm-panel" role="tabpanel" aria-labelledby="pm-settings-tab-archive" style="display: none;">
+        <div class="pm-panel-head">
+            <div class="ula-headline-group">
+                <h3 class="ula-headline-ar">{{ __('pm.archive_title') }}</h3>
+                @if(app()->getLocale() === 'ar')<span class="ula-headline-en">Archive</span>@endif
+                <span class="pm-muted">{{ __('pm.archive_help') }}</span>
+            </div>
+        </div>
+        <div id="pm-archive-list" class="pm-list" aria-live="polite"></div>
+
+        @if($user->isSuperAdmin() || $membership->hasPermission('projects.delete'))
+            <div class="pm-list-row" style="margin-block-start: var(--ula-space-7); border-color: var(--ula-border-danger);">
+                <div class="pm-grow">
+                    <div style="font-weight: 800;">{{ __('pm.archive_project') }}</div>
+                    <div class="pm-muted">{{ __('pm.archive_project_help') }}</div>
+                </div>
+                <x-btn variant="danger" size="md" icon="inventory_2" onclick="pmArchiveProject()">{{ __('pm.archive_project') }}</x-btn>
+            </div>
+        @endif
     </section>
 
     {{-- Further panels are included here by later features. --}}

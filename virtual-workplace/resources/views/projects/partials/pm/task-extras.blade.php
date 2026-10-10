@@ -108,6 +108,75 @@
         return pmExtrasRow(@json(__('pm.followers')), people + btn);
     });
 
+    // ── Related tasks: relates to / duplicate of ──
+    const PM_RELATION_LABELS = {
+        relates_to: @json(__('pm.rel_relates_to')),
+        duplicate_of: @json(__('pm.rel_duplicate_of')),
+        duplicated_by: @json(__('pm.rel_duplicated_by')),
+    };
+
+    PM.extraRows.push(t => {
+        const rels = t.task_relations || [];
+        const chips = rels.length ? rels.map(r => `
+            <span class="pm-label pm-label--${r.kind === 'relates_to' ? 'stone' : 'gold'}" style="gap: var(--ula-space-2);">
+                ${PM_RELATION_LABELS[r.kind] || r.kind}
+                <button type="button" style="all: unset; cursor: pointer; font-weight: 800;" onclick="openTaskInspector('${pmEsc(r.task.id)}')"><span class="pm-num">#${r.task.task_number}</span> ${pmEsc(r.task.title)}</button>
+                ${PM.can.editTasks ? `<button type="button" style="all: unset; cursor: pointer; display: inline-flex;" aria-label="{{ __('pm.remove_relation') }}" onclick="pmRemoveRelation(${r.id})"><span class="material-symbols-rounded" aria-hidden="true" style="font-size: 16px;">close</span></button>` : ''}
+            </span>`).join('') : `<span class="pm-muted">{{ __('pm.no_relations') }}</span>`;
+        const add = PM.can.editTasks
+            ? `<span class="pm-picker"><button type="button" class="pm-picker-trigger" aria-haspopup="dialog" aria-expanded="false" onclick="pmOpenRelationForm(this)"><span class="material-symbols-rounded" aria-hidden="true">add_link</span>{{ __('pm.add_relation') }}</button></span>`
+            : '';
+        return pmExtrasRow(@json(__('pm.related')), `<span class="pm-labels">${chips}</span>${add}`);
+    });
+
+    function pmOpenRelationForm(trigger) {
+        document.querySelectorAll('.pm-picker-menu').forEach(m => m.remove());
+        const t = PM.currentTask;
+        const options = PM.tasks.filter(x => x.id !== t.id)
+            .map(x => `<option value="${pmEsc(x.id)}">#${x.number} ${pmEsc(x.title)}</option>`).join('');
+        const menu = document.createElement('div');
+        menu.className = 'pm-picker-menu';
+        menu.setAttribute('role', 'dialog');
+        menu.innerHTML = `
+            <form style="display: grid; gap: var(--ula-space-3); padding: var(--ula-space-3);" onsubmit="pmAddRelation(event)">
+                <select class="pm-field" name="type" aria-label="{{ __('pm.relation_type') }}">
+                    <option value="relates_to">${PM_RELATION_LABELS.relates_to}</option>
+                    <option value="duplicate_of">${PM_RELATION_LABELS.duplicate_of}</option>
+                </select>
+                <select class="pm-field" name="related_task_id" required aria-label="{{ __('pm.related') }}">${options}</select>
+                <button type="submit" class="ula-btn ula-btn--primary ula-btn--sm">{{ __('pm.add') }}</button>
+            </form>`;
+        trigger.insertAdjacentElement('afterend', menu);
+        menu.querySelector('select').focus();
+        const close = e => {
+            if (e.type === 'keydown' && e.key !== 'Escape') return;
+            if (e.type === 'click' && (menu.contains(e.target) || trigger.contains(e.target))) return;
+            menu.remove();
+            document.removeEventListener('click', close, true);
+            document.removeEventListener('keydown', close, true);
+        };
+        setTimeout(() => { document.addEventListener('click', close, true); document.addEventListener('keydown', close, true); });
+    }
+
+    async function pmAddRelation(e) {
+        e.preventDefault();
+        const t = PM.currentTask;
+        try {
+            const data = await pmApi('POST', `/tasks/${t.id}/relations`, { type: e.target.type.value, related_task_id: e.target.related_task_id.value });
+            t.task_relations = data.relations;
+            pmRenderTaskExtras(t);
+        } catch (err) { showHubToast(pmEsc(err.message)); }
+    }
+
+    async function pmRemoveRelation(id) {
+        const t = PM.currentTask;
+        try {
+            const data = await pmApi('DELETE', `/tasks/${t.id}/relations/${id}`);
+            t.task_relations = data.relations;
+            pmRenderTaskExtras(t);
+        } catch (err) { showHubToast(pmEsc(err.message)); }
+    }
+
     async function pmToggleWatch() {
         const t = PM.currentTask;
         const following = (t.watchers || []).some(w => w.id === PM.userId);

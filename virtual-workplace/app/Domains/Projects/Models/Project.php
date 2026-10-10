@@ -12,10 +12,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Project extends Model
 {
-    use Auditable, BelongsToOrganization, HasFactory, HasUuid;
+    use Auditable, BelongsToOrganization, HasFactory, HasUuid, SoftDeletes;
+
+    /** "Deleting" archives the project; forceDelete() removes it for good. */
+    public const DELETED_AT = 'archived_at';
 
     protected $keyType = 'string';
 

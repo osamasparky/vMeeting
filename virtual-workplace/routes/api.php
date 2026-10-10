@@ -13,9 +13,11 @@ use App\Domains\People\Controllers\ProfileController;
 use App\Domains\Projects\Controllers\ProjectController;
 use App\Domains\Projects\Controllers\TaskController;
 use App\Domains\Projects\Controllers\TimesheetController;
+use App\Domains\Projects\Controllers\ArchiveController;
 use App\Domains\Projects\Controllers\SavedViewController;
 use App\Domains\Projects\Controllers\SprintController;
 use App\Domains\Projects\Controllers\TaskLabelController;
+use App\Domains\Projects\Controllers\TaskRelationController;
 use App\Domains\Projects\Controllers\TaskWatcherController;
 use App\Domains\Projects\Controllers\TimeTrackingController;
 use App\Domains\Tenancy\Controllers\BillingApiController;
@@ -287,6 +289,28 @@ Route::prefix('v1')->group(function () {
                     ->middleware('permission:tasks.edit');
                 Route::put('/tasks/{task}/assignees', [TaskLabelController::class, 'setTaskAssignees'])
                     ->middleware('permission:tasks.assign');
+
+                // ── Archive (deleting archives; restore / remove for good here) ──
+                Route::get('/archive/tasks', [ArchiveController::class, 'tasks'])
+                    ->middleware('permission:tasks.view');
+                Route::post('/archive/tasks/{task}/restore', [ArchiveController::class, 'restoreTask'])
+                    ->middleware('permission:tasks.delete');
+                Route::delete('/archive/tasks/{task}', [ArchiveController::class, 'forceDeleteTask'])
+                    ->middleware('permission:tasks.delete');
+                Route::get('/archive/projects', [ArchiveController::class, 'projects'])
+                    ->middleware('permission:projects.view');
+                Route::post('/archive/projects/{project}/restore', [ArchiveController::class, 'restoreProject'])
+                    ->middleware('permission:projects.delete');
+                Route::delete('/archive/projects/{project}', [ArchiveController::class, 'forceDeleteProject'])
+                    ->middleware('permission:projects.delete');
+
+                // ── Task relations ──
+                Route::get('/tasks/{task}/relations', [TaskRelationController::class, 'index'])
+                    ->middleware('permission:tasks.view');
+                Route::post('/tasks/{task}/relations', [TaskRelationController::class, 'store'])
+                    ->middleware('permission:tasks.edit');
+                Route::delete('/tasks/{task}/relations/{relation}', [TaskRelationController::class, 'destroy'])
+                    ->middleware('permission:tasks.edit');
 
                 // ── Following tasks ──
                 Route::post('/tasks/{task}/watch', [TaskWatcherController::class, 'store'])

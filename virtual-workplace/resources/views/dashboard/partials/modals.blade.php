@@ -1438,7 +1438,7 @@
         <div class="ctx-divider"></div>
 
         <a href="javascript:void(0)" class="ctx-item danger" onclick="ctxActionDelete()">
-            <span><span class="ctx-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">delete</span></span>{{ __('Delete Task') }}</span>
+            <span><span class="ctx-icon"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">inventory_2</span></span>{{ __('pm.archive_task') }}</span>
             <span style="font-size: 10px; color: var(--ula-status-danger); font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">Del</span>
         </a>
     </div>

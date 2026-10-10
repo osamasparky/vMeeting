@@ -146,6 +146,7 @@ class TaskController extends Controller
             'assignees:id,name,email',
             'watchers:id,name',
         ]);
+        $task->setAttribute('task_relations', TaskRelationController::present($task));
 
         $auditLogs = $this->getTaskActivityLog($task, 30);
 
@@ -300,10 +301,11 @@ class TaskController extends Controller
 
         Gate::authorize('delete', $task);
 
+        // Archives (soft delete); see ArchiveController for restore / permanent delete.
         $task->delete();
 
         return response()->json([
-            'message' => 'Task deleted successfully.',
+            'message' => 'Task archived.',
         ]);
     }
 
@@ -349,9 +351,8 @@ class TaskController extends Controller
 
         if ($action === 'delete') {
             $affected = $tasks->count();
-            Task::where('organization_id', $organization->id)
-                ->whereIn('id', $tasks->pluck('id'))
-                ->delete();
+            // Archive one by one so subtasks and rollups follow (model events).
+            $tasks->each->delete();
         } elseif ($action === 'update_status') {
             $statusAction = app(UpdateTaskStatusAction::class);
             foreach ($tasks as $task) {

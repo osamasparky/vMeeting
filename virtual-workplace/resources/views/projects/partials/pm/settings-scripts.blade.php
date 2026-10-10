@@ -80,6 +80,52 @@
         } catch (err) { showHubToast(pmEsc(err.message)); }
     }
 
+    // ── Archive ──────────────────────────────────────────────────────────
+    async function pmLoadArchive() {
+        const list = document.getElementById('pm-archive-list');
+        if (!list) return;
+        try {
+            const data = await pmApi('GET', `/archive/tasks?project_id=${PM.projectId}`);
+            const rows = data.data || [];
+            list.innerHTML = rows.length ? rows.map(t => `
+                <div class="pm-list-row">
+                    <span class="pm-num pm-muted">#${t.task_number}</span>
+                    <span class="pm-grow" style="font-weight: 700;">${pmEsc(t.title)}</span>
+                    <span class="pm-muted">{{ __('pm.archived_on') }} <span class="pm-num">${pmEsc((t.archived_at || '').slice(0, 10))}</span></span>
+                    ${PM.can.deleteTasks ? `
+                        <button type="button" class="ula-btn ula-btn--secondary ula-btn--sm" onclick="pmRestoreTask('${pmEsc(t.id)}')"><span class="material-symbols-rounded" aria-hidden="true">unarchive</span><span>{{ __('pm.restore') }}</span></button>
+                        <button type="button" class="ula-btn ula-btn--ghost ula-btn--sm" onclick="pmPurgeTask('${pmEsc(t.id)}')"><span class="material-symbols-rounded" aria-hidden="true">delete_forever</span><span>{{ __('pm.delete_forever') }}</span></button>` : ''}
+                </div>`).join('') : `<div class="pm-empty">{{ __('pm.archive_empty') }}</div>`;
+        } catch (e) { list.innerHTML = `<div class="pm-empty">${pmEsc(e.message)}</div>`; }
+    }
+
+    async function pmRestoreTask(id) {
+        try {
+            await pmApi('POST', `/archive/tasks/${id}/restore`);
+            PM.dirty = true;
+            showHubToast(@json(__('pm.task_restored')));
+            pmLoadArchive();
+        } catch (e) { showHubToast(pmEsc(e.message)); }
+    }
+
+    async function pmPurgeTask(id) {
+        if (!confirm(@json(__('pm.delete_forever_confirm')))) return;
+        try {
+            await pmApi('DELETE', `/archive/tasks/${id}`);
+            pmLoadArchive();
+        } catch (e) { showHubToast(pmEsc(e.message)); }
+    }
+
+    async function pmArchiveProject() {
+        if (!confirm(@json(__('pm.archive_project_confirm')))) return;
+        try {
+            await pmApi('DELETE', `/projects/${PM.projectId}`);
+            window.location.href = @json(route('dashboard')) + '#projects';
+        } catch (e) { showHubToast(pmEsc(e.message)); }
+    }
+
+    document.addEventListener('pm:settings-panel', e => { if (e.detail === 'archive') pmLoadArchive(); });
+
     document.addEventListener('DOMContentLoaded', () => {
         pmPickNewLabelTone(PM.newLabelTone);
         pmRenderLabelList();

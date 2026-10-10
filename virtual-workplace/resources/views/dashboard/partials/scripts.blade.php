@@ -1854,7 +1854,7 @@
 
         async function ctxActionDelete() {
             closeTaskContextMenu();
-            if (!confirm('{{ __('Are you sure you want to delete this task?') }}')) return;
+            if (!confirm(@json(__('pm.archive_task_confirm')))) return;
 
             try {
                 const res = await fetch(`/api/v1/organizations/${ORG_ID}/tasks/${activeCtxTaskId}`, {
@@ -1871,7 +1871,7 @@
                 const row = document.querySelector(`.alltask-row[data-id="${activeCtxTaskId}"]`);
                 if (row) row.remove();
                 filterAllTasksTable();
-                showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">delete</span> ' + "{{ __('Task deleted.') }}");
+                showToastNotification('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">delete</span> ' + @json(__('pm.task_archived')));
             } catch (err) {
                 alert('Network error deleting task.');
             }

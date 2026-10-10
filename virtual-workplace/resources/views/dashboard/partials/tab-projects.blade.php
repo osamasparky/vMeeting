@@ -127,4 +127,54 @@
             </table>
         </div>
     </div>
+
+    {{-- Archived projects: restore or delete for good --}}
+    @php
+        $pmArchivedProjects = \App\Domains\Projects\Models\Project::onlyTrashed()
+            ->where('organization_id', $organization->id)->latest('archived_at')->get(['id', 'name', 'code', 'archived_at']);
+        $pmCanManageArchive = $user->isSuperAdmin() || $membership->hasPermission('projects.delete');
+    @endphp
+    @if($pmArchivedProjects->isNotEmpty())
+        <details class="pm-panel" style="margin-block-start: var(--ula-space-6);">
+            <summary class="pm-row" style="cursor: pointer; min-block-size: var(--ula-size-touch-target);">
+                <span class="material-symbols-rounded" aria-hidden="true">inventory_2</span>
+                <span style="font-weight: 800;">{{ __('pm.archived_projects') }}</span>
+                <span class="pm-label pm-label--stone pm-num">{{ $pmArchivedProjects->count() }}</span>
+            </summary>
+            <div class="pm-list" style="margin-block-start: var(--ula-space-4);">
+                @foreach($pmArchivedProjects as $ap)
+                    <div class="pm-list-row" id="pm-archived-project-{{ $ap->id }}">
+                        <span class="pm-num pm-muted">{{ $ap->code }}</span>
+                        <span class="pm-grow" style="font-weight: 700;">{{ $ap->name }}</span>
+                        <span class="pm-muted">{{ __('pm.archived_on') }} <span class="pm-num">{{ $ap->archived_at?->format('Y-m-d') }}</span></span>
+                        @if($pmCanManageArchive)
+                            <x-btn variant="secondary" size="sm" icon="unarchive" onclick="pmRestoreProject('{{ $ap->id }}')">{{ __('pm.restore') }}</x-btn>
+                            <x-btn variant="ghost" size="sm" icon="delete_forever" onclick="pmPurgeProject('{{ $ap->id }}')">{{ __('pm.delete_forever') }}</x-btn>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        </details>
+        <script nonce="{{ $cspNonce ?? '' }}">
+            async function pmArchiveCall(method, url) {
+                const res = await fetch(url, { method, credentials: 'same-origin', headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content } });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) throw new Error(data.message || `HTTP ${res.status}`);
+                return data;
+            }
+            async function pmRestoreProject(id) {
+                try {
+                    await pmArchiveCall('POST', `/api/v1/organizations/{{ $organization->id }}/archive/projects/${id}/restore`);
+                    window.location.reload();
+                } catch (e) { alert(e.message); }
+            }
+            async function pmPurgeProject(id) {
+                if (!confirm(@json(__('pm.delete_project_forever_confirm')))) return;
+                try {
+                    await pmArchiveCall('DELETE', `/api/v1/organizations/{{ $organization->id }}/archive/projects/${id}`);
+                    document.getElementById(`pm-archived-project-${id}`)?.remove();
+                } catch (e) { alert(e.message); }
+            }
+        </script>
+    @endif
 </div>
