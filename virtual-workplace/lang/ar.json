@@ -3555,5 +3555,16 @@
     "pm.notif_total": "إشعار",
     "pm.notif_empty": "لا توجد إشعارات هنا.",
     "pm.notif_load_more": "عرض المزيد",
-    "pm.notif_view_all": "عرض كل الإشعارات"
+    "pm.notif_view_all": "عرض كل الإشعارات",
+    "Timer stopped and time logged.": "تم إيقاف المؤقت وتسجيل الوقت.",
+    "Could not update the timer.": "تعذّر تحديث المؤقت.",
+    "pm.project_views": "أقسام المشروع",
+    "pm.more_views": "المزيد",
+    "pm.tabs_planning": "التخطيط",
+    "pm.tabs_collaboration": "التعاون",
+    "pm.tabs_admin": "الإدارة",
+    "pm.overdue_tasks": "مهام متأخرة",
+    "pm.tab_files": "الملفات",
+    "pm.tab_comments": "التعليقات",
+    "pm.tab_dependencies": "الارتباطات"
 }

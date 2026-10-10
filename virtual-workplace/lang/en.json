@@ -3555,5 +3555,16 @@
     "pm.notif_total": "notifications",
     "pm.notif_empty": "No notifications here.",
     "pm.notif_load_more": "Load more",
-    "pm.notif_view_all": "View all notifications"
+    "pm.notif_view_all": "View all notifications",
+    "Timer stopped and time logged.": "Timer stopped and time logged.",
+    "Could not update the timer.": "Could not update the timer.",
+    "pm.project_views": "Project views",
+    "pm.more_views": "More",
+    "pm.tabs_planning": "Planning",
+    "pm.tabs_collaboration": "Collaboration",
+    "pm.tabs_admin": "Administration",
+    "pm.overdue_tasks": "Overdue tasks",
+    "pm.tab_files": "Files",
+    "pm.tab_comments": "Comments",
+    "pm.tab_dependencies": "Dependencies"
 }

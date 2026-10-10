@@ -1120,23 +1120,25 @@ body, button, input, select, textarea, optgroup {
    ========================================================================== */
 .task-modal-segmented-bar {
   display: flex !important;
-  gap: 6px !important;
+  gap: 4px !important;
   background: var(--ula-surface-page-alt, #f4ede1) !important;
   padding: 5px !important;
   border-radius: 14px !important;
   border: 1px solid var(--ula-border-subtle, #e8e4dc) !important;
   margin-bottom: 18px !important;
-  overflow-x: auto !important;
-  scrollbar-width: none !important;
+  /* Wrap instead of scrolling, so no tab is ever hidden past the edge. */
+  flex-wrap: wrap !important;
+  overflow: visible !important;
 }
 .task-modal-segmented-bar::-webkit-scrollbar {
   display: none !important;
 }
 
 .task-modal-tab-btn {
-  height: 38px !important;
-  min-height: 38px !important;
-  padding: 0 16px !important;
+  height: var(--ula-size-touch-target, 44px) !important;
+  min-height: var(--ula-size-touch-target, 44px) !important;
+  padding: 0 10px !important;
+  flex: 1 1 auto !important;
   border-radius: 10px !important;
   font-size: 13px !important;
   font-weight: 700 !important;
@@ -1144,7 +1146,7 @@ body, button, input, select, textarea, optgroup {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 7px !important;
+  gap: 5px !important;
   cursor: pointer !important;
   white-space: nowrap !important;
   transition: all var(--ula-duration-fast, 160ms) var(--ula-ease-out, ease-out) !important;

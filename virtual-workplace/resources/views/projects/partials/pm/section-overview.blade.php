@@ -19,17 +19,29 @@
     $ovHealthIcon = ['on_track' => 'rocket_launch', 'at_risk' => 'warning', 'off_track' => 'error'];
 @endphp
 <div id="hub-section-overview" class="hub-section-content" style="display: none;">
-    <div class="pm-ov-grid">
+    {{-- What needs attention, at a glance --}}
+    <dl class="pm-ov-stats" aria-label="{{ __('pm.needs_attention') }}">
+        <div class="{{ $ovOverdue->isNotEmpty() ? 'is-alert' : '' }}">
+            <dt>@if($ovOverdue->isNotEmpty())<span class="material-symbols-rounded" aria-hidden="true">warning</span>@endif{{ __('Overdue') }}</dt>
+            <dd class="pm-num">{{ $ovOverdue->count() }}</dd>
+        </div>
+        <div><dt>{{ __('pm.due_this_week') }}</dt><dd class="pm-num">{{ $ovDueWeek->count() }}</dd></div>
+        <div><dt>{{ __('Unassigned') }}</dt><dd class="pm-num">{{ $ovUnassigned->count() }}</dd></div>
+        <div><dt>{{ __('pm.done_this_week') }}</dt><dd class="pm-num">{{ $ovDoneWeek->count() }}</dd></div>
+    </dl>
+
+    <div class="pm-ov-layout">
+        <div class="pm-ov-side">
         {{-- Health + updates --}}
-        <section class="pm-panel pm-ov-wide" aria-labelledby="pm-ov-health-title">
+        <section class="pm-panel pm-ov-main" aria-labelledby="pm-ov-health-title">
             <div class="pm-panel-head">
                 <div class="ula-headline-group">
                     <h3 class="ula-headline-ar" id="pm-ov-health-title">{{ __('pm.project_health') }}</h3>
                     @if(app()->getLocale() === 'ar')<span class="ula-headline-en">Project health</span>@endif
                 </div>
                 @if($ovLatest)
-                    <span class="pm-label pm-label--{{ $ovHealthTone[$ovLatest->health] }}" style="font-size: var(--ula-size-sm); padding-block: var(--ula-space-2); gap: var(--ula-space-2);">
-                        <span class="material-symbols-rounded" aria-hidden="true" style="font-size: 18px;">{{ $ovHealthIcon[$ovLatest->health] }}</span>
+                    <span class="pm-label pm-label--{{ $ovHealthTone[$ovLatest->health] }} pm-ov-health-now">
+                        <span class="material-symbols-rounded" aria-hidden="true">{{ $ovHealthIcon[$ovLatest->health] }}</span>
                         {{ __('pm.health_'.$ovLatest->health) }}
                     </span>
                 @else
@@ -38,48 +50,29 @@
             </div>
 
             <form class="pm-ov-update-form" onsubmit="pmPostUpdate(event)">
-                <div class="pm-row" role="radiogroup" aria-label="{{ __('pm.project_health') }}">
+                <fieldset class="pm-ov-health-set">
+                    <legend class="pm-extras-label">{{ __('pm.project_health') }}</legend>
                     @foreach(['on_track', 'at_risk', 'off_track'] as $h)
-                        <label class="pm-ov-health-choice">
+                        <label class="pm-ov-health-choice pm-ov-health-choice--{{ $ovHealthTone[$h] }}">
                             <input type="radio" name="health" value="{{ $h }}" @checked($h === ($ovLatest->health ?? 'on_track'))>
-                            <span class="pm-label pm-label--{{ $ovHealthTone[$h] }}" style="gap: var(--ula-space-2);">
-                                <span class="material-symbols-rounded" aria-hidden="true" style="font-size: 16px;">{{ $ovHealthIcon[$h] }}</span>{{ __('pm.health_'.$h) }}
-                            </span>
+                            <span class="material-symbols-rounded" aria-hidden="true">{{ $ovHealthIcon[$h] }}</span>
+                            <span>{{ __('pm.health_'.$h) }}</span>
                         </label>
                     @endforeach
-                </div>
+                </fieldset>
                 <textarea class="pm-field" name="body" rows="3" maxlength="5000" required placeholder="{{ __('pm.update_placeholder') }}" aria-label="{{ __('pm.update_placeholder') }}"></textarea>
                 <div><x-btn type="submit" variant="primary" size="md" icon="campaign">{{ __('pm.post_update') }}</x-btn></div>
             </form>
 
-            <div id="pm-update-feed" class="pm-list" style="margin-block-start: var(--ula-space-5);" aria-live="polite"></div>
-        </section>
-
-        {{-- Key numbers --}}
-        <section class="pm-panel" aria-labelledby="pm-ov-attention-title">
-            <h3 class="pm-extras-label" id="pm-ov-attention-title" style="margin: 0 0 var(--ula-space-4);">{{ __('pm.needs_attention') }}</h3>
-            <dl class="pm-ov-stats">
-                <div><dt>{{ __('Overdue') }}</dt><dd class="pm-num">{{ $ovOverdue->count() }}</dd></div>
-                <div><dt>{{ __('pm.due_this_week') }}</dt><dd class="pm-num">{{ $ovDueWeek->count() }}</dd></div>
-                <div><dt>{{ __('Unassigned') }}</dt><dd class="pm-num">{{ $ovUnassigned->count() }}</dd></div>
-                <div><dt>{{ __('pm.done_this_week') }}</dt><dd class="pm-num">{{ $ovDoneWeek->count() }}</dd></div>
-            </dl>
-            @if($ovOverdue->isNotEmpty())
-                <div class="pm-list" style="margin-block-start: var(--ula-space-4);">
-                    @foreach($ovOverdue->take(5) as $ot)
-                        <button type="button" class="pm-list-row pm-sprint-row" onclick="openTaskInspector('{{ $ot->id }}')">
-                            <span class="pm-num pm-muted">#{{ $ot->task_number }}</span>
-                            <span class="pm-grow" style="font-weight: 700;">{{ $ot->title }}</span>
-                            <span class="pm-num" style="color: var(--ula-text-danger);">{{ $ot->due_date->format('Y-m-d') }}</span>
-                        </button>
-                    @endforeach
-                </div>
-            @endif
+            <div id="pm-update-feed" class="pm-list pm-ov-feed" aria-live="polite"></div>
         </section>
 
         {{-- Progress by stage --}}
         <section class="pm-panel" aria-labelledby="pm-ov-stage-title">
-            <h3 class="pm-extras-label" id="pm-ov-stage-title" style="margin: 0 0 var(--ula-space-4);">{{ __('pm.tasks_by_stage') }}</h3>
+            <div class="ula-headline-group pm-ov-card-head">
+                <h3 class="ula-headline-ar" id="pm-ov-stage-title">{{ __('pm.tasks_by_stage') }}</h3>
+                @if(app()->getLocale() === 'ar')<span class="ula-headline-en">Tasks by stage</span>@endif
+            </div>
             <div class="pm-ov-bars" role="list">
                 @foreach($ovStages as $stage)
                     <div class="pm-ov-bar-row" role="listitem">
@@ -89,24 +82,59 @@
                     </div>
                 @endforeach
             </div>
-            <p class="pm-muted" style="margin: var(--ula-space-4) 0 0;">
-                {{ __('pm.overall_progress') }}: <span class="pm-num">{{ $kpis['progress_pct'] ?? 0 }}%</span>
+            <p class="pm-ov-progress">
+                <span>{{ __('pm.overall_progress') }}</span>
+                <span class="pm-ov-progress-track" aria-hidden="true"><span style="inline-size: {{ $kpis['progress_pct'] ?? 0 }}%;"></span></span>
+                <strong class="pm-num">{{ $kpis['progress_pct'] ?? 0 }}%</strong>
             </p>
         </section>
 
-        {{-- Upcoming milestones --}}
-        <section class="pm-panel" aria-labelledby="pm-ov-ms-title">
-            <h3 class="pm-extras-label" id="pm-ov-ms-title" style="margin: 0 0 var(--ula-space-4);">{{ __('pm.upcoming_milestones') }}</h3>
-            @forelse($ovMilestones as $oms)
-                <div class="pm-list-row" style="margin-block-end: var(--ula-space-2);">
-                    <span class="material-symbols-rounded" aria-hidden="true" style="color: var(--ula-icon-accent);">flag</span>
-                    <span class="pm-grow" style="font-weight: 700;">{{ $oms->name }}</span>
-                    <span class="pm-muted pm-num">{{ $oms->due_date?->format('Y-m-d') ?? '—' }}</span>
-                    <span class="pm-num">{{ $oms->progress_percentage }}%</span>
+        </div>
+
+        <div class="pm-ov-side">
+            {{-- Overdue work --}}
+            @if($ovOverdue->isNotEmpty())
+                <section class="pm-panel" aria-labelledby="pm-ov-overdue-title">
+                    <div class="ula-headline-group pm-ov-card-head">
+                        <h3 class="ula-headline-ar" id="pm-ov-overdue-title">{{ __('pm.overdue_tasks') }}</h3>
+                        @if(app()->getLocale() === 'ar')<span class="ula-headline-en">Overdue tasks</span>@endif
+                    </div>
+                    <div class="pm-list">
+                        @foreach($ovOverdue->take(5) as $ot)
+                            <button type="button" class="pm-ov-task" onclick="openTaskInspector('{{ $ot->id }}')">
+                                <span class="pm-ov-task-title" dir="auto">{{ $ot->title }}</span>
+                                <span class="pm-ov-task-meta">
+                                    <span class="pm-num pm-muted">#{{ $ot->task_number }}</span>
+                                    <span class="pm-num pm-ov-late">{{ $ot->due_date->format('Y-m-d') }}</span>
+                                </span>
+                            </button>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
+
+            {{-- Upcoming milestones --}}
+            <section class="pm-panel" aria-labelledby="pm-ov-ms-title">
+                <div class="ula-headline-group pm-ov-card-head">
+                    <h3 class="ula-headline-ar" id="pm-ov-ms-title">{{ __('pm.upcoming_milestones') }}</h3>
+                    @if(app()->getLocale() === 'ar')<span class="ula-headline-en">Upcoming milestones</span>@endif
                 </div>
-            @empty
-                <div class="pm-empty">{{ __('pm.no_upcoming_milestones') }}</div>
-            @endforelse
-        </section>
+                @forelse($ovMilestones as $oms)
+                    <div class="pm-ov-ms">
+                        <span class="material-symbols-rounded pm-ov-ms-icon" aria-hidden="true">flag</span>
+                        <div class="pm-ov-ms-body">
+                            <span class="pm-ov-ms-name" dir="auto">{{ $oms->name }}</span>
+                            <span class="pm-ov-ms-meta">
+                                <span class="pm-num pm-muted">{{ $oms->due_date?->format('Y-m-d') ?? '—' }}</span>
+                                <span class="pm-ov-progress-track" aria-hidden="true"><span style="inline-size: {{ $oms->progress_percentage }}%;"></span></span>
+                                <span class="pm-num">{{ $oms->progress_percentage }}%</span>
+                            </span>
+                        </div>
+                    </div>
+                @empty
+                    <div class="pm-empty">{{ __('pm.no_upcoming_milestones') }}</div>
+                @endforelse
+            </section>
+        </div>
     </div>
 </div>

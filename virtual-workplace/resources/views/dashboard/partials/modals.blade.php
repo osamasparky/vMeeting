@@ -560,9 +560,9 @@
                             <option value="done">{{ __('Done') }}</option>
                         </select>
                     </div>
-                    <div class="task-modal-chip" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; font-weight: 800; color: var(--ula-palm-900);">
-                        <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-status-success);">timer</span>
-                        <span id="task-modal-hours">0.00h / 0.00h</span>
+                    <div class="task-modal-chip">
+                        <span class="material-symbols-rounded" aria-hidden="true" style="font-size: 16px; color: var(--ula-status-success);">timer</span>
+                        <span id="task-modal-hours"></span>
                     </div>
                 </div>
 
@@ -586,17 +586,17 @@
                 </button>
                 <button type="button" onclick="switchTaskInspectorTab('attachments')" id="task-tab-btn-attachments" class="task-modal-tab-btn">
                     <span class="material-symbols-rounded" style="font-size: 17px;">attach_file</span>
-                    <span>{{ __('Files') }}</span>
+                    <span>{{ __('pm.tab_files') }}</span>
                     <span id="task-attachments-count" class="task-modal-tab-count">0</span>
                 </button>
                 <button type="button" onclick="switchTaskInspectorTab('comments')" id="task-tab-btn-comments" class="task-modal-tab-btn">
                     <span class="material-symbols-rounded" style="font-size: 17px;">chat_bubble</span>
-                    <span>{{ __('Discussions') }}</span>
+                    <span>{{ __('pm.tab_comments') }}</span>
                     <span id="task-comments-count" class="task-modal-tab-count">0</span>
                 </button>
                 <button type="button" onclick="switchTaskInspectorTab('dependencies')" id="task-tab-btn-dependencies" class="task-modal-tab-btn">
                     <span class="material-symbols-rounded" style="font-size: 17px;">link</span>
-                    <span>{{ __('Dependencies') }}</span>
+                    <span>{{ __('pm.tab_dependencies') }}</span>
                     <span id="task-dependencies-count" class="task-modal-tab-count">0</span>
                 </button>
                 <button type="button" onclick="switchTaskInspectorTab('timelog')" id="task-tab-btn-timelog" class="task-modal-tab-btn">

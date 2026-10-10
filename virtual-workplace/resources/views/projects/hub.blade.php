@@ -1012,13 +1012,49 @@
             </div>
 
             <!-- ── 5. VIEW TABS (underline, design-reference 35) ── -->
-            <div class="hub-tabs-nav ula-hub-tabs" role="tablist">
-                @foreach($hubTabs as [$tabKey, $tabIcon, $tabLabel])
-                    <button type="button" role="tab" onclick="switchHubSection('{{ $tabKey }}')" id="hub-nav-btn-{{ $tabKey }}" class="hub-tab-btn ula-hub-tab{{ $loop->first ? ' active' : '' }}">
-                        <span class="material-symbols-rounded">{{ $tabIcon }}</span>{{ __($tabLabel) }}
+            {{-- The main views stay visible; the rest sit in a grouped "More" menu.
+                 Picking one from the menu shows it on the More button. --}}
+            @php
+                $hubPrimary = ['overview', 'kanban', 'tasks', 'calendar', 'gantt', 'sprints'];
+                $hubTabMap = collect($hubTabs)->keyBy(0);
+                $hubMoreGroups = [
+                    'pm.tabs_planning' => ['goals', 'milestones', 'workload'],
+                    'pm.tabs_collaboration' => ['intake', 'docs', 'files', 'meetings', 'team'],
+                    'pm.tabs_admin' => ['timelog', 'settings'],
+                ];
+            @endphp
+            <nav class="pm-tabs" aria-label="{{ __('pm.project_views') }}">
+                <div class="pm-tabs-primary" role="tablist">
+                    @foreach($hubPrimary as $tabKey)
+                        @php [, $tabIcon, $tabLabel] = $hubTabMap[$tabKey]; @endphp
+                        <button type="button" role="tab" onclick="switchHubSection('{{ $tabKey }}')" id="hub-nav-btn-{{ $tabKey }}" aria-controls="hub-section-{{ $tabKey }}"
+                                class="hub-tab-btn pm-tab{{ $loop->first ? ' active' : '' }}">
+                            <span class="material-symbols-rounded" aria-hidden="true">{{ $tabIcon }}</span><span>{{ __($tabLabel) }}</span>
+                        </button>
+                    @endforeach
+                </div>
+                <div class="pm-tabs-more">
+                    <button type="button" class="pm-tab pm-tab-more-btn" id="hub-more-btn" aria-haspopup="true" aria-expanded="false" aria-controls="hub-more-menu" onclick="hubToggleMoreMenu()">
+                        <span class="material-symbols-rounded" aria-hidden="true" id="hub-more-icon">apps</span>
+                        <span id="hub-more-label">{{ __('pm.more_views') }}</span>
+                        <span class="material-symbols-rounded pm-tab-more-caret" aria-hidden="true">expand_more</span>
                     </button>
-                @endforeach
-            </div>
+                    <div class="pm-tabs-menu" id="hub-more-menu" hidden>
+                        @foreach($hubMoreGroups as $groupLabel => $groupKeys)
+                            <div class="pm-tabs-menu-group" role="group" aria-label="{{ __($groupLabel) }}">
+                                <span class="pm-tabs-menu-title" aria-hidden="true">{{ __($groupLabel) }}</span>
+                                @foreach($groupKeys as $tabKey)
+                                    @php [, $tabIcon, $tabLabel] = $hubTabMap[$tabKey]; @endphp
+                                    <button type="button" onclick="switchHubSection('{{ $tabKey }}'); hubToggleMoreMenu(false);" id="hub-nav-btn-{{ $tabKey }}"
+                                            class="hub-tab-btn pm-tabs-menu-item" data-icon="{{ $tabIcon }}" data-label="{{ __($tabLabel) }}">
+                                        <span class="material-symbols-rounded" aria-hidden="true">{{ $tabIcon }}</span><span>{{ __($tabLabel) }}</span>
+                                    </button>
+                                @endforeach
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </nav>
 
             <!-- ── 6. SUB-TAB VIEWS ── -->
 
@@ -2355,6 +2391,8 @@
 
             if (target) target.style.display = 'block';
             if (btn) btn.classList.add('active');
+            document.querySelectorAll('.pm-tabs-primary .hub-tab-btn').forEach(el => el.setAttribute('aria-selected', String(el === btn)));
+            hubSyncMoreTab(btn);
 
             // Task search/filters only apply to the task views (design-reference 35/36).
             const filterBar = document.querySelector('.hub-filter-bar');
@@ -2369,6 +2407,38 @@
                 setTimeout(() => initFrappeGantt(), 80);
             }
         }
+
+        // ── "More" views menu ──
+        function hubSyncMoreTab(btn) {
+            const more = document.getElementById('hub-more-btn');
+            if (!more) return;
+            const inMenu = btn && btn.classList.contains('pm-tabs-menu-item');
+            more.classList.toggle('active', inMenu);
+            document.getElementById('hub-more-icon').textContent = inMenu ? btn.dataset.icon : 'apps';
+            document.getElementById('hub-more-label').textContent = inMenu ? btn.dataset.label : @json(__('pm.more_views'));
+            document.querySelectorAll('.pm-tabs-menu-item').forEach(el => el.setAttribute('aria-current', String(el === btn)));
+        }
+
+        function hubToggleMoreMenu(force) {
+            const menu = document.getElementById('hub-more-menu');
+            const btn = document.getElementById('hub-more-btn');
+            if (!menu || !btn) return;
+            const open = force === undefined ? menu.hidden : force;
+            menu.hidden = !open;
+            btn.setAttribute('aria-expanded', String(open));
+            if (open) (menu.querySelector('[aria-current="true"]') || menu.querySelector('button'))?.focus();
+        }
+
+        document.addEventListener('click', e => {
+            const wrap = document.querySelector('.pm-tabs-more');
+            if (wrap && !wrap.contains(e.target)) hubToggleMoreMenu(false);
+        });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && !document.getElementById('hub-more-menu')?.hidden) {
+                hubToggleMoreMenu(false);
+                document.getElementById('hub-more-btn')?.focus();
+            }
+        });
 
         // Restore active tab from hash
         window.addEventListener('DOMContentLoaded', () => {
@@ -2720,6 +2790,59 @@
         function ctxActionStartTimer() {
             closeTaskContextMenu();
             startTaskDirectTimer(activeCtxProjectId, activeCtxTaskId);
+        }
+
+        // ── Timer from the task inspector and the task cards ──
+        // One button: starts this task's timer, or stops it when it is the one running.
+        async function hubTimerCall(path, method = 'GET', body) {
+            const res = await fetch(`/api/v1/organizations/${ORG_ID}/time/${path}`, {
+                method,
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN },
+                body: body ? JSON.stringify(body) : undefined,
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(data.message || "{{ __('Could not update the timer.') }}");
+            return data;
+        }
+
+        function renderInspectorTimerButton(running) {
+            const btn = document.getElementById('task-modal-timer-btn');
+            if (!btn) return;
+            btn.classList.toggle('is-running', running);
+            btn.setAttribute('aria-pressed', String(running));
+            btn.innerHTML = running
+                ? `<span class="material-symbols-rounded ula-btn__icon" aria-hidden="true">stop_circle</span><span>{{ __('Stop Timer') }}</span>`
+                : `<span class="material-symbols-rounded ula-btn__icon" aria-hidden="true">play_arrow</span><span>{{ __('Start Timer') }}</span>`;
+        }
+
+        async function syncInspectorTimer(taskId) {
+            try {
+                const { timer } = await hubTimerCall('active-timer');
+                renderInspectorTimerButton(!!timer && timer.task_id === taskId);
+            } catch (e) { renderInspectorTimerButton(false); }
+        }
+
+        async function startHubTaskTimerDirect(projectId, taskId) {
+            const btn = document.getElementById('task-modal-timer-btn');
+            if (btn) btn.disabled = true;
+            try {
+                const { timer } = await hubTimerCall('active-timer');
+                if (timer && timer.task_id === taskId) {
+                    await hubTimerCall('timer/stop', 'POST', {});
+                    showHubToast('⏹️ ' + "{{ __('Timer stopped and time logged.') }}");
+                    renderInspectorTimerButton(false);
+                } else {
+                    // Starting here stops (and logs) any other running timer.
+                    await hubTimerCall('timer/start', 'POST', { project_id: projectId, task_id: taskId });
+                    showHubToast('⏱️ ' + "{{ __('Timer started!') }}");
+                    renderInspectorTimerButton(true);
+                }
+            } catch (err) {
+                showHubToast(pmEsc(err.message));
+            } finally {
+                if (btn) btn.disabled = false;
+            }
         }
 
         async function ctxActionDuplicate() {
@@ -3728,7 +3851,9 @@
                 statusSelect.value = t.status || 'backlog';
             }
             document.getElementById('task-modal-description').textContent = t.description || '{{ __("No description provided.") }}';
-            document.getElementById('task-modal-hours').textContent = `${t.estimated_hours || 0} {{ __("Estimated Hours") }} / ${t.actual_hours || 0} {{ __("Logged Hours") }}`;
+            // Only the numbers are isolated in the mono face; the Arabic labels keep the text font.
+            document.getElementById('task-modal-hours').innerHTML =
+                `{{ __("Logged Hours") }} <strong class="pm-num">${Number(t.actual_hours || 0)}</strong> / {{ __("Estimated Hours") }} <strong class="pm-num">${Number(t.estimated_hours || 0)}</strong>`;
 
             // Approval Banner logic
             const appBanner = document.getElementById('task-modal-approval-banner');
@@ -3769,7 +3894,8 @@
             if (timerBtn) {
                 const pId = t.project_id || '{{ $project->id ?? "" }}';
                 const pName = t.project ? t.project.name : '{{ $project->name ?? "Project" }}';
-                timerBtn.onclick = () => startHubTaskTimerDirect(pId, t.id, t.title, pName);
+                timerBtn.onclick = () => startHubTaskTimerDirect(pId, t.id);
+                syncInspectorTimer(t.id);
             }
 
             // Checklist

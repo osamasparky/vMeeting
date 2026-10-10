@@ -2044,7 +2044,9 @@
 
             document.getElementById('task-modal-status-select').value = t.status || 'backlog';
             document.getElementById('task-modal-description').textContent = t.description || '{{ __("No description provided.") }}';
-            document.getElementById('task-modal-hours').textContent = `${t.estimated_hours || 0} {{ __("Estimated Hours") }} / ${t.actual_hours || 0} {{ __("Logged Hours") }}`;
+            // Only the numbers are isolated in the mono face; the Arabic labels keep the text font.
+            document.getElementById('task-modal-hours').innerHTML =
+                `{{ __("Logged Hours") }} <strong class="pm-num">${Number(t.actual_hours || 0)}</strong> / {{ __("Estimated Hours") }} <strong class="pm-num">${Number(t.estimated_hours || 0)}</strong>`;
 
             // Approval Banner logic
             const appBanner = document.getElementById('task-modal-approval-banner');
