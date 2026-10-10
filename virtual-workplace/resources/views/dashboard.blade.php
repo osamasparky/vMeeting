@@ -1716,6 +1716,7 @@
 
         <!-- 9. PROFILE & PROJECTS TABS -->
         @include('dashboard.partials.tab-profile')
+        @include('dashboard.partials.tab-notifications')
         @include('dashboard.partials.tab-projects')
 
         <!-- 10. TASKS & TIMESHEETS TABS -->

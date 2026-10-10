@@ -101,6 +101,7 @@
                 'billing' => __('Billing & Subscription'),
                 'settings' => __('Workspace Settings'),
                 'profile' => __('My User Profile'),
+                'notifications' => __('pm.notif_all_title'),
             ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!};
 
             const subtitles = {!! json_encode([

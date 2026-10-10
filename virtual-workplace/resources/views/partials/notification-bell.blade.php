@@ -30,6 +30,9 @@
             <button type="button" class="notif-tab-btn" aria-pressed="false" onclick="filterNotifTab('spatial', this)">{{ __('Office') }}</button>
         </div>
         <div id="notifListContainer" class="notif-list"></div>
+        <a class="notif-all-link" href="{{ route('dashboard') }}#notifications" onclick="if (typeof switchAdminTab === 'function' && document.getElementById('tab-notifications')) { event.preventDefault(); switchAdminTab('notifications'); toggleNotificationDropdown(); }">
+            {{ __('pm.notif_view_all') }}<span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
+        </a>
     </div>
 </div>
 
@@ -142,6 +145,7 @@
                 if (!state.first && unread > state.unread) {
                     const newest = state.items.find(n => !n.is_read) || state.items[0];
                     if (newest) { chime(); toast(newest); desktop(newest); }
+                    document.dispatchEvent(new CustomEvent('notifications:arrived'));
                 }
                 state.unread = unread;
                 state.first = false;
@@ -223,6 +227,9 @@
                 bell?.focus();
             }
         });
+
+        // The "All notifications" tab marks items read; keep the badge in step.
+        document.addEventListener('notifications:changed', refresh);
 
         const start = () => { refresh(); setInterval(refresh, 15000); };
         if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);

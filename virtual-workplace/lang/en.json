@@ -3547,5 +3547,13 @@
     "pm.prefs_channels_help": "Choose what shows in the bell and what reaches you by email, per type.",
     "pm.channel_bell": "Bell",
     "pm.channel_email": "Email",
-    "pm.pref_office": "Virtual office (waves, knocks, rings)"
+    "pm.pref_office": "Virtual office (waves, knocks, rings)",
+    "pm.notif_all_title": "All notifications",
+    "pm.notif_settings": "Notification settings",
+    "pm.notif_filter": "Filter notifications",
+    "pm.notif_unread": "unread",
+    "pm.notif_total": "notifications",
+    "pm.notif_empty": "No notifications here.",
+    "pm.notif_load_more": "Load more",
+    "pm.notif_view_all": "View all notifications"
 }

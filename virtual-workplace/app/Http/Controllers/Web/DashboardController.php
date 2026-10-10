@@ -12,6 +12,7 @@ use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Http\Controllers\Controller;
 use App\Services\FileUploadService;
+use App\Support\NotificationPreferences;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -140,7 +141,9 @@ class DashboardController extends Controller
     }
 
     /**
-     * Fetch user profile, live working timer and task list for office spotlight / inspector.
+     * The user's notifications. Without ?page this is the bell's feed (latest 35);
+     * with ?page it is the "All notifications" tab: 30 per page, with an optional
+     * ?filter of unread, task, meeting or office.
      */
     public function getUserNotifications(Request $request)
     {
@@ -150,28 +153,41 @@ class DashboardController extends Controller
         }
 
         $unreadCount = WorkplaceNotification::forUser($user->id)->unread()->count();
-        $notifications = WorkplaceNotification::forUser($user->id)
+        $present = fn ($n) => [
+            'id' => $n->id,
+            'type' => $n->type,
+            'title' => $n->title,
+            'body' => $n->body,
+            'icon' => $n->icon ?: '🔔',
+            'action_url' => $n->action_url,
+            'is_read' => (bool) $n->is_read,
+            'data' => $n->data,
+            'created_at_human' => $n->created_at ? $n->created_at->diffForHumans() : '',
+            'created_at' => $n->created_at ? $n->created_at->toISOString() : '',
+        ];
+
+        if (! $request->has('page')) {
+            return response()->json([
+                'unread_count' => $unreadCount,
+                'notifications' => WorkplaceNotification::forUser($user->id)->orderByDesc('created_at')->limit(35)->get()->map($present),
+            ]);
+        }
+
+        $filter = $request->validate(['filter' => ['nullable', 'in:all,unread,task,meeting,office']])['filter'] ?? 'all';
+        $page = WorkplaceNotification::forUser($user->id)
+            ->when($filter === 'unread', fn ($q) => $q->unread())
+            ->when($filter === 'task', fn ($q) => $q->where('type', 'like', 'task%'))
+            ->when($filter === 'meeting', fn ($q) => $q->where('type', 'like', 'meeting%'))
+            ->when($filter === 'office', fn ($q) => $q->where(fn ($w) => $w->whereIn('type', NotificationPreferences::OFFICE_TYPES)->orWhere('type', 'like', 'room%')))
             ->orderByDesc('created_at')
-            ->limit(35)
-            ->get()
-            ->map(function ($n) {
-                return [
-                    'id' => $n->id,
-                    'type' => $n->type,
-                    'title' => $n->title,
-                    'body' => $n->body,
-                    'icon' => $n->icon ?: '🔔',
-                    'action_url' => $n->action_url,
-                    'is_read' => (bool) $n->is_read,
-                    'data' => $n->data,
-                    'created_at_human' => $n->created_at ? $n->created_at->diffForHumans() : '',
-                    'created_at' => $n->created_at ? $n->created_at->toISOString() : '',
-                ];
-            });
+            ->paginate(30);
 
         return response()->json([
             'unread_count' => $unreadCount,
-            'notifications' => $notifications,
+            'notifications' => collect($page->items())->map($present),
+            'current_page' => $page->currentPage(),
+            'last_page' => $page->lastPage(),
+            'total' => $page->total(),
         ]);
     }
 

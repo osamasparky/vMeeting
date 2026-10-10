@@ -258,17 +258,19 @@
                 </div>
                 <form method="POST" action="{{ route('profile.notifications.update') }}" style="display: flex; flex-direction: column; gap: 14px;">
                     @csrf
-                    @foreach(array_keys(\App\Support\NotificationPreferences::INAPP_DEFAULTS) as $prefKey)
-                        <fieldset class="pm-pref-row">
-                            <legend class="pm-pref-name">{{ __('pm.pref_' . $prefKey) }}</legend>
-                            <div class="pm-pref-switches">
+                    <div class="pm-pref-grid">
+                        @foreach(array_keys(\App\Support\NotificationPreferences::INAPP_DEFAULTS) as $prefKey)
+                            <div class="pm-pref-row" role="group" aria-labelledby="pm-pref-name-{{ $prefKey }}">
+                                <span class="pm-pref-name" id="pm-pref-name-{{ $prefKey }}">{{ __('pm.pref_' . $prefKey) }}</span>
                                 <x-switch name="inapp_{{ $prefKey }}" id="pm-inapp-{{ $prefKey }}" :checked="$pmInApp[$prefKey]" :label="__('pm.channel_bell')" />
                                 @if(array_key_exists($prefKey, \App\Support\NotificationPreferences::DEFAULTS))
                                     <x-switch name="email_{{ $prefKey }}" id="pm-pref-{{ $prefKey }}" :checked="$pmPrefs[$prefKey]" :label="__('pm.channel_email')" />
+                                @else
+                                    <span aria-hidden="true"></span>
                                 @endif
                             </div>
-                        </fieldset>
-                    @endforeach
+                        @endforeach
+                    </div>
                     <div style="padding-top: 12px; border-top: 1px solid var(--ula-border-subtle);">
                         <x-btn variant="primary" size="md" type="submit" icon="notifications">{{ __('pm.prefs_save') }}</x-btn>
                     </div>

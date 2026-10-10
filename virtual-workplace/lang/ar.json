@@ -3547,5 +3547,13 @@
     "pm.prefs_channels_help": "اختر ما يظهر في الجرس وما يصلك بالبريد لكل نوع.",
     "pm.channel_bell": "الجرس",
     "pm.channel_email": "البريد",
-    "pm.pref_office": "المكتب الافتراضي (تلويح، طرق باب، رنّة)"
+    "pm.pref_office": "المكتب الافتراضي (تلويح، طرق باب، رنّة)",
+    "pm.notif_all_title": "كل الإشعارات",
+    "pm.notif_settings": "إعدادات الإشعارات",
+    "pm.notif_filter": "تصفية الإشعارات",
+    "pm.notif_unread": "غير مقروءة",
+    "pm.notif_total": "إشعار",
+    "pm.notif_empty": "لا توجد إشعارات هنا.",
+    "pm.notif_load_more": "عرض المزيد",
+    "pm.notif_view_all": "عرض كل الإشعارات"
 }
