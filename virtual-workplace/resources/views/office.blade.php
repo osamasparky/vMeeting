@@ -2430,6 +2430,19 @@
                     segments.push({ x1: rx + rw, y1: curY, x2: rx + rw, y2: ry + rh, roomId: r.id });
                 }
             }
+            // Walls and obstacles drawn in the map editor (layout_data, in tiles): building
+            // walls, partitions and furniture that are only painted on the floor image.
+            const layout = (CONFIG.map && CONFIG.map.layout_data) || {};
+            for (const w of (Array.isArray(layout.walls) ? layout.walls : [])) {
+                segments.push({ x1: w.x1 * TILE_SIZE, y1: w.y1 * TILE_SIZE, x2: w.x2 * TILE_SIZE, y2: w.y2 * TILE_SIZE, roomId: null });
+            }
+            for (const o of (Array.isArray(layout.obstacles) ? layout.obstacles : [])) {
+                const x1 = o.x * TILE_SIZE, y1 = o.y * TILE_SIZE, x2 = (o.x + o.width) * TILE_SIZE, y2 = (o.y + o.height) * TILE_SIZE;
+                segments.push(
+                    { x1, y1, x2, y2: y1, roomId: null }, { x1: x2, y1, x2, y2, roomId: null },
+                    { x1, y1: y2, x2, y2, roomId: null }, { x1, y1, x2: x1, y2, roomId: null },
+                );
+            }
             return segments;
         }
 

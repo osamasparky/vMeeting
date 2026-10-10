@@ -19,6 +19,7 @@ use App\Domains\Workspace\Models\MapObject;
 use App\Domains\Workspace\Models\Room;
 use App\Domains\Workspace\Models\RoomFile;
 use App\Domains\Workspace\Services\AiMapGeneratorService;
+use App\Domains\Workspace\Support\MapGeometry;
 use App\Domains\Workspace\Support\RoomAccess;
 use App\Domains\Workspace\Support\RoomBoundsGap;
 use App\Http\Controllers\Controller;
@@ -358,6 +359,10 @@ class OfficeController extends Controller
         if (! $membership) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
+        // Changing the floor map needs the map designer permission, like opening the editor.
+        if ($membership && $this->memberLacksMapsPermission($membership)) {
+            return response()->json(['message' => __('Unauthorized: You do not have permission to access the Floor Map Editor.')], 403);
+        }
 
         $file = $request->file('image') ?? $request->file('background');
         $catalogFloorUrl = $request->input('floor_url') ?? $request->input('image_url');
@@ -418,6 +423,11 @@ class OfficeController extends Controller
      */
     public function uploadObjectImage(Request $request)
     {
+        $membership = OrganizationMember::where('user_id', Auth::id())->whereIn('status', ['active', 'invited'])->with('role.permissions')->first();
+        if (! Auth::user()->isSuperAdmin() && (! $membership || $this->memberLacksMapsPermission($membership))) {
+            return response()->json(['message' => __('Unauthorized: You do not have permission to access the Floor Map Editor.')], 403);
+        }
+
         $user = Auth::user();
         if (! $user) {
             return response()->json(['message' => 'Unauthorized.'], 401);
@@ -458,6 +468,10 @@ class OfficeController extends Controller
         if (! $membership) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
+        // Changing the floor map needs the map designer permission, like opening the editor.
+        if ($membership && $this->memberLacksMapsPermission($membership)) {
+            return response()->json(['message' => __('Unauthorized: You do not have permission to access the Floor Map Editor.')], 403);
+        }
 
         $layoutData = $map->layout_data ?? [];
         unset($layoutData['background_image_url']);
@@ -492,13 +506,17 @@ class OfficeController extends Controller
         if (! $membership && ! $user->isSuperAdmin()) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
+        // Changing the floor map needs the map designer permission, like opening the editor.
+        if ($membership && $this->memberLacksMapsPermission($membership)) {
+            return response()->json(['message' => __('Unauthorized: You do not have permission to access the Floor Map Editor.')], 403);
+        }
 
         // Delete all furniture objects
         MapObject::where('map_id', $map->id)->delete();
 
-        // Clear custom background image
+        // Clear custom background image, walls and obstacles
         $layoutData = $map->layout_data ?? [];
-        unset($layoutData['background_image_url']);
+        unset($layoutData['background_image_url'], $layoutData['walls'], $layoutData['obstacles']);
         $layoutData['background_width'] = 1200;
         $layoutData['background_height'] = 708;
 
@@ -560,6 +578,10 @@ class OfficeController extends Controller
         if (! $membership && ! $user->isSuperAdmin()) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
+        // Changing the floor map needs the map designer permission, like opening the editor.
+        if ($membership && $this->memberLacksMapsPermission($membership)) {
+            return response()->json(['message' => __('Unauthorized: You do not have permission to access the Floor Map Editor.')], 403);
+        }
 
         $validated = $request->validate([
             'name' => 'nullable|string|max:120',
@@ -572,7 +594,8 @@ class OfficeController extends Controller
             $map->name = $validated['name'];
         }
         if (isset($validated['layout_data'])) {
-            $map->layout_data = $validated['layout_data'];
+            // Walls and obstacles are kept only when well formed (see MapGeometry).
+            $map->layout_data = MapGeometry::sanitize($validated['layout_data']);
         }
         $map->status = 'published';
         $map->published_at = now();
@@ -697,6 +720,10 @@ class OfficeController extends Controller
         if (! $membership && ! $user->isSuperAdmin()) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
+        // Changing the floor map needs the map designer permission, like opening the editor.
+        if ($membership && $this->memberLacksMapsPermission($membership)) {
+            return response()->json(['message' => __('Unauthorized: You do not have permission to access the Floor Map Editor.')], 403);
+        }
 
         $publishedMap = $action->execute($map, $user);
 
@@ -719,6 +746,10 @@ class OfficeController extends Controller
 
         if (! $membership && ! $user->isSuperAdmin()) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
+        }
+        // Changing the floor map needs the map designer permission, like opening the editor.
+        if ($membership && $this->memberLacksMapsPermission($membership)) {
+            return response()->json(['message' => __('Unauthorized: You do not have permission to access the Floor Map Editor.')], 403);
         }
 
         $org = $membership ? $membership->organization : Organization::find($orgId);
@@ -777,6 +808,10 @@ class OfficeController extends Controller
             if (! $membership && ! $user->isSuperAdmin()) {
                 return response()->json(['message' => 'Unauthorized access.'], 403);
             }
+            // Changing the floor map needs the map designer permission, like opening the editor.
+            if ($membership && $this->memberLacksMapsPermission($membership)) {
+                return response()->json(['message' => __('Unauthorized: You do not have permission to access the Floor Map Editor.')], 403);
+            }
 
             $org = $membership ? $membership->organization : Organization::find($orgId);
             if ($org && $org->hasReachedRoomLimit()) {
@@ -823,6 +858,10 @@ class OfficeController extends Controller
 
         if (! $membership && ! $user->isSuperAdmin()) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
+        }
+        // Changing the floor map needs the map designer permission, like opening the editor.
+        if ($membership && $this->memberLacksMapsPermission($membership)) {
+            return response()->json(['message' => __('Unauthorized: You do not have permission to access the Floor Map Editor.')], 403);
         }
 
         $data = $request->only([
@@ -877,6 +916,10 @@ class OfficeController extends Controller
 
         if (! $membership && ! $user->isSuperAdmin()) {
             return response()->json(['message' => 'Unauthorized access: insufficient permissions.'], 403);
+        }
+        // Deleting a room changes the floor map: same permission as the editor.
+        if ($membership && $this->memberLacksMapsPermission($membership)) {
+            return response()->json(['message' => __('Unauthorized: You do not have permission to access the Floor Map Editor.')], 403);
         }
 
         $room->delete();

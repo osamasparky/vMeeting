@@ -801,6 +801,14 @@
                             <span class="material-symbols-rounded">chair</span>
                             <span>{{ __('Furniture') }}</span>
                         </button>
+                        <button class="tool-btn" id="tool-wall" onclick="setTool('wall')" title="{{ __('Draw solid walls avatars cannot cross (W)') }}">
+                            <span class="material-symbols-rounded">fence</span>
+                            <span>{{ __('Walls') }}</span>
+                        </button>
+                        <button class="tool-btn" id="tool-obstacle" onclick="setTool('obstacle')" title="{{ __('Mark furniture or areas avatars walk around (B)') }}">
+                            <span class="material-symbols-rounded">block</span>
+                            <span>{{ __('Obstacles') }}</span>
+                        </button>
                     </div>
 
                     <span class="ed-toolbar-sep" aria-hidden="true"></span>
@@ -1129,6 +1137,14 @@
 
                     <div id="inspector-content" style="display: none; flex-direction: column; gap: 12px;">
                         
+                        <!-- Wall / obstacle (collision geometry) -->
+                        <div id="inspector-geo-fields" class="prop-section" style="display: none;">
+                            <strong style="font-size: 13px; color: var(--ula-text-primary);"><span class="material-symbols-rounded" id="geo-icon" style="font-size: 1em; vertical-align: text-bottom;">fence</span> <span id="geo-title"></span></strong>
+                            <span id="geo-size" style="font-size: 12px; color: var(--ula-text-secondary); direction: ltr; unicode-bidi: isolate; font-family: var(--ula-font-mono);"></span>
+                            <span style="font-size: 12px; color: var(--ula-text-muted);">{{ __('Avatars cannot pass through it in the office. Drag to move, Delete to remove.') }}</span>
+                            <button type="button" class="ula-btn ula-btn--secondary ula-btn--sm" onclick="deleteSelectedItem()"><span class="material-symbols-rounded" aria-hidden="true">delete</span><span>{{ __('Delete') }}</span></button>
+                        </div>
+
                         <!-- Object Fields -->
                         <div id="inspector-object-fields" class="prop-section" style="display: none;">
                             <strong style="font-size: 13px; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">chair</span> {{ __('Object Properties') }}</strong>
@@ -1507,6 +1523,32 @@
             setTimeout(fitAndCenterView, 50);
         }
 
+        // ── Collision geometry: walls (segments) and obstacles (rectangles), in tiles ──
+        // Stored in layout_data so they are saved with the map; the office treats them as solid.
+        MAP_DATA.layout_data = MAP_DATA.layout_data || {};
+        if (!Array.isArray(MAP_DATA.layout_data.walls)) MAP_DATA.layout_data.walls = [];
+        if (!Array.isArray(MAP_DATA.layout_data.obstacles)) MAP_DATA.layout_data.obstacles = [];
+        const geoWalls = () => MAP_DATA.layout_data.walls;
+        const geoObstacles = () => MAP_DATA.layout_data.obstacles;
+        let currentWall = null;
+
+        function snapHalf(v) { return Math.round(v * 2) / 2; }
+
+        // Walls snap to half tiles and straighten when they are nearly horizontal or vertical.
+        function wallEnd(x1, y1, x2, y2) {
+            let ex = snapHalf(x2), ey = snapHalf(y2);
+            const dx = Math.abs(ex - x1), dy = Math.abs(ey - y1);
+            if (dy <= dx * 0.25) ey = y1; else if (dx <= dy * 0.25) ex = x1;
+            return { x: ex, y: ey };
+        }
+
+        function distToSegmentTiles(px, py, w) {
+            const dx = w.x2 - w.x1, dy = w.y2 - w.y1;
+            const len = dx * dx + dy * dy;
+            const t = len ? Math.max(0, Math.min(1, ((px - w.x1) * dx + (py - w.y1) * dy) / len)) : 0;
+            return Math.hypot(px - (w.x1 + t * dx), py - (w.y1 + t * dy));
+        }
+
         // ── Navigation & Tools ──
         function setTool(tool) {
             currentTool = tool;
@@ -1870,6 +1912,15 @@
                         break;
                     }
                 }
+                // Walls and obstacles next (thin, so they win over the room under them)
+                if (!clicked) {
+                    const wall = [...geoWalls()].reverse().find(w => distToSegmentTiles(rawTileX, rawTileY, w) < 0.6 / zoomLevel + 0.3);
+                    if (wall) clicked = { type: 'wall', item: wall };
+                }
+                if (!clicked) {
+                    const ob = [...geoObstacles()].reverse().find(o => rawTileX >= o.x && rawTileX <= o.x + o.width && rawTileY >= o.y && rawTileY <= o.y + o.height);
+                    if (ob) clicked = { type: 'obstacle', item: ob };
+                }
                 // Rooms second
                 if (!clicked) {
                     for (let i = rooms.length - 1; i >= 0; i--) {
@@ -1893,6 +1944,13 @@
                         dragOrigX = (selectedItem.item.position ? selectedItem.item.position.x : 0);
                         dragOrigY = (selectedItem.item.position ? selectedItem.item.position.y : 0);
                         roomContainedObjects = [];
+                    } else if (selectedItem.type === 'wall') {
+                        dragOrigX = { ...selectedItem.item };
+                        roomContainedObjects = [];
+                    } else if (selectedItem.type === 'obstacle') {
+                        dragOrigX = selectedItem.item.x;
+                        dragOrigY = selectedItem.item.y;
+                        roomContainedObjects = [];
                     } else if (selectedItem.type === 'room') {
                         dragOrigX = selectedItem.item.bounds.x;
                         dragOrigY = selectedItem.item.bounds.y;
@@ -1913,11 +1971,14 @@
                 updateInspector();
                 updateFloatingActions();
                 draw();
-            } else if (currentTool === 'room') {
+            } else if (currentTool === 'room' || currentTool === 'obstacle') {
                 isDrawing = true;
                 startX = tileX;
                 startY = tileY;
                 currentRect = { x: tileX, y: tileY, width: 1, height: 1 };
+            } else if (currentTool === 'wall') {
+                const sx = snapHalf(rawTileX), sy = snapHalf(rawTileY);
+                currentWall = { x1: sx, y1: sy, x2: sx, y2: sy };
             } else if (currentTool === 'object') {
                 let objImgUrl = currentObjectCustom?.imageUrl || null;
                 let initConfig = currentObjectCustom?.interactionConfig ? JSON.parse(JSON.stringify(currentObjectCustom.interactionConfig)) : {};
@@ -2009,7 +2070,13 @@
                 const dx = rawTileX - dragStartTileX;
                 const dy = rawTileY - dragStartTileY;
 
-                if (selectedItem.type === 'object') {
+                if (selectedItem.type === 'wall') {
+                    const o = dragOrigX, mx = snapHalf(dx), my = snapHalf(dy);
+                    Object.assign(selectedItem.item, { x1: o.x1 + mx, y1: o.y1 + my, x2: o.x2 + mx, y2: o.y2 + my });
+                } else if (selectedItem.type === 'obstacle') {
+                    selectedItem.item.x = Math.max(0, Math.min(maxTilesX - selectedItem.item.width, snapHalf(dragOrigX + dx)));
+                    selectedItem.item.y = Math.max(0, Math.min(maxTilesY - selectedItem.item.height, snapHalf(dragOrigY + dy)));
+                } else if (selectedItem.type === 'object') {
                     const objW = selectedItem.item.width || (selectedItem.item.size ? selectedItem.item.size.width : 1);
                     const objH = selectedItem.item.height || (selectedItem.item.size ? selectedItem.item.size.height : 1);
                     selectedItem.item.position.x = Math.max(0, Math.min(maxTilesX - objW, snapCoordinate(dragOrigX + dx, gridSnapStep)));
@@ -2032,6 +2099,14 @@
                     }
                 }
                 updateFloatingActions();
+                draw();
+                return;
+            }
+
+            if (currentWall) {
+                const end = wallEnd(currentWall.x1, currentWall.y1, rawTileX, rawTileY);
+                currentWall.x2 = end.x;
+                currentWall.y2 = end.y;
                 draw();
                 return;
             }
@@ -2080,6 +2155,29 @@
                 canvas.style.cursor = currentTool === 'select' ? 'default' : 'crosshair';
                 updateFloatingActions();
                 draw();
+            }
+
+            if (currentWall) {
+                const w = currentWall;
+                currentWall = null;
+                if (Math.hypot(w.x2 - w.x1, w.y2 - w.y1) >= 0.5) {
+                    geoWalls().push(w);
+                    selectedItem = { type: 'wall', item: w };
+                    updateInspector();
+                }
+                draw();
+                return;
+            }
+
+            if (isDrawing && currentRect && currentTool === 'obstacle') {
+                const ob = { ...currentRect };
+                geoObstacles().push(ob);
+                selectedItem = { type: 'obstacle', item: ob };
+                isDrawing = false;
+                currentRect = null;
+                updateInspector();
+                draw();
+                return;
             }
 
             if (isDrawing && currentRect) {
@@ -2171,6 +2269,8 @@
         window.addEventListener('keydown', (e) => {
             if (['input', 'textarea', 'select'].includes(document.activeElement.tagName.toLowerCase())) return;
             const k = e.key.toLowerCase();
+            if (k === 'w' && !e.ctrlKey && !e.metaKey) { setTool('wall'); return; }
+            if (k === 'b' && !e.ctrlKey && !e.metaKey) { setTool('obstacle'); return; }
             if (k === 'r' && selectedItem && selectedItem.type === 'object') {
                 rotateSelectedItem(90);
             } else if ((k === 'delete' || k === 'backspace') && selectedItem) {
@@ -2471,6 +2571,35 @@
                 ctx.restore();
             });
 
+            // 2b. Collision geometry: obstacles (hatched) and walls (thick lines)
+            geoObstacles().forEach(o => {
+                const sel = selectedItem && selectedItem.item === o;
+                ctx.save();
+                ctx.fillStyle = edAlpha(ED.danger, sel ? 0.28 : 0.16);
+                ctx.fillRect(o.x * TILE_SIZE, o.y * TILE_SIZE, o.width * TILE_SIZE, o.height * TILE_SIZE);
+                ctx.strokeStyle = ED.danger;
+                ctx.lineWidth = sel ? 2.5 : 1.5;
+                ctx.setLineDash([6, 4]);
+                ctx.strokeRect(o.x * TILE_SIZE, o.y * TILE_SIZE, o.width * TILE_SIZE, o.height * TILE_SIZE);
+                ctx.restore();
+            });
+            [...geoWalls(), ...(currentWall ? [currentWall] : [])].forEach(w => {
+                const sel = selectedItem && selectedItem.item === w;
+                ctx.save();
+                ctx.strokeStyle = w === currentWall ? edAlpha(ED.danger, 0.6) : ED.danger;
+                ctx.lineWidth = sel ? 8 : 6;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(w.x1 * TILE_SIZE, w.y1 * TILE_SIZE);
+                ctx.lineTo(w.x2 * TILE_SIZE, w.y2 * TILE_SIZE);
+                ctx.stroke();
+                if (sel) {
+                    ctx.fillStyle = ED.knob;
+                    [[w.x1, w.y1], [w.x2, w.y2]].forEach(([x, y]) => { ctx.beginPath(); ctx.arc(x * TILE_SIZE, y * TILE_SIZE, 5, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); });
+                }
+                ctx.restore();
+            });
+
             // 3. Selected Room Rectangular Acoustic Sound Isolation Aura & Handles
             if (selectedItem && selectedItem.type === 'room' && selectedItem.item.bounds) {
                 const r = selectedItem.item;
@@ -2647,7 +2776,7 @@
                 const dw = currentRect.width * TILE_SIZE;
                 const dh = currentRect.height * TILE_SIZE;
 
-                ctx.fillStyle = ED.accentFill;
+                ctx.fillStyle = currentTool === 'obstacle' ? edAlpha(ED.danger, 0.2) : ED.accentFill;
                 ctx.fillRect(dx, dy, dw, dh);
                 ctx.strokeStyle = ED.accent;
                 ctx.lineWidth = 2;
@@ -2675,6 +2804,21 @@
             emptyBox.style.display = 'none';
             contentBox.style.display = 'flex';
             const item = selectedItem.item;
+            const geoFields = document.getElementById('inspector-geo-fields');
+            if (geoFields) geoFields.style.display = 'none';
+
+            if (selectedItem.type === 'wall' || selectedItem.type === 'obstacle') {
+                objFields.style.display = 'none';
+                roomFields.style.display = 'none';
+                geoFields.style.display = 'flex';
+                const isWall = selectedItem.type === 'wall';
+                document.getElementById('geo-icon').textContent = isWall ? 'fence' : 'block';
+                document.getElementById('geo-title').textContent = isWall ? @json(__('Wall')) : @json(__('Obstacle'));
+                document.getElementById('geo-size').textContent = isWall
+                    ? `${(Math.hypot(item.x2 - item.x1, item.y2 - item.y1)).toFixed(1)} tiles`
+                    : `${item.width}×${item.height} tiles`;
+                return;
+            }
 
             if (selectedItem.type === 'object') {
                 objFields.style.display = 'flex';
@@ -2955,6 +3099,10 @@
             if (selectedItem.type === 'object') {
                 const idx = objects.indexOf(selectedItem.item);
                 if (idx > -1) objects.splice(idx, 1);
+            } else if (selectedItem.type === 'wall' || selectedItem.type === 'obstacle') {
+                const list = selectedItem.type === 'wall' ? geoWalls() : geoObstacles();
+                const idx = list.indexOf(selectedItem.item);
+                if (idx > -1) list.splice(idx, 1);
             } else if (selectedItem.type === 'room') {
                 const r = selectedItem.item;
                 const idx = rooms.indexOf(r);
@@ -3245,6 +3393,8 @@
                     delete MAP_DATA.layout_data.background_image_url;
                     MAP_DATA.layout_data.background_width = 1200;
                     MAP_DATA.layout_data.background_height = 708;
+                    MAP_DATA.layout_data.walls = [];
+                    MAP_DATA.layout_data.obstacles = [];
                     BLUEPRINT_IMAGE.removeAttribute('src');
                     BLUEPRINT_IMAGE.src = '';
                     blueprintLoaded = false;

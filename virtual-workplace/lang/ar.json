@@ -3569,5 +3569,11 @@
     "pm.tab_dependencies": "الارتباطات",
     "Enter a room to share files with the people in it.": "ادخل غرفة لمشاركة الملفات مع الموجودين فيها.",
     "You do not have access to this room.": "ليس لديك صلاحية دخول هذه الغرفة.",
-    "This door would open outside the map — choose another wall or move the room.": "هذا الباب سيفتح خارج الخريطة — اختر حائطًا آخر أو حرّك الغرفة."
+    "This door would open outside the map — choose another wall or move the room.": "هذا الباب سيفتح خارج الخريطة — اختر حائطًا آخر أو حرّك الغرفة.",
+    "Draw solid walls avatars cannot cross (W)": "ارسم حوائط صلبة لا يعبرها الأفاتار (W)",
+    "Mark furniture or areas avatars walk around (B)": "حدّد أثاثًا أو مناطق يلتف حولها الأفاتار (B)",
+    "Walls": "الحوائط",
+    "Obstacles": "العوائق",
+    "Obstacle": "عائق",
+    "Avatars cannot pass through it in the office. Drag to move, Delete to remove.": "لا يمكن للأفاتار المرور من خلاله في المكتب. اسحبه للتحريك أو اضغط Delete للحذف."
 }

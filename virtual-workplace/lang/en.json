@@ -3569,5 +3569,11 @@
     "pm.tab_dependencies": "Dependencies",
     "Enter a room to share files with the people in it.": "Enter a room to share files with the people in it.",
     "You do not have access to this room.": "You do not have access to this room.",
-    "This door would open outside the map — choose another wall or move the room.": "This door would open outside the map — choose another wall or move the room."
+    "This door would open outside the map — choose another wall or move the room.": "This door would open outside the map — choose another wall or move the room.",
+    "Draw solid walls avatars cannot cross (W)": "Draw solid walls avatars cannot cross (W)",
+    "Mark furniture or areas avatars walk around (B)": "Mark furniture or areas avatars walk around (B)",
+    "Walls": "Walls",
+    "Obstacles": "Obstacles",
+    "Obstacle": "Obstacle",
+    "Avatars cannot pass through it in the office. Drag to move, Delete to remove.": "Avatars cannot pass through it in the office. Drag to move, Delete to remove."
 }
