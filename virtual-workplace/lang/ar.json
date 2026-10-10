@@ -3531,5 +3531,10 @@
     "pm.widget_completed_trend": "المنجز آخر 14 يومًا",
     "pm.widget_time_week": "ساعاتي هذا الأسبوع",
     "pm.widget_by_project": "مهامي حسب المشروع",
-    "pm.widget_project_health": "صحة مشاريعي"
+    "pm.widget_project_health": "صحة مشاريعي",
+    "🔔 :sender is ringing you": "🔔 :sender يرنّ عليك",
+    ":sender needs your attention now.": ":sender يحتاج انتباهك الآن.",
+    "Room not found.": "الغرفة غير موجودة.",
+    "You cannot send this to yourself.": "لا يمكنك إرسال هذا لنفسك.",
+    "This person is not in your organization.": "هذا الشخص ليس ضمن مؤسستك."
 }

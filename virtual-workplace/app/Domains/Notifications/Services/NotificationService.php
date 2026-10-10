@@ -215,7 +215,7 @@ class NotificationService
     /**
      * Notify user when a colleague waves at them in the spatial office.
      */
-    public static function notifyWave($targetUser, User $sender, ?string $roomName = null): ?WorkplaceNotification
+    public static function notifyWave($targetUser, User $sender, ?string $roomName = null, ?string $orgId = null): ?WorkplaceNotification
     {
         $targetUserId = $targetUser instanceof User ? $targetUser->id : $targetUser;
 
@@ -236,7 +236,8 @@ class NotificationService
                 'sender_id' => $sender->id,
                 'sender_name' => $sender->name,
             ],
-            '👋'
+            '👋',
+            $orgId
         );
     }
 

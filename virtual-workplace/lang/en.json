@@ -3531,5 +3531,10 @@
     "pm.widget_completed_trend": "Completed, last 14 days",
     "pm.widget_time_week": "My hours this week",
     "pm.widget_by_project": "My tasks by project",
-    "pm.widget_project_health": "Health of my projects"
+    "pm.widget_project_health": "Health of my projects",
+    "🔔 :sender is ringing you": "🔔 :sender is ringing you",
+    ":sender needs your attention now.": ":sender needs your attention now.",
+    "Room not found.": "Room not found.",
+    "You cannot send this to yourself.": "You cannot send this to yourself.",
+    "This person is not in your organization.": "This person is not in your organization."
 }

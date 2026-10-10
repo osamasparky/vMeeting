@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\Web;
 
 use App\Domains\Administration\Models\AuditLog;
-use App\Domains\Identity\Models\User;
 use App\Domains\Identity\Services\RealtimeTokenService;
-use App\Domains\Notifications\Services\NotificationService;
+use App\Domains\Notifications\Services\SpatialNotifier;
 use App\Domains\People\Models\Department;
 use App\Domains\People\Models\Team;
 use App\Domains\Tenancy\Models\Organization;
@@ -1007,19 +1006,12 @@ class OfficeController extends Controller
     {
         $user = Auth::user();
         $validated = $request->validate([
-            'target_user_id' => 'required|exists:users,id',
+            'target_user_id' => 'required|string',
             'room_name' => 'nullable|string|max:100',
         ]);
 
-        if ($validated['target_user_id'] === $user->id) {
-            return response()->json(['message' => 'Cannot wave to yourself'], 422);
-        }
-
-        $notification = NotificationService::notifyWave(
-            $validated['target_user_id'],
-            $user,
-            $validated['room_name'] ?? null
-        );
+        // Only people in the same organization can be waved at.
+        SpatialNotifier::wave($user, $this->activeOrganizationId($user), $validated['target_user_id'], $validated['room_name'] ?? null);
 
         return response()->json([
             'success' => true,
@@ -1034,30 +1026,26 @@ class OfficeController extends Controller
     {
         $user = Auth::user();
         $validated = $request->validate([
-            'room_id' => 'required|exists:rooms,id',
+            'room_id' => 'required|string',
         ]);
 
-        $room = Room::find($validated['room_id']);
-        if (! $room) {
-            return response()->json(['message' => 'Room not found'], 404);
-        }
-
-        // Find occupants or organization admins
-        $occupants = User::where('current_room_id', $room->id)->get();
-        if ($occupants->isEmpty()) {
-            // Notify room or organization members
-            $occupants = $room->organization ? $room->organization->users()->limit(3)->get() : collect([$user]);
-        }
-
-        foreach ($occupants as $occupant) {
-            if ($occupant->id !== $user->id) {
-                NotificationService::notifyDoorKnock($room, $occupant, $user);
-            }
-        }
+        // People inside the room (or the organization's admins when it is empty) are notified.
+        SpatialNotifier::knock($user, $this->activeOrganizationId($user), $validated['room_id']);
 
         return response()->json([
             'success' => true,
             'message' => __('Knock sent to room occupants!'),
         ]);
+    }
+
+    /** The organization the office shows: the user's first active membership, as in office(). */
+    private function activeOrganizationId($user): string
+    {
+        $organizationId = OrganizationMember::where('user_id', $user->id)
+            ->whereIn('status', ['active', 'invited'])
+            ->value('organization_id');
+        abort_unless($organizationId, 403);
+
+        return $organizationId;
     }
 }

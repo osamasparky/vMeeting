@@ -2,136 +2,78 @@
 
 namespace App\Domains\Workspace\Controllers;
 
-use App\Domains\Identity\Models\User;
-use App\Domains\Notifications\Models\Notification;
+use App\Domains\Notifications\Models\WorkplaceNotification;
+use App\Domains\Notifications\Services\SpatialNotifier;
 use App\Domains\Tenancy\Models\Organization;
-use App\Domains\Workspace\Models\Room;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
+/**
+ * Mobile / API side of the office interactions and the notification feed.
+ * Uses the same notifications table as the web bell.
+ */
 class SpatialInteractionsApiController extends Controller
 {
     /**
-     * Send door knocking request to a private sound-isolated room.
+     * Knock on a room door: the people inside are notified.
      */
     public function knock(Request $request, Organization $organization): JsonResponse
     {
         $validated = $request->validate([
-            'room_id' => 'required|exists:rooms,id',
-            'message' => 'nullable|string|max:200',
+            'room_id' => ['required', 'string'],
+            'message' => ['nullable', 'string', 'max:200'],
         ]);
 
-        $user = $request->user();
-        $room = Room::findOrFail($validated['room_id']);
+        $sent = SpatialNotifier::knock($request->user(), $organization->id, $validated['room_id']);
 
-        // Create a notification for room members or admin
-        $notification = Notification::create([
-            'organization_id' => $organization->id,
-            'user_id' => $user->id,
-            'type' => 'door_knock',
-            'data' => [
-                'sender_id' => $user->id,
-                'sender_name' => $user->name,
-                'room_id' => $room->id,
-                'room_name' => $room->name,
-                'message' => $validated['message'] ?? 'طلب استئذان بالدخول إلى الغرفة.',
-                'timestamp' => now()->toIso8601String(),
-            ],
-            'read_at' => null,
-        ]);
-
-        return response()->json([
-            'message' => 'Door knock sent successfully.',
-            'notification' => $notification,
-            'room' => $room,
-        ]);
+        return response()->json(['message' => 'Door knock sent successfully.', 'notified' => $sent]);
     }
 
     /**
-     * Send friendly wave to another teammate.
+     * Wave at a teammate.
      */
     public function wave(Request $request, Organization $organization): JsonResponse
     {
-        $validated = $request->validate([
-            'target_user_id' => 'required|exists:users,id',
-        ]);
+        $validated = $request->validate(['target_user_id' => ['required', 'string']]);
 
-        $user = $request->user();
-        $targetUser = User::findOrFail($validated['target_user_id']);
+        SpatialNotifier::wave($request->user(), $organization->id, $validated['target_user_id']);
 
-        $notification = Notification::create([
-            'organization_id' => $organization->id,
-            'user_id' => $targetUser->id,
-            'type' => 'user_wave',
-            'data' => [
-                'sender_id' => $user->id,
-                'sender_name' => $user->name,
-                'message' => "لوّح لك {$user->name} بالتحية 👋",
-                'timestamp' => now()->toIso8601String(),
-            ],
-            'read_at' => null,
-        ]);
-
-        return response()->json([
-            'message' => 'Wave sent successfully.',
-            'target_user' => $targetUser->only(['id', 'name']),
-        ]);
+        return response()->json(['message' => 'Wave sent successfully.']);
     }
 
     /**
-     * Send direct attention ringing alert to another teammate.
+     * Ring a teammate for urgent attention.
      */
     public function ring(Request $request, Organization $organization): JsonResponse
     {
-        $validated = $request->validate([
-            'target_user_id' => 'required|exists:users,id',
-        ]);
+        $validated = $request->validate(['target_user_id' => ['required', 'string']]);
 
-        $user = $request->user();
-        $targetUser = User::findOrFail($validated['target_user_id']);
+        SpatialNotifier::ring($request->user(), $organization->id, $validated['target_user_id']);
 
-        $notification = Notification::create([
-            'organization_id' => $organization->id,
-            'user_id' => $targetUser->id,
-            'type' => 'user_ring',
-            'data' => [
-                'sender_id' => $user->id,
-                'sender_name' => $user->name,
-                'message' => "تنبيه صوتي عاجل من {$user->name} 🔔",
-                'timestamp' => now()->toIso8601String(),
-            ],
-            'read_at' => null,
-        ]);
-
-        return response()->json([
-            'message' => 'Ring sent successfully.',
-            'target_user' => $targetUser->only(['id', 'name']),
-        ]);
+        return response()->json(['message' => 'Ring sent successfully.']);
     }
 
     /**
-     * Get user in-app notifications.
+     * The signed-in user's notifications, newest first.
      */
     public function notifications(Request $request): JsonResponse
     {
-        $notifications = Notification::where('user_id', $request->user()->id)
+        $page = WorkplaceNotification::forUser($request->user()->id)
             ->latest()
-            ->paginate(20);
+            ->paginate(20, ['id', 'organization_id', 'type', 'title', 'body', 'icon', 'action_url', 'data', 'is_read', 'read_at', 'created_at']);
 
-        return response()->json($notifications);
+        return response()->json($page->toArray() + [
+            'unread_count' => WorkplaceNotification::forUser($request->user()->id)->unread()->count(),
+        ]);
     }
 
     /**
-     * Mark notification as read.
+     * Mark one of the user's notifications as read.
      */
     public function markAsRead(Request $request, string $id): JsonResponse
     {
-        $notification = Notification::where('user_id', $request->user()->id)
-            ->where('id', $id)
-            ->firstOrFail();
-
-        $notification->update(['read_at' => now()]);
+        WorkplaceNotification::forUser($request->user()->id)->whereKey($id)->firstOrFail()->markAsRead();
 
         return response()->json(['message' => 'Notification marked as read.']);
     }
