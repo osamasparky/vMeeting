@@ -1103,27 +1103,38 @@
             <div id="hub-section-kanban" class="hub-section-content" style="display: block;">
                 <div class="kanban-grid">
                     @php
-                        $columns = [
-                            'backlog' => ['title' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">push_pin</span> ' . __('Backlog'), 'color' => 'var(--ula-text-secondary)'],
-                            'ready' => ['title' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">track_changes</span> ' . __('Ready'), 'color' => 'var(--ula-tone-palm-fg)'],
-                            'in_progress' => ['title' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bolt</span> ' . __('In Progress'), 'color' => 'var(--ula-text-primary)'],
-                            'review' => ['title' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span> ' . __('Review / QA'), 'color' => 'var(--ula-status-warning)'],
-                            'done' => ['title' => '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">celebration</span> ' . __('Done'), 'color' => 'var(--ula-tone-palm-fg)'],
+                        // Columns are the project's own states (Settings → States); the group sets icon and colour.
+                        $groupMeta = [
+                            'backlog' => ['push_pin', 'var(--ula-text-secondary)'],
+                            'ready' => ['track_changes', 'var(--ula-tone-palm-fg)'],
+                            'in_progress' => ['bolt', 'var(--ula-text-primary)'],
+                            'review' => ['search', 'var(--ula-status-warning)'],
+                            'qa' => ['fact_check', 'var(--ula-status-warning)'],
+                            'done' => ['celebration', 'var(--ula-tone-palm-fg)'],
                         ];
+                        $boardStates = $project->states;
+                        $tasksByState = $tasks->groupBy(function ($t) use ($boardStates) {
+                            $state = $boardStates->firstWhere('id', $t->state_id)
+                                ?? $boardStates->first(fn ($s) => \App\Domains\Projects\Models\ProjectState::groupsMatch($s->group, $t->status))
+                                ?? $boardStates->first();
+                            return $state?->id;
+                        });
                         $isProjectManager = ($user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || ($project && $project->manager_id === $user->id));
                     @endphp
 
-                    @foreach($columns as $colKey => $colMeta)
+                    @foreach($boardStates as $boardState)
                         @php
-                            $colTasks = $tasks->where('status', $colKey);
+                            $colKey = $boardState->id;
+                            $colTasks = $tasksByState->get($boardState->id, collect());
+                            [$colIcon, $colColor] = $groupMeta[$boardState->group] ?? ['label', 'var(--ula-text-secondary)'];
                         @endphp
                         <div class="kanban-column" id="kanban-column-{{ $colKey }}">
-                            <div class="kanban-col-header" style="color: {{ $colMeta['color'] }};">
-                                <span>{!! $colMeta['title'] !!}</span>
+                            <div class="kanban-col-header" style="color: {{ $colColor }};">
+                                <span><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;" aria-hidden="true">{{ $colIcon }}</span> {{ $boardState->displayName() }}</span>
                                 <span class="badge-pill badge-neutral" id="kanban-count-{{ $colKey }}">{{ $colTasks->count() }}</span>
                             </div>
 
-                            <div class="kanban-cards-container" id="kanban-cards-{{ $colKey }}" data-status="{{ $colKey }}" style="display: flex; flex-direction: column; gap: 10px; flex: 1; min-height: 140px;">
+                            <div class="kanban-cards-container" id="kanban-cards-{{ $colKey }}" data-status="{{ $boardState->group }}" data-state-id="{{ $boardState->id }}" style="display: flex; flex-direction: column; gap: 10px; flex: 1; min-height: 140px;">
                                 @foreach($colTasks as $t)
                                     @php
                                         $canEditThisTask = $user->can('update', $t);
@@ -1268,9 +1279,9 @@
                                         </td>
                                         <td onclick="event.stopPropagation();">
                                             @if($user->can('update', $t))
-                                                <select class="pm-cell-select" aria-label="{{ __('Status') }}" onchange="pmInlineUpdate('{{ $t->id }}', 'status', this.value, this)">
-                                                    @foreach(['backlog' => __('Backlog'), 'ready' => __('Ready'), 'in_progress' => __('In Progress'), 'review' => __('Review'), 'qa' => __('QA'), 'done' => __('Done')] as $stKey => $stLabel)
-                                                        <option value="{{ $stKey }}" @selected($t->status === $stKey)>{{ $stLabel }}</option>
+                                                <select class="pm-cell-select" aria-label="{{ __('Status') }}" onchange="pmInlineUpdate('{{ $t->id }}', 'state', this.value, this)">
+                                                    @foreach($project->states as $rowState)
+                                                        <option value="{{ $rowState->id }}" @selected($t->state_id === $rowState->id)>{{ $rowState->displayName() }}</option>
                                                     @endforeach
                                                 </select>
                                             @else
@@ -2836,8 +2847,9 @@
 
                         if (!taskId || !targetStatus) return;
 
+                        const targetStateId = targetCol.getAttribute('data-state-id');
                         // Same column and position - no-op
-                        if (targetStatus === fromStatus && evt.oldIndex === evt.newIndex) {
+                        if (targetCol === fromCol && evt.oldIndex === evt.newIndex) {
                             return;
                         }
 
@@ -2857,7 +2869,7 @@
                                     'X-CSRF-TOKEN': CSRF_TOKEN,
                                     'Accept': 'application/json'
                                 },
-                                body: JSON.stringify({ status: targetStatus })
+                                body: JSON.stringify({ status: targetStatus, state_id: targetStateId ? Number(targetStateId) : null })
                             });
 
                             const data = await res.json();
@@ -2882,7 +2894,8 @@
         }
 
         function updateKanbanBadgeCounts() {
-            const columns = ['backlog', 'ready', 'in_progress', 'review', 'done'];
+            // One entry per board column (project states).
+            const columns = [...document.querySelectorAll('.kanban-cards-container')].map(c => c.id.replace('kanban-cards-', ''));
             columns.forEach(col => {
                 const colContainer = document.getElementById(`kanban-cards-${col}`);
                 const badge = document.getElementById(`kanban-count-${col}`);

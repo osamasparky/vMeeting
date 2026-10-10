@@ -15,6 +15,7 @@ use App\Domains\Projects\Controllers\TaskController;
 use App\Domains\Projects\Controllers\TimesheetController;
 use App\Domains\Projects\Controllers\ArchiveController;
 use App\Domains\Projects\Controllers\ExportController;
+use App\Domains\Projects\Controllers\ProjectStateController;
 use App\Domains\Projects\Controllers\SavedViewController;
 use App\Domains\Projects\Controllers\SprintController;
 use App\Domains\Projects\Controllers\TaskLabelController;
@@ -304,6 +305,16 @@ Route::prefix('v1')->group(function () {
                     ->middleware('permission:projects.delete');
                 Route::delete('/archive/projects/{project}', [ArchiveController::class, 'forceDeleteProject'])
                     ->middleware('permission:projects.delete');
+
+                // ── Project workflow states ──
+                Route::get('/projects/{project}/states', [ProjectStateController::class, 'index'])
+                    ->middleware('permission:projects.view');
+                Route::post('/projects/{project}/states', [ProjectStateController::class, 'store'])
+                    ->middleware('permission:projects.edit');
+                Route::patch('/projects/{project}/states/{state}', [ProjectStateController::class, 'update'])
+                    ->middleware('permission:projects.edit');
+                Route::delete('/projects/{project}/states/{state}', [ProjectStateController::class, 'destroy'])
+                    ->middleware('permission:projects.edit');
 
                 // ── CSV / Excel exports (registered before /timesheets/{timesheet}) ──
                 Route::get('/projects/{project}/export/tasks', [ExportController::class, 'tasks'])

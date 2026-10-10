@@ -10,10 +10,15 @@
         try {
             const data = field === 'status'
                 ? await pmApi('PATCH', `/tasks/${taskId}/status`, { status: value })
-                : await pmApi('PATCH', `/tasks/${taskId}`, { [field]: value });
+                : field === 'state'
+                    ? await pmApi('PATCH', `/tasks/${taskId}/status`, { state_id: Number(value) })
+                    : await pmApi('PATCH', `/tasks/${taskId}`, { [field]: value });
             const task = data.task || {};
 
-            if (field === 'status' && task.status && task.status !== value) {
+            if (field === 'state' && task.state_id && String(task.state_id) !== String(value)) {
+                control.value = task.state_id;
+                showHubToast(@json(__('pm.sent_for_approval')));
+            } else if (field === 'status' && task.status && task.status !== value) {
                 // e.g. a member asking for "done" is routed to review for approval.
                 control.value = task.status;
                 showHubToast(@json(__('pm.sent_for_approval')));

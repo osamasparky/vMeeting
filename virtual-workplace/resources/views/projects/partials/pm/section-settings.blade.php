@@ -1,6 +1,7 @@
 {{-- Project settings tab: labels (+ states, automations, templates, archive in later panels). --}}
 @php
     $pmSettingsPanels = [
+        ['states', 'view_column', __('pm.states')],
         ['labels', 'sell', __('pm.labels')],
         ['archive', 'inventory_2', __('pm.archive')],
     ];
@@ -16,8 +17,31 @@
         @endforeach
     </div>
 
+    {{-- States --}}
+    <section id="pm-settings-states" class="pm-panel" role="tabpanel" aria-labelledby="pm-settings-tab-states">
+        <div class="pm-panel-head">
+            <div class="ula-headline-group">
+                <h3 class="ula-headline-ar">{{ __('pm.states_title') }}</h3>
+                @if(app()->getLocale() === 'ar')<span class="ula-headline-en">Workflow states</span>@endif
+                <span class="pm-muted">{{ __('pm.states_help') }}</span>
+            </div>
+        </div>
+        @if($user->isSuperAdmin() || $membership->hasPermission('projects.edit'))
+            <form class="pm-row" style="margin-block-end: var(--ula-space-5);" onsubmit="pmCreateState(event)">
+                <input class="pm-field pm-grow" name="name" maxlength="60" required placeholder="{{ __('pm.new_state') }}" aria-label="{{ __('pm.new_state') }}">
+                <select class="pm-field" name="group" aria-label="{{ __('pm.state_group') }}">
+                    @foreach(['backlog', 'ready', 'in_progress', 'review', 'qa', 'done'] as $g)
+                        <option value="{{ $g }}">{{ __('pm.group_'.$g) }}</option>
+                    @endforeach
+                </select>
+                <x-btn type="submit" variant="primary" size="md" icon="add">{{ __('pm.add_state') }}</x-btn>
+            </form>
+        @endif
+        <div id="pm-state-list" class="pm-list"></div>
+    </section>
+
     {{-- Labels --}}
-    <section id="pm-settings-labels" class="pm-panel" role="tabpanel" aria-labelledby="pm-settings-tab-labels">
+    <section id="pm-settings-labels" class="pm-panel" role="tabpanel" aria-labelledby="pm-settings-tab-labels" style="display: none;">
         <div class="pm-panel-head">
             <div class="ula-headline-group">
                 <h3 class="ula-headline-ar">{{ __('pm.labels_title') }}</h3>

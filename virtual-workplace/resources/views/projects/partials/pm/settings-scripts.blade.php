@@ -80,6 +80,63 @@
         } catch (err) { showHubToast(pmEsc(err.message)); }
     }
 
+    // ── States ───────────────────────────────────────────────────────────
+    function pmRenderStateList() {
+        const list = document.getElementById('pm-state-list');
+        if (!list) return;
+        list.innerHTML = PM.states.map((s, i) => `
+            <div class="pm-list-row">
+                <span class="pm-grow" style="font-weight: 800;">${pmEsc(PM.stateNames[s.name] || s.name)}
+                    ${s.is_default ? `<span class="pm-label pm-label--palm" style="margin-inline-start: var(--ula-space-2);">{{ __('pm.default_state') }}</span>` : ''}</span>
+                <span class="pm-label pm-label--stone">${pmEsc(PM.groupLabels[s.group] || s.group)}</span>
+                ${PM.can.editProject ? `
+                    <button type="button" class="ula-btn ula-btn--ghost ula-btn--sm" ${i === 0 ? 'disabled' : ''} onclick="pmUpdateState(${s.id}, {move: 'up'})" aria-label="{{ __('pm.move_up') }} ${pmEsc(s.name)}"><span class="material-symbols-rounded" aria-hidden="true">arrow_upward</span></button>
+                    <button type="button" class="ula-btn ula-btn--ghost ula-btn--sm" ${i === PM.states.length - 1 ? 'disabled' : ''} onclick="pmUpdateState(${s.id}, {move: 'down'})" aria-label="{{ __('pm.move_down') }} ${pmEsc(s.name)}"><span class="material-symbols-rounded" aria-hidden="true">arrow_downward</span></button>
+                    ${s.is_default ? '' : `<button type="button" class="ula-btn ula-btn--ghost ula-btn--sm" onclick="pmUpdateState(${s.id}, {is_default: true})"><span class="material-symbols-rounded" aria-hidden="true">star</span><span>{{ __('pm.make_default') }}</span></button>`}
+                    <button type="button" class="ula-btn ula-btn--ghost ula-btn--sm" onclick="pmRenameState(${s.id})"><span class="material-symbols-rounded" aria-hidden="true">edit</span><span>{{ __('pm.rename') }}</span></button>
+                    <button type="button" class="ula-btn ula-btn--ghost ula-btn--sm" onclick="pmDeleteState(${s.id})"><span class="material-symbols-rounded" aria-hidden="true">delete</span><span>{{ __('pm.delete') }}</span></button>` : ''}
+            </div>`).join('');
+    }
+
+    async function pmReloadStates() {
+        const data = await pmApi('GET', `/projects/${PM.projectId}/states`);
+        PM.states = data.states.map(s => ({ id: s.id, name: s.name, group: s.group, is_default: s.is_default }));
+        PM.dirty = true;
+        pmRenderStateList();
+    }
+
+    async function pmCreateState(e) {
+        e.preventDefault();
+        try {
+            await pmApi('POST', `/projects/${PM.projectId}/states`, { name: e.target.name.value.trim(), group: e.target.group.value });
+            e.target.reset();
+            await pmReloadStates();
+        } catch (err) { showHubToast(pmEsc(err.message)); }
+    }
+
+    async function pmUpdateState(id, body) {
+        try {
+            await pmApi('PATCH', `/projects/${PM.projectId}/states/${id}`, body);
+            await pmReloadStates();
+        } catch (err) { showHubToast(pmEsc(err.message)); }
+    }
+
+    function pmRenameState(id) {
+        const s = PM.states.find(x => x.id === id);
+        const name = prompt(@json(__('pm.rename_state')), s.name);
+        if (name && name.trim() !== s.name) pmUpdateState(id, { name: name.trim() });
+    }
+
+    async function pmDeleteState(id) {
+        if (!confirm(@json(__('pm.delete_state_confirm')))) return;
+        try {
+            await pmApi('DELETE', `/projects/${PM.projectId}/states/${id}`);
+            await pmReloadStates();
+        } catch (err) { showHubToast(pmEsc(err.message)); }
+    }
+
+    document.addEventListener('DOMContentLoaded', pmRenderStateList);
+
     // ── Archive ──────────────────────────────────────────────────────────
     async function pmLoadArchive() {
         const list = document.getElementById('pm-archive-list');

@@ -11,6 +11,7 @@ use App\Domains\Projects\Actions\PostTaskCommentWithNotificationsAction;
 use App\Domains\Projects\Actions\UpdateTaskAction;
 use App\Domains\Projects\Actions\UpdateTaskStatusAction;
 use App\Domains\Projects\Models\Project;
+use App\Domains\Projects\Models\ProjectState;
 use App\Domains\Projects\Models\Task;
 use App\Domains\Projects\Models\TaskChecklistItem;
 use App\Domains\Projects\Models\TaskCustomFieldValue;
@@ -261,7 +262,9 @@ class TaskController extends Controller
 
         $this->authorizeTaskEdit($organization, $task);
 
-        $updated = $action->execute($task, $request->validated('status'));
+        $stateId = $request->validated('state_id');
+        $status = $request->validated('status') ?? ProjectState::find($stateId)->group;
+        $updated = $action->execute($task, $status, $stateId ? (int) $stateId : null);
 
         return response()->json([
             'message' => 'Task status updated.',

@@ -5,6 +5,7 @@ namespace App\Domains\Projects\Actions;
 use App\Domains\Identity\Models\User;
 use App\Domains\Notifications\Services\NotificationService;
 use App\Domains\Projects\Models\Project;
+use App\Domains\Projects\Models\ProjectState;
 use App\Domains\Projects\Models\Task;
 use App\Domains\Tenancy\Models\Organization;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,11 @@ class CreateTaskAction
             $nextNumber = Task::where('project_id', $projectId)->max('task_number') + 1;
             $nextOrder = $data['order'] ?? (Task::where('project_id', $projectId)->max('order') + 1);
 
+            // Without an explicit status, start in the project's default state.
+            $defaultState = empty($data['status'])
+                ? ProjectState::where('project_id', $projectId)->where('is_default', true)->first()
+                : null;
+
             $task = Task::create([
                 'organization_id' => $organization->id,
                 'project_id' => $projectId,
@@ -30,7 +36,8 @@ class CreateTaskAction
                 'description' => $data['description'] ?? null,
                 'task_number' => $nextNumber,
                 'task_type' => $data['task_type'] ?? 'task',
-                'status' => $data['status'] ?? Task::STATUS_BACKLOG,
+                'status' => $data['status'] ?? $defaultState?->group ?? Task::STATUS_BACKLOG,
+                'state_id' => $defaultState?->id,
                 'priority' => $data['priority'] ?? Task::PRIORITY_MEDIUM,
                 // With several assignees the first is the primary one.
                 'assignee_id' => $data['assignee_ids'][0] ?? $data['assignee_id'] ?? null,

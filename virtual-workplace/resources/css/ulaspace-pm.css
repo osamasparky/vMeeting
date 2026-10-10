@@ -322,3 +322,10 @@ textarea.pm-field { padding-block: var(--ula-space-3); }
 .pm-bd-table summary { cursor: pointer; color: var(--ula-text-secondary); min-block-size: var(--ula-size-touch-target); display: flex; align-items: center; }
 .pm-bd-table table { inline-size: 100%; border-collapse: collapse; }
 .pm-bd-table th, .pm-bd-table td { padding: var(--ula-space-2) var(--ula-space-3); border-block-end: 1px solid var(--ula-border-subtle); text-align: start; }
+
+/* ── Board: one column per project state (any count), scrolling sideways when needed ── */
+#hub-section-kanban .kanban-grid {
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(220px, 1fr);
+}

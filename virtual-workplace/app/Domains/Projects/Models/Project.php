@@ -165,6 +165,11 @@ class Project extends Model
         return $this->hasMany(ProjectSprint::class)->latest('start_date');
     }
 
+    public function states(): HasMany
+    {
+        return $this->hasMany(ProjectState::class)->orderBy('position');
+    }
+
     public function labels(): HasMany
     {
         return $this->hasMany(ProjectLabel::class)->orderBy('name');

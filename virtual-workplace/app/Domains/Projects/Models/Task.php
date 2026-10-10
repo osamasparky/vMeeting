@@ -95,6 +95,7 @@ class Task extends Model
         'task_number',
         'task_type',
         'status',
+        'state_id',
         'priority',
         'assignee_id',
         'reporter_id',
@@ -259,6 +260,11 @@ class Task extends Model
         return $this->hasMany(TaskCustomFieldValue::class, 'task_id')->with('definition');
     }
 
+    public function state(): BelongsTo
+    {
+        return $this->belongsTo(ProjectState::class, 'state_id');
+    }
+
     public function labels(): BelongsToMany
     {
         return $this->belongsToMany(ProjectLabel::class, 'task_labels', 'task_id', 'label_id')->orderBy('name');
@@ -328,6 +334,20 @@ class Task extends Model
     {
         // Keep the assignee list in step with the primary assignee when it is
         // set through the single-assignee paths (create, assign, bulk, office).
+        // Keep the task's state inside its status group: any path that only
+        // sets `status` (bulk, office, recurrence, approval) lands the task in
+        // the project's first state of that group.
+        static::saving(function (Task $task) {
+            if (! $task->project_id || (! $task->isDirty(['status', 'state_id', 'project_id']) && $task->exists)) {
+                return;
+            }
+            $current = $task->state_id ? ProjectState::find($task->state_id) : null;
+            if ($current && $current->project_id === $task->project_id && ProjectState::groupsMatch($current->group, $task->status)) {
+                return;
+            }
+            $task->state_id = ProjectState::defaultFor($task->project_id, $task->status ?? self::STATUS_BACKLOG)?->id;
+        });
+
         static::created(function (Task $task) {
             if ($task->assignee_id) {
                 $task->assignees()->syncWithoutDetaching([$task->assignee_id]);

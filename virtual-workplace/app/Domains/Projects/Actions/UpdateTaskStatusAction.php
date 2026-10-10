@@ -4,6 +4,7 @@ namespace App\Domains\Projects\Actions;
 
 use App\Domains\Identity\Models\User;
 use App\Domains\Notifications\Services\NotificationService;
+use App\Domains\Projects\Models\ProjectState;
 use App\Domains\Projects\Models\Task;
 use App\Domains\Tenancy\Models\OrganizationMember;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +18,11 @@ use InvalidArgumentException;
  */
 class UpdateTaskStatusAction
 {
-    public function execute(Task $task, string $newStatus): Task
+    /**
+     * @param  int|null  $stateId  a project state to land in; ignored when the
+     *                             workflow redirects the task (e.g. to review for approval)
+     */
+    public function execute(Task $task, string $newStatus, ?int $stateId = null): Task
     {
         if (! in_array($newStatus, Task::STATUSES, true)) {
             throw new InvalidArgumentException("Invalid task status: {$newStatus}");
@@ -74,7 +79,14 @@ class UpdateTaskStatusAction
             ]);
         }
 
-        $task = $task->fresh(['project', 'assignee', 'reporter', 'approver', 'milestone']);
+        if ($stateId) {
+            $state = ProjectState::find($stateId);
+            if ($state && $state->project_id === $task->project_id && ProjectState::groupsMatch($state->group, $task->status)) {
+                $task->forceFill(['state_id' => $state->id])->saveQuietly();
+            }
+        }
+
+        $task = $task->fresh(['project', 'assignee', 'reporter', 'approver', 'milestone', 'state']);
 
         // ── Followers hear about real status changes ──
         if ($statusBefore !== $task->status) {

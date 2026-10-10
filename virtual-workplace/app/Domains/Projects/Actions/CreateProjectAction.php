@@ -5,6 +5,7 @@ namespace App\Domains\Projects\Actions;
 use App\Domains\Identity\Models\User;
 use App\Domains\Projects\Models\Project;
 use App\Domains\Projects\Models\ProjectMember;
+use App\Domains\Projects\Models\ProjectState;
 use App\Domains\Tenancy\Models\Organization;
 use Illuminate\Support\Facades\DB;
 
@@ -35,6 +36,8 @@ class CreateProjectAction
                 'planned_hours' => $data['planned_hours'] ?? null,
                 'color' => $data['color'] ?? '#3b82f6',
             ]);
+
+            ProjectState::ensureDefaults($project);
 
             // Add creator / manager as project member
             ProjectMember::updateOrCreate(

@@ -12,6 +12,10 @@
             'editTasks' => $pmCan('tasks.edit'),
             'deleteTasks' => $pmCan('tasks.delete'),
         ],
+        'states' => $project->states->map(fn ($s) => ['id' => $s->id, 'name' => $s->name, 'group' => $s->group, 'is_default' => $s->is_default])->values(),
+        // Standard state names are stored in English; JS shows them through this map.
+        'stateNames' => collect(\App\Domains\Projects\Models\ProjectState::DEFAULTS)->mapWithKeys(fn ($d) => [$d[0] => __($d[0])]),
+        'groupLabels' => collect(['backlog', 'ready', 'in_progress', 'review', 'qa', 'done'])->mapWithKeys(fn ($g) => [$g => __('pm.group_'.$g)]),
         'labels' => $project->labels->map(fn ($l) => ['id' => $l->id, 'name' => $l->name, 'tone' => $l->tone])->values(),
         'members' => $allMembers->filter(fn ($m) => $m->user)->map(fn ($m) => ['id' => $m->user_id, 'name' => $m->user->name])->values(),
         'tones' => \App\Domains\Projects\Models\ProjectLabel::TONES,

@@ -6,6 +6,7 @@ use App\Domains\Identity\Models\User;
 use App\Domains\Meetings\Models\Meeting;
 use App\Domains\Projects\Models\ActiveTimer;
 use App\Domains\Projects\Models\Project;
+use App\Domains\Projects\Models\ProjectState;
 use App\Domains\Tenancy\Models\OrganizationMember;
 
 /**
@@ -19,6 +20,8 @@ class BuildProjectHubViewAction
     public function execute(User $user, OrganizationMember $membership, Project $project): array
     {
         $organization = $membership->organization;
+
+        ProjectState::ensureDefaults($project);
 
         // Eager load project relations with optimal queries
         $project->load([
@@ -34,6 +37,7 @@ class BuildProjectHubViewAction
             'sprints.tasks',
             'files.user',
             'labels',
+            'states',
             'tasks' => function ($q) {
                 $q->with([
                     'assignee.profiles',
