@@ -1843,5 +1843,6 @@
     <!-- MODALS & SCRIPTS -->
     @include('dashboard.partials.modals')
     @include('dashboard.partials.scripts')
+    @include('dashboard.partials.my-work-scripts')
 </body>
 </html>

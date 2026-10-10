@@ -66,6 +66,8 @@
         <x-kpi-card density="default" icon="mail" iconColor="terracotta" :title="__('دعوات معلقة')" :value="$pendingGuests" :caption="__('بانتظار الانضمام')" />
     </div>
 
+    @include('dashboard.partials.my-dashboard')
+
     <!-- ── 3. Bottom Panels Grid (Matches 06-Dashboard-Overview: 1.4fr 1fr) ── -->
     <div style="display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px;">
         <!-- Column 1: Today's Meetings -->

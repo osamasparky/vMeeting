@@ -28,6 +28,7 @@ class OrganizationMember extends Model
         'billing_rate' => 'decimal:2',
         'weekly_capacity_hours' => 'decimal:2',
         'joined_at' => 'datetime',
+        'dashboard_widgets' => 'array',
     ];
 
     // ── Relationships ──

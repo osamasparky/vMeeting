@@ -14,6 +14,7 @@ use App\Domains\Projects\Controllers\ArchiveController;
 use App\Domains\Projects\Controllers\AutomationController;
 use App\Domains\Projects\Controllers\ExportController;
 use App\Domains\Projects\Controllers\IntakeController;
+use App\Domains\Projects\Controllers\MyWorkController;
 use App\Domains\Projects\Controllers\ProjectController;
 use App\Domains\Projects\Controllers\ProjectDocumentController;
 use App\Domains\Projects\Controllers\ProjectStateController;
@@ -407,6 +408,11 @@ Route::prefix('v1')->group(function () {
                     ->middleware('permission:projects.edit');
                 Route::delete('/projects/{project}/sprints/{sprint}', [SprintController::class, 'destroy'])
                     ->middleware('permission:projects.edit');
+
+                // ── My work (any member, own data only) ──
+                Route::get('/my-work/tasks', [MyWorkController::class, 'tasks']);
+                Route::get('/my-work/dashboard', [MyWorkController::class, 'dashboard']);
+                Route::put('/my-work/dashboard', [MyWorkController::class, 'saveLayout']);
 
                 // ── Saved views ──
                 Route::get('/projects/{project}/views', [SavedViewController::class, 'index'])

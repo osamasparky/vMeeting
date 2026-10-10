@@ -11,6 +11,27 @@
         </div>
     </div>
 
+    {{-- My work: planner (every project, grouped by due date) or the status board --}}
+    <div class="pm-row mw-toolbar">
+        <div class="mw-segmented" role="tablist" aria-label="{{ __('pm.mywork_view') }}">
+            <button type="button" role="tab" id="mw-view-planner" aria-controls="mywork-planner" aria-selected="true" onclick="mwSetView('planner')">
+                <span class="material-symbols-rounded" aria-hidden="true">event_note</span>{{ __('pm.mywork_planner') }}</button>
+            <button type="button" role="tab" id="mw-view-board" aria-controls="mywork-board" aria-selected="false" onclick="mwSetView('board')">
+                <span class="material-symbols-rounded" aria-hidden="true">view_kanban</span>{{ __('pm.mywork_board') }}</button>
+        </div>
+        <div class="pm-row" id="mw-scopes" role="group" aria-label="{{ __('pm.mywork_scope') }}">
+            @foreach(['assigned' => __('pm.mywork_assigned'), 'created' => __('pm.mywork_created'), 'following' => __('pm.mywork_following')] as $scopeKey => $scopeLabel)
+                <button type="button" class="mw-chip" data-scope="{{ $scopeKey }}" aria-pressed="{{ $scopeKey === 'assigned' ? 'true' : 'false' }}" onclick="mwSetScope('{{ $scopeKey }}')">{{ $scopeLabel }}</button>
+            @endforeach
+        </div>
+        <span class="pm-muted pm-grow" id="mw-summary" aria-live="polite" style="text-align: end;"></span>
+    </div>
+
+    <div id="mywork-planner" role="tabpanel" aria-labelledby="mw-view-planner">
+        <div class="pm-empty">{{ __('pm.loading') }}</div>
+    </div>
+
+    <div id="mywork-board" role="tabpanel" aria-labelledby="mw-view-board" hidden>
     <!-- Task Status Columns Grid (5-Column Kanban matching All Tasks) -->
     <div class="ula-kanban-5">
 
@@ -52,5 +73,6 @@
                 </div>
             </div>
         @endforeach
+    </div>
     </div>
 </div>
