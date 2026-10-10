@@ -3542,5 +3542,10 @@
     "⚠️ Changes Requested on task \":task\" by :name": "⚠️ طلب :name تعديلات على المهمة \":task\"",
     "⏳ Task Approval Needed: \":task\"": "⏳ مطلوب اعتماد المهمة: \":task\"",
     "pm.pref_meetings": "دعوات الاجتماعات",
-    "pm.mail_open_meeting": "عرض الاجتماع"
+    "pm.mail_open_meeting": "عرض الاجتماع",
+    "pm.prefs_channels_title": "الإشعارات",
+    "pm.prefs_channels_help": "اختر ما يظهر في الجرس وما يصلك بالبريد لكل نوع.",
+    "pm.channel_bell": "الجرس",
+    "pm.channel_email": "البريد",
+    "pm.pref_office": "المكتب الافتراضي (تلويح، طرق باب، رنّة)"
 }

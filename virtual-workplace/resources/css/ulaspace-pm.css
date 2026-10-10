@@ -700,3 +700,19 @@ textarea.pm-field { padding-block: var(--ula-space-3); }
 .notif-empty .material-symbols-rounded { font-size: 32px; }
 .notif-empty strong { color: var(--ula-text-primary); font-size: var(--ula-size-sm); }
 .notif-head-btn:focus-visible, .notif-tab-btn:focus-visible, .notif-item:focus-visible { outline: none; box-shadow: var(--ula-focus-ring); }
+
+/* ── Notification preferences (profile): one row per type, bell + email switches ── */
+.pm-pref-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ula-space-3);
+  margin: 0;
+  padding: 0 0 var(--ula-space-3);
+  border: 0;
+  border-block-end: 1px solid var(--ula-border-subtle);
+}
+.pm-pref-name { float: inline-start; padding: 0; font-size: var(--ula-size-sm); font-weight: 700; color: var(--ula-text-primary); }
+.pm-pref-switches { display: flex; flex-wrap: wrap; gap: var(--ula-space-5); }
+.pm-pref-switches > label { inline-size: auto; }

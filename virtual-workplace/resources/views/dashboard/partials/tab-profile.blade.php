@@ -246,17 +246,28 @@
             </div>
 
             <!-- Email notification preferences -->
-            @php $pmPrefs = \App\Support\NotificationPreferences::for($user); @endphp
-            <div class="card" style="margin-bottom: 0; border-radius: var(--ula-radius-xl); padding: 24px; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-sm);">
+            @php
+                $pmPrefs = \App\Support\NotificationPreferences::for($user);
+                $pmInApp = \App\Support\NotificationPreferences::inApp($user);
+            @endphp
+            <div class="card" id="notification-preferences" style="margin-bottom: 0; border-radius: var(--ula-radius-xl); padding: 24px; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-sm);">
                 <div class="ula-headline-group" style="margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--ula-border-subtle);">
-                    <h3 class="ula-headline-ar" style="font-size: var(--ula-size-h4); margin: 0;">{{ __('pm.prefs_title') }}</h3>
-                    @if(app()->getLocale() === 'ar')<span class="ula-headline-en" style="font-size: var(--ula-size-xs);">Email notifications</span>@endif
-                    <span class="pm-muted">{{ __('pm.prefs_help') }}</span>
+                    <h3 class="ula-headline-ar" style="font-size: var(--ula-size-h4); margin: 0;">{{ __('pm.prefs_channels_title') }}</h3>
+                    @if(app()->getLocale() === 'ar')<span class="ula-headline-en" style="font-size: var(--ula-size-xs);">Notifications</span>@endif
+                    <span class="pm-muted">{{ __('pm.prefs_channels_help') }}</span>
                 </div>
                 <form method="POST" action="{{ route('profile.notifications.update') }}" style="display: flex; flex-direction: column; gap: 14px;">
                     @csrf
-                    @foreach(array_keys(\App\Support\NotificationPreferences::DEFAULTS) as $prefKey)
-                        <x-switch name="email_{{ $prefKey }}" id="pm-pref-{{ $prefKey }}" :checked="$pmPrefs[$prefKey]" :label="__('pm.pref_' . $prefKey)" />
+                    @foreach(array_keys(\App\Support\NotificationPreferences::INAPP_DEFAULTS) as $prefKey)
+                        <fieldset class="pm-pref-row">
+                            <legend class="pm-pref-name">{{ __('pm.pref_' . $prefKey) }}</legend>
+                            <div class="pm-pref-switches">
+                                <x-switch name="inapp_{{ $prefKey }}" id="pm-inapp-{{ $prefKey }}" :checked="$pmInApp[$prefKey]" :label="__('pm.channel_bell')" />
+                                @if(array_key_exists($prefKey, \App\Support\NotificationPreferences::DEFAULTS))
+                                    <x-switch name="email_{{ $prefKey }}" id="pm-pref-{{ $prefKey }}" :checked="$pmPrefs[$prefKey]" :label="__('pm.channel_email')" />
+                                @endif
+                            </div>
+                        </fieldset>
                     @endforeach
                     <div style="padding-top: 12px; border-top: 1px solid var(--ula-border-subtle);">
                         <x-btn variant="primary" size="md" type="submit" icon="notifications">{{ __('pm.prefs_save') }}</x-btn>

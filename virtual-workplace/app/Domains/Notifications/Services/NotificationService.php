@@ -7,6 +7,7 @@ use App\Domains\Meetings\Models\Meeting;
 use App\Domains\Notifications\Models\WorkplaceNotification;
 use App\Domains\Projects\Models\Task;
 use App\Domains\Workspace\Models\Room;
+use App\Support\NotificationPreferences;
 use App\Support\TaskMailDispatcher;
 use Illuminate\Support\Facades\Log;
 
@@ -57,7 +58,11 @@ class NotificationService
 
             [$title, $body] = self::inLocaleOf($targetUserId, fn () => [value($title), value($body)]);
 
-            $notification = WorkplaceNotification::create([
+            // A type the person muted in the bell is not stored, but its email still goes out if wanted.
+            $recipient = User::find($targetUserId);
+            $store = ! $recipient || NotificationPreferences::wantsInApp($recipient, $type);
+
+            $notification = (new WorkplaceNotification)->forceFill([
                 'user_id' => $targetUserId,
                 'organization_id' => $orgId,
                 'type' => $type,
@@ -68,6 +73,9 @@ class NotificationService
                 'data' => $data,
                 'is_read' => false,
             ]);
+            if ($store) {
+                $notification->save();
+            }
 
             // Task notifications also go out by email when the user wants them.
             TaskMailDispatcher::queue($notification);
