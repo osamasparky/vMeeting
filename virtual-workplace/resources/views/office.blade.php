@@ -1227,6 +1227,7 @@
 
         <script src="/js/webrtc/livekit-client.umd.min.js" nonce="{{ $cspNonce ?? '' }}"></script>
     <script src="/js/webrtc/webrtc-manager.js" nonce="{{ $cspNonce ?? '' }}"></script>
+    <script src="/js/office/room-doors.js" nonce="{{ $cspNonce ?? '' }}"></script>
 
     <!-- ── JavaScript Realtime Engine, LiveKit SFU & Spatial Audio Pipeline ── -->
     <script nonce="{{ $cspNonce ?? '' }}">
@@ -1540,7 +1541,7 @@
 
             if (sortedMapObjects && sortedMapObjects.length > 0) {
                 sortedMapObjects.forEach(obj => {
-                    const ox = (obj.position ? obj.position.x : (obj.y || 0)) * TILE_SIZE;
+                    const ox = (obj.position ? obj.position.x : (obj.x || 0)) * TILE_SIZE;
                     const oy = (obj.position ? obj.position.y : (obj.y || 0)) * TILE_SIZE;
                     const ow = (obj.width || 1) * TILE_SIZE;
                     const oh = (obj.height || 1) * TILE_SIZE;
@@ -2169,183 +2170,21 @@
         let lastCanvasClickPos = { x: 0, y: 0 };
         const roomDoorPortalsCache = new Map();
 
+        // Door placement is shared with the map editor (public/js/office/room-doors.js),
+        // so the door drawn in the editor is the one avatars walk through.
+        let roomDoorPortalsCacheKey = '';
         function getRoomDoorPortal(r) {
             if (!r || !r.bounds) return null;
+            // Doors depend on the map size, which changes once the floor image loads.
+            const key = `${MAP_WIDTH_PX}x${MAP_HEIGHT_PX}`;
+            if (key !== roomDoorPortalsCacheKey) {
+                roomDoorPortalsCache.clear();
+                roomDoorPortalsCacheKey = key;
+            }
             if (roomDoorPortalsCache.has(r.id)) {
                 return roomDoorPortalsCache.get(r.id);
             }
-
-            const rx = r.bounds.x * TILE_SIZE;
-            const ry = r.bounds.y * TILE_SIZE;
-            const rw = r.bounds.width * TILE_SIZE;
-            const rh = r.bounds.height * TILE_SIZE;
-            const doorWidth = 56; // High visibility wider portal
-
-            // 1. User Explicit Configuration in Room Design (if specified)
-            const explicitSide = r.bounds.doorSide || r.bounds.door_side || r.door_side || r.doorSide || null;
-            const explicitOffset = (typeof r.bounds.doorOffset === 'number') ? r.bounds.doorOffset : null;
-
-            // Candidate wall sides and offset samples
-            const offsetSamples = (explicitOffset !== null) 
-                ? [explicitOffset] 
-                : [0.5, 0.75, 0.82, 0.25, 0.18, 0.65, 0.35];
-
-            const candidates = [];
-            const sides = (explicitSide && explicitSide !== 'auto') 
-                ? [explicitSide.toLowerCase()] 
-                : ['bottom', 'top', 'right', 'left'];
-
-            for (const side of sides) {
-                for (const off of offsetSamples) {
-                    let cx = 0, cy = 0, inX = 0, inY = 0, outX = 0, outY = 0;
-                    if (side === 'bottom') {
-                        cx = rx + (rw * off);
-                        cy = ry + rh;
-                        inX = cx; inY = cy - 26;
-                        outX = cx; outY = cy + 32;
-                    } else if (side === 'top') {
-                        cx = rx + (rw * off);
-                        cy = ry;
-                        inX = cx; inY = cy + 26;
-                        outX = cx; outY = cy - 32;
-                    } else if (side === 'right') {
-                        cx = rx + rw;
-                        cy = ry + (rh * off);
-                        inX = cx - 26; inY = cy;
-                        outX = cx + 32; outY = cy;
-                    } else if (side === 'left') {
-                        cx = rx;
-                        cy = ry + (rh * off);
-                        inX = cx + 26; inY = cy;
-                        outX = cx - 32; outY = cy;
-                    }
-
-                    candidates.push({
-                        side: side,
-                        offset: off,
-                        x: cx,
-                        y: cy,
-                        entryInsideX: inX,
-                        entryInsideY: inY,
-                        exitOutsideX: outX,
-                        exitOutsideY: outY,
-                    });
-                }
-            }
-
-            // 2. Intelligent Placement Facing the Central Open Walkway & Avoiding Shared Walls
-            const mapCenter = { x: MAP_WIDTH_PX / 2, y: MAP_HEIGHT_PX / 2 };
-            // An automatic door must leave a walkable strip to the map edge (avatar diameter + slack).
-            const outerMargin = 40;
-
-            let bestCandidate = null;
-            let bestScore = -Infinity;
-
-            for (const cand of candidates) {
-                // A0. A door that opens off the map can never be used, even when chosen by hand
-                //     (rooms drawn before the floor image changed can overhang it).
-                if (cand.exitOutsideX < 0 || cand.exitOutsideY < 0 || cand.exitOutsideX > MAP_WIDTH_PX || cand.exitOutsideY > MAP_HEIGHT_PX) {
-                    continue;
-                }
-                // A. Disqualify outer exterior building walls touching outer map canvas border (unless explicitly chosen)
-                if (!explicitSide || explicitSide === 'auto') {
-                    if (cand.exitOutsideX < outerMargin || cand.exitOutsideX > MAP_WIDTH_PX - outerMargin ||
-                        cand.exitOutsideY < outerMargin || cand.exitOutsideY > MAP_HEIGHT_PX - outerMargin) {
-                        continue; // Skip: Outer exterior building wall facing outside margins!
-                    }
-                }
-
-                // B. Check overlap with other rooms (MUST NOT touch or enter any other room!)
-                let isInsideOtherRoom = false;
-                let minDistanceToOtherRooms = 99999;
-
-                for (const other of rooms) {
-                    if (other.id === r.id || !other.bounds) continue;
-                    const orx = other.bounds.x * TILE_SIZE;
-                    const ory = other.bounds.y * TILE_SIZE;
-                    const orw = other.bounds.width * TILE_SIZE;
-                    const orh = other.bounds.height * TILE_SIZE;
-
-                    // Test if exit outside point is inside or touching other room with 6px safety margin
-                    if (cand.exitOutsideX >= orx - 6 && cand.exitOutsideX <= orx + orw + 6 &&
-                        cand.exitOutsideY >= ory - 6 && cand.exitOutsideY <= ory + orh + 6) {
-                        isInsideOtherRoom = true;
-                        break;
-                    }
-
-                    // Test if door position itself on the wall falls on a shared wall segment
-                    if (cand.x >= orx - 4 && cand.x <= orx + orw + 4 &&
-                        cand.y >= ory - 4 && cand.y <= ory + orh + 4) {
-                        isInsideOtherRoom = true;
-                        break;
-                    }
-
-                    // Calculate clearance distance to other room's rectangle
-                    const dx = Math.max(orx - cand.exitOutsideX, 0, cand.exitOutsideX - (orx + orw));
-                    const dy = Math.max(ory - cand.exitOutsideY, 0, cand.exitOutsideY - (ory + orh));
-                    const dist = Math.hypot(dx, dy);
-                    if (dist < minDistanceToOtherRooms) {
-                        minDistanceToOtherRooms = dist;
-                    }
-                }
-
-                if (isInsideOtherRoom) {
-                    continue; // Discard: this position touches another room!
-                }
-
-                // C. Score candidate: closer to Central Open Corridor + open clearance distance
-                const distToCenter = Math.hypot(cand.exitOutsideX - mapCenter.x, cand.exitOutsideY - mapCenter.y);
-                const score = (1200 - distToCenter) + (minDistanceToOtherRooms * 4) + (cand.offset === 0.5 ? 25 : 0);
-
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestCandidate = cand;
-                }
-            }
-
-            // The chosen door wall is blocked by a neighbouring room (rooms may share walls):
-            // a door there would lead into the other room, so fall back to the automatic choice.
-            if (!bestCandidate && explicitSide && explicitSide !== 'auto') {
-                return getRoomDoorPortal({ ...r, doorSide: null, door_side: null, bounds: { ...r.bounds, doorSide: 'auto', door_side: null, doorOffset: undefined } });
-            }
-
-            // Fallback (strictly prioritize candidates NOT inside other rooms)
-            if (!bestCandidate) {
-                const nonOverlapping = candidates.filter(cand => {
-                    for (const other of rooms) {
-                        if (other.id === r.id || !other.bounds) continue;
-                        const orx = other.bounds.x * TILE_SIZE;
-                        const ory = other.bounds.y * TILE_SIZE;
-                        const orw = other.bounds.width * TILE_SIZE;
-                        const orh = other.bounds.height * TILE_SIZE;
-                        if (cand.exitOutsideX >= orx - 4 && cand.exitOutsideX <= orx + orw + 4 &&
-                            cand.exitOutsideY >= ory - 4 && cand.exitOutsideY <= ory + orh + 4) {
-                            return false;
-                        }
-                    }
-                    return true;
-                });
-                const pool = nonOverlapping.length > 0 ? nonOverlapping : candidates;
-                pool.sort((a, b) => {
-                    const da = Math.hypot(a.exitOutsideX - mapCenter.x, a.exitOutsideY - mapCenter.y);
-                    const db = Math.hypot(b.exitOutsideX - mapCenter.x, b.exitOutsideY - mapCenter.y);
-                    return da - db;
-                });
-                bestCandidate = pool[0];
-            }
-
-            const portal = {
-                x: bestCandidate.x,
-                y: bestCandidate.y,
-                width: doorWidth,
-                height: 20,
-                wallSide: bestCandidate.side,
-                entryInsideX: bestCandidate.entryInsideX,
-                entryInsideY: bestCandidate.entryInsideY,
-                exitOutsideX: bestCandidate.exitOutsideX,
-                exitOutsideY: bestCandidate.exitOutsideY
-            };
-
+            const portal = window.UlaRoomDoors.compute(r, rooms, { mapW: MAP_WIDTH_PX, mapH: MAP_HEIGHT_PX, tile: TILE_SIZE });
             roomDoorPortalsCache.set(r.id, portal);
             return portal;
         }
@@ -2510,7 +2349,17 @@
         // Authoritative Solid Wall Geometry:
         // Walls are 100% solid by default across ALL rooms.
         // Valid unlocked doors create explicit walkable portal openings in those walls.
+        let wallSegmentsCache = null;
+        let wallSegmentsCacheKey = '';
         function getAllSolidWallSegments() {
+            const lockKey = rooms.map(r => (roomDoorStates.get(r.id) ? '1' : '0')).join('') + `|${MAP_WIDTH_PX}x${MAP_HEIGHT_PX}`;
+            if (wallSegmentsCache && lockKey === wallSegmentsCacheKey) return wallSegmentsCache;
+            wallSegmentsCacheKey = lockKey;
+            wallSegmentsCache = buildSolidWallSegments();
+            return wallSegmentsCache;
+        }
+
+        function buildSolidWallSegments() {
             const segments = [];
             for (const r of rooms) {
                 if (!r.bounds) continue;
@@ -3437,7 +3286,15 @@
         }
 
         // ── Main Game & Render Loop with Solid Wall Collisions & Waypoint Following ──
+        let lastUpdateAt = 0;
         function update() {
+            // Movement speed is defined per 60 fps frame; scale it to the real frame time
+            // so 120/144 Hz screens don't walk faster (capped so a stalled tab doesn't jump).
+            const nowMs = performance.now();
+            const frameScale = lastUpdateAt ? Math.min(3, Math.max(0.25, (nowMs - lastUpdateAt) / (1000 / 60))) : 1;
+            lastUpdateAt = nowMs;
+            const step = localAvatar.speed * frameScale;
+
             let dx = 0, dy = 0;
             if (keys['w'] || keys['arrowup']) dy -= 1;
             if (keys['s'] || keys['arrowdown']) dy += 1;
@@ -3461,8 +3318,8 @@
                 if (dx !== 0 || dy !== 0) {
                     avatarWaypoints = []; // Clear waypoints if manual key pressed
                     const len = Math.sqrt(dx * dx + dy * dy);
-                    nextX += (dx / len) * localAvatar.speed;
-                    nextY += (dy / len) * localAvatar.speed;
+                    nextX += (dx / len) * step;
+                    nextY += (dy / len) * step;
                     localAvatar.targetX = nextX;
                     localAvatar.targetY = nextY;
                 } else {
@@ -3470,8 +3327,9 @@
                     const diffY = localAvatar.targetY - localAvatar.y;
                     const dist = Math.sqrt(diffX * diffX + diffY * diffY);
                     if (dist > 3) {
-                        nextX += (diffX / dist) * localAvatar.speed;
-                        nextY += (diffY / dist) * localAvatar.speed;
+                        const move = Math.min(step, dist);
+                        nextX += (diffX / dist) * move;
+                        nextY += (diffY / dist) * move;
                     } else if (avatarWaypoints.length > 0) {
                         // Reached waypoint, advance to next waypoint!
                         const nextWp = avatarWaypoints.shift();
@@ -3523,18 +3381,25 @@
                 }
             }
 
-            // 4. Solid Wall Physics: Block avatar from crossing solid room walls
+            // 4. Solid Wall Physics: Block avatar from crossing solid walls
             const wallNow = minWallDistance(localAvatar.x, localAvatar.y);
             const stuckInWall = wallNow < AVATAR_COLLISION_RADIUS;
-            const blocked = stuckInWall
-                ? minWallDistance(nextX, nextY) <= wallNow // only moves that step out of the wall
-                : checkCapsuleWallCollision(localAvatar.x, localAvatar.y, nextX, nextY, AVATAR_COLLISION_RADIUS);
-            if (blocked && (nextX !== localAvatar.x || nextY !== localAvatar.y)) {
-                nextX = localAvatar.x;
-                nextY = localAvatar.y;
-                localAvatar.targetX = localAvatar.x;
-                localAvatar.targetY = localAvatar.y;
-                avatarWaypoints = []; // Clear waypoints so avatar doesn't get stuck indefinitely
+            const moveBlocked = (tx, ty) => stuckInWall
+                ? minWallDistance(tx, ty) <= wallNow // only moves that step out of the wall
+                : checkCapsuleWallCollision(localAvatar.x, localAvatar.y, tx, ty, AVATAR_COLLISION_RADIUS);
+            if ((nextX !== localAvatar.x || nextY !== localAvatar.y) && moveBlocked(nextX, nextY)) {
+                // Slide: keep whichever axis is still free, so brushing a wall doesn't stop you dead.
+                if (nextX !== localAvatar.x && !moveBlocked(nextX, localAvatar.y)) {
+                    nextY = localAvatar.y;
+                } else if (nextY !== localAvatar.y && !moveBlocked(localAvatar.x, nextY)) {
+                    nextX = localAvatar.x;
+                } else {
+                    nextX = localAvatar.x;
+                    nextY = localAvatar.y;
+                    localAvatar.targetX = localAvatar.x;
+                    localAvatar.targetY = localAvatar.y;
+                    avatarWaypoints = []; // Clear waypoints so avatar doesn't get stuck indefinitely
+                }
             }
 
             // Update Door Proximity Animation & Auto Open when approaching or inside
@@ -3567,9 +3432,10 @@
             // Smooth remote avatar interpolation & Dynamic Spatial Audio + Screen Share Isolation
             const localRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
 
+            const glide = 1 - Math.pow(0.75, frameScale);
             remoteAvatars.forEach(av => {
-                av.x += (av.targetX - av.x) * 0.25;
-                av.y += (av.targetY - av.y) * 0.25;
+                av.x += (av.targetX - av.x) * glide;
+                av.y += (av.targetY - av.y) * glide;
 
                 const remoteRoom = getCurrentRoom(av.x, av.y);
                 const isInSameRoom = localRoom ? (remoteRoom && remoteRoom.id === localRoom.id) : (!remoteRoom && Math.hypot(localAvatar.x - av.x, localAvatar.y - av.y) <= 250);
@@ -3697,7 +3563,7 @@
             if (!window._officeObjImgCache) window._officeObjImgCache = new Map();
 
             sortedMapObjects.forEach(obj => {
-                const ox = (obj.position ? obj.position.x : (obj.y || 0)) * TILE_SIZE;
+                const ox = (obj.position ? obj.position.x : (obj.x || 0)) * TILE_SIZE;
                 const oy = (obj.position ? obj.position.y : (obj.y || 0)) * TILE_SIZE;
                 const objW = (obj.width || (obj.size ? obj.size.width : 1)) * TILE_SIZE;
                 const objH = (obj.height || (obj.size ? obj.size.height : 1)) * TILE_SIZE;

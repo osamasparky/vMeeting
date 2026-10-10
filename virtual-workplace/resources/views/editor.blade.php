@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="{{ asset('css/ulaspace-office.css') }}">
     <link rel="stylesheet" href="{{ asset('css/modern-design-system.css') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="/js/office/room-doors.js" nonce="{{ $cspNonce ?? '' }}"></script>
 
     <style>
         /* ══ Map editor — light chrome (design-reference 33, re-toned light) ══════════════
@@ -2265,33 +2266,25 @@
             return null;
         }
 
-        // ── Door geometry, mirrored from office.blade.php getRoomDoorPortal() ──
-        // A door is only usable when its outside step lands on free floor, not inside another room.
-        function doorSideBlocked(room, side, offset) {
-            if (!room || !room.bounds || side === 'auto') return false;
-            const rx = room.bounds.x * TILE_SIZE, ry = room.bounds.y * TILE_SIZE;
-            const rw = room.bounds.width * TILE_SIZE, rh = room.bounds.height * TILE_SIZE;
-            let cx, cy, outX, outY;
-            if (side === 'bottom') { cx = rx + rw * offset; cy = ry + rh; outX = cx; outY = cy + 32; }
-            else if (side === 'top') { cx = rx + rw * offset; cy = ry; outX = cx; outY = cy - 32; }
-            else if (side === 'right') { cx = rx + rw; cy = ry + rh * offset; outX = cx + 32; outY = cy; }
-            else { cx = rx; cy = ry + rh * offset; outX = cx - 32; outY = cy; }
-            if (outX < 0 || outY < 0 || outX > MAP_WIDTH_PX || outY > MAP_HEIGHT_PX) return true;
-            for (const o of rooms) {
-                if (o === room || !o.bounds) continue;
-                const ox = o.bounds.x * TILE_SIZE, oy = o.bounds.y * TILE_SIZE;
-                const ow = o.bounds.width * TILE_SIZE, oh = o.bounds.height * TILE_SIZE;
-                if (outX >= ox - 6 && outX <= ox + ow + 6 && outY >= oy - 6 && outY <= oy + oh + 6) return true;
-            }
-            return false;
+        // ── Door geometry: the shared module the office uses too (public/js/office/room-doors.js) ──
+        function roomDoor(room, side = null, offset = null) {
+            if (!room || !room.bounds) return null;
+            const bounds = side === null ? room.bounds : { ...room.bounds, doorSide: side, doorOffset: offset };
+            return window.UlaRoomDoors.compute({ ...room, bounds }, rooms, { mapW: MAP_WIDTH_PX, mapH: MAP_HEIGHT_PX, tile: TILE_SIZE });
         }
 
-        // Where an 'auto' door will actually go: first wall whose centre opens onto free floor.
+        // A chosen wall is blocked when its door would open off the map or into another room
+        // (the office would then move the door automatically).
+        function doorSideBlocked(room, side, offset) {
+            if (!room || !room.bounds || side === 'auto') return false;
+            const door = roomDoor(room, side, offset);
+            return !door || door.redirected;
+        }
+
+        // Where an 'auto' door will actually go.
         function autoDoorSide(room) {
-            for (const side of ['bottom', 'top', 'right', 'left']) {
-                if (!doorSideBlocked(room, side, 0.5)) return side;
-            }
-            return 'bottom';
+            const door = roomDoor(room, 'auto', null);
+            return door ? door.wallSide : 'bottom';
         }
 
         // Can this room still be entered? Its chosen door (or, for 'auto', any wall) must open onto free floor.
@@ -2354,6 +2347,7 @@
                 knob: raised,
                 objDefault: edAlpha(accent, 0.35),
                 objLine: edAlpha(raised, 0.5),
+                danger: edColor('--ula-status-danger'),
             });
         }
         refreshEditorPalette();
@@ -2455,17 +2449,16 @@
                     ctx.fillText(labelText, rx + 10, ry + 13);
                 }
 
-                // Visual Door Indicator on Wall
-                const doorSide = (r.bounds && r.bounds.doorSide && r.bounds.doorSide !== 'auto') ? r.bounds.doorSide : autoDoorSide(r);
-                const doorOffset = (r.bounds && typeof r.bounds.doorOffset === 'number') ? r.bounds.doorOffset : 0.5;
-                const dW = Math.min(42, (doorSide === 'top' || doorSide === 'bottom') ? rw * 0.45 : rh * 0.45);
-                let dX = rx + rw * doorOffset, dY = ry + rh;
-                if (doorSide === 'top') { dX = rx + rw * doorOffset; dY = ry; }
-                else if (doorSide === 'left') { dX = rx; dY = ry + rh * doorOffset; }
-                else if (doorSide === 'right') { dX = rx + rw; dY = ry + rh * doorOffset; }
+                // Door indicator: exactly where the office places it (shared module).
+                const door = roomDoor(r);
+                if (!door) return;
+                const doorSide = door.wallSide;
+                const dW = Math.min(window.UlaRoomDoors.DOOR_WIDTH, (doorSide === 'top' || doorSide === 'bottom') ? rw * 0.6 : rh * 0.6);
+                const dX = door.x, dY = door.y;
 
                 ctx.save();
-                ctx.fillStyle = ED.accent;
+                // A chosen wall the office can't use is shown in the warning colour.
+                ctx.fillStyle = door.redirected ? ED.danger : ED.accent;
                 ctx.strokeStyle = ED.knob;
                 ctx.lineWidth = 1.5;
                 if (doorSide === 'top' || doorSide === 'bottom') {
@@ -3392,19 +3385,23 @@
                 b.setAttribute('aria-checked', on ? 'true' : 'false');
                 b.setAttribute('aria-disabled', blocked ? 'true' : 'false');
             });
+            // Preview the door the office will actually use (shared module), including 'auto'.
+            const door = room ? roomDoor(room, side, side === 'auto' ? null : offset / 100) : null;
             const mark = document.getElementById('door-picker-mark');
-            if (mark) {
-                // 'auto' draws on the bottom wall (see draw()), so preview it there.
-                const drawn = side === 'auto' ? autoDoorSide(room) : side;
-                mark.dataset.side = drawn;
-                mark.style.left = (drawn === 'top' || drawn === 'bottom') ? offset + '%' : '';
-                mark.style.top = (drawn === 'left' || drawn === 'right') ? offset + '%' : '';
+            if (mark && door) {
+                const drawnOffset = Math.round(door.offset * 100);
+                mark.dataset.side = door.wallSide;
+                mark.style.left = (door.wallSide === 'top' || door.wallSide === 'bottom') ? drawnOffset + '%' : '';
+                mark.style.top = (door.wallSide === 'left' || door.wallSide === 'right') ? drawnOffset + '%' : '';
             }
             const caption = document.getElementById('door-picker-caption');
             if (caption) {
-                const bad = doorSideBlocked(room, side, offset / 100);
-                caption.textContent = bad ? @json(__('This wall is shared with another room — choose a wall that opens onto free floor.')) : (DOOR_SIDE_LABELS[side] || side);
-                caption.classList.toggle('is-warning', bad);
+                const bad = side !== 'auto' && door && door.redirected;
+                const why = door && door.reason === 'off-map'
+                    ? @json(__('This door would open outside the map — choose another wall or move the room.'))
+                    : @json(__('This wall is shared with another room — choose a wall that opens onto free floor.'));
+                caption.textContent = bad ? why : (DOOR_SIDE_LABELS[side] || side);
+                caption.classList.toggle('is-warning', !!bad);
             }
         }
         function setDoorSide(side) {
