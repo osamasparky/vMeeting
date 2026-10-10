@@ -252,3 +252,7 @@ Route::post('/csp-violation-report', function (Request $request) {
 
     return response()->noContent();
 })->name('csp.violation.report');
+
+// Project intake: public request form behind a project's shareable link (no account needed)
+Route::get('/intake/{token}', [\App\Http\Controllers\Web\PublicIntakeController::class, 'show'])->middleware('throttle:public')->name('intake.show');
+Route::post('/intake/{token}', [\App\Http\Controllers\Web\PublicIntakeController::class, 'store'])->middleware('throttle:guest-token')->name('intake.store');

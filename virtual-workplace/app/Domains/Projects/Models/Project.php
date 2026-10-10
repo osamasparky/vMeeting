@@ -166,6 +166,11 @@ class Project extends Model
         return $this->hasMany(ProjectSprint::class)->latest('start_date');
     }
 
+    public function intakeRequests(): HasMany
+    {
+        return $this->hasMany(IntakeRequest::class);
+    }
+
     public function updates(): HasMany
     {
         return $this->hasMany(ProjectUpdate::class);

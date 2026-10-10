@@ -950,7 +950,7 @@
                 $hubTabs = [
                     ['overview', 'monitor_heart', 'pm.overview'],
                     ['kanban', 'view_kanban', 'hub.tab_kanban'], ['tasks', 'table_rows', 'hub.tab_list'],
-                    ['calendar', 'calendar_month', 'pm.calendar'], ['sprints', 'directions_run', 'pm.sprints'],
+                    ['calendar', 'calendar_month', 'pm.calendar'], ['sprints', 'directions_run', 'pm.sprints'], ['intake', 'move_to_inbox', 'pm.intake'],
                     ['gantt', 'timeline', 'hub.tab_gantt'], ['workload', 'stacked_bar_chart', 'hub.tab_workload'],
                     ['docs', 'article', 'hub.tab_docs'], ['goals', 'flag', 'hub.tab_goals'],
                     ['timelog', 'payments', 'hub.tab_time'], ['meetings', 'videocam', 'hub.tab_meetings'],
@@ -2049,6 +2049,7 @@
             @include('projects.partials.pm.section-overview')
             @include('projects.partials.pm.section-calendar')
             @include('projects.partials.pm.section-sprints')
+            @include('projects.partials.pm.section-intake')
             @include('projects.partials.pm.section-settings')
 
         </main>

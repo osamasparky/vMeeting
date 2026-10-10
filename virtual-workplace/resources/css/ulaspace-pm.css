@@ -349,3 +349,15 @@ textarea.pm-field { padding-block: var(--ula-space-3); }
 .pm-ov-bar-value { font-size: var(--ula-size-xs); font-weight: 700; color: var(--ula-text-primary); }
 .pm-update { display: grid; gap: var(--ula-space-2); padding: var(--ula-space-4); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md); background: var(--ula-surface-page); }
 .pm-update-body { margin: 0; font-size: var(--ula-size-sm); line-height: 1.7; color: var(--ula-text-primary); white-space: pre-wrap; }
+
+/* ── Public intake form ───────────────────────────────────────────────── */
+.pm-intake-page { margin: 0; min-block-size: 100vh; background: var(--ula-surface-page); color: var(--ula-text-primary); font-family: var(--ula-font-family); display: flex; justify-content: center; padding: var(--ula-space-8) var(--ula-space-5); box-sizing: border-box; }
+.pm-intake-card { inline-size: 100%; max-inline-size: 640px; align-self: flex-start; background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-block-start: 3px solid var(--ula-highlight-default); border-radius: var(--ula-radius-xl); padding: var(--ula-space-8); box-shadow: var(--ula-shadow-md); }
+.pm-intake-form { display: grid; gap: var(--ula-space-5); }
+.pm-intake-label { font-size: var(--ula-size-sm); font-weight: 600; color: var(--ula-text-primary); margin-block-end: calc(var(--ula-space-4) * -1); }
+.pm-intake-hp { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); }
+.pm-intake-done { display: flex; gap: var(--ula-space-4); align-items: flex-start; padding: var(--ula-space-5); border-radius: var(--ula-radius-md); background: var(--ula-surface-accent-soft); margin-block-end: var(--ula-space-5); }
+.pm-intake-done .material-symbols-rounded { font-size: 28px; color: var(--ula-icon-accent); }
+.pm-intake-lang { display: inline-flex; align-items: center; min-block-size: var(--ula-size-touch-target); color: var(--ula-text-link); font-size: var(--ula-size-sm); font-weight: 600; }
+.pm-intake-lang:focus-visible { outline: none; box-shadow: var(--ula-focus-ring); border-radius: var(--ula-radius-xs); }
+@media (max-width: 560px) { .pm-intake-card { padding: var(--ula-space-6); } }

@@ -15,6 +15,7 @@ use App\Domains\Projects\Controllers\TaskController;
 use App\Domains\Projects\Controllers\TimesheetController;
 use App\Domains\Projects\Controllers\ArchiveController;
 use App\Domains\Projects\Controllers\ExportController;
+use App\Domains\Projects\Controllers\IntakeController;
 use App\Domains\Projects\Controllers\ProjectStateController;
 use App\Domains\Projects\Controllers\ProjectUpdateController;
 use App\Domains\Projects\Controllers\SavedViewController;
@@ -307,6 +308,20 @@ Route::prefix('v1')->group(function () {
                     ->middleware('permission:projects.delete');
                 Route::delete('/archive/projects/{project}', [ArchiveController::class, 'forceDeleteProject'])
                     ->middleware('permission:projects.delete');
+
+                // ── Intake (outside requests) ──
+                Route::get('/projects/{project}/intake', [IntakeController::class, 'index'])
+                    ->middleware('permission:tasks.view');
+                Route::patch('/projects/{project}/intake/settings', [IntakeController::class, 'updateSettings'])
+                    ->middleware('permission:projects.edit');
+                Route::post('/projects/{project}/intake/{intake}/accept', [IntakeController::class, 'accept'])
+                    ->middleware('permission:tasks.create');
+                Route::post('/projects/{project}/intake/{intake}/decline', [IntakeController::class, 'decline'])
+                    ->middleware('permission:tasks.create');
+                Route::post('/projects/{project}/intake/{intake}/snooze', [IntakeController::class, 'snooze'])
+                    ->middleware('permission:tasks.create');
+                Route::post('/projects/{project}/intake/{intake}/duplicate', [IntakeController::class, 'duplicate'])
+                    ->middleware('permission:tasks.create');
 
                 // ── Templates ──
                 Route::get('/project-templates', [TemplateController::class, 'projectTemplates'])
