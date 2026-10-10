@@ -192,6 +192,11 @@ class Project extends Model
         return $this->hasMany(ProjectLabel::class)->orderBy('name');
     }
 
+    public function automations(): HasMany
+    {
+        return $this->hasMany(ProjectAutomation::class)->orderBy('id');
+    }
+
     public function progressPercentage(): int
     {
         $total = $this->tasks()->count();

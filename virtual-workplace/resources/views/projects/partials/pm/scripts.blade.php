@@ -133,6 +133,7 @@
 
 @include('projects.partials.pm.task-extras')
 @include('projects.partials.pm.settings-scripts')
+@include('projects.partials.pm.automation-scripts')
 @include('projects.partials.pm.list-scripts')
 @include('projects.partials.pm.views-scripts')
 @include('projects.partials.pm.calendar-scripts')

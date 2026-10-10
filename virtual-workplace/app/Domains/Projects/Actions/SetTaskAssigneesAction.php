@@ -5,6 +5,7 @@ namespace App\Domains\Projects\Actions;
 use App\Domains\Identity\Models\User;
 use App\Domains\Notifications\Services\NotificationService;
 use App\Domains\Projects\Models\Task;
+use App\Domains\Projects\Services\AutomationEngine;
 use Illuminate\Support\Facades\DB;
 
 class SetTaskAssigneesAction
@@ -34,6 +35,9 @@ class SetTaskAssigneesAction
 
         foreach (array_diff($userIds, $before) as $added) {
             NotificationService::notifyTaskAssigned($task, $added, $actor);
+        }
+        if (array_diff($userIds, $before)) {
+            AutomationEngine::fire($task, 'assignee_changed');
         }
 
         return $task->fresh(['assignee:id,name,email', 'assignees:id,name,email', 'labels']);

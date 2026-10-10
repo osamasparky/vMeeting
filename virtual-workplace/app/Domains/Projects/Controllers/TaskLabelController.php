@@ -6,6 +6,7 @@ use App\Domains\Projects\Actions\SetTaskAssigneesAction;
 use App\Domains\Projects\Models\Project;
 use App\Domains\Projects\Models\ProjectLabel;
 use App\Domains\Projects\Models\Task;
+use App\Domains\Projects\Services\AutomationEngine;
 use App\Domains\Tenancy\Models\Organization;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -79,7 +80,10 @@ class TaskLabelController extends Controller
             'label_ids.*' => ['integer', Rule::exists('project_labels', 'id')->where('project_id', $task->project_id)],
         ]);
 
-        $task->labels()->sync($validated['label_ids']);
+        $added = $task->labels()->sync($validated['label_ids'])['attached'];
+        if ($added) {
+            AutomationEngine::fire($task, 'label_added', ['label_ids' => $added]);
+        }
 
         return response()->json(['message' => 'Labels updated.', 'labels' => $task->labels()->get()]);
     }

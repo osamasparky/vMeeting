@@ -4,6 +4,7 @@ namespace App\Domains\Projects\Models;
 
 use App\Domains\Identity\Models\User;
 use App\Domains\People\Models\Team;
+use App\Domains\Projects\Services\AutomationEngine;
 use App\Traits\Auditable;
 use App\Traits\BelongsToOrganization;
 use App\Traits\HasUuid;
@@ -354,6 +355,7 @@ class Task extends Model
             }
             // The reporter and the assignee follow the task from the start.
             $task->addWatchers([$task->reporter_id, $task->assignee_id]);
+            AutomationEngine::fire($task, 'task_created');
         });
 
         // Archiving a task archives its subtasks with it; restoring brings back
@@ -391,6 +393,18 @@ class Task extends Model
                 }
             }
             $task->refreshRollups();
+        });
+
+        static::updated(function (Task $task) {
+            if ($task->wasChanged('state_id')) {
+                AutomationEngine::fire($task, 'state_changed');
+            }
+            if ($task->wasChanged('priority')) {
+                AutomationEngine::fire($task, 'priority_changed');
+            }
+            if ($task->wasChanged('assignee_id') && $task->assignee_id) {
+                AutomationEngine::fire($task, 'assignee_changed');
+            }
         });
 
         static::updated(function (Task $task) {

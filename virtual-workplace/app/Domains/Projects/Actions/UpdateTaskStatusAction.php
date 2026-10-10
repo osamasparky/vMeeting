@@ -6,8 +6,10 @@ use App\Domains\Identity\Models\User;
 use App\Domains\Notifications\Services\NotificationService;
 use App\Domains\Projects\Models\ProjectState;
 use App\Domains\Projects\Models\Task;
+use App\Domains\Projects\Services\AutomationEngine;
 use App\Domains\Tenancy\Models\OrganizationMember;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 
@@ -28,6 +30,12 @@ class UpdateTaskStatusAction
             throw new InvalidArgumentException("Invalid task status: {$newStatus}");
         }
 
+        // One transaction so automations (run after commit) see the final state.
+        return DB::transaction(fn () => $this->transition($task, $newStatus, $stateId));
+    }
+
+    private function transition(Task $task, string $newStatus, ?int $stateId): Task
+    {
         $user = Auth::user();
         $statusBefore = $task->status;
         $wasDone = $statusBefore === Task::STATUS_DONE;
@@ -82,7 +90,10 @@ class UpdateTaskStatusAction
         if ($stateId) {
             $state = ProjectState::find($stateId);
             if ($state && $state->project_id === $task->project_id && ProjectState::groupsMatch($state->group, $task->status)) {
-                $task->forceFill(['state_id' => $state->id])->saveQuietly();
+                if ($state->id !== $task->state_id) {
+                    $task->forceFill(['state_id' => $state->id])->saveQuietly();
+                    AutomationEngine::fire($task, 'state_changed');
+                }
             }
         }
 

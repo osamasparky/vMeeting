@@ -1,8 +1,9 @@
-{{-- Project settings tab: labels (+ states, automations, templates, archive in later panels). --}}
+{{-- Project settings tab: states, labels, automations, templates, archive. --}}
 @php
     $pmSettingsPanels = [
         ['states', 'view_column', __('pm.states')],
         ['labels', 'sell', __('pm.labels')],
+        ['automations', 'bolt', __('pm.automations')],
         ['templates', 'content_copy', __('pm.templates')],
         ['archive', 'inventory_2', __('pm.archive')],
     ];
@@ -60,6 +61,67 @@
         @endif
 
         <div id="pm-label-list" class="pm-list"></div>
+    </section>
+
+    {{-- Automations --}}
+    <section id="pm-settings-automations" class="pm-panel" role="tabpanel" aria-labelledby="pm-settings-tab-automations" style="display: none;">
+        <div class="pm-panel-head">
+            <div class="ula-headline-group">
+                <h3 class="ula-headline-ar">{{ __('pm.automations_title') }}</h3>
+                @if(app()->getLocale() === 'ar')<span class="ula-headline-en">Automations</span>@endif
+                <span class="pm-muted">{{ __('pm.automations_help') }}</span>
+            </div>
+            @if($user->isSuperAdmin() || $membership->hasPermission('projects.edit'))
+                <x-btn variant="primary" size="md" icon="add" id="pm-automation-new-btn" onclick="pmEditAutomation(null)">{{ __('pm.new_automation') }}</x-btn>
+            @endif
+        </div>
+
+        @if($user->isSuperAdmin() || $membership->hasPermission('projects.edit'))
+            <form id="pm-automation-form" class="pm-automation-form" hidden onsubmit="pmSaveAutomation(event)" aria-labelledby="pm-automation-form-title">
+                <h4 class="pm-extras-label" id="pm-automation-form-title" style="margin: 0;">{{ __('pm.automation_rule') }}</h4>
+                <input class="pm-field" name="name" maxlength="120" required placeholder="{{ __('pm.automation_name') }}" aria-label="{{ __('pm.automation_name') }}">
+
+                <div class="pm-automation-step">
+                    <span class="pm-automation-step-label">{{ __('pm.when') }}</span>
+                    <select class="pm-field pm-grow" name="trigger" aria-label="{{ __('pm.when') }}">
+                        @foreach(\App\Domains\Projects\Models\ProjectAutomation::TRIGGERS as $trigger)
+                            <option value="{{ $trigger }}">{{ __('pm.trigger_'.$trigger) }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="pm-automation-step">
+                    <span class="pm-automation-step-label">{{ __('pm.only_if') }}</span>
+                    <div class="pm-row pm-grow">
+                        <select class="pm-field" name="cond_state_id" aria-label="{{ __('pm.cond_state') }}"></select>
+                        <select class="pm-field" name="cond_priority" aria-label="{{ __('pm.cond_priority') }}">
+                            <option value="">{{ __('pm.cond_any_priority') }}</option>
+                            @foreach(\App\Domains\Projects\Models\Task::PRIORITIES as $priority)
+                                <option value="{{ $priority }}">{{ __(ucfirst($priority)) }}</option>
+                            @endforeach
+                        </select>
+                        <select class="pm-field" name="cond_label_id" aria-label="{{ __('pm.cond_label') }}"></select>
+                        <select class="pm-field" name="cond_assignee" aria-label="{{ __('pm.cond_assignee') }}"></select>
+                    </div>
+                </div>
+
+                <div class="pm-automation-step">
+                    <span class="pm-automation-step-label">{{ __('pm.then') }}</span>
+                    <div class="pm-grow">
+                        <div id="pm-automation-actions" class="pm-list"></div>
+                        <button type="button" class="ula-btn ula-btn--ghost ula-btn--sm" id="pm-automation-add-action" onclick="pmAddAutomationAction()" style="margin-block-start: var(--ula-space-2);">
+                            <span class="material-symbols-rounded" aria-hidden="true">add</span><span>{{ __('pm.add_action') }}</span></button>
+                    </div>
+                </div>
+
+                <div class="pm-row" style="justify-content: flex-end;">
+                    <x-btn variant="ghost" size="md" onclick="pmCloseAutomationForm()">{{ __('Cancel') }}</x-btn>
+                    <x-btn type="submit" variant="primary" size="md" icon="save">{{ __('pm.save') }}</x-btn>
+                </div>
+            </form>
+        @endif
+
+        <div id="pm-automation-list" class="pm-list" aria-live="polite"></div>
     </section>
 
     {{-- Templates --}}

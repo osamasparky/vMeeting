@@ -11,6 +11,7 @@ use App\Domains\People\Controllers\AttendanceApiController;
 use App\Domains\People\Controllers\PeopleController;
 use App\Domains\People\Controllers\ProfileController;
 use App\Domains\Projects\Controllers\ArchiveController;
+use App\Domains\Projects\Controllers\AutomationController;
 use App\Domains\Projects\Controllers\ExportController;
 use App\Domains\Projects\Controllers\IntakeController;
 use App\Domains\Projects\Controllers\ProjectController;
@@ -299,6 +300,14 @@ Route::prefix('v1')->group(function () {
                 Route::patch('/projects/{project}/labels/{label}', [TaskLabelController::class, 'update'])
                     ->middleware('permission:projects.edit');
                 Route::delete('/projects/{project}/labels/{label}', [TaskLabelController::class, 'destroy'])
+                    ->middleware('permission:projects.edit');
+                Route::get('/projects/{project}/automations', [AutomationController::class, 'index'])
+                    ->middleware('permission:projects.view');
+                Route::post('/projects/{project}/automations', [AutomationController::class, 'store'])
+                    ->middleware('permission:projects.edit');
+                Route::put('/projects/{project}/automations/{automation}', [AutomationController::class, 'update'])
+                    ->middleware('permission:projects.edit');
+                Route::delete('/projects/{project}/automations/{automation}', [AutomationController::class, 'destroy'])
                     ->middleware('permission:projects.edit');
                 Route::put('/tasks/{task}/labels', [TaskLabelController::class, 'setTaskLabels'])
                     ->middleware('permission:tasks.edit');
