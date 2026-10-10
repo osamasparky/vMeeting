@@ -3,6 +3,7 @@
 namespace Tests\Feature\Projects;
 
 use App\Domains\Notifications\Models\WorkplaceNotification;
+use App\Domains\Projects\Models\Project;
 use App\Mail\TaskActivityMail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
@@ -133,6 +134,26 @@ class TaskNotificationsTest extends TestCase
         $late->update(['due_date' => '2026-10-09']);
         $this->artisan('tasks:due-reminders')->assertSuccessful();
         $this->assertSame(2, $this->noticesFor($this->otherEmployee->id, 'task_overdue'));
+    }
+
+    public function test_archived_work_gets_no_reminders(): void
+    {
+        $this->travelTo(now()->setDate(2026, 10, 10)->setTime(9, 0));
+        $this->task->delete();
+        $this->makeTask(['assignee_id' => $this->employee->id, 'due_date' => '2026-10-11', 'status' => 'ready'])->delete();
+
+        $other = Project::create([
+            'organization_id' => $this->org->id, 'name' => 'Old', 'code' => 'OLD', 'manager_id' => $this->manager->id, 'owner_id' => $this->owner->id, 'status' => 'active',
+        ]);
+        $this->makeTask(['project_id' => $other->id, 'assignee_id' => $this->employee->id, 'due_date' => '2026-10-08', 'status' => 'ready']);
+        $other->delete();
+
+        $live = $this->makeTask(['assignee_id' => $this->otherEmployee->id, 'due_date' => '2026-10-11', 'status' => 'ready']);
+
+        $this->artisan('tasks:due-reminders')->assertSuccessful();
+
+        $this->assertSame(0, $this->noticesFor($this->employee->id, 'task_due_soon') + $this->noticesFor($this->employee->id, 'task_overdue'));
+        $this->assertSame(1, $this->noticesFor($this->otherEmployee->id, 'task_due_soon'));
     }
 
     public function test_notification_links_open_the_task_in_its_project(): void

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Domains\Notifications\Services\NotificationService;
 use App\Domains\Projects\Models\Task;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Remind assignees the day before a task is due, and once when it becomes
@@ -24,7 +25,12 @@ class SendTaskDueRemindersCommand extends Command
         $soon = 0;
         $late = 0;
 
+        // withoutGlobalScopes() drops the tenant scope (no request here) but also the
+        // archive scope, so archived tasks and tasks of archived projects are excluded by hand.
         $open = fn () => Task::withoutGlobalScopes()
+            ->whereNull('tasks.archived_at')
+            ->where(fn ($q) => $q->whereNull('project_id')
+                ->orWhereNotIn('project_id', DB::table('projects')->whereNotNull('archived_at')->select('id')))
             ->whereNotNull('due_date')
             ->where('status', '!=', Task::STATUS_DONE)
             ->with(['project:id,name', 'assignees:id']);

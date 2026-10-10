@@ -45,6 +45,11 @@ class SpatialNotificationsTest extends TestCase
         $this->postJson("/api/v1/notifications/{$n->id}/read")->assertOk();
         $this->assertTrue($n->fresh()->is_read);
 
+        // Filtering by organization keeps that organization's notices.
+        WorkplaceNotification::create(['user_id' => $this->employee->id, 'organization_id' => $this->otherOrg->id, 'type' => 'task_assigned', 'title' => 'Elsewhere', 'data' => [], 'is_read' => false]);
+        $this->getJson('/api/v1/notifications?organization_id='.$this->org->id)->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('unread_count', 0);
+        $this->getJson('/api/v1/notifications')->assertOk()->assertJsonCount(2, 'data');
+
         $other = WorkplaceNotification::where('user_id', $this->manager->id)->first();
         $this->postJson("/api/v1/notifications/{$other->id}/read")->assertNotFound();
     }

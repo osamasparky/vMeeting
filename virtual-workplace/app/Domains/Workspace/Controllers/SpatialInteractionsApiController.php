@@ -59,13 +59,16 @@ class SpatialInteractionsApiController extends Controller
      */
     public function notifications(Request $request): JsonResponse
     {
-        $page = WorkplaceNotification::forUser($request->user()->id)
-            ->latest()
+        $orgId = $request->validate(['organization_id' => ['nullable', 'string']])['organization_id'] ?? null;
+
+        // The app can ask for one organization; notifications with no organization always show.
+        $query = fn () => WorkplaceNotification::forUser($request->user()->id)
+            ->when($orgId, fn ($q) => $q->where(fn ($w) => $w->where('organization_id', $orgId)->orWhereNull('organization_id')));
+
+        $page = $query()->latest()
             ->paginate(20, ['id', 'organization_id', 'type', 'title', 'body', 'icon', 'action_url', 'data', 'is_read', 'read_at', 'created_at']);
 
-        return response()->json($page->toArray() + [
-            'unread_count' => WorkplaceNotification::forUser($request->user()->id)->unread()->count(),
-        ]);
+        return response()->json($page->toArray() + ['unread_count' => $query()->unread()->count()]);
     }
 
     /**
