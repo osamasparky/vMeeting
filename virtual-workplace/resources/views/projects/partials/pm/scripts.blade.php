@@ -133,3 +133,4 @@
 @include('projects.partials.pm.views-scripts')
 @include('projects.partials.pm.calendar-scripts')
 @include('projects.partials.pm.sprints-scripts')
+@include('projects.partials.pm.overview-scripts')

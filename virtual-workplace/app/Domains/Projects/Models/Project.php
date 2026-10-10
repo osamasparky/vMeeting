@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Project extends Model
@@ -163,6 +164,17 @@ class Project extends Model
     public function sprints(): HasMany
     {
         return $this->hasMany(ProjectSprint::class)->latest('start_date');
+    }
+
+    public function updates(): HasMany
+    {
+        return $this->hasMany(ProjectUpdate::class);
+    }
+
+    /** Health from the most recent status update (null until one is posted). */
+    public function latestUpdate(): HasOne
+    {
+        return $this->hasOne(ProjectUpdate::class)->latestOfMany();
     }
 
     public function states(): HasMany

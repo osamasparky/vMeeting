@@ -948,6 +948,7 @@
                 $hubBudget = (float) ($kpis['budget'] ?? $kpis['budget_amount'] ?? 0);
                 $hubBudgetLeft = (float) ($kpis['budget_variance'] ?? 0);
                 $hubTabs = [
+                    ['overview', 'monitor_heart', 'pm.overview'],
                     ['kanban', 'view_kanban', 'hub.tab_kanban'], ['tasks', 'table_rows', 'hub.tab_list'],
                     ['calendar', 'calendar_month', 'pm.calendar'], ['sprints', 'directions_run', 'pm.sprints'],
                     ['gantt', 'timeline', 'hub.tab_gantt'], ['workload', 'stacked_bar_chart', 'hub.tab_workload'],
@@ -2045,6 +2046,7 @@
             </div>
 
             {{-- ── Project-management feature tabs ── --}}
+            @include('projects.partials.pm.section-overview')
             @include('projects.partials.pm.section-calendar')
             @include('projects.partials.pm.section-sprints')
             @include('projects.partials.pm.section-settings')

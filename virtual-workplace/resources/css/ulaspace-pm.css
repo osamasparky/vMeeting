@@ -329,3 +329,23 @@ textarea.pm-field { padding-block: var(--ula-space-3); }
   grid-auto-flow: column;
   grid-auto-columns: minmax(220px, 1fr);
 }
+
+/* ── Overview ─────────────────────────────────────────────────────────── */
+.pm-ov-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: var(--ula-space-5); }
+.pm-ov-grid > .pm-panel + .pm-panel { margin-block-start: 0; }
+.pm-ov-wide { grid-column: 1 / -1; }
+.pm-ov-update-form { display: grid; gap: var(--ula-space-3); }
+.pm-ov-health-choice { display: inline-flex; align-items: center; gap: var(--ula-space-2); min-block-size: var(--ula-size-touch-target); cursor: pointer; }
+.pm-ov-health-choice input:focus-visible + .pm-label { box-shadow: var(--ula-focus-ring); }
+.pm-ov-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ula-space-4); margin: 0; }
+.pm-ov-stats div { padding: var(--ula-space-4); border-radius: var(--ula-radius-md); background: var(--ula-surface-sunken); }
+.pm-ov-stats dt { font-size: var(--ula-size-xs); color: var(--ula-text-secondary); }
+.pm-ov-stats dd { margin: var(--ula-space-1) 0 0; font-size: var(--ula-size-h3); font-weight: 800; color: var(--ula-text-primary); }
+.pm-ov-bars { display: grid; gap: var(--ula-space-3); }
+.pm-ov-bar-row { display: grid; grid-template-columns: minmax(90px, 30%) 1fr 36px; align-items: center; gap: var(--ula-space-3); }
+.pm-ov-bar-label { font-size: var(--ula-size-xs); color: var(--ula-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pm-ov-bar-track { block-size: 16px; }
+.pm-ov-bar { display: block; block-size: 100%; min-inline-size: 2px; background: var(--ula-accent-default); border-start-end-radius: 4px; border-end-end-radius: 4px; }
+.pm-ov-bar-value { font-size: var(--ula-size-xs); font-weight: 700; color: var(--ula-text-primary); }
+.pm-update { display: grid; gap: var(--ula-space-2); padding: var(--ula-space-4); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-md); background: var(--ula-surface-page); }
+.pm-update-body { margin: 0; font-size: var(--ula-size-sm); line-height: 1.7; color: var(--ula-text-primary); white-space: pre-wrap; }

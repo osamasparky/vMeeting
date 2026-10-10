@@ -33,6 +33,7 @@ class NotificationPreferences
         'task_due_soon' => 'due',
         'task_overdue' => 'due',
         'task_intake' => 'assigned',
+        'project_update' => 'status',
     ];
 
     /** @return array<string, bool> */
