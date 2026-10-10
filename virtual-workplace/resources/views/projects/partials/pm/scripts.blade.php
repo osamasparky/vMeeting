@@ -11,6 +11,8 @@
             'editProject' => $pmCan('projects.edit'),
             'editTasks' => $pmCan('tasks.edit'),
             'deleteTasks' => $pmCan('tasks.delete'),
+            'createTasks' => $pmCan('tasks.create'),
+            'createProjects' => $pmCan('projects.create'),
         ],
         'states' => $project->states->map(fn ($s) => ['id' => $s->id, 'name' => $s->name, 'group' => $s->group, 'is_default' => $s->is_default])->values(),
         // Standard state names are stored in English; JS shows them through this map.
@@ -20,6 +22,8 @@
         'members' => $allMembers->filter(fn ($m) => $m->user)->map(fn ($m) => ['id' => $m->user_id, 'name' => $m->user->name])->values(),
         'tones' => \App\Domains\Projects\Models\ProjectLabel::TONES,
         'locale' => app()->getLocale(),
+        'taskTemplates' => \App\Domains\Projects\Models\TaskTemplate::availableFor($project)->orderBy('name')->get(['id', 'name', 'project_id', 'payload']),
+        'projectTemplates' => \App\Domains\Projects\Models\ProjectTemplate::where('organization_id', $organization->id)->latest()->get(['id', 'name', 'description']),
         'statusLabels' => ['backlog' => __('Backlog'), 'ready' => __('Ready'), 'in_progress' => __('In Progress'), 'review' => __('Review'), 'qa' => __('QA'), 'done' => __('Done')],
         // Calendar data: one row per task with the attributes the shared filter reads.
         'tasks' => $tasks->map(fn ($t) => [

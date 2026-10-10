@@ -22,6 +22,7 @@ use App\Domains\Projects\Controllers\SprintController;
 use App\Domains\Projects\Controllers\TaskLabelController;
 use App\Domains\Projects\Controllers\TaskRelationController;
 use App\Domains\Projects\Controllers\TaskWatcherController;
+use App\Domains\Projects\Controllers\TemplateController;
 use App\Domains\Projects\Controllers\TimeTrackingController;
 use App\Domains\Tenancy\Controllers\BillingApiController;
 use App\Domains\Tenancy\Controllers\OrganizationController;
@@ -306,6 +307,20 @@ Route::prefix('v1')->group(function () {
                     ->middleware('permission:projects.delete');
                 Route::delete('/archive/projects/{project}', [ArchiveController::class, 'forceDeleteProject'])
                     ->middleware('permission:projects.delete');
+
+                // ── Templates ──
+                Route::get('/project-templates', [TemplateController::class, 'projectTemplates'])
+                    ->middleware('permission:projects.view');
+                Route::post('/projects/{project}/save-as-template', [TemplateController::class, 'saveProjectAsTemplate'])
+                    ->middleware('permission:projects.create');
+                Route::delete('/project-templates/{template}', [TemplateController::class, 'destroyProjectTemplate'])
+                    ->middleware('permission:projects.create');
+                Route::get('/projects/{project}/task-templates', [TemplateController::class, 'taskTemplates'])
+                    ->middleware('permission:tasks.view');
+                Route::post('/tasks/{task}/save-as-template', [TemplateController::class, 'saveTaskAsTemplate'])
+                    ->middleware('permission:tasks.create');
+                Route::delete('/task-templates/{template}', [TemplateController::class, 'destroyTaskTemplate'])
+                    ->middleware('permission:projects.edit');
 
                 // ── Project status updates ──
                 Route::get('/projects/{project}/updates', [ProjectUpdateController::class, 'index'])

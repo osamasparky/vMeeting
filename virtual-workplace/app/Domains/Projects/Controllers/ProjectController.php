@@ -3,12 +3,14 @@
 namespace App\Domains\Projects\Controllers;
 
 use App\Domains\Projects\Actions\CreateProjectAction;
+use App\Domains\Projects\Actions\ProjectTemplateActions;
 use App\Domains\Projects\Actions\UpdateProjectAction;
 use App\Domains\Projects\Models\Project;
 use App\Domains\Projects\Models\ProjectDocument;
 use App\Domains\Projects\Models\ProjectGoal;
 use App\Domains\Projects\Models\ProjectGoalTarget;
 use App\Domains\Projects\Models\ProjectMilestone;
+use App\Domains\Projects\Models\ProjectTemplate;
 use App\Domains\Projects\Requests\StoreProjectRequest;
 use App\Domains\Projects\Requests\UpdateProjectRequest;
 use App\Domains\Tenancy\Models\Organization;
@@ -62,7 +64,10 @@ class ProjectController extends Controller
         Organization $organization,
         CreateProjectAction $action
     ): JsonResponse {
-        $project = $action->execute($request->validated(), $organization, Auth::user());
+        $data = $request->validated();
+        $project = ! empty($data['template_id'])
+            ? app(ProjectTemplateActions::class)->instantiate(ProjectTemplate::findOrFail($data['template_id']), $data, $organization, Auth::user())
+            : $action->execute($data, $organization, Auth::user());
 
         return response()->json([
             'message' => 'Project created successfully.',

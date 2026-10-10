@@ -137,6 +137,52 @@
 
     document.addEventListener('DOMContentLoaded', pmRenderStateList);
 
+    // ── Templates ────────────────────────────────────────────────────────
+    function pmRenderTemplateLists() {
+        const tasks = document.getElementById('pm-task-template-list');
+        if (tasks) {
+            tasks.innerHTML = PM.taskTemplates.length ? PM.taskTemplates.map(t => `
+                <div class="pm-list-row">
+                    <span class="material-symbols-rounded" aria-hidden="true" style="color: var(--ula-icon-accent);">task</span>
+                    <span class="pm-grow" style="font-weight: 700;">${pmEsc(t.name)}</span>
+                    <span class="pm-label pm-label--${t.project_id ? 'stone' : 'palm'}">${t.project_id ? @json(__('pm.this_project')) : @json(__('pm.organization_wide'))}</span>
+                    <span class="pm-muted"><span class="pm-num">${(t.payload.checklist || []).length}</span> {{ __('pm.checklist_items') }}</span>
+                    ${PM.can.editProject ? `<button type="button" class="ula-btn ula-btn--ghost ula-btn--sm" onclick="pmDeleteTemplate('task', ${t.id})"><span class="material-symbols-rounded" aria-hidden="true">delete</span><span>{{ __('pm.delete') }}</span></button>` : ''}
+                </div>`).join('') : `<div class="pm-empty">{{ __('pm.no_task_templates') }}</div>`;
+        }
+        const projects = document.getElementById('pm-project-template-list');
+        if (projects) {
+            projects.innerHTML = PM.projectTemplates.length ? PM.projectTemplates.map(t => `
+                <div class="pm-list-row">
+                    <span class="material-symbols-rounded" aria-hidden="true" style="color: var(--ula-icon-accent);">folder_copy</span>
+                    <span class="pm-grow"><span style="font-weight: 700;">${pmEsc(t.name)}</span>${t.description ? `<br><span class="pm-muted">${pmEsc(t.description)}</span>` : ''}</span>
+                    ${PM.can.createProjects ? `<button type="button" class="ula-btn ula-btn--ghost ula-btn--sm" onclick="pmDeleteTemplate('project', ${t.id})"><span class="material-symbols-rounded" aria-hidden="true">delete</span><span>{{ __('pm.delete') }}</span></button>` : ''}
+                </div>`).join('') : `<div class="pm-empty">{{ __('pm.no_project_templates') }}</div>`;
+        }
+    }
+
+    async function pmSaveProjectTemplate(e) {
+        e.preventDefault();
+        try {
+            const data = await pmApi('POST', `/projects/${PM.projectId}/save-as-template`, { name: e.target.name.value.trim(), description: e.target.description.value.trim() || null });
+            PM.projectTemplates.unshift(data.template);
+            pmRenderTemplateLists();
+            showHubToast(@json(__('pm.template_saved')));
+        } catch (err) { showHubToast(pmEsc(err.message)); }
+    }
+
+    async function pmDeleteTemplate(kind, id) {
+        if (!confirm(@json(__('pm.delete_template_confirm')))) return;
+        try {
+            await pmApi('DELETE', kind === 'task' ? `/task-templates/${id}` : `/project-templates/${id}`);
+            if (kind === 'task') PM.taskTemplates = PM.taskTemplates.filter(t => t.id !== id);
+            else PM.projectTemplates = PM.projectTemplates.filter(t => t.id !== id);
+            pmRenderTemplateLists();
+        } catch (err) { showHubToast(pmEsc(err.message)); }
+    }
+
+    document.addEventListener('DOMContentLoaded', pmRenderTemplateLists);
+
     // ── Archive ──────────────────────────────────────────────────────────
     async function pmLoadArchive() {
         const list = document.getElementById('pm-archive-list');

@@ -5,8 +5,10 @@ namespace App\Domains\Projects\Actions;
 use App\Domains\Identity\Models\User;
 use App\Domains\Notifications\Services\NotificationService;
 use App\Domains\Projects\Models\Project;
+use App\Domains\Projects\Models\ProjectLabel;
 use App\Domains\Projects\Models\ProjectState;
 use App\Domains\Projects\Models\Task;
+use App\Domains\Projects\Models\TaskTemplate;
 use App\Domains\Tenancy\Models\Organization;
 use Illuminate\Support\Facades\DB;
 
@@ -14,7 +16,17 @@ class CreateTaskAction
 {
     public function execute(array $data, Organization $organization, User $creator): Task
     {
-        return DB::transaction(function () use ($data, $organization, $creator) {
+        // A task template fills whatever the form left empty.
+        $template = ! empty($data['template_id']) ? TaskTemplate::find($data['template_id']) : null;
+        if ($template) {
+            foreach (['title', 'description', 'priority', 'task_type', 'estimated_hours'] as $field) {
+                if (empty($data[$field]) && isset($template->payload[$field])) {
+                    $data[$field] = $template->payload[$field];
+                }
+            }
+        }
+
+        return DB::transaction(function () use ($data, $organization, $creator, $template) {
             $projectId = $data['project_id'];
 
             // Calculate next auto-incremented task_number per project
@@ -58,6 +70,17 @@ class CreateTaskAction
             }
             if (! empty($data['label_ids'])) {
                 $task->labels()->sync($data['label_ids']);
+            }
+            if ($template) {
+                if (! empty($template->payload['story_points'])) {
+                    $task->forceFill(['story_points' => $template->payload['story_points']])->saveQuietly();
+                }
+                foreach (array_values($template->payload['checklist'] ?? []) as $i => $title) {
+                    $task->checklistItems()->create(['organization_id' => $organization->id, 'title' => $title, 'order' => $i + 1]);
+                }
+                // Template labels match this project's labels by name.
+                $labelIds = ProjectLabel::where('project_id', $task->project_id)->whereIn('name', $template->payload['labels'] ?? [])->pluck('id');
+                $task->labels()->syncWithoutDetaching($labelIds);
             }
 
             foreach ($task->assignees()->pluck('users.id') as $assigneeId) {

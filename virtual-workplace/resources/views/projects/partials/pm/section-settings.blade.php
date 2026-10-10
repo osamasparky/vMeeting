@@ -3,6 +3,7 @@
     $pmSettingsPanels = [
         ['states', 'view_column', __('pm.states')],
         ['labels', 'sell', __('pm.labels')],
+        ['templates', 'content_copy', __('pm.templates')],
         ['archive', 'inventory_2', __('pm.archive')],
     ];
 @endphp
@@ -59,6 +60,30 @@
         @endif
 
         <div id="pm-label-list" class="pm-list"></div>
+    </section>
+
+    {{-- Templates --}}
+    <section id="pm-settings-templates" class="pm-panel" role="tabpanel" aria-labelledby="pm-settings-tab-templates" style="display: none;">
+        <div class="pm-panel-head">
+            <div class="ula-headline-group">
+                <h3 class="ula-headline-ar">{{ __('pm.templates_title') }}</h3>
+                @if(app()->getLocale() === 'ar')<span class="ula-headline-en">Templates</span>@endif
+                <span class="pm-muted">{{ __('pm.templates_help') }}</span>
+            </div>
+        </div>
+
+        <h4 class="pm-extras-label" style="margin: 0 0 var(--ula-space-3);">{{ __('pm.task_templates') }}</h4>
+        <div id="pm-task-template-list" class="pm-list" style="margin-block-end: var(--ula-space-6);"></div>
+
+        <h4 class="pm-extras-label" style="margin: 0 0 var(--ula-space-3);">{{ __('pm.project_templates') }}</h4>
+        @if($user->isSuperAdmin() || $membership->hasPermission('projects.create'))
+            <form class="pm-row" style="margin-block-end: var(--ula-space-4);" onsubmit="pmSaveProjectTemplate(event)">
+                <input class="pm-field pm-grow" name="name" maxlength="120" required value="{{ $project->name }}" aria-label="{{ __('pm.template_name') }}">
+                <input class="pm-field pm-grow" name="description" maxlength="1000" placeholder="{{ __('pm.template_description') }}" aria-label="{{ __('pm.template_description') }}">
+                <x-btn type="submit" variant="primary" size="md" icon="content_copy">{{ __('pm.save_project_template') }}</x-btn>
+            </form>
+        @endif
+        <div id="pm-project-template-list" class="pm-list"></div>
     </section>
 
     {{-- Archive --}}

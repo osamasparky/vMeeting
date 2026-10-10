@@ -7,6 +7,10 @@
             </div>
             <form id="new-task-form" onsubmit="createProjectTaskSubmit(event)" style="display: flex; flex-direction: column; gap: 14px;">
                 <input type="hidden" name="project_id" value="{{ $project->id }}">
+                <div data-pm-template-row style="display: none;">
+                    <label for="pm-new-task-template" style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('pm.start_from_template') }}</label>
+                    <select id="pm-new-task-template" name="template_id" class="form-input" onchange="pmApplyTaskTemplate(this.value)"></select>
+                </div>
                 <div>
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Task Title') }} *</label>
                     <input type="text" name="title" required placeholder="e.g. Implement payment gateway webhook" class="form-input">

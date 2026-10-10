@@ -6,6 +6,19 @@
                 <button onclick="closeNewProjectModal()" class="modal-close" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ula-text-primary); font-weight: 800;"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
             </div>
             <form id="new-project-form" onsubmit="createProjectSubmit(event)" style="display: flex; flex-direction: column; gap: 14px;">
+                @php $pmProjectTemplates = \App\Domains\Projects\Models\ProjectTemplate::where('organization_id', $organization->id)->latest()->get(['id', 'name']); @endphp
+                @if($pmProjectTemplates->isNotEmpty())
+                    <div>
+                        <label for="pm-new-project-template" style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('pm.start_from_template') }}</label>
+                        <select id="pm-new-project-template" name="template_id" class="form-input" style="width: 100%;">
+                            <option value="">{{ __('pm.no_template') }}</option>
+                            @foreach($pmProjectTemplates as $pt)
+                                <option value="{{ $pt->id }}">{{ $pt->name }}</option>
+                            @endforeach
+                        </select>
+                        <p class="pm-muted" style="margin: 6px 0 0;">{{ __('pm.project_template_hint') }}</p>
+                    </div>
+                @endif
                 <div>
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Project Name') }} *</label>
                     <input type="text" name="name" required placeholder="e.g. Mobile App Redesign, Cloud Migration" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--ula-shadow-xs);">

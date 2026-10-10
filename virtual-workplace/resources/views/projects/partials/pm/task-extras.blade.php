@@ -177,6 +177,51 @@
         } catch (err) { showHubToast(pmEsc(err.message)); }
     }
 
+    // ── Save this task's shape as a reusable template ──
+    PM.extraRows.push(() => PM.can.createTasks
+        ? pmExtrasRow(@json(__('pm.templates')), `<button type="button" class="pm-picker-trigger" style="border-style: solid;" onclick="pmSaveTaskTemplate()"><span class="material-symbols-rounded" aria-hidden="true">content_copy</span>{{ __('pm.save_as_template') }}</button>`)
+        : '');
+
+    async function pmSaveTaskTemplate() {
+        const t = PM.currentTask;
+        const name = prompt(@json(__('pm.template_name')), t.title);
+        if (!name) return;
+        try {
+            const data = await pmApi('POST', `/tasks/${t.id}/save-as-template`, { name: name.trim() });
+            PM.taskTemplates.push(data.template);
+            if (window.pmRenderTemplateLists) pmRenderTemplateLists();
+            pmFillTemplateSelect();
+            showHubToast(@json(__('pm.template_saved')));
+        } catch (e) { showHubToast(pmEsc(e.message)); }
+    }
+
+    // ── New-task form: start from a template ──
+    function pmFillTemplateSelect() {
+        const select = document.getElementById('pm-new-task-template');
+        if (!select) return;
+        select.closest('[data-pm-template-row]').style.display = PM.taskTemplates.length ? '' : 'none';
+        select.innerHTML = `<option value="">{{ __('pm.no_template') }}</option>`
+            + PM.taskTemplates.map(t => `<option value="${t.id}">${pmEsc(t.name)}</option>`).join('');
+    }
+
+    function pmApplyTaskTemplate(id) {
+        const t = PM.taskTemplates.find(x => String(x.id) === String(id));
+        const form = document.getElementById('new-task-form');
+        if (!t || !form) return;
+        const p = t.payload || {};
+        if (p.title && !form.title.value) form.title.value = p.title;
+        if (p.description && !form.description.value) form.description.value = p.description;
+        if (p.priority) form.priority.value = p.priority;
+        if (p.estimated_hours) form.estimated_hours.value = p.estimated_hours;
+        (p.labels || []).forEach(name => {
+            const label = PM.labels.find(l => l.name === name);
+            const box = label && form.querySelector(`input[name="label_ids[]"][value="${label.id}"]`);
+            if (box) box.checked = true;
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', pmFillTemplateSelect);
+
     async function pmToggleWatch() {
         const t = PM.currentTask;
         const following = (t.watchers || []).some(w => w.id === PM.userId);

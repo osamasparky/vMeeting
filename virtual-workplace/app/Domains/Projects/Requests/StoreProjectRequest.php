@@ -34,6 +34,7 @@ class StoreProjectRequest extends FormRequest
             'members.*.project_role' => ['nullable', 'string', 'in:manager,lead,contributor,viewer'],
             'members.*.cost_rate' => ['nullable', 'numeric', 'min:0'],
             'members.*.billing_rate' => ['nullable', 'numeric', 'min:0'],
+            'template_id' => ['nullable', 'integer', $this->existsInOrganization('project_templates')],
         ];
     }
 }
