@@ -740,3 +740,10 @@ textarea.pm-field { padding-block: var(--ula-space-3); }
 .nf-list .notif-item:last-child { border-block-end: 0; }
 .nf-list .notif-row strong { white-space: normal; font-size: var(--ula-size-sm); }
 .nf-list .notif-body { -webkit-line-clamp: 3; font-size: var(--ula-size-sm); }
+
+/* ── Bell in the office toolbar ───────────────────────────────────────── */
+.notif-wrap { position: relative; display: inline-flex; }
+.notif-office-btn { inline-size: var(--ula-size-touch-target); min-block-size: var(--ula-size-touch-target); justify-content: center; padding: 0; cursor: pointer; }
+.notif-office-btn:focus-visible { outline: none; box-shadow: var(--ula-focus-ring); }
+.nx-map-toolbar .notification-dropdown-panel { color: var(--ula-text-primary); text-align: start; }
+.notif-head-title .badge-status { gap: var(--ula-space-1); }

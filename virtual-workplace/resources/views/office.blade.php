@@ -1014,6 +1014,10 @@
                     <span class="material-symbols-rounded" style="font-size: 16px;">person_add</span>
                     <span>{{ __('Invite') }}</span>
                 </button>
+
+                @if(empty($user->is_guest))
+                    @include('partials.notification-bell', ['bellButtonClass' => 'nx-toolbar-btn notif-office-btn', 'bellQuietOffice' => true])
+                @endif
             </div>
         </header>
  

@@ -26,6 +26,14 @@ class NotificationBellTest extends TestCase
             ->assertSee('window.toggleNotificationDropdown', false);
     }
 
+    public function test_office_has_the_bell_too(): void
+    {
+        $html = $this->actingAs($this->manager)->get('/office')->assertOk()->getContent();
+
+        $this->assertSame(1, substr_count($html, 'id="notifWrapper"'));
+        $this->assertStringContainsString('notif-office-btn', $html);
+    }
+
     public function test_dashboard_has_exactly_one_bell(): void
     {
         $html = $this->actingAs($this->manager)->get('/dashboard')->assertOk()->getContent();

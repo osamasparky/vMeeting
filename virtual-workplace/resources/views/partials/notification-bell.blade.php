@@ -1,8 +1,14 @@
 {{-- Notification bell: badge, dropdown and polling. Shared by every page that shows the top bar.
      Notification text comes from users (task titles, comments, public intake forms), so every
-     string is escaped before it reaches the DOM. --}}
-<div class="ula-shell-notif" id="notifWrapper">
-    <button type="button" id="notifBellBtn" class="ula-shell-iconbtn" onclick="toggleNotificationDropdown()"
+     string is escaped before it reaches the DOM.
+     $bellButtonClass  the trigger's look on this page (the office toolbar uses nx-toolbar-btn)
+     $bellQuietOffice  no toast/chime for office pings: the office already shows them live --}}
+@php
+    $bellButtonClass = $bellButtonClass ?? 'ula-shell-iconbtn';
+    $bellQuietOffice = $bellQuietOffice ?? false;
+@endphp
+<div class="ula-shell-notif notif-wrap" id="notifWrapper">
+    <button type="button" id="notifBellBtn" class="{{ $bellButtonClass }}" onclick="toggleNotificationDropdown()"
             aria-label="{{ __('nav.notifications') }}" title="{{ __('nav.notifications') }}"
             aria-haspopup="true" aria-expanded="false" aria-controls="notifDropdown">
         <span class="material-symbols-rounded" aria-hidden="true">notifications</span>
@@ -45,6 +51,7 @@
             clearConfirm: @json(__('Clear all notifications?')),
             fallbackTitle: @json(__('Notifications')),
         };
+        const QUIET_TYPES = @json($bellQuietOffice ? \App\Support\NotificationPreferences::OFFICE_TYPES : []);
         const state = { items: [], filter: 'all', unread: 0, first: true };
 
         const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -66,6 +73,7 @@
             const html = `<strong>${esc(n.title)}</strong>${n.body ? `<br><small>${esc(n.body)}</small>` : ''}`;
             if (typeof window.showToastNotification === 'function') window.showToastNotification(html);
             else if (typeof window.showHubToast === 'function') window.showHubToast(html);
+            else if (typeof window.showToast === 'function') window.showToast(html);
         }
 
         function chime() {
@@ -144,7 +152,7 @@
                 state.items = data.notifications || [];
                 if (!state.first && unread > state.unread) {
                     const newest = state.items.find(n => !n.is_read) || state.items[0];
-                    if (newest) { chime(); toast(newest); desktop(newest); }
+                    if (newest && !QUIET_TYPES.includes(newest.type)) { chime(); toast(newest); desktop(newest); }
                     document.dispatchEvent(new CustomEvent('notifications:arrived'));
                 }
                 state.unread = unread;
