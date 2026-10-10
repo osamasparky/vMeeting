@@ -91,6 +91,7 @@ export class PresenceManager {
       currentRoomId: null,
       currentZoneId: null,
       lastActive: Date.now(),
+      isGuest: token.role === 'Guest' || String(token.sub).startsWith('guest_'),
     };
 
     const connection: ClientConnection = {

@@ -3566,5 +3566,7 @@
     "pm.overdue_tasks": "مهام متأخرة",
     "pm.tab_files": "الملفات",
     "pm.tab_comments": "التعليقات",
-    "pm.tab_dependencies": "الارتباطات"
+    "pm.tab_dependencies": "الارتباطات",
+    "Enter a room to share files with the people in it.": "ادخل غرفة لمشاركة الملفات مع الموجودين فيها.",
+    "You do not have access to this room.": "ليس لديك صلاحية دخول هذه الغرفة."
 }

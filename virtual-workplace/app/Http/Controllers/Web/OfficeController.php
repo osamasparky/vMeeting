@@ -19,6 +19,7 @@ use App\Domains\Workspace\Models\MapObject;
 use App\Domains\Workspace\Models\Room;
 use App\Domains\Workspace\Models\RoomFile;
 use App\Domains\Workspace\Services\AiMapGeneratorService;
+use App\Domains\Workspace\Support\RoomAccess;
 use App\Domains\Workspace\Support\RoomBoundsGap;
 use App\Http\Controllers\Controller;
 use App\Services\FileUploadService;
@@ -922,6 +923,11 @@ class OfficeController extends Controller
      */
     public function listRoomFiles(Organization $organization, Room $room)
     {
+        // Reachable without a session (invited guests): RoomAccess is the gate.
+        if (! RoomAccess::resolve($organization, $room)) {
+            return response()->json(['message' => 'You do not have access to this room.'], 403);
+        }
+
         $files = RoomFile::where('organization_id', $organization->id)
             ->where('room_id', $room->id)
             ->orderBy('created_at', 'desc')
@@ -941,8 +947,9 @@ class OfficeController extends Controller
             'file' => 'required|file|max:51200', // max 50MB
         ]);
 
-        if ($room->organization_id !== $organization->id) {
-            return response()->json(['message' => 'Unauthorized.'], 403);
+        $access = RoomAccess::resolve($organization, $room);
+        if (! $access) {
+            return response()->json(['message' => 'You do not have access to this room.'], 403);
         }
 
         $uploadedFile = $request->file('file');
@@ -962,13 +969,13 @@ class OfficeController extends Controller
         $path = $uploadedFile->storeAs("public/room_files/{$organization->id}/{$room->id}", $filename);
         $url = Storage::url($path);
 
-        $user = Auth::user();
+        $user = $access['user'];
 
         $roomFile = RoomFile::create([
             'organization_id' => $organization->id,
             'room_id' => $room->id,
             'uploaded_by_user_id' => $user?->id,
-            'uploader_name' => $user?->name ?: 'Team Member',
+            'uploader_name' => $user?->name ?: ($access['guest']['guest_name'] ?? 'Team Member'),
             'name' => $originalName,
             'file_path' => $path,
             'file_url' => $url,
@@ -989,6 +996,14 @@ class OfficeController extends Controller
     {
         if ($file->organization_id !== $organization->id || $file->room_id !== $room->id) {
             return response()->json(['message' => 'Unauthorized.'], 403);
+        }
+
+        // Deleting needs a member who may enter the room: the uploader, or someone who manages rooms.
+        $access = RoomAccess::resolve($organization, $room);
+        $user = $access['user'] ?? null;
+        $mayDelete = $user && ($file->uploaded_by_user_id === $user->id || RoomAccess::isHost($access['membership'], $user));
+        if (! $mayDelete) {
+            return response()->json(['message' => 'Only the uploader or a room manager can delete this file.'], 403);
         }
 
         Storage::delete($file->file_path);

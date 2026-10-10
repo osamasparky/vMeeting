@@ -37,6 +37,8 @@ export interface OfficeUser {
   camActive?: boolean;
   micActive?: boolean;
   lastActive: number;
+  /** From the signed token (role "Guest"), never from the display name. */
+  isGuest?: boolean;
 }
 
 // ── Inbound Client Events ──

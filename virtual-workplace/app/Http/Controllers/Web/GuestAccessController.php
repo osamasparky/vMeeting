@@ -7,6 +7,7 @@ use App\Domains\Guests\Models\GuestInvitation;
 use App\Domains\Guests\Requests\GuestEnterRequest;
 use App\Domains\Identity\Services\RealtimeTokenService;
 use App\Domains\Tenancy\Models\OrganizationMember;
+use App\Domains\Workspace\Support\RoomAccess;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -47,6 +48,10 @@ class GuestAccessController extends Controller
         }
 
         $sessionData = $buildSession->execute($invitation, $request->validated('guest_name'), $tokenService);
+
+        // The guest has no account: this session entry is what later lets them use
+        // the invited room's media and files (see RoomAccess), and nothing else.
+        RoomAccess::rememberGuest($invitation, $sessionData['user']->id, $sessionData['user']->name);
 
         return view('office', $sessionData);
     }

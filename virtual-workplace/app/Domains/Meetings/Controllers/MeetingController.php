@@ -5,8 +5,8 @@ namespace App\Domains\Meetings\Controllers;
 use App\Domains\Meetings\Models\Meeting;
 use App\Domains\Meetings\Services\LiveKitTokenService;
 use App\Domains\Tenancy\Models\Organization;
-use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Domains\Workspace\Models\Room;
+use App\Domains\Workspace\Support\RoomAccess;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -23,23 +23,23 @@ class MeetingController extends Controller
         Room $room,
         LiveKitTokenService $service
     ): JsonResponse {
-        if ($room->organization_id !== $organization->id) {
-            return response()->json(['message' => 'Unauthorized: Room does not belong to this organization.'], 403);
+        // Members allowed into this room, or a guest whose invitation is for this room.
+        // This route is reachable without a session, so the check is the only gate.
+        $access = RoomAccess::resolve($organization, $room);
+        if (! $access) {
+            return response()->json(['message' => 'You do not have access to this room.'], 403);
         }
 
-        $user = Auth::user();
+        $user = $access['user'];
         $isHost = false;
 
         if ($user) {
-            $membership = OrganizationMember::where('organization_id', $organization->id)
-                ->where('user_id', $user->id)
-                ->first();
-
-            $isHost = $membership && in_array($membership->role, ['owner', 'admin', 'manager']);
+            $isHost = RoomAccess::isHost($access['membership'], $user);
             $token = $service->generateRoomToken($user, $room, $isHost);
         } else {
-            $guestName = (string) ($request->input('guest_name') ?: 'Guest User');
-            $guestId = (string) ($request->input('guest_id') ?: ('guest_'.uniqid()));
+            // The guest's identity comes from the invitation session, never from the request.
+            $guestId = $access['guest']['guest_id'];
+            $guestName = $access['guest']['guest_name'];
             $token = $service->generateGuestRoomToken($guestId, $guestName, $room);
         }
 

@@ -307,6 +307,8 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
 
         case 'room.knock_response': {
           const { roomId, requesterUserId, approved } = event.payload;
+          // Only someone inside the room can let a knocker in (or turn them away).
+          if (conn.user.isGuest || conn.user.currentRoomId !== roomId) break;
           const reqWs = presence.findUserSocket(requesterUserId);
 
           if (reqWs) {
@@ -328,9 +330,17 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
           const user = conn.user;
           if (!user.mapId) break;
 
-          // Restrict guest users from closing or opening doors
-          if (user.name.includes('(Guest)')) {
+          // Guests never change doors. Members change a door only from inside the room;
+          // anyone may re-open a door once nobody is left inside (empty rooms rest unlocked).
+          if (user.isGuest) {
             console.log(`[WS] Blocked guest ${user.name} from modifying door state.`);
+            break;
+          }
+          if (typeof roomId !== 'string' || !roomId) break;
+          const inside = user.currentRoomId === roomId;
+          const roomEmpty = presence.getRoomOccupants(user.organizationId, user.mapId, roomId).length === 0;
+          if (!inside && !(isClosed === false && roomEmpty)) {
+            console.log(`[WS] Blocked ${user.name} from changing door of room ${roomId} from outside.`);
             break;
           }
 

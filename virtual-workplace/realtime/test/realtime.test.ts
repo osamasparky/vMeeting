@@ -8,7 +8,7 @@ import { OfficeUser } from '../src/events/event-types.js';
 
 const SECRET = 'super-secret-virtual-workplace-key-2026';
 
-function createMockToken(userId: string, name: string, orgId: string): string {
+function createMockToken(userId: string, name: string, orgId: string, role = 'member'): string {
   const header = Buffer.from(JSON.stringify({ typ: 'JWT', alg: 'HS256' })).toString('base64');
   const payload = Buffer.from(
     JSON.stringify({
@@ -16,7 +16,7 @@ function createMockToken(userId: string, name: string, orgId: string): string {
       name,
       email: `${userId}@test.com`,
       organization_id: orgId,
-      role: 'member',
+      role,
       iat: Math.floor(Date.now() / 1000),
       exp: Math.floor(Date.now() / 1000) + 3600,
     })
@@ -138,7 +138,76 @@ async function runTests() {
   await liveServerTest();
   console.log('   ✓ Office session survives a bell connection; Laravel pings reach the bell only with the secret.');
 
-  console.log('\n✨ All Realtime Service Tests Passed Successfully! (5/5 suites)');
+  // Test 6: Door and knock rules on a live server
+  console.log('6. Testing door and knock permissions...');
+  await doorRulesTest();
+  console.log('   ✓ Only people inside lock a door; guests never do; empty rooms may be reopened; only insiders answer knocks.');
+
+  console.log('\n✨ All Realtime Service Tests Passed Successfully! (6/6 suites)');
+}
+
+async function withServer(run: (port: number) => Promise<void>): Promise<void> {
+  const port = 19000 + Math.floor(Math.random() * 1000);
+  const env = { ...process.env, REALTIME_PORT: String(port), REALTIME_HOST: '127.0.0.1', REALTIME_SECRET: SECRET };
+  const child = spawn(process.execPath, ['--import', 'tsx', 'src/server.ts'], { env, stdio: ['ignore', 'pipe', 'pipe'] });
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error('❌ Server did not start')), 15000);
+      child.stdout.on('data', (d) => { if (String(d).includes('listening')) { clearTimeout(timer); resolve(); } });
+      child.on('exit', (code) => reject(new Error(`❌ Server exited early (${code})`)));
+    });
+    await run(port);
+  } finally {
+    child.kill();
+  }
+}
+
+async function doorRulesTest(): Promise<void> {
+  await withServer(async (port) => {
+    const connect = async (id: string, role = 'member') => {
+      const ws = new WebSocket(`ws://127.0.0.1:${port}/?token=${encodeURIComponent(createMockToken(id, id, 'org-1', role))}`);
+      const inbox: any[] = [];
+      ws.on('message', (m) => inbox.push(JSON.parse(String(m))));
+      await new Promise((r) => ws.once('open', r));
+      ws.send(JSON.stringify({ type: 'map.join', payload: { mapId: 'map-1', initialPosition: { x: 10, y: 10 } } }));
+      return { ws, inbox, send: (type: string, payload: any) => ws.send(JSON.stringify({ type, payload })) };
+    };
+    const pause = () => new Promise((r) => setTimeout(r, 250));
+    const doorEvents = (c: { inbox: any[] }) => c.inbox.filter((e) => e.type === 'room.door_updated');
+
+    const inside = await connect('alice');
+    const outside = await connect('bob');
+    const guest = await connect('guest_carol', 'Guest');
+    await pause();
+    inside.send('room.enter', { roomId: 'room-1' });
+    await pause();
+
+    outside.send('room.door_toggle', { roomId: 'room-1', isClosed: true });
+    guest.send('room.door_toggle', { roomId: 'room-1', isClosed: true });
+    await pause();
+    if (doorEvents(inside).length !== 0) throw new Error('❌ An outsider or a guest changed the door');
+
+    inside.send('room.door_toggle', { roomId: 'room-1', isClosed: true });
+    await pause();
+    if (doorEvents(outside).length !== 1 || doorEvents(outside)[0].payload.isClosed !== true) throw new Error('❌ The occupant could not lock the door');
+
+    // Knock answers only count from inside the room.
+    outside.send('room.knock_response', { roomId: 'room-1', requesterUserId: 'guest_carol', approved: true });
+    await pause();
+    if (guest.inbox.some((e) => e.type === 'room.knock_result')) throw new Error('❌ An outsider answered a knock');
+    inside.send('room.knock_response', { roomId: 'room-1', requesterUserId: 'guest_carol', approved: true });
+    await pause();
+    if (!guest.inbox.some((e) => e.type === 'room.knock_result' && e.payload.approved === true)) throw new Error('❌ The occupant could not answer the knock');
+
+    // Once the room is empty anyone may reopen it (rooms rest unlocked).
+    inside.send('room.leave', { roomId: 'room-1' });
+    await pause();
+    outside.send('room.door_toggle', { roomId: 'room-1', isClosed: false });
+    await pause();
+    if (!doorEvents(inside).some((e) => e.payload.isClosed === false)) throw new Error('❌ An empty room could not be reopened');
+
+    for (const c of [inside, outside, guest]) c.ws.close();
+  });
 }
 
 async function liveServerTest(): Promise<void> {

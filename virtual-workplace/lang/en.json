@@ -3566,5 +3566,7 @@
     "pm.overdue_tasks": "Overdue tasks",
     "pm.tab_files": "Files",
     "pm.tab_comments": "Comments",
-    "pm.tab_dependencies": "Dependencies"
+    "pm.tab_dependencies": "Dependencies",
+    "Enter a room to share files with the people in it.": "Enter a room to share files with the people in it.",
+    "You do not have access to this room.": "You do not have access to this room."
 }

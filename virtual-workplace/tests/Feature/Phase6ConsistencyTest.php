@@ -117,11 +117,20 @@ class Phase6ConsistencyTest extends TestCase
 
     // ── Session-less upload endpoints ───────────────────────────────
 
-    public function test_room_file_upload_rejects_executable_files_even_without_a_session(): void
+    /** An invited guest's session for this room (see RoomAccess): the only way in without an account. */
+    private function asRoomGuest(): static
+    {
+        return $this->withSession([\App\Domains\Workspace\Support\RoomAccess::GUEST_SESSION_KEY => [
+            'organization_id' => $this->organization->id, 'room_id' => $this->room->id,
+            'guest_id' => 'guest_phase6', 'guest_name' => 'Visitor (Guest)', 'expires_at' => time() + 3600,
+        ]]);
+    }
+
+    public function test_room_file_upload_rejects_executable_files_even_from_a_guest(): void
     {
         Storage::fake('local');
 
-        $response = $this->postJson(
+        $response = $this->asRoomGuest()->postJson(
             "/organizations/{$this->organization->id}/rooms/{$this->room->id}/files",
             ['file' => UploadedFile::fake()->createWithContent('shell.php', '<?php system($_GET["c"]); ?>')]
         );
@@ -150,7 +159,7 @@ class Phase6ConsistencyTest extends TestCase
     {
         Storage::fake('local');
 
-        $response = $this->postJson(
+        $response = $this->asRoomGuest()->postJson(
             "/organizations/{$this->organization->id}/rooms/{$this->room->id}/files",
             ['file' => UploadedFile::fake()->create('agenda.pdf', 20, 'application/pdf')]
         );

@@ -2045,19 +2045,19 @@
                     const item = nearbyInteractive;
                     if (item.interaction_type === 'drink') {
                         playDoorSlideSound();
-                        showToast(`☕ ${__("Enjoying fresh drink from")} ${item.name}! Cheers! 🎉`);
+                        showToast(`☕ ${__("Enjoying fresh drink from")} ${escapeHtml(item.name)}! Cheers! 🎉`);
                         triggerSpeechReaction('☕', 'emoji');
                     } else if (item.interaction_type === 'whiteboard') {
                         const boardModal = document.getElementById('whiteboard-modal');
                         if (boardModal) boardModal.style.display = 'flex';
-                        else showToast(`📋 ${__("Interactive Strategy Whiteboard")}: ${item.name}`);
+                        else showToast(`📋 ${__("Interactive Strategy Whiteboard")}: ${escapeHtml(item.name)}`);
                     } else if (item.interaction_type === 'soundEffect') {
                         playDoorKnockSound();
-                        showToast(`🔔 ${__("Chime sound effect triggered on")} ${item.name}!`);
+                        showToast(`🔔 ${__("Chime sound effect triggered on")} ${escapeHtml(item.name)}!`);
                         triggerSpeechReaction('🎉', 'emoji');
                     } else if (item.interaction_type === 'instrument' || item.interaction_type === 'staticMusic') {
                         playDoorSlideSound();
-                        showToast(`🎹 ${__("Playing musical note on")} ${item.name}! 🎶`);
+                        showToast(`🎹 ${__("Playing musical note on")} ${escapeHtml(item.name)}! 🎶`);
                         triggerSpeechReaction('🎶', 'emoji');
                     } else if (nearbyChair && (
                         minWallDistance(nearbyChair.x, nearbyChair.y) < AVATAR_COLLISION_RADIUS ||
@@ -2406,10 +2406,10 @@
 
             if (nextLocked) {
                 playDoorKnockSound();
-                showToast(`🔒 ${room.name} ` + __('door closed & locked'));
+                showToast(`🔒 ${escapeHtml(room.name)} ` + __('door closed & locked'));
             } else {
                 playDoorSlideSound();
-                showToast(`🔓 ${room.name} ` + __('door opened'));
+                showToast(`🔓 ${escapeHtml(room.name)} ` + __('door opened'));
             }
 
             if (ws && ws.readyState === WebSocket.OPEN) {
@@ -3174,7 +3174,7 @@
             if (targetRoom && targetRoom !== myRoom) {
                 // Moving into another room REQUIRES Double-Click!
                 if (!isDblClick) {
-                    showToast(`💡 ${__('Double-click to navigate into:')} ${getLocalizedRoomName(targetRoom)}`);
+                    showToast(`💡 ${__('Double-click to navigate into:')} ${escapeHtml(getLocalizedRoomName(targetRoom))}`);
                     return;
                 }
 
@@ -3184,10 +3184,10 @@
                         return;
                     }
                 } else if (CONFIG.allowedRoomIds && CONFIG.allowedRoomIds.length > 0 && !CONFIG.allowedRoomIds.includes(targetRoom.id)) {
-                    showToast(`🚫 {{ __("Restricted Room: You do not have permission to access ':name'.", ['name' => '']) }} ${getLocalizedRoomName(targetRoom)}`);
+                    showToast(`🚫 {{ __("Restricted Room: You do not have permission to access ':name'.", ['name' => '']) }} ${escapeHtml(getLocalizedRoomName(targetRoom))}`);
                     return;
                 } else if (targetRoom.capacity && targetRoom.capacity > 0 && countRoomOccupants(targetRoom.id) >= targetRoom.capacity) {
-                    showToast(`⚠️ {{ __("Room ':name' has reached full capacity (:max max occupants).", ['name' => '', 'max' => '']) }} ${getLocalizedRoomName(targetRoom)} (${targetRoom.capacity})`);
+                    showToast(`⚠️ {{ __("Room ':name' has reached full capacity (:max max occupants).", ['name' => '', 'max' => '']) }} ${escapeHtml(getLocalizedRoomName(targetRoom))} (${targetRoom.capacity})`);
                     return;
                 } else if (roomDoorStates.get(targetRoom.id)) {
                     playDoorKnockSound();
@@ -3271,7 +3271,7 @@
 
                 if (openInNewTab && targetUrl && targetUrl !== '#') {
                     window.open(targetUrl, '_blank');
-                    showToast(`🚀 {{ __("Opening link:") }} ${linkTitle}`);
+                    showToast(`🚀 {{ __("Opening link:") }} ${escapeHtml(linkTitle)}`);
                 } else {
                     const modal = document.getElementById('custom-link-modal');
                     const title = document.getElementById('custom-link-modal-title');
@@ -3504,7 +3504,7 @@
                     nextY = localAvatar.y;
                     localAvatar.targetX = localAvatar.x;
                     localAvatar.targetY = localAvatar.y;
-                    showToast(`🚫 {{ __("Restricted Room: Access not permitted for ':name'.", ['name' => '']) }} ${targetR.name}`);
+                    showToast(`🚫 {{ __("Restricted Room: Access not permitted for ':name'.", ['name' => '']) }} ${escapeHtml(targetR.name)}`);
                 }
                 // 3. Room Capacity Check
                 else if (targetR.capacity && targetR.capacity > 0 && countRoomOccupants(targetR.id) >= targetR.capacity) {
@@ -3512,7 +3512,7 @@
                     nextY = localAvatar.y;
                     localAvatar.targetX = localAvatar.x;
                     localAvatar.targetY = localAvatar.y;
-                    showToast(`⚠️ {{ __("Room ':name' has reached full capacity (:max max occupants).", ['name' => '', 'max' => '']) }} ${targetR.name} (${targetR.capacity})`);
+                    showToast(`⚠️ {{ __("Room ':name' has reached full capacity (:max max occupants).", ['name' => '', 'max' => '']) }} ${escapeHtml(targetR.name)} (${targetR.capacity})`);
                 }
                 // 4. Door Lock Check
                 else if (roomDoorStates.get(targetR.id)) {
@@ -4632,7 +4632,7 @@
                                     isSpeaking: false,
                                     gender: u.gender || 'male'
                                 });
-                                showToast(`👋 ${u.name} {{ __("joined the office") }}`);
+                                showToast(`👋 ${escapeHtml(u.name)} {{ __("joined the office") }}`);
                                 updateOccupantsCounter();
                             }
                         }
@@ -4659,7 +4659,7 @@
                             if (userId && remoteAvatars.has(userId)) {
                                 const av = remoteAvatars.get(userId);
                                 av.gender = gender;
-                                showToast(`🎭 ${av.name} {{ __("changed avatar character to") }} ${gender === 'female' ? '👩 Female' : '👨 Male'}`);
+                                showToast(`🎭 ${escapeHtml(av.name)} {{ __("changed avatar character to") }} ${gender === 'female' ? '👩 Female' : '👨 Male'}`);
                             }
                         }
 
@@ -4704,7 +4704,7 @@
                         else if (data.type === 'room.knock_result' && data.payload) {
                             if (data.payload.approved) {
                                 playDoorSlideSound();
-                                showToast(`🚪 {{ __("Access granted by") }} ${data.payload.responderName}!`);
+                                showToast(`🚪 {{ __("Access granted by") }} ${escapeHtml(data.payload.responderName)}!`);
                                 roomDoorStates.set(data.payload.roomId, false);
                                 updateRoomPresence();
                             } else {
@@ -4766,7 +4766,7 @@
                         else if (data.type === 'user.wave' && data.payload) {
                             if (data.payload.targetUserId === localAvatar.id) {
                                 playWaveSound();
-                                showToast(`👋 ${data.payload.senderName || 'A Colleague'} ${__('says HI to you!')}`);
+                                showToast(`👋 ${escapeHtml(data.payload.senderName || 'A Colleague')} ${__('says HI to you!')}`);
                                 spawnSpeechBubble(data.payload.senderUserId, data.payload.senderName, `👋 ${data.payload.senderName || 'Colleague'} says HI!`, '👋');
                             }
                         }
@@ -4791,7 +4791,7 @@
                                 if (descEl) descEl.textContent = `${__('Immediate attention requested by')} ${data.payload.senderName}.`;
                                 const ringModal = document.getElementById('incoming-ring-modal');
                                 if (ringModal) ringModal.style.display = 'flex';
-                                showToast(`🔔 ${data.payload.senderName} ${__('is ringing you!')}`);
+                                showToast(`🔔 ${escapeHtml(data.payload.senderName)} ${__('is ringing you!')}`);
                             }
                         }
 
@@ -4820,7 +4820,7 @@
                         else if (data.type === 'whiteboard.clear' && data.payload) {
                             if (wbCtx && wbCanvas) {
                                 wbCtx.clearRect(0, 0, wbCanvas.width, wbCanvas.height);
-                                showToast(`🧹 ${data.payload.clearedBy} {{ __("cleared the whiteboard.") }}`);
+                                showToast(`🧹 ${escapeHtml(data.payload.clearedBy)} {{ __("cleared the whiteboard.") }}`);
                             }
                         }
 
@@ -4849,7 +4849,7 @@
                         // 11. Presentation started/stopped
                         else if (data.type === 'presentation.started' && data.payload) {
                             if (data.payload.presenterId) activeScreenSharers.add(data.payload.presenterId);
-                            showToast(`🖥️ ${data.payload.presenterName || 'Colleague'} {{ __("started screen presentation") }}`);
+                            showToast(`🖥️ ${escapeHtml(data.payload.presenterName || 'Colleague')} {{ __("started screen presentation") }}`);
                             const btn = document.getElementById('btn-chat-focus-screen');
                             if (btn) btn.style.display = 'inline-flex';
                         }
@@ -5749,21 +5749,33 @@
         // ── Chat File Upload Handler ──
         async function handleChatFileUpload(input) {
             if (!input.files || !input.files[0]) return;
+            // Files are shared through the current room's file shelf (same access rules as the room).
+            const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+            if (!myRoom) {
+                showToast('⚠️ {{ __("Enter a room to share files with the people in it.") }}');
+                input.value = '';
+                return;
+            }
+
             const formData = new FormData();
             formData.append('file', input.files[0]);
             showToast('⏳ {{ __("Uploading attachment...") }}');
 
             try {
-                const res = await fetch(`/organizations/${CONFIG.org.id}/files`, {
+                const res = await fetch(`/organizations/${CONFIG.org.id}/rooms/${myRoom.id}/files`, {
                     method: 'POST',
                     headers: { 'X-CSRF-TOKEN': CONFIG.csrf, 'Accept': 'application/json' },
                     credentials: 'same-origin',
                     body: formData
                 });
-                if (res.ok) {
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    showToast('❌ ' + escapeHtml(err.message || '{{ __("Failed to upload file") }}'));
+                    return;
+                }
+                {
                     const data = await res.json();
-                    const fileData = data.file || { name: input.files[0].name, url: '#' };
-                    const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+                    const fileData = data.file ? { name: data.file.name, url: data.file.file_url } : { name: input.files[0].name, url: '' };
                     const fileMsgText = `📎 {{ __("Shared a file:") }} ${fileData.name}`;
 
                     appendChatMessage({
@@ -6602,7 +6614,7 @@
                 localAvatar.targetY = av.y;
             }
             closeOccupantsModal();
-            showToast(`🎯 {{ __('Moving to') }} ${av.name}...`);
+            showToast(`🎯 {{ __('Moving to') }} ${escapeHtml(av.name)}...`);
         }
 
         // ── User Spotlight & Activity Drawer ──
@@ -6752,8 +6764,8 @@
                                     <div style="display: flex; align-items: center; gap: 8px;">
                                         <span style="font-size: 14px;">${t.status === 'done' ? '✅' : (t.status === 'in_progress' ? '⚡' : '📌')}</span>
                                         <div>
-                                            <div style="font-size: 12px; font-weight: 800; color: var(--ula-text-primary); text-decoration: ${t.status === 'done' ? 'line-through' : 'none'};">${t.title}</div>
-                                            <div style="font-size: 10px; color: var(--ula-text-secondary);">${t.project_name} ${t.due_date ? '· 📅 ' + t.due_date : ''}</div>
+                                            <div style="font-size: 12px; font-weight: 800; color: var(--ula-text-primary); text-decoration: ${t.status === 'done' ? 'line-through' : 'none'};">${escapeHtml(t.title)}</div>
+                                            <div style="font-size: 10px; color: var(--ula-text-secondary);">${escapeHtml(t.project_name)} ${t.due_date ? '· 📅 ' + escapeHtml(t.due_date) : ''}</div>
                                         </div>
                                     </div>
                                     <span class="guest-badge" style="text-transform: uppercase; font-size: 9px;">${t.status.replace('_', ' ')}</span>
@@ -6964,7 +6976,7 @@
                     showToast(`✅ {{ __("Task status updated to:") }} ${newStatus.replace('_', ' ')}`);
                     loadMyOfficeTasks();
                 } else {
-                    showToast(`❌ ${data.message || '{{ __("Failed to update status") }}'}`);
+                    showToast(`❌ ${escapeHtml(data.message || '{{ __("Failed to update status") }}')}`);
                 }
             } catch (e) {
                 console.error('Error updating task status:', e);
@@ -7001,10 +7013,10 @@
                 });
                 const data = await res.json();
                 if (res.ok && data.success) {
-                    showToast(`⚡ {{ __("Task timer started for:") }} ${title}`);
+                    showToast(`⚡ {{ __("Task timer started for:") }} ${escapeHtml(title)}`);
                     loadMyOfficeTasks();
                 } else {
-                    showToast(`❌ ${data.message || '{{ __("Failed to start timer") }}'}`);
+                    showToast(`❌ ${escapeHtml(data.message || '{{ __("Failed to start timer") }}')}`);
                 }
             } catch (e) {
                 console.error('Error starting task timer:', e);
@@ -7028,7 +7040,7 @@
                     showToast('⏹️ {{ __("Task timer stopped and logged to timesheet!") }}');
                     loadMyOfficeTasks();
                 } else {
-                    showToast(`❌ ${data.message || '{{ __("Failed to stop timer") }}'}`);
+                    showToast(`❌ ${escapeHtml(data.message || '{{ __("Failed to stop timer") }}')}`);
                 }
             } catch (e) {
                 console.error('Error stopping task timer:', e);
