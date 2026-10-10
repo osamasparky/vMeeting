@@ -3575,5 +3575,12 @@
     "Walls": "الحوائط",
     "Obstacles": "العوائق",
     "Obstacle": "عائق",
-    "Avatars cannot pass through it in the office. Drag to move, Delete to remove.": "لا يمكن للأفاتار المرور من خلاله في المكتب. اسحبه للتحريك أو اضغط Delete للحذف."
+    "Avatars cannot pass through it in the office. Drag to move, Delete to remove.": "لا يمكن للأفاتار المرور من خلاله في المكتب. اسحبه للتحريك أو اضغط Delete للحذف.",
+    "The new floor image has a different size. Scale the existing rooms, furniture and walls to match it?": "صورة الأرضية الجديدة بمقاس مختلف. هل تريد تحجيم الغرف والأثاث والحوائط الحالية لتطابقها؟",
+    "Layout scaled to the new image — press Save to keep it.": "تم تحجيم المخطط على الصورة الجديدة — اضغط حفظ لتثبيته.",
+    "Move them inside": "أدخِلها داخل الخريطة",
+    "Some rooms are outside the floor image, so their walls and doors are unreachable in the office:": "بعض الغرف خارج صورة الأرضية، لذلك لا يمكن الوصول لحوائطها وأبوابها في المكتب:",
+    "Rooms moved inside the map — press Save to keep it.": "تم إدخال الغرف داخل الخريطة — اضغط حفظ لتثبيت التعديل.",
+    "This room is outside the floor image. Move it inside the map.": "هذه الغرفة خارج صورة الأرضية. حرّكها داخل الخريطة.",
+    "These rooms are outside the floor image: :names. Move them inside the map first.": "هذه الغرف خارج صورة الأرضية: :names. أدخِلها داخل الخريطة أولًا."
 }

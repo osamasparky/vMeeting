@@ -47,6 +47,57 @@ class MapEditorTest extends TestCase
         $this->assertEquals([['x' => 5, 'y' => 6, 'width' => 2, 'height' => 1]], $layout['obstacles']);
     }
 
+    public function test_rooms_must_lie_on_the_floor_image(): void
+    {
+        $this->map->forceFill(['layout_data' => ['background_width' => 1200, 'background_height' => 720]])->save(); // 75 x 45 tiles
+        $this->actingAs($this->owner);
+
+        // Bulk save: a room hanging off the image is refused and nothing is written.
+        $this->postJson("/editor/maps/{$this->map->id}/save", [
+            'name' => 'Renamed',
+            'rooms' => [['name' => 'Lounge', 'bounds' => ['x' => 2, 'y' => 30, 'width' => 20, 'height' => 25]]],
+        ])->assertStatus(422)->assertJsonFragment(['message' => __('These rooms are outside the floor image: :names. Move them inside the map first.', ['names' => 'Lounge'])]);
+        $this->assertSame('Map', $this->map->fresh()->name);
+
+        // Non-numeric bounds are refused too.
+        $this->postJson("/editor/maps/{$this->map->id}/save", ['rooms' => [['name' => 'X', 'bounds' => ['x' => 'a', 'y' => 1, 'width' => 2, 'height' => 2]]]])->assertStatus(422);
+
+        // Single-room endpoint applies the same rule; a room inside the image is fine.
+        $room = fn ($y) => ['organization_id' => $this->org->id, 'map_id' => $this->map->id, 'name' => 'R', 'type' => 'meeting', 'bounds' => ['x' => 2, 'y' => $y, 'width' => 10, 'height' => 10]];
+        $this->postJson('/editor/rooms', $room(40))->assertStatus(422);
+        $this->postJson('/editor/rooms', $room(5))->assertCreated();
+    }
+
+    public function test_room_fits_map_rules(): void
+    {
+        $layout = ['background_width' => 1200, 'background_height' => 708]; // 75 x 44.25 tiles
+        $this->assertTrue(MapGeometry::roomFitsMap(['x' => 0, 'y' => 0, 'width' => 75, 'height' => 45], $layout)); // AI grid, within slack
+        $this->assertFalse(MapGeometry::roomFitsMap(['x' => 70, 'y' => 0, 'width' => 10, 'height' => 5], $layout));
+        $this->assertFalse(MapGeometry::roomFitsMap(['x' => -1, 'y' => 0, 'width' => 2, 'height' => 2], $layout));
+        $this->assertTrue(MapGeometry::roomFitsMap(['x' => 500, 'y' => 500, 'width' => 2, 'height' => 2], [])); // unknown image size
+    }
+
+    public function test_repair_command_crops_overhanging_rooms_in_place(): void
+    {
+        $this->map->forceFill(['tile_size' => 16, 'layout_data' => ['background_width' => 1200, 'background_height' => 708]])->save();
+        $hanging = Room::withoutGlobalScopes()->create([
+            'organization_id' => $this->org->id, 'map_id' => $this->map->id, 'name' => 'Low', 'type' => 'meeting',
+            'access_mode' => 'public', 'capacity' => 4, 'bounds' => ['x' => 2, 'y' => 30, 'width' => 20, 'height' => 25, 'doorSide' => 'top'],
+        ]);
+        $gone = Room::withoutGlobalScopes()->create([
+            'organization_id' => $this->org->id, 'map_id' => $this->map->id, 'name' => 'Off', 'type' => 'meeting',
+            'access_mode' => 'public', 'capacity' => 4, 'bounds' => ['x' => 90, 'y' => 5, 'width' => 10, 'height' => 10],
+        ]);
+
+        $this->artisan('maps:repair-bounds')->assertSuccessful();
+        $this->assertSame(25, $hanging->fresh()->bounds['height'], 'dry run writes nothing');
+
+        $this->artisan('maps:repair-bounds', ['--apply' => true])->assertSuccessful();
+        $this->assertEquals(['x' => 2, 'y' => 30, 'width' => 20, 'height' => 14, 'doorSide' => 'top'], $hanging->fresh()->bounds);
+        $this->assertEquals(['x' => 65, 'y' => 5, 'width' => 10, 'height' => 10], $gone->fresh()->bounds);
+        $this->artisan('maps:repair-bounds')->expectsOutput('All maps already match their floor images.')->assertSuccessful();
+    }
+
     public function test_too_many_shapes_are_capped(): void
     {
         $walls = array_fill(0, MapGeometry::MAX_WALLS + 50, ['x1' => 0, 'y1' => 0, 'x2' => 1, 'y2' => 0]);

@@ -1502,11 +1502,16 @@
                 if (BLUEPRINT_IMAGE.naturalWidth > 0 && BLUEPRINT_IMAGE.naturalHeight > 0) {
                     MAP_WIDTH_PX = BLUEPRINT_IMAGE.naturalWidth;
                     MAP_HEIGHT_PX = BLUEPRINT_IMAGE.naturalHeight;
+                    // Keep the stored size in step with the real image (older maps saved a default).
+                    MAP_DATA.layout_data = MAP_DATA.layout_data || {};
+                    MAP_DATA.layout_data.background_width = MAP_WIDTH_PX;
+                    MAP_DATA.layout_data.background_height = MAP_HEIGHT_PX;
                 } else {
                     MAP_WIDTH_PX = 1200;
                     MAP_HEIGHT_PX = 708;
                 }
                 fitAndCenterView();
+                checkLayoutInBounds();
                 draw();
             };
             BLUEPRINT_IMAGE.onerror = () => {
@@ -1547,6 +1552,94 @@
             const len = dx * dx + dy * dy;
             const t = len ? Math.max(0, Math.min(1, ((px - w.x1) * dx + (py - w.y1) * dy) / len)) : 0;
             return Math.hypot(px - (w.x1 + t * dx), py - (w.y1 + t * dy));
+        }
+
+
+        // ── Keeping the layout on the floor image ──
+        // Rooms, furniture, walls and obstacles are stored in tiles over the image. When the
+        // image is replaced by one of a different size they would no longer line up, so the
+        // editor offers to scale them with it, and flags anything left outside the image.
+        function rescaleLayout(sx, sy) {
+            rooms.forEach(r => {
+                if (!r.bounds) return;
+                const b = r.bounds;
+                b.x = Math.round(b.x * sx); b.y = Math.round(b.y * sy);
+                b.width = Math.max(1, Math.round(b.width * sx)); b.height = Math.max(1, Math.round(b.height * sy));
+            });
+            objects.forEach(o => {
+                if (!o.position) return;
+                o.position.x = Math.round(o.position.x * sx * 2) / 2;
+                o.position.y = Math.round(o.position.y * sy * 2) / 2;
+            });
+            geoWalls().forEach(w => { w.x1 *= sx; w.x2 *= sx; w.y1 *= sy; w.y2 *= sy; });
+            geoObstacles().forEach(o => { o.x *= sx; o.y *= sy; o.width *= sx; o.height *= sy; });
+        }
+
+        function adoptBackgroundSize(newW, newH) {
+            const oldW = MAP_WIDTH_PX, oldH = MAP_HEIGHT_PX;
+            MAP_WIDTH_PX = newW;
+            MAP_HEIGHT_PX = newH;
+            MAP_DATA.layout_data = MAP_DATA.layout_data || {};
+            MAP_DATA.layout_data.background_width = newW;
+            MAP_DATA.layout_data.background_height = newH;
+            const hasContent = rooms.length || objects.length || geoWalls().length || geoObstacles().length;
+            const changed = Math.abs(newW - oldW) > 2 || Math.abs(newH - oldH) > 2;
+            if (hasContent && changed && oldW > 0 && oldH > 0
+                && confirm(@json(__('The new floor image has a different size. Scale the existing rooms, furniture and walls to match it?')))) {
+                rescaleLayout(newW / oldW, newH / oldH);
+                showToast('✅ ' + @json(__('Layout scaled to the new image — press Save to keep it.')));
+            }
+            checkLayoutInBounds();
+            draw();
+        }
+
+        function roomsOutsideMap() {
+            // Same one-tile slack as the server (MapGeometry::roomFitsMap).
+            const maxX = MAP_WIDTH_PX / TILE_SIZE + 1, maxY = MAP_HEIGHT_PX / TILE_SIZE + 1;
+            return rooms.filter(r => r.bounds && (r.bounds.x < 0 || r.bounds.y < 0 || r.bounds.x + r.bounds.width > maxX || r.bounds.y + r.bounds.height > maxY));
+        }
+
+        function checkLayoutInBounds() {
+            const outside = roomsOutsideMap();
+            let banner = document.getElementById('ed-bounds-banner');
+            if (!outside.length) { banner?.remove(); return; }
+            if (!banner) {
+                banner = document.createElement('div');
+                banner.id = 'ed-bounds-banner';
+                banner.className = 'ed-bounds-banner';
+                banner.setAttribute('role', 'alert');
+                document.body.appendChild(banner);
+            }
+            const names = outside.map(r => r.name || '').filter(Boolean).join('، ');
+            banner.innerHTML = `
+                <span class="material-symbols-rounded" aria-hidden="true">warning</span>
+                <span class="ed-bounds-text"></span>
+                <button type="button" class="ula-btn ula-btn--primary ula-btn--sm" onclick="fitRoomsIntoMap()">${@json(__('Move them inside'))}</button>
+                <button type="button" class="ula-icon-btn ula-icon-btn--subtle ula-icon-btn--sm" onclick="document.getElementById('ed-bounds-banner')?.remove()" aria-label="${@json(__('Close'))}"><span class="material-symbols-rounded">close</span></button>`;
+            banner.querySelector('.ed-bounds-text').textContent =
+                @json(__('Some rooms are outside the floor image, so their walls and doors are unreachable in the office:')) + ' ' + names;
+        }
+
+        function fitRoomsIntoMap() {
+            const maxX = Math.floor(MAP_WIDTH_PX / TILE_SIZE), maxY = Math.floor(MAP_HEIGHT_PX / TILE_SIZE);
+            // Crop the part hanging off the image and keep the room in place (so it can't land on
+            // a neighbour); only a room entirely off the image is moved back on. Same as maps:repair-bounds.
+            roomsOutsideMap().forEach(r => {
+                const b = r.bounds;
+                b.x = Math.max(0, Math.round(b.x)); b.y = Math.max(0, Math.round(b.y));
+                if (b.x >= maxX) { b.width = Math.min(b.width, maxX); b.x = maxX - b.width; }
+                if (b.y >= maxY) { b.height = Math.min(b.height, maxY); b.y = maxY - b.height; }
+                b.width = Math.max(1, Math.min(Math.round(b.width), maxX - b.x));
+                b.height = Math.max(1, Math.min(Math.round(b.height), maxY - b.y));
+            });
+            objects.forEach(o => {
+                if (!o.position) return;
+                o.position.x = Math.max(0, Math.min(o.position.x, maxX - 1));
+                o.position.y = Math.max(0, Math.min(o.position.y, maxY - 1));
+            });
+            checkLayoutInBounds();
+            draw();
+            showToast('✅ ' + @json(__('Rooms moved inside the map — press Save to keep it.')));
         }
 
         // ── Navigation & Tools ──
@@ -1631,8 +1724,7 @@
                     MAP_DATA.layout_data.background_width = width;
                     MAP_DATA.layout_data.background_height = height;
                     
-                    MAP_WIDTH_PX = width;
-                    MAP_HEIGHT_PX = height;
+                    adoptBackgroundSize(width, height);
                     
                     BLUEPRINT_IMAGE.src = floorUrl + (floorUrl.includes('?') ? '&' : '?') + 'v=' + Date.now();
                     blueprintLoaded = true;
@@ -1675,8 +1767,7 @@
                     BLUEPRINT_IMAGE.onload = () => {
                         blueprintLoaded = true;
                         if (BLUEPRINT_IMAGE.naturalWidth > 0 && BLUEPRINT_IMAGE.naturalHeight > 0) {
-                            MAP_WIDTH_PX = BLUEPRINT_IMAGE.naturalWidth;
-                            MAP_HEIGHT_PX = BLUEPRINT_IMAGE.naturalHeight;
+                            adoptBackgroundSize(BLUEPRINT_IMAGE.naturalWidth, BLUEPRINT_IMAGE.naturalHeight);
                         }
                         fitAndCenterView();
                         renderFloorsCatalog();
@@ -3325,10 +3416,7 @@
                     BLUEPRINT_IMAGE.onload = () => {
                         blueprintLoaded = true;
                         if (BLUEPRINT_IMAGE.naturalWidth > 0 && BLUEPRINT_IMAGE.naturalHeight > 0) {
-                            MAP_WIDTH_PX = BLUEPRINT_IMAGE.naturalWidth;
-                            MAP_HEIGHT_PX = BLUEPRINT_IMAGE.naturalHeight;
-                            MAP_DATA.layout_data.background_width = BLUEPRINT_IMAGE.naturalWidth;
-                            MAP_DATA.layout_data.background_height = BLUEPRINT_IMAGE.naturalHeight;
+                            adoptBackgroundSize(BLUEPRINT_IMAGE.naturalWidth, BLUEPRINT_IMAGE.naturalHeight);
                         }
                         fitAndCenterView();
                         draw();

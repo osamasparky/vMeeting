@@ -124,6 +124,7 @@ class ProjectManagementRegressionTest extends TestCase
 
     public function test_stopped_timer_records_real_elapsed_time(): void
     {
+        $this->freezeSecond(); // the real clock can tick between start and stop
         Sanctum::actingAs($this->employee);
         $this->postJson($this->api('/time/timer/start'), ['project_id' => $this->project->id, 'task_id' => $this->task->id])->assertCreated();
 
@@ -135,6 +136,7 @@ class ProjectManagementRegressionTest extends TestCase
 
     public function test_switching_timers_records_real_elapsed_time_for_the_first(): void
     {
+        $this->freezeSecond(); // the real clock can tick between start and stop
         Sanctum::actingAs($this->employee);
         $this->postJson($this->api('/time/timer/start'), ['project_id' => $this->project->id, 'task_id' => $this->task->id])->assertCreated();
         $this->travel(45)->minutes();
@@ -155,6 +157,7 @@ class ProjectManagementRegressionTest extends TestCase
 
     public function test_active_timer_elapsed_seconds_is_positive(): void
     {
+        $this->freezeSecond(); // the real clock can tick between start and the check
         Sanctum::actingAs($this->employee);
         $this->postJson($this->api('/time/timer/start'), ['project_id' => $this->project->id])->assertCreated();
         $this->travel(10)->minutes();
@@ -164,6 +167,7 @@ class ProjectManagementRegressionTest extends TestCase
 
     public function test_closed_attendance_session_keeps_its_duration(): void
     {
+        $this->freezeSecond(); // the real clock can tick between create and close
         $session = AttendanceSession::create([
             'organization_id' => $this->org->id,
             'user_id' => $this->employee->id,

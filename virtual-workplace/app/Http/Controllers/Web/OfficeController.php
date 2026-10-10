@@ -550,6 +550,11 @@ class OfficeController extends Controller
         $map = Map::find($mapId);
         $tilePx = $map?->tile_size ?: RoomBoundsGap::CANONICAL_TILE_PX;
 
+        // A room off the floor image has unreachable walls and doors in the office.
+        if (! MapGeometry::roomFitsMap($bounds, $map?->layout_data, $tilePx)) {
+            return response()->json(['message' => __('This room is outside the floor image. Move it inside the map.')], 422);
+        }
+
         $siblings = Room::where('map_id', $mapId)
             ->when($ignoreRoomId, fn ($q) => $q->where('id', '!=', $ignoreRoomId))
             ->get(['id', 'name', 'bounds']);
@@ -589,6 +594,20 @@ class OfficeController extends Controller
             'rooms' => 'nullable|array',
             'objects' => 'nullable|array',
         ]);
+
+        // Every room must lie on the floor image (and have numeric bounds); checked before
+        // anything is written so a rejected save changes nothing.
+        if (isset($validated['rooms'])) {
+            $layoutForCheck = $validated['layout_data'] ?? $map->layout_data;
+            $outside = array_values(array_filter($validated['rooms'], fn ($r) => ! MapGeometry::roomFitsMap($r['bounds'] ?? null, $layoutForCheck, RoomBoundsGap::CANONICAL_TILE_PX)));
+            if ($outside) {
+                return response()->json([
+                    'message' => __('These rooms are outside the floor image: :names. Move them inside the map first.', [
+                        'names' => implode(', ', array_map(fn ($r) => $r['name'] ?? __('Room'), array_slice($outside, 0, 5))),
+                    ]),
+                ], 422);
+            }
+        }
 
         if (! empty($validated['name'])) {
             $map->name = $validated['name'];

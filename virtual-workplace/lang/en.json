@@ -3575,5 +3575,12 @@
     "Walls": "Walls",
     "Obstacles": "Obstacles",
     "Obstacle": "Obstacle",
-    "Avatars cannot pass through it in the office. Drag to move, Delete to remove.": "Avatars cannot pass through it in the office. Drag to move, Delete to remove."
+    "Avatars cannot pass through it in the office. Drag to move, Delete to remove.": "Avatars cannot pass through it in the office. Drag to move, Delete to remove.",
+    "The new floor image has a different size. Scale the existing rooms, furniture and walls to match it?": "The new floor image has a different size. Scale the existing rooms, furniture and walls to match it?",
+    "Layout scaled to the new image — press Save to keep it.": "Layout scaled to the new image — press Save to keep it.",
+    "Move them inside": "Move them inside",
+    "Some rooms are outside the floor image, so their walls and doors are unreachable in the office:": "Some rooms are outside the floor image, so their walls and doors are unreachable in the office:",
+    "Rooms moved inside the map — press Save to keep it.": "Rooms moved inside the map — press Save to keep it.",
+    "This room is outside the floor image. Move it inside the map.": "This room is outside the floor image. Move it inside the map.",
+    "These rooms are outside the floor image: :names. Move them inside the map first.": "These rooms are outside the floor image: :names. Move them inside the map first."
 }

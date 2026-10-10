@@ -907,3 +907,26 @@ textarea.pm-field { padding-block: var(--ula-space-3); }
   .pm-tabs-menu { grid-template-columns: 1fr; max-block-size: 70vh; overflow-y: auto; inline-size: min(90vw, 320px); }
   .pm-tabs .pm-tab { padding: 0 var(--ula-space-3); }
 }
+
+/* ── Map editor: rooms outside the floor image ────────────────────────── */
+.ed-bounds-banner {
+  position: fixed;
+  inset-block-start: calc(var(--ula-space-7) * 2);
+  inset-inline: 50% auto;
+  transform: translateX(-50%);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  gap: var(--ula-space-3);
+  max-inline-size: min(92vw, 760px);
+  padding: var(--ula-space-3) var(--ula-space-4);
+  border-radius: var(--ula-radius-lg);
+  border: 1px solid var(--ula-tone-terracotta-fg);
+  background: var(--ula-tone-terracotta-bg);
+  color: var(--ula-tone-terracotta-fg);
+  box-shadow: var(--ula-shadow-lg);
+  font-size: var(--ula-size-sm);
+  font-weight: 700;
+}
+[dir="rtl"] .ed-bounds-banner { transform: translateX(50%); }
+.ed-bounds-banner .ed-bounds-text { flex: 1; }

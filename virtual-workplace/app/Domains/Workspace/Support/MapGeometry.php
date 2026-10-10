@@ -15,6 +15,35 @@ class MapGeometry
 
     private const MAX_COORD = 2000; // tiles
 
+    /**
+     * Whether a room's bounds (tiles) lie on the floor image. Without a known image
+     * size only negative positions are rejected. One tile of slack absorbs rounding
+     * (the AI generator lays rooms on a 75x45 grid over a 1200x708 image).
+     */
+    public static function roomFitsMap(mixed $bounds, ?array $layout, int $tilePx = 16): bool
+    {
+        if (! is_array($bounds)) {
+            return false;
+        }
+        foreach (['x', 'y', 'width', 'height'] as $k) {
+            if (! isset($bounds[$k]) || ! is_numeric($bounds[$k])) {
+                return false;
+            }
+        }
+        if ($bounds['x'] < 0 || $bounds['y'] < 0 || $bounds['width'] < 1 || $bounds['height'] < 1) {
+            return false;
+        }
+
+        $bw = (float) ($layout['background_width'] ?? 0);
+        $bh = (float) ($layout['background_height'] ?? 0);
+        if ($bw < 100 || $bh < 100) {
+            return true;
+        }
+
+        return $bw / $tilePx + 1 >= $bounds['x'] + $bounds['width']
+            && $bh / $tilePx + 1 >= $bounds['y'] + $bounds['height'];
+    }
+
     public static function sanitize(array $layout): array
     {
         $num = fn ($v) => is_numeric($v) ? max(0, min(self::MAX_COORD, round((float) $v, 2))) : null;
