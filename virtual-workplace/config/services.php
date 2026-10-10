@@ -41,7 +41,8 @@ return [
         // two unrelated security domains. Must be set explicitly per
         // environment; RealtimeTokenService throws if this is empty.
         'secret' => env('REALTIME_SECRET'),
-        'ws_url' => env('REALTIME_WS_URL', 'ws://127.0.0.1:8080'),
+        // Same fallback as the office (BuildOfficeViewAction): production sets VITE_REALTIME_WS_URL.
+        'ws_url' => env('REALTIME_WS_URL', env('VITE_REALTIME_WS_URL', 'ws://127.0.0.1:8080')),
         // Server-to-server address Laravel uses to tell the realtime service a
         // user has new notifications (POST /internal/notifications).
         'http_url' => env('REALTIME_HTTP_URL', 'http://127.0.0.1:'.env('REALTIME_PORT', 8080)),
