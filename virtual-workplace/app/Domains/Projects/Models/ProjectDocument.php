@@ -58,6 +58,44 @@ class ProjectDocument extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    public function lastEditor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'last_edited_by');
+    }
+
+    public function versions(): HasMany
+    {
+        return $this->hasMany(ProjectDocumentVersion::class, 'document_id')->orderByDesc('version');
+    }
+
+    /**
+     * Save new text, keeping the current one as a version first. No-op when
+     * nothing changed, so repeated saves don't flood the history.
+     */
+    public function saveRevision(string $title, string $content, ?string $userId): bool
+    {
+        if ($title === $this->title && $content === (string) $this->content) {
+            return false;
+        }
+
+        $this->versions()->create([
+            'version' => $this->version,
+            'title' => $this->title,
+            'content' => $this->content,
+            'user_id' => $this->last_edited_by ?? $this->created_by,
+            'created_at' => $this->updated_at ?? now(),
+        ]);
+
+        $this->forceFill([
+            'title' => $title,
+            'content' => $content,
+            'version' => $this->version + 1,
+            'last_edited_by' => $userId,
+        ])->save();
+
+        return true;
+    }
+
     public function parent(): BelongsTo
     {
         return $this->belongsTo(ProjectDocument::class, 'parent_document_id');

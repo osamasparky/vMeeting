@@ -1846,7 +1846,7 @@
 
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
                         @forelse($project->documents as $doc)
-                        <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 18px; box-shadow: var(--ula-shadow-xs); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                        <div class="pm-doc-card" role="button" tabindex="0" aria-label="{{ __('pm.open_doc') }}: {{ $doc->title }}" onclick="pmOpenDoc({{ $doc->id }})" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); pmOpenDoc({{ $doc->id }}); }" style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-lg); padding: 18px; box-shadow: var(--ula-shadow-xs); transition: all 0.2s; cursor: pointer;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                 <span style="font-size: 22px;">@if($doc->icon){{ $doc->icon }}@else<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">description</span>@endif</span>
                                 <span class="badge-pill badge-neutral">v{{ $doc->version }}</span>
@@ -2058,6 +2058,7 @@
     <!-- ── 7. MODALS ── -->
 
 @include('projects.partials.modals')
+@include('projects.partials.pm.doc-editor')
 
         <script nonce="{{ $cspNonce ?? '' }}">
         const ORG_ID = "{{ $organization->id }}";
@@ -2135,7 +2136,8 @@
             const form = e.target;
             const payload = {
                 title: form.title.value,
-                icon: form.icon.value || '<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">description</span>',
+                // The icon column holds an emoji (max 30 chars); the old HTML default failed validation.
+                icon: form.icon.value || '📄',
                 content: form.content.value,
                 is_pinned: form.is_pinned ? form.is_pinned.checked : false,
             };
@@ -2146,9 +2148,11 @@
                     body: JSON.stringify(payload)
                 });
                 if (res.ok) {
-                    showHubToast('<span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">menu_book</span> {{ __('Document created successfully!') }}');
+                    const created = await res.json();
                     closeNewDocModal();
-                    setTimeout(() => window.location.reload(), 500);
+                    // Straight into the editor; the cards refresh when it closes.
+                    PM.docsDirty = true;
+                    pmOpenDoc(created.document.id);
                 } else {
                     const err = await res.json();
                     alert(err.message || 'Error creating document.');

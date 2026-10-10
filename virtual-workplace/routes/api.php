@@ -10,20 +10,21 @@ use App\Domains\Meetings\Controllers\MeetingController;
 use App\Domains\People\Controllers\AttendanceApiController;
 use App\Domains\People\Controllers\PeopleController;
 use App\Domains\People\Controllers\ProfileController;
-use App\Domains\Projects\Controllers\ProjectController;
-use App\Domains\Projects\Controllers\TaskController;
-use App\Domains\Projects\Controllers\TimesheetController;
 use App\Domains\Projects\Controllers\ArchiveController;
 use App\Domains\Projects\Controllers\ExportController;
 use App\Domains\Projects\Controllers\IntakeController;
+use App\Domains\Projects\Controllers\ProjectController;
+use App\Domains\Projects\Controllers\ProjectDocumentController;
 use App\Domains\Projects\Controllers\ProjectStateController;
 use App\Domains\Projects\Controllers\ProjectUpdateController;
 use App\Domains\Projects\Controllers\SavedViewController;
 use App\Domains\Projects\Controllers\SprintController;
+use App\Domains\Projects\Controllers\TaskController;
 use App\Domains\Projects\Controllers\TaskLabelController;
 use App\Domains\Projects\Controllers\TaskRelationController;
 use App\Domains\Projects\Controllers\TaskWatcherController;
 use App\Domains\Projects\Controllers\TemplateController;
+use App\Domains\Projects\Controllers\TimesheetController;
 use App\Domains\Projects\Controllers\TimeTrackingController;
 use App\Domains\Tenancy\Controllers\BillingApiController;
 use App\Domains\Tenancy\Controllers\OrganizationController;
@@ -208,7 +209,16 @@ Route::prefix('v1')->group(function () {
                     ->middleware('permission:projects.view');
                 Route::post('/projects/{project}/docs', [ProjectController::class, 'storeDocument'])
                     ->middleware('permission:projects.edit');
-                Route::put('/projects/{project}/docs/{document}', [ProjectController::class, 'updateDocument'])
+                // Saving keeps the previous text as a version (see ProjectDocumentController).
+                Route::get('/projects/{project}/docs/{document}', [ProjectDocumentController::class, 'show'])
+                    ->middleware('permission:projects.view');
+                Route::get('/projects/{project}/docs/{document}/versions', [ProjectDocumentController::class, 'versions'])
+                    ->middleware('permission:projects.view');
+                Route::get('/projects/{project}/docs/{document}/versions/{version}', [ProjectDocumentController::class, 'version'])
+                    ->middleware('permission:projects.view');
+                Route::post('/projects/{project}/docs/{document}/versions/{version}/restore', [ProjectDocumentController::class, 'restore'])
+                    ->middleware('permission:projects.edit');
+                Route::put('/projects/{project}/docs/{document}', [ProjectDocumentController::class, 'update'])
                     ->middleware('permission:projects.edit');
                 Route::delete('/projects/{project}/docs/{document}', [ProjectController::class, 'destroyDocument'])
                     ->middleware('permission:projects.delete');

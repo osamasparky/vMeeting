@@ -14,6 +14,7 @@ use App\Domains\Projects\Models\ProjectTemplate;
 use App\Domains\Projects\Requests\StoreProjectRequest;
 use App\Domains\Projects\Requests\UpdateProjectRequest;
 use App\Domains\Tenancy\Models\Organization;
+use App\Support\HtmlSanitizer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -354,7 +355,7 @@ class ProjectController extends Controller
             'organization_id' => $organization->id,
             'created_by' => Auth::id(),
             'title' => $validated['title'],
-            'content' => $validated['content'] ?? '',
+            'content' => HtmlSanitizer::clean($validated['content'] ?? ''),
             'icon' => $validated['icon'] ?? '📄',
             'is_pinned' => $validated['is_pinned'] ?? false,
             'parent_document_id' => $validated['parent_document_id'] ?? null,
