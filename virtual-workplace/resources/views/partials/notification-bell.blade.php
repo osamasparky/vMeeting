@@ -6,6 +6,23 @@
 @php
     $bellButtonClass = $bellButtonClass ?? 'ula-shell-iconbtn';
     $bellQuietOffice = $bellQuietOffice ?? false;
+
+    // Live updates: a notifications-only realtime connection (not office presence).
+    // Without a realtime secret the bell simply keeps polling.
+    $bellRealtime = null;
+    try {
+        $bellUser = auth()->user();
+        $bellOrg = $organization ?? \App\Domains\Tenancy\Models\OrganizationMember::where('user_id', $bellUser?->id)
+            ->where('status', 'active')->first()?->organization;
+        if ($bellUser && $bellOrg && config('services.realtime.secret')) {
+            $bellRealtime = [
+                'wsUrl' => config('services.realtime.ws_url'),
+                'wsToken' => app(\App\Domains\Identity\Services\RealtimeTokenService::class)->generateToken($bellUser, $bellOrg, 12 * 3600),
+            ];
+        }
+    } catch (\Throwable $e) {
+        $bellRealtime = null;
+    }
 @endphp
 <div class="ula-shell-notif notif-wrap" id="notifWrapper">
     <button type="button" id="notifBellBtn" class="{{ $bellButtonClass }}" onclick="toggleNotificationDropdown()"
@@ -51,6 +68,7 @@
             clearConfirm: @json(__('Clear all notifications?')),
             fallbackTitle: @json(__('Notifications')),
         };
+        const RT = @json($bellRealtime);
         const QUIET_TYPES = @json($bellQuietOffice ? \App\Support\NotificationPreferences::OFFICE_TYPES : []);
         const state = { items: [], filter: 'all', unread: 0, first: true };
 
@@ -239,7 +257,38 @@
         // The "All notifications" tab marks items read; keep the badge in step.
         document.addEventListener('notifications:changed', refresh);
 
-        const start = () => { refresh(); setInterval(refresh, 15000); };
+        // ── Live updates ──
+        // The realtime service sends a content-free "notification.new" ping; the
+        // bell then fetches through the normal authenticated endpoint. While the
+        // socket is up, polling drops to once a minute as a safety net.
+        let live = false;
+        let retryMs = 2000;
+        function connect() {
+            if (!RT || !('WebSocket' in window)) return;
+            let ws;
+            try {
+                const sep = RT.wsUrl.includes('?') ? '&' : '?';
+                ws = new WebSocket(`${RT.wsUrl}${sep}channel=notifications&token=${encodeURIComponent(RT.wsToken)}`);
+            } catch (e) { return; }
+            ws.onopen = () => { live = true; retryMs = 2000; };
+            ws.onmessage = e => {
+                try { if (JSON.parse(e.data).type === 'notification.new') refresh(); } catch (err) {}
+            };
+            ws.onclose = e => {
+                live = false;
+                // 4001/4002: missing or expired token. Keep polling until the next page load.
+                if (e.code === 4001 || e.code === 4002) return;
+                setTimeout(connect, retryMs);
+                retryMs = Math.min(retryMs * 2, 60000);
+            };
+        }
+
+        let tick = 0;
+        const start = () => {
+            refresh();
+            connect();
+            setInterval(() => { tick++; if (!live || tick % 4 === 0) refresh(); }, 15000);
+        };
         if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
         else start();
     })();

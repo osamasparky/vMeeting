@@ -1,5 +1,7 @@
 import crypto from 'crypto';
+import { spawn } from 'child_process';
 import { WebSocket } from 'ws';
+import { NotificationHub, parsePublishBody, secretMatches } from '../src/notifications/notification-hub.js';
 import { TokenVerifier } from '../src/auth/token-verifier.js';
 import { ProximityCalculator } from '../src/state/proximity-calculator.js';
 import { OfficeUser } from '../src/events/event-types.js';
@@ -106,7 +108,96 @@ async function runTests() {
   }
   console.log('   ✓ Private room occupants completely isolated from open floor.');
 
-  console.log('\n✨ All Realtime Service Tests Passed Successfully! (3/3 suites)');
+  // Test 4: Notification hub (unit)
+  console.log('4. Testing Notification Hub...');
+  const hub = new NotificationHub();
+  const sent: string[] = [];
+  const fakeSocket = (tag: string) => ({ readyState: WebSocket.OPEN, send: (m: string) => sent.push(`${tag}:${m}`) }) as unknown as WebSocket;
+  const tabA = fakeSocket('a1');
+  const tabB = fakeSocket('a2');
+  hub.add('alice', tabA);
+  hub.add('alice', tabB);
+  hub.add('bob', fakeSocket('b1'));
+  if (hub.publish(['alice', 'alice']) !== 2 || sent.length !== 2 || !sent.every((m) => m.includes('notification.new'))) {
+    throw new Error(`❌ Hub should ping each of Alice's tabs once: ${JSON.stringify(sent)}`);
+  }
+  hub.remove('alice', tabA);
+  if (hub.publish(['alice']) !== 1 || hub.connectionCount() !== 2) {
+    throw new Error('❌ Hub should forget closed tabs');
+  }
+  if (!secretMatches('s3cret', 's3cret') || secretMatches('s3cret', 'other') || secretMatches(undefined, 's3cret') || secretMatches('x', undefined)) {
+    throw new Error('❌ Secret check is wrong');
+  }
+  if (parsePublishBody('{"user_ids":["a","b"]}')?.length !== 2 || parsePublishBody('{"user_ids":[1]}') !== null || parsePublishBody('nope') !== null) {
+    throw new Error('❌ Publish body parsing is wrong');
+  }
+  console.log('   ✓ Pings reach every open tab once; secret and body are validated.');
+
+  // Test 5: Real server — a bell connection must not replace the office session
+  console.log('5. Testing bell channel against a live server...');
+  await liveServerTest();
+  console.log('   ✓ Office session survives a bell connection; Laravel pings reach the bell only with the secret.');
+
+  console.log('\n✨ All Realtime Service Tests Passed Successfully! (5/5 suites)');
+}
+
+async function liveServerTest(): Promise<void> {
+  const port = 18000 + Math.floor(Math.random() * 1000);
+  const env = { ...process.env, REALTIME_PORT: String(port), REALTIME_HOST: '127.0.0.1', REALTIME_SECRET: SECRET };
+  const child = spawn(process.execPath, ['--import', 'tsx', 'src/server.ts'], { env, stdio: ['ignore', 'pipe', 'pipe'] });
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error('❌ Server did not start')), 15000);
+      child.stdout.on('data', (d) => { if (String(d).includes('listening')) { clearTimeout(timer); resolve(); } });
+      child.on('exit', (code) => reject(new Error(`❌ Server exited early (${code})`)));
+    });
+
+    const token = createMockToken('alice', 'Alice', 'org-1');
+    const open = (url: string) => new Promise<WebSocket>((resolve, reject) => {
+      const ws = new WebSocket(url);
+      ws.once('open', () => resolve(ws));
+      ws.once('error', reject);
+    });
+
+    const office = await open(`ws://127.0.0.1:${port}/?token=${encodeURIComponent(token)}`);
+    let officeClosed = false;
+    office.on('close', () => { officeClosed = true; });
+    const officeMessages: string[] = [];
+    office.on('message', (m) => officeMessages.push(String(m)));
+
+    const bell = await open(`ws://127.0.0.1:${port}/?channel=notifications&token=${encodeURIComponent(token)}`);
+    const bellMessages: string[] = [];
+    bell.on('message', (m) => bellMessages.push(String(m)));
+    await new Promise((r) => setTimeout(r, 300));
+
+    if (officeClosed || officeMessages.some((m) => m.includes('session.replaced'))) {
+      throw new Error('❌ Opening the bell channel replaced the office session');
+    }
+
+    const post = (secret: string | null) => fetch(`http://127.0.0.1:${port}/internal/notifications`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(secret ? { 'X-Realtime-Secret': secret } : {}) },
+      body: JSON.stringify({ user_ids: ['alice'] }),
+    });
+
+    if ((await post(null)).status !== 401 || (await post('wrong')).status !== 401) {
+      throw new Error('❌ Internal endpoint accepted a call without the secret');
+    }
+    const ok = await post(SECRET);
+    const body = await ok.json() as { delivered: number };
+    await new Promise((r) => setTimeout(r, 200));
+    if (ok.status !== 202 || body.delivered !== 1 || !bellMessages.some((m) => m.includes('notification.new'))) {
+      throw new Error(`❌ Bell did not get the ping: ${ok.status} ${JSON.stringify(body)} ${JSON.stringify(bellMessages)}`);
+    }
+    if (officeMessages.some((m) => m.includes('notification.new'))) {
+      throw new Error('❌ Office socket should not receive bell pings');
+    }
+
+    office.close();
+    bell.close();
+  } finally {
+    child.kill();
+  }
 }
 
 runTests().catch((err) => {

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Domains\Projects\Models\Task;
 use App\Policies\TaskPolicy;
+use App\Support\RealtimeNotifier;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -18,7 +19,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // One per request / job, so pending pings never leak between them.
+        $this->app->scoped(RealtimeNotifier::class);
     }
 
     /**

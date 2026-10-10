@@ -5,13 +5,42 @@ import dotenv from 'dotenv';
 import { TokenVerifier } from './auth/token-verifier.js';
 import { PresenceManager } from './state/presence-manager.js';
 import { InboundDirectRelay, InboundEvent } from './events/event-types.js';
+import { NotificationHub, parsePublishBody, secretMatches } from './notifications/notification-hub.js';
 
 dotenv.config();
 
 const PORT = parseInt(process.env.REALTIME_PORT || '8080', 10);
 const HOST = process.env.REALTIME_HOST || '0.0.0.0';
 
+const notificationHub = new NotificationHub();
+
 const server = http.createServer((req, res) => {
+  // Laravel → "these users have new notifications". Authenticated by the shared secret.
+  if (req.url === '/internal/notifications' && req.method === 'POST') {
+    if (!secretMatches(req.headers['x-realtime-secret'] as string | undefined, process.env.REALTIME_SECRET)) {
+      res.writeHead(401);
+      res.end();
+      return;
+    }
+    let raw = '';
+    req.on('data', (chunk) => {
+      raw += chunk;
+      if (raw.length > 100_000) req.destroy();
+    });
+    req.on('end', () => {
+      const userIds = parsePublishBody(raw);
+      if (!userIds) {
+        res.writeHead(422, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Expected {"user_ids": [...]}' }));
+        return;
+      }
+      const delivered = notificationHub.publish(userIds);
+      res.writeHead(202, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ delivered }));
+    });
+    return;
+  }
+
   if (req.url === '/health' || req.url === '/') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ status: 'ok', service: 'virtual-workplace-realtime', timestamp: new Date().toISOString() }));
@@ -46,6 +75,15 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
       payload: { code: 'INVALID_TOKEN', message: 'Invalid or expired authentication token.' },
     });
     ws.close(4002, 'Invalid authentication token');
+    return;
+  }
+
+  // Bell connections only receive notification pings; they are not office presence,
+  // so they never replace the user's office session or show up as occupants.
+  if (parsedUrl.query.channel === 'notifications') {
+    const userId = tokenPayload.sub;
+    notificationHub.add(userId, ws);
+    ws.on('close', () => notificationHub.remove(userId, ws));
     return;
   }
 

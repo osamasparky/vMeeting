@@ -8,6 +8,7 @@ use App\Domains\Notifications\Models\WorkplaceNotification;
 use App\Domains\Projects\Models\Task;
 use App\Domains\Workspace\Models\Room;
 use App\Support\NotificationPreferences;
+use App\Support\RealtimeNotifier;
 use App\Support\TaskMailDispatcher;
 use Illuminate\Support\Facades\Log;
 
@@ -75,6 +76,8 @@ class NotificationService
             ]);
             if ($store) {
                 $notification->save();
+                // Open bells refresh right away (see RealtimeNotifier).
+                RealtimeNotifier::queue($targetUserId);
             }
 
             // Task notifications also go out by email when the user wants them.

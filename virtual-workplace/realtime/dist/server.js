@@ -9,10 +9,38 @@ const ws_1 = require("ws");
 const dotenv_1 = __importDefault(require("dotenv"));
 const token_verifier_js_1 = require("./auth/token-verifier.js");
 const presence_manager_js_1 = require("./state/presence-manager.js");
+const notification_hub_js_1 = require("./notifications/notification-hub.js");
 dotenv_1.default.config();
 const PORT = parseInt(process.env.REALTIME_PORT || '8080', 10);
 const HOST = process.env.REALTIME_HOST || '0.0.0.0';
+const notificationHub = new notification_hub_js_1.NotificationHub();
 const server = http_1.default.createServer((req, res) => {
+    // Laravel → "these users have new notifications". Authenticated by the shared secret.
+    if (req.url === '/internal/notifications' && req.method === 'POST') {
+        if (!(0, notification_hub_js_1.secretMatches)(req.headers['x-realtime-secret'], process.env.REALTIME_SECRET)) {
+            res.writeHead(401);
+            res.end();
+            return;
+        }
+        let raw = '';
+        req.on('data', (chunk) => {
+            raw += chunk;
+            if (raw.length > 100_000)
+                req.destroy();
+        });
+        req.on('end', () => {
+            const userIds = (0, notification_hub_js_1.parsePublishBody)(raw);
+            if (!userIds) {
+                res.writeHead(422, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ error: 'Expected {"user_ids": [...]}' }));
+                return;
+            }
+            const delivered = notificationHub.publish(userIds);
+            res.writeHead(202, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ delivered }));
+        });
+        return;
+    }
     if (req.url === '/health' || req.url === '/') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ status: 'ok', service: 'virtual-workplace-realtime', timestamp: new Date().toISOString() }));
@@ -43,6 +71,14 @@ wss.on('connection', (ws, req) => {
             payload: { code: 'INVALID_TOKEN', message: 'Invalid or expired authentication token.' },
         });
         ws.close(4002, 'Invalid authentication token');
+        return;
+    }
+    // Bell connections only receive notification pings; they are not office presence,
+    // so they never replace the user's office session or show up as occupants.
+    if (parsedUrl.query.channel === 'notifications') {
+        const userId = tokenPayload.sub;
+        notificationHub.add(userId, ws);
+        ws.on('close', () => notificationHub.remove(userId, ws));
         return;
     }
     // Register client session
