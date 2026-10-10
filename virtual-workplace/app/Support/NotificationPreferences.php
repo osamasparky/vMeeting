@@ -5,7 +5,7 @@ namespace App\Support;
 use App\Domains\Identity\Models\User;
 
 /**
- * Which task events a user wants by email. In-app notifications are always
+ * Which events (tasks, meetings) a user wants by email. In-app notifications are always
  * delivered; these switches only control email.
  */
 class NotificationPreferences
@@ -18,6 +18,7 @@ class NotificationPreferences
         'status' => true,
         'approvals' => true,
         'due' => true,
+        'meetings' => true,
     ];
 
     /** Notification type (WorkplaceNotification::type) => preference key. */
@@ -34,6 +35,7 @@ class NotificationPreferences
         'task_overdue' => 'due',
         'task_intake' => 'assigned',
         'project_update' => 'status',
+        'meeting_scheduled' => 'meetings',
     ];
 
     /** @return array<string, bool> */

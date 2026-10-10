@@ -255,7 +255,7 @@
                 </div>
                 <form method="POST" action="{{ route('profile.notifications.update') }}" style="display: flex; flex-direction: column; gap: 14px;">
                     @csrf
-                    @foreach(['assigned', 'comments', 'mentions', 'status', 'approvals', 'due'] as $prefKey)
+                    @foreach(array_keys(\App\Support\NotificationPreferences::DEFAULTS) as $prefKey)
                         <x-switch name="email_{{ $prefKey }}" id="pm-pref-{{ $prefKey }}" :checked="$pmPrefs[$prefKey]" :label="__('pm.pref_' . $prefKey)" />
                     @endforeach
                     <div style="padding-top: 12px; border-top: 1px solid var(--ula-border-subtle);">

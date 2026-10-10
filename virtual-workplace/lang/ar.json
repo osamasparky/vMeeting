@@ -3540,5 +3540,7 @@
     "🔔 :name mentioned you in task \":task\"": "🔔 أشار إليك :name في المهمة \":task\"",
     "🎉 Task Approved: \":task\" has been approved as Completed by :name": "🎉 تم اعتماد المهمة: اعتمد :name المهمة \":task\" كمكتملة",
     "⚠️ Changes Requested on task \":task\" by :name": "⚠️ طلب :name تعديلات على المهمة \":task\"",
-    "⏳ Task Approval Needed: \":task\"": "⏳ مطلوب اعتماد المهمة: \":task\""
+    "⏳ Task Approval Needed: \":task\"": "⏳ مطلوب اعتماد المهمة: \":task\"",
+    "pm.pref_meetings": "دعوات الاجتماعات",
+    "pm.mail_open_meeting": "عرض الاجتماع"
 }

@@ -31,7 +31,7 @@
                     @if($notification->body)
                         <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:{{ $ink }};">{{ $notification->body }}</p>
                     @endif
-                    <a href="{{ $actionUrl }}" style="display:inline-block;padding:12px 22px;border-radius:10px;background:{{ $accent }};color:{{ $onAccent }};font-weight:700;font-size:14px;text-decoration:none;">{{ __('pm.mail_open_task') }}</a>
+                    <a href="{{ $actionUrl }}" style="display:inline-block;padding:12px 22px;border-radius:10px;background:{{ $accent }};color:{{ $onAccent }};font-weight:700;font-size:14px;text-decoration:none;">{{ str_starts_with($notification->type, 'meeting') ? __('pm.mail_open_meeting') : __('pm.mail_open_task') }}</a>
                 </td></tr>
                 <tr><td style="padding:16px 24px;border-top:1px solid {{ $rule }};font-size:12px;color:{{ $muted }};text-align:{{ $rtl ? 'right' : 'left' }};">
                     {{ __('pm.mail_footer') }}

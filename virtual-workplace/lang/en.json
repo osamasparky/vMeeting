@@ -3540,5 +3540,7 @@
     "🔔 :name mentioned you in task \":task\"": "🔔 :name mentioned you in task \":task\"",
     "🎉 Task Approved: \":task\" has been approved as Completed by :name": "🎉 Task Approved: \":task\" has been approved as Completed by :name",
     "⚠️ Changes Requested on task \":task\" by :name": "⚠️ Changes Requested on task \":task\" by :name",
-    "⏳ Task Approval Needed: \":task\"": "⏳ Task Approval Needed: \":task\""
+    "⏳ Task Approval Needed: \":task\"": "⏳ Task Approval Needed: \":task\"",
+    "pm.pref_meetings": "Meeting invitations",
+    "pm.mail_open_meeting": "View meeting"
 }

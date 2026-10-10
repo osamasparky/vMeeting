@@ -4,13 +4,22 @@ namespace App\Domains\Notifications\Models;
 
 use App\Domains\Identity\Models\User;
 use App\Domains\Tenancy\Models\Organization;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Prunable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class WorkplaceNotification extends Model
 {
-    use HasUuids;
+    use HasUuids, Prunable;
+
+    /** Read notices are kept 90 days, unread ones 180; `model:prune` runs daily (routes/console.php). */
+    public function prunable(): Builder
+    {
+        return static::where(fn ($q) => $q->where('is_read', true)->where('created_at', '<', now()->subDays(90)))
+            ->orWhere('created_at', '<', now()->subDays(180));
+    }
 
     protected $table = 'workplace_notifications';
 
