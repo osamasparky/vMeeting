@@ -30,7 +30,7 @@ class PostTaskCommentWithNotificationsAction
         $this->notifyWatchers->execute(
             $task,
             'task_comment',
-            __('💬 New comment on ":task" by :name', ['task' => $task->title, 'name' => $author->name]),
+            fn () => __('💬 New comment on ":task" by :name', ['task' => $task->title, 'name' => $author->name]),
             Str::limit($body, 120),
             $author,
             except: $mentioned,
@@ -62,7 +62,7 @@ class PostTaskCommentWithNotificationsAction
                 NotificationService::notifyCustom(
                     $target->id,
                     'task_mention',
-                    __('🔔 :name mentioned you in task ":task"', ['name' => $author->name, 'task' => $task->title]),
+                    fn () => __('🔔 :name mentioned you in task ":task"', ['name' => $author->name, 'task' => $task->title]),
                     Str::limit($body, 120),
                     ['task_id' => $task->id, 'project_id' => $task->project_id],
                     $author->id,

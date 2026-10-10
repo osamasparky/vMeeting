@@ -173,7 +173,7 @@ class AutomationEngine
                     NotificationService::send(
                         $userId,
                         'task_updated',
-                        __('Automation: :rule', ['rule' => $rule->name]),
+                        fn () => __('Automation: :rule', ['rule' => $rule->name]),
                         $task->title,
                         NotificationService::taskUrl($task->project_id, $task->id),
                         ['task_id' => $task->id, 'project_id' => $task->project_id, 'automation_id' => $rule->id],

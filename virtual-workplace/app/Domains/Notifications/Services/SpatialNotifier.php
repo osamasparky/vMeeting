@@ -30,8 +30,8 @@ class SpatialNotifier
         return NotificationService::send(
             $target->id,
             'user_ring',
-            __('🔔 :sender is ringing you', ['sender' => $sender->name]),
-            __(':sender needs your attention now.', ['sender' => $sender->name]),
+            fn () => __('🔔 :sender is ringing you', ['sender' => $sender->name]),
+            fn () => __(':sender needs your attention now.', ['sender' => $sender->name]),
             '/office',
             ['sender_id' => $sender->id, 'sender_name' => $sender->name],
             '🔔',

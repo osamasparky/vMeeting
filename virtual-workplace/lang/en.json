@@ -3536,5 +3536,9 @@
     ":sender needs your attention now.": ":sender needs your attention now.",
     "Room not found.": "Room not found.",
     "You cannot send this to yourself.": "You cannot send this to yourself.",
-    "This person is not in your organization.": "This person is not in your organization."
+    "This person is not in your organization.": "This person is not in your organization.",
+    "🔔 :name mentioned you in task \":task\"": "🔔 :name mentioned you in task \":task\"",
+    "🎉 Task Approved: \":task\" has been approved as Completed by :name": "🎉 Task Approved: \":task\" has been approved as Completed by :name",
+    "⚠️ Changes Requested on task \":task\" by :name": "⚠️ Changes Requested on task \":task\" by :name",
+    "⏳ Task Approval Needed: \":task\"": "⏳ Task Approval Needed: \":task\""
 }

@@ -70,8 +70,8 @@ class UpdateTaskStatusAction
                     NotificationService::notifyCustom(
                         $pmId,
                         'task_approval_request',
-                        __('⏳ Task Approval Needed: ":task"', ['task' => $task->title]),
-                        __(':user submitted task ":task" for completion approval.', ['user' => $user?->name ?? 'Team member', 'task' => $task->title]),
+                        fn () => __('⏳ Task Approval Needed: ":task"', ['task' => $task->title]),
+                        fn () => __(':user submitted task ":task" for completion approval.', ['user' => $user?->name ?? 'Team member', 'task' => $task->title]),
                         ['task_id' => $task->id, 'project_id' => $task->project_id],
                         $user?->id
                     );
@@ -104,8 +104,8 @@ class UpdateTaskStatusAction
             app(NotifyTaskWatchersAction::class)->execute(
                 $task,
                 'task_status',
-                __('🔄 ":task" is now :status', ['task' => $task->title, 'status' => __(Str::headline($task->status))]),
-                __(':actor changed the status from :old to :new.', [
+                fn () => __('🔄 ":task" is now :status', ['task' => $task->title, 'status' => __(Str::headline($task->status))]),
+                fn () => __(':actor changed the status from :old to :new.', [
                     'actor' => $user?->name ?? __('A team member'),
                     'old' => __(Str::headline($statusBefore)),
                     'new' => __(Str::headline($task->status)),

@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Domains\Identity\Models\User;
 use App\Domains\Notifications\Models\WorkplaceNotification;
+use App\Domains\Notifications\Services\NotificationService;
 use App\Domains\Tenancy\Models\Organization;
 use App\Mail\TaskActivityMail;
 use Illuminate\Support\Facades\Log;
@@ -42,7 +43,8 @@ class TaskMailDispatcher
 
         try {
             OrganizationMailer::apply($notification->organization_id ? Organization::find($notification->organization_id) : null);
-            Mail::to($user->email)->send(new TaskActivityMail(
+            // The email's own wording (greeting, button, footer) follows the recipient's language too.
+            Mail::to($user->email)->locale(NotificationService::localeFor($user->id))->send(new TaskActivityMail(
                 $notification,
                 $user->name,
                 url($notification->action_url ?: '/dashboard'),

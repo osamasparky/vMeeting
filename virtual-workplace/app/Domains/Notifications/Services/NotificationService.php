@@ -12,14 +12,37 @@ use Illuminate\Support\Facades\Log;
 
 class NotificationService
 {
+    /** The language a person reads notifications in: the one they last used, else the app default. */
+    public static function localeFor(?string $userId): string
+    {
+        $locale = $userId ? User::whereKey($userId)->value('locale') : null;
+
+        return in_array($locale, ['ar', 'en'], true) ? $locale : config('app.locale');
+    }
+
+    /** Run $build with the recipient's language active, then restore the current one. */
+    public static function inLocaleOf(?string $userId, callable $build): mixed
+    {
+        $previous = app()->getLocale();
+        app()->setLocale(self::localeFor($userId));
+        try {
+            return $build();
+        } finally {
+            app()->setLocale($previous);
+        }
+    }
+
     /**
      * Send a general workplace notification to a user.
+     *
+     * Pass $title / $body as closures (fn () => __('...')) so they are written
+     * in the recipient's language; plain strings are stored as given.
      */
     public static function send(
         $userId,
         string $type,
-        string $title,
-        ?string $body = null,
+        string|\Closure $title,
+        string|\Closure|null $body = null,
         ?string $actionUrl = null,
         array $data = [],
         string $icon = '🔔',
@@ -31,6 +54,8 @@ class NotificationService
             if (! $targetUserId) {
                 return null;
             }
+
+            [$title, $body] = self::inLocaleOf($targetUserId, fn () => [value($title), value($body)]);
 
             $notification = WorkplaceNotification::create([
                 'user_id' => $targetUserId,
@@ -67,75 +92,26 @@ class NotificationService
             return null;
         }
 
-        $actorName = $actor ? $actor->name : __('A team member');
-        $taskTitle = $task->title ?: __('Untitled Task');
-        $projectName = $task->project ? $task->project->name : __('Workspace Project');
-
-        $title = __('New Task Assigned: :task', ['task' => $taskTitle]);
-        $body = __(':actor assigned you to task ":task" in project ":project".', [
-            'actor' => $actorName,
-            'task' => $taskTitle,
-            'project' => $projectName,
-        ]);
-
-        $actionUrl = self::taskUrl($task->project_id, $task->id);
+        $words = fn () => [
+            'actor' => $actor ? $actor->name : __('A team member'),
+            'task' => $task->title ?: __('Untitled Task'),
+            'project' => $task->project ? $task->project->name : __('Workspace Project'),
+        ];
 
         return self::send(
             $targetUserId,
             'task_assigned',
-            $title,
-            $body,
-            $actionUrl,
+            fn () => __('New Task Assigned: :task', $words()),
+            fn () => __(':actor assigned you to task ":task" in project ":project".', $words()),
+            self::taskUrl($task->project_id, $task->id),
             [
                 'task_id' => $task->id,
                 'project_id' => $task->project_id,
-                'actor_id' => $actor ? $actor->id : null,
-                'actor_name' => $actorName,
+                'actor_id' => $actor?->id,
+                'actor_name' => $actor?->name,
             ],
             '📋',
             $task->organization_id ?? ($task->project ? $task->project->organization_id : null)
-        );
-    }
-
-    /**
-     * Notify task assignee when task status changes or is updated.
-     */
-    public static function notifyTaskStatusChanged(Task $task, string $oldStatus, string $newStatus, ?User $actor = null): ?WorkplaceNotification
-    {
-        if (! $task->assignee_id) {
-            return null;
-        }
-
-        if ($actor && $actor->id === $task->assignee_id) {
-            return null;
-        }
-
-        $actorName = $actor ? $actor->name : __('A team member');
-        $taskTitle = $task->title ?: __('Untitled Task');
-
-        $title = __('Task Updated: :task', ['task' => $taskTitle]);
-        $body = __(':actor changed status of task ":task" from :old to :new.', [
-            'actor' => $actorName,
-            'task' => $taskTitle,
-            'old' => ucfirst(str_replace('_', ' ', $oldStatus)),
-            'new' => ucfirst(str_replace('_', ' ', $newStatus)),
-        ]);
-
-        $actionUrl = self::taskUrl($task->project_id, $task->id);
-
-        return self::send(
-            $task->assignee_id,
-            'task_updated',
-            $title,
-            $body,
-            $actionUrl,
-            [
-                'task_id' => $task->id,
-                'old_status' => $oldStatus,
-                'new_status' => $newStatus,
-            ],
-            '⚡',
-            $task->organization_id
         );
     }
 
@@ -150,29 +126,22 @@ class NotificationService
             return null;
         }
 
-        $hostName = $host ? $host->name : __('Organizer');
-        $meetingTitle = $meeting->title ?: __('Workspace Meeting');
         $sched = $meeting->scheduled_at ?? $meeting->start_time;
-        $timeFormatted = $sched ? (is_string($sched) ? $sched : $sched->format('Y-m-d H:i')) : __('Upcoming');
-
-        $title = __('📅 Meeting Invitation: :meeting', ['meeting' => $meetingTitle]);
-        $body = __(':host scheduled a meeting ":meeting" at :time.', [
-            'host' => $hostName,
-            'meeting' => $meetingTitle,
-            'time' => $timeFormatted,
-        ]);
-
-        $actionUrl = '/dashboard#meetings';
+        $words = fn () => [
+            'host' => $host ? $host->name : __('Organizer'),
+            'meeting' => $meeting->title ?: __('Workspace Meeting'),
+            'time' => $sched ? (is_string($sched) ? $sched : $sched->format('Y-m-d H:i')) : __('Upcoming'),
+        ];
 
         return self::send(
             $targetUserId,
             'meeting_scheduled',
-            $title,
-            $body,
-            $actionUrl,
+            fn () => __('📅 Meeting Invitation: :meeting', $words()),
+            fn () => __(':host scheduled a meeting ":meeting" at :time.', $words()),
+            '/dashboard#meetings',
             [
                 'meeting_id' => $meeting->id,
-                'host_id' => $host ? $host->id : null,
+                'host_id' => $host?->id,
                 'room_id' => $meeting->room_id,
             ],
             '📅',
@@ -186,23 +155,18 @@ class NotificationService
     public static function notifyDoorKnock(Room $room, $occupant, $requester): ?WorkplaceNotification
     {
         $targetUserId = $occupant instanceof User ? $occupant->id : $occupant;
-        $requesterName = $requester instanceof User ? $requester->name : (is_string($requester) ? $requester : __('A colleague'));
-        $roomName = $room->name ?: __('Private Room');
-
-        $title = __('🚪 Knock on Door: :room', ['room' => $roomName]);
-        $body = __(':requester is knocking on your room ":room" and requesting entry.', [
-            'requester' => $requesterName,
-            'room' => $roomName,
-        ]);
-
-        $actionUrl = '/office?room='.$room->id;
+        $requesterName = $requester instanceof User ? $requester->name : (is_string($requester) ? $requester : null);
+        $words = fn () => [
+            'requester' => $requesterName ?? __('A colleague'),
+            'room' => $room->name ?: __('Private Room'),
+        ];
 
         return self::send(
             $targetUserId,
             'door_knock',
-            $title,
-            $body,
-            $actionUrl,
+            fn () => __('🚪 Knock on Door: :room', $words()),
+            fn () => __(':requester is knocking on your room ":room" and requesting entry.', $words()),
+            '/office?room='.$room->id,
             [
                 'room_id' => $room->id,
                 'requester_name' => $requesterName,
@@ -219,19 +183,14 @@ class NotificationService
     {
         $targetUserId = $targetUser instanceof User ? $targetUser->id : $targetUser;
 
-        $title = __('👋 Wave from :sender', ['sender' => $sender->name]);
-        $body = $roomName
-            ? __(':sender waved at you from :room.', ['sender' => $sender->name, 'room' => $roomName])
-            : __(':sender waved at you in the workplace.', ['sender' => $sender->name]);
-
-        $actionUrl = '/office';
-
         return self::send(
             $targetUserId,
             'wave',
-            $title,
-            $body,
-            $actionUrl,
+            fn () => __('👋 Wave from :sender', ['sender' => $sender->name]),
+            fn () => $roomName
+                ? __(':sender waved at you from :room.', ['sender' => $sender->name, 'room' => $roomName])
+                : __(':sender waved at you in the workplace.', ['sender' => $sender->name]),
+            '/office',
             [
                 'sender_id' => $sender->id,
                 'sender_name' => $sender->name,
@@ -242,13 +201,14 @@ class NotificationService
     }
 
     /**
-     * Send a custom workplace notification.
+     * Send a custom workplace notification. Title and body may be closures,
+     * evaluated in the recipient's language (see send()).
      */
     public static function notifyCustom(
         $targetUser,
         string $type,
-        string $title,
-        ?string $body = null,
+        string|\Closure $title,
+        string|\Closure|null $body = null,
         array $data = [],
         $actorId = null,
         string $icon = '🔔',

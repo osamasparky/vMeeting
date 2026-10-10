@@ -303,8 +303,8 @@ class ProjectHubController extends Controller
             NotificationService::notifyCustom(
                 $task->assignee_id,
                 'task_approved',
-                __('🎉 Task Approved: ":task" has been approved as Completed by :name', ['task' => $task->title, 'name' => $user->name]),
-                __('Great work! Your task was reviewed and approved.'),
+                fn () => __('🎉 Task Approved: ":task" has been approved as Completed by :name', ['task' => $task->title, 'name' => $user->name]),
+                fn () => __('Great work! Your task was reviewed and approved.'),
                 ['task_id' => $task->id, 'project_id' => $task->project_id],
                 $user->id
             );
@@ -347,7 +347,7 @@ class ProjectHubController extends Controller
             NotificationService::notifyCustom(
                 $task->assignee_id,
                 'task_rejected',
-                __('⚠️ Changes Requested on task ":task" by :name', ['task' => $task->title, 'name' => $user->name]),
+                fn () => __('⚠️ Changes Requested on task ":task" by :name', ['task' => $task->title, 'name' => $user->name]),
                 $validated['rejection_reason'],
                 ['task_id' => $task->id, 'project_id' => $task->project_id],
                 $user->id

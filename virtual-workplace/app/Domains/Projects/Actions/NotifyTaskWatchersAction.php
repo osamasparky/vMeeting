@@ -14,7 +14,7 @@ class NotifyTaskWatchersAction
      *
      * @param  list<string>  $except
      */
-    public function execute(Task $task, string $type, string $title, ?string $body, ?User $actor = null, array $except = []): int
+    public function execute(Task $task, string $type, string|\Closure $title, string|\Closure|null $body, ?User $actor = null, array $except = []): int
     {
         $skip = array_filter(array_merge($except, [$actor?->id]));
         $sent = 0;

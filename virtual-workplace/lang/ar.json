@@ -3536,5 +3536,9 @@
     ":sender needs your attention now.": ":sender يحتاج انتباهك الآن.",
     "Room not found.": "الغرفة غير موجودة.",
     "You cannot send this to yourself.": "لا يمكنك إرسال هذا لنفسك.",
-    "This person is not in your organization.": "هذا الشخص ليس ضمن مؤسستك."
+    "This person is not in your organization.": "هذا الشخص ليس ضمن مؤسستك.",
+    "🔔 :name mentioned you in task \":task\"": "🔔 أشار إليك :name في المهمة \":task\"",
+    "🎉 Task Approved: \":task\" has been approved as Completed by :name": "🎉 تم اعتماد المهمة: اعتمد :name المهمة \":task\" كمكتملة",
+    "⚠️ Changes Requested on task \":task\" by :name": "⚠️ طلب :name تعديلات على المهمة \":task\"",
+    "⏳ Task Approval Needed: \":task\"": "⏳ مطلوب اعتماد المهمة: \":task\""
 }

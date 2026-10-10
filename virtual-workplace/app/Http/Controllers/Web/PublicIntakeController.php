@@ -51,7 +51,7 @@ class PublicIntakeController extends Controller
             NotificationService::send(
                 $userId,
                 'task_intake',
-                __('📥 New request for :project: :title', ['project' => $project->name, 'title' => $intake->title]),
+                fn () => __('📥 New request for :project: :title', ['project' => $project->name, 'title' => $intake->title]),
                 Str::limit(($intake->description ?? '').' — '.$intake->requester_name, 160),
                 '/projects/'.$project->id.'#intake',
                 ['project_id' => $project->id, 'intake_id' => $intake->id],

@@ -40,8 +40,8 @@ class SendTaskDueRemindersCommand extends Command
             ->chunkById(200, function ($tasks) use (&$soon) {
                 foreach ($tasks as $task) {
                     $this->notify($task, 'task_due_soon',
-                        __('⏰ ":task" is due tomorrow', ['task' => $task->title]),
-                        __('Task ":task" in project ":project" is due on :date.', ['task' => $task->title, 'project' => $task->project?->name, 'date' => $task->due_date->toDateString()]));
+                        fn () => __('⏰ ":task" is due tomorrow', ['task' => $task->title]),
+                        fn () => __('Task ":task" in project ":project" is due on :date.', ['task' => $task->title, 'project' => $task->project?->name, 'date' => $task->due_date->toDateString()]));
                     $task->forceFill(['due_reminder_sent_for' => $task->due_date])->saveQuietly();
                     $soon++;
                 }
@@ -52,8 +52,8 @@ class SendTaskDueRemindersCommand extends Command
             ->chunkById(200, function ($tasks) use (&$late) {
                 foreach ($tasks as $task) {
                     $this->notify($task, 'task_overdue',
-                        __('⚠️ ":task" is overdue', ['task' => $task->title]),
-                        __('Task ":task" in project ":project" was due on :date.', ['task' => $task->title, 'project' => $task->project?->name, 'date' => $task->due_date->toDateString()]));
+                        fn () => __('⚠️ ":task" is overdue', ['task' => $task->title]),
+                        fn () => __('Task ":task" in project ":project" was due on :date.', ['task' => $task->title, 'project' => $task->project?->name, 'date' => $task->due_date->toDateString()]));
                     $task->forceFill(['overdue_notice_sent_for' => $task->due_date])->saveQuietly();
                     $late++;
                 }
@@ -64,7 +64,7 @@ class SendTaskDueRemindersCommand extends Command
         return self::SUCCESS;
     }
 
-    private function notify(Task $task, string $type, string $title, string $body): void
+    private function notify(Task $task, string $type, \Closure $title, \Closure $body): void
     {
         $recipients = $task->assignees->pluck('id')->push($task->assignee_id)->filter()->unique();
 

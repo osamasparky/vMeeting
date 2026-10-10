@@ -49,7 +49,7 @@ class ProjectUpdateController extends Controller
             NotificationService::send(
                 $userId,
                 'project_update',
-                __('📣 :project: :health', ['project' => $project->name, 'health' => __('pm.health_'.$update->health)]),
+                fn () => __('📣 :project: :health', ['project' => $project->name, 'health' => __('pm.health_'.$update->health)]),
                 Str::limit($update->body, 160),
                 '/projects/'.$project->id.'#overview',
                 ['project_id' => $project->id, 'update_id' => $update->id],

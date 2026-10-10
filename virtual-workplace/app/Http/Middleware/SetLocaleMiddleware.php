@@ -31,12 +31,24 @@ class SetLocaleMiddleware
             $locale = $request->cookie('locale');
             Session::put('locale', $locale);
         }
-        // 4. Default
+        // 4. The language saved on the account (e.g. signing in on a new browser)
+        elseif (in_array($request->user()?->locale, ['ar', 'en'], true)) {
+            $locale = $request->user()->locale;
+            Session::put('locale', $locale);
+        }
+        // 5. Default
         else {
             $locale = config('app.locale', 'ar'); // Default to Arabic if desired or 'ar'
         }
 
         App::setLocale($locale);
+
+        // Remember the language on the account, so notifications and emails reach the
+        // person in it, even when someone else, or the scheduler, triggers them.
+        $user = $request->user();
+        if ($user && $user->locale !== $locale && in_array($locale, ['ar', 'en'], true)) {
+            $user->forceFill(['locale' => $locale])->saveQuietly();
+        }
 
         return $next($request);
     }
