@@ -1010,10 +1010,12 @@
                     <span id="occupants-counter">1 {{ __('Online') }}</span>
                 </button>
 
+                @if(empty($user->is_guest))
                 <button onclick="openGuestInviteModal()" class="nx-toolbar-btn btn-accent" title="{{ __('Invite Guest') }}">
                     <span class="material-symbols-rounded" style="font-size: 16px;">person_add</span>
                     <span>{{ __('Invite') }}</span>
                 </button>
+                @endif
 
                 @if(empty($user->is_guest))
                     @include('partials.notification-bell', ['bellButtonClass' => 'nx-toolbar-btn notif-office-btn', 'bellQuietOffice' => true])
@@ -1103,11 +1105,13 @@
             <button type="button" class="ula-people-btn" onclick="closeOccupantsModal()" aria-label="{{ __('Close') }}"><span class="material-symbols-rounded">close</span></button>
         </div>
         <div class="ula-people-list" id="people-list" role="list"></div>
+        @if(empty($user->is_guest))
         <div class="ula-people-foot">
             <button type="button" class="ula-people-invite" onclick="closeOccupantsModal(); openGuestInviteModal();">
                 <span class="material-symbols-rounded" aria-hidden="true">person_add</span> {{ __('office.people_invite') }}
             </button>
         </div>
+        @endif
     </aside>
 
     <!-- ── Call card (design-reference 29): incoming answer / decline / wave, outgoing cancel ── -->
@@ -1157,20 +1161,24 @@
 
         <div class="nx-dock-divider"></div>
 
+        @if(empty($user->is_guest))
         <button class="nx-dock-btn" id="btn-tasks-dock" onclick="openMyTaskDrawer()" title="{{ __('My Tasks & Time Tracking') }}">
             <span class="material-symbols-rounded">task_alt</span>
             <span>{{ __('Tasks') }}</span>
         </button>
+        @endif
 
         <button class="nx-dock-btn" id="btn-whiteboard-dock" onclick="openWhiteboardModal()" title="{{ __('Collaborative Whiteboard') }}">
             <span class="material-symbols-rounded">draw</span>
             <span>{{ __('Whiteboard') }}</span>
         </button>
 
+        @if(empty($user->is_guest))
         <button class="nx-dock-btn" id="btn-record" onclick="toggleRecording()" title="{{ __('Record Session') }}">
             <span id="rec-icon" class="material-symbols-rounded">radio_button_checked</span>
             <span id="rec-text">{{ __('Record') }}</span>
         </button>
+        @endif
 
         <button class="nx-dock-btn" id="btn-more-dock" onclick="toggleMoreMenu(event)" title="{{ __('More Tools & Settings') }}">
             <span class="material-symbols-rounded">more_horiz</span>
@@ -1200,9 +1208,11 @@
         <button class="more-menu-item" onclick="toggleCameraGalleryModal(); closeMoreMenu();">
             <span class="material-symbols-rounded" style="font-size: 18px;">grid_view</span> <span>{{ __('Live Camera Grid') }}</span>
         </button>
+        @if(empty($user->is_guest))
         <button class="more-menu-item" onclick="openRecordingsGallery(); closeMoreMenu();">
             <span class="material-symbols-rounded" style="font-size: 18px;">video_library</span> <span>{{ __('Recordings Library') }}</span>
         </button>
+        @endif
     </div>
 
     <!-- ── Floating In-World Contextual Prompts & Menus ── -->
@@ -2116,8 +2126,9 @@
             const objects = (CONFIG.map && CONFIG.map.objects) || [];
             let found = null;
             for (const obj of objects) {
-                const ox = (obj.position ? obj.position.x : (obj.x || 0)) * 32 + ((obj.width || (obj.size ? obj.size.width : 1)) * 16);
-                const oy = (obj.position ? obj.position.y : (obj.y || 0)) * 32 + ((obj.height || (obj.size ? obj.size.height : 1)) * 16);
+                // Centre of the object, in the same units it is drawn with (tiles x TILE_SIZE).
+                const ox = ((obj.position ? obj.position.x : (obj.x || 0)) + (obj.width || (obj.size ? obj.size.width : 1)) / 2) * TILE_SIZE;
+                const oy = ((obj.position ? obj.position.y : (obj.y || 0)) + (obj.height || (obj.size ? obj.size.height : 1)) / 2) * TILE_SIZE;
                 const dist = Math.hypot(localAvatar.x - ox, localAvatar.y - oy);
                 if (dist < 48) {
                     const behType = obj.interaction_type || (obj.interaction_config && obj.interaction_config.behavior?.type) || ((obj.type && (obj.type.includes('chair') || obj.type.includes('desk') || obj.type.includes('sofa') || obj.type.includes('seating'))) ? 'sit' : null);
@@ -5351,6 +5362,7 @@
         let isRecording = false;
 
         function toggleRecording() {
+            if (isGuest) return;
             if (isRecording) {
                 stopRecordingSession();
             } else {
@@ -6180,7 +6192,7 @@
         }
 
         // ── Guest Invite Link ──
-        function openGuestInviteModal() { document.getElementById('guest-modal').style.display = 'flex'; }
+        function openGuestInviteModal() { if (isGuest) return; document.getElementById('guest-modal').style.display = 'flex'; }
         function closeGuestModal() { document.getElementById('guest-modal').style.display = 'none'; }
 
         let currentGuestJoinUrl = '';
