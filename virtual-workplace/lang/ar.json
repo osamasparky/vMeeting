@@ -3591,5 +3591,10 @@
     "Guests chat:": "محادثة الضيوف:",
     "only the people in this room see it": "لا يراها إلا الموجودون في هذه الغرفة",
     "you are here": "أنت هنا",
-    "Enter a room to chat with room occupants.": "ادخل غرفة للدردشة مع الموجودين فيها."
+    "Enter a room to chat with room occupants.": "ادخل غرفة للدردشة مع الموجودين فيها.",
+    "Who can enter": "من يمكنه الدخول",
+    "Everyone in the company": "كل أعضاء الشركة",
+    "Private: members with access only": "خاصة: لمن لديه صلاحية فقط",
+    "Delete the room \":name\"? Its guest links and files are deleted with it.": "حذف الغرفة «:name»؟ ستُحذف معها روابط الضيوف وملفاتها.",
+    "Room resized — press Save to keep it.": "تم تغيير مقاس الغرفة — اضغط حفظ لتثبيته."
 }

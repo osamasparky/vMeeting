@@ -3591,5 +3591,10 @@
     "Guests chat:": "Guests chat:",
     "only the people in this room see it": "only the people in this room see it",
     "you are here": "you are here",
-    "Enter a room to chat with room occupants.": "Enter a room to chat with room occupants."
+    "Enter a room to chat with room occupants.": "Enter a room to chat with room occupants.",
+    "Who can enter": "Who can enter",
+    "Everyone in the company": "Everyone in the company",
+    "Private: members with access only": "Private: members with access only",
+    "Delete the room \":name\"? Its guest links and files are deleted with it.": "Delete the room \":name\"? Its guest links and files are deleted with it.",
+    "Room resized — press Save to keep it.": "Room resized — press Save to keep it."
 }

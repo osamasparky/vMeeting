@@ -122,4 +122,25 @@ class MapEditorTest extends TestCase
         // The company admin may.
         $this->actingAs($this->owner)->postJson("/editor/maps/{$this->map->id}/save", ['layout_data' => ['walls' => []]])->assertSuccessful();
     }
+
+    public function test_saving_twice_keeps_new_rooms_and_object_settings(): void
+    {
+        $this->actingAs($this->owner);
+        $payload = fn (?string $roomId) => [
+            'rooms' => [['id' => $roomId, 'name' => 'New', 'bounds' => ['x' => 2, 'y' => 2, 'width' => 6, 'height' => 6]]],
+            'objects' => [['type' => 'rug', 'name' => 'Rug', 'position' => ['x' => 3, 'y' => 3], 'width' => 2, 'height' => 2, 'elevation' => 0, 'interaction_type' => 'drink']],
+        ];
+
+        $first = $this->postJson("/editor/maps/{$this->map->id}/save", $payload(null))->assertSuccessful()->json('room_ids');
+        $this->assertCount(1, $first);
+
+        // The editor sends the id back on the next save: same room, not a new one.
+        $second = $this->postJson("/editor/maps/{$this->map->id}/save", $payload($first[0]))->assertSuccessful()->json('room_ids');
+        $this->assertSame($first, $second);
+        $this->assertSame(1, Room::withoutGlobalScopes()->where('map_id', $this->map->id)->count());
+
+        $object = $this->map->fresh()->objects()->first();
+        $this->assertSame(0, $object->elevation);
+        $this->assertSame('drink', $object->interaction_type);
+    }
 }

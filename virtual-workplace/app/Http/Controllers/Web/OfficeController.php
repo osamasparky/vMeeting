@@ -671,8 +671,12 @@ class OfficeController extends Controller
                 if ($id && $existing->has($id)) {
                     $existing[$id]->update($attributes);
                 } else {
-                    $id = $id && ! Room::whereKey($id)->exists() ? $id : (string) Str::uuid();
-                    Room::create(['id' => $id] + $attributes);
+                    $id = $id && ! Room::withoutGlobalScopes()->whereKey($id)->exists() ? $id : (string) Str::uuid();
+                    // id isn't mass-assignable: set it directly so the id we keep is the room's real id
+                    // (otherwise the room is created with another id and deleted just below).
+                    $room = new Room($attributes);
+                    $room->id = $id;
+                    $room->save();
                 }
                 $keptIds[] = $id;
             }
@@ -723,6 +727,8 @@ class OfficeController extends Controller
         return response()->json([
             'message' => 'Map saved successfully.',
             'map' => $map->fresh(['floor', 'rooms', 'zones', 'objects']),
+            // Ids of the submitted rooms in the order sent, so the editor can keep the ones just created.
+            'room_ids' => $keptIds ?? null,
         ]);
     }
 

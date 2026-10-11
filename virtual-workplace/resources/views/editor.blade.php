@@ -1287,6 +1287,13 @@
                                     <option value="reception">{{ __('Reception Lobby') }}</option>
                                 </select>
                             </div>
+                            <div>
+                                <label class="prop-label" for="prop-room-access">{{ __('Who can enter') }}</label>
+                                <select class="prop-input" id="prop-room-access" onchange="updateRoomProp('access_mode', this.value)">
+                                    <option value="public">{{ __('Everyone in the company') }}</option>
+                                    <option value="private">{{ __('Private: members with access only') }}</option>
+                                </select>
+                            </div>
                             
                             <!-- Acoustic Isolation Box -->
                             <div style="background: var(--ula-surface-accent-soft); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
@@ -1691,7 +1698,7 @@
                         <div style="position:relative; width:100%; height:75px; border-radius:8px; overflow:hidden; background: var(--ula-surface-page-alt);">
                             <img src="${f.thumb}" alt="${f.name_en}" style="width:100%; height:100%; object-fit:cover;">
                             <span style="position:absolute; bottom:3px; inset-inline-end:3px; background: var(--ula-surface-raised); font-size:9px; font-family:var(--ula-font-mono); padding:1px 4px; border-radius:4px; color:var(--ula-text-secondary); direction:ltr; unicode-bidi:isolate;">1200×708</span>
-                            ${isActive ? '<span style="position:absolute; top:3px; inset-inline-start:3px; background:var(--ula-accent-default); font-size:9px; font-weight:800; padding:1px 6px; border-radius:4px; color:var(--ula-accent-fg);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check</span> نشط</span>' : ''}
+                            ${isActive ? '<span style="position:absolute; top:3px; inset-inline-start:3px; background:var(--ula-accent-default); font-size:9px; font-weight:800; padding:1px 6px; border-radius:4px; color:var(--ula-accent-fg);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">check</span> ${@json(__('Active'))}</span>' : ''}
                         </div>
                         <div style="font-size:11px; font-weight:700; color:var(--ula-text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:start;">
                             ${isAr ? f.name_ar : f.name_en}
@@ -1724,11 +1731,14 @@
                     MAP_DATA.layout_data.background_width = width;
                     MAP_DATA.layout_data.background_height = height;
                     
-                    adoptBackgroundSize(width, height);
-                    
+                    // Use the image's real size once it loads (the catalogue size is only a hint).
+                    BLUEPRINT_IMAGE.onload = () => {
+                        blueprintLoaded = true;
+                        adoptBackgroundSize(BLUEPRINT_IMAGE.naturalWidth || width, BLUEPRINT_IMAGE.naturalHeight || height);
+                        fitAndCenterView();
+                    };
                     BLUEPRINT_IMAGE.src = floorUrl + (floorUrl.includes('?') ? '&' : '?') + 'v=' + Date.now();
-                    blueprintLoaded = true;
-                    
+
                     fitAndCenterView();
                     renderFloorsCatalog();
                     showToast('✅ {{ __("Floor Style Applied Successfully") }}');
@@ -1793,16 +1803,12 @@
                     }
                 });
                 if (res.ok) {
-                    if (MAP_DATA.layout_data) {
-                        delete MAP_DATA.layout_data.background_image_url;
-                        MAP_DATA.layout_data.background_width = 1200;
-                        MAP_DATA.layout_data.background_height = 708;
-                    }
+                    if (MAP_DATA.layout_data) delete MAP_DATA.layout_data.background_image_url;
                     blueprintLoaded = false;
+                    BLUEPRINT_IMAGE.onload = null;
+                    BLUEPRINT_IMAGE.onerror = null;
                     BLUEPRINT_IMAGE.removeAttribute('src');
-                    BLUEPRINT_IMAGE.src = '';
-                    MAP_WIDTH_PX = 1200;
-                    MAP_HEIGHT_PX = 708;
+                    adoptBackgroundSize(1200, 708);
                     fitAndCenterView();
                     renderFloorsCatalog();
                     draw();
@@ -1947,8 +1953,17 @@
             return Math.round(val / step) * step;
         }
 
-        function zoomIn() { zoomLevel = Math.min(3.5, zoomLevel + 0.15); draw(); }
-        function zoomOut() { zoomLevel = Math.max(0.25, zoomLevel - 0.15); draw(); }
+        function zoomAroundCentre(newZoom) {
+            newZoom = Math.max(0.25, Math.min(3.5, newZoom));
+            const cx = width / 2, cy = height / 2;
+            panOffset.x -= (cx - panOffset.x) * (newZoom / zoomLevel - 1);
+            panOffset.y -= (cy - panOffset.y) * (newZoom / zoomLevel - 1);
+            zoomLevel = newZoom;
+            updateFloatingActions();
+            draw();
+        }
+        function zoomIn() { zoomAroundCentre(zoomLevel + 0.15); }
+        function zoomOut() { zoomAroundCentre(zoomLevel - 0.15); }
         function resetView() { fitAndCenterView(); draw(); }
         function toggleGrid() { showGrid = !showGrid; draw(); }
 
@@ -1989,6 +2004,15 @@
             const tileY = Math.floor(rawTileY);
 
             if (currentTool === 'select') {
+                // Grab an edge or corner of the selected room to resize it.
+                if (selectedItem && selectedItem.type === 'room' && selectedItem.item.bounds) {
+                    const hit = roomResizeHit(selectedItem.item, rawTileX, rawTileY);
+                    if (hit) {
+                        resizing = { room: selectedItem.item, edges: hit, orig: { ...selectedItem.item.bounds } };
+                        canvas.style.cursor = resizeCursor(hit);
+                        return;
+                    }
+                }
                 let clicked = null;
                 // Objects first (support sub-tile hit testing)
                 for (let i = objects.length - 1; i >= 0; i--) {
@@ -2124,7 +2148,7 @@
                     width: placeW,
                     height: placeH,
                     collision: currentObjectCustom ? currentObjectCustom.collision : true,
-                    elevation: currentObjectCustom?.elevation || 1,
+                    elevation: currentObjectCustom?.elevation ?? 1,
                     interaction_type: iType,
                     interaction_config: initConfig,
                     is_custom: true
@@ -2154,6 +2178,21 @@
             const rawTileY = mouseY / TILE_SIZE;
             const tileX = Math.floor(rawTileX);
             const tileY = Math.floor(rawTileY);
+
+            if (resizing) {
+                const o = resizing.orig, e = resizing.edges, b = resizing.room.bounds;
+                const maxTx = Math.floor(MAP_WIDTH_PX / TILE_SIZE), maxTy = Math.floor(MAP_HEIGHT_PX / TILE_SIZE);
+                const gx = Math.round(rawTileX), gy = Math.round(rawTileY);
+                let left = o.x, right = o.x + o.width, top = o.y, bottom = o.y + o.height;
+                if (e.l) left = Math.max(0, Math.min(right - 2, gx));
+                if (e.r) right = Math.min(maxTx, Math.max(left + 2, gx));
+                if (e.t) top = Math.max(0, Math.min(bottom - 2, gy));
+                if (e.b) bottom = Math.min(maxTy, Math.max(top + 2, gy));
+                b.x = left; b.y = top; b.width = right - left; b.height = bottom - top;
+                updateInspector();
+                draw();
+                return;
+            }
 
             if (isDragging && selectedItem) {
                 const maxTilesX = MAP_WIDTH_PX / TILE_SIZE;
@@ -2203,16 +2242,49 @@
             }
 
             if (isDrawing) {
-                const x = Math.min(startX, tileX);
-                const y = Math.min(startY, tileY);
-                const w = Math.max(1, Math.abs(tileX - startX) + 1);
-                const h = Math.max(1, Math.abs(tileY - startY) + 1);
+                // Keep the rectangle on the floor image: rooms off it are refused when saved.
+                const maxTx = Math.floor(MAP_WIDTH_PX / TILE_SIZE) - 1, maxTy = Math.floor(MAP_HEIGHT_PX / TILE_SIZE) - 1;
+                const cx = Math.max(0, Math.min(maxTx, tileX)), cy = Math.max(0, Math.min(maxTy, tileY));
+                const sx0 = Math.max(0, Math.min(maxTx, startX)), sy0 = Math.max(0, Math.min(maxTy, startY));
+                const x = Math.min(sx0, cx);
+                const y = Math.min(sy0, cy);
+                const w = Math.max(1, Math.abs(cx - sx0) + 1);
+                const h = Math.max(1, Math.abs(cy - sy0) + 1);
                 currentRect = { x, y, width: w, height: h };
                 draw();
+                return;
+            }
+
+            // Hovering the selected room's edge or corner shows it can be resized.
+            if (currentTool === 'select') {
+                const hit = (selectedItem && selectedItem.type === 'room') ? roomResizeHit(selectedItem.item, rawTileX, rawTileY) : null;
+                canvas.style.cursor = hit ? resizeCursor(hit) : 'default';
             }
         });
 
         window.addEventListener('mouseup', () => {
+            if (resizing) {
+                const { room, orig } = resizing;
+                resizing = null;
+                const b = room.bounds;
+                const snapped = snapRoomBounds(b, rooms, 'resize');
+                const maxTx = MAP_WIDTH_PX / TILE_SIZE, maxTy = MAP_HEIGHT_PX / TILE_SIZE;
+                if (snapped.x >= 0 && snapped.y >= 0 && snapped.x + snapped.width <= maxTx && snapped.y + snapped.height <= maxTy) Object.assign(b, { x: snapped.x, y: snapped.y, width: snapped.width, height: snapped.height });
+                const conflict = roomSpacingConflict(room);
+                const doorVictim = conflict ? null : blockedNeighbourDoor(room);
+                if (conflict || doorVictim) {
+                    Object.assign(b, orig);
+                    showToast('❌ ' + (doorVictim
+                        ? @json(__('This room would block the door of ":name". Move that room\'s door to another wall first.')).replace(':name', doorVictim === room ? @json(__('this room')) : (doorVictim.name || ''))
+                        : @json(__('This room must either share a wall with ":name" or be at least :gap tiles away from it, so people can walk between them.')).replace(':name', conflict.name || '').replace(':gap', ROOM_MIN_GAP_TILES)));
+                } else if (b.width !== orig.width || b.height !== orig.height || b.x !== orig.x || b.y !== orig.y) {
+                    showToast('✅ ' + @json(__('Room resized — press Save to keep it.')));
+                }
+                canvas.style.cursor = 'default';
+                updateInspector();
+                draw();
+                return;
+            }
             if (isPanning) {
                 isPanning = false;
                 canvas.style.cursor = currentTool === 'select' ? 'default' : 'crosshair';
@@ -2369,12 +2441,38 @@
             } else if (k === 'd' && selectedItem && selectedItem.type === 'object') {
                 duplicateSelectedItem();
             } else if (k === 'escape') {
+                if (resizing) { Object.assign(resizing.room.bounds, resizing.orig); resizing = null; updateInspector(); draw(); return; }
+                if (isDrawing || currentWall) { isDrawing = false; currentRect = null; currentWall = null; setTool('select'); draw(); return; }
                 selectedItem = null;
                 updateInspector();
                 hideFloatingActions();
                 draw();
             }
         });
+
+        // ── Room resizing ──
+        let resizing = null; // { room, edges: {l,r,t,b}, orig }
+        // Which edges of a room the pointer is on (a corner is two), or null.
+        function roomResizeHit(room, tx, ty) {
+            const b = room && room.bounds;
+            if (!b) return null;
+            const tol = Math.max(0.35, 7 / (TILE_SIZE * zoomLevel));
+            const inX = tx >= b.x - tol && tx <= b.x + b.width + tol;
+            const inY = ty >= b.y - tol && ty <= b.y + b.height + tol;
+            if (!inX || !inY) return null;
+            const e = {
+                l: Math.abs(tx - b.x) <= tol, r: Math.abs(tx - (b.x + b.width)) <= tol,
+                t: Math.abs(ty - b.y) <= tol, b: Math.abs(ty - (b.y + b.height)) <= tol,
+            };
+            if (e.l && e.r) e.r = false;
+            if (e.t && e.b) e.b = false;
+            return (e.l || e.r || e.t || e.b) ? e : null;
+        }
+        function resizeCursor(e) {
+            if ((e.l && e.t) || (e.r && e.b)) return 'nwse-resize';
+            if ((e.r && e.t) || (e.l && e.b)) return 'nesw-resize';
+            return (e.l || e.r) ? 'ew-resize' : 'ns-resize';
+        }
 
         // ── Room adjacency ──
         // Rooms either share a wall or keep a full walking corridor (RoomBoundsGap on the server).
@@ -2461,7 +2559,10 @@
         function roomDoor(room, side = null, offset = null) {
             if (!room || !room.bounds) return null;
             const bounds = side === null ? room.bounds : { ...room.bounds, doorSide: side, doorOffset: offset };
-            return window.UlaRoomDoors.compute({ ...room, bounds }, rooms, { mapW: MAP_WIDTH_PX, mapH: MAP_HEIGHT_PX, tile: TILE_SIZE });
+            // The room goes in as a copy, so leave the original out of the neighbours: a room that
+            // isn't saved yet has no id, and would otherwise block every door with its own walls.
+            const others = rooms.filter(o => o !== room);
+            return window.UlaRoomDoors.compute({ ...room, bounds }, others, { mapW: MAP_WIDTH_PX, mapH: MAP_HEIGHT_PX, tile: TILE_SIZE });
         }
 
         // A chosen wall is blocked when its door would open off the map or into another room
@@ -2922,7 +3023,7 @@
                     btn.classList.toggle('active', btn.textContent.includes(`${rot}°`));
                 });
                 const elevEl = document.getElementById('prop-elevation');
-                if (elevEl) elevEl.value = item.elevation || 1;
+                if (elevEl) elevEl.value = (item.elevation ?? 1);
                 const badgeEl = document.getElementById('prop-interaction-badge');
                 const iType = item.interaction_type || (item.interaction_config && item.interaction_config.behavior?.type) || (item.type === 'branding' ? 'branding' : (item.type === 'sticky_note' ? 'stickyNote' : (item.type === 'custom_link' ? 'link' : (item.type === 'custom_image' ? 'customImage' : 'none'))));
                 if (badgeEl) {
@@ -2969,6 +3070,8 @@
 
                 document.getElementById('prop-room-name').value = item.name || '';
                 document.getElementById('prop-room-type').value = item.type || 'meeting';
+                const accessEl = document.getElementById('prop-room-access');
+                if (accessEl) accessEl.value = item.access_mode === 'private' ? 'private' : 'public';
                 document.getElementById('prop-room-capacity').value = item.capacity || 10;
                 document.getElementById('prop-room-isolation').checked = item.metadata.audio_isolation !== false;
 
@@ -2992,6 +3095,7 @@
 
             if (prop === 'name') r.name = val;
             else if (prop === 'type') r.type = val;
+            else if (prop === 'access_mode') r.access_mode = val === 'private' ? 'private' : 'public';
             else if (prop === 'capacity') r.capacity = parseInt(val) || 10;
             else if (prop === 'color') r.color = val;
             else if (prop === 'audio_isolation') r.metadata.audio_isolation = !!val;
@@ -3005,9 +3109,10 @@
             if (!selectedItem) return;
             if (prop === 'name') selectedItem.item.name = val;
             if (prop === 'color') selectedItem.item.color = val;
-            if (prop === 'width') selectedItem.item.width = val;
-            if (prop === 'height') selectedItem.item.height = val;
-            if (prop === 'elevation') selectedItem.item.elevation = parseInt(val) || 1;
+            // Sizes arrive as text from the inputs; keep them numbers (hit-testing adds them).
+            if (prop === 'width') selectedItem.item.width = Math.max(0.25, parseFloat(val) || 1);
+            if (prop === 'height') selectedItem.item.height = Math.max(0.25, parseFloat(val) || 1);
+            if (prop === 'elevation') { const n = parseInt(val, 10); selectedItem.item.elevation = Number.isNaN(n) ? 1 : n; }
             draw();
         }
 
@@ -3196,6 +3301,7 @@
                 if (idx > -1) list.splice(idx, 1);
             } else if (selectedItem.type === 'room') {
                 const r = selectedItem.item;
+                if (!confirm(@json(__('Delete the room ":name"? Its guest links and files are deleted with it.')).replace(':name', r.name || ''))) return;
                 const idx = rooms.indexOf(r);
                 if (idx > -1) rooms.splice(idx, 1);
                 if (r.id) {
@@ -3236,6 +3342,12 @@
             document.getElementById('floating-actions').style.display = 'none';
         }
 
+        const edEscape = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const ROOM_TYPE_LABELS = {
+            meeting: @json(__('Meeting Room')), private: @json(__('Private Office')), focus: @json(__('Focus Pod')),
+            breakout: @json(__('Breakout Lounge')), reception: @json(__('Reception Lobby')),
+        };
+
         function renderRoomsDirectory() {
             const container = document.getElementById('rooms-list-container');
             if (!container) return;
@@ -3248,8 +3360,8 @@
                 html += `
                     <div style="background: var(--ula-surface-card); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; display: flex; align-items: center; justify-content: space-between;">
                         <div style="display: flex; flex-direction: column; gap: 2px;">
-                            <strong style="font-size: 12px; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> ${r.name}</strong>
-                            <span style="font-size: 10px; color: var(--ula-text-muted);">${r.type || 'meeting'} · ${r.capacity || 10} seats</span>
+                            <strong style="font-size: 12px; color: var(--ula-text-primary);"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> ${edEscape(r.name)}</strong>
+                            <span style="font-size: 10px; color: var(--ula-text-muted);">${edEscape(ROOM_TYPE_LABELS[r.type] || r.type || '')} · <span style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">${parseInt(r.capacity, 10) || 10}</span> ${@json(__('seats'))}</span>
                         </div>
                         <button onclick="selectRoomByIndex(${idx})" class="tool-btn" style="padding: 4px 8px; font-size: 11px;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">search</span></button>
                     </div>
@@ -3337,6 +3449,9 @@
                         image_url: o.image_url || null,
                         is_custom: typeof o.is_custom !== 'undefined' ? o.is_custom : true,
                         collision: typeof o.collision === 'boolean' ? o.collision : true,
+                        // Sent explicitly: the server would otherwise reset them to level 1 / no interaction.
+                        elevation: (o.elevation ?? o.interaction_config?.elevation ?? 1),
+                        interaction_type: o.interaction_type || o.interaction_config?.interaction_type || o.interaction_config?.behavior?.type || 'none',
                         interaction_config: o.interaction_config || { image_url: o.image_url, is_custom: true }
                     }))
                 };
@@ -3349,13 +3464,20 @@
                 });
                 const data = await res.json();
                 if (res.ok) {
+                    // Rooms that had no id yet were created now: remember their ids, or the next
+                    // save would create them again (and drop their guest links and files).
+                    if (Array.isArray(data.room_ids)) {
+                        data.room_ids.forEach((id, i) => { if (rooms[i] && id) rooms[i].id = id; });
+                    }
                     showToast('✅ {{ __("Draft saved successfully!") }}');
-                } else {
-                    showToast('❌ ' + (data.message || 'Save failed'));
+                    return true;
                 }
+                showToast('❌ ' + (data.message || 'Save failed'));
+                return false;
             } catch(e) {
                 console.error(e);
                 showToast('❌ {{ __("Failed to save draft") }}');
+                return false;
             }
         }
 
@@ -3363,7 +3485,8 @@
             if (!confirm('{{ __("Are you sure you want to publish this map layout to all live office users?") }}')) return;
             showToast('🚀 {{ __("Publishing map...") }}');
             try {
-                await saveMapDraft();
+                // Publishing an unsaved layout would put the old one live: stop if the save failed.
+                if (!(await saveMapDraft())) return;
 
                 const res = await fetch(`/editor/maps/${MAP_ID}/publish`, {
                     method: 'POST',
@@ -3444,13 +3567,11 @@
                 if (res.ok) {
                     MAP_DATA.layout_data = MAP_DATA.layout_data || {};
                     delete MAP_DATA.layout_data.background_image_url;
-                    MAP_DATA.layout_data.background_width = 1200;
-                    MAP_DATA.layout_data.background_height = 708;
                     blueprintLoaded = false;
+                    BLUEPRINT_IMAGE.onload = null;
+                    BLUEPRINT_IMAGE.onerror = null;
                     BLUEPRINT_IMAGE.removeAttribute('src');
-                    BLUEPRINT_IMAGE.src = '';
-                    MAP_WIDTH_PX = 1200;
-                    MAP_HEIGHT_PX = 708;
+                    adoptBackgroundSize(1200, 708);
                     fitAndCenterView();
                     renderFloorsCatalog();
                     draw();
@@ -3823,6 +3944,11 @@
                 if (data.background_image_url) {
                     MAP_DATA.layout_data = MAP_DATA.layout_data || {};
                     MAP_DATA.layout_data.background_image_url = data.background_image_url;
+                    BLUEPRINT_IMAGE.onload = () => {
+                        blueprintLoaded = true;
+                        if (BLUEPRINT_IMAGE.naturalWidth > 0) adoptBackgroundSize(BLUEPRINT_IMAGE.naturalWidth, BLUEPRINT_IMAGE.naturalHeight);
+                        fitAndCenterView();
+                    };
                     BLUEPRINT_IMAGE.src = data.background_image_url + (data.background_image_url.includes('?') ? '&' : '?') + 'v=' + Date.now();
                 }
 
