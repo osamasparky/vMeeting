@@ -2,11 +2,14 @@
 
 namespace Tests\Feature\Office;
 
+use App\Domains\CMS\Models\FeatureFlag;
+use App\Domains\Tenancy\Models\OrganizationSetting;
 use App\Domains\Workspace\Models\Floor;
 use App\Domains\Workspace\Models\Map;
 use App\Domains\Workspace\Models\Room;
 use App\Domains\Workspace\Support\MapGeometry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\Feature\Projects\Concerns\BuildsProjectWorkspace;
 use Tests\TestCase;
 
@@ -142,5 +145,38 @@ class MapEditorTest extends TestCase
         $object = $this->map->fresh()->objects()->first();
         $this->assertSame(0, $object->elevation);
         $this->assertSame('drink', $object->interaction_type);
+    }
+
+    public function test_ai_generator_can_be_switched_off_by_the_super_admin(): void
+    {
+        FeatureFlag::updateOrCreate(['flag_key' => 'ai_office_generator'], ['name_en' => 'AI', 'name_ar' => 'AI', 'category' => 'ai', 'is_enabled' => false]);
+
+        $this->actingAs($this->owner)->postJson('/organization/ai-map/generate', ['target_floor_id' => $this->map->floor_id])->assertForbidden();
+        $this->get('/editor')->assertOk()->assertDontSee('onclick="openAiGeneratorModal()"', false)->assertDontSee('id="ai-generator-modal"', false);
+    }
+
+    public function test_ai_floor_plan_is_only_a_proposal_until_saved(): void
+    {
+        FeatureFlag::updateOrCreate(['flag_key' => 'ai_office_generator'], ['name_en' => 'AI', 'name_ar' => 'AI', 'category' => 'ai', 'is_enabled' => true]);
+        OrganizationSetting::updateOrCreate(['organization_id' => $this->org->id], ['openai_settings' => ['api_key' => 'test-key']]);
+        Http::fake(['api.openai.com/*' => Http::response(['data' => [['b64_json' => base64_encode('png')]]])]);
+        $this->map->forceFill(['layout_data' => ['background_image_url' => '/images/old.png'], 'status' => 'draft'])->save();
+
+        $res = $this->actingAs($this->owner)->postJson('/organization/ai-map/generate', ['target_floor_id' => $this->map->floor_id, 'office_rooms' => 1])->assertOk();
+        $url = $res->json('background_image_url');
+        $this->assertStringStartsWith('/uploads/maps/', $url);
+        @unlink(public_path(ltrim($url, '/')));
+
+        // Nothing reached the office: same image, still a draft.
+        $fresh = $this->map->fresh();
+        $this->assertSame('/images/old.png', $fresh->layout_data['background_image_url']);
+        $this->assertSame('draft', $fresh->status);
+    }
+
+    public function test_only_local_floor_images_are_saved(): void
+    {
+        $this->assertArrayNotHasKey('background_image_url', MapGeometry::sanitize(['background_image_url' => 'https://evil.example/x.png']));
+        $this->assertArrayNotHasKey('background_image_url', MapGeometry::sanitize(['background_image_url' => '//evil.example/x.png']));
+        $this->assertSame('/uploads/maps/a_1.png?v=2', MapGeometry::sanitize(['background_image_url' => '/uploads/maps/a_1.png?v=2'])['background_image_url']);
     }
 }

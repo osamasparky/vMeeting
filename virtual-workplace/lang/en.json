@@ -3596,5 +3596,11 @@
     "Everyone in the company": "Everyone in the company",
     "Private: members with access only": "Private: members with access only",
     "Delete the room \":name\"? Its guest links and files are deleted with it.": "Delete the room \":name\"? Its guest links and files are deleted with it.",
-    "Room resized — press Save to keep it.": "Room resized — press Save to keep it."
+    "Room resized — press Save to keep it.": "Room resized — press Save to keep it.",
+    "Unsaved changes": "Unsaved changes",
+    "Solid — avatars walk around it": "Solid — avatars walk around it",
+    "Room added — press Save to keep it.": "Room added — press Save to keep it.",
+    "Delete the room \":name\"? When you save, its guest links and files are deleted with it.": "Delete the room \":name\"? When you save, its guest links and files are deleted with it.",
+    "Floor plan generated. Review it, then press Save to put it in the office.": "Floor plan generated. Review it, then press Save to put it in the office.",
+    "The AI office generator is not available.": "The AI office generator is not available."
 }

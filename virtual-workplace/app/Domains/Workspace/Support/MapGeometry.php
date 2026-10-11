@@ -75,6 +75,13 @@ class MapGeometry
         $layout['walls'] = $walls;
         $layout['obstacles'] = $obstacles;
 
+        if (array_key_exists('background_image_url', $layout)) {
+            $url = $layout['background_image_url'];
+            if (! is_string($url) || ! preg_match('#^/(?!/)[A-Za-z0-9_\-./%]+(\?[A-Za-z0-9_=&.\-]*)?$#', $url)) {
+                unset($layout['background_image_url']);
+            }
+        }
+
         return $layout;
     }
 }

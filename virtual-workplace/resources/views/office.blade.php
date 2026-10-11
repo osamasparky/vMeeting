@@ -2084,7 +2084,7 @@
                         showToast(`🎹 ${__("Playing musical note on")} ${escapeHtml(item.name)}! 🎶`);
                         triggerSpeechReaction('🎶', 'emoji');
                     } else if (nearbyChair && (
-                        minWallDistance(nearbyChair.x, nearbyChair.y) < AVATAR_COLLISION_RADIUS ||
+                        minWallDistance(nearbyChair.x, nearbyChair.y, nearbyChair.id) < AVATAR_COLLISION_RADIUS ||
                         (getCurrentRoom(nearbyChair.x, nearbyChair.y)?.id || null) !== (getCurrentRoom(localAvatar.x, localAvatar.y)?.id || null)
                     )) {
                         // The seat sits on a wall or in another room: sitting there would put the avatar inside a wall.
@@ -2467,22 +2467,72 @@
                     { x1, y1: y2, x2, y2, roomId: null }, { x1, y1, x2: x1, y2, roomId: null },
                 );
             }
+            // Furniture marked solid in the editor: its footprint blocks avatars like an obstacle.
+            // Rugs (floor level) and ceiling items never block.
+            for (const f of solidFurnitureRects()) {
+                const { x1, y1, x2, y2, id } = f;
+                segments.push(
+                    { x1, y1, x2, y2: y1, roomId: null, objectId: id }, { x1: x2, y1, x2, y2, roomId: null, objectId: id },
+                    { x1, y1: y2, x2, y2, roomId: null, objectId: id }, { x1, y1, x2: x1, y2, roomId: null, objectId: id },
+                );
+            }
             return segments;
         }
 
+        // Footprints (map pixels) of furniture that avatars must walk around.
+        function solidFurnitureRects() {
+            const out = [];
+            for (const o of ((CONFIG.map && CONFIG.map.objects) || [])) {
+                if (o.collision === false || o.collision === 0) continue;
+                const elev = typeof o.elevation === 'number' ? o.elevation : Number(o.interaction_config?.elevation ?? 1);
+                if (!(elev >= 1 && elev <= 3)) continue;
+                const px = Number(o.position ? o.position.x : (o.x || 0));
+                const py = Number(o.position ? o.position.y : (o.y || 0));
+                let w = Number(o.width || (o.size ? o.size.width : 1)) || 1;
+                let h = Number(o.height || (o.size ? o.size.height : 1)) || 1;
+                let x = px, y = py;
+                const rot = (((Number(o.position?.rotation ?? o.rotation ?? 0)) % 360) + 360) % 360;
+                if (rot === 90 || rot === 270) { // drawn turned around its centre: the footprint turns too
+                    const cx = px + w / 2, cy = py + h / 2;
+                    [w, h] = [h, w];
+                    x = cx - w / 2; y = cy - h / 2;
+                }
+                out.push({ id: o.id || null, x1: x * TILE_SIZE, y1: y * TILE_SIZE, x2: (x + w) * TILE_SIZE, y2: (y + h) * TILE_SIZE });
+            }
+            return out;
+        }
+
+        // A clicked spot inside furniture or a wall: the nearest place an avatar can stand.
+        function nearestFreePoint(x, y) {
+            if (!checkCapsuleWallCollision(x, y, x, y, AVATAR_COLLISION_RADIUS) && !isInsideSolidFurniture(x, y)) return { x, y };
+            for (let r = 12; r <= 240; r += 8) {
+                for (let a = 0; a < 16; a++) {
+                    const tx = x + Math.cos(a * Math.PI / 8) * r, ty = y + Math.sin(a * Math.PI / 8) * r;
+                    if (tx < 16 || ty < 16 || tx > MAP_WIDTH_PX - 16 || ty > MAP_HEIGHT_PX - 16) continue;
+                    if (!checkCapsuleWallCollision(tx, ty, tx, ty, AVATAR_COLLISION_RADIUS) && !isInsideSolidFurniture(tx, ty)) return { x: tx, y: ty };
+                }
+            }
+            return { x, y };
+        }
+        function isInsideSolidFurniture(x, y) {
+            return solidFurnitureRects().some(f => x > f.x1 && x < f.x2 && y > f.y1 && y < f.y2);
+        }
+
         // Distance from a point to the nearest solid wall (Infinity when there are no walls).
-        function minWallDistance(x, y) {
+        function minWallDistance(x, y, ignoreObjectId = null) {
             let best = Infinity;
             for (const w of getAllSolidWallSegments()) {
+                if (ignoreObjectId && w.objectId === ignoreObjectId) continue;
                 const d = distPointToSegment(x, y, w.x1, w.y1, w.x2, w.y2);
                 if (d < best) best = d;
             }
             return best;
         }
 
-        function checkCapsuleWallCollision(x1, y1, x2, y2, radius = AVATAR_COLLISION_RADIUS) {
+        function checkCapsuleWallCollision(x1, y1, x2, y2, radius = AVATAR_COLLISION_RADIUS, ignoreObjectId = null) {
             const walls = getAllSolidWallSegments();
             for (const w of walls) {
+                if (ignoreObjectId && w.objectId === ignoreObjectId) continue;
                 const dist = distBetweenSegments(x1, y1, x2, y2, w.x1, w.y1, w.x2, w.y2);
                 if (dist < radius) {
                     return true; // Collision detected!
@@ -3094,10 +3144,11 @@
                 }
             }
 
-            // Calculate obstacle-aware collision-free route
+            // Calculate obstacle-aware collision-free route (to the nearest free spot if you clicked on furniture)
+            const dest = nearestFreePoint(clickX, clickY);
             const route = buildNavigationRoute(
                 { x: localAvatar.x, y: localAvatar.y },
-                { x: clickX, y: clickY },
+                dest,
                 myRoom,
                 targetRoom
             );
@@ -3448,11 +3499,15 @@
             }
 
             // 4. Solid Wall Physics: Block avatar from crossing solid walls
-            const wallNow = minWallDistance(localAvatar.x, localAvatar.y);
+            // Standing inside a piece of furniture (just got up from a seat, or it was placed on
+            // you): that piece doesn't hold you, so you can walk off it.
+            const insideFurniture = solidFurnitureRects().find(f => localAvatar.x > f.x1 && localAvatar.x < f.x2 && localAvatar.y > f.y1 && localAvatar.y < f.y2);
+            const ignoreId = insideFurniture ? insideFurniture.id : null;
+            const wallNow = minWallDistance(localAvatar.x, localAvatar.y, ignoreId);
             const stuckInWall = wallNow < AVATAR_COLLISION_RADIUS;
             const moveBlocked = (tx, ty) => stuckInWall
-                ? minWallDistance(tx, ty) <= wallNow // only moves that step out of the wall
-                : checkCapsuleWallCollision(localAvatar.x, localAvatar.y, tx, ty, AVATAR_COLLISION_RADIUS);
+                ? minWallDistance(tx, ty, ignoreId) <= wallNow // only moves that step out of the wall
+                : checkCapsuleWallCollision(localAvatar.x, localAvatar.y, tx, ty, AVATAR_COLLISION_RADIUS, ignoreId);
             if ((nextX !== localAvatar.x || nextY !== localAvatar.y) && moveBlocked(nextX, nextY)) {
                 // Slide: keep whichever axis is still free, so brushing a wall doesn't stop you dead.
                 if (nextX !== localAvatar.x && !moveBlocked(nextX, localAvatar.y)) {

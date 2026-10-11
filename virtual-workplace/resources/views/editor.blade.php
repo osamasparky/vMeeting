@@ -106,6 +106,8 @@
         .nx-editor-screen .nx-toolbar-btn.ed-danger { color: var(--ula-text-danger); }
         .nx-editor-screen .nx-toolbar-btn.ed-danger:hover { background: var(--ula-tone-terracotta-bg); border-color: var(--ula-border-danger); color: var(--ula-text-danger); }
         /* Green acts: publish is the one filled action. */
+        .ed-unsaved-dot { width: 8px; height: 8px; border-radius: var(--ula-radius-pill); background: var(--ula-highlight-default); flex: none; }
+        .ed-unsaved-dot[hidden] { display: none; }
         .nx-editor-screen .nx-toolbar-btn.ed-primary { background: var(--ula-accent-default); border-color: var(--ula-accent-default); color: var(--ula-accent-fg); }
         .nx-editor-screen .nx-toolbar-btn.ed-primary:hover { background: var(--ula-accent-hover); border-color: var(--ula-accent-hover); color: var(--ula-accent-fg); }
         /* Gold notices: the AI entry point keeps a gold icon, never a gold fill. */
@@ -828,16 +830,23 @@
                 <div class="nx-toolbar-group">
                     <input type="file" id="floorplan-file-input" accept="image/jpeg,image/png,image/webp,image/jpg" style="display:none;" onchange="handleFloorplanUpload(this)">
 
+                    @php $aiGeneratorEnabled = \App\Domains\CMS\Models\FeatureFlag::isEnabled('ai_office_generator'); @endphp
+
+                    @if($aiGeneratorEnabled)
+
                     <button type="button" onclick="openAiGeneratorModal()" class="nx-toolbar-btn btn-accent ed-collapsible" title="{{ __('Generate 3D Isometric Office Floorplan & Rooms with AI') }}">
                         <span class="material-symbols-rounded">auto_awesome</span>
                         <span>{{ __('AI Generator') }}</span>
                     </button>
 
+                    @endif
+
                     <span class="ed-toolbar-sep" aria-hidden="true"></span>
 
-                    <button class="nx-toolbar-btn ed-collapsible" onclick="saveMapDraft()" title="{{ __('Save Map Draft') }}">
+                    <button class="nx-toolbar-btn ed-collapsible" id="btn-save-map" onclick="saveMapDraft()" title="{{ __('Save Map Draft') }}">
                         <span class="material-symbols-rounded">save</span>
                         <span>{{ __('Save') }}</span>
+                        <span class="ed-unsaved-dot" id="ed-unsaved-dot" hidden title="{{ __('Unsaved changes') }}"></span>
                     </button>
                     <button class="nx-toolbar-btn ed-primary ed-collapsible" onclick="publishMap()" title="{{ __('Publish Map to Live Office') }}">
                         <span class="material-symbols-rounded">publish</span>
@@ -1178,6 +1187,10 @@
                                     <option value="5">{{ __('Ceiling / Overhead') }}</option>
                                 </select>
                             </div>
+                            <label style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ula-text-primary); cursor: pointer; min-height: 44px;">
+                                <input type="checkbox" id="prop-collision" onchange="updateSelectedProp('collision', this.checked)" style="width: 18px; height: 18px; accent-color: var(--ula-accent-default);">
+                                <span>{{ __('Solid — avatars walk around it') }}</span>
+                            </label>
                             <div>
                                 <label class="prop-label">{{ __('Interaction') }}</label>
                                 <div id="prop-interaction-badge" style="font-size: 11px; font-weight: 700; color: var(--ula-text-primary); padding: 4px 8px; background: var(--ula-surface-accent-soft); border-radius: 6px; display: inline-block;">NONE</div>
@@ -1520,6 +1533,7 @@
                 fitAndCenterView();
                 checkLayoutInBounds();
                 draw();
+                if (savedSnapshot === null) markSaved();
             };
             BLUEPRINT_IMAGE.onerror = () => {
                 blueprintLoaded = false;
@@ -1527,12 +1541,13 @@
                 MAP_HEIGHT_PX = 708;
                 fitAndCenterView();
                 draw();
+                if (savedSnapshot === null) markSaved();
             };
         } else {
             blueprintLoaded = false;
             MAP_WIDTH_PX = 1200;
             MAP_HEIGHT_PX = 708;
-            setTimeout(fitAndCenterView, 50);
+            setTimeout(() => { fitAndCenterView(); markSaved(); }, 50);
         }
 
         // ── Collision geometry: walls (segments) and obstacles (rectangles), in tiles ──
@@ -2385,39 +2400,8 @@
                     }
                     selectedItem = { type: 'room', item: newRoom };
 
-                    // Save room to backend
-                    fetch('/editor/rooms', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': CSRF_TOKEN,
-                            'Accept': 'application/json'
-                        },
-                        credentials: 'same-origin',
-                        body: JSON.stringify({
-                            organization_id: ORG_ID,
-                            map_id: MAP_ID,
-                            name: newRoom.name,
-                            type: newRoom.type,
-                            access_mode: newRoom.access_mode,
-                            capacity: newRoom.capacity,
-                            color: newRoom.color,
-                            bounds: newRoom.bounds,
-                            metadata: newRoom.metadata
-                        })
-                    }).then(async res => {
-                        const data = await res.json().catch(() => ({}));
-                        if (res.ok && data.room && data.room.id) { newRoom.id = data.room.id; return; }
-                        // Rejected by the server: take it back off the canvas and say why.
-                        const idx = rooms.indexOf(newRoom);
-                        if (idx > -1) rooms.splice(idx, 1);
-                        if (selectedItem && selectedItem.item === newRoom) { selectedItem = null; updateInspector(); hideFloatingActions(); }
-                        draw();
-                        showToast('❌ ' + (data.message || @json(__('Failed to save room'))));
-                    }).catch(console.error);
-
                     switchDrawerTab('inspector');
-                    showToast(didSnap ? '✅ ' + @json(__('Snapped to the neighbouring room wall')) : '🏢 {{ __("Room created!") }}');
+                    showToast('✅ ' + (didSnap ? @json(__('Snapped to the neighbouring room wall')) + ' · ' : '') + @json(__('Room added — press Save to keep it.')));
                 }
                 isDrawing = false;
                 currentRect = null;
@@ -3024,6 +3008,8 @@
                 });
                 const elevEl = document.getElementById('prop-elevation');
                 if (elevEl) elevEl.value = (item.elevation ?? 1);
+                const colEl = document.getElementById('prop-collision');
+                if (colEl) colEl.checked = item.collision !== false;
                 const badgeEl = document.getElementById('prop-interaction-badge');
                 const iType = item.interaction_type || (item.interaction_config && item.interaction_config.behavior?.type) || (item.type === 'branding' ? 'branding' : (item.type === 'sticky_note' ? 'stickyNote' : (item.type === 'custom_link' ? 'link' : (item.type === 'custom_image' ? 'customImage' : 'none'))));
                 if (badgeEl) {
@@ -3113,6 +3099,7 @@
             if (prop === 'width') selectedItem.item.width = Math.max(0.25, parseFloat(val) || 1);
             if (prop === 'height') selectedItem.item.height = Math.max(0.25, parseFloat(val) || 1);
             if (prop === 'elevation') { const n = parseInt(val, 10); selectedItem.item.elevation = Number.isNaN(n) ? 1 : n; }
+            if (prop === 'collision') selectedItem.item.collision = !!val;
             draw();
         }
 
@@ -3156,12 +3143,14 @@
             if (nameInput) nameInput.value = obj.name;
         }
 
+        // Our own sticky-note images (they used to be hot-linked from another site).
         const STICKY_COLOR_MAP = {
-            yellow: 'https://assets.kumospace.com/furniture/decor/sticky-yellow-01/yella-large_240.png',
-            orange: 'https://assets.kumospace.com/furniture/decor/sticky-orange-01/orange-large_240.png',
-            purple: 'https://assets.kumospace.com/furniture/decor/sticky-purple-01/purple-large_240.png',
-            green: 'https://assets.kumospace.com/furniture/decor/sticky-green-01/green-large_240.png',
-            blue: 'https://assets.kumospace.com/furniture/decor/sticky-blue-01/blue-large_240.png'
+            yellow: '/images/furniture/sticky/sticky-yellow.svg',
+            orange: '/images/furniture/sticky/sticky-orange.svg',
+            purple: '/images/furniture/sticky/sticky-purple.svg',
+            green: '/images/furniture/sticky/sticky-green.svg',
+            blue: '/images/furniture/sticky/sticky-blue.svg',
+            red: '/images/furniture/sticky/sticky-red.svg',
         };
 
         function setStickyColor(colorKey) {
@@ -3301,16 +3290,9 @@
                 if (idx > -1) list.splice(idx, 1);
             } else if (selectedItem.type === 'room') {
                 const r = selectedItem.item;
-                if (!confirm(@json(__('Delete the room ":name"? Its guest links and files are deleted with it.')).replace(':name', r.name || ''))) return;
+                if (!confirm(@json(__('Delete the room ":name"? When you save, its guest links and files are deleted with it.')).replace(':name', r.name || ''))) return;
                 const idx = rooms.indexOf(r);
                 if (idx > -1) rooms.splice(idx, 1);
-                if (r.id) {
-                    fetch(`/editor/rooms/${r.id}`, {
-                        method: 'DELETE',
-                        headers: { 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
-                        credentials: 'same-origin'
-                    }).catch(console.error);
-                }
             }
             selectedItem = null;
             updateInspector();
@@ -3380,45 +3362,9 @@
         }
 
         // ── Backend Sync: Save & Publish ──
+        // The room panel's save button saves the whole map: rooms are only ever saved one way.
         async function saveSelectedRoom() {
-            if (!selectedItem || selectedItem.type !== 'room') return;
-            const r = selectedItem.item;
-            showToast('💾 {{ __("Saving room settings...") }}');
-
-            try {
-                let isUuid = r.id && typeof r.id === 'string' && r.id.length === 36 && r.id.includes('-');
-                let url = isUuid ? `/editor/rooms/${r.id}` : `/editor/rooms`;
-                let method = isUuid ? 'PATCH' : 'POST';
-                let body = {
-                    organization_id: ORG_ID,
-                    map_id: MAP_ID,
-                    name: r.name || 'Meeting Room',
-                    type: r.type || 'meeting',
-                    access_mode: r.access_mode || 'public',
-                    capacity: parseInt(r.capacity) || 10,
-                    color: r.color || '#4F9B5F',
-                    bounds: r.bounds || { x: 1, y: 1, width: 8, height: 6 },
-                    metadata: r.metadata || {}
-                };
-
-                const res = await fetch(url, {
-                    method: method,
-                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF_TOKEN, 'Accept': 'application/json' },
-                    credentials: 'same-origin',
-                    body: JSON.stringify(body)
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    if (data.room && data.room.id) r.id = data.room.id;
-                    draw();
-                    showToast('✅ {{ __("Room saved successfully!") }}');
-                } else {
-                    showToast('❌ ' + (data.message || 'Save failed'));
-                }
-            } catch(e) {
-                console.error(e);
-                showToast('❌ {{ __("Failed to save room") }}');
-            }
+            return saveMapDraft();
         }
 
         async function saveMapDraft() {
@@ -3469,6 +3415,7 @@
                     if (Array.isArray(data.room_ids)) {
                         data.room_ids.forEach((id, i) => { if (rooms[i] && id) rooms[i].id = id; });
                     }
+                    markSaved();
                     showToast('✅ {{ __("Draft saved successfully!") }}');
                     return true;
                 }
@@ -3961,7 +3908,7 @@
                 modalContent.style.display = 'block';
                 loadingBox.style.display = 'none';
 
-                showToast('✨ ' + (data.message || '{{ __("AI Virtual Office floorplan generated successfully!") }}'));
+                showToast('✅ ' + @json(__('Floor plan generated. Review it, then press Save to put it in the office.')));
             } catch (err) {
                 clearInterval(interval);
                 modalContent.style.display = 'block';
@@ -3970,10 +3917,27 @@
             }
         }
 
+        // ── Unsaved changes: the dot on Save, and a warning before leaving ──
+        let savedSnapshot = null;
+        function editorSnapshot() { return JSON.stringify([MAP_DATA.name, rooms, objects, MAP_DATA.layout_data]); }
+        function hasUnsavedChanges() { return savedSnapshot !== null && editorSnapshot() !== savedSnapshot; }
+        function refreshUnsaved() {
+            const dot = document.getElementById('ed-unsaved-dot');
+            if (dot) dot.hidden = !hasUnsavedChanges();
+        }
+        function markSaved() { savedSnapshot = editorSnapshot(); refreshUnsaved(); }
+        setInterval(refreshUnsaved, 1000);
+        window.addEventListener('beforeunload', (e) => {
+            if (!hasUnsavedChanges()) return;
+            e.preventDefault();
+            e.returnValue = '';
+        });
+
         // Initial draw
         draw();
     </script>
 
+    @if($aiGeneratorEnabled)
     <!-- ── AI Office & Floorplan Generator Modal ── -->
     <div id="ai-generator-modal" style="display: none; position: fixed; inset: 0; background: var(--ula-surface-overlay); backdrop-filter: blur(14px); z-index: 99999; align-items: center; justify-content: center; padding: 20px;">
         <div style="background: var(--ula-surface-page); border: 1px solid var(--ula-border-subtle); border-radius: var(--ula-radius-xl); width: 100%; max-width: 820px; max-height: 90vh; overflow-y: auto; box-shadow: var(--ula-shadow-xl); display: flex; flex-direction: column;">
@@ -4166,5 +4130,6 @@
             </div>
         </div>
     </div>
+    @endif
 </body>
 </html>

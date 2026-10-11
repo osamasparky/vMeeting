@@ -912,17 +912,20 @@ class OrganizationSettingsController extends Controller
 
         $orgSettings->smtp_settings = $newSmtp;
 
-        // Update Organization OpenAI / AI Floorplan Settings
+        // Update Organization OpenAI / AI Floorplan Settings (the section is absent when the super
+        // admin has switched the generator off; keep what was saved then).
         $currentOpenAi = $orgSettings->openai_settings ?? [];
-        $openAiApiKey = $request->filled('openai_api_key') ? trim($request->input('openai_api_key')) : ($currentOpenAi['api_key'] ?? '');
-        $newOpenAi = [
-            'api_key' => $openAiApiKey,
-            'model' => $request->input('openai_model', 'gpt-image-1-mini'),
-            'image_size' => $request->input('openai_image_size', '1024x1024'),
-            'quality' => $request->input('openai_quality', 'standard'),
-            'is_enabled' => $request->has('openai_is_enabled') || ! empty($openAiApiKey),
-        ];
-        $orgSettings->openai_settings = $newOpenAi;
+        if ($request->has('openai_model')) {
+            $openAiApiKey = $request->filled('openai_api_key') ? trim($request->input('openai_api_key')) : ($currentOpenAi['api_key'] ?? '');
+            $newOpenAi = [
+                'api_key' => $openAiApiKey,
+                'model' => $request->input('openai_model', 'gpt-image-1-mini'),
+                'image_size' => $request->input('openai_image_size', '1024x1024'),
+                'quality' => $request->input('openai_quality', 'standard'),
+                'is_enabled' => $request->has('openai_is_enabled') || ! empty($openAiApiKey),
+            ];
+            $orgSettings->openai_settings = $newOpenAi;
+        }
 
         // Update Organization Attendance & Inactivity Policies
         $currentPolicies = $orgSettings->policies ?? [];

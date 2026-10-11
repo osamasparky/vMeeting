@@ -3596,5 +3596,11 @@
     "Everyone in the company": "كل أعضاء الشركة",
     "Private: members with access only": "خاصة: لمن لديه صلاحية فقط",
     "Delete the room \":name\"? Its guest links and files are deleted with it.": "حذف الغرفة «:name»؟ ستُحذف معها روابط الضيوف وملفاتها.",
-    "Room resized — press Save to keep it.": "تم تغيير مقاس الغرفة — اضغط حفظ لتثبيته."
+    "Room resized — press Save to keep it.": "تم تغيير مقاس الغرفة — اضغط حفظ لتثبيته.",
+    "Unsaved changes": "تعديلات غير محفوظة",
+    "Solid — avatars walk around it": "صلب — يلتف الأفاتار حوله",
+    "Room added — press Save to keep it.": "تمت إضافة الغرفة — اضغط حفظ لتثبيتها.",
+    "Delete the room \":name\"? When you save, its guest links and files are deleted with it.": "حذف الغرفة «:name»؟ عند الحفظ ستُحذف معها روابط الضيوف وملفاتها.",
+    "Floor plan generated. Review it, then press Save to put it in the office.": "تم توليد المخطط. راجعه ثم اضغط حفظ ليظهر في المكتب.",
+    "The AI office generator is not available.": "مولّد المكاتب بالذكاء الاصطناعي غير متاح."
 }

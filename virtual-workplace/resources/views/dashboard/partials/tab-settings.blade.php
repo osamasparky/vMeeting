@@ -19,6 +19,10 @@
         ['ai', 'auto_awesome', 'settings.nav_ai'],
         ['attendance', 'timer', 'settings.nav_attendance'],
     ];
+    $aiGeneratorEnabled = \App\Domains\CMS\Models\FeatureFlag::isEnabled('ai_office_generator');
+    if (! $aiGeneratorEnabled) {
+        $settingsSections = array_values(array_filter($settingsSections, fn ($s) => $s[0] !== 'ai'));
+    }
     $selectClass = 'h-[46px] w-full appearance-none rounded-[var(--ula-radius-md)] border border-[var(--ula-border-default)] bg-[var(--ula-surface-page)] ps-10 pe-10 text-[15px] text-[var(--ula-text-primary)] transition-[border-color,box-shadow] duration-[var(--ula-duration-fast)] ease-[var(--ula-ease-out)] focus:border-[var(--ula-border-focus)] focus:outline-none focus-visible:shadow-[var(--ula-focus-ring)]';
 @endphp
 
@@ -147,6 +151,7 @@
             </section>
 
             {{-- 3. AI floor-plan engine --}}
+            @if($aiGeneratorEnabled)
             <section id="org-subtab-content-ai" class="ula-set-card org-subtab-pane" aria-labelledby="set-h-ai">
                 <div class="ula-set-card-head">
                     <span class="material-symbols-rounded" aria-hidden="true">auto_awesome</span>
@@ -202,6 +207,7 @@
                     <x-btn variant="primary" size="md" type="submit" icon="save">{{ __('settings.save') }}</x-btn>
                 </div>
             </section>
+            @endif
 
             {{-- 4. Attendance & idle policy --}}
             <section id="org-subtab-content-attendance" class="ula-set-card org-subtab-pane" aria-labelledby="set-h-attendance">

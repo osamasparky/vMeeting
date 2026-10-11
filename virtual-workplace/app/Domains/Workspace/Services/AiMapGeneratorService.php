@@ -232,7 +232,7 @@ class AiMapGeneratorService
             $map = $organization->maps()->create([
                 'floor_id' => $floor->id,
                 'name' => $floor->name.' AI Blueprint',
-                'status' => 'published',
+                'status' => 'draft',
                 'version' => 1,
                 'width' => $gridWidth,
                 'height' => $gridHeight,
@@ -245,24 +245,12 @@ class AiMapGeneratorService
                     'is_ai_generated' => true,
                     'generated_at' => now()->toIso8601String(),
                 ],
-                'published_at' => now(),
             ]);
-        } else {
-            $layoutData = $map->layout_data ?? [];
-            $layoutData['theme'] = $styleKey;
-            $layoutData['style_name'] = $styleConfig['name'];
-            $layoutData['background_image_url'] = $imageUrl;
-            $layoutData['is_ai_generated'] = true;
-            $layoutData['generated_at'] = now()->toIso8601String();
-
-            $map->update([
-                'width' => $gridWidth,
-                'height' => $gridHeight,
-                'layout_data' => $layoutData,
-                'status' => 'published',
-                'published_at' => now(),
-            ]);
+            // A brand-new map starts as a draft: it is published from the editor like any other.
+            $map->forceFill(['status' => 'draft', 'published_at' => null])->save();
         }
+        // An existing map is left untouched: the editor shows the generated image and it only
+        // reaches the office when someone presses Save (the office reads the saved map).
 
         return [
             'success' => true,

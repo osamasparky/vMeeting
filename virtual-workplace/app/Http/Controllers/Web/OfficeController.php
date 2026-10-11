@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Domains\Administration\Models\AuditLog;
+use App\Domains\CMS\Models\FeatureFlag;
 use App\Domains\Identity\Services\RealtimeTokenService;
 use App\Domains\Notifications\Services\SpatialNotifier;
 use App\Domains\People\Models\Department;
@@ -104,6 +105,13 @@ class OfficeController extends Controller
      */
     public function generateAiOffice(Request $request, AiMapGeneratorService $aiMapService)
     {
+        // Switched off by the super admin: the generator is gone for everyone.
+        if (! FeatureFlag::isEnabled('ai_office_generator')) {
+            return $request->wantsJson() || $request->ajax()
+                ? response()->json(['success' => false, 'message' => __('The AI office generator is not available.')], 403)
+                : abort(403);
+        }
+
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->with(['organization.plan', 'role.permissions'])->first();
         if (! $membership) {
