@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domains\Identity\Support\SwitchSessionUser;
 use App\Domains\Administration\Models\AuditLog;
 use App\Domains\Administration\Models\Permission;
 use App\Domains\Administration\Models\Role;
@@ -258,7 +259,7 @@ class SuperAdminController extends Controller
             ],
         ]);
 
-        Auth::login($targetUser);
+        SwitchSessionUser::to($targetUser);
 
         return redirect()->route('dashboard')->with('success', "⚡ Logged into {$organization->name} as {$targetUser->name}.");
     }
@@ -285,7 +286,7 @@ class SuperAdminController extends Controller
         $impersonatedOrgName = session('superadmin_impersonated_org_name');
         session()->forget(['superadmin_impersonator_id', 'superadmin_impersonated_org_id', 'superadmin_impersonated_org_name']);
 
-        Auth::login($superAdmin);
+        SwitchSessionUser::to($superAdmin);
 
         return redirect()->route('superadmin.companies')->with('success', "🛡️ Exited impersonation of {$impersonatedOrgName} and returned to Super Admin.");
     }

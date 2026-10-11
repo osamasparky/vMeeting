@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Domains\Identity\Models\User;
+use App\Domains\Identity\Support\SwitchSessionUser;
 use App\Domains\People\Models\UserProfile;
 use App\Domains\Tenancy\Actions\RegisterUserWithOrganizationAction;
 use App\Domains\Tenancy\Models\OrganizationMember;
@@ -211,7 +213,7 @@ class AuthController extends Controller
             'org_impersonated_member_name' => $member->user->name,
         ]);
 
-        Auth::loginUsingId($member->user_id);
+        SwitchSessionUser::to($member->user);
 
         return redirect()->route('dashboard')->with('success', __('Switched session: Logged in as :name', ['name' => $member->user->name]));
     }
@@ -226,7 +228,13 @@ class AuthController extends Controller
 
         if ($origId) {
             session()->forget(['org_impersonator_id', 'org_impersonator_name', 'org_impersonated_member_name']);
-            Auth::loginUsingId($origId);
+            $original = User::find($origId);
+            if (! $original) {
+                Auth::logout();
+
+                return redirect()->route('login');
+            }
+            SwitchSessionUser::to($original);
 
             return redirect()->route('dashboard')->with('success', __('Returned to admin account from :name', ['name' => $memberName]));
         }
