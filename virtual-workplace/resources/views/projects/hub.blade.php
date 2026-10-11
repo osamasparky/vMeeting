@@ -1771,20 +1771,28 @@
 
                     <!-- Gantt Legend -->
                     <div style="padding: 8px 24px; display: flex; gap: 16px; flex-wrap: wrap; border-bottom: 1px solid var(--ula-border-subtle); background: var(--ula-surface-page-alt);">
-                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: var(--ula-palm-500); display: inline-block;"></span> {{ __('Done') }}</span>
-                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: var(--ula-gold-500); display: inline-block;"></span> {{ __('In Progress') }}</span>
-                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: var(--ula-terracotta-400); display: inline-block;"></span> {{ __('Review/QA') }}</span>
-                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: var(--ula-stone-400); display: inline-block;"></span> {{ __('Backlog/Ready') }}</span>
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: var(--ula-status-success); display: inline-block;"></span> {{ __('Done') }}</span>
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: var(--ula-status-warning); display: inline-block;"></span> {{ __('In Progress') }}</span>
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: var(--ula-tone-terracotta-dot); display: inline-block;"></span> {{ __('Review/QA') }}</span>
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; background: var(--ula-border-strong); display: inline-block;"></span> {{ __('Backlog/Ready') }}</span>
+                        <span style="font-size: 11px; display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 2px; border: 2px solid var(--ula-status-danger); display: inline-block;"></span> {{ __('gantt.overdue') }}</span>
                         <span style="font-size: 11px; margin-inline-start: auto; color: var(--ula-text-muted);">↔ {{ __('Drag bars to reschedule') }}</span>
                     </div>
 
                     <!-- Frappe Gantt Mount Point -->
-                    <div id="frappe-gantt-wrapper" style="overflow-x: auto; min-height: 300px; padding: 12px 0;">
+                    <div id="frappe-gantt-wrapper" dir="ltr" style="overflow-x: auto; min-height: 300px; padding: 12px 0;">
                         <div id="frappe-gantt-container"></div>
                         <div id="gantt-empty-state" style="display: none; text-align: center; padding: 60px 20px; color: var(--ula-text-muted);">
                             <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">bar_chart</span> {{ __('No tasks with dates found. Add start & due dates to tasks to see the Gantt chart.') }}
                         </div>
                     </div>
+                    @if(($ganttUnscheduled ?? 0) > 0)
+                        <div dir="auto" style="padding: 10px 24px; border-top: 1px solid var(--ula-border-subtle); font-size: 12px; color: var(--ula-text-secondary); display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <span class="material-symbols-rounded" style="font-size: 16px;" aria-hidden="true">event_busy</span>
+                            {{ __('gantt.unscheduled', ['count' => $ganttUnscheduled]) }}
+                            <a href="#tasks" onclick="switchHubSection('tasks'); return false;" style="color: var(--ula-accent-default); font-weight: 600; min-height: 44px; display: inline-flex; align-items: center;">{{ __('gantt.open_list') }}</a>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Gantt Task Popover -->
@@ -2215,34 +2223,39 @@
             backlog:     '#c1b6a6', // --ula-stone-300
         };
 
-        // Build Frappe Gantt task objects from PHP $ganttTasks
+        // Tasks as the server sent them: only real dates (nothing is invented here).
+        const GANTT_DATA = @json($ganttTasks);
+        const GANTT_LOCALE = @json(app()->getLocale());
+        const ganttEsc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
         function buildFrappeGanttTasks() {
-            const raw = @json($ganttTasks);
-            if (!raw || raw.length === 0) return [];
-            const allIds = new Set(raw.map(t => String(t.id)));
+            if (!Array.isArray(GANTT_DATA) || GANTT_DATA.length === 0) return [];
+            return GANTT_DATA.map(t => ({
+                id:           String(t.id),
+                // Frappe puts the name into the bar label as HTML: give it escaped text.
+                name:         ganttEsc(t.title),
+                start:        t.start_date,
+                end:          t.due_date,
+                progress:     t.progress || 0,
+                dependencies: (t.dependencies || []).join(','),
+                custom_class: 'gantt-bar-' + (t.status || 'backlog') + (t.overdue ? ' gantt-bar-overdue' : ''),
+                _meta:        t,
+            }));
+        }
 
-            return raw.map(t => {
-                let s = t.start_date;
-                let e = t.due_date;
-                if (!s) s = new Date().toISOString().slice(0, 10);
-                if (!e || e <= s) {
-                    const d = new Date(s);
-                    d.setDate(d.getDate() + 2);
-                    e = d.toISOString().slice(0, 10);
-                }
-
-                const validDeps = (t.dependencies || []).filter(id => allIds.has(String(id))).join(',');
-
-                return {
-                    id:           String(t.id),
-                    name:         t.title,
-                    start:        s,
-                    end:          e,
-                    progress:     t.progress || 0,
-                    dependencies: validDeps,
-                    custom_class: 'gantt-bar-' + (t.status || 'backlog'),
-                    _meta:        t,
-                };
+        // Frappe Gantt 0.6 has no Arabic: it draws in English and the header is translated here.
+        function localizeGanttHeader() {
+            if (GANTT_LOCALE !== 'ar') return;
+            const months = {};
+            for (let m = 0; m < 12; m++) {
+                const d = new Date(Date.UTC(2024, m, 15));
+                const ar = new Intl.DateTimeFormat('ar', { month: 'long', timeZone: 'UTC' }).format(d);
+                months[new Intl.DateTimeFormat('en', { month: 'long', timeZone: 'UTC' }).format(d)] = ar;
+                months[new Intl.DateTimeFormat('en', { month: 'short', timeZone: 'UTC' }).format(d)] = ar;
+            }
+            const pattern = new RegExp('\\b(' + Object.keys(months).sort((a, b) => b.length - a.length).join('|') + ')\\b', 'g');
+            document.querySelectorAll('#frappe-gantt-container .upper-text, #frappe-gantt-container .lower-text').forEach(el => {
+                el.textContent = el.textContent.replace(pattern, m => months[m] || m);
             });
         }
 
@@ -2265,6 +2278,7 @@
 
             if (typeof Gantt === 'undefined') {
                 console.warn('Frappe Gantt not loaded');
+                emptyState.style.display = 'block';
                 return;
             }
 
@@ -2272,7 +2286,7 @@
                 frappeGantt = new Gantt('#frappe-gantt-container', tasks, {
                     view_mode:      frappeGanttCurrentView,
                     date_format:    'YYYY-MM-DD',
-                    language:       '{{ app()->getLocale() }}',
+                    language:       'en',
                     popup_trigger:  'click',
                     custom_popup_html: null, // we handle our own popover
 
@@ -2280,28 +2294,45 @@
                         showGanttTaskPopover(task);
                     },
 
+                    on_view_change: function () {
+                        localizeGanttHeader();
+                    },
+
                     on_date_change: function (task, start, end) {
                         const orgId = '{{ $project->organization_id }}';
-                        const taskId = task.id;
                         const startStr = formatGanttDate(start);
                         const endStr   = formatGanttDate(end);
+                        const meta = GANTT_DATA.find(t => String(t.id) === String(task.id));
 
-                        fetch(`/api/v1/organizations/${orgId}/tasks/${taskId}`, {
+                        fetch(`/api/v1/organizations/${orgId}/tasks/${task.id}`, {
                             method: 'PATCH',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': CSRF_TOKEN,
                                 'Accept': 'application/json',
                             },
+                            credentials: 'same-origin',
                             body: JSON.stringify({ start_date: startStr, due_date: endStr }),
                         })
-                        .then(r => r.json())
-                        .then(() => showHubToast('📅 {{ __('Task rescheduled') }}: ' + task.name))
-                        .catch(() => showHubToast('⚠️ {{ __('Could not reschedule task') }}', 'error'));
+                        .then(async r => {
+                            if (!r.ok) {
+                                const data = await r.json().catch(() => ({}));
+                                throw new Error(data.message || '');
+                            }
+                            // Saved: the chart and the popover now show the new dates.
+                            if (meta) { meta.start_date = startStr; meta.due_date = endStr; meta.has_start = true; meta.has_due = true; }
+                            showHubToast('📅 {{ __('Task rescheduled') }}: ' + ganttEsc(meta ? meta.title : ''));
+                        })
+                        .catch(err => {
+                            // Not saved: put the bar back where it was.
+                            showHubToast('⚠️ {{ __('Could not reschedule task') }}' + (err && err.message ? ' — ' + ganttEsc(err.message) : ''), 'error');
+                            initFrappeGantt();
+                        });
                     },
                 });
 
                 injectGanttStatusStyles();
+                localizeGanttHeader();
             } catch (err) {
                 console.error('Error initializing Frappe Gantt:', err);
             }
@@ -2315,10 +2346,15 @@
                 .gantt .bar-wrapper.gantt-bar-done         .bar { fill: var(--ula-status-success) !important; }
                 .gantt .bar-wrapper.gantt-bar-in_progress  .bar { fill: var(--ula-status-warning) !important; }
                 .gantt .bar-wrapper.gantt-bar-review       .bar { fill: var(--ula-tone-terracotta-dot) !important; }
-                .gantt .bar-wrapper.gantt-bar-qa           .bar { fill: var(--ula-status-danger-hover) !important; }
-                .gantt .bar-wrapper.gantt-bar-ready        .bar { fill: var(--ula-icon-disabled) !important; }
+                .gantt .bar-wrapper.gantt-bar-qa           .bar { fill: var(--ula-tone-terracotta-dot) !important; }
+                .gantt .bar-wrapper.gantt-bar-ready        .bar { fill: var(--ula-border-strong) !important; }
                 .gantt .bar-wrapper.gantt-bar-backlog      .bar { fill: var(--ula-border-strong) !important; }
+                .gantt .bar-wrapper.gantt-bar-overdue      .bar { stroke: var(--ula-status-danger) !important; stroke-width: 2px !important; }
+                .gantt .bar-progress { fill: rgba(0, 0, 0, 0.18) !important; }
+                /* Progress comes from the checklist, so it is not dragged on the chart. */
+                .gantt .handle.progress { display: none !important; }
                 .gantt .bar-label { font-size: 11px !important; font-weight: 800 !important; fill: var(--ula-white) !important; }
+                .gantt .bar-label.big { fill: var(--ula-text-primary) !important; }
             `;
             document.head.appendChild(style);
         }
@@ -2334,6 +2370,7 @@
 
             if (frappeGantt) {
                 frappeGantt.change_view_mode(mode);
+                localizeGanttHeader();
                 showHubToast('📊 {{ __('Gantt view') }}: ' + mode);
             } else {
                 initFrappeGantt();
@@ -2347,15 +2384,18 @@
             const color = GANTT_STATUS_COLORS[meta.status] || GANTT_STATUS_COLORS.backlog;
 
             document.getElementById('gantt-popover-content').innerHTML = `
-                <div style="font-weight: 900; font-size: 13px; color: var(--ula-text-primary); margin-bottom: 8px; line-height: 1.4;">${task.name}</div>
+                <div style="font-weight: 900; font-size: 13px; color: var(--ula-text-primary); margin-bottom: 8px; line-height: 1.4;">${ganttEsc(meta.title || '')}</div>
                 <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
-                    <span style="background: ${color}22; color: ${color}; padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 800; border: 1px solid ${color}44;">${(meta.status || 'backlog').replace('_', ' ').toUpperCase()}</span>
-                    <span style="background: var(--ula-surface-page-alt); padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 700; border: 1px solid var(--ula-border-subtle);">${meta.priority || 'medium'}</span>
+                    <span style="background: ${color}22; color: ${color}; padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 800; border: 1px solid ${color}44;">${ganttEsc((meta.status || 'backlog').replace('_', ' ').toUpperCase())}</span>
+                    <span style="background: var(--ula-surface-page-alt); padding: 2px 8px; border-radius: 99px; font-size: 10px; font-weight: 700; border: 1px solid var(--ula-border-subtle);">${ganttEsc(meta.priority || 'medium')}</span>
                 </div>
                 <div style="font-size: 11px; color: var(--ula-text-muted); display: flex; flex-direction: column; gap: 4px;">
-                    <span>👤 ${meta.assignee || '{{ __('Unassigned') }}'}</span>
-                    <span>📅 ${meta.start_date || '?'} → ${meta.due_date || '?'}</span>
-                    <span>📊 {{ __('Progress') }}: ${task.progress || 0}%</span>
+                    <span>👤 ${ganttEsc(meta.assignee || @json(__('Unassigned')))}</span>
+                    <span>📅 <span dir="ltr" style="font-family: var(--ula-font-mono); unicode-bidi: isolate;">${meta.has_start ? ganttEsc(meta.start_date) : '—'} → ${meta.has_due ? ganttEsc(meta.due_date) : '—'}</span></span>
+                    ${!meta.has_start ? `<span>${@json(__('gantt.no_start'))}</span>` : ''}
+                    ${!meta.has_due ? `<span>${@json(__('gantt.no_due'))}</span>` : ''}
+                    ${meta.overdue ? `<span style="color: var(--ula-status-danger); font-weight: 700;">${@json(__('gantt.overdue'))}</span>` : ''}
+                    <span>📊 {{ __('Progress') }}: <span style="font-family: var(--ula-font-mono);">${Number(task.progress) || 0}%</span></span>
                 </div>
             `;
 

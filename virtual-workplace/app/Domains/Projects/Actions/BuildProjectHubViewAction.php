@@ -126,39 +126,23 @@ class BuildProjectHubViewAction
             ];
         });
 
-        // Interactive Gantt Tasks with safe dates & valid dependencies
-        $taskIds = $tasks->pluck('id')->toArray();
-        $minSafeYear = max(2024, now()->year - 1);
-        $maxSafeYear = now()->year + 2;
+        // Gantt: only tasks that really have a date. A task with just a due date (or just a start)
+        // is drawn as that one day; tasks without any date are counted, not placed at made-up dates.
+        $ganttSource = $tasks->filter(fn ($t) => ! $t->archived_at && ($t->start_date || $t->due_date))->values();
+        $ganttUnscheduled = $tasks->filter(fn ($t) => ! $t->archived_at && ! $t->start_date && ! $t->due_date)->count();
+        $taskIds = $ganttSource->pluck('id')->map(fn ($id) => (string) $id)->all();
 
-        $ganttTasks = $tasks->map(function ($t) use ($project, $taskIds, $minSafeYear, $maxSafeYear) {
-            $start = $t->start_date
-                ? $t->start_date->copy()
-                : ($t->due_date ? $t->due_date->copy()->subDays(max(1, (int) ceil(($t->estimated_hours ?? 8) / 8))) : ($project->created_at ? $project->created_at->copy() : now()->subDays(3)));
-
-            $end = $t->due_date
-                ? $t->due_date->copy()
-                : $start->copy()->addDays(max(2, (int) ceil(($t->estimated_hours ?? 8) / 8)));
-
-            // Normalize outlier/faker dates (e.g. 1979 or year 2099)
-            if ($start->year < $minSafeYear || $start->year > $maxSafeYear) {
-                $start = now()->subDays(5);
-            }
-            if ($end->year < $minSafeYear || $end->year > $maxSafeYear) {
-                $end = $start->copy()->addDays(max(2, (int) ceil(($t->estimated_hours ?? 8) / 8)));
+        $ganttTasks = $ganttSource->map(function ($t) use ($taskIds) {
+            $start = ($t->start_date ?? $t->due_date)->copy();
+            $end = ($t->due_date ?? $t->start_date)->copy();
+            if ($end->lt($start)) { // a due date before the start: show it where it is due
+                $start = $end->copy();
             }
 
-            // Frappe Gantt requires end date > start date
-            if ($end->lte($start)) {
-                $end = $start->copy()->addDays(1);
-            }
-
-            // Only keep dependencies that exist in current project tasks
-            $validDeps = $t->dependencies
-                ->pluck('depends_on_task_id')
-                ->filter(fn ($id) => in_array($id, $taskIds, true))
-                ->values()
-                ->toArray();
+            // Progress: the share of the checklist that is ticked; otherwise done = 100%, anything else 0%.
+            $checklist = $t->checklistItems;
+            $progress = $t->status === 'done' ? 100
+                : ($checklist->count() > 0 ? (int) round($checklist->where('is_completed', true)->count() / $checklist->count() * 100) : 0);
 
             return [
                 'id' => (string) $t->id,
@@ -168,10 +152,18 @@ class BuildProjectHubViewAction
                 'assignee' => $t->assignee ? $t->assignee->name : __('Unassigned'),
                 'start_date' => $start->format('Y-m-d'),
                 'due_date' => $end->format('Y-m-d'),
-                'progress' => $t->status === 'done' ? 100 : ($t->status === 'in_progress' ? 50 : ($t->status === 'review' ? 75 : 10)),
-                'dependencies' => $validDeps,
+                'has_start' => (bool) $t->start_date,
+                'has_due' => (bool) $t->due_date,
+                'overdue' => $t->status !== 'done' && $t->due_date && $t->due_date->lt(now()->startOfDay()),
+                'progress' => $progress,
+                'dependencies' => $t->dependencies
+                    ->pluck('depends_on_task_id')
+                    ->map(fn ($id) => (string) $id)
+                    ->filter(fn ($id) => in_array($id, $taskIds, true))
+                    ->values()
+                    ->all(),
             ];
-        });
+        })->values();
 
         // Project Meetings
         $projectMeetings = Meeting::where('project_id', $project->id)
@@ -225,6 +217,7 @@ class BuildProjectHubViewAction
             // The bulk-assign menu reads $projectMembers; it was never passed, so it rendered empty.
             'projectMembers' => $allMembers,
             'ganttTasks' => $ganttTasks,
+            'ganttUnscheduled' => $ganttUnscheduled,
         ];
     }
 }

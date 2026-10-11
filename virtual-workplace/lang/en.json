@@ -3647,5 +3647,10 @@
     "dash.office_use_now": "Office use right now",
     "dash.rooms_busy": "of rooms busy",
     "dash.rooms_free": "Free rooms",
-    "dash.in_open_area": "In the open area"
+    "dash.in_open_area": "In the open area",
+    "gantt.overdue": "Overdue",
+    "gantt.unscheduled": ":count tasks have no dates and are not on the chart — give them a start or due date.",
+    "gantt.open_list": "Open the task list",
+    "gantt.no_start": "No start date — shown on its due day only",
+    "gantt.no_due": "No due date — shown on its start day only"
 }
