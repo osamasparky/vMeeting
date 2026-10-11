@@ -2483,7 +2483,7 @@
         function solidFurnitureRects() {
             const out = [];
             for (const o of ((CONFIG.map && CONFIG.map.objects) || [])) {
-                if (o.collision === false || o.collision === 0) continue;
+                if (!(o.collision === true || o.collision === 1)) continue; // only furniture marked solid blocks
                 const elev = typeof o.elevation === 'number' ? o.elevation : Number(o.interaction_config?.elevation ?? 1);
                 if (!(elev >= 1 && elev <= 3)) continue;
                 const px = Number(o.position ? o.position.x : (o.x || 0));

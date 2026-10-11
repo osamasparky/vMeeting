@@ -145,6 +145,7 @@ class MapEditorTest extends TestCase
         $object = $this->map->fresh()->objects()->first();
         $this->assertSame(0, $object->elevation);
         $this->assertSame('drink', $object->interaction_type);
+        $this->assertFalse($object->collision, 'furniture is walk-through unless marked solid');
     }
 
     public function test_ai_generator_can_be_switched_off_by_the_super_admin(): void

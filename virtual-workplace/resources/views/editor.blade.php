@@ -1470,7 +1470,7 @@
             is_custom: typeof o.is_custom !== 'undefined' ? o.is_custom : (o.interaction_config && typeof o.interaction_config.is_custom !== 'undefined' ? o.interaction_config.is_custom : true),
             width: o.width || (o.size ? o.size.width : (o.interaction_config && o.interaction_config.width ? o.interaction_config.width : 1)),
             height: o.height || (o.size ? o.size.height : (o.interaction_config && o.interaction_config.height ? o.interaction_config.height : 1)),
-            collision: typeof o.collision === 'boolean' ? o.collision : true
+            collision: o.collision === true || o.collision === 1 // furniture is walk-through unless marked solid
         }));
 
         let selectedItem = null;
@@ -2162,7 +2162,7 @@
                     image_url: objImgUrl,
                     width: placeW,
                     height: placeH,
-                    collision: currentObjectCustom ? currentObjectCustom.collision : true,
+                    collision: false, // new furniture is walk-through; tick "Solid" to block avatars
                     elevation: currentObjectCustom?.elevation ?? 1,
                     interaction_type: iType,
                     interaction_config: initConfig,
@@ -3009,7 +3009,7 @@
                 const elevEl = document.getElementById('prop-elevation');
                 if (elevEl) elevEl.value = (item.elevation ?? 1);
                 const colEl = document.getElementById('prop-collision');
-                if (colEl) colEl.checked = item.collision !== false;
+                if (colEl) colEl.checked = item.collision === true;
                 const badgeEl = document.getElementById('prop-interaction-badge');
                 const iType = item.interaction_type || (item.interaction_config && item.interaction_config.behavior?.type) || (item.type === 'branding' ? 'branding' : (item.type === 'sticky_note' ? 'stickyNote' : (item.type === 'custom_link' ? 'link' : (item.type === 'custom_image' ? 'customImage' : 'none'))));
                 if (badgeEl) {
@@ -3394,7 +3394,7 @@
                         color: o.color,
                         image_url: o.image_url || null,
                         is_custom: typeof o.is_custom !== 'undefined' ? o.is_custom : true,
-                        collision: typeof o.collision === 'boolean' ? o.collision : true,
+                        collision: o.collision === true,
                         // Sent explicitly: the server would otherwise reset them to level 1 / no interaction.
                         elevation: (o.elevation ?? o.interaction_config?.elevation ?? 1),
                         interaction_type: o.interaction_type || o.interaction_config?.interaction_type || o.interaction_config?.behavior?.type || 'none',

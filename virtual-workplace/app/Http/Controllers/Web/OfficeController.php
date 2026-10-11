@@ -716,7 +716,7 @@ class OfficeController extends Controller
                     'size' => $obj['size'] ?? ['width' => $obj['width'] ?? 1, 'height' => $obj['height'] ?? 1],
                     'rotation' => $obj['rotation'] ?? 0,
                     'color' => $obj['color'] ?? null,
-                    'collision' => $obj['collision'] ?? true,
+                    'collision' => (bool) ($obj['collision'] ?? false), // walk-through unless marked solid
                     'interaction_config' => array_merge(
                         $obj['interaction_config'] ?? [],
                         array_filter([

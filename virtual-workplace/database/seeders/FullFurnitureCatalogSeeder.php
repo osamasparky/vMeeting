@@ -65,7 +65,7 @@ class FullFurnitureCatalogSeeder extends Seeder
                             'icon' => $item['icon'] ?? '🪑',
                             'width' => $item['width'] ?? 1,
                             'height' => $item['height'] ?? 1,
-                            'collision' => $item['collision'] ?? true,
+                            'collision' => false, // walk-through unless made solid in the editor
                             'elevation' => $item['elevation'] ?? 1,
                             'interaction_type' => $item['interaction_type'] ?? 'none',
                             'interaction_config' => $item['interaction_config'] ?? null,

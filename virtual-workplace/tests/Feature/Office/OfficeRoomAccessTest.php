@@ -3,6 +3,7 @@
 namespace Tests\Feature\Office;
 
 use App\Domains\Guests\Models\GuestInvitation;
+use App\Domains\Identity\Services\RealtimeTokenService;
 use App\Domains\Workspace\Models\Floor;
 use App\Domains\Workspace\Models\Map;
 use App\Domains\Workspace\Models\Room;
@@ -140,7 +141,7 @@ class OfficeRoomAccessTest extends TestCase
     {
         config(['services.realtime.secret' => 'test-secret']);
         $claims = function ($user) {
-            $token = app(\App\Domains\Identity\Services\RealtimeTokenService::class)->generateToken($user, $this->org);
+            $token = app(RealtimeTokenService::class)->generateToken($user, $this->org);
 
             return json_decode(base64_decode(explode('.', $token)[1]), true);
         };
