@@ -7,6 +7,7 @@ use App\Domains\Meetings\Actions\ScheduleMeetingAction;
 use App\Domains\Meetings\Models\Meeting;
 use App\Domains\Meetings\Requests\ScheduleMeetingRequest;
 use App\Domains\Notifications\Models\WorkplaceNotification;
+use App\Domains\People\Services\WorkspacePulse;
 use App\Domains\Tenancy\Actions\BuildOrganizationDashboardAction;
 use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Tenancy\Models\OrganizationMember;
@@ -62,6 +63,16 @@ class DashboardController extends Controller
         }
 
         return view('dashboard', $buildDashboard->execute($user, $membership));
+    }
+
+    /** Who is in the office now (the dashboard refreshes its online panel with this). */
+    public function pulse(WorkspacePulse $pulse)
+    {
+        $membership = OrganizationMember::where('user_id', Auth::id())->whereIn('status', ['active', 'invited'])->with('organization')->first();
+        abort_unless($membership, 403);
+        $online = $pulse->onlineNow($membership->organization);
+
+        return response()->json(['online' => $online, 'count' => $online->count()]);
     }
 
     /**

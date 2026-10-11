@@ -51,183 +51,244 @@
         </div>
     </div>
 
-    <!-- ── 2. Stat Cards Grid (4 Columns · Weight 300 Numbers) ── -->
+    <!-- ── 2. KPI cards: real figures, each card opens the page the figure comes from ── -->
     @php
         $todayMeetings = $upcomingMeetings->filter(fn($m) => $m->scheduled_at && $m->scheduled_at->isToday());
-        $openRooms = $rooms->where('door_status', 'open')->count();
-        $pendingGuests = $guestInvitations->where('status', 'pending')->count() ?? 0;
-        $activeMembersCount = $stats['members'] ?? 1;
+        $mk = $memberKpis;
+        $ok = $ownerKpis;
+        $dashUrl = route('dashboard');
+        $num = fn ($v) => is_float($v) ? rtrim(rtrim(number_format($v, 1, '.', ''), '0'), '.') : $v;
     @endphp
 
-    <div class="ula-kpi-row">
-        <x-kpi-card density="default" icon="person" iconColor="sage" :title="__('متصلون الآن')" :value="$activeMembersCount" :caption="__('من فريقك متصلون الآن')" />
-        <x-kpi-card density="default" icon="event" iconColor="gold" :title="__('اجتماعات اليوم')" :value="$todayMeetings->count()" :caption="__('مجدولة لهذا اليوم')" />
-        <x-kpi-card density="default" icon="meeting_room" iconColor="sage" :title="__('مساحات نشطة')" :value="$openRooms" :caption="__('مفتوحة للعمل')" />
-        <x-kpi-card density="default" icon="mail" iconColor="terracotta" :title="__('دعوات معلقة')" :value="$pendingGuests" :caption="__('بانتظار الانضمام')" />
+    @if($isOwnerView && $ok)
+        <section class="ula-dash-kpis" aria-labelledby="dash-kpi-title">
+            <div class="ula-dash-kpis-head">
+                <div class="ula-headline-group">
+                    <h2 class="ula-headline-ar" id="dash-kpi-title">{{ __('dash.kpi_title') }}</h2>
+                    @if(app()->getLocale() === 'ar')<span class="ula-headline-en">Company at a glance</span>@endif
+                </div>
+                <span class="ula-dash-kpis-note">{{ __('dash.kpi_note') }}</span>
+            </div>
+            <div class="ula-kpi-row ula-kpi-row--links">
+                <a class="ula-kpi-link" href="#dash-online" aria-label="{{ __('dash.online_now') }}">
+                    <x-kpi-card id="kpi-online" icon="sensors" iconColor="sage" :title="__('dash.online_now')" :value="$ok['online']">
+                        <x-kpi-chip tone="stone" :n="$ok['members']">{{ __('dash.of_members') }}</x-kpi-chip>
+                    </x-kpi-card>
+                </a>
+                <a class="ula-kpi-link" href="{{ $dashUrl }}#timesheets" aria-label="{{ __('dash.present_today') }}">
+                    <x-kpi-card icon="how_to_reg" iconColor="sage" :title="__('dash.present_today')" :value="$ok['present_today']">
+                        <x-kpi-chip tone="palm" :n="$num($ok['office_hours_today'])">{{ __('dash.office_hours') }}</x-kpi-chip>
+                    </x-kpi-card>
+                </a>
+                <a class="ula-kpi-link" href="{{ $dashUrl }}#timesheets" aria-label="{{ __('dash.hours_week') }}">
+                    <x-kpi-card icon="schedule" iconColor="gold" :title="__('dash.hours_week')" :value="$num($ok['hours_week'])">
+                        <x-kpi-chip tone="gold" :n="$num($ok['billable_hours_week'])">{{ __('dash.billable') }}</x-kpi-chip>
+                    </x-kpi-card>
+                </a>
+                <a class="ula-kpi-link" href="{{ $dashUrl }}#timesheets" aria-label="{{ __('dash.timesheets_pending') }}">
+                    <x-kpi-card icon="fact_check" :iconColor="$ok['timesheets_pending'] ? 'terracotta' : 'muted'" :title="__('dash.timesheets_pending')" :value="$ok['timesheets_pending']">
+                        <x-kpi-chip :tone="$ok['timesheets_pending'] ? 'terracotta' : 'stone'">{{ $ok['timesheets_pending'] ? __('dash.needs_you') : __('dash.all_clear') }}</x-kpi-chip>
+                    </x-kpi-card>
+                </a>
+                <a class="ula-kpi-link" href="{{ $dashUrl }}#all-tasks" aria-label="{{ __('dash.overdue_tasks') }}">
+                    <x-kpi-card icon="assignment_late" :iconColor="$ok['overdue_tasks'] ? 'terracotta' : 'muted'" :title="__('dash.overdue_tasks')" :value="$ok['overdue_tasks']">
+                        <x-kpi-chip tone="stone" :n="$ok['open_tasks']">{{ __('dash.open_tasks') }}</x-kpi-chip>
+                    </x-kpi-card>
+                </a>
+                <a class="ula-kpi-link" href="{{ $dashUrl }}#all-tasks" aria-label="{{ __('dash.done_week') }}">
+                    <x-kpi-card icon="task_alt" iconColor="sage" :title="__('dash.done_week')" :value="$ok['done_week']">
+                        @if($ok['completion_rate'] !== null)
+                            <x-kpi-chip tone="palm" :n="$ok['completion_rate'] . '%'">{{ __('dash.completion') }}</x-kpi-chip>
+                        @endif
+                    </x-kpi-card>
+                </a>
+                <a class="ula-kpi-link" href="{{ $dashUrl }}#projects" aria-label="{{ __('dash.active_projects') }}">
+                    <x-kpi-card icon="folder_open" iconColor="gold" :title="__('dash.active_projects')" :value="$ok['active_projects']">
+                        <x-kpi-chip :tone="$ok['late_projects'] ? 'terracotta' : 'stone'" :n="$ok['late_projects']">{{ __('dash.late_projects') }}</x-kpi-chip>
+                    </x-kpi-card>
+                </a>
+                <a class="ula-kpi-link" href="{{ $dashUrl }}#meetings" aria-label="{{ __('dash.meetings_today') }}">
+                    <x-kpi-card icon="event" iconColor="gold" :title="__('dash.meetings_today')" :value="$ok['meetings_today']">
+                        <x-kpi-chip :tone="$ok['meetings_live'] ? 'palm' : 'stone'" :n="$ok['meetings_live']">{{ __('dash.live_now') }}</x-kpi-chip>
+                    </x-kpi-card>
+                </a>
+                <a class="ula-kpi-link" href="{{ $dashUrl }}#rooms" aria-label="{{ __('dash.rooms_in_use') }}">
+                    <x-kpi-card icon="meeting_room" iconColor="sage" :title="__('dash.rooms_in_use')" :value="$ok['rooms_in_use']">
+                        <x-kpi-chip tone="stone" :n="$ok['rooms']">{{ __('dash.rooms_total') }}</x-kpi-chip>
+                    </x-kpi-card>
+                </a>
+                <a class="ula-kpi-link" href="{{ $dashUrl }}#billing" aria-label="{{ __('dash.seats') }}">
+                    <x-kpi-card icon="badge" iconColor="muted" :title="__('dash.seats')" :value="$ok['seats_used'] . ($ok['seat_limit'] ? ' / ' . $ok['seat_limit'] : '')">
+                        <x-kpi-chip :tone="$ok['invited'] ? 'gold' : 'stone'" :n="$ok['invited']">{{ __('dash.invited') }}</x-kpi-chip>
+                    </x-kpi-card>
+                </a>
+                <a class="ula-kpi-link" href="{{ $dashUrl }}#guests" aria-label="{{ __('dash.guest_links') }}">
+                    <x-kpi-card icon="link" iconColor="muted" :title="__('dash.guest_links')" :value="$ok['guest_links']">
+                        <x-kpi-chip tone="stone">{{ __('dash.not_used_yet') }}</x-kpi-chip>
+                    </x-kpi-card>
+                </a>
+            </div>
+        </section>
+    @else
+        <div class="ula-kpi-row ula-kpi-row--links">
+            <a class="ula-kpi-link" href="#dash-online" aria-label="{{ __('dash.online_now') }}">
+                <x-kpi-card id="kpi-online" icon="sensors" iconColor="sage" :title="__('dash.online_now')" :value="$mk['online']">
+                    <x-kpi-chip tone="stone" :n="$mk['members']">{{ __('dash.of_members') }}</x-kpi-chip>
+                </x-kpi-card>
+            </a>
+            <a class="ula-kpi-link" href="{{ $dashUrl }}#meetings" aria-label="{{ __('dash.meetings_today') }}">
+                <x-kpi-card icon="event" iconColor="gold" :title="__('dash.meetings_today')" :value="$mk['meetings_today']" :caption="__('dash.scheduled_today')" />
+            </a>
+            <a class="ula-kpi-link" href="{{ $dashUrl }}#my-tasks" aria-label="{{ __('dash.my_open_tasks') }}">
+                <x-kpi-card icon="checklist" iconColor="sage" :title="__('dash.my_open_tasks')" :value="$mk['my_open_tasks']">
+                    <x-kpi-chip :tone="$mk['my_overdue_tasks'] ? 'terracotta' : 'stone'" :n="$mk['my_overdue_tasks']">{{ __('dash.overdue') }}</x-kpi-chip>
+                </x-kpi-card>
+            </a>
+            <a class="ula-kpi-link" href="{{ $dashUrl }}#timesheets" aria-label="{{ __('dash.my_hours_week') }}">
+                <x-kpi-card icon="schedule" iconColor="gold" :title="__('dash.my_hours_week')" :value="$num($mk['my_hours_week'])" :caption="__('dash.this_week')" />
+            </a>
+        </div>
+    @endif
+
+    <!-- ── 3. Who is in the office now + today's meetings ── -->
+    <div class="ula-dash-pair">
+        <section class="ula-dash-panel" id="dash-online" aria-labelledby="dash-online-title">
+            <div class="ula-dash-panel-head">
+                <span class="ms ula-dash-panel-icon" aria-hidden="true">sensors</span>
+                <h3 id="dash-online-title">{{ __('dash.online_now') }}</h3>
+                <span class="ula-dash-count" id="dash-online-count">{{ $onlineNow->count() }}</span>
+                <span class="ula-dash-spacer"></span>
+                <x-btn variant="secondary" size="md" icon="login" :href="route('office')">{{ __('dash.enter_office') }}</x-btn>
+            </div>
+            <ul class="ula-online-list" id="dash-online-list" aria-live="polite"
+                data-endpoint="{{ route('dashboard.pulse') }}"
+                data-open-area="{{ __('dash.open_area') }}" data-since="{{ __('dash.since') }}" data-empty="{{ __('dash.nobody_online') }}">
+                @forelse($onlineNow as $person)
+                    <li class="ula-online-row">
+                        <span class="ula-online-avatar" aria-hidden="true">
+                            @if($person['avatar_url'])<img src="{{ $person['avatar_url'] }}" alt="">@else{{ mb_substr($person['name'], 0, 1) }}@endif
+                            <span class="ula-online-dot"></span>
+                        </span>
+                        <span class="ula-online-main">
+                            <span class="ula-online-name">{{ $person['name'] }}</span>
+                            <span class="ula-online-where"><span class="ms" aria-hidden="true">{{ $person['room'] ? 'meeting_room' : 'deck' }}</span>{{ $person['room'] ?? __('dash.open_area') }}</span>
+                        </span>
+                        <span class="ula-online-since">{{ __('dash.since') }} <span class="pm-num">{{ $person['since'] ? \Illuminate\Support\Carbon::parse($person['since'])->format('H:i') : '' }}</span></span>
+                    </li>
+                @empty
+                    <li class="ula-online-empty">{{ __('dash.nobody_online') }}</li>
+                @endforelse
+            </ul>
+        </section>
+
+        <section class="ula-dash-panel" aria-labelledby="dash-meet-title">
+            <div class="ula-dash-panel-head">
+                <span class="ms ula-dash-panel-icon" aria-hidden="true">calendar_month</span>
+                <h3 id="dash-meet-title">{{ __('dash.meetings_today') }}</h3>
+                <span class="ula-dash-spacer"></span>
+                <a class="ula-dash-link" href="{{ $dashUrl }}#meetings">{{ __('dash.view_all') }}</a>
+            </div>
+            <div class="ula-meet-list">
+                @forelse($todayMeetings->take(5) as $meeting)
+                    <div class="ula-meet-row">
+                        <span class="ula-meet-icon {{ $meeting->status === 'live' ? 'is-live' : '' }}" aria-hidden="true"><span class="ms">{{ $meeting->status === 'live' ? 'videocam' : 'schedule' }}</span></span>
+                        <span class="ula-online-main">
+                            <span class="ula-online-name">{{ $meeting->title }}</span>
+                            <span class="ula-online-where">{{ $meeting->room->name ?? ($meeting->project->name ?? __('dash.open_area')) }}</span>
+                        </span>
+                        <span class="pm-num ula-meet-time">{{ $meeting->scheduled_at?->format('H:i') }}</span>
+                        <x-badge :variant="$meeting->status === 'live' ? 'success' : 'warning'">{{ $meeting->status === 'live' ? __('dash.live_now') : __('dash.scheduled') }}</x-badge>
+                    </div>
+                @empty
+                    <div class="ula-dash-empty">
+                        <span class="ms" aria-hidden="true">event_available</span>
+                        <span>{{ __('dash.no_meetings_today') }}</span>
+                        <x-btn variant="secondary" size="md" icon="event" onclick="openScheduleMeetingModal('general')">{{ __('hero.schedule_meeting') }}</x-btn>
+                    </div>
+                @endforelse
+            </div>
+        </section>
     </div>
 
     @include('dashboard.partials.my-dashboard')
 
-    <!-- ── 3. Bottom Panels Grid (Matches 06-Dashboard-Overview: 1.4fr 1fr) ── -->
-    <div style="display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px;">
-        <!-- Column 1: Today's Meetings -->
-        <div style="border-radius: 20px; border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); background: var(--ula-surface-card); padding: 20px; box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 16px; min-width: 0;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <span style="color: var(--ula-accent-hover); display: inline-flex;"><span class="ms" style="font-size: 20px;">calendar_month</span></span>
-                <span style="font-size: 18px; font-weight: 600; color: var(--ula-text-primary);">{{ __('اجتماعات اليوم') }}</span>
-                <div style="flex: 1;"></div>
-                <a href="javascript:void(0)" onclick="switchAdminTab('meetings')" style="font-size: 13px; font-weight: 600; color: var(--ula-accent-default); text-decoration: none;">{{ __('عرض الكل') }}</a>
+    <!-- ── 4. Quick actions + rooms in use right now ── -->
+    @php
+        $roomsTotal = $rooms->count();
+        $roomsBusy = $onlineNow->pluck('room_id')->filter()->unique()->count();
+        $inOpenArea = $onlineNow->whereNull('room_id')->count();
+        $busyPercent = $roomsTotal > 0 ? (int) round($roomsBusy / $roomsTotal * 100) : 0;
+        $circumference = 314;
+        $dashoffset = $circumference - ($busyPercent / 100 * $circumference);
+    @endphp
+    <div class="ula-dash-pair ula-dash-pair--even">
+        <section class="ula-dash-panel" aria-labelledby="dash-qa-title">
+            <div class="ula-dash-panel-head">
+                <span class="ms ula-dash-panel-icon" aria-hidden="true">bolt</span>
+                <h3 id="dash-qa-title">{{ __('dash.quick_actions') }}</h3>
             </div>
-
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                @forelse($todayMeetings->take(4) as $meeting)
-                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: var(--ula-surface-page); border: var(--ula-border-width-hairline) solid var(--ula-border-subtle);">
-                        <span style="width: 36px; height: 36px; border-radius: 10px; background: {{ $meeting->status === 'live' ? 'var(--ula-tone-palm-bg)' : 'var(--ula-tone-gold-bg)' }}; color: {{ $meeting->status === 'live' ? 'var(--ula-tone-palm-fg)' : 'var(--ula-tone-gold-fg)' }}; display: inline-flex; align-items: center; justify-content: center;">
-                            <span class="ms" style="font-size: 20px;">{{ $meeting->status === 'live' ? 'videocam' : 'schedule' }}</span>
-                        </span>
-                        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
-                            <span style="font-size: 15px; font-weight: 600; color: var(--ula-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                {{ $meeting->title }}
-                            </span>
-                            <span style="font-size: 13px; color: var(--ula-text-secondary);">
-                                {{ $meeting->room->name ?? ($meeting->project->name ?? __('قاعة عامة')) }}
-                            </span>
-                        </div>
-                        <span style="font-family: var(--ula-font-mono); font-size: 12px; color: var(--ula-text-secondary); direction: ltr; unicode-bidi: isolate;">
-                            {{ $meeting->scheduled_at ? $meeting->scheduled_at->format('H:i') : '10:00' }}
-                        </span>
-                        @if($meeting->status === 'live')
-                            <span style="height: 26px; padding: 0 10px; border-radius: var(--ula-radius-pill); background: var(--ula-tone-palm-bg); color: var(--ula-tone-palm-fg); font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
-                                <span style="width: 6px; height: 6px; border-radius: var(--ula-radius-pill); background: var(--ula-palm-700);"></span>
-                                {{ __('مباشر الآن') }}
-                            </span>
-                        @else
-                            <span style="height: 26px; padding: 0 10px; border-radius: var(--ula-radius-pill); background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg); font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
-                                <span style="width: 6px; height: 6px; border-radius: var(--ula-radius-pill); background: var(--ula-gold-500);"></span>
-                                {{ __('مجدول') }}
-                            </span>
-                        @endif
-                    </div>
-                @empty
-                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: var(--ula-surface-page); border: var(--ula-border-width-hairline) solid var(--ula-border-subtle);">
-                        <span style="width: 36px; height: 36px; border-radius: 10px; background: var(--ula-tone-palm-bg); color: var(--ula-tone-palm-fg); display: inline-flex; align-items: center; justify-content: center;">
-                            <span class="ms" style="font-size: 20px;">videocam</span>
-                        </span>
-                        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
-                            <span style="font-size: 15px; font-weight: 600; color: var(--ula-text-primary);">مراجعة الربع الثالث</span>
-                            <span style="font-size: 13px; color: var(--ula-text-secondary);">قاعة النخيل</span>
-                        </div>
-                        <span style="font-family: var(--ula-font-mono); font-size: 12px; color: var(--ula-text-secondary); direction: ltr; unicode-bidi: isolate;">10:00</span>
-                        <span style="height: 26px; padding: 0 10px; border-radius: var(--ula-radius-pill); background: var(--ula-tone-palm-bg); color: var(--ula-tone-palm-fg); font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
-                            <span style="width: 6px; height: 6px; border-radius: var(--ula-radius-pill); background: var(--ula-palm-700);"></span>
-                            {{ __('مباشر الآن') }}
-                        </span>
-                    </div>
-
-                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: var(--ula-surface-page); border: var(--ula-border-width-hairline) solid var(--ula-border-subtle);">
-                        <span style="width: 36px; height: 36px; border-radius: 10px; background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg); display: inline-flex; align-items: center; justify-content: center;">
-                            <span class="ms" style="font-size: 20px;">schedule</span>
-                        </span>
-                        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
-                            <span style="font-size: 15px; font-weight: 600; color: var(--ula-text-primary);">مزامنة فريق التصميم</span>
-                            <span style="font-size: 13px; color: var(--ula-text-secondary);">الغرفة العامة</span>
-                        </div>
-                        <span style="font-family: var(--ula-font-mono); font-size: 12px; color: var(--ula-text-secondary); direction: ltr; unicode-bidi: isolate;">13:30</span>
-                        <span style="height: 26px; padding: 0 10px; border-radius: var(--ula-radius-pill); background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg); font-size: 12px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;">
-                            <span style="width: 6px; height: 6px; border-radius: var(--ula-radius-pill); background: var(--ula-gold-500);"></span>
-                            {{ __('مجدول') }}
-                        </span>
-                    </div>
-                @endforelse
+            <div class="ula-quick-grid">
+                <button type="button" class="ula-quick" onclick="openInviteModal()"><span class="ms" aria-hidden="true">person_add</span>{{ __('dash.invite_member') }}</button>
+                <a class="ula-quick" href="{{ $dashUrl }}#rooms"><span class="ms" aria-hidden="true">meeting_room</span>{{ __('dash.manage_rooms') }}</a>
+                <button type="button" class="ula-quick" onclick="openNewTaskModal()"><span class="ms" aria-hidden="true">add_task</span>{{ __('dash.new_task') }}</button>
+                <button type="button" class="ula-quick" onclick="openScheduleMeetingModal('general')"><span class="ms" aria-hidden="true">event</span>{{ __('hero.schedule_meeting') }}</button>
             </div>
-        </div>
+        </section>
 
-        <!-- Column 2: Quick Actions + Utilization -->
-        <div style="display: flex; flex-direction: column; gap: 16px;">
-            <!-- Quick Actions Card -->
-            <div style="border-radius: 20px; border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); background: var(--ula-surface-card); padding: 20px; box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 16px; min-width: 0;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="color: var(--ula-accent-hover); display: inline-flex;"><span class="ms" style="font-size: 20px;">bolt</span></span>
-                    <span style="font-size: 18px; font-weight: 600; color: var(--ula-text-primary);">{{ __('إجراءات سريعة') }}</span>
-                </div>
-
-                <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;">
-                    <button type="button" onclick="openInviteModal()" style="padding: 16px; border-radius: 16px; border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); background: var(--ula-surface-page); display: flex; flex-direction: column; align-items: flex-start; gap: 12px; cursor: pointer; font-family: var(--ula-font-ar); text-align: start;">
-                        <span style="width: 40px; height: 40px; border-radius: 12px; background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg); display: inline-flex; align-items: center; justify-content: center;">
-                            <span class="ms" style="font-size: 24px;">person_add</span>
-                        </span>
-                        <span style="font-size: 15px; font-weight: 600; color: var(--ula-text-primary);">{{ __('دعوة عضو') }}</span>
-                    </button>
-
-                    <button type="button" onclick="switchAdminTab('rooms')" style="padding: 16px; border-radius: 16px; border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); background: var(--ula-surface-page); display: flex; flex-direction: column; align-items: flex-start; gap: 12px; cursor: pointer; font-family: var(--ula-font-ar); text-align: start;">
-                        <span style="width: 40px; height: 40px; border-radius: 12px; background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg); display: inline-flex; align-items: center; justify-content: center;">
-                            <span class="ms" style="font-size: 24px;">meeting_room</span>
-                        </span>
-                        <span style="font-size: 15px; font-weight: 600; color: var(--ula-text-primary);">{{ __('إدارة الغرف') }}</span>
-                    </button>
-
-                    <button type="button" onclick="openNewTaskModal()" style="padding: 16px; border-radius: 16px; border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); background: var(--ula-surface-page); display: flex; flex-direction: column; align-items: flex-start; gap: 12px; cursor: pointer; font-family: var(--ula-font-ar); text-align: start;">
-                        <span style="width: 40px; height: 40px; border-radius: 12px; background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg); display: inline-flex; align-items: center; justify-content: center;">
-                            <span class="ms" style="font-size: 24px;">add_task</span>
-                        </span>
-                        <span style="font-size: 15px; font-weight: 600; color: var(--ula-text-primary);">{{ __('مهمة جديدة') }}</span>
-                    </button>
-
-                    <button type="button" onclick="openScheduleMeetingModal('general')" style="padding: 16px; border-radius: 16px; border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); background: var(--ula-surface-page); display: flex; flex-direction: column; align-items: flex-start; gap: 12px; cursor: pointer; font-family: var(--ula-font-ar); text-align: start;">
-                        <span style="width: 40px; height: 40px; border-radius: 12px; background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg); display: inline-flex; align-items: center; justify-content: center;">
-                            <span class="ms" style="font-size: 24px;">event</span>
-                        </span>
-                        <span style="font-size: 15px; font-weight: 600; color: var(--ula-text-primary);">{{ __('جدولة اجتماع') }}</span>
-                    </button>
-                </div>
+        <a class="ula-dash-panel ula-dash-panel--link" href="{{ $dashUrl }}#rooms" aria-labelledby="dash-use-title">
+            <div class="ula-dash-panel-head">
+                <span class="ms ula-dash-panel-icon" aria-hidden="true">donut_large</span>
+                <h3 id="dash-use-title">{{ __('dash.office_use_now') }}</h3>
             </div>
-
-            <!-- Workspace Utilization Card with SVG Donut -->
-            @php
-                $totalRooms = max(1, $rooms->count());
-                $occupancyPercent = round(($openRooms / $totalRooms) * 100);
-                $closedRooms = $totalRooms - $openRooms;
-                $circumference = 314;
-                $dashoffset = $circumference - ($occupancyPercent / 100 * $circumference);
-            @endphp
-            <div style="border-radius: 20px; border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); background: var(--ula-surface-card); padding: 20px; box-shadow: var(--ula-shadow-xs); display: flex; flex-direction: column; gap: 16px; min-width: 0;">
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="color: var(--ula-accent-hover); display: inline-flex;"><span class="ms" style="font-size: 20px;">donut_large</span></span>
-                    <span style="font-size: 18px; font-weight: 600; color: var(--ula-text-primary);">{{ __('استخدام مساحة العمل') }}</span>
+            <div class="ula-use">
+                <div class="ula-use-donut">
+                    <svg width="120" height="120" viewBox="0 0 120 120" aria-hidden="true">
+                        <circle cx="60" cy="60" r="50" fill="none" stroke="var(--ula-border-subtle)" stroke-width="14"></circle>
+                        <circle cx="60" cy="60" r="50" fill="none" stroke="var(--ula-accent-default)" stroke-width="14" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="{{ $dashoffset }}"></circle>
+                    </svg>
+                    <span class="ula-use-figure"><span class="pm-num">{{ $busyPercent }}%</span><small>{{ __('dash.rooms_busy') }}</small></span>
                 </div>
-
-                <div style="display: flex; align-items: center; gap: 24px;">
-                    <div style="position: relative; width: 120px; height: 120px; flex-shrink: 0;">
-                        <svg width="120" height="120" viewBox="0 0 120 120" style="transform: rotate(-90deg);">
-                            <circle cx="60" cy="60" r="50" fill="none" stroke="var(--ula-border-subtle)" stroke-width="14"></circle>
-                            <circle cx="60" cy="60" r="50" fill="none" stroke="var(--ula-accent-default)" stroke-width="14" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="{{ $dashoffset }}"></circle>
-                        </svg>
-                        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <span style="font-size: 24px; font-weight: 600; direction: ltr; font-family: var(--ula-font-mono);">{{ $occupancyPercent }}%</span>
-                            <span style="font-size: 11px; color: var(--ula-text-secondary);">{{ __('قيد الاستخدام') }}</span>
-                        </div>
-                    </div>
-
-                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px; font-size: 14px;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="width: 10px; height: 10px; border-radius: 3px; background: var(--ula-accent-default);"></span>
-                            <span style="flex: 1; color: var(--ula-text-body);">{{ __('غرف مفتوحة') }}</span>
-                            <span style="font-family: var(--ula-font-mono); font-size: 13px; color: var(--ula-text-primary); direction: ltr; unicode-bidi: isolate;">{{ $openRooms }}</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="width: 10px; height: 10px; border-radius: 3px; background: var(--ula-highlight-default);"></span>
-                            <span style="flex: 1; color: var(--ula-text-body);">{{ __('غرف مقفلة') }}</span>
-                            <span style="font-family: var(--ula-font-mono); font-size: 13px; color: var(--ula-text-primary); direction: ltr; unicode-bidi: isolate;">{{ $closedRooms }}</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="width: 10px; height: 10px; border-radius: 3px; background: var(--ula-stone-300);"></span>
-                            <span style="flex: 1; color: var(--ula-text-body);">{{ __('نسبة الشغور') }}</span>
-                            <span style="font-family: var(--ula-font-mono); font-size: 13px; color: var(--ula-text-primary); direction: ltr; unicode-bidi: isolate;">{{ 100 - $occupancyPercent }}%</span>
-                        </div>
-                    </div>
-                </div>
+                <dl class="ula-use-legend">
+                    <div><dt><i class="is-busy"></i>{{ __('dash.rooms_in_use') }}</dt><dd class="pm-num">{{ $roomsBusy }}</dd></div>
+                    <div><dt><i class="is-free"></i>{{ __('dash.rooms_free') }}</dt><dd class="pm-num">{{ max(0, $roomsTotal - $roomsBusy) }}</dd></div>
+                    <div><dt><i class="is-open"></i>{{ __('dash.in_open_area') }}</dt><dd class="pm-num">{{ $inOpenArea }}</dd></div>
+                </dl>
             </div>
-        </div>
+        </a>
     </div>
+
+    <script nonce="{{ $cspNonce ?? '' }}">
+        // Keep "online now" fresh while the dashboard is open (the office sends a heartbeat every 45s).
+        (function () {
+            const list = document.getElementById('dash-online-list');
+            if (!list) return;
+            const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+            const hhmm = (iso) => { const d = iso ? new Date(iso) : null; return d && !isNaN(d) ? String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') : ''; };
+            async function refresh() {
+                if (document.hidden) return;
+                try {
+                    const res = await fetch(list.dataset.endpoint, { headers: { Accept: 'application/json' }, credentials: 'same-origin' });
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    const people = Array.isArray(data.online) ? data.online : [];
+                    list.innerHTML = people.length ? people.map(p => `
+                        <li class="ula-online-row">
+                            <span class="ula-online-avatar" aria-hidden="true">${p.avatar_url ? `<img src="${esc(p.avatar_url)}" alt="">` : esc((p.name || '?').charAt(0))}<span class="ula-online-dot"></span></span>
+                            <span class="ula-online-main">
+                                <span class="ula-online-name">${esc(p.name)}</span>
+                                <span class="ula-online-where"><span class="ms" aria-hidden="true">${p.room ? 'meeting_room' : 'deck'}</span>${esc(p.room || list.dataset.openArea)}</span>
+                            </span>
+                            <span class="ula-online-since">${esc(list.dataset.since)} <span class="pm-num">${hhmm(p.since)}</span></span>
+                        </li>`).join('') : `<li class="ula-online-empty">${esc(list.dataset.empty)}</li>`;
+                    const count = document.getElementById('dash-online-count');
+                    if (count) count.textContent = people.length;
+                    const kpi = document.querySelector('#kpi-online [data-kpi-value]');
+                    if (kpi) kpi.textContent = people.length;
+                } catch (e) { /* keep the last list */ }
+            }
+            setInterval(refresh, 60000);
+            document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(); });
+        })();
+    </script>
 
 </div>

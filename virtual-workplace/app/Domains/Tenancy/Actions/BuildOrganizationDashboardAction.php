@@ -10,6 +10,7 @@ use App\Domains\Meetings\Models\Meeting;
 use App\Domains\People\Models\Department;
 use App\Domains\People\Models\Team;
 use App\Domains\People\Models\UserProfile;
+use App\Domains\People\Services\WorkspacePulse;
 use App\Domains\Projects\Models\ActiveTimer;
 use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Tenancy\Models\OrganizationMember;
@@ -213,6 +214,8 @@ class BuildOrganizationDashboardAction
             'upcomingMeetingsJson' => $upcomingMeetingsJson,
             'pendingSubscriptionRequest' => $pendingSubscriptionRequest,
             'attendancePolicy' => $attendancePolicy,
+            // Live figures: who is in the office now, and the owner's daily KPIs (real data only).
+            ...$this->pulse($organization, $membership, $user, $rooms->count()),
             'projectMembersMap' => $projectMembersMap,
         ];
     }
@@ -248,5 +251,20 @@ class BuildOrganizationDashboardAction
             ]);
             Team::create(['organization_id' => $organization->id, 'department_id' => $design->id, 'name' => 'UI / UX Design']);
         }
+    }
+
+    private function pulse(Organization $organization, OrganizationMember $membership, User $user, int $roomCount): array
+    {
+        $pulse = app(WorkspacePulse::class);
+        $online = $pulse->onlineNow($organization);
+        $isOwnerView = $membership->role?->slug === 'company_admin' || $membership->hasPermission('organizations.manage');
+
+        return [
+            'onlineNow' => $online,
+            'isOwnerView' => $isOwnerView,
+            'ownerKpis' => $isOwnerView ? $pulse->ownerKpis($organization, $online, $roomCount) : null,
+            // The owner's view shows the company figures instead of these.
+            'memberKpis' => $isOwnerView ? null : $pulse->memberKpis($organization, $user, $online),
+        ];
     }
 }

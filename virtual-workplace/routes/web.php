@@ -43,6 +43,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
+    Route::get('/dashboard/pulse', [DashboardController::class, 'pulse'])->name('dashboard.pulse');
     Route::post('/organization/upgrade-plan', [OrganizationSettingsController::class, 'upgradePlan'])->name('organization.upgrade_plan');
     Route::get('/billing/payment/{plan}', [OrganizationSettingsController::class, 'showPaymentPage'])->name('subscription.payment');
     Route::post('/billing/payment/{plan}/submit', [OrganizationSettingsController::class, 'submitBankTransferPayment'])->name('subscription.payment.submit');
