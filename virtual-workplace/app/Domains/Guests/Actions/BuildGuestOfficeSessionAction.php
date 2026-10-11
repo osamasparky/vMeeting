@@ -83,7 +83,7 @@ class BuildGuestOfficeSessionAction
         }
 
         $attendancePolicy = optional($organization->settings)->getAttendancePolicy()
-            ?? OrganizationSetting::getAttendancePolicy();
+            ?? (new OrganizationSetting)->getAttendancePolicy(); // no settings row yet: the defaults
 
         return [
             'user' => $user,

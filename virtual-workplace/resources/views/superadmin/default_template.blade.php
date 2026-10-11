@@ -227,11 +227,11 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
                     <div>
                         <label style="display: block; font-size: 10px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Grid Width') }}</label>
-                        <input type="number" name="width" value="{{ $template->width }}" min="10" max="100" required style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 8px; color: var(--ula-text-primary); font-size: 12px; font-weight: 700;">
+                        <input type="number" name="width" value="{{ $template->width }}" min="10" max="200" required style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 8px; color: var(--ula-text-primary); font-size: 12px; font-weight: 700;">
                     </div>
                     <div>
                         <label style="display: block; font-size: 10px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Grid Height') }}</label>
-                        <input type="number" name="height" value="{{ $template->height }}" min="10" max="100" required style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 8px; color: var(--ula-text-primary); font-size: 12px; font-weight: 700;">
+                        <input type="number" name="height" value="{{ $template->height }}" min="10" max="200" required style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 8px; color: var(--ula-text-primary); font-size: 12px; font-weight: 700;">
                     </div>
                 </div>
 

@@ -101,6 +101,11 @@ class BlueprintOfficeSeeder extends Seeder
                     'metadata' => $rData['metadata'] ?? ['audio_isolation' => true],
                 ]);
             }
+
+            // 6. The template's furniture (only for a map that has none yet).
+            if (! MapObject::where('map_id', $map->id)->exists()) {
+                $template->placeFurniture($map, $roomsList);
+            }
         }
     }
 }

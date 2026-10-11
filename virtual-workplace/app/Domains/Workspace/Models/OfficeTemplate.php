@@ -375,6 +375,56 @@ class OfficeTemplate extends Model
     }
 
     /**
+     * Put this template's furniture on a company's map. Furniture standing in a template room the
+     * company didn't get (its plan allows fewer rooms) is left out; the open area is always kept.
+     *
+     * @param  array<int, array>  $keptRooms  the template rooms that were created for the company
+     */
+    public function placeFurniture(Map $map, array $keptRooms): int
+    {
+        $dropped = array_filter($this->rooms_data ?: [], fn ($r) => ! in_array($r, $keptRooms, true));
+        $inside = function (array $o, array $b): bool {
+            $cx = ($o['position']['x'] ?? 0) + ($o['width'] ?? 1) / 2;
+            $cy = ($o['position']['y'] ?? 0) + ($o['height'] ?? 1) / 2;
+
+            return $cx >= $b['x'] && $cx <= $b['x'] + $b['width'] && $cy >= $b['y'] && $cy <= $b['y'] + $b['height'];
+        };
+
+        $count = 0;
+        foreach ($this->objects_data ?: [] as $o) {
+            foreach ($dropped as $room) {
+                if (isset($room['bounds']) && $inside($o, $room['bounds'])) {
+                    continue 2;
+                }
+            }
+            $w = $o['width'] ?? 1;
+            $h = $o['height'] ?? 1;
+            MapObject::create([
+                'map_id' => $map->id,
+                'organization_id' => $map->organization_id,
+                'type' => $o['type'] ?? 'decor',
+                'name' => $o['name'] ?? null,
+                'position' => $o['position'] ?? ['x' => 0, 'y' => 0, 'rotation' => 0],
+                'size' => ['width' => $w, 'height' => $h],
+                'rotation' => $o['rotation'] ?? ($o['position']['rotation'] ?? 0),
+                'color' => null,
+                'collision' => (bool) ($o['collision'] ?? false),
+                'interaction_config' => array_merge($o['interaction_config'] ?? [], [
+                    'image_url' => $o['image_url'] ?? null,
+                    'is_custom' => false,
+                    'width' => $w,
+                    'height' => $h,
+                    'elevation' => $o['elevation'] ?? 1,
+                    'interaction_type' => $o['interaction_type'] ?? 'none',
+                ]),
+            ]);
+            $count++;
+        }
+
+        return $count;
+    }
+
+    /**
      * Get the default system template (Free tier default).
      */
     public static function getDefault(): self

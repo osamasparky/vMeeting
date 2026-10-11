@@ -1306,8 +1306,8 @@ class SuperAdminController extends Controller
             'name' => ['required', 'string', 'max:150'],
             'description' => ['nullable', 'string', 'max:500'],
             'background_image_url' => ['nullable', 'string', 'max:500'],
-            'width' => ['required', 'integer', 'min:10', 'max:100'],
-            'height' => ['required', 'integer', 'min:10', 'max:100'],
+            'width' => ['required', 'integer', 'min:10', 'max:200'],
+            'height' => ['required', 'integer', 'min:10', 'max:200'],
             'tile_size' => ['required', 'integer', 'in:16,32,48,64'],
         ]);
 
@@ -1595,6 +1595,10 @@ class SuperAdminController extends Controller
                         'metadata' => $rData['metadata'] ?? ['audio_isolation' => true],
                     ]);
                 }
+
+                // The rooms were reset from the template: its furniture comes with them.
+                MapObject::where('map_id', $map->id)->delete();
+                $template->placeFurniture($map, $roomsList);
             }
 
             $count++;

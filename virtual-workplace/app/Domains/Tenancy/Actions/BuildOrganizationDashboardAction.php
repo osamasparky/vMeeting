@@ -149,7 +149,7 @@ class BuildOrganizationDashboardAction
 
         $smtpSettings = $organization->settings?->smtp_settings ?? [];
         $openAiSettings = $organization->settings?->openai_settings ?? [];
-        $attendancePolicy = $organization->settings?->getAttendancePolicy() ?? OrganizationSetting::getAttendancePolicy();
+        $attendancePolicy = $organization->settings?->getAttendancePolicy() ?? (new OrganizationSetting)->getAttendancePolicy(); // no settings row yet: the defaults
 
         $upcomingMeetingsJson = $upcomingMeetings->map(function ($m) {
             return [
