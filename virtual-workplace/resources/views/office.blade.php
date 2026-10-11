@@ -3028,6 +3028,12 @@
             const targetRoom = getCurrentRoom(clickX, clickY);
             const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
 
+            // A guest stays in the invited room: no walking out to the open area or other rooms.
+            if (guestConfined() && (!targetRoom || targetRoom.id !== guestAllowedRoomId)) {
+                guestLimitToast();
+                return;
+            }
+
             // Double Click Detection for Entering Rooms
             const isDblClick = (now - lastCanvasClickTime < 380) && (Math.hypot(clickX - lastCanvasClickPos.x, clickY - lastCanvasClickPos.y) < 25);
             lastCanvasClickTime = now;
@@ -3300,6 +3306,17 @@
 
         // ── Main Game & Render Loop with Solid Wall Collisions & Waypoint Following ──
         let lastUpdateAt = 0;
+        // Guests are kept inside the room their invitation is for (when that room is on this map).
+        function guestConfined() {
+            return isGuest && !!guestAllowedRoomId && rooms.some(r => r.id === guestAllowedRoomId);
+        }
+        let lastGuestLimitToast = 0;
+        function guestLimitToast() {
+            if (Date.now() - lastGuestLimitToast < 3000) return; // pushing against the door shouldn't stack toasts
+            lastGuestLimitToast = Date.now();
+            showToast(`🚫 {{ __("Restricted Room: Guests are only permitted inside their invited meeting room.") }}`);
+        }
+
         function update() {
             // Movement speed is defined per 60 fps frame; scale it to the real frame time
             // so 120/144 Hz screens don't walk faster (capped so a stalled tab doesn't jump).
@@ -3359,6 +3376,16 @@
             const currentR = getCurrentRoom(localAvatar.x, localAvatar.y);
             const targetR = getCurrentRoom(nextX, nextY);
 
+            // A guest inside the invited room never steps out of it, to the open area or anywhere else.
+            if (guestConfined() && currentR && currentR.id === guestAllowedRoomId && (!targetR || targetR.id !== guestAllowedRoomId)) {
+                nextX = localAvatar.x;
+                nextY = localAvatar.y;
+                localAvatar.targetX = localAvatar.x;
+                localAvatar.targetY = localAvatar.y;
+                avatarWaypoints = [];
+                guestLimitToast();
+            }
+
             // Door lock & Room Permission Guard collision detection
             if (targetR && targetR !== currentR) {
                 // 1. Guest Restriction Check
@@ -3367,7 +3394,7 @@
                     nextY = localAvatar.y;
                     localAvatar.targetX = localAvatar.x;
                     localAvatar.targetY = localAvatar.y;
-                    showToast(`🚫 {{ __("Restricted Room: Guests are only permitted inside their invited meeting room.") }}`);
+                    guestLimitToast();
                 }
                 // 2. Member Room Permission Check
                 else if (CONFIG.allowedRoomIds && CONFIG.allowedRoomIds.length > 0 && !CONFIG.allowedRoomIds.includes(targetR.id)) {
@@ -4036,6 +4063,10 @@
 
         // ── Modern Profile & Live Video Node Rendering ──
         function drawAvatar(av, isSelf) {
+            // Paired with the ctx.restore() at the end: each avatar draws in its own state, so the
+            // camera transform survives for the next one (an unpaired restore here used to drop the
+            // zoom after the first avatar, drawing everyone after it at the wrong place and size).
+            ctx.save();
             const x = Number(av.x) || 400;
             const y = Number(av.y) || 400;
             const cardSize = 36;
