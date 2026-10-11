@@ -204,7 +204,14 @@
 
             <div style="margin-bottom: 14px;">
                 <label style="display: block; font-size: 11px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px; text-transform: uppercase;">{{ __('Features (Comma-separated)') }}</label>
-                <input type="text" id="inputPlanFeatures" name="features" placeholder="basic_chat, basic_audio, video, screen_share, analytics" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 500;">
+                <input type="text" id="inputPlanFeatures" name="features" oninput="syncPlanAiBox()" placeholder="basic_chat, basic_audio, video, screen_share, analytics" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 500;">
+            </div>
+
+            <div style="margin-bottom: 14px;">
+                <label style="display: flex; align-items: center; gap: 8px; min-height: 44px; font-size: 12px; font-weight: 700; cursor: pointer; color: var(--ula-text-primary);">
+                    <input type="checkbox" id="inputPlanAi" onchange="togglePlanAi(this.checked)" style="accent-color: var(--ula-accent-default); width: 16px; height: 16px;">
+                    <span>{{ __('AI office generator included in this plan') }}</span>
+                </label>
             </div>
 
             <div style="margin-bottom: 20px;">
@@ -250,9 +257,24 @@
         document.getElementById('inputPlanRooms').value = '10';
         document.getElementById('inputPlanStorage').value = '5';
         document.getElementById('inputPlanFeatures').value = 'basic_chat, basic_audio, video, screen_share';
+        syncPlanAiBox();
         document.getElementById('inputPlanActive').checked = true;
         togglePerSeatInputs();
         document.getElementById('planModal').style.display = 'flex';
+    }
+
+    // The AI generator is a plan feature ("ai_office_generator"): the box adds or removes it from the list.
+    const PLAN_AI_FEATURE = 'ai_office_generator';
+    function planFeatureList() {
+        return document.getElementById('inputPlanFeatures').value.split(',').map(f => f.trim()).filter(Boolean);
+    }
+    function syncPlanAiBox() {
+        document.getElementById('inputPlanAi').checked = planFeatureList().includes(PLAN_AI_FEATURE);
+    }
+    function togglePlanAi(on) {
+        const list = planFeatureList().filter(f => f !== PLAN_AI_FEATURE);
+        if (on) list.push(PLAN_AI_FEATURE);
+        document.getElementById('inputPlanFeatures').value = list.join(', ');
     }
 
     function openEditPlanModal(plan) {
@@ -269,6 +291,7 @@
         document.getElementById('inputPlanRooms').value = plan.room_limit;
         document.getElementById('inputPlanStorage').value = plan.storage_limit_gb;
         document.getElementById('inputPlanFeatures').value = (plan.features || []).join(', ');
+        syncPlanAiBox();
         document.getElementById('inputPlanActive').checked = !!plan.is_active;
         togglePerSeatInputs();
         document.getElementById('planModal').style.display = 'flex';

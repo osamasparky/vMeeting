@@ -289,7 +289,7 @@
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
                     <div style="grid-column: 1 / -1;">
                         <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; font-weight: 700; color: var(--ula-text-primary);">
-                            <input type="checkbox" name="is_enabled" value="1" {{ !empty($aiSettings['is_enabled']) || !empty($aiSettings['api_key']) ? 'checked' : '' }} style="width: 18px; height: 18px; accent-color: var(--ula-palm-900);">
+                            <input type="checkbox" name="is_enabled" value="1" {{ !empty($aiSettings['is_enabled']) ? 'checked' : '' }} style="width: 18px; height: 18px; accent-color: var(--ula-palm-900);">
                             <span>{{ __('Enable AI Office & Floorplan Generator Platform-wide') }}</span>
                         </label>
                     </div>

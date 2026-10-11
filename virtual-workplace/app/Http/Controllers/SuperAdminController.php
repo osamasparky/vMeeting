@@ -730,7 +730,7 @@ class SuperAdminController extends Controller
             'image_size' => $request->input('image_size', '1024x1024'),
             'quality' => $request->input('quality', 'standard'),
             'prompt_prefix' => trim($request->input('prompt_prefix', "A clean, photorealistic direct top-down 2D architectural floor plan blueprint of a modern virtual workplace office (straight 90-degree overhead bird's-eye plan view with cutaway interior walls).")),
-            'is_enabled' => $request->has('is_enabled') || ! empty(trim($request->input('api_key', ''))),
+            'is_enabled' => $request->boolean('is_enabled'), // the checkbox decides; a saved key doesn't switch the generator on
         ];
 
         SystemSetting::set('openai_settings', $aiSettings);

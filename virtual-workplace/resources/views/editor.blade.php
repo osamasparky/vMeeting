@@ -830,7 +830,7 @@
                 <div class="nx-toolbar-group">
                     <input type="file" id="floorplan-file-input" accept="image/jpeg,image/png,image/webp,image/jpg" style="display:none;" onchange="handleFloorplanUpload(this)">
 
-                    @php $aiGeneratorEnabled = \App\Domains\CMS\Models\FeatureFlag::isEnabled('ai_office_generator'); @endphp
+                    @php $aiGeneratorEnabled = \App\Domains\Workspace\Support\AiOfficeGenerator::availableFor($organization ?? null); @endphp
 
                     @if($aiGeneratorEnabled)
 

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Web;
 
 use App\Domains\Administration\Models\AuditLog;
-use App\Domains\CMS\Models\FeatureFlag;
 use App\Domains\Identity\Services\RealtimeTokenService;
 use App\Domains\Notifications\Services\SpatialNotifier;
 use App\Domains\People\Models\Department;
@@ -20,6 +19,7 @@ use App\Domains\Workspace\Models\MapObject;
 use App\Domains\Workspace\Models\Room;
 use App\Domains\Workspace\Models\RoomFile;
 use App\Domains\Workspace\Services\AiMapGeneratorService;
+use App\Domains\Workspace\Support\AiOfficeGenerator;
 use App\Domains\Workspace\Support\MapGeometry;
 use App\Domains\Workspace\Support\RoomAccess;
 use App\Domains\Workspace\Support\RoomBoundsGap;
@@ -105,13 +105,6 @@ class OfficeController extends Controller
      */
     public function generateAiOffice(Request $request, AiMapGeneratorService $aiMapService)
     {
-        // Switched off by the super admin: the generator is gone for everyone.
-        if (! FeatureFlag::isEnabled('ai_office_generator')) {
-            return $request->wantsJson() || $request->ajax()
-                ? response()->json(['success' => false, 'message' => __('The AI office generator is not available.')], 403)
-                : abort(403);
-        }
-
         $user = Auth::user();
         $membership = OrganizationMember::where('user_id', $user->id)->with(['organization.plan', 'role.permissions'])->first();
         if (! $membership) {
@@ -126,6 +119,13 @@ class OfficeController extends Controller
         }
 
         $organization = $membership->organization;
+
+        // Switched off by the super admin, or not part of this company's plan.
+        if (! AiOfficeGenerator::availableFor($organization)) {
+            return $request->wantsJson() || $request->ajax()
+                ? response()->json(['success' => false, 'message' => __('The AI office generator is not available.')], 403)
+                : abort(403);
+        }
 
         $validated = $request->validate([
             'style' => ['nullable', 'string', 'in:modern_glass_luxury,scandinavian_minimalist,silicon_valley_tech,executive_corporate,warm_wood_botanical,cyberpunk_neon'],

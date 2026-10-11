@@ -19,7 +19,7 @@
         ['ai', 'auto_awesome', 'settings.nav_ai'],
         ['attendance', 'timer', 'settings.nav_attendance'],
     ];
-    $aiGeneratorEnabled = \App\Domains\CMS\Models\FeatureFlag::isEnabled('ai_office_generator');
+    $aiGeneratorEnabled = \App\Domains\Workspace\Support\AiOfficeGenerator::availableFor($organization ?? null);
     if (! $aiGeneratorEnabled) {
         $settingsSections = array_values(array_filter($settingsSections, fn ($s) => $s[0] !== 'ai'));
     }

@@ -8,7 +8,7 @@
                     @if(app()->getLocale() === 'ar')<span class="ula-headline-en" style="font-size: var(--ula-size-h4);">Meeting Rooms &amp; Spatial Office Distribution</span>@endif
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    @if(\App\Domains\CMS\Models\FeatureFlag::isEnabled('ai_office_generator'))
+                    @if(\App\Domains\Workspace\Support\AiOfficeGenerator::availableFor($organization ?? null))
                     <x-btn variant="outline" size="md" href="{{ route('editor') }}" icon="auto_awesome">
                         {{ __('AI Office Generator') }}
                     </x-btn>

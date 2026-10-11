@@ -3652,5 +3652,6 @@
     "gantt.unscheduled": ":count tasks have no dates and are not on the chart — give them a start or due date.",
     "gantt.open_list": "Open the task list",
     "gantt.no_start": "No start date — shown on its due day only",
-    "gantt.no_due": "No due date — shown on its start day only"
+    "gantt.no_due": "No due date — shown on its start day only",
+    "AI office generator included in this plan": "AI office generator included in this plan"
 }

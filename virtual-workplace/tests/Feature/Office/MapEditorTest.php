@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\Office;
 
+use App\Domains\Administration\Models\SystemSetting;
 use App\Domains\CMS\Models\FeatureFlag;
 use App\Domains\Tenancy\Models\OrganizationSetting;
+use App\Domains\Tenancy\Models\Plan;
 use App\Domains\Workspace\Models\Floor;
 use App\Domains\Workspace\Models\Map;
 use App\Domains\Workspace\Models\Room;
@@ -158,7 +160,7 @@ class MapEditorTest extends TestCase
 
     public function test_ai_floor_plan_is_only_a_proposal_until_saved(): void
     {
-        FeatureFlag::updateOrCreate(['flag_key' => 'ai_office_generator'], ['name_en' => 'AI', 'name_ar' => 'AI', 'category' => 'ai', 'is_enabled' => true]);
+        $this->allowAi();
         OrganizationSetting::updateOrCreate(['organization_id' => $this->org->id], ['openai_settings' => ['api_key' => 'test-key']]);
         Http::fake(['api.openai.com/*' => Http::response(['data' => [['b64_json' => base64_encode('png')]]])]);
         $this->map->forceFill(['layout_data' => ['background_image_url' => '/images/old.png'], 'status' => 'draft'])->save();
@@ -179,5 +181,36 @@ class MapEditorTest extends TestCase
         $this->assertArrayNotHasKey('background_image_url', MapGeometry::sanitize(['background_image_url' => 'https://evil.example/x.png']));
         $this->assertArrayNotHasKey('background_image_url', MapGeometry::sanitize(['background_image_url' => '//evil.example/x.png']));
         $this->assertSame('/uploads/maps/a_1.png?v=2', MapGeometry::sanitize(['background_image_url' => '/uploads/maps/a_1.png?v=2'])['background_image_url']);
+    }
+
+    private function allowAi(bool $flag = true, bool $platform = true, bool $plan = true): void
+    {
+        FeatureFlag::updateOrCreate(['flag_key' => 'ai_office_generator'], ['name_en' => 'AI', 'name_ar' => 'AI', 'category' => 'ai', 'is_enabled' => $flag]);
+        SystemSetting::set('openai_settings', ['is_enabled' => $platform]);
+        $planModel = $this->org->plan ?? Plan::first();
+        $features = array_values(array_diff((array) ($planModel->features ?? []), ['ai_office_generator']));
+        $planModel->forceFill(['features' => $plan ? [...$features, 'ai_office_generator'] : $features])->save();
+        $this->org->forceFill(['plan_id' => $planModel->id])->save();
+        $this->org->refresh();
+    }
+
+    public function test_the_ai_generator_follows_the_plan_and_the_platform_switch(): void
+    {
+        $this->actingAs($this->owner);
+        $generate = fn () => $this->postJson('/organization/ai-map/generate', ['target_floor_id' => $this->map->floor_id, 'office_rooms' => 1]);
+
+        // Not in the company's plan: hidden in the editor, refused by the server.
+        $this->allowAi(plan: false);
+        $generate()->assertForbidden();
+        $this->get('/editor')->assertOk()->assertDontSee('id="ai-generator-modal"', false);
+
+        // In the plan, but switched off platform-wide in the AI settings.
+        $this->allowAi(platform: false);
+        $generate()->assertForbidden();
+        $this->get('/editor')->assertOk()->assertDontSee('id="ai-generator-modal"', false);
+
+        // Everything allows it: the editor offers it.
+        $this->allowAi();
+        $this->get('/editor')->assertOk()->assertSee('id="ai-generator-modal"', false);
     }
 }
