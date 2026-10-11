@@ -8,13 +8,12 @@ const crypto_1 = __importDefault(require("crypto"));
 class TokenVerifier {
     secrets;
     constructor(secret) {
-        const candidateSecrets = [
-            secret,
-            process.env.REALTIME_SECRET,
-            process.env.APP_KEY,
-            'nextspace_super_secure_realtime_jwt_secret_key_2026',
-            'base64:9fj2ZRPjCy3ClL13gPaYCv9gl8GsE8APwzVK8EceIRM='
-        ].filter(Boolean);
+        // Laravel signs with REALTIME_SECRET only. No APP_KEY or built-in fallback: a secret
+        // that is written in the source would let anyone mint a token for any user.
+        const candidateSecrets = [secret, process.env.REALTIME_SECRET].filter(Boolean);
+        if (candidateSecrets.length === 0) {
+            console.error('[Auth] REALTIME_SECRET is not set: every office connection will be refused.');
+        }
         this.secrets = [...new Set(candidateSecrets)];
     }
     /**

@@ -3585,5 +3585,11 @@
     "These rooms are outside the floor image: :names. Move them inside the map first.": "هذه الغرف خارج صورة الأرضية: :names. أدخِلها داخل الخريطة أولًا.",
     "Not connected to the office server.": "غير متصل بخادم المكتب.",
     "Sticky note added to the board.": "تمت إضافة الملاحظة إلى السبورة.",
-    "Clear the board for everyone in this room?": "مسح السبورة لكل من في هذه الغرفة؟"
+    "Clear the board for everyone in this room?": "مسح السبورة لكل من في هذه الغرفة؟",
+    "Guests Chat": "محادثة الضيوف",
+    "Only the guest and the people in the room with them see this": "لا يراها إلا الضيف ومن معه في الغرفة",
+    "Guests chat:": "محادثة الضيوف:",
+    "only the people in this room see it": "لا يراها إلا الموجودون في هذه الغرفة",
+    "you are here": "أنت هنا",
+    "Enter a room to chat with room occupants.": "ادخل غرفة للدردشة مع الموجودين فيها."
 }

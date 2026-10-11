@@ -63,6 +63,40 @@ function reopenIfEmpty(orgId, mapId, roomId) {
     shared.setDoor(orgId, mapId, roomId, false);
     presence.broadcastToMap(orgId, mapId, { type: 'room.door_updated', payload: { roomId, isClosed: false, toggledBy: 'system' } });
 }
+/**
+ * Who receives a chat line (and its bubble):
+ * - global: members on the map (guests neither send nor receive it);
+ * - room:   people in that room plus hosts anywhere on the map; the sender must be inside;
+ * - guest:  only the people in the room right now (the guest's own channel), no hosts outside.
+ * Returns null when the sender may not post to that scope.
+ */
+function chatRecipients(user, rawScope, rawRoomId) {
+    const scope = rawScope === 'global' ? 'global' : rawScope === 'guest' ? 'guest' : 'room';
+    const onMap = presence.getMapOccupants(user.organizationId, user.mapId);
+    if (scope === 'global') {
+        if (user.isGuest)
+            return null;
+        return { scope, roomId: null, recipients: onMap.filter((u) => !u.isGuest) };
+    }
+    const roomId = user.currentRoomId;
+    if (!roomId || (typeof rawRoomId === 'string' && rawRoomId !== roomId))
+        return null;
+    const inRoom = onMap.filter((u) => u.currentRoomId === roomId);
+    const recipients = scope === 'room' ? [...inRoom, ...onMap.filter((u) => u.isHost && u.currentRoomId !== roomId)] : inRoom;
+    return { scope, roomId, recipients };
+}
+/** Send one event to each listed user (once per user), except the sender's own socket. */
+function sendToEach(users, event, exceptWs) {
+    const seen = new Set();
+    for (const u of users) {
+        if (seen.has(u.userId))
+            continue;
+        seen.add(u.userId);
+        const target = presence.findUserSocket(u.userId);
+        if (target && target !== exceptWs)
+            presence.send(target, event);
+    }
+}
 const boardId = (roomId) => (typeof roomId === 'string' && /^[\w-]{1,64}$/.test(roomId) ? roomId : 'global');
 wss.on('connection', (ws, req) => {
     // Extract token from query parameters: ?token=...
@@ -225,22 +259,28 @@ wss.on('connection', (ws, req) => {
                     break;
                 }
                 case 'chat.send': {
-                    const { channelId, body, scope, roomId } = event.payload;
                     const user = conn.user;
                     if (!user.mapId)
                         break;
-                    presence.broadcastToMap(user.organizationId, user.mapId, {
+                    const body = typeof event.payload?.body === 'string' ? event.payload.body.slice(0, 2000) : '';
+                    if (!body.trim())
+                        break;
+                    const route = chatRecipients(user, event.payload?.scope, event.payload?.roomId);
+                    if (!route)
+                        break;
+                    sendToEach(route.recipients, {
                         type: 'chat.message',
                         payload: {
-                            channelId: channelId || (scope === 'global' ? 'global' : (roomId || 'room')),
+                            channelId: route.scope === 'global' ? 'global' : `${route.scope}:${route.roomId}`,
                             senderId: user.userId,
                             senderName: user.name,
+                            senderIsGuest: !!user.isGuest,
                             body,
-                            scope: scope || 'room',
-                            roomId: roomId || null,
+                            scope: route.scope,
+                            roomId: route.roomId,
                             timestamp: new Date().toISOString(),
                         },
-                    });
+                    }, ws);
                     break;
                 }
                 case 'room.knock': {
@@ -381,20 +421,24 @@ wss.on('connection', (ws, req) => {
                     break;
                 }
                 case 'chat.bubble': {
+                    // The bubble over the avatar repeats the message, so it reaches exactly who the message did.
                     const { text, scope, roomId } = event.payload;
                     const user = conn.user;
                     if (!user.mapId)
                         break;
-                    presence.broadcastToMap(user.organizationId, user.mapId, {
+                    const route = chatRecipients(user, scope, roomId);
+                    if (!route)
+                        break;
+                    sendToEach(route.recipients, {
                         type: 'chat.bubble',
                         payload: {
                             userId: user.userId,
                             userName: user.name,
-                            text,
-                            scope: scope || 'room',
-                            roomId: roomId || null,
+                            text: typeof text === 'string' ? text.slice(0, 300) : '',
+                            scope: route.scope,
+                            roomId: route.roomId,
                         },
-                    });
+                    }, ws);
                     break;
                 }
                 case 'user.reaction': {

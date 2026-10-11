@@ -8,7 +8,7 @@ import { OfficeUser } from '../src/events/event-types.js';
 
 const SECRET = 'super-secret-virtual-workplace-key-2026';
 
-function createMockToken(userId: string, name: string, orgId: string, role = 'member'): string {
+function createMockToken(userId: string, name: string, orgId: string, role = 'member', extra: Record<string, unknown> = {}, secret = SECRET): string {
   const header = Buffer.from(JSON.stringify({ typ: 'JWT', alg: 'HS256' })).toString('base64');
   const payload = Buffer.from(
     JSON.stringify({
@@ -19,10 +19,11 @@ function createMockToken(userId: string, name: string, orgId: string, role = 'me
       role,
       iat: Math.floor(Date.now() / 1000),
       exp: Math.floor(Date.now() / 1000) + 3600,
+      ...extra,
     })
   ).toString('base64');
 
-  const signature = crypto.createHmac('sha256', SECRET).update(`${header}.${payload}`).digest('base64');
+  const signature = crypto.createHmac('sha256', secret).update(`${header}.${payload}`).digest('base64');
   return `${header}.${payload}.${signature}`;
 }
 
@@ -148,7 +149,12 @@ async function runTests() {
   await sharedStateTest();
   console.log('   ✓ Late joiners see locked doors; empty rooms reopen; boards replay cleaned strokes and shared notes.');
 
-  console.log('\n✨ All Realtime Service Tests Passed Successfully! (7/7 suites)');
+  // Test 8: Room chat privacy and token secrets
+  console.log('8. Testing room chat routing and token secrets...');
+  await chatRoutingTest();
+  console.log('   ✓ Room chat reaches the room and hosts only; guests chat stays in the room; guests get no global chat; source-code secrets are refused.');
+
+  console.log('\n✨ All Realtime Service Tests Passed Successfully! (8/8 suites)');
 }
 
 async function withServer(run: (port: number) => Promise<void>): Promise<void> {
@@ -277,6 +283,57 @@ async function sharedStateTest(): Promise<void> {
 
     bob.ws.close();
     carol.ws.close();
+  });
+}
+
+async function chatRoutingTest(): Promise<void> {
+  // A token signed with a secret that used to be built into the verifier must be refused.
+  const verifier = new TokenVerifier(SECRET);
+  if (verifier.verify(createMockToken('mallory', 'M', 'org-1', 'member', { host: true }, 'nextspace_super_secure_realtime_jwt_secret_key_2026'))) {
+    throw new Error('❌ A token signed with a built-in fallback secret was accepted');
+  }
+
+  await withServer(async (port) => {
+    const connect = async (id: string, role = 'member', extra: Record<string, unknown> = {}) => {
+      const ws = new WebSocket(`ws://127.0.0.1:${port}/?token=${encodeURIComponent(createMockToken(id, id, 'org-1', role, extra))}`);
+      const inbox: any[] = [];
+      ws.on('message', (m) => inbox.push(JSON.parse(String(m))));
+      await new Promise((r) => ws.once('open', r));
+      ws.send(JSON.stringify({ type: 'map.join', payload: { mapId: 'map-1', initialPosition: { x: 10, y: 10 } } }));
+      return { ws, inbox, send: (type: string, payload: any) => ws.send(JSON.stringify({ type, payload })) };
+    };
+    const pause = () => new Promise((r) => setTimeout(r, 250));
+    const got = (c: { inbox: any[] }, body: string) => c.inbox.some((e) => e.type === 'chat.message' && e.payload.body === body);
+
+    const inside = await connect('alice');
+    const outside = await connect('bob');
+    const owner = await connect('olga', 'Company Admin', { host: true });
+    const guest = await connect('guest_gus', 'Guest', { host: true }); // a guest can never be a host
+    await pause();
+    inside.send('room.enter', { roomId: 'room-1' });
+    guest.send('room.enter', { roomId: 'room-1' });
+    await pause();
+
+    inside.send('chat.send', { body: 'room line', scope: 'room', roomId: 'room-1' });
+    outside.send('chat.send', { body: 'sneaky', scope: 'room', roomId: 'room-1' });   // not in the room
+    inside.send('chat.send', { body: 'wrong room', scope: 'room', roomId: 'room-2' }); // claims another room
+    guest.send('chat.send', { body: 'guest line', scope: 'guest', roomId: 'room-1' });
+    guest.send('chat.send', { body: 'guest global', scope: 'global' });
+    outside.send('chat.send', { body: 'hello all', scope: 'global' });
+    await pause();
+
+    if (!got(guest, 'room line') || !got(owner, 'room line')) throw new Error('❌ Room chat missed the room or the host');
+    if (got(outside, 'room line')) throw new Error('❌ Room chat reached someone outside the room');
+    if (got(inside, 'sneaky') || got(owner, 'sneaky') || got(owner, 'wrong room') || got(guest, 'wrong room')) throw new Error('❌ Room chat accepted from outside the room');
+    if (!got(inside, 'guest line') || got(owner, 'guest line') || got(outside, 'guest line')) throw new Error('❌ Guests chat left the room');
+    if (got(inside, 'guest global') || got(owner, 'guest global')) throw new Error('❌ A guest posted to the company chat');
+    if (!got(inside, 'hello all') || !got(owner, 'hello all') || got(guest, 'hello all')) throw new Error('❌ Global chat routing is wrong');
+    // Bubbles follow the same rule.
+    inside.send('chat.bubble', { text: 'bubble', scope: 'room', roomId: 'room-1' });
+    await pause();
+    if (outside.inbox.some((e) => e.type === 'chat.bubble')) throw new Error('❌ A room bubble reached the open area');
+
+    for (const c of [inside, outside, owner, guest]) c.ws.close();
   });
 }
 

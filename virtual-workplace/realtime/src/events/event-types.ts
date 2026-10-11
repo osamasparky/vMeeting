@@ -10,6 +10,8 @@ export interface TokenPayload {
   avatar_url?: string;
   organization_id: string;
   role: string;
+  /** Company owner or rooms.manage: may read every room's chat. Set by Laravel, signed. */
+  host?: boolean;
   iat: number;
   exp: number;
 }
@@ -39,6 +41,8 @@ export interface OfficeUser {
   lastActive: number;
   /** From the signed token (role "Guest"), never from the display name. */
   isGuest?: boolean;
+  /** From the signed token: may read every room's chat (company owner / rooms.manage). */
+  isHost?: boolean;
 }
 
 // ── Inbound Client Events ──
@@ -81,8 +85,11 @@ export interface InboundRoomLeave {
 export interface InboundChatMessage {
   type: 'chat.send';
   payload: {
-    channelId: string;
+    channelId?: string;
     body: string;
+    /** 'global' (members), 'room' (that room + hosts) or 'guest' (people in the room now). */
+    scope?: 'global' | 'room' | 'guest';
+    roomId?: string | null;
   };
 }
 

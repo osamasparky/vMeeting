@@ -1080,7 +1080,10 @@
         <div class="chat-tabs">
             <div class="chat-tab active" id="chat-tab-room" onclick="switchChatScope('room')"><span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom;">apartment</span> {{ __('Room Chat') }}</div>
             <div class="chat-tab chat-tab--dm" id="chat-tab-dm" onclick="switchChatScope('dm')"><span class="material-symbols-rounded" style="font-size: 14px;" aria-hidden="true">person</span> <span id="chat-tab-dm-name"></span></div>
+            <div class="chat-tab" id="chat-tab-guest" onclick="switchChatScope('guest')" style="{{ empty($user->is_guest) ? 'display: none;' : '' }}" title="{{ __('Only the guest and the people in the room with them see this') }}"><span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom;">shield_person</span> {{ __('Guests Chat') }}</div>
+            @if(empty($user->is_guest))
             <div class="chat-tab" id="chat-tab-global" onclick="switchChatScope('global')"><span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom;">public</span> {{ __('Global Chat') }}</div>
+            @endif
         </div>
         <div class="chat-messages" id="chat-messages-container">
             <div class="msg-bubble">
@@ -1481,6 +1484,16 @@
             $spawnPosJs = $initialSpawn ?? null;
         @endphp
         const isGuest = @json($isGuestJs);
+        @php
+            // Hosts (company owner / rooms.manage) read every room's chat, grouped by room.
+            $isOfficeHostJs = false;
+            if (empty($user->is_guest) && auth()->check() && isset($organization)) {
+                $officeMembership = \App\Domains\Tenancy\Models\OrganizationMember::where('organization_id', $organization->id)
+                    ->where('user_id', auth()->id())->with('role.permissions')->first();
+                $isOfficeHostJs = \App\Domains\Workspace\Support\RoomAccess::isHost($officeMembership, auth()->user());
+            }
+        @endphp
+        const isOfficeHost = @json($isOfficeHostJs);
         const guestAllowedRoomId = @json($guestAllowedRoomIdJs);
         const userGender = @json($userGenderJs);
         const spawnPos = @json($spawnPosJs);
@@ -3267,6 +3280,7 @@
                             ws.send(JSON.stringify({ type: 'room.enter', payload: { roomId: r.id } }));
                         }
                         syncLiveKitRoom(r.id);
+                        onChatRoomChanged();
                         logAttendanceInterval('enter', r.id);
                         if (prevId) {
                             logAttendanceInterval('leave', prevId);
@@ -3282,6 +3296,7 @@
                             ws.send(JSON.stringify({ type: 'room.leave', payload: { roomId: prevId } }));
                         }
                         syncLiveKitRoom(null);
+                        onChatRoomChanged();
                         logAttendanceInterval('leave', prevId);
                         checkAutoUnlockEmptyRooms();
                     }
@@ -4646,12 +4661,12 @@
                                 return;
                             }
 
-                            // Room isolation: if message is room-scoped, only show if user is in that exact room
-                            if (p.scope === 'room' && p.roomId) {
+                            // Room chat: the room's occupants (hosts read every room). Guests chat: only the room's occupants.
+                            if (p.scope === 'global' && isGuest) return;
+                            if (p.scope === 'room' || p.scope === 'guest') {
                                 const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
-                                if (!myRoom || myRoom.id !== p.roomId) {
-                                    return; // Ignore room chat when outside the room
-                                }
+                                const inThatRoom = !!(myRoom && p.roomId && myRoom.id === p.roomId);
+                                if (!inThatRoom && !(p.scope === 'room' && isOfficeHost)) return;
                             }
 
                             appendChatMessage({
@@ -4673,7 +4688,7 @@
                             }
 
                             // Room isolation for floating speech bubble
-                            if (p.scope === 'room' && p.roomId) {
+                            if ((p.scope === 'room' || p.scope === 'guest') && p.roomId) {
                                 const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
                                 if (!myRoom || myRoom.id !== p.roomId) {
                                     return;
@@ -7073,9 +7088,38 @@
         }
 
         // ── CHAT & FILE SHARING ENGINE (ROOM-SCOPED & GLOBAL) ──
-        let chatScope = 'room'; // 'room' or 'global'
-        const roomMessages = [];
+        let chatScope = 'room'; // 'room', 'guest', 'dm' or 'global'
+        // Room and guest chat are kept per room: you only see a room's lines while you are in
+        // it (hosts see every room's, grouped). The server only delivers lines you may read.
+        const roomChats = new Map();   // roomId -> [messages]
+        const guestChats = new Map();  // roomId -> [messages]
         const globalMessages = [];
+        const chatRoomName = (roomId) => { const r = rooms.find(x => x.id === roomId); return r ? getLocalizedRoomName(r) : ''; };
+
+        // The Guests tab shows for guests, and for members while a guest is in their room.
+        let guestTabShown = null;
+        function refreshGuestChatTab() {
+            const tab = document.getElementById('chat-tab-guest');
+            if (!tab) return;
+            const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+            let show = isGuest;
+            if (!show && myRoom) {
+                show = (guestChats.get(myRoom.id) || []).length > 0;
+                remoteAvatars.forEach(av => { if (av.isGuest && getCurrentRoom(av.x, av.y)?.id === myRoom.id) show = true; });
+            }
+            if (show === guestTabShown) return;
+            guestTabShown = show;
+            tab.style.display = show ? '' : 'none';
+            if (!show && chatScope === 'guest') switchChatScope('room');
+        }
+        setInterval(refreshGuestChatTab, 1000);
+
+        // Walking in or out of a room changes which room's chat you may read.
+        function onChatRoomChanged() {
+            refreshGuestChatTab();
+            const drawer = document.getElementById('chat-drawer');
+            if (drawer && drawer.style.display === 'flex') renderChatMessages();
+        }
 
         function toggleChatDrawer() {
             const drawer = document.getElementById('chat-drawer');
@@ -7095,6 +7139,8 @@
             const globalTab = document.getElementById('chat-tab-global');
             if (roomTab) roomTab.classList.toggle('active', scope === 'room');
             if (globalTab) globalTab.classList.toggle('active', scope === 'global');
+            const guestTab = document.getElementById('chat-tab-guest');
+            if (guestTab) guestTab.classList.toggle('active', scope === 'guest');
             const dmTab = document.getElementById('chat-tab-dm');
             if (dmTab) dmTab.classList.toggle('active', scope === 'dm');
             renderChatMessages();
@@ -7105,47 +7151,66 @@
             if (!container) return;
 
             if (chatScope === 'dm') { renderDirectMessages(container); return; }
-            const msgs = chatScope === 'global' ? globalMessages : roomMessages;
             const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
-
-            let headerHint = '';
-            if (chatScope === 'room') {
-                if (myRoom) {
-                    headerHint = `<div class="msg-dm-head">🏢 {{ __("Acoustic Room Channel:") }} ${escapeHtml(myRoom.name)}</div>`;
-                } else {
-                    headerHint = `<div class="msg-dm-head" style="background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg);">🚪 {{ __("Hallway / Open Space (Enter a room to chat with room occupants)") }}</div>`;
-                }
-            } else {
-                headerHint = `<div class="msg-dm-head" style="background: var(--ula-tone-stone-bg); color: var(--ula-tone-stone-fg);">🌐 {{ __("Company-Wide General Office Channel") }}</div>`;
-            }
-
-            if (!msgs.length) {
-                container.innerHTML = headerHint + `
-                    <div style="text-align: center; padding: 24px 10px; color: var(--ula-text-muted); font-size: 11px;">
-                        💬 ${chatScope === 'global' ? '{{ __("No general messages yet. Send a message to everyone!") }}' : '{{ __("No messages in this room yet.") }}'}
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = headerHint + msgs.map(m => {
+            const bubble = m => {
                 const isSelf = m.senderId === localAvatar.id;
                 return `
                     <div class="msg-bubble ${isSelf ? 'self' : ''}">
                         <div class="msg-meta">
                             <span>${isSelf ? '{{ __("You") }}' : escapeHtml(m.senderName)}</span>
-                            <span>${m.time || ''}</span>
+                            <span class="pm-num">${escapeHtml(m.time || '')}</span>
                         </div>
                         <span style="word-break: break-word;">${escapeHtml(m.body || m.text || '')}</span>
                     </div>
                 `;
-            }).join('');
+            };
+            const empty = (text) => `<div style="text-align: center; padding: 24px 10px; color: var(--ula-text-muted); font-size: 11px;">💬 ${text}</div>`;
+            const outsideHint = `<div class="msg-dm-head" style="background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg);">🚪 {{ __("Hallway / Open Space (Enter a room to chat with room occupants)") }}</div>`;
+
+            let html = '';
+            if (chatScope === 'global') {
+                html = `<div class="msg-dm-head" style="background: var(--ula-tone-stone-bg); color: var(--ula-tone-stone-fg);">🌐 {{ __("Company-Wide General Office Channel") }}</div>`
+                    + (globalMessages.length ? globalMessages.map(bubble).join('') : empty('{{ __("No general messages yet. Send a message to everyone!") }}'));
+            } else if (chatScope === 'guest') {
+                if (!myRoom) {
+                    html = outsideHint;
+                } else {
+                    const list = guestChats.get(myRoom.id) || [];
+                    html = `<div class="msg-dm-head">🛡️ {{ __("Guests chat:") }} ${escapeHtml(getLocalizedRoomName(myRoom))} · {{ __("only the people in this room see it") }}</div>`
+                        + (list.length ? list.map(bubble).join('') : empty('{{ __("No messages in this room yet.") }}'));
+                }
+            } else if (isOfficeHost) {
+                // Hosts: every room's chat, grouped by room, the room you are in first.
+                const ids = [...roomChats.keys()].filter(id => (roomChats.get(id) || []).length);
+                if (myRoom && !ids.includes(myRoom.id)) ids.unshift(myRoom.id);
+                ids.sort((a, b) => (myRoom && a === myRoom.id ? -1 : myRoom && b === myRoom.id ? 1 : 0));
+                html = (myRoom ? '' : outsideHint) + (ids.length ? ids.map(id => {
+                    const list = roomChats.get(id) || [];
+                    const here = myRoom && myRoom.id === id;
+                    return `<div class="msg-dm-head">🏢 ${escapeHtml(chatRoomName(id))}${here ? ' · {{ __("you are here") }}' : ''}</div>`
+                        + (list.length ? list.map(bubble).join('') : empty('{{ __("No messages in this room yet.") }}'));
+                }).join('') : empty('{{ __("No messages in this room yet.") }}'));
+            } else if (!myRoom) {
+                html = outsideHint;
+            } else {
+                const list = roomChats.get(myRoom.id) || [];
+                html = `<div class="msg-dm-head">🏢 {{ __("Acoustic Room Channel:") }} ${escapeHtml(getLocalizedRoomName(myRoom))}</div>`
+                    + (list.length ? list.map(bubble).join('') : empty('{{ __("No messages in this room yet.") }}'));
+            }
+            container.innerHTML = html;
 
             container.scrollTop = container.scrollHeight;
         }
 
         function appendChatMessage(msgPayload, isLocalSender = false) {
-            const targetList = msgPayload.scope === 'global' ? globalMessages : roomMessages;
+            let targetList = globalMessages;
+            if (msgPayload.scope === 'room' || msgPayload.scope === 'guest') {
+                if (!msgPayload.roomId) return;
+                const store = msgPayload.scope === 'guest' ? guestChats : roomChats;
+                if (!store.has(msgPayload.roomId)) store.set(msgPayload.roomId, []);
+                targetList = store.get(msgPayload.roomId);
+                if (msgPayload.scope === 'guest') refreshGuestChatTab();
+            }
             targetList.push(msgPayload);
 
             if (targetList.length > 100) targetList.shift();
@@ -7169,6 +7234,11 @@
             const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
             const activeScope = chatScope;
             const roomId = myRoom ? myRoom.id : null;
+            if (activeScope !== 'global' && !roomId) {
+                inp.value = text;
+                showToast('🚪 {{ __("Enter a room to chat with room occupants.") }}');
+                return;
+            }
 
             const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const msgPayload = {

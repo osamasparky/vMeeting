@@ -135,4 +135,17 @@ class OfficeRoomAccessTest extends TestCase
         auth()->logout();
         $this->withSession($this->guestSession($this->room))->postJson($url)->assertForbidden();
     }
+
+    public function test_realtime_token_marks_hosts_who_read_every_room_chat(): void
+    {
+        config(['services.realtime.secret' => 'test-secret']);
+        $claims = function ($user) {
+            $token = app(\App\Domains\Identity\Services\RealtimeTokenService::class)->generateToken($user, $this->org);
+
+            return json_decode(base64_decode(explode('.', $token)[1]), true);
+        };
+
+        $this->assertTrue($claims($this->owner)['host']);
+        $this->assertFalse($claims($this->employee)['host']);
+    }
 }

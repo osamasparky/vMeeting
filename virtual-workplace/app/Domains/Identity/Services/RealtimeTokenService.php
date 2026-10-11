@@ -4,6 +4,7 @@ namespace App\Domains\Identity\Services;
 
 use App\Domains\Identity\Models\User;
 use App\Domains\Tenancy\Models\Organization;
+use App\Domains\Workspace\Support\RoomAccess;
 
 class RealtimeTokenService
 {
@@ -14,7 +15,7 @@ class RealtimeTokenService
     {
         $header = base64_encode(json_encode(['typ' => 'JWT', 'alg' => 'HS256']));
 
-        $membership = $organization->members()->where('user_id', $user->id)->first();
+        $membership = $organization->members()->where('user_id', $user->id)->with('role.permissions')->first();
         $roleName = $membership?->role?->name ?? 'member';
 
         $payload = base64_encode(json_encode([
@@ -24,6 +25,8 @@ class RealtimeTokenService
             'avatar_url' => $user->avatar_url,
             'organization_id' => $organization->id,
             'role' => $roleName,
+            // Hosts (company owner / rooms.manage) may read every room's chat in the office.
+            'host' => RoomAccess::isHost($membership, $user),
             'iat' => time(),
             'exp' => time() + $ttlSeconds,
         ]));

@@ -92,6 +92,7 @@ export class PresenceManager {
       currentZoneId: null,
       lastActive: Date.now(),
       isGuest: token.role === 'Guest' || String(token.sub).startsWith('guest_'),
+      isHost: token.host === true && token.role !== 'Guest' && !String(token.sub).startsWith('guest_'),
     };
 
     const connection: ClientConnection = {

@@ -3585,5 +3585,11 @@
     "These rooms are outside the floor image: :names. Move them inside the map first.": "These rooms are outside the floor image: :names. Move them inside the map first.",
     "Not connected to the office server.": "Not connected to the office server.",
     "Sticky note added to the board.": "Sticky note added to the board.",
-    "Clear the board for everyone in this room?": "Clear the board for everyone in this room?"
+    "Clear the board for everyone in this room?": "Clear the board for everyone in this room?",
+    "Guests Chat": "Guests Chat",
+    "Only the guest and the people in the room with them see this": "Only the guest and the people in the room with them see this",
+    "Guests chat:": "Guests chat:",
+    "only the people in this room see it": "only the people in this room see it",
+    "you are here": "you are here",
+    "Enter a room to chat with room occupants.": "Enter a room to chat with room occupants."
 }
