@@ -246,6 +246,13 @@ class OfficeController extends Controller
             'published_at' => now(),
         ]);
 
+        // Lay the new office out from the plan's template, as the first office was.
+        try {
+            (new BlueprintOfficeSeeder)->seedOfficeMap($organization, $map);
+        } catch (\Throwable $e) {
+            report($e); // the office still exists, blank, and can be drawn in the editor
+        }
+
         AuditLog::create([
             'organization_id' => $organization->id,
             'actor_id' => $user->id,

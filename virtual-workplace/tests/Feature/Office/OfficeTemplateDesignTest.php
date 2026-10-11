@@ -120,6 +120,38 @@ class OfficeTemplateDesignTest extends TestCase
         })->count());
     }
 
+    public function test_a_new_office_branch_is_laid_out_from_the_template(): void
+    {
+        $design = $this->installTemplate('business');
+        $owner = User::factory()->create();
+        $org = app(CreateOrganizationAction::class)->execute(['name' => 'Branch Co', 'plan_slug' => 'business'], $owner);
+        (new BlueprintOfficeSeeder)->seedOrganizationOffice($org->fresh('plan'));
+
+        $this->actingAs($owner)->post('/offices', ['name' => 'Riyadh'])->assertRedirect();
+
+        $floor = $org->floors()->where('name', 'Riyadh')->firstOrFail();
+        $map = Map::where('floor_id', $floor->id)->firstOrFail();
+        $this->assertSame($design['width'], $map->width);
+        $this->assertSame(19, $map->rooms()->count());
+        $this->assertSame(count($design['objects']), MapObject::where('map_id', $map->id)->count());
+    }
+
+    public function test_a_new_office_gets_only_the_rooms_left_under_the_plan_limit(): void
+    {
+        $design = $this->installTemplate('business');
+        Plan::where('slug', 'business')->update(['room_limit' => 21]);
+        $owner = User::factory()->create();
+        $org = app(CreateOrganizationAction::class)->execute(['name' => 'Limit Co', 'plan_slug' => 'business'], $owner);
+        (new BlueprintOfficeSeeder)->seedOrganizationOffice($org->fresh('plan')); // uses 19 of the 21
+
+        $this->actingAs($owner)->post('/offices', ['name' => 'Jeddah'])->assertRedirect();
+
+        $map = Map::where('floor_id', $org->floors()->where('name', 'Jeddah')->value('id'))->firstOrFail();
+        $this->assertSame(2, $map->rooms()->count());
+        $this->assertLessThan(count($design['objects']), MapObject::where('map_id', $map->id)->count());
+        $this->assertSame(21, Room::withoutGlobalScopes()->where('organization_id', $org->id)->count());
+    }
+
     public function test_a_company_without_a_settings_row_can_open_its_dashboard(): void
     {
         $this->installTemplate('free');

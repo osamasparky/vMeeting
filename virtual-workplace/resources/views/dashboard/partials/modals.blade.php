@@ -1301,7 +1301,7 @@
                 <h3 class="modal-title"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">apartment</span> {{ __('Add New Office Branch') }}</h3>
                 <button onclick="closeNewOfficeModal()" class="modal-close"><span class="material-symbols-rounded" style="font-size: 18px;">close</span></button>
             </div>
-            <form method="POST" action="{{ route('offices.store') }}" style="display: flex; flex-direction: column; gap: 14px;">
+            <form method="POST" action="{{ route('offices.store') }}" onsubmit="this.querySelector('[type=submit]').disabled = true" style="display: flex; flex-direction: column; gap: 14px;">
                 @csrf
                 <div>
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Office Branch Name') }} *</label>
