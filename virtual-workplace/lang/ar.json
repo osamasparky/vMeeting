@@ -3582,5 +3582,8 @@
     "Some rooms are outside the floor image, so their walls and doors are unreachable in the office:": "بعض الغرف خارج صورة الأرضية، لذلك لا يمكن الوصول لحوائطها وأبوابها في المكتب:",
     "Rooms moved inside the map — press Save to keep it.": "تم إدخال الغرف داخل الخريطة — اضغط حفظ لتثبيت التعديل.",
     "This room is outside the floor image. Move it inside the map.": "هذه الغرفة خارج صورة الأرضية. حرّكها داخل الخريطة.",
-    "These rooms are outside the floor image: :names. Move them inside the map first.": "هذه الغرف خارج صورة الأرضية: :names. أدخِلها داخل الخريطة أولًا."
+    "These rooms are outside the floor image: :names. Move them inside the map first.": "هذه الغرف خارج صورة الأرضية: :names. أدخِلها داخل الخريطة أولًا.",
+    "Not connected to the office server.": "غير متصل بخادم المكتب.",
+    "Sticky note added to the board.": "تمت إضافة الملاحظة إلى السبورة.",
+    "Clear the board for everyone in this room?": "مسح السبورة لكل من في هذه الغرفة؟"
 }

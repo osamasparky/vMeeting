@@ -3582,5 +3582,8 @@
     "Some rooms are outside the floor image, so their walls and doors are unreachable in the office:": "Some rooms are outside the floor image, so their walls and doors are unreachable in the office:",
     "Rooms moved inside the map — press Save to keep it.": "Rooms moved inside the map — press Save to keep it.",
     "This room is outside the floor image. Move it inside the map.": "This room is outside the floor image. Move it inside the map.",
-    "These rooms are outside the floor image: :names. Move them inside the map first.": "These rooms are outside the floor image: :names. Move them inside the map first."
+    "These rooms are outside the floor image: :names. Move them inside the map first.": "These rooms are outside the floor image: :names. Move them inside the map first.",
+    "Not connected to the office server.": "Not connected to the office server.",
+    "Sticky note added to the board.": "Sticky note added to the board.",
+    "Clear the board for everyone in this room?": "Clear the board for everyone in this room?"
 }

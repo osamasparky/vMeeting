@@ -4480,6 +4480,11 @@
 
                         // 1. Welcome / Map Occupants Sync packet
                         if ((data.type === 'welcome' || data.type === 'map.occupants_sync') && data.payload?.occupants) {
+                            if (data.type === 'welcome' && Array.isArray(data.payload.closedDoors)) {
+                                roomDoorStates.clear();
+                                data.payload.closedDoors.forEach(id => roomDoorStates.set(id, true));
+                                updateRoomPresence();
+                            }
                             applyOccupantsRoster(data.payload.occupants);
                             syncLiveKitRoom(localAvatar.currentRoomId);
                         }
@@ -4692,12 +4697,40 @@
 
                         // 8f. Collaborative Whiteboard Stroke
                         else if (data.type === 'whiteboard.draw' && data.payload) {
-                            renderRemoteWbStroke(data.payload.stroke);
+                            if (isWbOpenFor(data.payload.roomId) && data.payload.stroke) {
+                                wbStrokes.push(data.payload.stroke);
+                                renderRemoteWbStroke(data.payload.stroke);
+                            }
+                        }
+
+                        // 8f-2. Board contents when opening it, and shared sticky notes
+                        else if (data.type === 'whiteboard.history' && data.payload) {
+                            if (data.payload.roomId === wbBoardId) {
+                                wbStrokes = Array.isArray(data.payload.strokes) ? data.payload.strokes.slice() : [];
+                                wbNotes = Array.isArray(data.payload.notes) ? data.payload.notes.slice() : [];
+                                redrawWhiteboard();
+                                wbHistory = [];
+                                saveWbState();
+                                loadWbStickyNotes();
+                            }
+                        }
+                        else if (data.type === 'whiteboard.note_added' && data.payload?.note) {
+                            if (data.payload.roomId === wbBoardId) {
+                                wbNotes = [data.payload.note, ...wbNotes.filter(n => n.id !== data.payload.note.id)];
+                                loadWbStickyNotes();
+                            }
+                        }
+                        else if (data.type === 'whiteboard.note_removed' && data.payload) {
+                            if (data.payload.roomId === wbBoardId) {
+                                wbNotes = wbNotes.filter(n => n.id !== data.payload.id);
+                                loadWbStickyNotes();
+                            }
                         }
 
                         // 8g. Collaborative Whiteboard Cleared
                         else if (data.type === 'whiteboard.clear' && data.payload) {
-                            if (wbCtx && wbCanvas) {
+                            if (isWbOpenFor(data.payload.roomId) && wbCtx && wbCanvas) {
+                                wbStrokes = [];
                                 wbCtx.clearRect(0, 0, wbCanvas.width, wbCanvas.height);
                                 showToast(`🧹 ${escapeHtml(data.payload.clearedBy)} {{ __("cleared the whiteboard.") }}`);
                             }
@@ -5692,6 +5725,11 @@
         let wbDrawing = false;
         let wbStartX = 0, wbStartY = 0;
         let wbHistory = [];
+        let wbPoints = [];      // the freehand stroke being drawn
+        let wbBoardId = null;   // board of the open modal: the room's id, or 'global' in the open area
+        let wbStrokes = [];     // everything on that board, as kept by the realtime server
+        let wbNotes = [];       // its sticky notes, shared with everyone on the board
+        const WB_HEX = /^#[0-9a-f]{6}$/i;
         let selectedStickyColor = { bg: '#FEF08A', border: '#FACC15', text: '#713F12' };
 
         function setWbTool(tool) {
@@ -5714,9 +5752,34 @@
             wbCanvas.width = wbCanvas.parentElement.clientWidth - 260;
             wbCanvas.height = wbCanvas.parentElement.clientHeight;
             setupWhiteboardEvents();
+
+            // Each room has its own board; ask the server what is already on it.
+            const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+            wbBoardId = myRoom ? String(myRoom.id) : 'global';
+            wbStrokes = [];
+            wbNotes = [];
+            wbHistory = [];
+            wbCtx.clearRect(0, 0, wbCanvas.width, wbCanvas.height);
             loadWbStickyNotes();
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'whiteboard.sync', payload: { roomId: wbBoardId } }));
+            }
         }
-        function closeWhiteboardModal() { document.getElementById('whiteboard-modal').style.display = 'none'; }
+        function closeWhiteboardModal() {
+            document.getElementById('whiteboard-modal').style.display = 'none';
+            wbBoardId = null;
+        }
+
+        function isWbOpenFor(roomId) {
+            const modal = document.getElementById('whiteboard-modal');
+            return !!wbBoardId && roomId === wbBoardId && modal && modal.style.display !== 'none';
+        }
+
+        function redrawWhiteboard() {
+            if (!wbCtx || !wbCanvas) return;
+            wbCtx.clearRect(0, 0, wbCanvas.width, wbCanvas.height);
+            wbStrokes.forEach(renderRemoteWbStroke);
+        }
 
         function toggleWbStickyForm(forceOpen = null) {
             const form = document.getElementById('wb-sticky-form');
@@ -5739,36 +5802,40 @@
             if (form) form.style.background = bg;
         }
 
-        function getWbStorageKey() {
-            return `wb_stickies_${CONFIG.org?.id || 'org'}_${CONFIG.currentUser?.id || 'usr'}`;
+        function wbSend(type, payload) {
+            if (!ws || ws.readyState !== WebSocket.OPEN || !wbBoardId) {
+                showToast('⚠️ {{ __("Not connected to the office server.") }}');
+                return false;
+            }
+            ws.send(JSON.stringify({ type, payload: Object.assign({ roomId: wbBoardId }, payload) }));
+            return true;
         }
 
         function loadWbStickyNotes() {
             const list = document.getElementById('wb-sticky-list');
             if (!list) return;
-            try {
-                const raw = localStorage.getItem(getWbStorageKey());
-                const stickies = raw ? JSON.parse(raw) : [];
-                if (stickies.length === 0) {
-                    list.innerHTML = `
-                        <div style="text-align: center; color: #94A3B8; font-size: 11px; padding: 24px 10px;">
-                            📌 {{ __('No sticky notes saved yet. Click + Add to create notes.') }}
-                        </div>
-                    `;
-                    return;
-                }
-                list.innerHTML = stickies.map((s, idx) => `
-                    <div style="background: ${s.bg || '#FEF08A'}; border: 1px solid ${s.border || '#FACC15'}; color: ${s.text || '#713F12'}; border-radius: 10px; padding: 10px 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); display: flex; flex-direction: column; gap: 6px; position: relative;">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 6px;">
-                            <span style="font-size: 10px; font-weight: 800; opacity: 0.75;">📌 ${s.time || ''}</span>
-                            <button onclick="deleteWbStickyNote(${idx})" style="background: none; border: none; color: ${s.text || '#713F12'}; opacity: 0.6; cursor: pointer; font-size: 12px; line-height: 1;" title="{{ __('Delete Note') }}">✕</button>
-                        </div>
-                        <div style="font-size: 12px; font-weight: 700; line-height: 1.4; word-break: break-word; white-space: pre-wrap;">${escapeHtml(s.content)}</div>
+            if (wbNotes.length === 0) {
+                list.innerHTML = `
+                    <div style="text-align: center; color: var(--ula-text-muted); font-size: 11px; padding: 24px 10px;">
+                        📌 {{ __('No sticky notes saved yet. Click + Add to create notes.') }}
                     </div>
-                `).join('');
-            } catch(e) {
-                console.warn('Error loading sticky notes:', e);
+                `;
+                return;
             }
+            const hex = (v, fallback) => (WB_HEX.test(v || '') ? v : fallback);
+            list.innerHTML = wbNotes.map(n => {
+                const bg = hex(n.bg, '#FEF08A'), border = hex(n.border, '#FACC15'), ink = hex(n.text, '#713F12');
+                const time = n.createdAt ? new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+                return `
+                    <div style="background: ${bg}; border: 1px solid ${border}; color: ${ink}; border-radius: 10px; padding: 10px 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); display: flex; flex-direction: column; gap: 6px; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 6px;">
+                            <span style="font-size: 10px; font-weight: 800; opacity: 0.75;">📌 ${escapeHtml(n.author || '')} · <span class="pm-num">${escapeHtml(time)}</span></span>
+                            <button onclick="deleteWbStickyNote(${JSON.stringify(String(n.id)).replace(/"/g, '&quot;')})" style="background: none; border: none; color: ${ink}; opacity: 0.6; cursor: pointer; font-size: 12px; line-height: 1;" title="{{ __('Delete Note') }}">✕</button>
+                        </div>
+                        <div style="font-size: 12px; font-weight: 700; line-height: 1.4; word-break: break-word; white-space: pre-wrap;">${escapeHtml(n.content)}</div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function saveWbStickyNote() {
@@ -5778,38 +5845,25 @@
                 showToast('⚠️ {{ __("Please enter text for the sticky note.") }}');
                 return;
             }
-            try {
-                const key = getWbStorageKey();
-                const raw = localStorage.getItem(key);
-                const stickies = raw ? JSON.parse(raw) : [];
-                stickies.unshift({
-                    content: text,
+            const sent = wbSend('whiteboard.note_add', {
+                note: {
+                    id: `n_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+                    content: text.slice(0, 500),
                     bg: selectedStickyColor.bg,
                     border: selectedStickyColor.border,
                     text: selectedStickyColor.text,
-                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                    timestamp: Date.now()
-                });
-                localStorage.setItem(key, JSON.stringify(stickies));
-                if (input) input.value = '';
-                toggleWbStickyForm(false);
-                loadWbStickyNotes();
-                showToast('📌 {{ __("Sticky note saved to your office whiteboard!") }}');
-            } catch(e) {
-                console.error(e);
-            }
+                },
+            });
+            if (!sent) return;
+            if (input) input.value = '';
+            toggleWbStickyForm(false);
+            showToast('📌 {{ __("Sticky note added to the board.") }}');
         }
 
-        function deleteWbStickyNote(idx) {
-            try {
-                const key = getWbStorageKey();
-                const raw = localStorage.getItem(key);
-                const stickies = raw ? JSON.parse(raw) : [];
-                stickies.splice(idx, 1);
-                localStorage.setItem(key, JSON.stringify(stickies));
-                loadWbStickyNotes();
+        function deleteWbStickyNote(id) {
+            if (wbSend('whiteboard.note_remove', { id: String(id) })) {
                 showToast('🗑️ {{ __("Sticky note removed.") }}');
-            } catch(e) {}
+            }
         }
 
         function setupWhiteboardEvents() {
@@ -5822,6 +5876,7 @@
                 if (wbTool === 'pen' || wbTool === 'highlighter' || wbTool === 'eraser') {
                     wbCtx.beginPath();
                     wbCtx.moveTo(wbStartX, wbStartY);
+                    wbPoints = [[wbStartX, wbStartY]];
                 } else if (wbTool === 'text') {
                     const txt = prompt('Enter text:');
                     if (txt) {
@@ -5843,6 +5898,7 @@
                 const rect = wbCanvas.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
+                if (wbPoints.length && wbPoints.length < 2000) wbPoints.push([x, y]);
 
                 if (wbTool === 'pen') {
                     wbCtx.strokeStyle = wbColor;
@@ -5883,6 +5939,10 @@
                     endX: x,
                     endY: y
                 };
+                if (wbTool === 'pen' || wbTool === 'highlighter' || wbTool === 'eraser') {
+                    strokeData.points = wbPoints.length > 1 ? wbPoints : [[wbStartX, wbStartY], [x, y]];
+                }
+                wbPoints = [];
 
                 if (wbTool === 'rect') {
                     wbCtx.strokeRect(wbStartX, wbStartY, x - wbStartX, y - wbStartY);
@@ -5912,18 +5972,13 @@
                 broadcastWbStroke(strokeData);
                 saveWbState();
             };
+            wbCanvas.onmouseleave = (e) => { if (wbDrawing) wbCanvas.onmouseup(e); };
         }
 
         function broadcastWbStroke(stroke) {
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
-                ws.send(JSON.stringify({
-                    type: 'whiteboard.draw',
-                    payload: {
-                        roomId: myRoom ? myRoom.id : 'global',
-                        stroke
-                    }
-                }));
+            wbStrokes.push(stroke);
+            if (ws && ws.readyState === WebSocket.OPEN && wbBoardId) {
+                ws.send(JSON.stringify({ type: 'whiteboard.draw', payload: { roomId: wbBoardId, stroke } }));
             }
         }
 
@@ -5934,7 +5989,32 @@
             wbCtx.fillStyle = (s.color || '#0F172A') + '33';
             wbCtx.lineWidth = 3;
 
-            if (s.tool === 'pen' || s.tool === 'line') {
+            if (Array.isArray(s.points) && s.points.length > 1) {
+                // Freehand: pen, highlighter or eraser, drawn exactly as on the sender's screen.
+                if (s.tool === 'highlighter') {
+                    wbCtx.strokeStyle = (s.color || '#0F172A') + '55';
+                    wbCtx.lineWidth = 14;
+                    wbCtx.lineCap = 'square';
+                } else if (s.tool === 'eraser') {
+                    wbCtx.strokeStyle = OC('--ula-white');
+                    wbCtx.lineWidth = 20;
+                } else {
+                    wbCtx.lineCap = 'round';
+                }
+                wbCtx.beginPath();
+                wbCtx.moveTo(s.points[0][0], s.points[0][1]);
+                for (let i = 1; i < s.points.length; i++) wbCtx.lineTo(s.points[i][0], s.points[i][1]);
+                wbCtx.stroke();
+            } else if (s.tool === 'arrow') {
+                const angle = Math.atan2(s.endY - s.startY, s.endX - s.startX);
+                wbCtx.beginPath();
+                wbCtx.moveTo(s.startX, s.startY);
+                wbCtx.lineTo(s.endX, s.endY);
+                wbCtx.lineTo(s.endX - 15 * Math.cos(angle - Math.PI / 6), s.endY - 15 * Math.sin(angle - Math.PI / 6));
+                wbCtx.moveTo(s.endX, s.endY);
+                wbCtx.lineTo(s.endX - 15 * Math.cos(angle + Math.PI / 6), s.endY - 15 * Math.sin(angle + Math.PI / 6));
+                wbCtx.stroke();
+            } else if (s.tool === 'pen' || s.tool === 'line') {
                 wbCtx.beginPath();
                 wbCtx.moveTo(s.startX, s.startY);
                 wbCtx.lineTo(s.endX, s.endY);
@@ -5980,8 +6060,14 @@
         }
 
         function clearWhiteboard() {
+            if (!wbCtx || !wbCanvas) return;
+            if (!confirm(@json(__('Clear the board for everyone in this room?')))) return;
             wbCtx.clearRect(0, 0, wbCanvas.width, wbCanvas.height);
+            wbStrokes = [];
             saveWbState();
+            if (ws && ws.readyState === WebSocket.OPEN && wbBoardId) {
+                ws.send(JSON.stringify({ type: 'whiteboard.clear', payload: { roomId: wbBoardId } }));
+            }
         }
 
         function exportWhiteboard() {

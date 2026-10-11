@@ -180,6 +180,22 @@ export interface InboundWhiteboardClear {
   };
 }
 
+/** Ask for a board's strokes and notes (answered with whiteboard.history). */
+export interface InboundWhiteboardSync {
+  type: 'whiteboard.sync';
+  payload: { roomId: string };
+}
+
+export interface InboundWhiteboardNoteAdd {
+  type: 'whiteboard.note_add';
+  payload: { roomId: string; note: { id?: string; content: string; bg?: string; border?: string; text?: string } };
+}
+
+export interface InboundWhiteboardNoteRemove {
+  type: 'whiteboard.note_remove';
+  payload: { roomId: string; id: string };
+}
+
 export interface InboundUserSit {
   type: 'user.sit';
   payload: {
@@ -243,6 +259,9 @@ export type InboundEvent =
   | InboundUserWave
   | InboundWhiteboardDraw
   | InboundWhiteboardClear
+  | InboundWhiteboardSync
+  | InboundWhiteboardNoteAdd
+  | InboundWhiteboardNoteRemove
   | InboundUserSit
   | InboundRoomKnock
   | InboundRoomKnockResponse

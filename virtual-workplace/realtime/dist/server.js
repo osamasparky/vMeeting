@@ -10,6 +10,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const token_verifier_js_1 = require("./auth/token-verifier.js");
 const presence_manager_js_1 = require("./state/presence-manager.js");
 const notification_hub_js_1 = require("./notifications/notification-hub.js");
+const shared_state_js_1 = require("./state/shared-state.js");
 dotenv_1.default.config();
 const PORT = parseInt(process.env.REALTIME_PORT || '8080', 10);
 const HOST = process.env.REALTIME_HOST || '0.0.0.0';
@@ -52,6 +53,17 @@ const server = http_1.default.createServer((req, res) => {
 const wss = new ws_1.WebSocketServer({ server });
 const tokenVerifier = new token_verifier_js_1.TokenVerifier(process.env.REALTIME_SECRET);
 const presence = new presence_manager_js_1.PresenceManager();
+const shared = new shared_state_js_1.SharedState();
+/** Once nobody is left in a locked room its door reopens for everyone (rooms rest unlocked). */
+function reopenIfEmpty(orgId, mapId, roomId) {
+    if (!roomId || !mapId || !shared.isDoorClosed(orgId, mapId, roomId))
+        return;
+    if (presence.getRoomOccupants(orgId, mapId, roomId).length > 0)
+        return;
+    shared.setDoor(orgId, mapId, roomId, false);
+    presence.broadcastToMap(orgId, mapId, { type: 'room.door_updated', payload: { roomId, isClosed: false, toggledBy: 'system' } });
+}
+const boardId = (roomId) => (typeof roomId === 'string' && /^[\w-]{1,64}$/.test(roomId) ? roomId : 'global');
 wss.on('connection', (ws, req) => {
     // Extract token from query parameters: ?token=...
     const parsedUrl = url_1.default.parse(req.url || '', true);
@@ -101,6 +113,7 @@ wss.on('connection', (ws, req) => {
                         payload: {
                             user,
                             occupants: occupants.filter((u) => u.userId !== user.userId),
+                            closedDoors: shared.closedDoors(user.organizationId, mapId),
                         },
                     });
                     // 2. Broadcast user.joined to all other occupants in this map
@@ -201,6 +214,7 @@ wss.on('connection', (ws, req) => {
                     const user = presence.setRoom(ws, null);
                     if (!user || !user.mapId)
                         break;
+                    reopenIfEmpty(user.organizationId, user.mapId, roomId);
                     presence.broadcastToMap(user.organizationId, user.mapId, {
                         type: 'room.left',
                         payload: {
@@ -311,6 +325,7 @@ wss.on('connection', (ws, req) => {
                         console.log(`[WS] Blocked ${user.name} from changing door of room ${roomId} from outside.`);
                         break;
                     }
+                    shared.setDoor(user.organizationId, user.mapId, roomId, isClosed === true);
                     presence.broadcastToMap(user.organizationId, user.mapId, {
                         type: 'room.door_updated',
                         payload: {
@@ -469,7 +484,11 @@ wss.on('connection', (ws, req) => {
                     const user = conn.user;
                     if (!user.mapId)
                         break;
-                    const { roomId, stroke } = event.payload;
+                    const roomId = boardId(event.payload?.roomId);
+                    const stroke = (0, shared_state_js_1.cleanStroke)(event.payload?.stroke);
+                    if (!stroke)
+                        break;
+                    shared.addStroke(user.organizationId, user.mapId, roomId, stroke);
                     presence.broadcastToMap(user.organizationId, user.mapId, {
                         type: 'whiteboard.draw',
                         payload: {
@@ -480,11 +499,44 @@ wss.on('connection', (ws, req) => {
                     }, ws);
                     break;
                 }
+                // Opening a board: send what's already on it (strokes and sticky notes).
+                case 'whiteboard.sync': {
+                    const user = conn.user;
+                    if (!user.mapId)
+                        break;
+                    const roomId = boardId(event.payload?.roomId);
+                    presence.send(ws, { type: 'whiteboard.history', payload: { roomId, ...shared.history(user.organizationId, user.mapId, roomId) } });
+                    break;
+                }
+                case 'whiteboard.note_add': {
+                    const user = conn.user;
+                    if (!user.mapId)
+                        break;
+                    const roomId = boardId(event.payload?.roomId);
+                    const note = (0, shared_state_js_1.cleanNote)(event.payload?.note, user.name);
+                    if (!note)
+                        break;
+                    shared.addNote(user.organizationId, user.mapId, roomId, note);
+                    presence.broadcastToMap(user.organizationId, user.mapId, { type: 'whiteboard.note_added', payload: { roomId, note } });
+                    break;
+                }
+                case 'whiteboard.note_remove': {
+                    const user = conn.user;
+                    if (!user.mapId)
+                        break;
+                    const roomId = boardId(event.payload?.roomId);
+                    const id = String(event.payload?.id ?? '');
+                    if (shared.removeNote(user.organizationId, user.mapId, roomId, id)) {
+                        presence.broadcastToMap(user.organizationId, user.mapId, { type: 'whiteboard.note_removed', payload: { roomId, id } });
+                    }
+                    break;
+                }
                 case 'whiteboard.clear': {
                     const user = conn.user;
                     if (!user.mapId)
                         break;
-                    const { roomId } = event.payload;
+                    const roomId = boardId(event.payload?.roomId);
+                    shared.clearStrokes(user.organizationId, user.mapId, roomId);
                     presence.broadcastToMap(user.organizationId, user.mapId, {
                         type: 'whiteboard.clear',
                         payload: {
@@ -520,7 +572,10 @@ wss.on('connection', (ws, req) => {
     });
     // Handle client disconnect
     ws.on('close', () => {
+        const leftRoomId = conn.user.currentRoomId;
         const left = presence.removeClient(ws);
+        if (left && left.mapId)
+            reopenIfEmpty(left.orgId, left.mapId, leftRoomId);
         if (left && left.mapId) {
             presence.broadcastToMap(left.orgId, left.mapId, {
                 type: 'user.left',

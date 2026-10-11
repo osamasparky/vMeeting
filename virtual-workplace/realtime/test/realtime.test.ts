@@ -143,7 +143,12 @@ async function runTests() {
   await doorRulesTest();
   console.log('   ✓ Only people inside lock a door; guests never do; empty rooms may be reopened; only insiders answer knocks.');
 
-  console.log('\n✨ All Realtime Service Tests Passed Successfully! (6/6 suites)');
+  // Test 7: Shared state a late joiner must see
+  console.log('7. Testing shared doors and whiteboards...');
+  await sharedStateTest();
+  console.log('   ✓ Late joiners see locked doors; empty rooms reopen; boards replay cleaned strokes and shared notes.');
+
+  console.log('\n✨ All Realtime Service Tests Passed Successfully! (7/7 suites)');
 }
 
 async function withServer(run: (port: number) => Promise<void>): Promise<void> {
@@ -207,6 +212,71 @@ async function doorRulesTest(): Promise<void> {
     if (!doorEvents(inside).some((e) => e.payload.isClosed === false)) throw new Error('❌ An empty room could not be reopened');
 
     for (const c of [inside, outside, guest]) c.ws.close();
+  });
+}
+
+async function sharedStateTest(): Promise<void> {
+  await withServer(async (port) => {
+    const connect = async (id: string) => {
+      const ws = new WebSocket(`ws://127.0.0.1:${port}/?token=${encodeURIComponent(createMockToken(id, id, 'org-1'))}`);
+      const inbox: any[] = [];
+      ws.on('message', (m) => inbox.push(JSON.parse(String(m))));
+      await new Promise((r) => ws.once('open', r));
+      ws.send(JSON.stringify({ type: 'map.join', payload: { mapId: 'map-1', initialPosition: { x: 10, y: 10 } } }));
+      return { ws, inbox, send: (type: string, payload: any) => ws.send(JSON.stringify({ type, payload })) };
+    };
+    const pause = () => new Promise((r) => setTimeout(r, 250));
+
+    const alice = await connect('alice');
+    await pause();
+    alice.send('room.enter', { roomId: 'room-1' });
+    await pause();
+    alice.send('room.door_toggle', { roomId: 'room-1', isClosed: true });
+    alice.send('whiteboard.draw', { roomId: 'room-1', stroke: { tool: 'pen', color: 'red;evil', points: [[1, 2], [3, 4], ['x', 5]], extra: '<script>' } });
+    alice.send('whiteboard.draw', { roomId: 'room-1', stroke: { tool: 'flamethrower', color: '#000000' } });
+    alice.send('whiteboard.note_add', { roomId: 'room-1', note: { id: 'n1', content: 'Agenda', bg: 'url(x)' } });
+    await pause();
+
+    // Someone arriving later learns the door is locked and sees the board as it is.
+    const bob = await connect('bob');
+    await pause();
+    const welcome = bob.inbox.find((e) => e.type === 'welcome');
+    if (!welcome || JSON.stringify(welcome.payload.closedDoors) !== '["room-1"]') throw new Error(`❌ Late joiner missed the locked door: ${JSON.stringify(welcome?.payload)}`);
+
+    bob.send('whiteboard.sync', { roomId: 'room-1' });
+    await pause();
+    const history = bob.inbox.find((e) => e.type === 'whiteboard.history');
+    if (!history || history.payload.strokes.length !== 1 || history.payload.notes.length !== 1) throw new Error(`❌ Board history wrong: ${JSON.stringify(history)}`);
+    const stroke = history.payload.strokes[0];
+    if (stroke.color !== '#0F172A' || stroke.extra !== undefined || stroke.points.length !== 2) throw new Error(`❌ Stroke not cleaned: ${JSON.stringify(stroke)}`);
+    if (history.payload.notes[0].bg !== '#FEF08A' || history.payload.notes[0].author !== 'alice') throw new Error('❌ Note not cleaned');
+
+    // Another room's board is separate.
+    bob.send('whiteboard.sync', { roomId: 'room-2' });
+    await pause();
+    const other = bob.inbox.filter((e) => e.type === 'whiteboard.history').pop();
+    if (other.payload.roomId !== 'room-2' || other.payload.strokes.length !== 0) throw new Error('❌ Boards leaked between rooms');
+
+    // Removing a note reaches everyone; clearing empties the stored strokes.
+    bob.send('whiteboard.note_remove', { roomId: 'room-1', id: 'n1' });
+    alice.send('whiteboard.clear', { roomId: 'room-1' });
+    await pause();
+    if (!alice.inbox.some((e) => e.type === 'whiteboard.note_removed' && e.payload.id === 'n1')) throw new Error('❌ Note removal not broadcast');
+    bob.send('whiteboard.sync', { roomId: 'room-1' });
+    await pause();
+    const cleared = bob.inbox.filter((e) => e.type === 'whiteboard.history').pop();
+    if (cleared.payload.strokes.length !== 0 || cleared.payload.notes.length !== 0) throw new Error('❌ Board not cleared');
+
+    // The last person leaving a locked room unlocks it for everyone.
+    alice.ws.close();
+    await pause();
+    if (!bob.inbox.some((e) => e.type === 'room.door_updated' && e.payload.roomId === 'room-1' && e.payload.isClosed === false)) throw new Error('❌ Empty locked room stayed locked');
+    const carol = await connect('carol');
+    await pause();
+    if (carol.inbox.find((e) => e.type === 'welcome')?.payload.closedDoors.length !== 0) throw new Error('❌ Reopened door still reported locked');
+
+    bob.ws.close();
+    carol.ws.close();
   });
 }
 
