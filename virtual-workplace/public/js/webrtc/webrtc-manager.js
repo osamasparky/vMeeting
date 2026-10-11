@@ -440,6 +440,23 @@ class WebRTCManager {
     }
 
     /**
+     * Token for a map's open area: a LiveKit room of its own, never shared with an office room.
+     */
+    async fetchOpenAreaToken(organizationId, mapId) {
+        const res = await fetch(`/organizations/${organizationId}/maps/${mapId}/open-area-token`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+                'Accept': 'application/json'
+            },
+            body: '{}'
+        });
+        if (!res.ok) throw new Error('Failed to obtain LiveKit WebRTC Access Token');
+        return await res.json();
+    }
+
+    /**
      * Connect to a LiveKit SFU Room
      */
     async joinLiveKitRoom(livekitHost, token, callbacks = {}) {

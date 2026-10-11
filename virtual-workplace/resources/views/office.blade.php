@@ -1226,8 +1226,8 @@
 @include('office.partials.modals')
 
         <script src="/js/webrtc/livekit-client.umd.min.js" nonce="{{ $cspNonce ?? '' }}"></script>
-    <script src="/js/webrtc/webrtc-manager.js" nonce="{{ $cspNonce ?? '' }}"></script>
-    <script src="/js/office/room-doors.js" nonce="{{ $cspNonce ?? '' }}"></script>
+    <script src="/js/webrtc/webrtc-manager.js?v={{ filemtime(public_path('js/webrtc/webrtc-manager.js')) }}" nonce="{{ $cspNonce ?? '' }}"></script>
+    <script src="/js/office/room-doors.js?v={{ filemtime(public_path('js/office/room-doors.js')) }}" nonce="{{ $cspNonce ?? '' }}"></script>
 
     <!-- ── JavaScript Realtime Engine, LiveKit SFU & Spatial Audio Pipeline ── -->
     <script nonce="{{ $cspNonce ?? '' }}">
@@ -4858,19 +4858,35 @@
         // ── LiveKit SFU Real-Time Media Engine ──
         let activeScreenSharers = new Set();
 
+        // Media follows where you stand: each room is its own LiveKit room, and the open
+        // area of the map is another one, so nothing said in a room reaches the floor.
         async function syncLiveKitRoom(roomId) {
-            const targetRoomId = roomId || (CONFIG.map?.rooms && CONFIG.map.rooms[0] ? CONFIG.map.rooms[0].id : null);
-            if (!targetRoomId) return;
+            if (!window.VWorkWebRTC) return;
+            const mapId = CONFIG.map?.id || null;
+            const targetRoomId = roomId ? String(roomId) : (mapId ? `open:${mapId}` : null);
 
-            if (currentLiveKitRoomId === targetRoomId && window.VWorkWebRTC && window.VWorkWebRTC.livekitRoom && window.VWorkWebRTC.livekitRoom.state === 'connected') {
+            // Guests only have media in the room they were invited to.
+            if (!targetRoomId || (isGuest && !roomId)) {
+                if (currentLiveKitRoomId) {
+                    currentLiveKitRoomId = null;
+                    await window.VWorkWebRTC.leaveLiveKitRoom().catch(() => {});
+                }
+                return;
+            }
+
+            if (currentLiveKitRoomId === targetRoomId && window.VWorkWebRTC.livekitRoom && window.VWorkWebRTC.livekitRoom.state === 'connected') {
                 return;
             }
             currentLiveKitRoomId = targetRoomId;
 
             try {
                 const guestInfo = isGuest ? { guestId: localAvatar.id, guestName: localAvatar.name } : null;
-                const res = await window.VWorkWebRTC.fetchRoomToken(CONFIG.org.id, targetRoomId, guestInfo);
+                const res = roomId
+                    ? await window.VWorkWebRTC.fetchRoomToken(CONFIG.org.id, roomId, guestInfo)
+                    : await window.VWorkWebRTC.fetchOpenAreaToken(CONFIG.org.id, mapId);
                 if (!res || !res.token) return;
+                // Moved on while the token was on its way: don't join the old place.
+                if (currentLiveKitRoomId !== targetRoomId) return;
 
                 console.log(`[LiveKit SFU] Connecting to room: ${targetRoomId}...`);
                 await window.VWorkWebRTC.joinLiveKitRoom(res.livekit_host, res.token, {

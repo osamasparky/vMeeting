@@ -4,6 +4,7 @@ namespace App\Domains\Meetings\Services;
 
 use App\Domains\Identity\Models\User;
 use App\Domains\Meetings\Models\Meeting;
+use App\Domains\Workspace\Models\Map;
 use App\Domains\Workspace\Models\Room;
 
 class LiveKitTokenService
@@ -27,12 +28,30 @@ class LiveKitTokenService
      */
     public function generateRoomToken(User $user, Room $room, bool $isHost = false, int $ttlSeconds = 7200): string
     {
-        $roomName = "org_{$room->organization_id}_room_{$room->id}";
+        return $this->memberToken($user, $room->organization_id, "org_{$room->organization_id}_room_{$room->id}", $room->id, $isHost, $ttlSeconds);
+    }
 
+    /** LiveKit room name for a map's open area (everywhere outside its rooms). */
+    public static function openAreaRoomName(Map $map): string
+    {
+        return "org_{$map->organization_id}_map_{$map->id}_open";
+    }
+
+    /**
+     * Token for a map's open area. It is its own LiveKit room, so people in the open
+     * area never share media with any office room.
+     */
+    public function generateOpenAreaToken(User $user, Map $map, bool $isHost = false, int $ttlSeconds = 7200): string
+    {
+        return $this->memberToken($user, $map->organization_id, self::openAreaRoomName($map), null, $isHost, $ttlSeconds);
+    }
+
+    private function memberToken(User $user, string $organizationId, string $roomName, ?string $roomId, bool $isHost, int $ttlSeconds): string
+    {
         $metadata = [
             'user_id' => $user->id,
-            'organization_id' => $room->organization_id,
-            'room_id' => $room->id,
+            'organization_id' => $organizationId,
+            'room_id' => $roomId,
             'name' => $user->name,
             'avatar_url' => $user->avatar_url,
             'job_title' => $user->profile?->job_title ?? 'Member',

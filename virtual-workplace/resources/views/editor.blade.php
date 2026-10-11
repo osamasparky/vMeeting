@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="{{ asset('css/ulaspace-office.css') }}">
     <link rel="stylesheet" href="{{ asset('css/modern-design-system.css') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <script src="/js/office/room-doors.js" nonce="{{ $cspNonce ?? '' }}"></script>
+    <script src="/js/office/room-doors.js?v={{ filemtime(public_path('js/office/room-doors.js')) }}" nonce="{{ $cspNonce ?? '' }}"></script>
 
     <style>
         /* ══ Map editor — light chrome (design-reference 33, re-toned light) ══════════════

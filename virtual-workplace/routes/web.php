@@ -147,6 +147,7 @@ Route::middleware('auth')->group(function () {
 
 // Hybrid Workplace & Media Plane Routes (Accessible by Authenticated Members and Invited Guests)
 Route::post('/organizations/{organization}/rooms/{room}/livekit-token', [MeetingController::class, 'getLiveKitToken'])->middleware('throttle:public')->name('web.rooms.livekit_token');
+Route::post('/organizations/{organization}/maps/{map}/open-area-token', [MeetingController::class, 'getOpenAreaToken'])->middleware('throttle:public')->name('web.maps.open_area_token');
 Route::get('/organizations/{organization}/webrtc/diagnostics-config', [MeetingController::class, 'getDiagnosticsConfig'])->middleware('throttle:public')->name('web.webrtc.diagnostics');
 Route::get('/organizations/{organization}/rooms/{room}/files', [OfficeController::class, 'listRoomFiles'])->middleware('throttle:public')->name('room_files.index');
 Route::post('/organizations/{organization}/rooms/{room}/files', [OfficeController::class, 'uploadRoomFile'])->middleware('throttle:uploads')->name('room_files.store');

@@ -5,6 +5,7 @@ namespace App\Domains\Meetings\Controllers;
 use App\Domains\Meetings\Models\Meeting;
 use App\Domains\Meetings\Services\LiveKitTokenService;
 use App\Domains\Tenancy\Models\Organization;
+use App\Domains\Workspace\Models\Map;
 use App\Domains\Workspace\Models\Room;
 use App\Domains\Workspace\Support\RoomAccess;
 use Illuminate\Http\JsonResponse;
@@ -50,6 +51,34 @@ class MeetingController extends Controller
             'livekit_host' => $livekitHost,
             'room_name' => "org_{$room->organization_id}_room_{$room->id}",
             'participant_identity' => $user ? $user->id : $guestId,
+            'is_host' => $isHost,
+            'ice_servers' => $this->getIceServersList(),
+        ]);
+    }
+
+    /**
+     * Token for a map's open area: its own LiveKit room, separate from every office
+     * room. Members of the organization only; guests stay in their invited room.
+     */
+    public function getOpenAreaToken(
+        Organization $organization,
+        string $map,
+        LiveKitTokenService $service
+    ): JsonResponse {
+        $mapModel = Map::withoutGlobalScopes()->where('organization_id', $organization->id)->find($map);
+        $access = $mapModel ? RoomAccess::member($organization) : null;
+        if (! $access) {
+            return response()->json(['message' => 'You do not have access to this office.'], 403);
+        }
+
+        $user = $access['user'];
+        $isHost = RoomAccess::isHost($access['membership'], $user);
+
+        return response()->json([
+            'token' => $service->generateOpenAreaToken($user, $mapModel, $isHost),
+            'livekit_host' => config('services.livekit.host', env('LIVEKIT_HOST', 'wss://nextspace.munazzah.com/livekit')),
+            'room_name' => LiveKitTokenService::openAreaRoomName($mapModel),
+            'participant_identity' => $user->id,
             'is_host' => $isHost,
             'ice_servers' => $this->getIceServersList(),
         ]);

@@ -43,20 +43,15 @@ class RoomAccess
             return null;
         }
 
-        $user = Auth::user();
-        if ($user) {
-            if ($user->isSuperAdmin()) {
-                return ['user' => $user, 'membership' => null, 'guest' => null];
+        if (Auth::check()) {
+            $member = self::member($organization);
+            if (! $member) {
+                return null;
             }
-            $membership = OrganizationMember::where('organization_id', $organization->id)
-                ->where('user_id', $user->id)
-                ->whereIn('status', ['active', 'invited'])
-                ->with('role.permissions')
-                ->first();
+            // Super admins have no membership and may enter anywhere.
+            $allowed = $member['membership'] === null || self::memberMayEnter($member['membership'], $room);
 
-            return $membership && self::memberMayEnter($membership, $room)
-                ? ['user' => $user, 'membership' => $membership, 'guest' => null]
-                : null;
+            return $allowed ? $member + ['guest' => null] : null;
         }
 
         $guest = session(self::GUEST_SESSION_KEY);
@@ -68,6 +63,30 @@ class RoomAccess
         }
 
         return null;
+    }
+
+    /**
+     * The signed-in member of this organization (super admins count), or null.
+     * Used for the open area of a map, which every member may use and guests may not.
+     *
+     * @return array{user: User, membership: ?OrganizationMember}|null
+     */
+    public static function member(Organization $organization): ?array
+    {
+        $user = Auth::user();
+        if (! $user) {
+            return null;
+        }
+        if ($user->isSuperAdmin()) {
+            return ['user' => $user, 'membership' => null];
+        }
+        $membership = OrganizationMember::where('organization_id', $organization->id)
+            ->where('user_id', $user->id)
+            ->whereIn('status', ['active', 'invited'])
+            ->with('role.permissions')
+            ->first();
+
+        return $membership ? ['user' => $user, 'membership' => $membership] : null;
     }
 
     public static function memberMayEnter(OrganizationMember $membership, Room $room): bool

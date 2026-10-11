@@ -118,4 +118,21 @@ class OfficeRoomAccessTest extends TestCase
         $this->actingAs($this->owner)->deleteJson("{$url}/{$file->id}")->assertOk();
         $this->assertSame(0, RoomFile::count());
     }
+
+    public function test_open_area_has_its_own_media_room_for_members_only(): void
+    {
+        $url = "/organizations/{$this->org->id}/maps/{$this->privateRoom->map_id}/open-area-token";
+
+        // A member who may not enter the private room still gets the open area, in a room of its own.
+        $this->actingAs($this->employee)->postJson($url)->assertOk()
+            ->assertJsonPath('room_name', "org_{$this->org->id}_map_{$this->privateRoom->map_id}_open")
+            ->assertJsonPath('participant_identity', $this->employee->id);
+
+        // Not for another organization's members, not for a map of another organization, not for guests.
+        $this->actingAs($this->outsider)->postJson($url)->assertForbidden();
+        $foreign = $this->makeRoom($this->otherOrg->id, 'public');
+        $this->actingAs($this->employee)->postJson("/organizations/{$this->org->id}/maps/{$foreign->map_id}/open-area-token")->assertForbidden();
+        auth()->logout();
+        $this->withSession($this->guestSession($this->room))->postJson($url)->assertForbidden();
+    }
 }
