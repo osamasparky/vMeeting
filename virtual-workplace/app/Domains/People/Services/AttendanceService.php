@@ -9,6 +9,7 @@ use App\Domains\Projects\Models\Task;
 use App\Domains\Projects\Models\TimeEntry;
 use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Tenancy\Models\OrganizationMember;
+use App\Domains\Workspace\Services\OfficeTimezone;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
@@ -21,24 +22,31 @@ class AttendanceService
      */
     protected int $staleTimeoutMinutes = 10;
 
+    public function __construct(protected OfficeTimezone $timezones) {}
+
     /**
      * Start (or continue) the user's attendance session in a room. Any other
      * session still open for the user — another room, or a duplicate opened by
      * a concurrent request — is closed, so a user is never in two places at once.
+     *
+     * The session records its office: the room's, or for the open space the
+     * office the client reports ($floorId), so its hours count in that office's time.
      */
     public function startSession(
         User $user,
         Organization $organization,
         ?string $roomId = null,
         ?string $ip = null,
-        ?string $userAgent = null
+        ?string $userAgent = null,
+        ?string $floorId = null
     ): AttendanceSession {
-        return DB::transaction(function () use ($user, $organization, $roomId, $ip, $userAgent) {
+        return DB::transaction(function () use ($user, $organization, $roomId, $ip, $userAgent, $floorId) {
             $this->lockUser($user->id);
             $this->cleanupStaleSessions($user->id);
 
+            $officeId = $this->timezones->resolveOfficeId($organization->id, $roomId, $floorId);
             $open = $this->openSessions($user->id, $organization->id)->get();
-            $keep = $open->first(fn ($s) => $s->room_id === $roomId);
+            $keep = $open->first(fn ($s) => $s->room_id === $roomId && $s->floor_id === $officeId);
 
             foreach ($open as $session) {
                 if ($session !== $keep) {
@@ -59,6 +67,7 @@ class AttendanceService
                 'organization_id' => $organization->id,
                 'user_id' => $user->id,
                 'room_id' => $roomId,
+                'floor_id' => $officeId,
                 'status' => 'active',
                 'started_at' => now(),
                 'last_heartbeat_at' => now(),
@@ -93,6 +102,7 @@ class AttendanceService
                     'organization_id' => $organization->id,
                     'user_id' => $user->id,
                     'room_id' => null,
+                    'floor_id' => $sessions->first()->floor_id,
                     'status' => 'active',
                     'started_at' => now(),
                     'last_heartbeat_at' => now(),
@@ -113,7 +123,7 @@ class AttendanceService
      * slept or the tab was suspended must start a new session, not stretch the
      * old one across the gap.
      */
-    public function recordHeartbeat(User $user, Organization $organization, ?string $roomId = null): ?AttendanceSession
+    public function recordHeartbeat(User $user, Organization $organization, ?string $roomId = null, ?string $floorId = null): ?AttendanceSession
     {
         $session = DB::transaction(function () use ($user, $organization) {
             $this->lockUser($user->id);
@@ -129,7 +139,7 @@ class AttendanceService
         });
 
         // Heartbeat without an open session (first heartbeat after a gap): start one.
-        $session ??= $this->startSession($user, $organization, $roomId);
+        $session ??= $this->startSession($user, $organization, $roomId, null, null, $floorId);
 
         // Background maintenance
         $this->cleanupStaleSessions();
@@ -168,14 +178,15 @@ class AttendanceService
 
     /**
      * Office-presence report for one user over a period, with a per-day
-     * breakdown. Days follow the organization's timezone; sessions crossing
-     * midnight are split between the days they cover.
+     * breakdown. The period follows the member's office time (the office they
+     * were last in); each session counts on its own office's calendar day, and
+     * sessions crossing midnight are split between the days they cover.
      */
     public function getUserReport(string $userId, ?string $organizationId = null, string $period = 'week'): array
     {
         $this->cleanupStaleSessions($userId);
 
-        $tz = $this->timezoneFor($organizationId);
+        $tz = $organizationId ? $this->timezones->forMember($userId, $organizationId) : config('app.timezone');
         $now = now()->setTimezone($tz);
         $startDate = match ($period) {
             'today', 'day' => $now->copy()->startOfDay(),
@@ -183,7 +194,7 @@ class AttendanceService
             default => $now->copy()->startOfWeek(),
         };
 
-        $query = $this->sessionsOverlapping($startDate, $now)
+        $query = $this->sessionsOverlapping($this->db($startDate)->subDay(), now()->addDay())
             ->where('user_id', $userId)
             ->with(['room:id,name', 'organization:id,name']);
 
@@ -192,20 +203,23 @@ class AttendanceService
         }
 
         $sessions = $query->orderBy('started_at', 'desc')->get();
-        $intervals = $sessions->map(fn ($s) => $this->sessionInterval($s))->all();
-
-        $totalSeconds = TimeIntervals::union(TimeIntervals::clip($intervals, $startDate->getTimestamp(), $now->getTimestamp()));
-        $todaySeconds = TimeIntervals::union(TimeIntervals::clip($intervals, $now->copy()->startOfDay()->getTimestamp(), $now->getTimestamp()));
 
         $daily = [];
+        $totalSeconds = 0;
+        $todaySeconds = 0;
         for ($day = $startDate->copy()->startOfDay(); $day->lte($now); $day->addDay()) {
-            $clipped = TimeIntervals::clip($intervals, $day->getTimestamp(), $day->copy()->addDay()->getTimestamp());
+            $date = $day->format('Y-m-d');
+            $clipped = $this->officeIntervalsOn($sessions, $date);
             if ($clipped === []) {
                 continue;
             }
             $seconds = TimeIntervals::union($clipped);
+            $totalSeconds += $seconds;
+            if ($date === $now->format('Y-m-d')) {
+                $todaySeconds = $seconds;
+            }
             $daily[] = [
-                'date' => $day->format('Y-m-d'),
+                'date' => $date,
                 'day_name' => $day->format('l'),
                 'duration_seconds' => $seconds,
                 'hours' => round($seconds / 3600, 2),
@@ -215,6 +229,7 @@ class AttendanceService
 
         return [
             'period' => $period,
+            'timezone' => $tz,
             'start_date' => $startDate->toIso8601String(),
             'end_date' => $now->toIso8601String(),
             'total_seconds' => $totalSeconds,
@@ -258,10 +273,10 @@ class AttendanceService
     /**
      * Resume user attendance session from idle pause state.
      */
-    public function resumeSessionFromIdle(User $user, Organization $organization, ?string $roomId = null): AttendanceSession
+    public function resumeSessionFromIdle(User $user, Organization $organization, ?string $roomId = null, ?string $floorId = null): AttendanceSession
     {
         // Re-start active session
-        return $this->startSession($user, $organization, $roomId);
+        return $this->startSession($user, $organization, $roomId, null, null, $floorId);
     }
 
     /**
@@ -275,22 +290,26 @@ class AttendanceService
      *                              unioned, never added
      *  - idle_seconds:             office time with no task running
      *
-     * Everything is clipped to the day in the organization's timezone.
+     * Days are local office days: each session is clipped to the date in its own
+     * office's timezone, task time to the date in the member's office timezone
+     * (the office they were last in). Without a date, "today" is the member's
+     * today — or the default office's in the all-members view.
      */
     public function getDailyTimesheetData(?string $userId, string $organizationId, ?string $date = null): array
     {
         // First cleanup any stale dead sessions to keep data 100% accurate
         $this->cleanupStaleSessions();
 
-        $tz = $this->timezoneFor($organizationId);
-        $targetDate = $date ? Carbon::parse($date, $tz)->startOfDay() : now()->setTimezone($tz)->startOfDay();
-        $dayStart = $targetDate->copy();
-        $dayEnd = $targetDate->copy()->addDay();
-
         $isAll = empty($userId) || $userId === 'all';
 
+        $tz = $isAll ? $this->timezones->forOrganization($organizationId) : $this->timezones->forMember($userId, $organizationId);
+        $targetDate = $date ? Carbon::parse($date, $tz)->startOfDay() : now()->setTimezone($tz)->startOfDay();
+        $day = $targetDate->format('Y-m-d');
+        [$searchFrom, $searchTo] = $this->searchRange($day);
+        $memberTz = fn (string $uid) => $this->timezones->forMember($uid, $organizationId);
+
         // ── Section 1: Project & Task Time Entries ──
-        $taskQuery = $this->entriesOverlapping($dayStart, $dayEnd)
+        $taskQuery = $this->entriesOverlapping($searchFrom, $searchTo)
             ->where('organization_id', $organizationId)
             ->with(['user.profiles', 'project:id,name,color,code', 'task:id,title,task_number,priority,status'])
             ->orderBy('started_at', 'desc');
@@ -299,10 +318,12 @@ class AttendanceService
             $taskQuery->where('user_id', $userId);
         }
 
-        $taskEntries = $taskQuery->get();
+        $taskEntries = $taskQuery->get()->filter(fn ($e) => TimeIntervals::clip(
+            [$this->entryInterval($e)], ...$this->dayWindow($day, $memberTz($e->user_id))
+        ) !== [])->values();
 
         // ── Section 2: Virtual Office Attendance Sessions ──
-        $attQuery = $this->sessionsOverlapping($dayStart, $dayEnd)
+        $attQuery = $this->sessionsOverlapping($searchFrom, $searchTo)
             ->where('organization_id', $organizationId)
             ->with(['user.profiles', 'room', 'room.floor', 'room.map'])
             ->orderBy('started_at', 'desc');
@@ -311,7 +332,8 @@ class AttendanceService
             $attQuery->where('user_id', $userId);
         }
 
-        $attendanceSessions = $attQuery->get();
+        $attendanceSessions = $attQuery->get()
+            ->filter(fn ($s) => $this->officeIntervalsOn(collect([$s]), $day) !== [])->values();
 
         // Running timers (one per user; every member's in the all-members view)
         $activeTimerQuery = ActiveTimer::where('organization_id', $organizationId)
@@ -328,15 +350,15 @@ class AttendanceService
             ->merge($activeTimers->pluck('user_id'))
             ->unique();
         foreach ($userIds as $uid) {
-            $day = $this->dayTotals(
+            $member = $this->dayTotals(
                 $attendanceSessions->where('user_id', $uid),
                 $taskEntries->where('user_id', $uid),
                 $activeTimers->where('user_id', $uid),
-                $dayStart,
-                $dayEnd,
+                $day,
+                $memberTz($uid),
             );
             foreach ($totals as $key => $value) {
-                $totals[$key] = $value + $day[$key];
+                $totals[$key] = $value + $member[$key];
             }
         }
 
@@ -367,7 +389,8 @@ class AttendanceService
         $activeOfficeSession = $activeOfficeQuery->first();
 
         // Format task entries with clean human readable duration & timestamps
-        $formattedTaskEntries = $taskEntries->map(function ($te) use ($tz) {
+        $formattedTaskEntries = $taskEntries->map(function ($te) use ($memberTz) {
+            $tz = $memberTz($te->user_id);
             [$start, $end] = $this->entryInterval($te);
             $sec = $end - $start;
             $durFormatted = sprintf('%02dh %02dm', floor($sec / 3600), floor(($sec % 3600) / 60));
@@ -395,7 +418,8 @@ class AttendanceService
         });
 
         // Format attendance sessions with room name, branch name, timestamps, and formatted durations
-        $formattedAttendanceSessions = $attendanceSessions->map(function ($s) use ($tz) {
+        $formattedAttendanceSessions = $attendanceSessions->map(function ($s) {
+            $tz = $this->timezones->forSession($s);
             [$start, $end] = $this->sessionInterval($s);
             $sec = $end - $start;
 
@@ -423,12 +447,14 @@ class AttendanceService
                 'duration_formatted' => $durFormatted,
                 'status' => $s->status,
                 'is_active' => $s->isActive(),
+                'timezone' => $tz,
             ];
         });
 
         return [
             'is_all_members' => $isAll,
-            'date' => $targetDate->format('Y-m-d'),
+            'timezone' => $tz,
+            'date' => $day,
             'date_formatted' => $targetDate->isoFormat('dddd, D MMMM YYYY'),
             'total_office_seconds' => $totals['office'],
             'total_office_hours' => round($totals['office'] / 3600, 2),
@@ -557,9 +583,8 @@ class AttendanceService
     {
         $this->cleanupStaleSessions();
 
-        $tz = $this->timezoneFor($organization->id);
-        $dayStart = now()->setTimezone($tz)->startOfDay();
-        $dayEnd = $dayStart->copy()->addDay();
+        // Each member's "today" is their office's today; fetch wide, clip per member.
+        [$searchFrom, $searchTo] = [now()->subDays(2), now()->addDay()];
 
         $members = $organization->members()
             ->whereHas('user', function ($q) {
@@ -575,12 +600,12 @@ class AttendanceService
             ->get()
             ->keyBy('user_id');
 
-        $todaySessions = $this->sessionsOverlapping($dayStart, $dayEnd)
+        $todaySessions = $this->sessionsOverlapping($searchFrom, $searchTo)
             ->where('organization_id', $organization->id)
             ->get()
             ->groupBy('user_id');
 
-        $todayTaskEntries = $this->entriesOverlapping($dayStart, $dayEnd)
+        $todayTaskEntries = $this->entriesOverlapping($searchFrom, $searchTo)
             ->where('organization_id', $organization->id)
             ->get()
             ->groupBy('user_id');
@@ -590,7 +615,7 @@ class AttendanceService
             ->get()
             ->keyBy('user_id');
 
-        $roster = $members->map(function ($m) use ($activeSessions, $todaySessions, $todayTaskEntries, $activeTimers, $dayStart, $dayEnd) {
+        $roster = $members->map(function ($m) use ($organization, $activeSessions, $todaySessions, $todayTaskEntries, $activeTimers) {
             $u = $m->user;
             if (! $u) {
                 return null;
@@ -599,13 +624,14 @@ class AttendanceService
             $activeSession = $activeSessions->get($u->id);
             $isOnline = (bool) $activeSession;
             $activeTimer = $activeTimers->get($u->id);
+            $tz = $this->timezones->forMember($u->id, $organization->id);
 
             $day = $this->dayTotals(
                 $todaySessions->get($u->id, collect()),
                 $todayTaskEntries->get($u->id, collect()),
                 $activeTimer ? collect([$activeTimer]) : collect(),
-                $dayStart,
-                $dayEnd,
+                now()->setTimezone($tz)->format('Y-m-d'),
+                $tz,
             );
 
             $currentRoom = $activeSession?->room?->name ?? ($isOnline ? 'Open Space' : null);
@@ -648,21 +674,47 @@ class AttendanceService
     // ── Time arithmetic ──
 
     /**
+     * Office hours and headcount for an organization today, each session on its
+     * own office's today — the owner dashboard's "in the office today".
+     *
+     * @return array{seconds: int, present: int}
+     */
+    public function organizationOfficeToday(Organization $organization): array
+    {
+        $sessions = $this->sessionsOverlapping(now()->subDays(2), now()->addDay())
+            ->where('organization_id', $organization->id)
+            ->get();
+
+        $seconds = 0;
+        $present = [];
+        foreach ($sessions->groupBy('user_id') as $uid => $userSessions) {
+            $today = [];
+            foreach ($userSessions as $s) {
+                $today = array_merge($today, $this->officeIntervalsOn(collect([$s]), now()->setTimezone($this->timezones->forSession($s))->format('Y-m-d')));
+            }
+            if ($today !== []) {
+                $seconds += TimeIntervals::union($today);
+                $present[] = $uid;
+            }
+        }
+
+        return ['seconds' => $seconds, 'present' => count($present)];
+    }
+
+    /**
      * One member's day: office presence, task time, their union and the
-     * office time with no task running. Inputs are that member's sessions,
-     * time entries and running timer(s); every interval is clipped to the day.
+     * office time with no task running. Each session is clipped to $date in its
+     * own office's timezone; task time to $date in the member's ($memberTz).
      *
      * @return array{office: int, task: int, attendance: int, idle: int}
      */
-    protected function dayTotals(Collection $sessions, Collection $entries, Collection $timers, CarbonInterface $from, CarbonInterface $to): array
+    protected function dayTotals(Collection $sessions, Collection $entries, Collection $timers, string $date, string $memberTz): array
     {
-        [$fromTs, $toTs] = [$from->getTimestamp(), $to->getTimestamp()];
-
-        $office = TimeIntervals::clip($sessions->map(fn ($s) => $this->sessionInterval($s))->values()->all(), $fromTs, $toTs);
+        $office = $this->officeIntervalsOn($sessions, $date);
         $task = TimeIntervals::clip(array_merge(
             $entries->map(fn ($e) => $this->entryInterval($e))->values()->all(),
             $timers->map(fn ($t) => [$t->started_at->getTimestamp(), max($t->started_at->getTimestamp(), now()->getTimestamp())])->values()->all(),
-        ), $fromTs, $toTs);
+        ), ...$this->dayWindow($date, $memberTz));
 
         $officeSeconds = TimeIntervals::union($office);
 
@@ -673,6 +725,36 @@ class AttendanceService
             'attendance' => TimeIntervals::union(array_merge($office, $task)),
             'idle' => $officeSeconds - TimeIntervals::overlap($office, $task),
         ];
+    }
+
+    /** Session intervals clipped to $date, each in its own office's timezone. */
+    protected function officeIntervalsOn(Collection $sessions, string $date): array
+    {
+        $out = [];
+        foreach ($sessions as $s) {
+            $out = array_merge($out, TimeIntervals::clip([$this->sessionInterval($s)], ...$this->dayWindow($date, $this->timezones->forSession($s))));
+        }
+
+        return $out;
+    }
+
+    /** [start, end) of a calendar date in a timezone, as unix timestamps. */
+    protected function dayWindow(string $date, string $tz): array
+    {
+        $start = Carbon::parse($date, $tz)->startOfDay();
+
+        return [$start->getTimestamp(), $start->copy()->addDay()->getTimestamp()];
+    }
+
+    /**
+     * A query range wide enough to hold $date in every timezone (UTC−12 to
+     * UTC+14); rows are then clipped to the exact local day.
+     */
+    protected function searchRange(string $date): array
+    {
+        $utc = Carbon::parse($date, 'UTC')->startOfDay();
+
+        return [$utc->copy()->subHours(14), $utc->copy()->addDay()->addHours(12)];
     }
 
     /**
@@ -748,14 +830,6 @@ class AttendanceService
     protected function lockUser(string $userId): void
     {
         DB::table('users')->where('id', $userId)->lockForUpdate()->first();
-    }
-
-    /** The organization's timezone, which defines where its days start and end. */
-    protected function timezoneFor(?string $organizationId): string
-    {
-        $tz = $organizationId ? Organization::whereKey($organizationId)->value('timezone') : null;
-
-        return $tz && in_array($tz, timezone_identifiers_list(), true) ? $tz : config('app.timezone');
     }
 
     /** A boundary converted to the timezone timestamps are stored in. */

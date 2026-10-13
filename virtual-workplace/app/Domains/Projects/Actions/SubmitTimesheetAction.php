@@ -6,6 +6,7 @@ use App\Domains\Identity\Models\User;
 use App\Domains\Projects\Models\TimeEntry;
 use App\Domains\Projects\Models\Timesheet;
 use App\Domains\Tenancy\Models\Organization;
+use App\Domains\Workspace\Services\OfficeTimezone;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -15,8 +16,10 @@ class SubmitTimesheetAction
     public function execute(Organization $organization, User $user, string $periodStart, string $periodEnd): Timesheet
     {
         return DB::transaction(function () use ($organization, $user, $periodStart, $periodEnd) {
-            $start = Carbon::parse($periodStart)->startOfDay();
-            $end = Carbon::parse($periodEnd)->endOfDay();
+            // The period's dates are days in the member's office time.
+            $tz = app(OfficeTimezone::class)->forMember($user->id, $organization->id);
+            $start = Carbon::parse($periodStart, $tz)->startOfDay();
+            $end = Carbon::parse($periodEnd, $tz)->endOfDay();
 
             // Find or create the timesheet record
             $timesheet = Timesheet::firstOrCreate(
@@ -38,7 +41,7 @@ class SubmitTimesheetAction
             // Find all draft or rejected time entries for this user in this date range
             $entries = TimeEntry::where('organization_id', $organization->id)
                 ->where('user_id', $user->id)
-                ->whereBetween('started_at', [$start, $end])
+                ->whereBetween('started_at', [$start->copy()->setTimezone(config('app.timezone')), $end->copy()->setTimezone(config('app.timezone'))])
                 ->whereIn('status', [TimeEntry::STATUS_DRAFT, TimeEntry::STATUS_REJECTED])
                 ->get();
 

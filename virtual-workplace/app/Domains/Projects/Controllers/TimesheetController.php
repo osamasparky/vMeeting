@@ -9,6 +9,7 @@ use App\Domains\Projects\Models\Timesheet;
 use App\Domains\Projects\Requests\RejectTimesheetRequest;
 use App\Domains\Projects\Requests\SubmitTimesheetRequest;
 use App\Domains\Tenancy\Models\Organization;
+use App\Domains\Workspace\Services\OfficeTimezone;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -48,8 +49,9 @@ class TimesheetController extends Controller
     public function myCurrent(Request $request, Organization $organization): JsonResponse
     {
         $user = Auth::user();
-        $start = now()->startOfWeek()->toDateString();
-        $end = now()->endOfWeek()->toDateString();
+        $tz = app(OfficeTimezone::class)->forMember($user->id, $organization->id);
+        $start = now()->setTimezone($tz)->startOfWeek()->toDateString();
+        $end = now()->setTimezone($tz)->endOfWeek()->toDateString();
 
         $timesheet = Timesheet::firstOrCreate(
             [

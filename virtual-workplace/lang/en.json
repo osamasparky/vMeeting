@@ -3653,5 +3653,7 @@
     "gantt.open_list": "Open the task list",
     "gantt.no_start": "No start date — shown on its due day only",
     "gantt.no_due": "No due date — shown on its start day only",
-    "AI office generator included in this plan": "AI office generator included in this plan"
+    "AI office generator included in this plan": "AI office generator included in this plan",
+    "Office Time Zone": "Office Time Zone",
+    "Attendance and working hours in this office are counted in this local time.": "Attendance and working hours in this office are counted in this local time."
 }

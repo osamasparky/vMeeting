@@ -316,17 +316,24 @@
 
         // ── Offices Modals ──
         function openNewOfficeModal() {
+            // Organizations still on UTC: start from this browser's timezone, the likeliest office location.
+            const tzSelect = document.getElementById('new-office-timezone-select');
+            const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            if (tzSelect && tzSelect.value === 'UTC' && browserTz && tzSelect.querySelector(`option[value="${browserTz}"]`)) {
+                tzSelect.value = browserTz;
+            }
             document.getElementById('new-office-modal').style.display = 'flex';
         }
         function closeNewOfficeModal() {
             document.getElementById('new-office-modal').style.display = 'none';
         }
-        function openEditOfficeModal(officeId, name, city, desc, isDefault) {
+        function openEditOfficeModal(officeId, name, city, desc, isDefault, timezone) {
             document.getElementById('edit-office-form').action = `/offices/${officeId}`;
             document.getElementById('edit-office-name-input').value = name || '';
             document.getElementById('edit-office-city-input').value = city || '';
             document.getElementById('edit-office-desc-input').value = desc || '';
             document.getElementById('edit-office-default-input').checked = !!isDefault;
+            document.getElementById('edit-office-timezone-select').value = timezone || 'UTC';
             document.getElementById('edit-office-modal').style.display = 'flex';
         }
         function closeEditOfficeModal() {

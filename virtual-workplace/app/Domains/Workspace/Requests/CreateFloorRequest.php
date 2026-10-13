@@ -16,6 +16,8 @@ class CreateFloorRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'order' => ['nullable', 'integer', 'min:0'],
+            // Optional for API clients; omitted, the office takes the organization's timezone.
+            'timezone' => ['nullable', 'timezone:all'],
         ];
     }
 }

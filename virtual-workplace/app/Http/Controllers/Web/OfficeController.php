@@ -212,6 +212,8 @@ class OfficeController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'city_location' => ['nullable', 'string', 'max:255'],
+            // Working hours in this office are counted in its local time.
+            'timezone' => ['required', 'timezone:all'],
             'description' => ['nullable', 'string', 'max:1000'],
             'is_default' => ['nullable', 'boolean'],
         ]);
@@ -223,6 +225,7 @@ class OfficeController extends Controller
         $floor = $organization->floors()->create([
             'name' => $validated['name'],
             'city_location' => $validated['city_location'] ?? null,
+            'timezone' => $validated['timezone'],
             'description' => $validated['description'] ?? null,
             'is_default' => ! empty($validated['is_default']),
             'order' => $organization->floors()->count() + 1,
@@ -285,6 +288,7 @@ class OfficeController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'city_location' => ['nullable', 'string', 'max:255'],
+            'timezone' => ['sometimes', 'required', 'timezone:all'],
             'description' => ['nullable', 'string', 'max:1000'],
             'is_default' => ['nullable', 'boolean'],
         ]);
@@ -296,6 +300,7 @@ class OfficeController extends Controller
         $floor->update([
             'name' => $validated['name'],
             'city_location' => $validated['city_location'] ?? null,
+            'timezone' => $validated['timezone'] ?? $floor->timezone,
             'description' => $validated['description'] ?? null,
             'is_default' => ! empty($validated['is_default']),
         ]);

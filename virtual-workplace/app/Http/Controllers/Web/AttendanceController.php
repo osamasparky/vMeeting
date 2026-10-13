@@ -41,6 +41,8 @@ class AttendanceController extends Controller
 
         $validated = $request->validate([
             'room_id' => 'nullable|uuid|exists:rooms,id',
+            // The office the client is in; checked against the organization's offices.
+            'floor_id' => 'nullable|uuid',
             'action' => 'required|in:enter,leave,heartbeat,idle_pause,idle_resume',
             // For idle_pause: seconds since the user's last activity. Otherwise informational only.
             'duration_seconds' => 'nullable|integer|min:0|max:86400',
@@ -48,19 +50,20 @@ class AttendanceController extends Controller
 
         $organization = $membership->organization;
         $roomId = $validated['room_id'] ?? null;
+        $floorId = $validated['floor_id'] ?? null;
         $action = $validated['action'];
 
         // 1. Manage dedicated attendance_sessions record
         if ($action === 'enter') {
-            $attendanceService->startSession($user, $organization, $roomId, $request->ip(), $request->userAgent());
+            $attendanceService->startSession($user, $organization, $roomId, $request->ip(), $request->userAgent(), $floorId);
         } elseif ($action === 'leave') {
             $attendanceService->endSession($user, $organization, $roomId);
         } elseif ($action === 'heartbeat') {
-            $attendanceService->recordHeartbeat($user, $organization, $roomId);
+            $attendanceService->recordHeartbeat($user, $organization, $roomId, $floorId);
         } elseif ($action === 'idle_pause') {
             $attendanceService->pauseSessionForIdle($user, $organization, $validated['duration_seconds'] ?? null);
         } elseif ($action === 'idle_resume') {
-            $attendanceService->resumeSessionFromIdle($user, $organization, $roomId);
+            $attendanceService->resumeSessionFromIdle($user, $organization, $roomId, $floorId);
         }
 
         // 2. Also log to AuditLog for audit trail history

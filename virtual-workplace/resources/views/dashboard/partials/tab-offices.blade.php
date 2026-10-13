@@ -49,6 +49,10 @@
                                 <span class="material-symbols-rounded" style="font-size: 14px;">location_on</span>
                                 <span>{{ $off->city_location ?: __('Primary Location') }}</span>
                             </span>
+                            <span style="font-size: var(--ula-size-xs); color: var(--ula-text-muted); font-weight: var(--ula-weight-semibold); display: flex; align-items: center; gap: 2px;" title="{{ __('Office Time Zone') }}">
+                                <span class="material-symbols-rounded" style="font-size: 14px;">schedule</span>
+                                <span style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">{{ $off->timezone ?? 'UTC' }} · {{ now()->setTimezone($off->timezone ?? 'UTC')->format('H:i') }}</span>
+                            </span>
                         </div>
                     </div>
                     @if($off->is_default)
@@ -87,7 +91,7 @@
                 <x-btn variant="primary" size="sm" href="{{ route('office', ['office' => $off->id]) }}" icon="login" style="flex: 1; justify-content: center;">
                     {{ __('Enter Office') }}
                 </x-btn>
-                <x-btn variant="secondary" size="sm" :iconOnly="true" icon="edit" onclick="openEditOfficeModal('{{ $off->id }}', '{{ addslashes($off->name) }}', '{{ addslashes($off->city_location ?? '') }}', '{{ addslashes($off->description ?? '') }}', {{ $off->is_default ? 'true' : 'false' }})" title="{{ __('Edit Branch Details') }}" />
+                <x-btn variant="secondary" size="sm" :iconOnly="true" icon="edit" onclick="openEditOfficeModal('{{ $off->id }}', '{{ addslashes($off->name) }}', '{{ addslashes($off->city_location ?? '') }}', '{{ addslashes($off->description ?? '') }}', {{ $off->is_default ? 'true' : 'false' }}, '{{ $off->timezone ?? 'UTC' }}')" title="{{ __('Edit Branch Details') }}" />
                 @if($offices->count() > 1)
                 <form method="POST" action="{{ route('offices.delete', $off->id) }}" onsubmit="return confirm('{{ __('Are you sure you want to permanently delete this office branch and its blueprint?') }}');" style="margin: 0;">
                     @csrf

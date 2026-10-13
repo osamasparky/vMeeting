@@ -7483,7 +7483,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CONFIG.csrf, 'Accept': 'application/json' },
                     credentials: 'same-origin',
-                    body: JSON.stringify({ action: action, room_id: roomId, duration_seconds: duration })
+                    body: JSON.stringify({ action: action, room_id: roomId, floor_id: CONFIG.map?.floor_id || null, duration_seconds: duration })
                 }).catch(()=>{});
             } catch(e) {}
         }
@@ -7846,6 +7846,7 @@
                     body: JSON.stringify({
                         action: action,
                         room_id: targetRoom,
+                        floor_id: CONFIG.map?.floor_id || null,
                         duration_seconds: duration
                     })
                 });

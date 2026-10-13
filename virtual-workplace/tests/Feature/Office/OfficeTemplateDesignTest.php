@@ -127,7 +127,7 @@ class OfficeTemplateDesignTest extends TestCase
         $org = app(CreateOrganizationAction::class)->execute(['name' => 'Branch Co', 'plan_slug' => 'business'], $owner);
         (new BlueprintOfficeSeeder)->seedOrganizationOffice($org->fresh('plan'));
 
-        $this->actingAs($owner)->post('/offices', ['name' => 'Riyadh'])->assertRedirect();
+        $this->actingAs($owner)->post('/offices', ['name' => 'Riyadh', 'timezone' => 'Asia/Riyadh'])->assertRedirect();
 
         $floor = $org->floors()->where('name', 'Riyadh')->firstOrFail();
         $map = Map::where('floor_id', $floor->id)->firstOrFail();
@@ -144,7 +144,7 @@ class OfficeTemplateDesignTest extends TestCase
         $org = app(CreateOrganizationAction::class)->execute(['name' => 'Limit Co', 'plan_slug' => 'business'], $owner);
         (new BlueprintOfficeSeeder)->seedOrganizationOffice($org->fresh('plan')); // uses 19 of the 21
 
-        $this->actingAs($owner)->post('/offices', ['name' => 'Jeddah'])->assertRedirect();
+        $this->actingAs($owner)->post('/offices', ['name' => 'Jeddah', 'timezone' => 'Asia/Riyadh'])->assertRedirect();
 
         $map = Map::where('floor_id', $org->floors()->where('name', 'Jeddah')->value('id'))->firstOrFail();
         $this->assertSame(2, $map->rooms()->count());

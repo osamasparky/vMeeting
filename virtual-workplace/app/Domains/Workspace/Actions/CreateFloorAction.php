@@ -17,6 +17,7 @@ class CreateFloorAction
                 'organization_id' => $organization->id,
                 'name' => $data['name'],
                 'order' => $nextOrder,
+                'timezone' => $data['timezone'] ?? null,
             ]);
         });
     }

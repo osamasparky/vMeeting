@@ -4,6 +4,7 @@ namespace App\Domains\People\Models;
 
 use App\Domains\Identity\Models\User;
 use App\Domains\Tenancy\Models\Organization;
+use App\Domains\Workspace\Models\Floor;
 use App\Domains\Workspace\Models\Room;
 use App\Traits\BelongsToOrganization;
 use App\Traits\HasUuid;
@@ -23,6 +24,7 @@ class AttendanceSession extends Model
         'organization_id',
         'user_id',
         'room_id',
+        'floor_id',
         'status',
         'started_at',
         'ended_at',
@@ -52,6 +54,12 @@ class AttendanceSession extends Model
     public function room(): BelongsTo
     {
         return $this->belongsTo(Room::class);
+    }
+
+    /** The office the session was in. */
+    public function floor(): BelongsTo
+    {
+        return $this->belongsTo(Floor::class);
     }
 
     public function isActive(): bool

@@ -2,6 +2,7 @@
 
 namespace App\Domains\Workspace\Models;
 
+use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Traits\Auditable;
 use App\Traits\BelongsToOrganization;
@@ -24,6 +25,7 @@ class Floor extends Model
         'organization_id',
         'name',
         'city_location',
+        'timezone',
         'description',
         'is_default',
         'order',
@@ -33,6 +35,27 @@ class Floor extends Model
         'order' => 'integer',
         'is_default' => 'boolean',
     ];
+
+    /**
+     * Every office has a timezone: working hours are counted in its local
+     * time. One created without an explicit choice takes its organization's.
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (Floor $floor) {
+            if (! self::isValidTimezone($floor->timezone)) {
+                $orgTz = $floor->organization_id
+                    ? Organization::whereKey($floor->organization_id)->value('timezone')
+                    : null;
+                $floor->timezone = self::isValidTimezone($orgTz) ? $orgTz : 'UTC';
+            }
+        });
+    }
+
+    public static function isValidTimezone(?string $tz): bool
+    {
+        return $tz !== null && $tz !== '' && in_array($tz, timezone_identifiers_list(), true);
+    }
 
     // ── Relationships ──
 

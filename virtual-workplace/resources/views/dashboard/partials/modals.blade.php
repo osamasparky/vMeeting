@@ -1313,6 +1313,8 @@
                     <input type="text" name="city_location" placeholder="e.g. Cairo, Egypt or Riyadh, KSA" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
 
+                @include('dashboard.partials.office-timezone-select', ['selectId' => 'new-office-timezone-select', 'selected' => $organization->timezone ?? 'UTC'])
+
                 <div>
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Description') }}</label>
                     <textarea name="description" rows="3" placeholder="Brief description of this branch and its teams..." style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;"></textarea>
@@ -1351,6 +1353,8 @@
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('City / Location') }}</label>
                     <input type="text" name="city_location" id="edit-office-city-input" style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                 </div>
+
+                @include('dashboard.partials.office-timezone-select', ['selectId' => 'edit-office-timezone-select', 'selected' => null])
 
                 <div>
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Description') }}</label>

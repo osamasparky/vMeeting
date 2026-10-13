@@ -8,6 +8,7 @@ use App\Domains\Projects\Models\Task;
 use App\Domains\Projects\Models\TimeEntry;
 use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Tenancy\Models\OrganizationMember;
+use App\Domains\Workspace\Services\OfficeTimezone;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -156,10 +157,12 @@ class MyWorkController extends Controller
             ),
 
             'time_week' => (function () use ($organization, $userId) {
-                $start = now()->startOfWeek();
+                // Days in the member's office time.
+                $tz = app(OfficeTimezone::class)->forMember($userId, $organization->id);
+                $start = now()->setTimezone($tz)->startOfWeek();
                 $byDay = TimeEntry::where('organization_id', $organization->id)->where('user_id', $userId)
-                    ->where('started_at', '>=', $start)->get(['started_at', 'duration_seconds'])
-                    ->groupBy(fn ($e) => $e->started_at->toDateString())
+                    ->where('started_at', '>=', $start->copy()->setTimezone(config('app.timezone')))->get(['started_at', 'duration_seconds'])
+                    ->groupBy(fn ($e) => $e->started_at->copy()->setTimezone($tz)->toDateString())
                     ->map(fn ($g) => round($g->sum('duration_seconds') / 3600, 1))->all();
                 $days = collect(range(0, 6))->map(fn ($i) => $start->copy()->addDays($i)->toDateString())
                     ->map(fn ($d) => ['date' => $d, 'value' => $byDay[$d] ?? 0])->all();

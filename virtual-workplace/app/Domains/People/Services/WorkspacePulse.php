@@ -13,6 +13,8 @@ use App\Domains\Projects\Models\Timesheet;
 use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Domains\Workspace\Models\Room;
+use App\Domains\Workspace\Services\OfficeTimezone;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
@@ -78,22 +80,16 @@ class WorkspacePulse
     {
         $orgId = $organization->id;
         $today = now()->startOfDay();
-        $weekStart = now()->startOfWeek();
+        // The working week starts on Monday in the main office's local time.
+        $weekStart = $this->officeWeekStart(app(OfficeTimezone::class)->forOrganization($orgId));
 
         $members = OrganizationMember::where('organization_id', $orgId)
             ->whereHas('user', fn ($q) => $q->where('is_super_admin', false))
             ->selectRaw("SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) AS active, SUM(CASE WHEN status = 'invited' THEN 1 ELSE 0 END) AS invited")
             ->first();
 
-        $todaySessions = AttendanceSession::withoutGlobalScopes()->where('organization_id', $orgId)
-            ->where(fn ($q) => $q->where('started_at', '>=', $today)->orWhereNull('ended_at')->orWhere('ended_at', '>=', $today))
-            ->get(['user_id', 'started_at', 'ended_at', 'last_heartbeat_at']);
-        $officeSecondsToday = $todaySessions->sum(function ($s) use ($today) {
-            $start = $s->started_at && $s->started_at->gt($today) ? $s->started_at : $today;
-            $end = $s->ended_at ?? $s->last_heartbeat_at ?? now();
-
-            return max(0, $end->getTimestamp() - $start->getTimestamp());
-        });
+        // Each session on its own office's today (offices can sit in different timezones).
+        $officeToday = app(AttendanceService::class)->organizationOfficeToday($organization);
 
         $time = TimeEntry::withoutGlobalScopes()->where('organization_id', $orgId)->where('started_at', '>=', $weekStart)
             ->selectRaw('COALESCE(SUM(duration_seconds), 0) AS total, COALESCE(SUM(CASE WHEN is_billable = 1 THEN duration_seconds ELSE 0 END), 0) AS billable')
@@ -122,8 +118,8 @@ class WorkspacePulse
         return [
             'members' => $activeMembers,
             'invited' => (int) ($members->invited ?? 0),
-            'present_today' => $todaySessions->pluck('user_id')->unique()->count(),
-            'office_hours_today' => round($officeSecondsToday / 3600, 1),
+            'present_today' => $officeToday['present'],
+            'office_hours_today' => round($officeToday['seconds'] / 3600, 1),
             'hours_week' => round(((int) $time->total) / 3600, 1),
             'billable_hours_week' => round(((int) $time->billable) / 3600, 1),
             'timesheets_pending' => Timesheet::withoutGlobalScopes()->where('organization_id', $orgId)->where('status', 'submitted')->count(),
@@ -160,7 +156,15 @@ class WorkspacePulse
             'my_open_tasks' => (clone $mine)->count(),
             'my_overdue_tasks' => (clone $mine)->whereNotNull('due_date')->where('due_date', '<', $today)->count(),
             'my_hours_week' => round(TimeEntry::withoutGlobalScopes()->where('organization_id', $orgId)
-                ->where('user_id', $user->id)->where('started_at', '>=', now()->startOfWeek())->sum('duration_seconds') / 3600, 1),
+                ->where('user_id', $user->id)
+                ->where('started_at', '>=', $this->officeWeekStart(app(OfficeTimezone::class)->forMember($user->id, $orgId)))
+                ->sum('duration_seconds') / 3600, 1),
         ];
+    }
+
+    /** Monday 00:00 in an office timezone, in the timezone timestamps are stored in. */
+    private function officeWeekStart(string $tz): Carbon
+    {
+        return now()->setTimezone($tz)->startOfWeek()->setTimezone(config('app.timezone'));
     }
 }
