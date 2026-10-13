@@ -47,7 +47,7 @@ class OrganizationSettingsController extends Controller
             }
         }
 
-        return ! $membership->isCompanyAdmin();
+        return ! $membership->isCompanyOwner();
     }
 
     public function upgradePlan(Request $request)
