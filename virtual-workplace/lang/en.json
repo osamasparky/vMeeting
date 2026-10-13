@@ -3655,5 +3655,21 @@
     "gantt.no_due": "No due date — shown on its start day only",
     "AI office generator included in this plan": "AI office generator included in this plan",
     "Office Time Zone": "Office Time Zone",
-    "Attendance and working hours in this office are counted in this local time.": "Attendance and working hours in this office are counted in this local time."
+    "Attendance and working hours in this office are counted in this local time.": "Attendance and working hours in this office are counted in this local time.",
+    "Working Hours": "Working Hours",
+    "Working Days": "Working Days",
+    "Day Starts": "Day Starts",
+    "Day Ends": "Day Ends",
+    "Late After (minutes)": "Late After (minutes)",
+    "Attendance reports compare each member against their home office’s working days and hours.": "Attendance reports compare each member against their home office’s working days and hours.",
+    "Home Office": "Home Office",
+    "Main office": "Main office",
+    "Attendance, lateness and working hours follow this office’s schedule and time zone.": "Attendance, lateness and working hours follow this office’s schedule and time zone.",
+    "Sunday": "Sunday",
+    "Monday": "Monday",
+    "Tuesday": "Tuesday",
+    "Wednesday": "Wednesday",
+    "Thursday": "Thursday",
+    "Friday": "Friday",
+    "Saturday": "Saturday"
 }

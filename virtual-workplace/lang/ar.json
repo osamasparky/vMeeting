@@ -3655,5 +3655,21 @@
     "gantt.no_due": "لا يوجد تاريخ استحقاق — تظهر يوم البدء فقط",
     "AI office generator included in this plan": "مولّد المكاتب بالذكاء الاصطناعي ضمن هذه الباقة",
     "Office Time Zone": "المنطقة الزمنية للمكتب",
-    "Attendance and working hours in this office are counted in this local time.": "يُحسب الحضور وساعات العمل في هذا المكتب بهذا التوقيت المحلي."
+    "Attendance and working hours in this office are counted in this local time.": "يُحسب الحضور وساعات العمل في هذا المكتب بهذا التوقيت المحلي.",
+    "Working Hours": "ساعات العمل",
+    "Working Days": "أيام العمل",
+    "Day Starts": "بداية الدوام",
+    "Day Ends": "نهاية الدوام",
+    "Late After (minutes)": "يُحتسب تأخيراً بعد (دقيقة)",
+    "Attendance reports compare each member against their home office’s working days and hours.": "تقارير الحضور تقارن كل موظف بأيام وساعات عمل مكتبه الأساسي.",
+    "Home Office": "المكتب الأساسي",
+    "Main office": "المكتب الرئيسي",
+    "Attendance, lateness and working hours follow this office’s schedule and time zone.": "يُحسب الحضور والتأخير وساعات العمل حسب مواعيد هذا المكتب ومنطقته الزمنية.",
+    "Sunday": "الأحد",
+    "Monday": "الإثنين",
+    "Tuesday": "الثلاثاء",
+    "Wednesday": "الأربعاء",
+    "Thursday": "الخميس",
+    "Friday": "الجمعة",
+    "Saturday": "السبت"
 }

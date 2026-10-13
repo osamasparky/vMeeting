@@ -101,6 +101,7 @@ class BuildMemberProfileDetailsAction
                 'status' => $member->status,
                 'joined_at' => $member->joined_at ? $member->joined_at->format('M d, Y') : ($member->created_at ? $member->created_at->format('M d, Y') : '—'),
                 'allowed_office_ids' => $member->offices->pluck('id')->toArray(),
+                'home_floor_id' => $member->home_floor_id,
                 'allowed_room_ids' => $member->rooms->pluck('id')->toArray(),
             ],
             'profile' => [

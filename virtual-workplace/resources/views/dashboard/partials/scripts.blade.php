@@ -287,6 +287,7 @@
             }
 
             // Reset checkboxes
+            document.getElementById('edit-member-home-office').value = '';
             document.querySelectorAll('.edit-member-office-cb').forEach(cb => cb.checked = false);
             document.querySelectorAll('.edit-member-room-cb').forEach(cb => cb.checked = false);
 
@@ -295,6 +296,7 @@
                 .then(r => r.json())
                 .then(data => {
                     if (data.member) {
+                        document.getElementById('edit-member-home-office').value = data.member.home_floor_id || '';
                         if (data.member.allowed_office_ids && Array.isArray(data.member.allowed_office_ids)) {
                             data.member.allowed_office_ids.forEach(id => {
                                 const el = document.getElementById(`edit-office-${id}`);
@@ -327,13 +329,22 @@
         function closeNewOfficeModal() {
             document.getElementById('new-office-modal').style.display = 'none';
         }
-        function openEditOfficeModal(officeId, name, city, desc, isDefault, timezone) {
+        function openEditOfficeModal(officeId, name, city, desc, isDefault, timezone, schedule) {
             document.getElementById('edit-office-form').action = `/offices/${officeId}`;
             document.getElementById('edit-office-name-input').value = name || '';
             document.getElementById('edit-office-city-input').value = city || '';
             document.getElementById('edit-office-desc-input').value = desc || '';
             document.getElementById('edit-office-default-input').checked = !!isDefault;
             document.getElementById('edit-office-timezone-select').value = timezone || 'UTC';
+            const sched = schedule || {};
+            const workDays = Array.isArray(sched.days) ? sched.days.map(Number) : [0, 1, 2, 3, 4];
+            for (let d = 0; d <= 6; d++) {
+                const box = document.getElementById(`edit-office-day-${d}`);
+                if (box) box.checked = workDays.includes(d);
+            }
+            document.getElementById('edit-office-start').value = sched.start || '09:00';
+            document.getElementById('edit-office-end').value = sched.end || '17:00';
+            document.getElementById('edit-office-grace').value = sched.grace ?? 15;
             document.getElementById('edit-office-modal').style.display = 'flex';
         }
         function closeEditOfficeModal() {

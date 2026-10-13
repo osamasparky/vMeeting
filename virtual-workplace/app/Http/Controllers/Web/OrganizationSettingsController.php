@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class OrganizationSettingsController extends Controller
 {
@@ -687,6 +688,8 @@ class OrganizationSettingsController extends Controller
             'allowed_offices.*' => ['uuid', 'exists:floors,id'],
             'allowed_rooms' => ['nullable', 'array'],
             'allowed_rooms.*' => ['uuid', 'exists:rooms,id'],
+            // The office whose working hours and timezone apply to the member.
+            'home_floor_id' => ['nullable', 'uuid', Rule::exists('floors', 'id')->where('organization_id', $membership->organization_id)],
         ]);
 
         $targetRole = Role::findOrFail($validated['role_id']);
@@ -716,6 +719,7 @@ class OrganizationSettingsController extends Controller
         $member->update([
             'role_id' => $validated['role_id'],
             'status' => $validated['status'],
+            'home_floor_id' => array_key_exists('home_floor_id', $validated) ? $validated['home_floor_id'] : $member->home_floor_id,
         ]);
 
         // Sync allowed offices & rooms

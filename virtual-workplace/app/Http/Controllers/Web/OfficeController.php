@@ -214,6 +214,7 @@ class OfficeController extends Controller
             'city_location' => ['nullable', 'string', 'max:255'],
             // Working hours in this office are counted in its local time.
             'timezone' => ['required', 'timezone:all'],
+            ...self::scheduleRules(),
             'description' => ['nullable', 'string', 'max:1000'],
             'is_default' => ['nullable', 'boolean'],
         ]);
@@ -226,6 +227,7 @@ class OfficeController extends Controller
             'name' => $validated['name'],
             'city_location' => $validated['city_location'] ?? null,
             'timezone' => $validated['timezone'],
+            ...self::scheduleValues($validated),
             'description' => $validated['description'] ?? null,
             'is_default' => ! empty($validated['is_default']),
             'order' => $organization->floors()->count() + 1,
@@ -271,6 +273,33 @@ class OfficeController extends Controller
     }
 
     /**
+     * Office working hours. Optional, so clients that predate them keep
+     * working; a new office without them gets Sun–Thu 09:00–17:00, 15 min grace.
+     */
+    private static function scheduleRules(): array
+    {
+        return [
+            'work_days' => ['sometimes', 'required', 'array', 'min:1'],
+            'work_days.*' => ['integer', 'between:0,6'],
+            'work_start' => ['sometimes', 'required', 'date_format:H:i'],
+            'work_end' => ['sometimes', 'required', 'date_format:H:i', 'different:work_start'],
+            'late_grace_minutes' => ['sometimes', 'required', 'integer', 'between:0,240'],
+        ];
+    }
+
+    private static function scheduleValues(array $validated, ?Floor $floor = null): array
+    {
+        return [
+            'work_days' => isset($validated['work_days'])
+                ? array_values(array_unique(array_map('intval', $validated['work_days'])))
+                : ($floor?->work_days ?? Floor::DEFAULT_WORK_DAYS),
+            'work_start' => $validated['work_start'] ?? $floor?->work_start ?? '09:00',
+            'work_end' => $validated['work_end'] ?? $floor?->work_end ?? '17:00',
+            'late_grace_minutes' => (int) ($validated['late_grace_minutes'] ?? $floor?->late_grace_minutes ?? 15),
+        ];
+    }
+
+    /**
      * Update Office branch details.
      */
     public function updateOffice(Request $request, Floor $floor)
@@ -289,6 +318,7 @@ class OfficeController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'city_location' => ['nullable', 'string', 'max:255'],
             'timezone' => ['sometimes', 'required', 'timezone:all'],
+            ...self::scheduleRules(),
             'description' => ['nullable', 'string', 'max:1000'],
             'is_default' => ['nullable', 'boolean'],
         ]);
@@ -301,6 +331,7 @@ class OfficeController extends Controller
             'name' => $validated['name'],
             'city_location' => $validated['city_location'] ?? null,
             'timezone' => $validated['timezone'] ?? $floor->timezone,
+            ...self::scheduleValues($validated, $floor),
             'description' => $validated['description'] ?? null,
             'is_default' => ! empty($validated['is_default']),
         ]);

@@ -1240,6 +1240,18 @@
                     </div>
                 </div>
 
+                <!-- Employment: home office (whose working hours and timezone apply) -->
+                <div>
+                    <label for="edit-member-home-office" style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Home Office') }}</label>
+                    <select name="home_floor_id" id="edit-member-home-office" style="width: 100%; min-height: 44px; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        <option value="">— {{ __('Main office') }} —</option>
+                        @foreach($offices as $off)
+                            <option value="{{ $off->id }}">{{ $off->name }}</option>
+                        @endforeach
+                    </select>
+                    <div style="font-size: 11px; color: var(--ula-text-muted); margin-top: 4px;">{{ __('Attendance, lateness and working hours follow this office’s schedule and time zone.') }}</div>
+                </div>
+
                 <!-- Granular Office Access Permissions -->
                 <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 12px;">
                     <label style="display: block; font-size: 12px; font-weight: 800; color: var(--ula-text-primary); margin-bottom: 4px;">
@@ -1315,6 +1327,8 @@
 
                 @include('dashboard.partials.office-timezone-select', ['selectId' => 'new-office-timezone-select', 'selected' => $organization->timezone ?? 'UTC'])
 
+                @include('dashboard.partials.office-schedule-fields', ['prefix' => 'new-office', 'office' => null])
+
                 <div>
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Description') }}</label>
                     <textarea name="description" rows="3" placeholder="Brief description of this branch and its teams..." style="width: 100%; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;"></textarea>
@@ -1355,6 +1369,8 @@
                 </div>
 
                 @include('dashboard.partials.office-timezone-select', ['selectId' => 'edit-office-timezone-select', 'selected' => null])
+
+                @include('dashboard.partials.office-schedule-fields', ['prefix' => 'edit-office', 'office' => null])
 
                 <div>
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Description') }}</label>

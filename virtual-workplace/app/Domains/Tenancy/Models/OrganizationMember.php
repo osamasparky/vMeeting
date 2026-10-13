@@ -16,6 +16,7 @@ class OrganizationMember extends Model
         'organization_id',
         'user_id',
         'role_id',
+        'home_floor_id',
         'status',
         'cost_rate',
         'billing_rate',
@@ -52,6 +53,12 @@ class OrganizationMember extends Model
     {
         return $this->belongsToMany(Floor::class, 'member_office_access', 'organization_member_id', 'floor_id')
             ->withTimestamps();
+    }
+
+    /** The office whose schedule and timezone the member works to. */
+    public function homeOffice(): BelongsTo
+    {
+        return $this->belongsTo(Floor::class, 'home_floor_id');
     }
 
     public function rooms(): BelongsToMany
