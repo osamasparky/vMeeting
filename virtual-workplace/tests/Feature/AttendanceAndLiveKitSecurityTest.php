@@ -81,8 +81,10 @@ class AttendanceAndLiveKitSecurityTest extends TestCase
         $this->assertEquals($this->room->id, $session->room_id);
         $this->assertNull($session->ended_at);
 
-        // 2. Heartbeat
-        $updated = $service->recordHeartbeat($this->user, $this->organization, $this->room->id, 120);
+        // 2. Heartbeat — duration is measured on the server from started_at
+        $this->travel(120)->seconds();
+        $updated = $service->recordHeartbeat($this->user, $this->organization, $this->room->id);
+        $this->assertSame($session->id, $updated->id);
         $this->assertEquals(120, $updated->duration_seconds);
 
         // 3. Leave room

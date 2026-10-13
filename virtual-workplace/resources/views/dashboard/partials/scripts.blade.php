@@ -3183,7 +3183,8 @@
 
                 const officeSec = data.total_office_seconds || 0;
                 const taskSec = data.total_task_seconds || 0;
-                const idleSec = Math.max(0, officeSec - taskSec);
+                // Office time with no task running. Not office − task: a timer can run outside the office.
+                const idleSec = Math.max(0, Number(data.idle_seconds) || 0);
 
                 if (officeEl) officeEl.textContent = data.total_office_formatted || '00:00:00';
                 if (taskEl) taskEl.textContent = data.total_task_formatted || '00:00:00';

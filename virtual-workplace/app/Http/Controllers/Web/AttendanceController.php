@@ -42,7 +42,8 @@ class AttendanceController extends Controller
         $validated = $request->validate([
             'room_id' => 'nullable|uuid|exists:rooms,id',
             'action' => 'required|in:enter,leave,heartbeat,idle_pause,idle_resume',
-            'duration_seconds' => 'nullable|integer',
+            // For idle_pause: seconds since the user's last activity. Otherwise informational only.
+            'duration_seconds' => 'nullable|integer|min:0|max:86400',
         ]);
 
         $organization = $membership->organization;
@@ -55,9 +56,9 @@ class AttendanceController extends Controller
         } elseif ($action === 'leave') {
             $attendanceService->endSession($user, $organization, $roomId);
         } elseif ($action === 'heartbeat') {
-            $attendanceService->recordHeartbeat($user, $organization, $roomId, $validated['duration_seconds'] ?? null);
+            $attendanceService->recordHeartbeat($user, $organization, $roomId);
         } elseif ($action === 'idle_pause') {
-            $attendanceService->pauseSessionForIdle($user, $organization);
+            $attendanceService->pauseSessionForIdle($user, $organization, $validated['duration_seconds'] ?? null);
         } elseif ($action === 'idle_resume') {
             $attendanceService->resumeSessionFromIdle($user, $organization, $roomId);
         }

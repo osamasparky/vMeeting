@@ -7,6 +7,7 @@ use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Workspace\Models\Room;
 use App\Traits\BelongsToOrganization;
 use App\Traits\HasUuid;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -63,23 +64,22 @@ class AttendanceSession extends Model
         return $this->status === 'idle_paused';
     }
 
-    public function pauseForIdle(): self
+    /** End the session at the user's last activity, not when the idle prompt ran out. */
+    public function pauseForIdle(?CarbonInterface $lastActiveAt = null): self
     {
-        $now = now();
-        $this->ended_at = $now;
-        $this->status = 'idle_paused';
-        $this->duration_seconds = max(0, (int) $this->started_at->diffInSeconds($now));
-        $this->save();
-
-        return $this;
+        return $this->close('idle_paused', $lastActiveAt);
     }
 
-    public function close(string $status = 'completed'): self
+    public function close(string $status = 'completed', ?CarbonInterface $at = null): self
     {
-        $now = now();
-        $this->ended_at = $now;
+        $end = $at ?? now();
+        if ($end->lt($this->started_at)) {
+            $end = $this->started_at;
+        }
+
+        $this->ended_at = $end;
         $this->status = $status;
-        $this->duration_seconds = max(0, (int) $this->started_at->diffInSeconds($now));
+        $this->duration_seconds = max(0, $end->getTimestamp() - $this->started_at->getTimestamp());
         $this->save();
 
         return $this;

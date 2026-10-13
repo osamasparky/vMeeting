@@ -2,6 +2,7 @@
 
 namespace App\Domains\People\Controllers;
 
+use App\Domains\People\Services\AttendanceService;
 use App\Domains\Projects\Models\ActiveTimer;
 use App\Domains\Projects\Models\TimeEntry;
 use App\Domains\Tenancy\Models\Organization;
@@ -15,39 +16,25 @@ class AttendanceApiController extends Controller
     /**
      * Get attendance summary for today.
      */
-    public function summary(Request $request, Organization $organization): JsonResponse
+    public function summary(Request $request, Organization $organization, AttendanceService $attendance): JsonResponse
     {
         $user = $request->user();
-        $today = Carbon::today();
 
         // Check for an active running timer
         $activeTimer = ActiveTimer::where('user_id', $user->id)
             ->where('organization_id', $organization->id)
             ->first();
 
-        // Calculate total tracked time today in seconds
-        $timeEntries = TimeEntry::where('user_id', $user->id)
-            ->where('organization_id', $organization->id)
-            ->whereDate('started_at', $today)
-            ->get();
-
-        $totalSeconds = 0;
-        foreach ($timeEntries as $entry) {
-            if ($entry->ended_at) {
-                $totalSeconds += Carbon::parse($entry->started_at)->diffInSeconds(Carbon::parse($entry->ended_at));
-            }
-        }
-
-        if ($activeTimer) {
-            $totalSeconds += Carbon::parse($activeTimer->started_at)->diffInSeconds(now());
-        }
+        // Task time today (organization's timezone), running timer included — same figure as the web timesheet.
+        $day = $attendance->getDailyTimesheetData($user->id, $organization->id);
+        $totalSeconds = (int) $day['total_task_seconds'];
 
         return response()->json([
             'is_clocked_in' => $activeTimer !== null,
             'clock_in_time' => $activeTimer ? $activeTimer->started_at : null,
             'today_total_seconds' => $totalSeconds,
-            'today_total_formatted' => gmdate('H:i:s', $totalSeconds),
-            'date' => $today->toDateString(),
+            'today_total_formatted' => sprintf('%02d:%02d:%02d', intdiv($totalSeconds, 3600), intdiv($totalSeconds % 3600, 60), $totalSeconds % 60),
+            'date' => $day['date'],
         ]);
     }
 
@@ -101,14 +88,18 @@ class AttendanceApiController extends Controller
 
         $startedAt = Carbon::parse($activeTimer->started_at);
         $endedAt = now();
-        $durationMinutes = max(1, $startedAt->diffInMinutes($endedAt));
+        $durationSeconds = max(1, $endedAt->getTimestamp() - $startedAt->getTimestamp());
+        $durationMinutes = intdiv($durationSeconds, 60);
 
+        // duration_seconds is the column; the old duration_minutes key was silently dropped, booking 0.
         $timeEntry = TimeEntry::create([
             'organization_id' => $organization->id,
             'user_id' => $user->id,
+            'project_id' => $activeTimer->project_id,
+            'task_id' => $activeTimer->task_id,
             'started_at' => $startedAt,
             'ended_at' => $endedAt,
-            'duration_minutes' => $durationMinutes,
+            'duration_seconds' => $durationSeconds,
             'description' => $activeTimer->description ?? 'General Work Shift',
             'status' => 'approved',
         ]);

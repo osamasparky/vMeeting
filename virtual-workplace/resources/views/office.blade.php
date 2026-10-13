@@ -7789,19 +7789,23 @@
         let isIdleCheckModalOpen = false;
 
         // 1. Attendance Heartbeat & Presence Logger & Live Office Clock
+        // The clock shows the server's figure for today plus wall-clock time since it was fetched.
+        // Counting +1 per tick drifts: background tabs throttle timers to once a minute.
         let officeAttendanceTotalSeconds = 0;
+        let officeAttendanceBaseAt = Date.now();
         let officeAttendanceTimerInterval = null;
 
         async function fetchInitialAttendanceSummary() {
             if (isGuest) return;
             try {
-                const res = await fetch(`/api/office/attendance/summary?organization_id=${CONFIG.org?.id}`, {
+                const res = await fetch(`/api/office/attendance/summary?period=today&organization_id=${CONFIG.org?.id}`, {
                     headers: { 'Accept': 'application/json', 'X-CSRF-TOKEN': CONFIG.csrf }
                 });
                 if (res.ok) {
                     const data = await res.json();
                     if (data && typeof data.today_total_seconds !== 'undefined') {
                         officeAttendanceTotalSeconds = Math.floor(Number(data.today_total_seconds) || 0);
+                        officeAttendanceBaseAt = Date.now();
                     }
                 }
             } catch(e) {}
@@ -7814,9 +7818,8 @@
             
             function tick() {
                 if (!isOfficePresencePaused) {
-                    officeAttendanceTotalSeconds = Math.floor(officeAttendanceTotalSeconds) + 1;
                     if (clockEl) {
-                        const totalSecs = Math.floor(officeAttendanceTotalSeconds);
+                        const totalSecs = officeAttendanceTotalSeconds + Math.max(0, Math.floor((Date.now() - officeAttendanceBaseAt) / 1000));
                         const hrs = String(Math.floor(totalSecs / 3600)).padStart(2, '0');
                         const mins = String(Math.floor((totalSecs % 3600) / 60)).padStart(2, '0');
                         const secs = String(totalSecs % 60).padStart(2, '0');
@@ -7862,6 +7865,14 @@
                     logAttendance('heartbeat', 45);
                 }
             }, 45000);
+
+            // After sleep or a long-hidden tab the server closed the session at its last heartbeat
+            // and starts a new one; resync so the clock does not count the gap.
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible' && !isOfficePresencePaused) {
+                    logAttendance('heartbeat').then(fetchInitialAttendanceSummary);
+                }
+            });
 
             // Log exit on page unload
             window.addEventListener('beforeunload', () => {
@@ -7958,7 +7969,8 @@
             const pausedOverlay = document.getElementById('office-idle-paused-overlay');
             if (pausedOverlay) pausedOverlay.style.display = 'flex';
             isOfficePresencePaused = true;
-            logAttendance('idle_pause');
+            // The server ends the session at the last activity, so the idle stretch is not counted.
+            logAttendance('idle_pause', Math.round((Date.now() - lastUserActivityTimestamp) / 1000));
         }
 
         function resumeUserPresenceFromPaused() {
@@ -7966,7 +7978,7 @@
             if (pausedOverlay) pausedOverlay.style.display = 'none';
             isOfficePresencePaused = false;
             lastUserActivityTimestamp = Date.now();
-            logAttendance('idle_resume');
+            logAttendance('idle_resume').then(fetchInitialAttendanceSummary);
             showToast('▶️ {{ __("Welcome back! Presence tracking resumed.") }}');
         }
 
