@@ -118,4 +118,7 @@
         </div>
         @endforelse
     </div>
+
+    {{-- Loaded when the tab opens (see loadHrPanels in scripts). --}}
+    <div data-hr-panel="holidays" aria-live="polite"></div>
 </div>

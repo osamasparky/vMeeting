@@ -134,6 +134,22 @@
             if (finalTabName === 'timesheets' && typeof refreshDailyTimesheet === 'function') {
                 refreshDailyTimesheet();
             }
+            loadHrPanels(targetTab);
+        }
+
+        // HR panels (holidays, leave, attendance report) are fetched when their tab opens.
+        // data-hr-panel names the panel; data-hr-query adds query parameters (e.g. month=2026-10).
+        async function loadHrPanels(scope) {
+            const panels = (scope || document).querySelectorAll('[data-hr-panel]');
+            for (const el of panels) {
+                const query = el.dataset.hrQuery ? `?${el.dataset.hrQuery}` : '';
+                try {
+                    const res = await fetch(`/hr/panel/${el.dataset.hrPanel}${query}`, { headers: { 'Accept': 'text/html' }, credentials: 'same-origin' });
+                    if (res.ok) el.innerHTML = await res.text();
+                } catch (e) {
+                    console.error('[HR] panel failed to load:', el.dataset.hrPanel, e);
+                }
+            }
         }
 
         // Global Live Search Filter

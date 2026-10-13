@@ -9,6 +9,7 @@ use App\Http\Controllers\Web\AttendanceController;
 use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\GuestAccessController;
+use App\Http\Controllers\Web\HrController;
 use App\Http\Controllers\Web\OfficeController;
 use App\Http\Controllers\Web\OrganizationSettingsController;
 use App\Http\Controllers\Web\ProjectHubController;
@@ -71,6 +72,11 @@ Route::middleware('auth')->group(function () {
     Route::put('/offices/{floor}', [OfficeController::class, 'updateOffice'])->name('offices.update');
     Route::delete('/offices/{floor}', [OfficeController::class, 'deleteOffice'])->name('offices.delete');
     Route::post('/organization/ai-map/generate', [OfficeController::class, 'generateAiOffice'])->middleware('throttle:expensive')->name('organization.ai_map.generate');
+
+    // Personnel affairs: official holidays
+    Route::get('/hr/panel/{panel}', [HrController::class, 'panel'])->name('hr.panel');
+    Route::post('/hr/holidays', [HrController::class, 'storeHoliday'])->name('hr.holidays.store');
+    Route::delete('/hr/holidays/{holiday}', [HrController::class, 'deleteHoliday'])->name('hr.holidays.delete');
 
     // Departments & Teams Management
     Route::post('/departments', [OrganizationSettingsController::class, 'storeDepartment'])->name('departments.store');

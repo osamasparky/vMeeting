@@ -3671,5 +3671,19 @@
     "Wednesday": "الأربعاء",
     "Thursday": "الخميس",
     "Friday": "الجمعة",
-    "Saturday": "السبت"
+    "Saturday": "السبت",
+    "Official Holidays": "العطلات الرسمية",
+    "Holiday Name": "اسم العطلة",
+    "e.g. Eid al-Fitr": "مثال: عيد الفطر",
+    "From": "من",
+    "To": "إلى",
+    "Applies To": "تنطبق على",
+    "All offices": "كل المكاتب",
+    "Add Holiday": "إضافة عطلة",
+    "No official holidays yet": "لا توجد عطلات رسمية بعد",
+    "Holidays added here are excluded from working days in attendance reports.": "العطلات المضافة هنا تُستبعد من أيام العمل في تقارير الحضور.",
+    "Remove this holiday?": "حذف هذه العطلة؟",
+    "Holiday added.": "تمت إضافة العطلة.",
+    "Holiday removed.": "تم حذف العطلة.",
+    "A holiday can span at most 60 days.": "لا يمكن أن تزيد العطلة عن 60 يوماً."
 }

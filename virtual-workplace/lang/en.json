@@ -3671,5 +3671,19 @@
     "Wednesday": "Wednesday",
     "Thursday": "Thursday",
     "Friday": "Friday",
-    "Saturday": "Saturday"
+    "Saturday": "Saturday",
+    "Official Holidays": "Official Holidays",
+    "Holiday Name": "Holiday Name",
+    "e.g. Eid al-Fitr": "e.g. Eid al-Fitr",
+    "From": "From",
+    "To": "To",
+    "Applies To": "Applies To",
+    "All offices": "All offices",
+    "Add Holiday": "Add Holiday",
+    "No official holidays yet": "No official holidays yet",
+    "Holidays added here are excluded from working days in attendance reports.": "Holidays added here are excluded from working days in attendance reports.",
+    "Remove this holiday?": "Remove this holiday?",
+    "Holiday added.": "Holiday added.",
+    "Holiday removed.": "Holiday removed.",
+    "A holiday can span at most 60 days.": "A holiday can span at most 60 days."
 }
