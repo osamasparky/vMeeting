@@ -59,6 +59,10 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
+            // Talk to the database in UTC, like the app. On SYSTEM (the server's CET/CEST), TIMESTAMP
+            // values were converted through local time: shifted by its offset, and the DST changeover
+            // hour each year is ambiguous or invalid.
+            'timezone' => env('DB_TIMEZONE', '+00:00'),
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
@@ -79,6 +83,10 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
+            // Talk to the database in UTC, like the app. On SYSTEM (the server's CET/CEST), TIMESTAMP
+            // values were converted through local time: shifted by its offset, and the DST changeover
+            // hour each year is ambiguous or invalid.
+            'timezone' => env('DB_TIMEZONE', '+00:00'),
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 (PHP_VERSION_ID >= 80500 ? Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
