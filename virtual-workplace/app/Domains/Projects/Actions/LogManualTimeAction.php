@@ -5,7 +5,7 @@ namespace App\Domains\Projects\Actions;
 use App\Domains\Identity\Models\User;
 use App\Domains\Projects\Models\TimeEntry;
 use App\Domains\Tenancy\Models\Organization;
-use Carbon\Carbon;
+use App\Domains\Workspace\Services\OfficeTimezone;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -14,8 +14,10 @@ class LogManualTimeAction
     public function execute(array $data, Organization $organization, User $user): TimeEntry
     {
         return DB::transaction(function () use ($data, $organization, $user) {
-            $startedAt = Carbon::parse($data['started_at']);
-            $endedAt = Carbon::parse($data['ended_at']);
+            // Typed in the member's office time unless an offset is given; stored in UTC.
+            $tz = app(OfficeTimezone::class)->forMember($user->id, $organization->id);
+            $startedAt = OfficeTimezone::toStorage($data['started_at'], $tz);
+            $endedAt = OfficeTimezone::toStorage($data['ended_at'], $tz);
 
             if ($endedAt->lessThanOrEqualTo($startedAt)) {
                 throw new InvalidArgumentException('End time must be strictly after start time.');

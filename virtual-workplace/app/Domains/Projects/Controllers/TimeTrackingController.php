@@ -13,6 +13,7 @@ use App\Domains\Projects\Requests\StartTimerRequest;
 use App\Domains\Projects\Requests\UpdateTimeEntryRequest;
 use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Tenancy\Models\OrganizationMember;
+use App\Domains\Workspace\Services\OfficeTimezone;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -192,6 +193,13 @@ class TimeTrackingController extends Controller
         $this->authorizeEntryOwner($request, $timeEntry);
 
         $data = $request->validated();
+        // Typed in the entry owner's office time unless an offset is given; stored in UTC.
+        $tz = app(OfficeTimezone::class)->forMember($timeEntry->user_id, $organization->id);
+        foreach (['started_at', 'ended_at'] as $field) {
+            if (! empty($data[$field])) {
+                $data[$field] = OfficeTimezone::toStorage((string) $data[$field], $tz);
+            }
+        }
         $timeEntry->fill($data);
 
         // Keep the stored duration in step with an edited start/end window.

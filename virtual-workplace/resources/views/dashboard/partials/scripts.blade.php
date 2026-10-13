@@ -3172,7 +3172,9 @@
         }
 
         // ── DUAL-SECTION DAILY TIMESHEETS & ATTENDANCE ENGINE ──
-        let currentTimesheetDate = document.getElementById('ts-filter-date')?.value || new Date().toISOString().split('T')[0];
+        // Empty = "today" in the member's office time; the server decides and the reply fills the date in.
+        // (toISOString() would give the UTC date, which is yesterday or tomorrow near midnight.)
+        let currentTimesheetDate = document.getElementById('ts-filter-date')?.value || '';
         let currentTimesheetUserId = document.getElementById('ts-filter-user')?.value || '{{ $user->id }}';
 
         function handleTimesheetDateChange(val) {
@@ -3194,15 +3196,10 @@
         }
 
         function setTimesheetToday() {
-            const today = new Date();
-            const yyyy = today.getFullYear();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const dd = String(today.getDate()).padStart(2, '0');
-            const todayStr = `${yyyy}-${mm}-${dd}`;
             const input = document.getElementById('ts-filter-date');
-            if (input) input.value = todayStr;
-            currentTimesheetDate = todayStr;
-            loadDailyTimesheetsData(currentTimesheetDate, currentTimesheetUserId);
+            if (input) input.value = '';
+            currentTimesheetDate = '';
+            loadDailyTimesheetsData('', currentTimesheetUserId);
         }
 
         function handleTimesheetUserChange(val) {
@@ -3217,11 +3214,11 @@
         }
 
         async function loadDailyTimesheetsData(date, userId) {
-            if (!date) date = new Date().toISOString().split('T')[0];
             if (!userId) userId = '{{ $user->id }}';
+            const dateParam = date ? `date=${encodeURIComponent(date)}&` : '';
 
             try {
-                const res = await fetch(`/api/timesheets/daily-summary?date=${encodeURIComponent(date)}&user_id=${encodeURIComponent(userId)}`, {
+                const res = await fetch(`/api/timesheets/daily-summary?${dateParam}user_id=${encodeURIComponent(userId)}`, {
                     headers: {
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': CSRF_TOKEN
@@ -3235,6 +3232,13 @@
                 }
 
                 const data = await res.json();
+
+                // The day the server reported on (for "today", the member's office date).
+                if (data.date) {
+                    currentTimesheetDate = data.date;
+                    const dateInput = document.getElementById('ts-filter-date');
+                    if (dateInput) dateInput.value = data.date;
+                }
 
                 // 1. Update KPI Summary Cards
                 // The ids sit on the x-kpi-card element; the figure itself is its [data-kpi-value] child.

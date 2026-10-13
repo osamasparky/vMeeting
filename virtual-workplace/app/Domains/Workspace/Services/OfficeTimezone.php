@@ -7,6 +7,7 @@ use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Domains\Workspace\Models\Floor;
 use App\Domains\Workspace\Models\Room;
+use Illuminate\Support\Carbon;
 
 /**
  * Which local time a working day is counted in.
@@ -50,6 +51,18 @@ class OfficeTimezone
         }
 
         return $this->defaults[$organizationId];
+    }
+
+    /**
+     * A date-time a member typed, as stored. A value without an offset (what a
+     * datetime-local field sends) is the member's office time; a value with an
+     * offset keeps it. Stored timestamps are in the app timezone (UTC), and
+     * Eloquent writes a Carbon's wall-clock time without converting it — so
+     * the conversion has to happen here.
+     */
+    public static function toStorage(string $value, string $timezone): Carbon
+    {
+        return Carbon::parse($value, $timezone)->setTimezone(config('app.timezone'));
     }
 
     public function forSession(AttendanceSession $session): string

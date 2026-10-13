@@ -114,7 +114,8 @@ class AttendanceController extends Controller
             }
         }
 
-        $date = $request->query('date', now()->format('Y-m-d'));
+        // No date: "today" in the member's office time, decided by the service — not the server's UTC date.
+        $date = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $request->query('date')) ? (string) $request->query('date') : null;
         $data = $attendanceService->getDailyTimesheetData($targetUserId, $membership->organization_id, $date);
 
         return response()->json($data);
