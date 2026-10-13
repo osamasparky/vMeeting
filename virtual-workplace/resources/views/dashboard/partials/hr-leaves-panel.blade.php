@@ -34,8 +34,8 @@
                     </div>
                     <label class="sr-only" for="leave-note-{{ $leave->id }}">{{ __('Note to the employee (optional)') }}</label>
                     <input type="text" name="note" id="leave-note-{{ $leave->id }}" maxlength="500" placeholder="{{ __('Note to the employee (optional)') }}" style="{{ $leaveField }} flex: 1 1 200px; width: auto;">
-                    <x-btn variant="primary" size="md" type="submit" icon="check">{{ __('Approve') }}</x-btn>
-                    <x-btn variant="danger" size="md" type="submit" icon="close" formaction="{{ route('hr.leaves.reject', $leave) }}">{{ __('Reject') }}</x-btn>
+                    <x-btn variant="primary" size="md" type="submit" icon="check">{{ __('hr.leave.approve') }}</x-btn>
+                    <x-btn variant="danger" size="md" type="submit" icon="close" formaction="{{ route('hr.leaves.reject', $leave) }}">{{ __('hr.leave.reject') }}</x-btn>
                 </form>
             @endforeach
         </div>

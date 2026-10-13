@@ -31,6 +31,7 @@
             ['workload', 'nav.workload', 'stacked_bar_chart', $membership->hasPermission('reports.view') || $isCompanyAdmin, null],
         ]],
         ['nav.hr_section', [
+            ['attendance', 'nav.attendance', 'fact_check', true, null],
             ['leaves', 'nav.leaves', 'beach_access', true, null],
         ]],
         ['nav.admin_section', [

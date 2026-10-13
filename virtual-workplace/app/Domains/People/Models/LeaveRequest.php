@@ -82,10 +82,10 @@ class LeaveRequest extends Model
     public function statusLabel(): string
     {
         return match ($this->status) {
-            self::STATUS_APPROVED => __('Approved'),
-            self::STATUS_REJECTED => __('Rejected'),
-            self::STATUS_CANCELLED => __('Cancelled'),
-            default => __('Pending'),
+            self::STATUS_APPROVED => __('hr.leave.approved'),
+            self::STATUS_REJECTED => __('hr.leave.rejected'),
+            self::STATUS_CANCELLED => __('hr.leave.cancelled'),
+            default => __('hr.leave.pending'),
         };
     }
 }

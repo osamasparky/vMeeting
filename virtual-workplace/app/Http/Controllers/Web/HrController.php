@@ -5,17 +5,21 @@ namespace App\Http\Controllers\Web;
 use App\Domains\People\Models\LeaveRequest;
 use App\Domains\People\Models\OfficeHoliday;
 use App\Domains\People\Services\LeaveService;
+use App\Domains\People\Services\MonthlyAttendanceReport;
 use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Domains\Workspace\Models\Floor;
 use App\Domains\Workspace\Services\OfficeTimezone;
 use App\Http\Controllers\Controller;
+use App\Support\SpreadsheetExport;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
  * Personnel affairs on the dashboard: official holidays, leave requests and
@@ -23,7 +27,10 @@ use Illuminate\Validation\ValidationException;
  */
 class HrController extends Controller
 {
-    public function __construct(protected LeaveService $leaves) {}
+    public function __construct(
+        protected LeaveService $leaves,
+        protected MonthlyAttendanceReport $reports,
+    ) {}
 
     private function currentMembership(): OrganizationMember
     {
@@ -56,6 +63,7 @@ class HrController extends Controller
                 ])
                 : abort(403),
             'leaves' => response()->view('dashboard.partials.hr-leaves-panel', $this->leavesPanelData($membership)),
+            'attendance' => response()->view('dashboard.partials.hr-attendance-panel', $this->attendancePanelData($request, $membership)),
             default => abort(404),
         };
     }
@@ -82,6 +90,95 @@ class HrController extends Controller
             'pending' => $isOwner ? $requests()->where('status', LeaveRequest::STATUS_PENDING)->orderBy('start_date')->get() : collect(),
             'decided' => $isOwner ? $requests()->where('status', '!=', LeaveRequest::STATUS_PENDING)->latest('updated_at')->limit(30)->get() : collect(),
         ];
+    }
+
+    // ── Monthly attendance report ──
+
+    /** Seeing other members' attendance: the owner and whoever may view reports or manage members. */
+    private function canViewOthers(OrganizationMember $membership): bool
+    {
+        return $membership->isCompanyOwner() || $membership->hasPermission('reports.view')
+            || $membership->hasPermission('members.manage') || (bool) Auth::user()?->isSuperAdmin();
+    }
+
+    /**
+     * Which member and month the report is for. `member` is a user id or "all"
+     * (team summary); members who may not view others always get their own.
+     *
+     * @return array{0: string, 1: string} [member, month]
+     */
+    private function reportScope(Request $request, OrganizationMember $membership): array
+    {
+        $month = preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', (string) $request->query('month')) ? (string) $request->query('month')
+            : now()->setTimezone(app(OfficeTimezone::class)->forMember($membership->user_id, $membership->organization_id))->format('Y-m');
+
+        $member = (string) $request->query('member', $membership->user_id);
+        if (! $this->canViewOthers($membership)) {
+            $member = $membership->user_id;
+        } elseif ($member !== 'all' && ! OrganizationMember::where('organization_id', $membership->organization_id)->where('user_id', $member)->exists()) {
+            $member = $membership->user_id;
+        }
+
+        return [$member, $month];
+    }
+
+    private function attendancePanelData(Request $request, OrganizationMember $membership): array
+    {
+        [$member, $month] = $this->reportScope($request, $membership);
+        $canViewOthers = $this->canViewOthers($membership);
+
+        return [
+            'month' => $month,
+            'member' => $member,
+            'canViewOthers' => $canViewOthers,
+            'members' => $canViewOthers
+                ? OrganizationMember::where('organization_id', $membership->organization_id)->where('status', 'active')
+                    ->whereHas('user', fn ($q) => $q->where('is_super_admin', false))->with('user:id,name')->get()->sortBy(fn ($m) => $m->user?->name)
+                : collect(),
+            'team' => $member === 'all' ? $this->reports->forOrganization($membership->organization_id, $month) : null,
+            'report' => $member === 'all' ? null : $this->reports->forMember($member, $membership->organization_id, $month),
+        ];
+    }
+
+    public function exportAttendance(Request $request): SymfonyResponse
+    {
+        $membership = $this->currentMembership();
+        [$member, $month] = $this->reportScope($request, $membership);
+        $hours = fn (int $s) => round($s / 3600, 2);
+        $rtl = app()->getLocale() === 'ar';
+
+        if ($member === 'all') {
+            $headers = [__('Employee'), __('Working days'), __('hr.day.present'), __('hr.day.absent'), __('Late days'), __('Late minutes'), __('hr.day.leave'), __('Hours worked'), __('Hours expected'), __('Overtime hours'), __('Shortfall hours')];
+            $rows = array_map(fn ($r) => [
+                $r['name'], $r['summary']['working_days'], $r['summary']['present'], $r['summary']['absent'], $r['summary']['late'], $r['summary']['late_minutes'],
+                $r['summary']['leave'], $hours($r['summary']['worked_seconds']), $hours($r['summary']['expected_seconds']), $hours($r['summary']['overtime_seconds']), $hours($r['summary']['shortfall_seconds']),
+            ], $this->reports->forOrganization($membership->organization_id, $month));
+
+            return SpreadsheetExport::download('xlsx', "attendance-{$month}", $headers, $rows, $rtl);
+        }
+
+        $report = $this->reports->forMember($member, $membership->organization_id, $month);
+        $name = OrganizationMember::where('organization_id', $membership->organization_id)->where('user_id', $member)->with('user:id,name')->first()?->user?->name ?? 'member';
+        $headers = [__('Date'), __('Status'), __('First arrival'), __('Late minutes'), __('Hours worked'), __('Hours expected'), __('Overtime hours'), __('Note')];
+        $rows = array_map(fn ($d) => [
+            $d['date'], self::dayStatusLabel($d['status']), $d['first_in'] ?? '', $d['late_minutes'] ?: '',
+            $hours($d['worked_seconds']), $hours($d['expected_seconds']), $hours($d['overtime_seconds']), $d['note'] ?? '',
+        ], $report['days']);
+
+        return SpreadsheetExport::download('xlsx', 'attendance-'.Str::slug($name).'-'.$month, $headers, $rows, $rtl);
+    }
+
+    public static function dayStatusLabel(?string $status): string
+    {
+        return match ($status) {
+            'present' => __('hr.day.present'),
+            'absent' => __('hr.day.absent'),
+            'leave' => __('hr.day.leave'),
+            'holiday' => __('hr.day.holiday'),
+            'weekend' => __('hr.day.weekend'),
+            'today' => __('hr.day.today'),
+            default => __('hr.day.upcoming'),
+        };
     }
 
     // ── Leave requests ──

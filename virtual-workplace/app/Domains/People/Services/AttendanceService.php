@@ -702,6 +702,48 @@ class AttendanceService
     }
 
     /**
+     * Per-day totals for one member over [$from, $to] (Y-m-d, inclusive):
+     * office, task, attendance (their union) and idle seconds, plus the first
+     * moment of attendance that day (unix timestamp or null) — when they
+     * "arrived", for lateness. Task time is counted in $memberTz; each session
+     * in its own office's timezone, as in the daily timesheet.
+     *
+     * @return array<string, array{office: int, task: int, attendance: int, idle: int, first_in: ?int}>
+     */
+    public function memberDays(string $userId, string $organizationId, string $from, string $to, string $memberTz): array
+    {
+        $this->cleanupStaleSessions($userId);
+
+        [$searchFrom] = $this->searchRange($from);
+        [, $searchTo] = $this->searchRange($to);
+
+        $sessions = $this->sessionsOverlapping($searchFrom, $searchTo)
+            ->where('organization_id', $organizationId)->where('user_id', $userId)->get();
+        $entries = $this->entriesOverlapping($searchFrom, $searchTo)
+            ->where('organization_id', $organizationId)->where('user_id', $userId)->get();
+        $timers = ActiveTimer::where('organization_id', $organizationId)->where('user_id', $userId)->get();
+
+        $days = [];
+        for ($day = Carbon::parse($from); $day->format('Y-m-d') <= $to; $day->addDay()) {
+            $date = $day->format('Y-m-d');
+            $totals = $this->dayTotals($sessions, $entries, $timers, $date, $memberTz);
+
+            $intervals = array_merge(
+                $this->officeIntervalsOn($sessions, $date),
+                TimeIntervals::clip(array_merge(
+                    $entries->map(fn ($e) => $this->entryInterval($e))->values()->all(),
+                    $timers->map(fn ($t) => [$t->started_at->getTimestamp(), max($t->started_at->getTimestamp(), now()->getTimestamp())])->values()->all(),
+                ), ...$this->dayWindow($date, $memberTz)),
+            );
+            $merged = TimeIntervals::merge($intervals);
+
+            $days[$date] = $totals + ['first_in' => $merged[0][0] ?? null];
+        }
+
+        return $days;
+    }
+
+    /**
      * One member's day: office presence, task time, their union and the
      * office time with no task running. Each session is clipped to $date in its
      * own office's timezone; task time to $date in the member's ($memberTz).

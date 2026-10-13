@@ -97,6 +97,7 @@
                 'timesheets' => __('Analytics & Timesheets'),
                 'workload' => __('Team Workload'),
                 'leaves' => __('nav.leaves'),
+                'attendance' => __('nav.attendance'),
                 'departments' => __('Departments & Teams'),
                 'audit' => __('Audit Logs'),
                 'billing' => __('Billing & Subscription'),
@@ -118,6 +119,7 @@
                 'timesheets' => __('Presence trends and productivity tracking'),
                 'workload' => __('Capacity planning and resource distribution'),
                 'leaves' => __('Leave balance, requests and approvals'),
+                'attendance' => __('Presence, lateness and hours against the office schedule'),
                 'departments' => __('Organizational structure and hierarchy'),
                 'audit' => __('Realtime activity logs and security history'),
                 'billing' => __('Manage subscription tier and payment plans'),
@@ -137,6 +139,19 @@
                 refreshDailyTimesheet();
             }
             loadHrPanels(targetTab);
+        }
+
+        // Attendance report: re-render for the chosen month / member (memberId overrides the select).
+        function reloadAttendanceReport(memberId) {
+            const panel = document.getElementById('hr-attendance-panel');
+            if (!panel) return;
+            const params = new URLSearchParams();
+            const month = document.getElementById('att-month')?.value;
+            const member = memberId || document.getElementById('att-member')?.value;
+            if (month) params.set('month', month);
+            if (member) params.set('member', member);
+            panel.dataset.hrQuery = params.toString();
+            loadHrPanels(panel.parentElement);
         }
 
         // HR panels (holidays, leave, attendance report) are fetched when their tab opens.

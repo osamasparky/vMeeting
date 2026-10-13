@@ -82,6 +82,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/hr/leaves/{leave}/approve', [HrController::class, 'approveLeave'])->name('hr.leaves.approve');
     Route::post('/hr/leaves/{leave}/reject', [HrController::class, 'rejectLeave'])->name('hr.leaves.reject');
     Route::post('/hr/leaves/{leave}/cancel', [HrController::class, 'cancelLeave'])->name('hr.leaves.cancel');
+    // Personnel affairs: monthly attendance report
+    Route::get('/hr/attendance/export', [HrController::class, 'exportAttendance'])->name('hr.attendance.export');
 
     // Departments & Teams Management
     Route::post('/departments', [OrganizationSettingsController::class, 'storeDepartment'])->name('departments.store');

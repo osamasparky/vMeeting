@@ -1731,6 +1731,7 @@
 
         <!-- 12. PERSONNEL: LEAVE -->
         @include('dashboard.partials.tab-leaves')
+        @include('dashboard.partials.tab-attendance')
 
     </main>
 
