@@ -17,6 +17,7 @@ class OrganizationMember extends Model
         'user_id',
         'role_id',
         'home_floor_id',
+        'annual_leave_days',
         'status',
         'cost_rate',
         'billing_rate',
@@ -28,6 +29,7 @@ class OrganizationMember extends Model
         'cost_rate' => 'decimal:2',
         'billing_rate' => 'decimal:2',
         'weekly_capacity_hours' => 'decimal:2',
+        'annual_leave_days' => 'integer',
         'joined_at' => 'datetime',
         'dashboard_widgets' => 'array',
     ];

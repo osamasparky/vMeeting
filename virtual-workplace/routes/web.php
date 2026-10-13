@@ -77,6 +77,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/hr/panel/{panel}', [HrController::class, 'panel'])->name('hr.panel');
     Route::post('/hr/holidays', [HrController::class, 'storeHoliday'])->name('hr.holidays.store');
     Route::delete('/hr/holidays/{holiday}', [HrController::class, 'deleteHoliday'])->name('hr.holidays.delete');
+    // Personnel affairs: leave requests (the company owner decides)
+    Route::post('/hr/leaves', [HrController::class, 'storeLeave'])->name('hr.leaves.store');
+    Route::post('/hr/leaves/{leave}/approve', [HrController::class, 'approveLeave'])->name('hr.leaves.approve');
+    Route::post('/hr/leaves/{leave}/reject', [HrController::class, 'rejectLeave'])->name('hr.leaves.reject');
+    Route::post('/hr/leaves/{leave}/cancel', [HrController::class, 'cancelLeave'])->name('hr.leaves.cancel');
 
     // Departments & Teams Management
     Route::post('/departments', [OrganizationSettingsController::class, 'storeDepartment'])->name('departments.store');

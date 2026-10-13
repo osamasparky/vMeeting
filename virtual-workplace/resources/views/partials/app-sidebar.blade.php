@@ -30,6 +30,9 @@
             ['timesheets', 'nav.timesheets', 'schedule', true, null],
             ['workload', 'nav.workload', 'stacked_bar_chart', $membership->hasPermission('reports.view') || $isCompanyAdmin, null],
         ]],
+        ['nav.hr_section', [
+            ['leaves', 'nav.leaves', 'beach_access', true, null],
+        ]],
         ['nav.admin_section', [
             ['members', 'nav.members', 'group', $membership->hasPermission('members.view') || $membership->hasPermission('members.manage'), null],
             ['offices', 'nav.offices', 'apartment', $membership->hasPermission('maps.manage') || $isCompanyAdmin, null],

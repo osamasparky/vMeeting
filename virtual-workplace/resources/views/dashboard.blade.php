@@ -1729,6 +1729,9 @@
         <!-- 11. WORKLOAD TAB -->
         @include('dashboard.partials.tab-workload')
 
+        <!-- 12. PERSONNEL: LEAVE -->
+        @include('dashboard.partials.tab-leaves')
+
     </main>
 
     <!-- MODALS & SCRIPTS -->
