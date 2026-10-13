@@ -790,6 +790,18 @@
                             <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">calendar_month</span> {{ __('Joined Workspace') }}</div>
                             <div id="mp-info-joined" style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary); margin-top: 4px;">Jan 01, 2026</div>
                         </div>
+                        <div style="background: var(--ula-surface-page-alt); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
+                            <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">badge</span> {{ __('Hire Date') }}</div>
+                            <div id="mp-info-hired" style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary); margin-top: 4px; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; text-align: start;">—</div>
+                        </div>
+                        <div style="background: var(--ula-surface-page-alt); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
+                            <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">work</span> {{ __('Employment Type') }}</div>
+                            <div id="mp-info-employment" style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary); margin-top: 4px;">—</div>
+                        </div>
+                        <div style="background: var(--ula-surface-page-alt); padding: 12px 14px; border-radius: 12px; border: 1px solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs);">
+                            <div style="font-size: 10px; font-weight: 800; color: var(--ula-text-muted); text-transform: uppercase;"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">supervisor_account</span> {{ __('Direct Manager') }}</div>
+                            <div id="mp-info-manager" style="font-size: 12px; font-weight: 700; color: var(--ula-text-primary); margin-top: 4px;">—</div>
+                        </div>
                     </div>
 
                     <!-- Bio Section -->
@@ -1240,7 +1252,40 @@
                     </div>
                 </div>
 
-                <!-- Employment: home office (whose working hours and timezone apply) -->
+                <!-- Employment record: home office (whose working hours and timezone apply), hire date, type, manager, leave entitlement -->
+                <fieldset style="border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 12px; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+                <legend style="padding: 0 6px; font-size: 12px; font-weight: 800; color: var(--ula-text-primary);">{{ __('Employment') }}</legend>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+                    <div>
+                        <label for="edit-member-hire-date" style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Hire Date') }}</label>
+                        <input type="date" name="hire_date" id="edit-member-hire-date" style="width: 100%; min-height: 44px; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
+                    </div>
+                    <div>
+                        <label for="edit-member-employment-type" style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Employment Type') }}</label>
+                        <select name="employment_type" id="edit-member-employment-type" style="width: 100%; min-height: 44px; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                            <option value="">—</option>
+                            <option value="full_time">{{ __('Full-time') }}</option>
+                            <option value="part_time">{{ __('Part-time') }}</option>
+                            <option value="contract">{{ __('Contract') }}</option>
+                            <option value="intern">{{ __('Intern') }}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="edit-member-manager" style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Direct Manager') }}</label>
+                        <select name="manager_user_id" id="edit-member-manager" style="width: 100%; min-height: 44px; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                            <option value="">—</option>
+                            @foreach($members as $m)
+                                @if($m->user)
+                                    <option value="{{ $m->user_id }}">{{ $m->user->name }}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label for="edit-member-leave-days" style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Annual Leave Days') }}</label>
+                        <input type="number" name="annual_leave_days" id="edit-member-leave-days" min="0" max="365" style="width: 100%; min-height: 44px; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
+                    </div>
+                </div>
                 <div>
                     <label for="edit-member-home-office" style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Home Office') }}</label>
                     <select name="home_floor_id" id="edit-member-home-office" style="width: 100%; min-height: 44px; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
@@ -1251,6 +1296,7 @@
                     </select>
                     <div style="font-size: 11px; color: var(--ula-text-muted); margin-top: 4px;">{{ __('Attendance, lateness and working hours follow this office’s schedule and time zone.') }}</div>
                 </div>
+                </fieldset>
 
                 <!-- Granular Office Access Permissions -->
                 <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 12px;">

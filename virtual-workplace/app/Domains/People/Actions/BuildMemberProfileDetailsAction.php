@@ -102,6 +102,18 @@ class BuildMemberProfileDetailsAction
                 'joined_at' => $member->joined_at ? $member->joined_at->format('M d, Y') : ($member->created_at ? $member->created_at->format('M d, Y') : '—'),
                 'allowed_office_ids' => $member->offices->pluck('id')->toArray(),
                 'home_floor_id' => $member->home_floor_id,
+                'hire_date' => $member->hire_date?->format('Y-m-d'),
+                'employment_type' => $member->employment_type,
+                'manager_user_id' => $member->manager_user_id,
+                'manager_name' => $member->manager?->name,
+                'employment_type_label' => match ($member->employment_type) {
+                    'full_time' => __('Full-time'),
+                    'part_time' => __('Part-time'),
+                    'contract' => __('Contract'),
+                    'intern' => __('Intern'),
+                    default => null,
+                },
+                'annual_leave_days' => $member->annual_leave_days,
                 'allowed_room_ids' => $member->rooms->pluck('id')->toArray(),
             ],
             'profile' => [

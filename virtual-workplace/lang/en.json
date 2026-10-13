@@ -3770,5 +3770,14 @@
     "hr.leave.rejected": "Rejected",
     "hr.leave.cancelled": "Cancelled",
     "hr.leave.pending": "Pending",
-    ":count working days this month": ":count working days this month"
+    ":count working days this month": ":count working days this month",
+    "Employment": "Employment",
+    "Hire Date": "Hire Date",
+    "Employment Type": "Employment Type",
+    "Full-time": "Full-time",
+    "Part-time": "Part-time",
+    "Contract": "Contract",
+    "Intern": "Intern",
+    "Direct Manager": "Direct Manager",
+    "Annual Leave Days": "Annual Leave Days"
 }

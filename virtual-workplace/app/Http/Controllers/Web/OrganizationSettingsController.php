@@ -690,6 +690,11 @@ class OrganizationSettingsController extends Controller
             'allowed_rooms.*' => ['uuid', 'exists:rooms,id'],
             // The office whose working hours and timezone apply to the member.
             'home_floor_id' => ['nullable', 'uuid', Rule::exists('floors', 'id')->where('organization_id', $membership->organization_id)],
+            // Employment record.
+            'hire_date' => ['nullable', 'date_format:Y-m-d'],
+            'employment_type' => ['nullable', Rule::in(OrganizationMember::EMPLOYMENT_TYPES)],
+            'manager_user_id' => ['nullable', 'uuid', Rule::notIn([$member->user_id]), Rule::exists('organization_members', 'user_id')->where('organization_id', $membership->organization_id)],
+            'annual_leave_days' => ['nullable', 'integer', 'between:0,365'],
         ]);
 
         $targetRole = Role::findOrFail($validated['role_id']);
@@ -720,6 +725,11 @@ class OrganizationSettingsController extends Controller
             'role_id' => $validated['role_id'],
             'status' => $validated['status'],
             'home_floor_id' => array_key_exists('home_floor_id', $validated) ? $validated['home_floor_id'] : $member->home_floor_id,
+            ...collect(['hire_date', 'employment_type', 'manager_user_id'])
+                ->filter(fn ($field) => array_key_exists($field, $validated))
+                ->mapWithKeys(fn ($field) => [$field => $validated[$field]])
+                ->all(),
+            ...(isset($validated['annual_leave_days']) ? ['annual_leave_days' => (int) $validated['annual_leave_days']] : []),
         ]);
 
         // Sync allowed offices & rooms

@@ -18,6 +18,9 @@ class OrganizationMember extends Model
         'role_id',
         'home_floor_id',
         'annual_leave_days',
+        'hire_date',
+        'employment_type',
+        'manager_user_id',
         'status',
         'cost_rate',
         'billing_rate',
@@ -30,6 +33,7 @@ class OrganizationMember extends Model
         'billing_rate' => 'decimal:2',
         'weekly_capacity_hours' => 'decimal:2',
         'annual_leave_days' => 'integer',
+        'hire_date' => 'date:Y-m-d',
         'joined_at' => 'datetime',
         'dashboard_widgets' => 'array',
     ];
@@ -61,6 +65,14 @@ class OrganizationMember extends Model
     public function homeOffice(): BelongsTo
     {
         return $this->belongsTo(Floor::class, 'home_floor_id');
+    }
+
+    public const EMPLOYMENT_TYPES = ['full_time', 'part_time', 'contract', 'intern'];
+
+    /** The member's direct manager. */
+    public function manager(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'manager_user_id');
     }
 
     public function rooms(): BelongsToMany

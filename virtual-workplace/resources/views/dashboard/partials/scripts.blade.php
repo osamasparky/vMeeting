@@ -320,7 +320,10 @@
             }
 
             // Reset checkboxes
-            document.getElementById('edit-member-home-office').value = '';
+            ['edit-member-home-office', 'edit-member-hire-date', 'edit-member-employment-type', 'edit-member-manager', 'edit-member-leave-days']
+                .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+            // A member cannot be their own manager.
+            document.querySelectorAll('#edit-member-manager option').forEach(o => { o.hidden = false; });
             document.querySelectorAll('.edit-member-office-cb').forEach(cb => cb.checked = false);
             document.querySelectorAll('.edit-member-room-cb').forEach(cb => cb.checked = false);
 
@@ -330,6 +333,12 @@
                 .then(data => {
                     if (data.member) {
                         document.getElementById('edit-member-home-office').value = data.member.home_floor_id || '';
+                        document.getElementById('edit-member-hire-date').value = data.member.hire_date || '';
+                        document.getElementById('edit-member-employment-type').value = data.member.employment_type || '';
+                        document.getElementById('edit-member-manager').value = data.member.manager_user_id || '';
+                        document.getElementById('edit-member-leave-days').value = data.member.annual_leave_days ?? 21;
+                        const self = document.querySelector(`#edit-member-manager option[value="${data.member.user_id}"]`);
+                        if (self) self.hidden = true;
                         if (data.member.allowed_office_ids && Array.isArray(data.member.allowed_office_ids)) {
                             data.member.allowed_office_ids.forEach(id => {
                                 const el = document.getElementById(`edit-office-${id}`);
@@ -3007,6 +3016,9 @@
                 document.getElementById('mp-info-phone').textContent = p.phone || '—';
                 document.getElementById('mp-info-dob').textContent = p.date_of_birth || '—';
                 document.getElementById('mp-info-joined').textContent = m.joined_at;
+                document.getElementById('mp-info-hired').textContent = m.hire_date || '—';
+                document.getElementById('mp-info-employment').textContent = m.employment_type_label || '—';
+                document.getElementById('mp-info-manager').textContent = m.manager_name || '—';
                 document.getElementById('mp-info-bio').textContent = p.bio || '{{ __('No bio or summary added yet.') }}';
 
                 // Skills

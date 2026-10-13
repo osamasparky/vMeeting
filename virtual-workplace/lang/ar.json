@@ -3770,5 +3770,14 @@
     "hr.leave.rejected": "مرفوضة",
     "hr.leave.cancelled": "ملغاة",
     "hr.leave.pending": "قيد الانتظار",
-    ":count working days this month": "أيام العمل هذا الشهر: :count"
+    ":count working days this month": "أيام العمل هذا الشهر: :count",
+    "Employment": "بيانات التوظيف",
+    "Hire Date": "تاريخ التعيين",
+    "Employment Type": "نوع التعاقد",
+    "Full-time": "دوام كامل",
+    "Part-time": "دوام جزئي",
+    "Contract": "عقد مؤقت",
+    "Intern": "متدرّب",
+    "Direct Manager": "المدير المباشر",
+    "Annual Leave Days": "أيام الإجازة السنوية"
 }
