@@ -226,9 +226,15 @@ class BuildOrganizationDashboardAction
      */
     private function ensureDefaultWorkspace(Organization $organization): void
     {
-        if ($organization->floors()->count() === 0) {
-            $seeder = new BlueprintOfficeSeeder;
-            $seeder->seedOrganizationOffice($organization);
+        // One query in the usual case: a company with rooms has its workspace.
+        if (! $organization->rooms()->exists()) {
+            if ($organization->floors()->count() === 0) {
+                (new BlueprintOfficeSeeder)->seedOrganizationOffice($organization);
+            } elseif ($map = $organization->maps()->orderBy('created_at')->first()) {
+                // An office left empty (no rooms, no furniture) — e.g. by the failed seed fixed on
+                // 2026-10-14 — gets its plan's template. seedOfficeMap leaves anything already drawn alone.
+                (new BlueprintOfficeSeeder)->seedOfficeMap($organization, $map);
+            }
         }
 
         if ($organization->departments()->count() === 0) {

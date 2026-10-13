@@ -68,19 +68,18 @@ class BlueprintOfficeSeeder extends Seeder
             ]);
         }
 
-        // 4. Clear any old untextured blue dummy objects
-        MapObject::where('map_id', $map->id)
-            ->whereNull('image_url')
-            ->delete();
+        // (map_objects has no image_url column: the old "clear untextured objects" step here
+        // failed on MySQL and left every new company with an empty office. SQLite hid it,
+        // reading the unknown "image_url" as a string literal.)
 
-        // 5. Seed Rooms from the Template up to organization plan limit
+        // 4. Seed Rooms from the Template up to organization plan limit
         if ($organization->rooms()->count() === 0) {
             $roomsList = $template->rooms_data ?: [];
             $maxAllowed = ($organization->plan && $organization->plan->room_limit > 0) ? $organization->plan->room_limit : count($roomsList);
             $roomsList = array_slice($roomsList, 0, $maxAllowed);
             $this->createRooms($organization, $map, $roomsList);
 
-            // 6. The template's furniture (only for a map that has none yet).
+            // 5. The template's furniture (only for a map that has none yet).
             if (! MapObject::where('map_id', $map->id)->exists()) {
                 $template->placeFurniture($map, $roomsList);
             }

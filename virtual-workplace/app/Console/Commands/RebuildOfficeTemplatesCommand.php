@@ -21,17 +21,19 @@ class RebuildOfficeTemplatesCommand extends Command
                             {--plan=* : free and/or business (default: both)}
                             {--apply : Write the templates (default: check and report only)}';
 
-    protected $description = 'Rebuild the Free and Business office templates from the catalogue furniture';
+    protected $description = 'Rebuild the plan office templates from the catalogue furniture';
+
+    private const PLANS = ['free', 'business'];
 
     public function handle(): int
     {
-        $plans = $this->option('plan') ?: ['free', 'business'];
+        $plans = $this->option('plan') ?: self::PLANS;
         $designer = new OfficeTemplateDesigner;
         $tile = OfficeTemplateDesigner::TILE;
         $ok = true;
 
         foreach ($plans as $slug) {
-            if (! in_array($slug, ['free', 'business'], true)) {
+            if (! in_array($slug, self::PLANS, true)) {
                 $this->error("Unknown plan: {$slug}");
 
                 return self::FAILURE;

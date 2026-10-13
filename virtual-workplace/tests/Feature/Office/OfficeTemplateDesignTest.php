@@ -161,4 +161,49 @@ class OfficeTemplateDesignTest extends TestCase
 
         $this->actingAs($owner)->get('/dashboard')->assertOk();
     }
+
+    public function test_every_desk_has_a_screen_and_the_free_office_a_kitchen_and_printer(): void
+    {
+        foreach (['free', 'business'] as $plan) {
+            $types = array_count_values(array_column((new OfficeTemplateDesigner)->design($plan)['objects'], 'type'));
+            $this->assertSame($types['desk_10'], $types['monitor'], "{$plan}: a screen on every desk");
+            $this->assertSame($types['desk_10'], $types['keyboard'], "{$plan}: a keyboard on every desk");
+            $this->assertArrayHasKey('printer', $types, "{$plan}: a printer");
+        }
+
+        $free = array_column((new OfficeTemplateDesigner)->design('free')['objects'], 'type');
+        foreach (['refrigerator', 'sink', 'microwave', 'espresso_machine', 'water_cooler', 'counter'] as $piece) {
+            $this->assertContains($piece, $free, "free: {$piece}");
+        }
+    }
+
+    public function test_an_office_left_empty_is_furnished_on_the_next_dashboard_visit(): void
+    {
+        $this->installTemplate('free');
+        $owner = User::factory()->create();
+        $org = app(CreateOrganizationAction::class)->execute(['name' => 'Empty Co', 'plan_slug' => 'free'], $owner);
+
+        // What the failed seed left behind: an office and its map, nothing in it.
+        $floor = $org->floors()->create(['name' => 'Main', 'order' => 1]);
+        $map = $org->maps()->create(['floor_id' => $floor->id, 'name' => 'Main', 'status' => 'published', 'version' => 1]);
+
+        $this->actingAs($owner)->get('/dashboard')->assertOk();
+
+        $this->assertSame(3, Room::where('map_id', $map->id)->count());
+        $this->assertGreaterThan(40, MapObject::where('map_id', $map->id)->count());
+    }
+
+    public function test_an_office_with_rooms_is_left_alone(): void
+    {
+        $this->installTemplate('free');
+        $owner = User::factory()->create();
+        $org = app(CreateOrganizationAction::class)->execute(['name' => 'Drawn Co', 'plan_slug' => 'free'], $owner);
+        $this->actingAs($owner)->get('/dashboard')->assertOk();
+        $objects = MapObject::where('organization_id', $org->id)->count();
+
+        $this->actingAs($owner)->get('/dashboard')->assertOk();
+
+        $this->assertSame(3, $org->rooms()->count());
+        $this->assertSame($objects, MapObject::where('organization_id', $org->id)->count());
+    }
 }

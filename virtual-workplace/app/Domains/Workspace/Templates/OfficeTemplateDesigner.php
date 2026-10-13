@@ -52,10 +52,13 @@ class OfficeTemplateDesigner
         $this->office('المكتب - Office', 32, 4, 24, 18, 4, 'bottom', 0.5);
         $this->thinkingRoom('غرفة التفكير - Thinking Room', 60, 4, 11, 10, 'bottom', 0.5);
         $this->openArea(4, 26, 67, 16, compact: true);
+        // The plan has three rooms, so the kitchen and print station sit in the open area.
+        $this->kitchenette(49, 29);
+        $this->printStation(66.5, 35.5);
 
         return $this->result('free', 75, 45,
             'المكتب الأساسي - Free Starter Office',
-            'غرفة اجتماعات، مكتب لأربعة موظفين، وغرفة تفكير، مع استقبال وجلسة انتظار في المساحة المفتوحة.');
+            'غرفة اجتماعات، مكتب لأربعة موظفين، وغرفة تفكير، مع استقبال وجلسة انتظار وركن مطبخ وطابعة في المساحة المفتوحة.');
     }
 
     private function business(): array
@@ -76,6 +79,7 @@ class OfficeTemplateDesigner
             $this->thinkingRoom(sprintf('غرفة تفكير %d - Thinking Room %d', $i + 1, $i + 1), 96 + 10 * $i, 82, 10, 10, 'top', 0.5);
         }
         $this->openArea(4, 77, 88, 15, compact: false);
+        $this->printStation(76, 79);
         // Greenery along the corridors and beside the CEO office.
         foreach ([[24, 25], [70, 25], [116, 25], [40, 51], [96, 51], [132, 32.5]] as [$x, $y]) {
             $this->at('planter_6', $x, $y, 0, 2);
@@ -127,6 +131,9 @@ class OfficeTemplateDesigner
     {
         $this->at('chair_96', $cx, $cy - 3.5, 0, 1);
         $this->at('desk_10', $cx, $cy, 0, 2);
+        // The person sits above the desk facing down, so the screen faces up at them.
+        $this->at('monitor', $cx - 0.3, $cy - 0.1, 180, 3);
+        $this->at('keyboard', $cx - 0.3, $cy - 1.8, 180, 3);
         $this->at('desk_plant', $cx + 2.1, $cy - 1, 0, 3, 1, 2);
     }
 
@@ -143,6 +150,9 @@ class OfficeTemplateDesigner
         $this->at('large_rug_13', $rx + 9.5, $ry + 10.5, 0, 0, 15, 10);
         $this->at('chair_55', $rx + 9.5, $ry + 5.8, 0, 1);
         $this->at('desk_15', $rx + 9.5, $ry + 9.5, 0, 2, 8.4, 6.3);
+        $this->at('monitor_2', $rx + 9.5, $ry + 10.6, 180, 3);
+        $this->at('phone', $rx + 12.3, $ry + 8.6, 0, 3);
+        $this->at('coat_rack', $rx + $w - 1.8, $ry + $h - 3.4, 0, 2);
         $this->at('chair_74', $rx + 7.3, $ry + 14.4, 180, 1);
         $this->at('chair_74', $rx + 11.7, $ry + 14.4, 180, 1);
         // Sitting corner.
@@ -237,6 +247,28 @@ class OfficeTemplateDesigner
         $this->plant($rx + $w - 2.4, $ry + 3.4);
         $this->at('floor_lamp', $rx + 2.2, $ry + 16, 0, 2);
         $this->plant($rx + $w - 2.2, $ry + $h - 2.6);
+    }
+
+    /** Open-plan kitchen corner: counter with sink, coffee and microwave, a fridge and a table for three. */
+    private function kitchenette(float $x, float $y): void
+    {
+        $this->at('counter', $x + 4, $y + 1.6, 0, 2, 8, 3.4);
+        $this->at('sink', $x + 1.6, $y + 1.4, 0, 3, 2.4, 2.6);
+        $this->at('espresso_machine', $x + 4.6, $y + 1.3, 0, 3, 3, 1.5);
+        $this->at('microwave', $x + 7, $y + 1.3, 0, 3);
+        $this->at('refrigerator', $x + 10.6, $y + 2.6, 0, 2);
+        $this->at('round_table_6', $x + 5, $y + 8, 0, 2);
+        $this->at('chair_74', $x + 1.3, $y + 8, 270, 1);
+        $this->at('chair_74', $x + 8.7, $y + 8, 90, 1);
+        $this->at('chair_74', $x + 5, $y + 11.2, 180, 1);
+    }
+
+    /** Shared printer, filing and a coat rack. */
+    private function printStation(float $x, float $y): void
+    {
+        $this->at('printer', $x, $y + 1.4, 0, 2);
+        $this->at('file_cabinet_1', $x + 3.4, $y + 1.6, 0, 2);
+        $this->at('coat_rack', $x - 3, $y + 2.2, 0, 2);
     }
 
     /** A single-person room: armchair, side table, lamp and a plant. */
