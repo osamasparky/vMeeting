@@ -102,6 +102,7 @@
 **Scope:** replace the stale `deploy_live_server.py` flow with a committed, secret-free script (credentials from environment): DB backup, fetch + checkout of the release branch, migrate, build, caches, ownership fix inside `virtual-workplace/` only, smoke checks (`/`, `/login`), uploads preserved.
 **Acceptance:** a dry-run mode prints the steps; one real deploy performed with it, with the owner's approval.
 **Rollback:** keep the manual procedure documented in the runbook.
+**Status (2026-10-14): script and runbook done; the real deploy with it waits for the owner.** `ops/deploy.py` (credentials only from `DEPLOY_*` environment variables; named outside the ignored `/deploy_*.py` pattern) and `docs/DEPLOY.md` (procedure, rules learned, rollback). The read-only steps were run against live: start state, vhost-root check (`psaserv 750`), app-dir owner, smoke checks. That caught a broken realtime check (a `pm2 jlist` text match that never matched) before it could fail a deploy; it now uses `pm2 describe`. Uploads are copied aside before the checkout and restored with `cp -an` after, which is what phase 3 needs.
 
 ---
 
