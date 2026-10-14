@@ -199,13 +199,17 @@ class MeetingController extends Controller
     }
 
     /**
-     * Internal helper to build ICE servers list with STUN & Coturn TURN fallbacks.
+     * ICE servers (STUN + the Coturn TURN relay) from config/services.php → TURN_*.
+     * Nothing configured: an empty list rather than entries with blank URLs.
      */
     protected function getIceServersList(): array
     {
-        $turnUrl = config('services.turn.url', env('TURN_URL', 'turn:173.212.248.192:3478'));
-        $turnUser = config('services.turn.username', env('TURN_USERNAME', 'vw_turn_user'));
-        $turnPass = config('services.turn.credential', env('TURN_CREDENTIAL', 'vw_turn_password_2026'));
+        $turnUrl = config('services.turn.url');
+        $turnUser = config('services.turn.username');
+        $turnPass = config('services.turn.credential');
+        if (blank($turnUrl)) {
+            return [];
+        }
 
         $stunUrl = str_replace('turn:', 'stun:', $turnUrl);
 

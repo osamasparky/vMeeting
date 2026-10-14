@@ -32,3 +32,10 @@ Thumbs.db
 .idea/
 .fleet/
 .zed/
+
+# One-off server scripts at the repo root carry SSH credentials: never commit them.
+# (Deploys go through git on the server; see docs/refactor/ROADMAP.md, phase 10.)
+/deploy_*.py
+/reset_*.py
+/fix_permissions.py
+/reload_fpm.py

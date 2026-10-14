@@ -29,6 +29,7 @@
 **Acceptance:** `git grep` finds no password literal in tracked files; TURN config still resolves from `config('services.turn.*')`; meeting tests pass.
 **Verify:** `git grep -nE "password\s*=\s*['\"][^'\"]{6,}"`; `php artisan test --filter=Meeting`; full suite in worktree.
 **Rollback:** revert the commit. **Live note:** if the live `.env` lacks `TURN_*`, set them before deploying (a missing TURN config degrades calls behind strict NAT).
+**Status (2026-10-14): done.** Changed from the plan: `deploy_direct_sftp.py` was **deleted** rather than moved to environment variables — it was obsolete (local path `d:\Vwork`, SFTP file copy instead of git, `chmod -R 777` on storage). The root scripts that hold credentials (`deploy_*.py`, `reset_*.py`, `fix_permissions.py`, `reload_fpm.py`) are now in `.gitignore`. The TURN literals were dead code (`config()` returns the existing key's `null`, never the `env()` default); with nothing configured the endpoint now returns an empty `ice_servers` list instead of entries with blank URLs. Live has no `TURN_*` set. **Still open for the owner:** rotate the root password (it remains in git history) and decide on purging history.
 
 ## Phase 2 — CI that runs and passes
 **Rationale:** §4.5. Every later phase needs it.
