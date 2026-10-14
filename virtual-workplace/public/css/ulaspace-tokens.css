@@ -777,6 +777,22 @@ body, button, input, select, textarea, optgroup {
 }
 [data-theme="dark"] .ula-btn--ghost, .dark .ula-btn--ghost { color: var(--ula-accent-default) !important; }
 [data-theme="dark"] .ula-btn--ghost:hover, .dark .ula-btn--ghost:hover { background-color: var(--ula-surface-hover) !important; color: var(--ula-accent-hover) !important; }
+/* Outline and secondary were missed by the two fixes above: palm-900 labels (and sand fills) don't
+   change with the theme, so outline buttons read as empty frames on the dark page. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .ula-btn--outline { border-color: var(--ula-border-default) !important; color: var(--ula-text-primary) !important; }
+  :root:not([data-theme="light"]) .ula-btn--outline:hover { background-color: var(--ula-surface-hover) !important; border-color: var(--ula-border-hover) !important; color: var(--ula-text-primary) !important; }
+  :root:not([data-theme="light"]) .ula-btn--outline:active { background-color: var(--ula-surface-pressed) !important; }
+  :root:not([data-theme="light"]) .ula-btn--secondary { background-color: var(--ula-surface-raised) !important; border-color: var(--ula-border-default) !important; color: var(--ula-text-primary) !important; }
+  :root:not([data-theme="light"]) .ula-btn--secondary:hover { background-color: var(--ula-surface-hover) !important; border-color: var(--ula-border-hover) !important; color: var(--ula-text-primary) !important; }
+  :root:not([data-theme="light"]) .ula-btn--secondary:active { background-color: var(--ula-surface-pressed) !important; }
+}
+[data-theme="dark"] .ula-btn--outline, .dark .ula-btn--outline { border-color: var(--ula-border-default) !important; color: var(--ula-text-primary) !important; }
+[data-theme="dark"] .ula-btn--outline:hover, .dark .ula-btn--outline:hover { background-color: var(--ula-surface-hover) !important; border-color: var(--ula-border-hover) !important; color: var(--ula-text-primary) !important; }
+[data-theme="dark"] .ula-btn--outline:active, .dark .ula-btn--outline:active { background-color: var(--ula-surface-pressed) !important; }
+[data-theme="dark"] .ula-btn--secondary, .dark .ula-btn--secondary { background-color: var(--ula-surface-raised) !important; border-color: var(--ula-border-default) !important; color: var(--ula-text-primary) !important; }
+[data-theme="dark"] .ula-btn--secondary:hover, .dark .ula-btn--secondary:hover { background-color: var(--ula-surface-hover) !important; border-color: var(--ula-border-hover) !important; color: var(--ula-text-primary) !important; }
+[data-theme="dark"] .ula-btn--secondary:active, .dark .ula-btn--secondary:active { background-color: var(--ula-surface-pressed) !important; }
 
 /* Secondary: Warm Sand */
 .ula-btn--secondary {
@@ -1104,23 +1120,25 @@ body, button, input, select, textarea, optgroup {
    ========================================================================== */
 .task-modal-segmented-bar {
   display: flex !important;
-  gap: 6px !important;
+  gap: 4px !important;
   background: var(--ula-surface-page-alt, #f4ede1) !important;
   padding: 5px !important;
   border-radius: 14px !important;
   border: 1px solid var(--ula-border-subtle, #e8e4dc) !important;
   margin-bottom: 18px !important;
-  overflow-x: auto !important;
-  scrollbar-width: none !important;
+  /* Wrap instead of scrolling, so no tab is ever hidden past the edge. */
+  flex-wrap: wrap !important;
+  overflow: visible !important;
 }
 .task-modal-segmented-bar::-webkit-scrollbar {
   display: none !important;
 }
 
 .task-modal-tab-btn {
-  height: 38px !important;
-  min-height: 38px !important;
-  padding: 0 16px !important;
+  height: var(--ula-size-touch-target, 44px) !important;
+  min-height: var(--ula-size-touch-target, 44px) !important;
+  padding: 0 10px !important;
+  flex: 1 1 auto !important;
   border-radius: 10px !important;
   font-size: 13px !important;
   font-weight: 700 !important;
@@ -1128,7 +1146,7 @@ body, button, input, select, textarea, optgroup {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 7px !important;
+  gap: 5px !important;
   cursor: pointer !important;
   white-space: nowrap !important;
   transition: all var(--ula-duration-fast, 160ms) var(--ula-ease-out, ease-out) !important;
@@ -1534,6 +1552,23 @@ body, button, input, select, textarea, optgroup {
 .dark .task-timer-pill:hover {
   background: var(--ula-palm-700) !important;
   color: #FFFFFF !important;
+}
+/* The milestone pill, title hover and avatar used palm-800/900, which in dark is the card colour
+   itself — the milestone name rendered as an empty capsule. */
+[data-theme="dark"] .task-card-milestone,
+.dark .task-card-milestone {
+  background: var(--ula-tone-palm-bg) !important;
+  color: var(--ula-tone-palm-fg) !important;
+  border-color: var(--ula-border-subtle) !important;
+}
+[data-theme="dark"] .kanban-task-card:hover .task-card-title,
+.dark .kanban-task-card:hover .task-card-title {
+  color: var(--ula-accent-hover) !important;
+}
+[data-theme="dark"] .task-avatar-circle,
+.dark .task-avatar-circle {
+  background: var(--ula-accent-default) !important;
+  color: var(--ula-accent-fg) !important;
 }
 
 

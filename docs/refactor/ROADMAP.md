@@ -95,6 +95,7 @@
 **Scope:** either serve `ulaspace-dashboard.css` through Vite from `resources/css`, or keep `public/css` as the only copy and delete the other; add a CI check that fails if two copies differ in the meantime.
 **Acceptance:** one copy; pages render identically (screenshot diff on dashboard, office, project hub).
 **Rollback:** revert.
+**Status (2026-10-14): done, with the "sync + check" option.** `resources/css` stays the source (as CLAUDE.md says) and `public/css` stays the served path; `scripts/sync-css.mjs` copies tokens/dashboard/office on every `npm run build`, and CI runs `--check` before the build. The check found `public/css/ulaspace-tokens.css` already stale: two committed fixes (dark-mode outline/secondary buttons, wrapping project tabs; 8bc94a2, a3935e1) had only gone into `resources/css`. Synced. Pages that also load the Vite bundle (dashboard, office, hub) already had them — computed styles identical before/after on the dashboard in dark mode; pages that load only `public/css` now get them.
 
 ## Phase 10 — Deploy script and runbook
 **Rationale:** §4.6.

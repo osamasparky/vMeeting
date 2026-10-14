@@ -48,6 +48,10 @@ jobs:
           cache: 'npm'
           cache-dependency-path: virtual-workplace/package-lock.json
 
+      # Before the build, which would sync them and hide a stale copy.
+      - name: Design-system CSS copies match their source
+        run: node scripts/sync-css.mjs --check
+
       - name: Install NPM Dependencies & Build Assets
         run: |
           npm ci || npm install
