@@ -10,9 +10,11 @@ use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\GuestAccessController;
 use App\Http\Controllers\Web\HrController;
+use App\Http\Controllers\Web\NotificationPreferencesController;
 use App\Http\Controllers\Web\OfficeController;
 use App\Http\Controllers\Web\OrganizationSettingsController;
 use App\Http\Controllers\Web\ProjectHubController;
+use App\Http\Controllers\Web\PublicIntakeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
@@ -53,7 +55,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/organization/settings', [OrganizationSettingsController::class, 'updateOrganizationSettings'])->name('organization.settings.update');
     Route::post('/profile', [AuthController::class, 'updateProfile'])->name('profile.update');
     Route::post('/profile/password', [AuthController::class, 'updatePassword'])->name('profile.password.update');
-    Route::post('/profile/notifications', [\App\Http\Controllers\Web\NotificationPreferencesController::class, 'update'])->name('profile.notifications.update');
+    Route::post('/profile/notifications', [NotificationPreferencesController::class, 'update'])->name('profile.notifications.update');
     Route::get('/office', [OfficeController::class, 'office'])->name('office');
     Route::get('/editor', [OfficeController::class, 'editor'])->name('editor');
     Route::post('/editor/maps/{map}/background', [OfficeController::class, 'uploadMapBackground'])->middleware('throttle:uploads')->name('editor.maps.background');
@@ -267,5 +269,5 @@ Route::post('/csp-violation-report', function (Request $request) {
 })->name('csp.violation.report');
 
 // Project intake: public request form behind a project's shareable link (no account needed)
-Route::get('/intake/{token}', [\App\Http\Controllers\Web\PublicIntakeController::class, 'show'])->middleware('throttle:public')->name('intake.show');
-Route::post('/intake/{token}', [\App\Http\Controllers\Web\PublicIntakeController::class, 'store'])->middleware('throttle:guest-token')->name('intake.store');
+Route::get('/intake/{token}', [PublicIntakeController::class, 'show'])->middleware('throttle:public')->name('intake.show');
+Route::post('/intake/{token}', [PublicIntakeController::class, 'store'])->middleware('throttle:guest-token')->name('intake.store');

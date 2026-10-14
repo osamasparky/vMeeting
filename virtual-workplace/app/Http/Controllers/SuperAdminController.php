@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Domains\Identity\Support\SwitchSessionUser;
 use App\Domains\Administration\Models\AuditLog;
 use App\Domains\Administration\Models\Permission;
 use App\Domains\Administration\Models\Role;
@@ -13,6 +12,7 @@ use App\Domains\CMS\Models\CmsSection;
 use App\Domains\CMS\Models\FeatureFlag;
 use App\Domains\CMS\Support\CmsSchema;
 use App\Domains\Identity\Models\User;
+use App\Domains\Identity\Support\SwitchSessionUser;
 use App\Domains\Projects\Models\Project;
 use App\Domains\Projects\Models\Task;
 use App\Domains\Projects\Models\TimeEntry;

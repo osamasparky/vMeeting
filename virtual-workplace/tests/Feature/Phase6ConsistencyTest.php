@@ -8,6 +8,7 @@ use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Workspace\Models\Floor;
 use App\Domains\Workspace\Models\Map;
 use App\Domains\Workspace\Models\Room;
+use App\Domains\Workspace\Support\RoomAccess;
 use Database\Seeders\PlansSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -120,7 +121,7 @@ class Phase6ConsistencyTest extends TestCase
     /** An invited guest's session for this room (see RoomAccess): the only way in without an account. */
     private function asRoomGuest(): static
     {
-        return $this->withSession([\App\Domains\Workspace\Support\RoomAccess::GUEST_SESSION_KEY => [
+        return $this->withSession([RoomAccess::GUEST_SESSION_KEY => [
             'organization_id' => $this->organization->id, 'room_id' => $this->room->id,
             'guest_id' => 'guest_phase6', 'guest_name' => 'Visitor (Guest)', 'expires_at' => time() + 3600,
         ]]);
