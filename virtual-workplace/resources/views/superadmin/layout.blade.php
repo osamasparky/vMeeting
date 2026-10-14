@@ -998,17 +998,13 @@
             </a>
 
             <div class="nav-category-title">{{ __('Website & CMS') }}</div>
-            <a href="{{ route('superadmin.cms.pages') }}" class="nav-item {{ request()->routeIs('superadmin.cms.pages*') ? 'active' : '' }}" data-tooltip="{{ __('CMS Pages & Sections') }}">
+            <a href="{{ route('superadmin.cms.pages') }}" class="nav-item {{ request()->routeIs('superadmin.cms.pages*') ? 'active' : '' }}" data-tooltip="{{ __('Website Content') }}">
                 <span class="nav-item-icon"><span class="material-symbols-rounded">web</span></span>
-                <span>{{ __('Website CMS Pages') }}</span>
+                <span>{{ __('Website Content') }}</span>
             </a>
-            <a href="{{ route('superadmin.cms.assets') }}" class="nav-item {{ request()->routeIs('superadmin.cms.assets*') ? 'active' : '' }}" data-tooltip="{{ __('3D & Media Assets') }}">
-                <span class="nav-item-icon"><span class="material-symbols-rounded">folder_open</span></span>
-                <span>{{ __('3D & Media Assets') }}</span>
-            </a>
-            <a href="{{ route('superadmin.cms.theme') }}" class="nav-item {{ request()->routeIs('superadmin.cms.theme*') ? 'active' : '' }}" data-tooltip="{{ __('Theme & Branding Studio') }}">
-                <span class="nav-item-icon"><span class="material-symbols-rounded">palette</span></span>
-                <span>{{ __('Theme & Branding') }}</span>
+            <a href="{{ route('superadmin.cms.assets') }}" class="nav-item {{ request()->routeIs('superadmin.cms.assets*') ? 'active' : '' }}" data-tooltip="{{ __('Image Library') }}">
+                <span class="nav-item-icon"><span class="material-symbols-rounded">photo_library</span></span>
+                <span>{{ __('Image Library') }}</span>
             </a>
             <a href="{{ route('superadmin.features') }}" class="nav-item {{ request()->routeIs('superadmin.features*') ? 'active' : '' }}" data-tooltip="{{ __('Feature Flags') }}">
                 <span class="nav-item-icon"><span class="material-symbols-rounded">flag</span></span>

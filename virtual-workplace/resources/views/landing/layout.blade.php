@@ -326,12 +326,14 @@
         </a>
 
         @php
-            $siteNavItems = \App\Domains\CMS\Models\CmsThemeSetting::getByKey('main_navigation', [
-                ['label_en' => 'Solutions', 'label_ar' => 'الحلول', 'url' => '#features'],
-                ['label_en' => 'Product', 'label_ar' => 'المنتج', 'url' => '#spaces'],
-                ['label_en' => 'Resources', 'label_ar' => 'الموارد', 'url' => '#identity'],
-                ['label_en' => 'Pricing', 'label_ar' => 'الأسعار', 'url' => '#pricing'],
-            ]);
+            // Header & footer copy: Super Admin → Website Content → Header & footer.
+            $siteHeader = \App\Domains\CMS\Support\Cms::section('site_header');
+            $siteFooter = \App\Domains\CMS\Support\Cms::section('site_footer');
+            $isAr = app()->getLocale() === 'ar';
+            $headerText = fn (string $key) => $isAr
+                ? ($siteHeader->field($key . '_ar') ?: $siteHeader->field($key . '_en'))
+                : ($siteHeader->field($key . '_en') ?: $siteHeader->field($key . '_ar'));
+            $siteNavItems = $siteHeader->items('nav');
         @endphp
 
         <!-- Navigation Links -->
@@ -353,9 +355,9 @@
         <!-- Header Actions -->
         <div class="ula-nav-actions">
             @auth
-                <a href="{{ route('dashboard') }}" class="ula-nav-login-btn">{{ __('لوحة التحكم') }}</a>
+                <a href="{{ route('dashboard') }}" class="ula-nav-login-btn">{{ $headerText('dashboard_text') }}</a>
             @else
-                <a href="{{ route('login') }}" class="ula-nav-login-btn">{{ __('تسجيل الدخول') }}</a>
+                <a href="{{ route('login') }}" class="ula-nav-login-btn">{{ $headerText('login_text') }}</a>
             @endauth
 
             <!-- Language switcher: shows the current language, links to the other -->
@@ -364,9 +366,9 @@
             </a>
 
             @auth
-                <a href="{{ route('office') }}" class="ula-nav-cta-btn">{{ __('ادخل إلى المكتب') }}</a>
+                <a href="{{ route('office') }}" class="ula-nav-cta-btn">{{ $headerText('office_text') }}</a>
             @else
-                <a href="{{ route('register') }}" class="ula-nav-cta-btn">{{ __('تجربة الآن') }}</a>
+                <a href="{{ route('register') }}" class="ula-nav-cta-btn">{{ $headerText('cta_text') }}</a>
             @endauth
 
             <button type="button" class="ula-mobile-toggle" onclick="toggleNav()" aria-label="Menu">
@@ -388,11 +390,11 @@
             @endforeach
             <hr style="border-color: var(--ula-border-on-dark); margin-block: var(--ula-space-2);">
             @auth
-                <a href="{{ route('dashboard') }}">{{ __('لوحة التحكم') }}</a>
-                <a href="{{ route('office') }}" style="color: var(--ula-accent-default); font-weight: 700;">{{ __('ادخل إلى المكتب') }}</a>
+                <a href="{{ route('dashboard') }}">{{ $headerText('dashboard_text') }}</a>
+                <a href="{{ route('office') }}" style="color: var(--ula-accent-default); font-weight: 700;">{{ $headerText('office_text') }}</a>
             @else
-                <a href="{{ route('login') }}">{{ __('تسجيل الدخول') }}</a>
-                <a href="{{ route('register') }}" style="color: var(--ula-tone-gold-fg); font-weight: 700;">{{ __('تجربة الآن') }}</a>
+                <a href="{{ route('login') }}">{{ $headerText('login_text') }}</a>
+                <a href="{{ route('register') }}" style="color: var(--ula-tone-gold-fg); font-weight: 700;">{{ $headerText('cta_text') }}</a>
             @endauth
         </div>
     </header>
@@ -408,8 +410,12 @@
             <svg role="img" aria-label="UlaSpace" width="30" height="20" viewBox="-1.2 -1.3 60 40" fill="currentColor" style="flex-shrink: 0; display: block"><path d="M0 38.734L1.493 30.973L4.179 20.824L6.865 11.869C8.259 7.491 11.94 4.207 17.91 2.018C26.268 -0.569 34.427 -0.669 42.387 1.719C49.153 3.311 54.128 7.292 57.312 13.66L57.312 38.734L26.268 38.734L25.074 27.988C23.482 20.824 21.591 17.242 19.403 17.242C17.214 18.038 15.721 21.819 14.925 28.585L14.328 38.734L0 38.734Z"></path></svg>
             <span class="ula-footer-brand-name">UlaSpace</span>
         </a>
-        <span class="ula-footer-copy">Spaces carved, not built.</span>
-        <span class="ula-footer-copy">© {{ date('Y') }} · AlUla · Saudi Arabia · The world</span>
+        @if($siteFooter->field('tagline_en'))
+            <span class="ula-footer-copy">{{ $siteFooter->field('tagline_en') }}</span>
+        @endif
+        @if($siteFooter->field('copyright_en'))
+            <span class="ula-footer-copy">{{ str_replace('{year}', date('Y'), $siteFooter->field('copyright_en')) }}</span>
+        @endif
     </footer>
 
     <script nonce="{{ $cspNonce ?? '' }}">

@@ -3,6 +3,10 @@
 @section('title', __('تسجيل الدخول') . ' — UlaSpace')
 
 @section('content')
+@php
+    // Super Admin → Website Content → Log in & sign up
+    $panel = \App\Domains\CMS\Support\Cms::section('auth_login');
+@endphp
 <div class="ula-auth-container login-layout">
     <!-- Left: Login Form -->
     <div class="ula-auth-form-side">
@@ -29,9 +33,13 @@
         <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 32px; max-width: 480px; width: 100%; margin-inline: auto;">
             <!-- Heading Group -->
             <div style="display: flex; flex-direction: column; gap: 4px;">
-                <h1 style="font-size: 34px; font-weight: 600; line-height: 1.25; color: var(--ula-text-primary);">أهلاً بعودتك</h1>
-                <span style="font-family: var(--ula-font-en); font-size: 18px; font-weight: 300; color: var(--ula-text-secondary);">Welcome back</span>
-                <p style="font-size: 15px; color: var(--ula-text-secondary); margin-top: 8px;">سجّل الدخول للوصول إلى مكتبك الافتراضي</p>
+                <h1 style="font-size: 34px; font-weight: 600; line-height: 1.25; color: var(--ula-text-primary);">{{ $panel->field('heading_ar') }}</h1>
+                @if($panel->field('heading_en'))
+                    <span style="font-family: var(--ula-font-en); font-size: 18px; font-weight: 300; color: var(--ula-text-secondary);">{{ $panel->field('heading_en') }}</span>
+                @endif
+                @if($panel->field('intro_ar'))
+                    <p style="font-size: 15px; color: var(--ula-text-secondary); margin-top: 8px;">{{ $panel->field('intro_ar') }}</p>
+                @endif
             </div>
 
             @if($errors->any())
@@ -120,10 +128,17 @@
     <!-- Right: Branding Hero Panel -->
     <div class="ula-auth-hero-side">
         <div class="ula-auth-hero-stripes"></div>
+        @if($panel->image_url)
+            <div class="ula-auth-hero-image" style="background-image: url('{{ e($panel->image_url) }}');" role="img" aria-label="{{ $panel->field('panel_title_ar') }}"></div>
+        @endif
         <div class="ula-auth-hero-scrim"></div>
         <div class="ula-auth-hero-content">
-            <h2 style="font-size: 44px; font-weight: 600; line-height: 1.25; color: var(--ula-text-on-dark);">مكتبك الافتراضي بانتظارك</h2>
-            <span style="font-family: var(--ula-font-en); font-size: 20px; font-weight: 300; color: var(--ula-sand-400);">Your Virtual Office Awaits</span>
+            @if($panel->field('panel_title_ar'))
+                <h2 style="font-size: 44px; font-weight: 600; line-height: 1.25; color: var(--ula-text-on-dark);">{{ $panel->field('panel_title_ar') }}</h2>
+            @endif
+            @if($panel->field('panel_title_en'))
+                <span style="font-family: var(--ula-font-en); font-size: 20px; font-weight: 300; color: var(--ula-sand-400);">{{ $panel->field('panel_title_en') }}</span>
+            @endif
         </div>
     </div>
 </div>

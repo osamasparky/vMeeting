@@ -2,12 +2,16 @@
 
 namespace App\Domains\CMS\Models;
 
+use App\Domains\CMS\Support\CmsSchema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CmsSection extends Model
 {
     protected $table = 'cms_sections';
+
+    /** Saving a section bumps its page's updated_at. */
+    protected $touches = ['page'];
 
     protected $fillable = [
         'page_id',
@@ -81,5 +85,21 @@ class CmsSection extends Model
         $content = $this->content ?? [];
 
         return data_get($content, $key, $default);
+    }
+
+    /** A CMS field as defined in CmsSchema, wherever it is stored. */
+    public function field(string $key, mixed $default = null): mixed
+    {
+        $value = CmsSchema::isColumn($key) ? $this->{$key} : $this->getContentValue($key);
+
+        return $value ?? $default;
+    }
+
+    /** A repeater field's rows; always an array. */
+    public function items(string $key): array
+    {
+        $rows = $this->field($key);
+
+        return is_array($rows) ? array_values(array_filter($rows, 'is_array')) : [];
     }
 }

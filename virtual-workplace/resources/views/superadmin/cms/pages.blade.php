@@ -1,112 +1,70 @@
 @extends('superadmin.layout')
 
-@section('title', __('CMS Pages & Website Content'))
-@section('page_title', __('Website CMS — Pages & Sections'))
+@section('title', __('Website Content'))
+@section('page_title', __('Website Content'))
+
+@section('styles')
+<style>
+    .cms-pages-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+    .cms-pages-head h2 { margin: 0; font-size: 20px; font-weight: var(--ula-weight-semibold); color: var(--ula-text-primary); }
+    .cms-pages-head p { margin: 4px 0 0; font-size: 13px; color: var(--ula-text-muted); }
+    .cms-pages-head a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
+    .cms-pages { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+    .cms-page-card { display: flex; flex-direction: column; gap: 16px; padding: 22px; border-radius: var(--ula-radius-xl); background: var(--ula-surface-card); border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); box-shadow: var(--ula-shadow-xs); text-decoration: none; color: inherit; }
+    .cms-page-card:hover { border-color: var(--ula-accent-default); box-shadow: var(--ula-shadow-sm); text-decoration: none; }
+    .cms-page-card:focus-visible { outline: none; box-shadow: var(--ula-focus-ring); }
+    .cms-page-icon { width: 48px; height: 48px; border-radius: var(--ula-radius-md); background: var(--ula-tone-gold-bg); color: var(--ula-tone-gold-fg); display: inline-flex; align-items: center; justify-content: center; }
+    .cms-page-card strong { display: block; font-size: 17px; font-weight: var(--ula-weight-semibold); color: var(--ula-text-primary); }
+    .cms-page-card .cms-en { font-family: var(--ula-font-en); font-size: 13px; color: var(--ula-text-secondary); }
+    .cms-page-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+    .cms-page-meta span { padding: 3px 10px; border-radius: var(--ula-radius-pill); background: var(--ula-surface-page-alt); font-size: 12px; color: var(--ula-text-secondary); }
+    .cms-num { font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate; }
+    [dir="rtl"] .cms-page-go .material-symbols-rounded { transform: scaleX(-1); }
+    .cms-page-go { margin-top: auto; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: var(--ula-weight-semibold); color: var(--ula-accent-default); }
+</style>
+@endsection
 
 @section('content')
 <div style="display: flex; flex-direction: column; gap: 24px;">
 
-    <!-- Top Action Bar -->
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+    <div class="cms-pages-head">
         <div>
-            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
-                <div style="width: 36px; height: 36px; border-radius: 10px; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); display: flex; align-items: center; justify-content: center; color: var(--ula-palm-700);">
-                    <span class="material-symbols-rounded" style="font-size: 22px;">language</span>
-                </div>
-                <h2 style="font-size: 20px; font-weight: 900; color: var(--ula-text-primary); margin: 0;">
-                    {{ __('Public Website Pages') }}
-                </h2>
-            </div>
-            <p style="font-size: 13px; color: var(--ula-text-muted); margin: 0;">
-                {{ __('Manage dynamic website content, section blocks, floorplan screenshots, and bilingual texts for UlaSpace.') }}
-            </p>
+            <h2>{{ __('Website Content') }}</h2>
+            <p>{{ __('Every text, link and image on the public website, the header and footer, and the log-in and sign-up pages.') }}</p>
         </div>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <a href="{{ route('landing.home') }}" target="_blank" class="tactile-btn btn-outline" style="display: inline-flex; align-items: center; gap: 6px;">
-                <span class="material-symbols-rounded" style="font-size: 18px;">visibility</span>
-                <span>{{ __('Preview Live Website') }}</span>
+            <a href="{{ route('landing.home') }}" target="_blank" rel="noopener" class="tactile-btn btn-outline">
+                <span class="material-symbols-rounded" style="font-size: 18px;">open_in_new</span>
+                <span>{{ __('View website') }}</span>
             </a>
-            <a href="{{ route('superadmin.cms.theme') }}" class="tactile-btn btn-secondary" style="display: inline-flex; align-items: center; gap: 6px;">
-                <span class="material-symbols-rounded" style="font-size: 18px;">palette</span>
-                <span>{{ __('Theme & Branding') }}</span>
-            </a>
-            <a href="{{ route('superadmin.cms.assets') }}" class="tactile-btn btn-primary" style="display: inline-flex; align-items: center; gap: 6px;">
+            <a href="{{ route('superadmin.cms.assets') }}" class="tactile-btn btn-secondary">
                 <span class="material-symbols-rounded" style="font-size: 18px;">photo_library</span>
-                <span>{{ __('Media Library') }}</span>
+                <span>{{ __('Image Library') }}</span>
             </a>
         </div>
     </div>
 
-    <!-- Pages Data Table -->
-    <div class="panel-card" style="border-radius: var(--ula-radius-xl); padding: 24px; border: 1px solid var(--ula-border-subtle); background: var(--ula-surface-card);">
-        <div class="data-table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>{{ __('Page Title & URL Slug') }}</th>
-                        <th>{{ __('Arabic Title') }}</th>
-                        <th>{{ __('Active Sections') }}</th>
-                        <th>{{ __('Status') }}</th>
-                        <th>{{ __('Last Updated') }}</th>
-                        <th style="text-align: center;">{{ __('Actions') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($pages as $p)
-                        <tr>
-                            <td>
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <div style="width: 32px; height: 32px; border-radius: 8px; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); display: flex; align-items: center; justify-content: center; color: var(--ula-palm-900); flex-shrink: 0;">
-                                        <span class="material-symbols-rounded" style="font-size: 18px;">description</span>
-                                    </div>
-                                    <div>
-                                        <strong style="font-size: 14px; color: var(--ula-text-primary); display: block;">
-                                            {{ $p->title_en }}
-                                        </strong>
-                                        <span style="font-size: 11px; font-family: var(--ula-font-mono); color: var(--ula-palm-700); font-weight: 700; direction: ltr; unicode-bidi: isolate;">
-                                            /{{ $p->slug === 'home' ? '' : $p->slug }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <span style="font-size: 13.5px; font-weight: 700; color: var(--ula-text-primary); font-family: 'Cairo', sans-serif;">
-                                    {{ $p->title_ar }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="nav-badge-pill" style="font-size: 12px; display: inline-flex; align-items: center; gap: 6px;">
-                                    <span class="material-symbols-rounded" style="font-size: 15px; color: var(--ula-palm-700);">view_quilt</span>
-                                    <span>{{ $p->sections_count }} {{ __('Sections') }}</span>
-                                </span>
-                            </td>
-                            <td>
-                                <span class="badge-status {{ $p->status === 'published' ? 'badge-active' : 'badge-suspended' }}">
-                                    {{ ucfirst($p->status) }}
-                                </span>
-                            </td>
-                            <td>
-                                <span style="font-size: 12px; color: var(--ula-text-muted);">
-                                    {{ $p->updated_at ? $p->updated_at->diffForHumans() : '—' }}
-                                </span>
-                            </td>
-                            <td style="text-align: center;">
-                                <a href="{{ route('superadmin.cms.pages.edit', $p) }}" class="tactile-btn btn-primary" style="padding: 7px 18px; font-size: 12.5px; display: inline-flex; align-items: center; gap: 6px;">
-                                    <span class="material-symbols-rounded" style="font-size: 16px;">edit_document</span>
-                                    <span>{{ __('Edit Sections & Content') }}</span>
-                                </a>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" style="text-align: center; padding: 36px; color: var(--ula-text-muted);">
-                                {{ __('No CMS pages found.') }}
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+    <div class="cms-pages">
+        @forelse($pages as $p)
+            @php $def = \App\Domains\CMS\Support\CmsSchema::page($p->slug); @endphp
+            <a href="{{ route('superadmin.cms.pages.edit', $p) }}" class="cms-page-card">
+                <span class="cms-page-icon"><span class="material-symbols-rounded" style="font-size: 26px;">{{ $def['icon'] }}</span></span>
+                <div>
+                    <strong>{{ $def['title_ar'] }}</strong>
+                    <span class="cms-en">{{ $def['title_en'] }}</span>
+                </div>
+                <div class="cms-page-meta">
+                    <span><span class="cms-num">{{ $p->sections_count }}</span> {{ __('sections') }}</span>
+                    @if($p->active_sections_count < $p->sections_count)
+                        <span><span class="cms-num">{{ $p->sections_count - $p->active_sections_count }}</span> {{ __('hidden') }}</span>
+                    @endif
+                    <span>{{ __('Updated') }} {{ $p->updated_at?->diffForHumans() ?? '—' }}</span>
+                </div>
+                <span class="cms-page-go">{{ __('Edit content') }} <span class="material-symbols-rounded" style="font-size: 18px;">arrow_forward</span></span>
+            </a>
+        @empty
+            <p style="color: var(--ula-text-muted);">{{ __('No pages yet — run php artisan migrate to create them.') }}</p>
+        @endforelse
     </div>
 </div>
 @endsection

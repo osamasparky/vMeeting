@@ -1,7 +1,7 @@
 @extends('landing.layout')
 
-@section('title', 'UlaSpace — مساحات العمل والمكاتب الافتراضية الذكية')
-@section('meta_description', 'مساحات عمل افتراضية غامرة تجمع فرق العمل عن بعد مع صوت وفيديو مكاني، وتخطيط خرائط المكاتب، والاجتماعات التفاعلية.')
+@section('title', $page?->meta_title_ar ?: 'UlaSpace — مساحات العمل والمكاتب الافتراضية الذكية')
+@section('meta_description', $page?->meta_desc_ar ?: 'مساحات عمل افتراضية غامرة تجمع فرق العمل عن بعد مع صوت وفيديو مكاني، وتخطيط خرائط المكاتب، والاجتماعات التفاعلية.')
 
 @section('styles')
 <style>
@@ -121,12 +121,16 @@
 @section('content')
 
     @php
-        $heroSec = $sections->get('home_hero');
-        $identitySec = $sections->get('home_company_workspace') ?? $sections->get('home_identity');
-        $spacesSec = $sections->get('home_floorplan_editor') ?? $sections->get('home_spaces');
-        $capabilitiesSec = $sections->get('home_collaboration') ?? $sections->get('home_benefits');
-        $pricingSec = $sections->get('home_pricing');
-        $ctaSec = $sections->get('home_cta');
+        // Every section below comes from the CMS (Super Admin → Website Content).
+        // A section that is hidden there is null here and is not rendered.
+        $hero = $sections->get('home_hero');
+        $features = $sections->get('home_features');
+        $identity = $sections->get('home_company_workspace');
+        $spaces = $sections->get('home_floorplan_editor');
+        $capabilities = $sections->get('home_collaboration');
+        $quote = $sections->get('home_quote');
+        $pricing = $sections->get('home_pricing');
+        $cta = $sections->get('home_cta');
 
         $planNameAr = ['free' => 'مجاني', 'starter' => 'مبتدئ', 'business' => 'أعمال', 'enterprise' => 'مؤسسات'];
         $featureAr = [
@@ -136,97 +140,102 @@
             'sso' => 'دخول موحد (SSO)', 'api_access' => 'وصول عبر API', 'priority_support' => 'دعم ذو أولوية',
             'advanced_analytics' => 'تحليلات متقدمة',
         ];
+        $roomTone = ['success' => 'var(--ula-status-success-on-dark)', 'highlight' => 'var(--ula-highlight-default)'];
         $mediaStyle = fn ($sec) => $sec?->image_url ? "background-image: url('" . e($sec->image_url) . "');" : '';
     @endphp
 
+    @if($hero)
     <!-- ── Hero ── -->
-    <section class="lp-media lp-hero" style="{{ $mediaStyle($heroSec) }}">
+    <section class="lp-media lp-hero" style="{{ $mediaStyle($hero) }}">
         <div class="lp-hero-scrim"></div>
-        @unless($heroSec?->image_url)
+        @unless($hero->image_url)
             <span class="lp-media-label lp-hero-label">alula-canyon.jpg</span>
         @endunless
 
         <div class="lp-hero-card">
-            <span class="lp-eyebrow">{{ $heroSec?->badge_en ?: 'Next-Generation Virtual Workplace' }}</span>
-            <h1 class="lp-hero-title">{{ $heroSec?->title_ar ?: 'اجمع فريقك في مساحة واحدة ذكية' }}</h1>
-            <p class="lp-hero-sub">{{ $heroSec?->subtitle_ar ?: 'مكاتب افتراضية نابضة بالحياة بالصوت والصورة والمحادثات. اجتماعات سهلة، ومشاركة أقرب.' }}</p>
-            <span class="lp-en lp-hero-en">{{ $heroSec?->title_en ?: 'A more human way to work together.' }}</span>
+            @if($hero->field('badge_en'))<span class="lp-eyebrow">{{ $hero->field('badge_en') }}</span>@endif
+            <h1 class="lp-hero-title">{{ $hero->field('title_ar') }}</h1>
+            @if($hero->field('subtitle_ar'))<p class="lp-hero-sub">{{ $hero->field('subtitle_ar') }}</p>@endif
+            @if($hero->field('title_en'))<span class="lp-en lp-hero-en">{{ $hero->field('title_en') }}</span>@endif
             <div class="lp-hero-actions">
                 @auth
-                    <x-btn variant="primary" size="md" :href="route('office')">{{ $heroSec?->getContentValue('cta_primary_text_ar') ?: 'ادخل إلى مساحتك' }}</x-btn>
+                    <x-btn variant="primary" size="md" :href="route('office')">{{ $hero->field('cta_primary_text_ar') }}</x-btn>
                 @else
-                    <x-btn variant="primary" size="md" :href="$heroSec?->getContentValue('cta_primary_link', route('register')) ?? route('register')">{{ $heroSec?->getContentValue('cta_primary_text_ar') ?: 'ادخل إلى مساحتك' }}</x-btn>
+                    <x-btn variant="primary" size="md" :href="$hero->field('cta_primary_link') ?: route('register')">{{ $hero->field('cta_primary_text_ar') }}</x-btn>
                 @endauth
                 <div class="lp-hero-actions-row">
-                    <x-btn variant="secondary" size="md" href="#spaces">{{ $heroSec?->getContentValue('cta_secondary_text_ar') ?: 'شاهد العرض' }}</x-btn>
-                    <x-btn variant="ghost" size="md" icon="dashboard" :href="auth()->check() ? route('dashboard') : route('login')">لوحة التحكم</x-btn>
+                    @if($hero->field('cta_secondary_text_ar'))
+                        <x-btn variant="secondary" size="md" :href="$hero->field('cta_secondary_link') ?: '#spaces'">{{ $hero->field('cta_secondary_text_ar') }}</x-btn>
+                    @endif
+                    @if($hero->field('dashboard_text_ar'))
+                        <x-btn variant="ghost" size="md" icon="dashboard" :href="auth()->check() ? route('dashboard') : route('login')">{{ $hero->field('dashboard_text_ar') }}</x-btn>
+                    @endif
                 </div>
             </div>
         </div>
 
-        <div class="lp-hero-tagline">
-            <strong>أكثر من<br>مكان العمل</strong>
-            <span class="lp-en">A more human<br>place to work.</span>
-        </div>
+        @if($hero->field('overlay_title_ar') || $hero->field('overlay_title_en'))
+            <div class="lp-hero-tagline">
+                @if($hero->field('overlay_title_ar'))<strong>{!! nl2br(e($hero->field('overlay_title_ar'))) !!}</strong>@endif
+                @if($hero->field('overlay_title_en'))<span class="lp-en">{!! nl2br(e($hero->field('overlay_title_en'))) !!}</span>@endif
+            </div>
+        @endif
     </section>
+    @endif
 
+    @if($features && $features->items('items'))
     <!-- ── Feature strip ── -->
     <section id="features" class="lp-features">
-        @foreach([
-            ['apartment', 'مكاتب افتراضية حية', 'Live Virtual Offices'],
-            ['videocam', 'اجتماعات سلسة', 'Seamless Meetings'],
-            ['person_add', 'دعوات بضغطة واحدة', '1-Click Guest Access'],
-            ['palette', 'تصميم مرن لمكتبك', 'Design Your Space'],
-        ] as [$icon, $ar, $en])
+        @foreach($features->items('items') as $item)
             <div class="lp-feature">
-                <span class="ms" aria-hidden="true">{{ $icon }}</span>
+                @if(!empty($item['icon']))<span class="ms" aria-hidden="true">{{ $item['icon'] }}</span>@endif
                 <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
-                    <strong>{{ $ar }}</strong>
-                    <span class="lp-en">{{ $en }}</span>
+                    <strong>{{ $item['text_ar'] ?? '' }}</strong>
+                    @if(!empty($item['text_en']))<span class="lp-en">{{ $item['text_en'] }}</span>@endif
                 </div>
             </div>
         @endforeach
     </section>
+    @endif
 
+    @if($identity)
     <!-- ── Identity ── -->
     <section id="identity" class="lp-section lp-section--alt lp-split">
         <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 16px;">
             <div class="lp-head">
-                <h2 class="lp-h2" style="font-size: 30px; line-height: 1.3;">{{ $identitySec?->title_ar ?: 'مستقبل العمل.. بروح سعودية' }}</h2>
-                <span class="lp-en lp-lead-en">{{ $identitySec?->title_en ?: 'The future of work. A Saudi spirit.' }}</span>
+                <h2 class="lp-h2" style="font-size: 30px; line-height: 1.3;">{{ $identity->field('title_ar') }}</h2>
+                @if($identity->field('title_en'))<span class="lp-en lp-lead-en">{{ $identity->field('title_en') }}</span>@endif
             </div>
-            <p class="lp-body" style="margin: 0; max-width: 420px;">{{ $identitySec?->subtitle_ar ?: 'صُمّمت UlaSpace بإلهام من العلا لفرق تعمل من كل مكان: ضيافة سعودية في التفاصيل، وهندسة عالمية في الأداء.' }}</p>
+            @if($identity->field('subtitle_ar'))<p class="lp-body" style="margin: 0; max-width: 420px;">{{ $identity->field('subtitle_ar') }}</p>@endif
         </div>
-        <div class="lp-media lp-identity-media" style="{{ $mediaStyle($identitySec) }}">
-            @unless($identitySec?->image_url)
+        <div class="lp-media lp-identity-media" style="{{ $mediaStyle($identity) }}">
+            @unless($identity->image_url)
                 <span class="lp-media-label">majlis-warm-light.jpg</span>
             @endunless
             <div class="lp-identity-caption">
-                <strong>{{ $identitySec?->badge_ar ?: 'من السعودية … إلى العالم' }}</strong>
-                <span class="lp-en">{{ $identitySec?->badge_en ?: 'From Saudi Arabia, to the world.' }}</span>
+                @if($identity->field('badge_ar'))<strong>{{ $identity->field('badge_ar') }}</strong>@endif
+                @if($identity->field('badge_en'))<span class="lp-en">{{ $identity->field('badge_en') }}</span>@endif
             </div>
         </div>
     </section>
+    @endif
 
+    @if($spaces)
     <!-- ── Smart spaces + live floor preview ── -->
     <section id="spaces" class="lp-section lp-split lp-spaces">
         <div style="display: flex; flex-direction: column; gap: 20px;">
             <div class="lp-head">
-                <span class="lp-eyebrow">{{ $spacesSec?->badge_ar ?: 'المساحات الذكية' }}</span>
-                <h2 class="lp-h2">{{ $spacesSec?->title_ar ?: 'مكتب افتراضي يشبه مكتبك الحقيقي' }}</h2>
-                <span class="lp-en lp-lead-en" style="max-width: 560px; text-align: end;">{{ $spacesSec?->subtitle_en ?: 'Design your floor once, and every teammate walks in to the same place — desks, meeting rooms, lounges, and quiet corners.' }}</span>
+                @if($spaces->field('badge_ar'))<span class="lp-eyebrow">{{ $spaces->field('badge_ar') }}</span>@endif
+                <h2 class="lp-h2">{{ $spaces->field('title_ar') }}</h2>
+                @if($spaces->field('subtitle_en'))<span class="lp-en lp-lead-en" style="max-width: 560px; text-align: end;">{{ $spaces->field('subtitle_en') }}</span>@endif
             </div>
             <div style="display: flex; flex-direction: column; gap: 10px;">
-                @foreach([
-                    ['chair', 'مكاتب فردية ومساحات عمل مشتركة', 'Private desks and open collaboration zones'],
-                    ['meeting_room', 'قاعات اجتماعات قابلة للقفل', 'Lockable meeting rooms with knock-to-enter'],
-                    ['workspaces', 'صالات استراحة وزوايا هادئة', 'Lounges and quiet corners for focus work'],
-                ] as [$icon, $ar, $en])
+                @foreach($spaces->items('tiles') as $tile)
                     <div class="lp-space-tile">
-                        <span class="lp-tile-icon"><span class="ms" aria-hidden="true">{{ $icon }}</span></span>
+                        <span class="lp-tile-icon"><span class="ms" aria-hidden="true">{{ $tile['icon'] ?? '' }}</span></span>
                         <div style="display: flex; flex-direction: column; min-width: 0;">
-                            <span style="font-size: var(--ula-size-body); font-weight: var(--ula-weight-semibold); line-height: 1.6;">{{ $ar }}</span>
-                            <span class="lp-en" style="font-size: var(--ula-size-xs); line-height: 1.5; color: var(--ula-text-secondary); text-align: start;">{{ $en }}</span>
+                            <span style="font-size: var(--ula-size-body); font-weight: var(--ula-weight-semibold); line-height: 1.6;">{{ $tile['text_ar'] ?? '' }}</span>
+                            @if(!empty($tile['text_en']))<span class="lp-en" style="font-size: var(--ula-size-xs); line-height: 1.5; color: var(--ula-text-secondary); text-align: start;">{{ $tile['text_en'] }}</span>@endif
                         </div>
                     </div>
                 @endforeach
@@ -236,73 +245,74 @@
         <div class="lp-floor">
             <div class="lp-floor-head">
                 <div style="display: flex; flex-direction: column;">
-                    <span style="font-size: 17px; font-weight: var(--ula-weight-semibold); line-height: 1.5;">الطابق الأول · المقر الرئيسي</span>
-                    <span class="lp-en" style="font-size: var(--ula-size-xs); color: var(--ula-text-on-dark-subtle); text-align: end;">Floor 1 · Main Headquarters</span>
+                    <span style="font-size: 17px; font-weight: var(--ula-weight-semibold); line-height: 1.5;">{{ $spaces->field('floor_name_ar') }}</span>
+                    @if($spaces->field('floor_name_en'))<span class="lp-en" style="font-size: var(--ula-size-xs); color: var(--ula-text-on-dark-subtle); text-align: end;">{{ $spaces->field('floor_name_en') }}</span>@endif
                 </div>
-                <span class="lp-live"><span class="lp-live-dot"></span><span class="lp-num">18</span>عضواً متصلاً</span>
+                @if($spaces->field('online_count') || $spaces->field('online_label_ar'))
+                    <span class="lp-live"><span class="lp-live-dot"></span><span class="lp-num">{{ $spaces->field('online_count') }}</span>{{ $spaces->field('online_label_ar') }}</span>
+                @endif
             </div>
-            <div class="lp-media lp-floor-preview" style="{{ $mediaStyle($spacesSec) }}">
-                @unless($spacesSec?->image_url)
+            <div class="lp-media lp-floor-preview" style="{{ $mediaStyle($spaces) }}">
+                @unless($spaces->image_url)
                     <span class="lp-media-label">floor-preview.png</span>
                 @endunless
             </div>
-            @foreach([
-                ['meeting_room', 'قاعة النخيل', 'Palm Boardroom · 4 In Call', 'في مكالمة', 'var(--ula-status-success-on-dark)'],
-                ['chair', 'مساحة الابتكار', 'Innovation Lounge · 2 Desks', 'مكتبان متاحان', 'var(--ula-highlight-default)'],
-            ] as [$icon, $name, $en, $status, $color])
+            @foreach($spaces->items('rooms') as $room)
                 <div class="lp-room">
-                    <span class="lp-room-icon"><span class="ms" style="font-size: 20px;" aria-hidden="true">{{ $icon }}</span></span>
+                    <span class="lp-room-icon"><span class="ms" style="font-size: 20px;" aria-hidden="true">{{ $room['icon'] ?? '' }}</span></span>
                     <div style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
-                        <span style="font-size: 14px; font-weight: var(--ula-weight-semibold);">{{ $name }}</span>
-                        <span class="lp-en" style="font-size: var(--ula-size-xs); color: var(--ula-text-on-dark-subtle); text-align: start;">{{ $en }}</span>
+                        <span style="font-size: 14px; font-weight: var(--ula-weight-semibold);">{{ $room['name_ar'] ?? '' }}</span>
+                        @if(!empty($room['detail_en']))<span class="lp-en" style="font-size: var(--ula-size-xs); color: var(--ula-text-on-dark-subtle); text-align: start;">{{ $room['detail_en'] }}</span>@endif
                     </div>
-                    <span style="font-size: var(--ula-size-sm); color: {{ $color }};">{{ $status }}</span>
+                    <span style="font-size: var(--ula-size-sm); color: {{ $roomTone[$room['tone'] ?? 'success'] ?? $roomTone['success'] }};">{{ $room['status_ar'] ?? '' }}</span>
                 </div>
             @endforeach
         </div>
     </section>
+    @endif
 
+    @if($capabilities)
     <!-- ── Capabilities ── -->
     <section id="capabilities" class="lp-section lp-section--alt" style="display: flex; flex-direction: column; gap: 28px;">
         <div class="lp-head" style="max-width: 760px;">
-            <span class="lp-eyebrow lp-en">{{ $capabilitiesSec?->badge_en ?: 'Platform Capabilities' }}</span>
-            <h2 class="lp-h2">{{ $capabilitiesSec?->title_ar ?: 'مصمم لبيئات العمل الحديثة التي تجمع بين التراث والابتكار' }}</h2>
-            <span class="lp-en lp-lead-en">{{ $capabilitiesSec?->subtitle_en ?: 'Everything you need to run a high-trust, collaborative virtual headquarters.' }}</span>
+            @if($capabilities->field('badge_en'))<span class="lp-eyebrow lp-en">{{ $capabilities->field('badge_en') }}</span>@endif
+            <h2 class="lp-h2">{{ $capabilities->field('title_ar') }}</h2>
+            @if($capabilities->field('subtitle_en'))<span class="lp-en lp-lead-en">{{ $capabilities->field('subtitle_en') }}</span>@endif
         </div>
         <div class="lp-grid-3">
-            @foreach([
-                ['graphic_eq', 'الصوت والفيديو المكاني', 'تواصل تلقائي يحاكي الواقع، حيث يقوى الصوت تدريجياً كلما اقتربت من زملائك على خريطة المقر دون روابط مكالمات معقدة.', 'Proximity-based WebRTC Mesh'],
-                ['lock', 'قاعات اجتماعات ذكية وأبواب خاصة', 'أبواب غرف قابلة للقفل مع جرس استئذان ومشاركة شاشة بدقة عالية وعزل صوتي كامل لسرية المحادثات.', 'Isolated Audio Zones & Knocking'],
-                ['architecture', 'محرر الخرائط ومكتبة الأثاث', 'صمم مخطط مكتبك بسحب وإفلات المكاتب والنباتات والسبورات البيضاء والشاشات التفاعلية بسهولة.', 'Custom Floorplan Architect & Catalog'],
-            ] as [$icon, $title, $body, $en])
+            @foreach($capabilities->items('cards') as $card)
                 <div class="lp-card">
-                    <span class="lp-card-icon"><span class="ms" style="font-size: 24px;" aria-hidden="true">{{ $icon }}</span></span>
-                    <h3>{{ $title }}</h3>
-                    <p class="lp-body" style="margin: 0;">{{ $body }}</p>
-                    <span class="lp-en" style="font-size: var(--ula-size-xs); line-height: 1.5; color: var(--ula-text-secondary); text-align: start;">{{ $en }}</span>
+                    <span class="lp-card-icon"><span class="ms" style="font-size: 24px;" aria-hidden="true">{{ $card['icon'] ?? '' }}</span></span>
+                    <h3>{{ $card['title_ar'] ?? '' }}</h3>
+                    @if(!empty($card['body_ar']))<p class="lp-body" style="margin: 0;">{{ $card['body_ar'] }}</p>@endif
+                    @if(!empty($card['caption_en']))<span class="lp-en" style="font-size: var(--ula-size-xs); line-height: 1.5; color: var(--ula-text-secondary); text-align: start;">{{ $card['caption_en'] }}</span>@endif
                 </div>
             @endforeach
         </div>
     </section>
+    @endif
 
+    @if($quote && $quote->field('quote_ar'))
     <!-- ── Quote ── -->
     <section class="lp-section lp-quote">
         <div class="lp-quote-box">
-            <blockquote>"المكان ليس مجرد جدران، بل مساحة تلتقي فيها العقول وتتدفق فيها الأفكار بحرية وشغف."</blockquote>
-            <span class="lp-eyebrow lp-en">UlaSpace — Designed with Heritage &amp; Modern Luxury</span>
+            <blockquote>"{{ $quote->field('quote_ar') }}"</blockquote>
+            @if($quote->field('attribution_en'))<span class="lp-eyebrow lp-en">{{ $quote->field('attribution_en') }}</span>@endif
         </div>
     </section>
+    @endif
 
-    <!-- ── Pricing (plans from the database) ── -->
+    @if($pricing)
+    <!-- ── Pricing (plans from Plans & Billing) ── -->
     <section id="pricing" class="lp-section" style="display: flex; flex-direction: column; gap: 28px;">
         <div class="lp-head">
-            <h2 class="lp-h2">{{ $pricingSec?->title_ar ?: 'باقة تناسب حجم فريقك' }}</h2>
-            <span class="lp-en lp-lead-en">{{ $pricingSec?->subtitle_en ?: 'Start free, upgrade any time as your team grows.' }}</span>
+            <h2 class="lp-h2">{{ $pricing->field('title_ar') }}</h2>
+            @if($pricing->field('subtitle_en'))<span class="lp-en lp-lead-en">{{ $pricing->field('subtitle_en') }}</span>@endif
         </div>
         <div class="lp-grid-4">
             @foreach($plans as $plan)
                 @php
-                    $isPopular = $plan->slug === 'business';
+                    $isPopular = $plan->slug === $pricing->field('featured_plan');
                     $nameAr = $planNameAr[$plan->slug] ?? $plan->name;
                     $nameEn = isset($planNameAr[$plan->slug]) ? $plan->name : null;
                     $highlights = array_slice(is_array($plan->features) ? $plan->features : [], -2);
@@ -316,8 +326,8 @@
                                 <span class="lp-en" style="font-size: var(--ula-size-xs); color: var(--ula-text-secondary); text-align: start;">{{ $nameEn }}</span>
                             @endif
                         </div>
-                        @if($isPopular)
-                            <span class="lp-popular">الأكثر شيوعاً</span>
+                        @if($isPopular && $pricing->field('popular_label_ar'))
+                            <span class="lp-popular">{{ $pricing->field('popular_label_ar') }}</span>
                         @endif
                     </div>
                     <div class="lp-price">
@@ -337,30 +347,35 @@
                             <span class="lp-plan-line"><span class="ms" aria-hidden="true">check_circle</span>{{ $featureAr[$feature] ?? \Illuminate\Support\Str::headline($feature) }}</span>
                         @endforeach
                     </div>
-                    <x-btn :variant="$isPopular ? 'primary' : 'outline'" size="md" :href="route('register', ['plan' => $plan->slug])">ابدأ الآن</x-btn>
+                    <x-btn :variant="$isPopular ? 'primary' : 'outline'" size="md" :href="route('register', ['plan' => $plan->slug])">{{ $pricing->field('button_text_ar') ?: 'ابدأ الآن' }}</x-btn>
                 </div>
             @endforeach
         </div>
     </section>
+    @endif
 
+    @if($cta)
     <!-- ── CTA band ── -->
     <section class="lp-section">
         <div class="lp-cta">
             <div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px; max-width: 700px;">
-                <h2>{{ $ctaSec?->title_ar ?: 'جاهز لنقل فريقك إلى بيئة عمل المستقبل؟' }}</h2>
-                <p>{{ $ctaSec?->subtitle_ar ?: 'انضم إلى المئات من الشركات الرائدة التي تبني ثقافة عمل قوية ومتصلة مع UlaSpace.' }}</p>
+                <h2>{{ $cta->field('title_ar') }}</h2>
+                @if($cta->field('subtitle_ar'))<p>{{ $cta->field('subtitle_ar') }}</p>@endif
             </div>
             <div class="lp-cta-actions">
                 @auth
-                    <x-btn variant="nav-cta" size="lg" :href="route('office')">ادخل إلى مساحتك</x-btn>
-                    <a href="{{ route('dashboard') }}" class="lp-btn-on-dark">لوحة التحكم</a>
+                    <x-btn variant="nav-cta" size="lg" :href="route('office')">{{ $hero?->field('cta_primary_text_ar') ?: 'ادخل إلى مساحتك' }}</x-btn>
+                    <a href="{{ route('dashboard') }}" class="lp-btn-on-dark">{{ $hero?->field('dashboard_text_ar') ?: 'لوحة التحكم' }}</a>
                 @else
-                    <x-btn variant="nav-cta" size="lg" :href="$ctaSec?->getContentValue('cta_primary_link', route('register')) ?? route('register')">{{ $ctaSec?->getContentValue('cta_primary_text_ar') ?: 'ابدأ التجربة المجانية الآن' }}</x-btn>
-                    <a href="{{ $ctaSec?->getContentValue('cta_secondary_link', route('login')) ?? route('login') }}" class="lp-btn-on-dark">{{ $ctaSec?->getContentValue('cta_secondary_text_ar') ?: 'تسجيل الدخول' }}</a>
+                    <x-btn variant="nav-cta" size="lg" :href="$cta->field('cta_primary_link') ?: route('register')">{{ $cta->field('cta_primary_text_ar') }}</x-btn>
+                    @if($cta->field('cta_secondary_text_ar'))
+                        <a href="{{ $cta->field('cta_secondary_link') ?: route('login') }}" class="lp-btn-on-dark">{{ $cta->field('cta_secondary_text_ar') }}</a>
+                    @endif
                 @endauth
             </div>
         </div>
     </section>
+    @endif
 
 @endsection
 

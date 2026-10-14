@@ -1,161 +1,112 @@
 @extends('superadmin.layout')
 
-@section('title', __('3D & Media Asset Manager'))
-@section('page_title', __('Website CMS — 3D & Media Assets'))
+@section('title', __('Image Library'))
+@section('page_title', __('Website Content — Image Library'))
+
+@section('styles')
+<style>
+    .lib-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+    .lib-head h2 { margin: 0; font-size: 20px; font-weight: var(--ula-weight-semibold); color: var(--ula-text-primary); }
+    .lib-head p { margin: 4px 0 0; font-size: 13px; color: var(--ula-text-muted); }
+    .lib-card { padding: 24px; border-radius: var(--ula-radius-xl); background: var(--ula-surface-card); border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); }
+    .lib-upload { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto; gap: 16px; align-items: end; }
+    .lib-field { display: flex; flex-direction: column; gap: 6px; }
+    .lib-field label { font-size: 12px; font-weight: var(--ula-weight-semibold); color: var(--ula-text-secondary); }
+    .lib-field .form-input { width: 100%; min-height: 44px; }
+    .lib-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
+    .lib-alert { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-radius: var(--ula-radius-sm); font-size: 13.5px; }
+    .lib-alert--ok { background: var(--ula-tone-palm-bg); color: var(--ula-tone-palm-fg); }
+    .lib-alert--err { background: var(--ula-tone-terracotta-bg); color: var(--ula-tone-terracotta-fg); }
+    .lib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
+    .lib-item { display: flex; flex-direction: column; border-radius: var(--ula-radius-lg); overflow: hidden; background: var(--ula-surface-page-alt); border: var(--ula-border-width-hairline) solid var(--ula-border-subtle); }
+    .lib-thumb { aspect-ratio: 4 / 3; background: repeating-linear-gradient(135deg, var(--ula-media-stripe-a) 0 12px, var(--ula-media-stripe-b) 12px 24px); }
+    .lib-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .lib-body { padding: 14px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .lib-body strong { font-size: 13px; color: var(--ula-text-primary); word-break: break-word; }
+    .lib-used { display: flex; flex-wrap: wrap; gap: 4px; }
+    .lib-used span { padding: 2px 8px; border-radius: var(--ula-radius-pill); background: var(--ula-tone-palm-bg); color: var(--ula-tone-palm-fg); font-size: 11px; }
+    .lib-meta { font-size: 11px; color: var(--ula-text-muted); }
+    .lib-actions { margin-top: auto; display: flex; gap: 8px; }
+    .lib-actions .tactile-btn { min-height: 44px; display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }
+    .lib-del { background: var(--ula-tone-terracotta-bg); color: var(--ula-tone-terracotta-fg); border-color: transparent; }
+    @media (max-width: 720px) { .lib-upload { grid-template-columns: minmax(0, 1fr); } }
+</style>
+@endsection
 
 @section('content')
+@php $schemaNames = fn ($key) => \App\Domains\CMS\Support\CmsSchema::section($key)['name_ar'] ?? $key; @endphp
 <div style="display: flex; flex-direction: column; gap: 24px;">
 
-    <!-- Top Action Bar -->
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+    <div class="lib-head">
         <div>
-            <h2 style="font-size: 20px; font-weight: 900; color: var(--ula-text-primary); margin-bottom: 4px;">
-                <span class="material-symbols-rounded" style="font-size: 1.15em; vertical-align: -0.2em;" aria-hidden="true">folder</span> {{ __('Nano Banana & 3D Media Asset Manager') }}
-            </h2>
-            <p style="font-size: 13px; color: var(--ula-text-muted); margin: 0;">
-                {{ __('Upload and manage GLB, GLTF, looping MP4/WebM videos, and architectural floorplans. Swap assets in sections instantly.') }}
-            </p>
+            <h2>{{ __('Image Library') }}</h2>
+            <p>{{ __('Images you upload here can be picked for any section with an image. You can also upload straight from a section.') }}</p>
         </div>
-        <div style="display: flex; gap: 10px;">
-            <a href="{{ route('superadmin.cms.pages') }}" class="tactile-btn btn-outline">
-                <span>←</span> {{ __('Back to CMS Pages') }}
-            </a>
-        </div>
+        <a href="{{ route('superadmin.cms.pages') }}" class="tactile-btn btn-outline lib-btn">
+            <span class="material-symbols-rounded" style="font-size: 18px;">arrow_back</span>
+            <span>{{ __('Website Content') }}</span>
+        </a>
     </div>
 
     @if(session('success'))
-        <div class="alert-box alert-success">
-            <span class="material-symbols-rounded" style="font-size: 1.15em; vertical-align: -0.2em;" aria-hidden="true">check_circle</span> {{ session('success') }}
-        </div>
+        <div class="lib-alert lib-alert--ok" role="status"><span class="material-symbols-rounded">check_circle</span>{{ session('success') }}</div>
+    @endif
+    @if($errors->any())
+        <div class="lib-alert lib-alert--err" role="alert"><span class="material-symbols-rounded">error</span>{{ $errors->first() }}</div>
     @endif
 
-    <!-- Upload Asset Card -->
-    <div class="panel-card" style="border-radius: var(--ula-radius-xl); padding: 24px;">
-        <div class="panel-header" style="margin-bottom: 20px;">
-            <div class="panel-title">
-                <span><span class="material-symbols-rounded" style="font-size: 1.15em; vertical-align: -0.2em;" aria-hidden="true">upload</span> </span>
-                <span>{{ __('Upload New Media or 3D GLB/GLTF Model') }}</span>
+    <form method="POST" action="{{ route('superadmin.cms.assets.upload') }}" enctype="multipart/form-data" class="lib-card">
+        @csrf
+        <div class="lib-upload">
+            <div class="lib-field">
+                <label for="lib_name">{{ __('Name') }}</label>
+                <input id="lib_name" type="text" name="name" required maxlength="255" placeholder="{{ __('e.g. Hero — AlUla canyon') }}" class="form-input" value="{{ old('name') }}">
             </div>
-            <p class="panel-subtitle">{{ __('Supported formats: GLB, GLTF, MP4, WebM, PNG, JPG, WebP, SVG, Lottie (Max 50MB)') }}</p>
+            <div class="lib-field">
+                <label for="lib_file">{{ __('Image') }} <span style="font-weight: var(--ula-weight-regular); color: var(--ula-text-muted);">JPG · PNG · WebP · AVIF · GIF · SVG — max 10 MB</span></label>
+                <input id="lib_file" type="file" name="file" required accept="image/*" class="form-input">
+            </div>
+            <button type="submit" class="tactile-btn btn-primary lib-btn">
+                <span class="material-symbols-rounded" style="font-size: 18px;">upload</span>
+                <span>{{ __('Upload') }}</span>
+            </button>
         </div>
+    </form>
 
-        <form method="POST" action="{{ route('superadmin.cms.assets.upload') }}" enctype="multipart/form-data">
-            @csrf
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 18px;">
-                <div>
-                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px; text-transform: uppercase;">
-                        <span class="material-symbols-rounded" style="font-size: 1.15em; vertical-align: -0.2em;" aria-hidden="true">sell</span> {{ __('Asset Name') }} *
-                    </label>
-                    <input type="text" name="name" required placeholder="e.g. Hero 3D Office Scene" class="form-input" style="width: 100%;">
-                </div>
-
-                <div>
-                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px; text-transform: uppercase;">
-                        <span class="material-symbols-rounded" style="font-size: 1.15em; vertical-align: -0.2em;" aria-hidden="true">inventory_2</span> {{ __('Asset Type') }} *
-                    </label>
-                    <select name="asset_type" required class="form-input" style="width: 100%;">
-                        <option value="image">Image (JPG, PNG, WebP, SVG)</option>
-                        <option value="video">Video (MP4, WebM)</option>
-                        <option value="3d_glb">3D Model (GLB)</option>
-                        <option value="3d_gltf">3D Scene (GLTF)</option>
-                        <option value="lottie">Lottie Animation</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px; text-transform: uppercase;">
-                        <span class="material-symbols-rounded" style="font-size: 1.15em; vertical-align: -0.2em;" aria-hidden="true">sell</span> {{ __('Version Tag') }}
-                    </label>
-                    <input type="text" name="version_tag" placeholder="e.g. hero-office-v2" class="form-input" style="width: 100%;">
-                </div>
-
-                <div>
-                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px; text-transform: uppercase;">
-                        <span class="material-symbols-rounded" style="font-size: 1.15em; vertical-align: -0.2em;" aria-hidden="true">sell</span> {{ __('Tags (Comma separated)') }}
-                    </label>
-                    <input type="text" name="tags" placeholder="hero, 3d, nano-banana" class="form-input" style="width: 100%;">
-                </div>
-
-                <div style="grid-column: 1 / -1;">
-                    <label style="display: block; font-size: 11px; font-weight: 800; color: var(--ula-text-secondary); margin-bottom: 4px; text-transform: uppercase;">
-                        <span class="material-symbols-rounded" style="font-size: 1.15em; vertical-align: -0.2em;" aria-hidden="true">folder</span> {{ __('Select File') }} *
-                    </label>
-                    <input type="file" name="file" required class="form-input" style="width: 100%;">
-                </div>
-            </div>
-
-            <div style="display: flex; justify-content: flex-end;">
-                <button type="submit" class="tactile-btn btn-primary" style="padding: 10px 28px; font-size: 13px;">
-                    <span class="material-symbols-rounded" style="font-size: 1.15em; vertical-align: -0.2em;" aria-hidden="true">rocket_launch</span> {{ __('Upload & Save Asset') }}
-                </button>
-            </div>
-        </form>
-    </div>
-
-    <!-- Asset Library Grid -->
-    <div class="panel-card" style="border-radius: var(--ula-radius-xl); padding: 24px;">
-        <div class="panel-header" style="margin-bottom: 20px;">
-            <div class="panel-title">
-                <span><span class="material-symbols-rounded" style="font-size: 1.15em; vertical-align: -0.2em;" aria-hidden="true">photo_library</span> </span>
-                <span>{{ __('Active Media & 3D Library') }}</span>
-            </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px;">
+    <div class="lib-card">
+        <div class="lib-grid">
             @forelse($assets as $ast)
-                <div style="background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between;">
-                    <div style="height: 150px; background: var(--ula-surface-map-canvas); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
-                        @if($ast->asset_type === 'image')
-                            <img src="{{ $ast->url }}" alt="{{ $ast->name }}" style="width: 100%; height: 100%; object-fit: cover;">
-                        @elseif($ast->asset_type === 'video')
-                            <video src="{{ $ast->url }}" autoplay loop muted style="width: 100%; height: 100%; object-fit: cover;"></video>
-                        @elseif(str_starts_with($ast->asset_type, '3d'))
-                            <div style="text-align: center;">
-                                <span style="font-size: 44px; display: block;"><span class="material-symbols-rounded" style="font-size: 1.15em; vertical-align: -0.2em;" aria-hidden="true">view_in_ar</span> </span>
-                                <span style="font-size: 11px; font-weight: 800; color: var(--ula-palm-900);">3D MODEL ({{ strtoupper($ast->asset_type) }})</span>
+                <div class="lib-item">
+                    <div class="lib-thumb"><img src="{{ $ast->url }}" alt="{{ $ast->name }}" loading="lazy"></div>
+                    <div class="lib-body">
+                        <strong>{{ $ast->name }}</strong>
+                        @if($ast->sections->isNotEmpty())
+                            <div class="lib-used">
+                                @foreach($ast->sections as $usedBy)
+                                    <span>{{ $schemaNames($usedBy->section_key) }}</span>
+                                @endforeach
                             </div>
-                        @else
-                            <span style="font-size: 40px;"><span class="material-symbols-rounded" style="font-size: 1.15em; vertical-align: -0.2em;" aria-hidden="true">folder</span> </span>
                         @endif
-
-                        <span style="position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); color: white; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 6px;">
-                            {{ strtoupper($ast->asset_type) }}
-                        </span>
-                    </div>
-
-                    <div style="padding: 16px;">
-                        <strong style="font-size: 13px; color: var(--ula-text-primary); display: block; margin-bottom: 4px; word-break: break-word;">
-                            {{ $ast->name }}
-                        </strong>
-                        <div style="font-size: 11px; color: var(--ula-text-muted); margin-bottom: 12px;">
-                            Tag: <strong>{{ $ast->version_tag ?? 'v1' }}</strong> · {{ $ast->created_at ? $ast->created_at->format('Y-m-d') : '' }}
-                        </div>
-
-                        <div style="display: flex; gap: 8px; justify-content: space-between; align-items: center;">
-                            <button type="button" onclick="navigator.clipboard.writeText('{{ $ast->url }}'); alert('{{ __('URL copied to clipboard!') }}')" class="tactile-btn btn-secondary" style="padding: 4px 10px; font-size: 11px;">
-                                <span class="material-symbols-rounded" style="font-size: 1.15em; vertical-align: -0.2em;" aria-hidden="true">content_copy</span> {{ __('Copy URL') }}
-                            </button>
-
-                            <form method="POST" action="{{ route('superadmin.cms.assets.delete', $ast) }}" onsubmit="return confirm('{{ __('Are you sure you want to delete this asset?') }}')" style="margin: 0;">
+                        <span class="lib-meta">{{ $ast->created_at?->format('Y-m-d') }}</span>
+                        <div class="lib-actions">
+                            <a href="{{ $ast->url }}" target="_blank" rel="noopener" class="tactile-btn btn-secondary">
+                                <span class="material-symbols-rounded" style="font-size: 16px;">open_in_new</span>{{ __('Open') }}
+                            </a>
+                            <form method="POST" action="{{ route('superadmin.cms.assets.delete', $ast) }}" onsubmit="return confirm(@js($ast->sections->isNotEmpty() ? __('This image is used on the website. Delete it? Those sections will show the placeholder.') : __('Delete this image?')))" style="margin: 0;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="tactile-btn" style="padding: 4px 10px; font-size: 11px; background: var(--ula-tone-terracotta-bg); color: var(--ula-tone-terracotta-fg); border-color: transparent;">
-                                    <span class="material-symbols-rounded" style="font-size: 1.15em; vertical-align: -0.2em;" aria-hidden="true">delete</span> {{ __('Delete') }}
+                                <button type="submit" class="tactile-btn lib-del">
+                                    <span class="material-symbols-rounded" style="font-size: 16px;">delete</span>{{ __('Delete') }}
                                 </button>
                             </form>
                         </div>
                     </div>
                 </div>
             @empty
-                <div style="grid-column: 1 / -1; text-align: center; padding: 48px; color: var(--ula-text-muted);">
-                    {{ __('No media assets uploaded yet.') }}
-                </div>
+                <p style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--ula-text-muted);">{{ __('No images yet.') }}</p>
             @endforelse
         </div>
-
-        <div style="margin-top: 24px;">
-            {{ $assets->links() }}
-        </div>
+        <div style="margin-top: 20px;">{{ $assets->links() }}</div>
     </div>
 </div>
 @endsection

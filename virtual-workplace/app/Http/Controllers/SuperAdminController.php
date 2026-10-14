@@ -10,9 +10,8 @@ use App\Domains\Administration\Models\SystemSetting;
 use App\Domains\CMS\Models\CmsMediaAsset;
 use App\Domains\CMS\Models\CmsPage;
 use App\Domains\CMS\Models\CmsSection;
-use App\Domains\CMS\Models\CmsThemeSetting;
 use App\Domains\CMS\Models\FeatureFlag;
-use App\Domains\CMS\Services\ThemeEngineService;
+use App\Domains\CMS\Support\CmsSchema;
 use App\Domains\Identity\Models\User;
 use App\Domains\Projects\Models\Project;
 use App\Domains\Projects\Models\Task;
@@ -1608,119 +1607,193 @@ class SuperAdminController extends Controller
     }
 
     /* ═══════════════════════════════════════════════════════════════
-       CMS & 3D WEBSITE MANAGEMENT (SUPER ADMIN)
+       WEBSITE CMS (SUPER ADMIN)
+       Every editable page, section and field is defined in CmsSchema.
        ═══════════════════════════════════════════════════════════════ */
 
     /**
-     * List all CMS Pages.
+     * List the website pages the CMS manages.
      */
     public function cmsPages()
     {
-        $pages = CmsPage::withCount('sections')->get();
+        $order = array_keys(CmsSchema::pages());
+        $pages = CmsPage::withCount(['sections', 'activeSections'])
+            ->whereIn('slug', $order)
+            ->get()
+            ->sortBy(fn ($p) => array_search($p->slug, $order));
 
         return view('superadmin.cms.pages', compact('pages'));
     }
 
     /**
-     * Edit a CMS Page and its sections.
+     * Edit a page's sections.
      */
     public function editCmsPage(CmsPage $page)
     {
-        $page->load(['sections' => function ($q) {
-            $q->orderBy('display_order');
-        }, 'sections.mediaAsset']);
-        $assets = CmsMediaAsset::where('is_active', true)->get();
+        $pageDef = CmsSchema::page($page->slug);
+        abort_unless($pageDef, 404);
 
-        return view('superadmin.cms.page_edit', compact('page', 'assets'));
+        $page->load(['sections' => fn ($q) => $q->orderBy('display_order'), 'sections.mediaAsset']);
+        $sections = $page->sections->filter(fn ($s) => isset($pageDef['sections'][$s->section_key]));
+        $assets = CmsMediaAsset::where('is_active', true)->where('asset_type', 'image')->latest()->get();
+        $plans = Plan::orderBy('price')->get(['slug', 'name']);
+
+        return view('superadmin.cms.page_edit', compact('page', 'pageDef', 'sections', 'assets', 'plans'));
     }
 
     /**
-     * Update a CMS Section.
+     * Update a page's search-engine title and description.
+     */
+    public function updateCmsPage(Request $request, CmsPage $page)
+    {
+        abort_if(empty(CmsSchema::page($page->slug)['seo']), 404);
+
+        $page->update($request->validate([
+            'meta_title_ar' => ['nullable', 'string', 'max:255'],
+            'meta_desc_ar' => ['nullable', 'string', 'max:500'],
+        ]));
+
+        return back()->with('success', __('Page settings saved.'));
+    }
+
+    /**
+     * Update a section from its CmsSchema definition.
      */
     public function updateCmsSection(Request $request, CmsSection $section)
     {
-        $data = [
-            'title_en' => $request->input('title_en'),
-            'title_ar' => $request->input('title_ar'),
-            'subtitle_en' => $request->input('subtitle_en'),
-            'subtitle_ar' => $request->input('subtitle_ar'),
-            'badge_en' => $request->input('badge_en'),
-            'badge_ar' => $request->input('badge_ar'),
-            'is_active' => $request->has('is_active'),
-            'display_order' => (int) $request->input('display_order', $section->display_order),
-            'media_asset_id' => $request->input('media_asset_id') ?: null,
-        ];
+        $def = CmsSchema::section($section->section_key);
+        abort_unless($def, 404);
 
-        // Direct image upload for section
-        if ($request->hasFile('image_file')) {
-            $file = $request->file('image_file');
-            $extension = strtolower($file->getClientOriginalExtension());
-            if (! $rejection = FileUploadService::rejectionReasonFor($file, $extension)) {
-                $destDir = public_path('uploads/cms');
-                $stored = FileUploadService::moveToPublicUploads($file, $destDir, 'section_'.$section->section_key, $extension);
-                $filePath = '/uploads/cms/'.$stored['filename'];
+        $request->validate([
+            'image_file' => ['nullable', 'file', 'image', 'max:10240'],
+            'media_asset_id' => ['nullable', 'integer', 'exists:cms_media_assets,id'],
+        ]);
 
-                $asset = CmsMediaAsset::create([
-                    'name' => ($section->title_en ?: $section->section_key).' Image',
+        $input = (array) $request->input('fields', []);
+        $content = [];
+        $data = [];
+        $errors = [];
+
+        foreach ($def['fields'] as $key => $fieldDef) {
+            if ($fieldDef['type'] === 'repeater') {
+                $rows = [];
+                foreach ((array) ($input[$key] ?? []) as $row) {
+                    $clean = [];
+                    foreach ($fieldDef['fields'] as $subKey => $subDef) {
+                        $clean[$subKey] = $this->cleanCmsValue($row[$subKey] ?? null, $subDef, $fieldDef['label'].' → '.$subDef['label'], $errors);
+                    }
+                    if (array_filter($clean, fn ($v) => $v !== null && $v !== '')) {
+                        $rows[] = $clean;
+                    }
+                }
+                $content[$key] = $rows;
+
+                continue;
+            }
+
+            $value = $this->cleanCmsValue($input[$key] ?? null, $fieldDef, $fieldDef['label'], $errors);
+            if (CmsSchema::isColumn($key)) {
+                $data[$key] = $value;
+            } else {
+                $content[$key] = $value;
+            }
+        }
+
+        if ($errors) {
+            return back()->withErrors($errors)->withInput()->with('cms_section', $section->section_key);
+        }
+
+        if (! empty($def['image'])) {
+            if ($request->boolean('remove_image')) {
+                $data['media_asset_id'] = null;
+            } elseif ($request->hasFile('image_file')) {
+                $file = $request->file('image_file');
+                $extension = strtolower($file->getClientOriginalExtension());
+                if ($rejection = FileUploadService::rejectionReasonFor($file, $extension)) {
+                    return back()->withErrors(['image_file' => $rejection])->with('cms_section', $section->section_key);
+                }
+                $stored = FileUploadService::moveToPublicUploads($file, public_path('uploads/cms'), 'section_'.$section->section_key, $extension);
+                $data['media_asset_id'] = CmsMediaAsset::create([
+                    'name' => $def['name_en'].' image',
                     'asset_type' => 'image',
-                    'file_path' => $filePath,
+                    'file_path' => '/uploads/cms/'.$stored['filename'],
+                    'file_size' => $stored['size'],
                     'version_tag' => 'v'.time(),
                     'tags' => ['section', $section->section_key],
                     'is_active' => true,
-                ]);
-
-                $data['media_asset_id'] = $asset->id;
+                ])->id;
+            } else {
+                $data['media_asset_id'] = $request->input('media_asset_id') ?: null;
             }
         }
 
-        // Merge content fields
-        $content = $section->content ?? [];
-        if ($request->has('content') && is_array($request->input('content'))) {
-            $content = array_replace_recursive($content, $request->input('content'));
-        }
-
-        if ($request->has('content_json')) {
-            $decoded = json_decode($request->input('content_json'), true);
-            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                $content = array_replace_recursive($content, $decoded);
-            }
+        if (empty($def['required'])) {
+            $data['is_active'] = $request->boolean('is_active');
         }
 
         $data['content'] = $content;
         $section->update($data);
 
-        return back()->with('success', __('CMS Section updated successfully!'));
+        return back()->with('success', __(':section saved.', ['section' => $def['name_en']]))->with('cms_section', $section->section_key);
     }
 
     /**
-     * Toggle section active status.
+     * Trim a submitted field value and reject unsafe links.
+     */
+    private function cleanCmsValue(mixed $value, array $fieldDef, string $label, array &$errors): ?string
+    {
+        if (! is_scalar($value)) {
+            return null;
+        }
+        $value = mb_substr(trim((string) $value), 0, $fieldDef['type'] === 'textarea' ? 2000 : 500);
+
+        if ($fieldDef['type'] === 'url' && $value !== '' && ! preg_match('~^(/|#|https?://|mailto:)~i', $value)) {
+            $errors[] = __(':field must start with /, #, https:// or mailto:', ['field' => $label]);
+        }
+        if ($fieldDef['type'] === 'icon') {
+            $value = preg_replace('/[^a-z0-9_]/', '', strtolower($value));
+        }
+        if ($fieldDef['type'] === 'select' && ! array_key_exists($value, $fieldDef['options'])) {
+            $value = $fieldDef['default'] ?? null;
+        }
+
+        return $value;
+    }
+
+    /**
+     * Show or hide an optional section on the website.
      */
     public function toggleCmsSection(CmsSection $section)
     {
+        $def = CmsSchema::section($section->section_key);
+        abort_if(! $def || ! empty($def['required']), 404);
+
         $section->update(['is_active' => ! $section->is_active]);
 
-        return back()->with('success', __('Section status updated!'));
+        return back()->with('success', __('Section visibility updated.'))->with('cms_section', $section->section_key);
     }
 
     /**
-     * Media & 3D Asset Management (Nano Banana Pipeline).
+     * Website image library.
      */
     public function cmsAssets()
     {
-        $assets = CmsMediaAsset::orderBy('created_at', 'desc')->paginate(20);
+        $assets = CmsMediaAsset::with('sections:id,section_key,media_asset_id')
+            ->where('asset_type', 'image')
+            ->orderBy('created_at', 'desc')
+            ->paginate(24);
 
         return view('superadmin.cms.assets', compact('assets'));
     }
 
     /**
-     * Upload Media or 3D GLB/GLTF Asset.
+     * Upload an image to the library.
      */
     public function uploadCmsAsset(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'asset_type' => 'required|in:image,video,3d_glb,3d_gltf,lottie,audio',
-            'file' => 'required|file|max:51200', // max 50MB
+            'file' => 'required|file|max:10240',
         ]);
 
         $file = $request->file('file');
@@ -1729,28 +1802,32 @@ class SuperAdminController extends Controller
         if ($rejection = FileUploadService::rejectionReasonFor($file, $extension)) {
             return back()->withErrors(['file' => $rejection]);
         }
+        if (! in_array($extension, ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'avif'], true)) {
+            return back()->withErrors(['file' => __('Only image files can be added to the website library.')]);
+        }
 
-        $destDir = public_path('uploads/cms');
-        $stored = FileUploadService::moveToPublicUploads($file, $destDir, 'asset', $extension);
-        $filePath = '/uploads/cms/'.$stored['filename'];
+        $stored = FileUploadService::moveToPublicUploads($file, public_path('uploads/cms'), 'asset', $extension);
 
         CmsMediaAsset::create([
             'name' => $request->input('name'),
-            'asset_type' => $request->input('asset_type'),
-            'file_path' => $filePath,
-            'version_tag' => $request->input('version_tag', 'v1'),
-            'tags' => array_filter(array_map('trim', explode(',', $request->input('tags', '')))),
+            'asset_type' => 'image',
+            'file_path' => '/uploads/cms/'.$stored['filename'],
+            'file_size' => $stored['size'],
+            'version_tag' => 'v1',
+            'tags' => [],
             'is_active' => true,
         ]);
 
-        return back()->with('success', __('Asset uploaded successfully!'));
+        return back()->with('success', __('Image uploaded.'));
     }
 
     /**
-     * Delete Media Asset.
+     * Delete an image from the library. Sections using it fall back to their placeholder.
      */
     public function deleteCmsAsset(CmsMediaAsset $asset)
     {
+        CmsSection::where('media_asset_id', $asset->id)->update(['media_asset_id' => null]);
+
         if (str_starts_with($asset->file_path, '/uploads/cms/')) {
             $fullPath = public_path(ltrim($asset->file_path, '/'));
             if (file_exists($fullPath)) {
@@ -1759,88 +1836,7 @@ class SuperAdminController extends Controller
         }
         $asset->delete();
 
-        return back()->with('success', __('Media Asset deleted successfully.'));
-    }
-
-    /**
-     * Theme & Branding Studio & Menu Navigation.
-     */
-    public function cmsTheme()
-    {
-        $tokens = ThemeEngineService::getThemeTokens();
-        $navItems = CmsThemeSetting::getByKey('main_navigation', [
-            ['label_en' => 'Spaces', 'label_ar' => 'المساحات الذكية', 'url' => '#spaces'],
-            ['label_en' => 'Benefits', 'label_ar' => 'مميزات النظام', 'url' => '#benefits'],
-            ['label_en' => 'Meetings', 'label_ar' => 'الاجتماعات', 'url' => '#meetings'],
-            ['label_en' => 'Heritage', 'label_ar' => 'عن المنصة', 'url' => '#identity'],
-            ['label_en' => 'Pricing', 'label_ar' => 'الباقات والاشتراكات', 'url' => '#pricing'],
-        ]);
-
-        return view('superadmin.cms.theme', compact('tokens', 'navItems'));
-    }
-
-    /**
-     * Update Theme Tokens and Menu Navigation.
-     */
-    public function updateCmsTheme(Request $request)
-    {
-        $validated = $request->validate([
-            'color_deep_space' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{3,8}$/'],
-            'color_dark_green' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{3,8}$/'],
-            'color_emerald' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{3,8}$/'],
-            'color_mint' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{3,8}$/'],
-            'color_soft_mint' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{3,8}$/'],
-            'color_white' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{3,8}$/'],
-            'color_text_dark' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{3,8}$/'],
-            'color_text_light' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{3,8}$/'],
-            'color_text_muted' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{3,8}$/'],
-            'font_family_latin' => ['nullable', 'string', 'max:50', 'regex:/^[a-zA-Z0-9\s,\-\'\"]+$/'],
-            'font_family_arabic' => ['nullable', 'string', 'max:50', 'regex:/^[a-zA-Z0-9\s,\-\'\"]+$/'],
-            'radius_btn' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+(px|rem|em|%)?$/'],
-            'radius_card' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+(px|rem|em|%)?$/'],
-            'glass_blur' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+(px|rem|em)?$/'],
-            'glass_bg' => ['nullable', 'string', 'max:50'],
-            'glass_border' => ['nullable', 'string', 'max:50'],
-            'nav_labels_en.*' => ['nullable', 'string', 'max:50'],
-            'nav_labels_ar.*' => ['nullable', 'string', 'max:50'],
-            'nav_urls.*' => ['nullable', 'string', 'max:255'],
-        ]);
-
-        $fields = [
-            'color_deep_space', 'color_dark_green', 'color_emerald', 'color_mint',
-            'color_soft_mint', 'color_white', 'color_text_dark', 'color_text_light',
-            'color_text_muted', 'font_family_latin', 'font_family_arabic',
-            'radius_btn', 'radius_card', 'glass_blur', 'glass_bg', 'glass_border',
-        ];
-
-        foreach ($fields as $f) {
-            if ($request->has($f) && isset($validated[$f])) {
-                CmsThemeSetting::setKey($f, $validated[$f]);
-            }
-        }
-
-        // Process Main Navigation Menu
-        if ($request->has('nav_labels_en')) {
-            $labelsEn = $request->input('nav_labels_en', []);
-            $labelsAr = $request->input('nav_labels_ar', []);
-            $navUrls = $request->input('nav_urls', []);
-
-            $menu = [];
-            foreach ($labelsEn as $i => $en) {
-                if (! empty(trim($en))) {
-                    $menu[] = [
-                        'label_en' => trim($en),
-                        'label_ar' => trim($labelsAr[$i] ?? $en),
-                        'url' => trim($navUrls[$i] ?? '#'),
-                    ];
-                }
-            }
-            if (! empty($menu)) {
-                CmsThemeSetting::setKey('main_navigation', $menu);
-            }
-        }
-
-        return back()->with('success', __('Theme tokens and main navigation menu updated successfully!'));
+        return back()->with('success', __('Image deleted.'));
     }
 
     /**

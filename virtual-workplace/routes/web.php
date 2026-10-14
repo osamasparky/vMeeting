@@ -241,15 +241,13 @@ Route::prefix('superadmin')->middleware(['auth', 'superadmin'])->name('superadmi
     // CMS & Website Management Routes
     Route::get('/cms/pages', [SuperAdminController::class, 'cmsPages'])->name('cms.pages');
     Route::get('/cms/pages/{page}', [SuperAdminController::class, 'editCmsPage'])->name('cms.pages.edit');
+    Route::put('/cms/pages/{page}', [SuperAdminController::class, 'updateCmsPage'])->name('cms.pages.update');
     Route::put('/cms/sections/{section}', [SuperAdminController::class, 'updateCmsSection'])->name('cms.sections.update');
     Route::post('/cms/sections/{section}/toggle', [SuperAdminController::class, 'toggleCmsSection'])->name('cms.sections.toggle');
 
     Route::get('/cms/assets', [SuperAdminController::class, 'cmsAssets'])->name('cms.assets');
     Route::post('/cms/assets/upload', [SuperAdminController::class, 'uploadCmsAsset'])->name('cms.assets.upload');
     Route::delete('/cms/assets/{asset}', [SuperAdminController::class, 'deleteCmsAsset'])->name('cms.assets.delete');
-
-    Route::get('/cms/theme', [SuperAdminController::class, 'cmsTheme'])->name('cms.theme');
-    Route::post('/cms/theme', [SuperAdminController::class, 'updateCmsTheme'])->name('cms.theme.update');
 
     Route::get('/features', [SuperAdminController::class, 'featureFlags'])->name('features');
     Route::post('/features/{flag}/toggle', [SuperAdminController::class, 'toggleFeature'])->name('features.toggle');

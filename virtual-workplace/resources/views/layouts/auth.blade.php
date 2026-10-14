@@ -271,6 +271,14 @@
             background: repeating-linear-gradient(135deg, var(--ula-palm-800) 0 14px, var(--ula-palm-chrome) 14px 28px);
         }
 
+        /* Side-panel photo from the CMS; the stripes stay as the placeholder underneath. */
+        .ula-auth-hero-image {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+        }
+
         .ula-auth-hero-scrim {
             position: absolute;
             inset: 0;

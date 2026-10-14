@@ -38,6 +38,10 @@
 @endsection
 
 @section('content')
+@php
+    // Super Admin → Website Content → Log in & sign up
+    $panel = \App\Domains\CMS\Support\Cms::section('auth_register');
+@endphp
 <div class="ula-auth-container register-layout">
     <!-- Left: Register Form -->
     <div class="ula-auth-form-side">
@@ -64,8 +68,10 @@
         <div style="display: flex; flex-direction: column; gap: 24px;">
             <!-- Heading -->
             <div style="display: flex; flex-direction: column; gap: 4px;">
-                <h1 style="font-size: 34px; font-weight: 600; line-height: 1.25; color: var(--ula-text-primary);">أنشئ حسابك</h1>
-                <span style="font-family: var(--ula-font-en); font-size: 18px; font-weight: 300; color: var(--ula-text-secondary);">Create your account</span>
+                <h1 style="font-size: 34px; font-weight: 600; line-height: 1.25; color: var(--ula-text-primary);">{{ $panel->field('heading_ar') }}</h1>
+                @if($panel->field('heading_en'))
+                    <span style="font-family: var(--ula-font-en); font-size: 18px; font-weight: 300; color: var(--ula-text-secondary);">{{ $panel->field('heading_en') }}</span>
+                @endif
             </div>
 
             @if($errors->any())
@@ -231,13 +237,20 @@
     <!-- Right: Branding Hero Panel with Quote -->
     <div class="ula-auth-hero-side">
         <div class="ula-auth-hero-stripes"></div>
+        @if($panel->image_url)
+            <div class="ula-auth-hero-image" style="background-image: url('{{ e($panel->image_url) }}');" role="img" aria-label="{{ $panel->field('quote_ar') }}"></div>
+        @endif
         <div class="ula-auth-hero-scrim"></div>
-        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; gap: 6px; padding-inline-start: 16px; border-inline-start: 2px solid var(--ula-highlight-default);">
-            <blockquote style="font-size: 26px; font-weight: 600; line-height: 1.4; color: var(--ula-text-on-dark); margin: 0;">
-                "المكان ليس مجرد جدران، بل مساحة تلتقي فيها العقول."
-            </blockquote>
-            <span style="font-family: var(--ula-font-en); font-size: 14px; color: var(--ula-sand-400);">UlaSpace</span>
-        </div>
+        @if($panel->field('quote_ar'))
+            <div style="position: relative; z-index: 2; display: flex; flex-direction: column; gap: 6px; padding-inline-start: 16px; border-inline-start: 2px solid var(--ula-highlight-default);">
+                <blockquote style="font-size: 26px; font-weight: 600; line-height: 1.4; color: var(--ula-text-on-dark); margin: 0;">
+                    "{{ $panel->field('quote_ar') }}"
+                </blockquote>
+                @if($panel->field('attribution_en'))
+                    <span style="font-family: var(--ula-font-en); font-size: 14px; color: var(--ula-sand-400);">{{ $panel->field('attribution_en') }}</span>
+                @endif
+            </div>
+        @endif
     </div>
 </div>
 @endsection
