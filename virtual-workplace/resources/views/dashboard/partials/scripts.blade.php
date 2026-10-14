@@ -72,6 +72,7 @@
 
             if (activeNavBtn) {
                 activeNavBtn.classList.add('active');
+                if (typeof openShellSectionFor === 'function') openShellSectionFor(activeNavBtn);
                 const parentAccordion = activeNavBtn.closest('.sidebar-accordion');
                 if (parentAccordion) {
                     // Close all other accordions and open only the parent accordion

@@ -52,6 +52,18 @@
 
     // Office and editor are separate pages in both modes.
     $shellRoutes = ['office' => route('office'), 'editor' => route('editor')];
+
+    // The groups are an accordion: one open at a time. The group holding the current page opens,
+    // otherwise the first one.
+    $shellSections = array_values(array_filter($shellSections, fn ($section) => count(array_filter($section[1], fn ($item) => $item[3])) > 0));
+    $shellOpenSection = 0;
+    foreach ($shellSections as $sectionIndex => [, $sectionItems]) {
+        foreach ($sectionItems as $sectionItem) {
+            if ($sectionItem[3] && $sectionItem[0] === $shellActive) {
+                $shellOpenSection = $sectionIndex;
+            }
+        }
+    }
 @endphp
 
 <aside class="sidebar ula-shell-sidebar" id="dashboardSidebar" aria-label="{{ __('nav.menu') }}">
@@ -76,11 +88,19 @@
     </div>
 
     <nav class="ula-shell-nav">
-        @foreach($shellSections as [$sectionLabel, $items])
-            @php $visibleItems = array_filter($items, fn ($item) => $item[3]); @endphp
-            @if(count($visibleItems))
-            <div class="ula-shell-section">
-                <span class="ula-shell-section-label">{{ __($sectionLabel) }}</span>
+        @foreach($shellSections as $sectionIndex => [$sectionLabel, $items])
+            @php
+                $visibleItems = array_filter($items, fn ($item) => $item[3]);
+                $sectionOpen = $sectionIndex === $shellOpenSection;
+            @endphp
+            <div class="ula-shell-section ula-shell-accordion">
+                <button type="button" class="ula-shell-section-label ula-shell-accordion-toggle" id="nav-section-toggle-{{ $sectionIndex }}"
+                        aria-expanded="{{ $sectionOpen ? 'true' : 'false' }}" aria-controls="nav-section-{{ $sectionIndex }}"
+                        onclick="toggleShellSection(this)">
+                    <span>{{ __($sectionLabel) }}</span>
+                    <span class="material-symbols-rounded ula-shell-chevron" aria-hidden="true">expand_more</span>
+                </button>
+                <div class="ula-shell-section-items{{ $sectionOpen ? '' : ' is-closed' }}" id="nav-section-{{ $sectionIndex }}" role="group" aria-labelledby="nav-section-toggle-{{ $sectionIndex }}">
                 @foreach($visibleItems as [$key, $label, $icon, $visible, $extra])
                     @php
                         $isActive = $shellActive === $key;
@@ -106,8 +126,8 @@
                         </a>
                     @endif
                 @endforeach
+                </div>
             </div>
-            @endif
         @endforeach
 
         @if($user->isSuperAdmin())
@@ -138,3 +158,26 @@
         </form>
     </div>
 </aside>
+
+@once
+<script>
+    // Sidebar accordion: opening a group closes the others; a group can also be closed again.
+    function setShellSection(toggle, open) {
+        const panel = document.getElementById(toggle.getAttribute('aria-controls'));
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        // A class, not the hidden attribute: Tailwind forces [hidden] to display:none !important,
+        // and the icon-only (collapsed) sidebar must still show every group.
+        if (panel) panel.classList.toggle('is-closed', !open);
+    }
+    function toggleShellSection(toggle) {
+        const opening = toggle.getAttribute('aria-expanded') !== 'true';
+        document.querySelectorAll('.ula-shell-accordion-toggle').forEach(t => setShellSection(t, t === toggle && opening));
+    }
+    // Opens the group that holds an item (used when a tab is switched from elsewhere on the page).
+    function openShellSectionFor(item) {
+        const section = item && item.closest('.ula-shell-accordion');
+        const toggle = section && section.querySelector('.ula-shell-accordion-toggle');
+        if (toggle && toggle.getAttribute('aria-expanded') !== 'true') toggleShellSection(toggle);
+    }
+</script>
+@endonce

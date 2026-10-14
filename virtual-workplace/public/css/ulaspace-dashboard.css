@@ -832,6 +832,31 @@ body {
     color: var(--ula-text-on-dark-subtle);
 }
 
+/* Accordion groups: the label is the toggle, one group open at a time. */
+.ula-shell-accordion-toggle {
+    width: 100%;
+    min-height: var(--ula-size-touch-target);
+    border: 0;
+    border-radius: var(--ula-radius-md);
+    background: transparent;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ula-space-2);
+    text-align: start;
+    cursor: pointer;
+    transition: color var(--ula-duration-fast) var(--ula-ease-out), background-color var(--ula-duration-fast) var(--ula-ease-out);
+}
+.ula-shell-accordion-toggle:hover,
+.ula-shell-accordion-toggle[aria-expanded="true"] { color: var(--ula-text-on-dark); }
+.ula-shell-accordion-toggle:hover { background: var(--ula-control-dark-fill-strong); }
+.ula-shell-accordion-toggle:focus-visible { outline: none; box-shadow: var(--ula-focus-ring-on-dark); }
+.ula-shell-chevron { font-size: 18px; transition: transform var(--ula-duration-fast) var(--ula-ease-out); }
+.ula-shell-accordion-toggle[aria-expanded="true"] .ula-shell-chevron { transform: rotate(180deg); }
+.ula-shell-section-items { display: flex; flex-direction: column; gap: var(--ula-space-1); }
+.ula-shell-section-items.is-closed { display: none; }
+
 .ula-shell-sidebar .ula-shell-item.nav-tab-btn {
     width: 100%;
     min-height: var(--ula-size-touch-target);
@@ -939,6 +964,8 @@ body {
 .ula-shell-sidebar.sidebar-collapsed .ula-shell-toggle .material-symbols-rounded { transform: scaleX(-1); }
 [dir="ltr"] .ula-shell-sidebar.sidebar-collapsed .ula-shell-toggle .material-symbols-rounded { transform: none; }
 .ula-shell-sidebar.sidebar-collapsed .ula-shell-item.nav-tab-btn { justify-content: center; padding: 0; }
+/* Collapsed to icons: no group titles, every icon stays reachable. */
+.ula-shell-sidebar.sidebar-collapsed .ula-shell-section-items.is-closed { display: flex; }
 .ula-shell-sidebar.sidebar-collapsed .ula-shell-user { flex-direction: column; }
 
 /* Top bar */
