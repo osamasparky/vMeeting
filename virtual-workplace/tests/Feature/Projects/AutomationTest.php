@@ -59,23 +59,23 @@ class AutomationTest extends TestCase
     public function test_moving_to_a_state_assigns_a_reviewer_and_notifies(): void
     {
         $review = $this->state('review');
-        $this->rule('state_changed', [['type' => 'add_assignee', 'value' => $this->manager->id], ['type' => 'notify', 'value' => 'reporter']], ['state_id' => $review->id]);
+        $rule = $this->rule('state_changed', [['type' => 'add_assignee', 'value' => $this->manager->id], ['type' => 'notify', 'value' => 'reporter']], ['state_id' => $review->id]);
 
         $task = $this->makeTask(['reporter_id' => $this->owner->id]);
         $this->actingAs($this->owner);
         app(UpdateTaskStatusAction::class)->execute($task->fresh(), 'review', $review->id);
 
         $this->assertTrue($task->fresh()->isAssignedTo($this->manager->id));
-        $this->assertTrue(WorkplaceNotification::where('user_id', $this->owner->id)->where('data->automation_id', 1)->exists());
+        $this->assertTrue(WorkplaceNotification::where('user_id', $this->owner->id)->where('data->automation_id', $rule->id)->exists());
     }
 
     public function test_rules_do_not_trigger_each_other(): void
     {
         $this->rule('task_created', [['type' => 'set_priority', 'value' => 'high']]);
-        $this->rule('priority_changed', [['type' => 'set_priority', 'value' => 'low']]);
+        $second = $this->rule('priority_changed', [['type' => 'set_priority', 'value' => 'low']]);
 
         $this->assertSame('high', $this->makeTask(['priority' => 'medium'])->fresh()->priority);
-        $this->assertSame(0, ProjectAutomation::find(2)->run_count);
+        $this->assertSame(0, $second->fresh()->run_count);
     }
 
     public function test_label_added_matches_the_new_label_only(): void
