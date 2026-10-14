@@ -88,6 +88,7 @@
 **Excludes:** the office engine, WebRTC, chat.
 **Acceptance:** the same browser checks used in the attendance work pass (clock counts, heartbeat posts with `floor_id`, idle pause/resume); no console errors in light/dark, RTL/LTR.
 **Rollback:** revert.
+**Status (2026-10-14): done.** Changed from the plan: the module is a classic script, `public/js/office/attendance.js`, loaded right after the page script with the CSP nonce and a filemtime cache-buster — the existing convention (`public/js/office/room-doors.js`), and the only way to keep the shared top-level scope without rewriting call sites. 203 lines moved verbatim; the two translated toasts come from an inline `attendanceText` (Blade `@json`). Browser checks in Arabic/light and English/dark, 20/20: script loaded, clock counts, `enter` with `floor_id`, today's summary, idle prompt and confirm, `idle_pause` with idle seconds, paused overlay, resume, no page errors.
 
 ## Phase 9 — One source for page CSS
 **Rationale:** §4.8.
