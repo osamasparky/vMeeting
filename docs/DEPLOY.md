@@ -25,7 +25,7 @@ The script stops at the first failing step. It runs, in order: a database backup
 ## Rules learned the hard way
 
 - **Never `chown` the vhost root** (`…/nextspace.munazzah.com`). A recursive chown once changed its group away from `psaserv` and Apache answered 403 for the whole site. Only chown inside `virtual-workplace/`.
-- **Uploads are user data.** Until they are out of git (roadmap phase 3), a checkout can delete them; the script copies them aside first.
+- **Uploads are user data.** They are out of git since roadmap phase 3, but checking out a commit from before that (a rollback) can still delete them; the script copies them aside first, and rollback step 3 restores them.
 - **SQLite tests do not prove MySQL behaviour.** That is what the MariaDB CI job is for — check it before deploying a migration.
 - **Artisan runs as root**, so caches it writes are root-owned until the ownership step runs.
 

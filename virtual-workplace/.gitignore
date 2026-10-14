@@ -28,3 +28,6 @@ Thumbs.db
 
 # Furniture images copied onto each server by: php artisan furniture:localize-images --apply
 /public/images/furniture/catalog/
+
+# User uploads are data, not source (refactor phase 3). FileUploadService writes each folder's .htaccess itself.
+/public/uploads/

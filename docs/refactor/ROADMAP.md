@@ -48,7 +48,7 @@
 **Touch points:** `.gitignore`, the index; a deploy runbook note.
 **Acceptance:** `git ls-files public/uploads` empty; files still on disk locally and live; uploaded images still served.
 **Rollback:** restore from the copied folder; revert the commit.
-**Status (2026-10-14): not started — waiting for the owner.** Untracking the files means the next `git checkout` on live deletes them unless the deploy copies them aside first; that is a destructive step to agree on before doing.
+**Status (2026-10-14): done, with the owner's approval.** `/public/uploads/` is in `virtual-workplace/.gitignore`; the 97 tracked files left the index and stay on disk (551 local files before and after). The tracked `.htaccess` files are not needed in git: `FileUploadService::protectDirectoryFromExecution` writes one into each upload folder. On live, `ops/deploy.py` copies uploads aside before the checkout that removes them and restores them with `cp -an`.
 
 ## Phase 4 — One resolver for the current organisation (web side)
 **Rationale:** §4.3, and a prerequisite for Phase 5.
