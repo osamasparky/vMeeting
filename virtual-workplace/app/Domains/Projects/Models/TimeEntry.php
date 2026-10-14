@@ -93,6 +93,14 @@ class TimeEntry extends Model
         return (float) round($this->duration_seconds / 3600, 2);
     }
 
+    /** "2h 15m", or "45m" under an hour — used by the member profile's time list. */
+    public function formattedDuration(): string
+    {
+        $minutes = intdiv(max(0, (int) $this->duration_seconds), 60);
+
+        return $minutes >= 60 ? sprintf('%dh %02dm', intdiv($minutes, 60), $minutes % 60) : sprintf('%dm', $minutes);
+    }
+
     public function isLocked(): bool
     {
         return in_array($this->status, [self::STATUS_SUBMITTED, self::STATUS_APPROVED], true);

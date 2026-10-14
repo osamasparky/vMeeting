@@ -16,6 +16,7 @@ use App\Domains\People\Requests\StoreTeamRequest;
 use App\Domains\Tenancy\Actions\CreateOrInviteOrganizationMemberAction;
 use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Tenancy\Models\OrganizationMember;
+use App\Domains\Tenancy\Models\OrganizationSetting;
 use App\Domains\Tenancy\Models\Plan;
 use App\Domains\Tenancy\Models\Subscription;
 use App\Domains\Tenancy\Models\SubscriptionRequest;
