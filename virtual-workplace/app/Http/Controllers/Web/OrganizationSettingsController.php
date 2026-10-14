@@ -53,7 +53,7 @@ class OrganizationSettingsController extends Controller
     public function upgradePlan(Request $request)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->whereIn('status', ['active', 'invited'])
             ->with(['organization', 'role.permissions'])
             ->first();
@@ -88,7 +88,7 @@ class OrganizationSettingsController extends Controller
     public function showPaymentPage(Request $request, Plan $plan, SubscriptionPricingService $pricingService)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->whereIn('status', ['active', 'invited'])
             ->with(['organization.plan', 'role.permissions'])
             ->first();
@@ -179,7 +179,7 @@ class OrganizationSettingsController extends Controller
     public function submitBankTransferPayment(Request $request, Plan $plan, SubscriptionPricingService $pricingService)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->whereIn('status', ['active', 'invited'])
             ->with(['organization', 'role.permissions'])
             ->first();
@@ -262,7 +262,7 @@ class OrganizationSettingsController extends Controller
     public function updateSubscriptionSeats(Request $request, SubscriptionPricingService $pricingService)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->whereIn('status', ['active', 'invited'])
             ->with(['organization.plan', 'role.permissions'])
             ->first();
@@ -344,7 +344,7 @@ class OrganizationSettingsController extends Controller
     public function cancelSubscriptionRequest(SubscriptionRequest $subscriptionRequest)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->whereIn('status', ['active', 'invited'])
             ->with(['organization', 'role.permissions'])
             ->first();
@@ -369,7 +369,7 @@ class OrganizationSettingsController extends Controller
     public function storeDepartment(StoreDepartmentRequest $request)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
+        $membership = OrganizationMember::forUser($user->id)->with('role.permissions')->first();
         if (! $membership) {
             abort(403);
         }
@@ -394,7 +394,7 @@ class OrganizationSettingsController extends Controller
     public function updateDepartment(StoreDepartmentRequest $request, Department $department)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
+        $membership = OrganizationMember::forUser($user->id)->with('role.permissions')->first();
         if (! $membership) {
             abort(403);
         }
@@ -420,7 +420,7 @@ class OrganizationSettingsController extends Controller
     public function deleteDepartment(Department $department)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
+        $membership = OrganizationMember::forUser($user->id)->with('role.permissions')->first();
         if (! $membership) {
             abort(403);
         }
@@ -445,7 +445,7 @@ class OrganizationSettingsController extends Controller
     public function storeTeam(StoreTeamRequest $request)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
+        $membership = OrganizationMember::forUser($user->id)->with('role.permissions')->first();
         if (! $membership) {
             abort(403);
         }
@@ -477,7 +477,7 @@ class OrganizationSettingsController extends Controller
     public function updateTeam(StoreTeamRequest $request, Team $team)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
+        $membership = OrganizationMember::forUser($user->id)->with('role.permissions')->first();
         if (! $membership) {
             abort(403);
         }
@@ -512,7 +512,7 @@ class OrganizationSettingsController extends Controller
     public function deleteTeam(Team $team)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
+        $membership = OrganizationMember::forUser($user->id)->with('role.permissions')->first();
         if (! $membership) {
             abort(403);
         }
@@ -536,7 +536,7 @@ class OrganizationSettingsController extends Controller
     public function assignMemberDepartment(AssignMemberDepartmentRequest $request, OrganizationMember $member)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
+        $membership = OrganizationMember::forUser($user->id)->with('role.permissions')->first();
         if (! $membership) {
             abort(403);
         }
@@ -602,7 +602,7 @@ class OrganizationSettingsController extends Controller
     public function storeMember(Request $request, CreateOrInviteOrganizationMemberAction $createMember)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
+        $membership = OrganizationMember::forUser($user->id)->with('role.permissions')->first();
         if (! $membership) {
             abort(403);
         }
@@ -663,7 +663,7 @@ class OrganizationSettingsController extends Controller
     public function updateOrganizationMember(Request $request, OrganizationMember $member)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
+        $membership = OrganizationMember::forUser($user->id)->with('role.permissions')->first();
         if (! $membership) {
             abort(403);
         }
@@ -755,7 +755,7 @@ class OrganizationSettingsController extends Controller
     public function updateMemberPassword(Request $request, OrganizationMember $member)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
+        $membership = OrganizationMember::forUser($user->id)->with('role.permissions')->first();
         if (! $membership) {
             abort(403);
         }
@@ -785,7 +785,7 @@ class OrganizationSettingsController extends Controller
     public function deleteOrganizationMember(OrganizationMember $member)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
+        $membership = OrganizationMember::forUser($user->id)->with('role.permissions')->first();
         if (! $membership) {
             abort(403);
         }
@@ -815,7 +815,7 @@ class OrganizationSettingsController extends Controller
     public function getMemberProfileDetails(OrganizationMember $member, BuildMemberProfileDetailsAction $buildProfile): JsonResponse
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->whereIn('status', ['active', 'invited'])
             ->first();
 
@@ -832,7 +832,7 @@ class OrganizationSettingsController extends Controller
     public function clearAuditLogs(Request $request)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
+        $membership = OrganizationMember::forUser($user->id)->with('role.permissions')->first();
         if (! $membership) {
             abort(403);
         }
@@ -852,7 +852,7 @@ class OrganizationSettingsController extends Controller
     public function updateOrganizationSettings(Request $request)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions', 'organization')->first();
+        $membership = OrganizationMember::forUser($user->id)->with('role.permissions', 'organization')->first();
         if (! $membership) {
             abort(403);
         }
@@ -962,7 +962,7 @@ class OrganizationSettingsController extends Controller
     public function testOrgAiConnection(Request $request)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        $membership = OrganizationMember::forUser($user->id)->first();
         if (! $membership) {
             abort(403);
         }
@@ -1028,7 +1028,7 @@ class OrganizationSettingsController extends Controller
     public function testSmtpConnection(Request $request)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        $membership = OrganizationMember::forUser($user->id)->first();
         if (! $membership) {
             abort(403);
         }

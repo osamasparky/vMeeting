@@ -50,7 +50,7 @@ class OfficeController extends Controller
     {
         $user = Auth::user();
 
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->whereIn('status', ['active', 'invited'])
             ->with(['organization.plan', 'role.permissions', 'offices', 'rooms'])
             ->first();
@@ -106,7 +106,7 @@ class OfficeController extends Controller
     public function generateAiOffice(Request $request, AiMapGeneratorService $aiMapService)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->with(['organization.plan', 'role.permissions'])->first();
+        $membership = OrganizationMember::forUser($user->id)->with(['organization.plan', 'role.permissions'])->first();
         if (! $membership) {
             abort(403);
         }
@@ -192,7 +192,7 @@ class OfficeController extends Controller
     public function storeOffice(Request $request)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->with(['organization.plan', 'role.permissions'])->first();
+        $membership = OrganizationMember::forUser($user->id)->with(['organization.plan', 'role.permissions'])->first();
         if (! $membership) {
             abort(403);
         }
@@ -305,7 +305,7 @@ class OfficeController extends Controller
     public function updateOffice(Request $request, Floor $floor)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->with(['organization', 'role.permissions'])->first();
+        $membership = OrganizationMember::forUser($user->id)->with(['organization', 'role.permissions'])->first();
         if (! $membership || $floor->organization_id !== $membership->organization_id) {
             abort(403);
         }
@@ -345,7 +345,7 @@ class OfficeController extends Controller
     public function deleteOffice(Floor $floor)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->with(['organization', 'role.permissions'])->first();
+        $membership = OrganizationMember::forUser($user->id)->with(['organization', 'role.permissions'])->first();
         if (! $membership || $floor->organization_id !== $membership->organization_id) {
             abort(403);
         }
@@ -373,7 +373,7 @@ class OfficeController extends Controller
     {
         $user = Auth::user();
 
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->whereIn('status', ['active', 'invited'])
             ->with(['organization.plan'])
             ->first();
@@ -403,7 +403,7 @@ class OfficeController extends Controller
     public function uploadMapBackground(Request $request, Map $map)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->where('organization_id', $map->organization_id)
             ->first();
 
@@ -474,7 +474,7 @@ class OfficeController extends Controller
      */
     public function uploadObjectImage(Request $request)
     {
-        $membership = OrganizationMember::where('user_id', Auth::id())->whereIn('status', ['active', 'invited'])->with('role.permissions')->first();
+        $membership = OrganizationMember::forUser(Auth::id())->whereIn('status', ['active', 'invited'])->with('role.permissions')->first();
         if (! Auth::user()->isSuperAdmin() && (! $membership || $this->memberLacksMapsPermission($membership))) {
             return response()->json(['message' => __('Unauthorized: You do not have permission to access the Floor Map Editor.')], 403);
         }
@@ -512,7 +512,7 @@ class OfficeController extends Controller
     public function deleteMapBackground(Request $request, Map $map)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->where('organization_id', $map->organization_id)
             ->first();
 
@@ -550,7 +550,7 @@ class OfficeController extends Controller
     public function clearEditorMap(Request $request, Map $map)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->where('organization_id', $map->organization_id)
             ->first();
 
@@ -627,7 +627,7 @@ class OfficeController extends Controller
     public function saveEditorMap(Request $request, Map $map)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->where('organization_id', $map->organization_id)
             ->first();
 
@@ -789,7 +789,7 @@ class OfficeController extends Controller
     public function publishEditorMap(Request $request, Map $map, PublishMapAction $action)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->where('organization_id', $map->organization_id)
             ->first();
 
@@ -816,7 +816,7 @@ class OfficeController extends Controller
     {
         $user = Auth::user();
         $orgId = $request->input('organization_id') ?: ($user->organizations()->first()?->id);
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->where('organization_id', $orgId)
             ->first();
 
@@ -877,7 +877,7 @@ class OfficeController extends Controller
 
         if (! $roomModel) {
             $orgId = $request->input('organization_id') ?: ($user->organizations()->first()?->id);
-            $membership = OrganizationMember::where('user_id', $user->id)
+            $membership = OrganizationMember::forUser($user->id)
                 ->where('organization_id', $orgId)
                 ->first();
 
@@ -928,7 +928,7 @@ class OfficeController extends Controller
             ]);
         }
 
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->where('organization_id', $roomModel->organization_id)
             ->first();
 
@@ -986,7 +986,7 @@ class OfficeController extends Controller
     public function deleteEditorRoom(Request $request, Room $room)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->where('organization_id', $room->organization_id)
             ->first();
 
@@ -1175,7 +1175,7 @@ class OfficeController extends Controller
     /** The organization the office shows: the user's first active membership, as in office(). */
     private function activeOrganizationId($user): string
     {
-        $organizationId = OrganizationMember::where('user_id', $user->id)
+        $organizationId = OrganizationMember::forUser($user->id)
             ->whereIn('status', ['active', 'invited'])
             ->value('organization_id');
         abort_unless($organizationId, 403);

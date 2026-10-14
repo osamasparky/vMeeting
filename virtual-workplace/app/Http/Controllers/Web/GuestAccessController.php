@@ -62,7 +62,7 @@ class GuestAccessController extends Controller
     public function clearGuestInvitations(Request $request)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->with('role.permissions')->first();
+        $membership = OrganizationMember::forUser($user->id)->with('role.permissions')->first();
         if (! $membership) {
             abort(403);
         }

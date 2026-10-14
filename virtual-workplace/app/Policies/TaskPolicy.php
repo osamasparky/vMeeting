@@ -13,7 +13,7 @@ class TaskPolicy
      */
     public function view(User $user, Task $task): bool
     {
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->where('organization_id', $task->organization_id)
             ->first();
 
@@ -25,7 +25,7 @@ class TaskPolicy
      */
     public function update(User $user, Task $task): bool
     {
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->where('organization_id', $task->organization_id)
             ->first();
 
@@ -47,7 +47,7 @@ class TaskPolicy
      */
     public function delete(User $user, Task $task): bool
     {
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->where('organization_id', $task->organization_id)
             ->first();
 

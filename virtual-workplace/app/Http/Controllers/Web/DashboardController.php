@@ -27,7 +27,7 @@ class DashboardController extends Controller
 
         // If Super Admin accesses tenant dashboard without a tenant membership, route cleanly to Super Admin Dashboard
         if ($user->isSuperAdmin()) {
-            $hasMembership = OrganizationMember::where('user_id', $user->id)
+            $hasMembership = OrganizationMember::forUser($user->id)
                 ->whereIn('status', ['active', 'invited'])
                 ->exists();
             if (! $hasMembership) {
@@ -36,7 +36,7 @@ class DashboardController extends Controller
         }
 
         // Get the active/invited membership
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->whereIn('status', ['active', 'invited'])
             ->with(['organization.plan', 'organization.subscription', 'role'])
             ->first();
@@ -68,7 +68,7 @@ class DashboardController extends Controller
     /** Who is in the office now (the dashboard refreshes its online panel with this). */
     public function pulse(WorkspacePulse $pulse)
     {
-        $membership = OrganizationMember::where('user_id', Auth::id())->whereIn('status', ['active', 'invited'])->with('organization')->first();
+        $membership = OrganizationMember::forUser(Auth::id())->whereIn('status', ['active', 'invited'])->with('organization')->first();
         abort_unless($membership, 403);
         $online = $pulse->onlineNow($membership->organization);
 
@@ -82,7 +82,7 @@ class DashboardController extends Controller
     public function storeScheduledMeeting(ScheduleMeetingRequest $request, ScheduleMeetingAction $scheduleMeeting)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        $membership = OrganizationMember::forUser($user->id)->first();
         if (! $membership) {
             abort(403);
         }
@@ -111,7 +111,7 @@ class DashboardController extends Controller
     public function cancelMeeting(Meeting $meeting)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        $membership = OrganizationMember::forUser($user->id)->first();
         if (! $membership || $meeting->organization_id !== $membership->organization_id) {
             abort(403);
         }

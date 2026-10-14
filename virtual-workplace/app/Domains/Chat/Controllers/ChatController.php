@@ -119,7 +119,7 @@ class ChatController extends Controller
     public function webConversations(Request $request): JsonResponse
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->whereIn('status', ['active', 'invited'])
             ->with('organization')
             ->first();
@@ -233,7 +233,7 @@ class ChatController extends Controller
     public function webGetOrCreateDm(User $targetUser): JsonResponse
     {
         $currentUser = Auth::user();
-        $membership = OrganizationMember::where('user_id', $currentUser->id)
+        $membership = OrganizationMember::forUser($currentUser->id)
             ->whereIn('status', ['active', 'invited'])
             ->first();
 
@@ -289,7 +289,7 @@ class ChatController extends Controller
     public function webListMessages(Channel $channel): JsonResponse
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->whereIn('status', ['active', 'invited'])
             ->first();
 
@@ -340,7 +340,7 @@ class ChatController extends Controller
     public function webSendMessage(Request $request, Channel $channel): JsonResponse
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->whereIn('status', ['active', 'invited'])
             ->first();
 

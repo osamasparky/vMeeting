@@ -25,7 +25,7 @@ class AttendanceController extends Controller
      */
     private function currentMembership(): ?OrganizationMember
     {
-        return OrganizationMember::where('user_id', Auth::id())->first();
+        return OrganizationMember::forUser(Auth::id())->first();
     }
 
     /**
@@ -306,7 +306,7 @@ class AttendanceController extends Controller
         $orgId = null;
 
         if ($viewer) {
-            $viewerMembership = OrganizationMember::where('user_id', $viewer->id)->first();
+            $viewerMembership = OrganizationMember::forUser($viewer->id)->first();
             if (! $viewerMembership) {
                 return response()->json(['message' => 'Unauthorized'], 403);
             }
@@ -321,7 +321,7 @@ class AttendanceController extends Controller
             return response()->json(['message' => 'Member not found'], 404);
         }
 
-        $targetMembership = OrganizationMember::where('user_id', $targetUser->id)
+        $targetMembership = OrganizationMember::forUser($targetUser->id)
             ->when($orgId, function ($q) use ($orgId) {
                 $q->where('organization_id', $orgId);
             })

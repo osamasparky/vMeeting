@@ -34,7 +34,7 @@ class HrController extends Controller
 
     private function currentMembership(): OrganizationMember
     {
-        $membership = OrganizationMember::where('user_id', Auth::id())->with('role.permissions')->first();
+        $membership = OrganizationMember::forUser(Auth::id())->with('role.permissions')->first();
         abort_unless($membership, 403);
 
         return $membership;

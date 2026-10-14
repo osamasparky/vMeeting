@@ -100,7 +100,7 @@ class AuthController extends Controller
     public function updateProfile(Request $request)
     {
         $user = Auth::user();
-        $membership = OrganizationMember::where('user_id', $user->id)->first();
+        $membership = OrganizationMember::forUser($user->id)->first();
         if (! $membership) {
             abort(403);
         }

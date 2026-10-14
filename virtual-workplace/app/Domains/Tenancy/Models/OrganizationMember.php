@@ -6,6 +6,7 @@ use App\Domains\Administration\Models\Role;
 use App\Domains\Identity\Models\User;
 use App\Domains\Workspace\Models\Floor;
 use App\Domains\Workspace\Models\Room;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -79,6 +80,19 @@ class OrganizationMember extends Model
     {
         return $this->belongsToMany(Room::class, 'member_room_access', 'organization_member_id', 'room_id')
             ->withTimestamps();
+    }
+
+    // ── Scopes ──
+
+    /**
+     * A user's memberships, oldest first. Web pages resolve "the user's
+     * organisation" with ->forUser($id)->first(); the fixed order means a user
+     * who belongs to several organisations always lands in the same one (the
+     * first they joined) instead of whichever row the database returns first.
+     */
+    public function scopeForUser(Builder $query, int|string|null $userId): Builder
+    {
+        return $query->where('user_id', $userId)->orderBy('created_at')->orderBy('id');
     }
 
     // ── Helpers ──

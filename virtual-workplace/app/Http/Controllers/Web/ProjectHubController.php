@@ -32,7 +32,7 @@ class ProjectHubController extends Controller
             return redirect()->route('login');
         }
 
-        $membership = OrganizationMember::where('user_id', $user->id)
+        $membership = OrganizationMember::forUser($user->id)
             ->where('organization_id', $project->organization_id)
             ->whereIn('status', ['active', 'invited'])
             ->with(['organization.plan', 'role.permissions'])
