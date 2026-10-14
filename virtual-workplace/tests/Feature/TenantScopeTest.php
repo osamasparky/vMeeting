@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Domains\Administration\Models\Role;
 use App\Domains\Identity\Models\User;
 use App\Domains\Projects\Models\Project;
 use App\Domains\Tenancy\Actions\CreateOrganizationAction;
@@ -101,5 +102,18 @@ class TenantScopeTest extends TestCase
         $all = Project::withoutTenantScope()->get();
 
         $this->assertCount(2, $all);
+    }
+
+    public function test_shared_rows_stay_visible_for_models_that_have_them(): void
+    {
+        config(['tenancy.enforce_global_scope' => true]);
+        $custom = Role::create(['organization_id' => $this->orgB->id, 'name' => 'B only', 'slug' => 'b-only']);
+        request()->merge(['current_organization' => $this->orgA]);
+
+        // System roles (organization_id NULL) are everyone's; another company's custom role is not.
+        $slugs = Role::pluck('slug');
+        $this->assertTrue($slugs->contains('company_admin'));
+        $this->assertTrue($slugs->contains('employee'));
+        $this->assertFalse($slugs->contains($custom->slug));
     }
 }

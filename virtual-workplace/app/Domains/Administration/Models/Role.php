@@ -10,6 +10,9 @@ class Role extends Model
 {
     use BelongsToOrganization;
 
+    /** System roles (Company Admin, Manager, Employee…) have no organisation and are shared by all. */
+    public bool $tenantScopeIncludesShared = true;
+
     protected $fillable = [
         'organization_id',
         'name',

@@ -27,9 +27,20 @@ class TenantScope implements Scope
         }
 
         $organization = $this->currentOrganizationId();
-        if ($organization !== null) {
-            $builder->where($model->qualifyColumn('organization_id'), $organization);
+        if ($organization === null) {
+            return;
         }
+
+        $column = $model->qualifyColumn('organization_id');
+        // Models with platform-wide rows (organization_id NULL — e.g. the system roles every
+        // company uses) see their own organisation's rows plus those; all others only their own.
+        if (property_exists($model, 'tenantScopeIncludesShared') && $model->tenantScopeIncludesShared) {
+            $builder->where(fn (Builder $q) => $q->where($column, $organization)->orWhereNull($column));
+
+            return;
+        }
+
+        $builder->where($column, $organization);
     }
 
     private function currentOrganizationId(): ?string

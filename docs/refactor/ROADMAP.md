@@ -65,6 +65,7 @@
 **Excludes:** turning it on in production (separate decision once the leg is green for a while).
 **Acceptance:** suite green with the flag on and off.
 **Rollback:** drop the matrix leg.
+**Status (2026-10-14): done.** With the flag on, 105 tests failed at first. 104 had one cause, not a data leak: `Role` is tenant-scoped but the system roles have `organization_id` NULL, so every permission check lost its role — the scope could never have been switched on. Models can now declare `$tenantScopeIncludesShared` (own rows plus NULL rows); only `Role` does. The last failure was the Gantt endpoint returning tasks in no defined order; it now orders by `task_number`. Suite 374/374 with the flag off and on; CI runs both. Production flag still off — turning it on is a separate decision once CI has been green for a while.
 
 ## Phase 6 — Static analysis baseline
 **Rationale:** §4.5 (Larastan unused).

@@ -211,6 +211,7 @@ class ProjectController extends Controller
 
         $tasks = $project->tasks()
             ->with(['assignee:id,name', 'dependencies.dependsOnTask:id,title'])
+            ->orderBy('task_number') // a fixed order; without one the chart's rows came back in whatever order the database chose
             ->get()
             ->map(function ($t) use ($project) {
                 $start = $t->start_date ?? ($t->due_date ? $t->due_date->copy()->subDays(max(1, (int) ceil(($t->estimated_hours ?? 8) / 8))) : $project->created_at);

@@ -59,6 +59,13 @@ jobs:
       - name: Execute Tests via PHPUnit (SQLite)
         run: php artisan test
 
+      # Tenant isolation is enforced by hand in production (the global scope is off);
+      # this run keeps the code working with it on, so it can be turned on later.
+      - name: Execute Tests with the tenant scope enforced
+        env:
+          TENANCY_ENFORCE_GLOBAL_SCOPE: 'true'
+        run: php artisan test
+
   # Same suite on the live database engine. SQLite hides MySQL/MariaDB-only
   # behaviour that has reached production before: the first NOT NULL TIMESTAMP
   # column getting ON UPDATE CURRENT_TIMESTAMP, and unknown columns in a
