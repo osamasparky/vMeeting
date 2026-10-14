@@ -47,6 +47,8 @@ class OfficeTemplate extends Model
 
     /**
      * Associated subscription plan if this is a plan-specific template.
+     *
+     * @return BelongsTo<Plan, $this>
      */
     public function plan(): BelongsTo
     {
@@ -55,6 +57,8 @@ class OfficeTemplate extends Model
 
     /**
      * User who authored or last modified this template.
+     *
+     * @return BelongsTo<User, $this>
      */
     public function creator(): BelongsTo
     {

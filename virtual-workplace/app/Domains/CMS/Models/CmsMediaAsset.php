@@ -26,6 +26,7 @@ class CmsMediaAsset extends Model
         'is_active' => 'boolean',
     ];
 
+    /** @return HasMany<CmsSection, $this> */
     public function sections(): HasMany
     {
         return $this->hasMany(CmsSection::class, 'media_asset_id');

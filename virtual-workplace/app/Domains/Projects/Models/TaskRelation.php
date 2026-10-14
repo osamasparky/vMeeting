@@ -19,11 +19,13 @@ class TaskRelation extends Model
 
     protected $fillable = ['organization_id', 'task_id', 'related_task_id', 'type', 'created_by'];
 
+    /** @return BelongsTo<Task, $this> */
     public function task(): BelongsTo
     {
         return $this->belongsTo(Task::class);
     }
 
+    /** @return BelongsTo<Task, $this> */
     public function relatedTask(): BelongsTo
     {
         return $this->belongsTo(Task::class, 'related_task_id');

@@ -1,5 +1,7 @@
 includes:
     - vendor/larastan/larastan/extension.neon
+    # Known findings as of 2026-10-14 (mostly selectRaw aggregates and env() fallbacks); new code may not add more.
+    - phpstan-baseline.neon
 
 parameters:
     paths:

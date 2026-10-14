@@ -43,81 +43,97 @@ class Organization extends Model
 
     // ── Relationships ──
 
+    /** @return BelongsTo<Plan, $this> */
     public function plan(): BelongsTo
     {
         return $this->belongsTo(Plan::class);
     }
 
+    /** @return HasOne<OrganizationSetting, $this> */
     public function settings(): HasOne
     {
         return $this->hasOne(OrganizationSetting::class);
     }
 
+    /** @return HasMany<OrganizationMember, $this> */
     public function members(): HasMany
     {
         return $this->hasMany(OrganizationMember::class);
     }
 
+    /** @return HasOne<Subscription, $this> */
     public function subscription(): HasOne
     {
         return $this->hasOne(Subscription::class)->latestOfMany();
     }
 
+    /** @return HasMany<Department, $this> */
     public function departments(): HasMany
     {
         return $this->hasMany(Department::class);
     }
 
+    /** @return HasMany<Team, $this> */
     public function teams(): HasMany
     {
         return $this->hasMany(Team::class);
     }
 
+    /** @return HasMany<AuditLog, $this> */
     public function auditLogs(): HasMany
     {
         return $this->hasMany(AuditLog::class);
     }
 
+    /** @return HasMany<Floor, $this> */
     public function floors(): HasMany
     {
         return $this->hasMany(Floor::class);
     }
 
+    /** @return HasMany<Map, $this> */
     public function maps(): HasMany
     {
         return $this->hasMany(Map::class);
     }
 
+    /** @return HasMany<Room, $this> */
     public function rooms(): HasMany
     {
         return $this->hasMany(Room::class);
     }
 
+    /** @return HasMany<Project, $this> */
     public function projects(): HasMany
     {
         return $this->hasMany(Project::class);
     }
 
+    /** @return HasMany<Task, $this> */
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class);
     }
 
+    /** @return HasMany<TimeEntry, $this> */
     public function timeEntries(): HasMany
     {
         return $this->hasMany(TimeEntry::class);
     }
 
+    /** @return HasMany<Timesheet, $this> */
     public function timesheets(): HasMany
     {
         return $this->hasMany(Timesheet::class);
     }
 
+    /** @return HasMany<SubscriptionRequest, $this> */
     public function subscriptionRequests(): HasMany
     {
         return $this->hasMany(SubscriptionRequest::class)->latest();
     }
 
+    /** @return HasOne<SubscriptionRequest, $this> */
     public function pendingSubscriptionRequest(): HasOne
     {
         return $this->hasOne(SubscriptionRequest::class)->where('status', 'pending')->latestOfMany();
@@ -171,6 +187,7 @@ class Organization extends Model
         return $this->activeMembersCount() >= $limit;
     }
 
+    /** @return HasMany<Floor, $this> */
     public function offices(): HasMany
     {
         return $this->hasMany(Floor::class)->orderBy('order', 'asc');

@@ -17,11 +17,13 @@ class Team extends Model
         'name',
     ];
 
+    /** @return BelongsTo<Department, $this> */
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class);
     }
 
+    /** @return HasMany<UserProfile, $this> */
     public function userProfiles(): HasMany
     {
         return $this->hasMany(UserProfile::class);

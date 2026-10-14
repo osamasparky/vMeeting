@@ -41,28 +41,36 @@ class OrganizationMember extends Model
 
     // ── Relationships ──
 
+    /** @return BelongsTo<Organization, $this> */
     public function organization(): BelongsTo
     {
         return $this->belongsTo(Organization::class);
     }
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /** @return BelongsTo<Role, $this> */
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
     }
 
+    /** @return BelongsToMany<Floor, $this> */
     public function offices(): BelongsToMany
     {
         return $this->belongsToMany(Floor::class, 'member_office_access', 'organization_member_id', 'floor_id')
             ->withTimestamps();
     }
 
-    /** The office whose schedule and timezone the member works to. */
+    /**
+     * The office whose schedule and timezone the member works to.
+     *
+     * @return BelongsTo<Floor, $this>
+     */
     public function homeOffice(): BelongsTo
     {
         return $this->belongsTo(Floor::class, 'home_floor_id');
@@ -70,12 +78,17 @@ class OrganizationMember extends Model
 
     public const EMPLOYMENT_TYPES = ['full_time', 'part_time', 'contract', 'intern'];
 
-    /** The member's direct manager. */
+    /**
+     * The member's direct manager.
+     *
+     * @return BelongsTo<User, $this>
+     */
     public function manager(): BelongsTo
     {
         return $this->belongsTo(User::class, 'manager_user_id');
     }
 
+    /** @return BelongsToMany<Room, $this> */
     public function rooms(): BelongsToMany
     {
         return $this->belongsToMany(Room::class, 'member_room_access', 'organization_member_id', 'room_id')

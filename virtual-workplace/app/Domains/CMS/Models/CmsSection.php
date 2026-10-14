@@ -35,11 +35,13 @@ class CmsSection extends Model
         'display_order' => 'integer',
     ];
 
+    /** @return BelongsTo<CmsPage, $this> */
     public function page(): BelongsTo
     {
         return $this->belongsTo(CmsPage::class, 'page_id');
     }
 
+    /** @return BelongsTo<CmsMediaAsset, $this> */
     public function mediaAsset(): BelongsTo
     {
         return $this->belongsTo(CmsMediaAsset::class, 'media_asset_id');

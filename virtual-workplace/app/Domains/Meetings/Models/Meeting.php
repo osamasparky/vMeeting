@@ -52,21 +52,25 @@ class Meeting extends Model
 
     // ── Relationships ──
 
+    /** @return BelongsTo<Room, $this> */
     public function room(): BelongsTo
     {
         return $this->belongsTo(Room::class);
     }
 
+    /** @return BelongsTo<Project, $this> */
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
     }
 
+    /** @return BelongsTo<User, $this> */
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    /** @return HasMany<MeetingParticipant, $this> */
     public function participants(): HasMany
     {
         return $this->hasMany(MeetingParticipant::class);

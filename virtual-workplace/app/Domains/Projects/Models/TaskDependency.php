@@ -23,11 +23,13 @@ class TaskDependency extends Model
         'dependency_type',
     ];
 
+    /** @return BelongsTo<Task, $this> */
     public function task(): BelongsTo
     {
         return $this->belongsTo(Task::class, 'task_id');
     }
 
+    /** @return BelongsTo<Task, $this> */
     public function dependsOnTask(): BelongsTo
     {
         return $this->belongsTo(Task::class, 'depends_on_task_id');

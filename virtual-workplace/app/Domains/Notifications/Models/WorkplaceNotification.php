@@ -44,6 +44,8 @@ class WorkplaceNotification extends Model
 
     /**
      * Recipient user.
+     *
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -52,6 +54,8 @@ class WorkplaceNotification extends Model
 
     /**
      * Organization scope.
+     *
+     * @return BelongsTo<Organization, $this>
      */
     public function organization(): BelongsTo
     {

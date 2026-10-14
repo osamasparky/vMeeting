@@ -31,16 +31,19 @@ class Message extends Model
 
     // ── Relationships ──
 
+    /** @return BelongsTo<Channel, $this> */
     public function channel(): BelongsTo
     {
         return $this->belongsTo(Channel::class);
     }
 
+    /** @return BelongsTo<User, $this> */
     public function sender(): BelongsTo
     {
         return $this->belongsTo(User::class, 'sender_id');
     }
 
+    /** @return BelongsToMany<User, $this> */
     public function readers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'message_reads')

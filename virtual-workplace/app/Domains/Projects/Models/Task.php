@@ -167,71 +167,85 @@ class Task extends Model
 
     // ── Relationships ──
 
+    /** @return BelongsTo<User, $this> */
     public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
     }
 
+    /** @return BelongsTo<Project, $this> */
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
     }
 
+    /** @return BelongsTo<ProjectPhase, $this> */
     public function phase(): BelongsTo
     {
         return $this->belongsTo(ProjectPhase::class, 'phase_id');
     }
 
+    /** @return BelongsTo<ProjectMilestone, $this> */
     public function milestone(): BelongsTo
     {
         return $this->belongsTo(ProjectMilestone::class, 'milestone_id');
     }
 
+    /** @return BelongsTo<Task, $this> */
     public function parentTask(): BelongsTo
     {
         return $this->belongsTo(Task::class, 'parent_task_id');
     }
 
+    /** @return HasMany<Task, $this> */
     public function subtasks(): HasMany
     {
         return $this->hasMany(Task::class, 'parent_task_id')->orderBy('order');
     }
 
+    /** @return BelongsTo<User, $this> */
     public function assignee(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assignee_id');
     }
 
+    /** @return BelongsTo<User, $this> */
     public function reporter(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reporter_id');
     }
 
+    /** @return BelongsTo<Team, $this> */
     public function team(): BelongsTo
     {
         return $this->belongsTo(Team::class);
     }
 
+    /** @return HasMany<TaskChecklistItem, $this> */
     public function checklistItems(): HasMany
     {
         return $this->hasMany(TaskChecklistItem::class)->orderBy('order');
     }
 
+    /** @return HasMany<TaskComment, $this> */
     public function comments(): HasMany
     {
         return $this->hasMany(TaskComment::class)->orderBy('created_at', 'asc');
     }
 
+    /** @return HasMany<TaskAttachment, $this> */
     public function attachments(): HasMany
     {
         return $this->hasMany(TaskAttachment::class)->orderBy('created_at', 'desc');
     }
 
+    /** @return HasMany<TaskDependency, $this> */
     public function dependencies(): HasMany
     {
         return $this->hasMany(TaskDependency::class, 'task_id');
     }
 
+    /** @return BelongsToMany<Task, $this> */
     public function dependsOnTasks(): BelongsToMany
     {
         return $this->belongsToMany(Task::class, 'task_dependencies', 'task_id', 'depends_on_task_id')
@@ -239,6 +253,7 @@ class Task extends Model
             ->withTimestamps();
     }
 
+    /** @return BelongsToMany<Task, $this> */
     public function dependentTasks(): BelongsToMany
     {
         return $this->belongsToMany(Task::class, 'task_dependencies', 'depends_on_task_id', 'task_id')
@@ -246,26 +261,31 @@ class Task extends Model
             ->withTimestamps();
     }
 
+    /** @return HasMany<TimeEntry, $this> */
     public function timeEntries(): HasMany
     {
         return $this->hasMany(TimeEntry::class);
     }
 
+    /** @return BelongsTo<ProjectSprint, $this> */
     public function sprint(): BelongsTo
     {
         return $this->belongsTo(ProjectSprint::class, 'sprint_id');
     }
 
+    /** @return HasMany<TaskCustomFieldValue, $this> */
     public function customFieldValues(): HasMany
     {
         return $this->hasMany(TaskCustomFieldValue::class, 'task_id')->with('definition');
     }
 
+    /** @return BelongsTo<ProjectState, $this> */
     public function state(): BelongsTo
     {
         return $this->belongsTo(ProjectState::class, 'state_id');
     }
 
+    /** @return BelongsToMany<ProjectLabel, $this> */
     public function labels(): BelongsToMany
     {
         return $this->belongsToMany(ProjectLabel::class, 'task_labels', 'task_id', 'label_id')->orderBy('name');
@@ -274,6 +294,8 @@ class Task extends Model
     /**
      * Everyone working on the task. assignee_id is the primary (first) one and
      * is always part of this list — see booted().
+     *
+     * @return BelongsToMany<User, $this>
      */
     public function assignees(): BelongsToMany
     {
@@ -291,7 +313,11 @@ class Task extends Model
         });
     }
 
-    /** People following the task — told about status changes and comments. */
+    /**
+     * People following the task — told about status changes and comments.
+     *
+     * @return BelongsToMany<User, $this>
+     */
     public function watchers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'task_watchers', 'task_id', 'user_id')->withTimestamps();
@@ -315,11 +341,13 @@ class Task extends Model
         $this->project?->goals->each->recalculateProgress();
     }
 
+    /** @return HasMany<TaskRelation, $this> */
     public function relations(): HasMany
     {
         return $this->hasMany(TaskRelation::class, 'task_id');
     }
 
+    /** @return HasMany<TaskRelation, $this> */
     public function inverseRelations(): HasMany
     {
         return $this->hasMany(TaskRelation::class, 'related_task_id');
@@ -423,6 +451,7 @@ class Task extends Model
         });
     }
 
+    /** @return HasMany<ActiveTimer, $this> */
     public function activeTimers(): HasMany
     {
         return $this->hasMany(ActiveTimer::class);

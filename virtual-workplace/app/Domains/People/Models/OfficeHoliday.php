@@ -33,6 +33,7 @@ class OfficeHoliday extends Model
         'end_date' => 'date:Y-m-d',
     ];
 
+    /** @return BelongsTo<Floor, $this> */
     public function office(): BelongsTo
     {
         return $this->belongsTo(Floor::class, 'floor_id');

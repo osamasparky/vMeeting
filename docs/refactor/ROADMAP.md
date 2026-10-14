@@ -73,6 +73,7 @@
 **Excludes:** raising the level.
 **Acceptance:** `phpstan analyse` passes with the baseline; baseline shrinks by the annotated models.
 **Rollback:** remove the CI step.
+**Status (2026-10-14): done.** Generic `@return` PHPDoc on 217 relations in 64 model files (comments only) took Larastan from 445 to 49 findings. Two of the remaining were real runtime errors, fixed and tested in their own commit (1f390d4): the member profile/edit form returned 500 for any member with time entries (`TimeEntry::formattedDuration()` did not exist), and saving workspace settings for a company without a settings row crashed on a missing import. The rest (selectRaw aggregates, `env()` fallbacks, a dead `Room::$floor_id` branch) are in `phpstan-baseline.neon`; Larastan runs in CI and was checked to still fail on a new undefined-method call.
 
 ## Phase 7 — Split `SuperAdminController`
 **Rationale:** §4.7. Pure move.

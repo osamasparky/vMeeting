@@ -29,11 +29,13 @@ class CustomFieldDefinition extends Model
         'sort_order' => 'integer',
     ];
 
+    /** @return BelongsTo<Project, $this> */
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
     }
 
+    /** @return HasMany<TaskCustomFieldValue, $this> */
     public function values(): HasMany
     {
         return $this->hasMany(TaskCustomFieldValue::class, 'custom_field_definition_id');

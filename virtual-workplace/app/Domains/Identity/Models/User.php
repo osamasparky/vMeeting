@@ -81,6 +81,7 @@ class User extends Authenticatable
 
     // ── Relationships ──
 
+    /** @return HasMany<OrganizationMember, $this> */
     public function memberships(): HasMany
     {
         return $this->hasMany(OrganizationMember::class);
@@ -93,21 +94,25 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    /** @return HasMany<UserProfile, $this> */
     public function profiles(): HasMany
     {
         return $this->hasMany(UserProfile::class);
     }
 
+    /** @return HasOne<UserProfile, $this> */
     public function profile(): HasOne
     {
         return $this->hasOne(UserProfile::class);
     }
 
+    /** @return HasMany<ProjectMember, $this> */
     public function projectMemberships(): HasMany
     {
         return $this->hasMany(ProjectMember::class);
     }
 
+    /** @return BelongsToMany<Project, $this> */
     public function projects(): BelongsToMany
     {
         return $this->belongsToMany(Project::class, 'project_members')
@@ -115,26 +120,31 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    /** @return HasMany<Task, $this> */
     public function assignedTasks(): HasMany
     {
         return $this->hasMany(Task::class, 'assignee_id');
     }
 
+    /** @return HasMany<Task, $this> */
     public function createdTasks(): HasMany
     {
         return $this->hasMany(Task::class, 'reporter_id');
     }
 
+    /** @return HasMany<TimeEntry, $this> */
     public function timeEntries(): HasMany
     {
         return $this->hasMany(TimeEntry::class);
     }
 
+    /** @return HasOne<ActiveTimer, $this> */
     public function activeTimer(): HasOne
     {
         return $this->hasOne(ActiveTimer::class);
     }
 
+    /** @return HasMany<Timesheet, $this> */
     public function timesheets(): HasMany
     {
         return $this->hasMany(Timesheet::class);

@@ -1,0 +1,205 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Anonymous function has an unused use \$add\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: app/Console/Commands/LocalizeFurnitureImagesCommand.php
+
+		-
+			message: '#^Access to an undefined property App\\Domains\\Workspace\\Models\\Room\:\:\$floor_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Domains/Guests/Actions/BuildGuestOfficeSessionAction.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$settings\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Domains/Guests/Actions/BuildGuestOfficeSessionAction.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:floors\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: app/Domains/Guests/Actions/BuildGuestOfficeSessionAction.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:maps\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Domains/Guests/Actions/BuildGuestOfficeSessionAction.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 2
+			path: app/Domains/Guests/Actions/BuildGuestOfficeSessionAction.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 4
+			path: app/Domains/Meetings/Controllers/MeetingController.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 2
+			path: app/Domains/Meetings/Services/LiveKitTokenService.php
+
+		-
+			message: '#^Access to an undefined property App\\Domains\\Meetings\\Models\\Meeting\:\:\$start_time\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Domains/Notifications/Services/NotificationService.php
+
+		-
+			message: '#^Access to an undefined property App\\Domains\\Tenancy\\Models\\OrganizationMember\:\:\$job_title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Domains/People/Services/AttendanceService.php
+
+		-
+			message: '#^Access to an undefined property App\\Domains\\Meetings\\Models\\Meeting\:\:\$live\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Domains/People/Services/WorkspacePulse.php
+
+		-
+			message: '#^Access to an undefined property App\\Domains\\Meetings\\Models\\Meeting\:\:\$today\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Domains/People/Services/WorkspacePulse.php
+
+		-
+			message: '#^Access to an undefined property App\\Domains\\Projects\\Models\\Project\:\:\$active\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Domains/People/Services/WorkspacePulse.php
+
+		-
+			message: '#^Access to an undefined property App\\Domains\\Projects\\Models\\Project\:\:\$late\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Domains/People/Services/WorkspacePulse.php
+
+		-
+			message: '#^Access to an undefined property App\\Domains\\Projects\\Models\\Task\:\:\$done\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Domains/People/Services/WorkspacePulse.php
+
+		-
+			message: '#^Access to an undefined property App\\Domains\\Projects\\Models\\Task\:\:\$done_week\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Domains/People/Services/WorkspacePulse.php
+
+		-
+			message: '#^Access to an undefined property App\\Domains\\Projects\\Models\\Task\:\:\$open\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Domains/People/Services/WorkspacePulse.php
+
+		-
+			message: '#^Access to an undefined property App\\Domains\\Projects\\Models\\Task\:\:\$overdue\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Domains/People/Services/WorkspacePulse.php
+
+		-
+			message: '#^Access to an undefined property App\\Domains\\Projects\\Models\\Task\:\:\$total\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Domains/People/Services/WorkspacePulse.php
+
+		-
+			message: '#^Access to an undefined property App\\Domains\\Projects\\Models\\TimeEntry\:\:\$billable\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Domains/People/Services/WorkspacePulse.php
+
+		-
+			message: '#^Access to an undefined property App\\Domains\\Projects\\Models\\TimeEntry\:\:\$total\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Domains/People/Services/WorkspacePulse.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$c\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Domains/Projects/Controllers/MyWorkController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$project_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Domains/Projects/Controllers/MyWorkController.php
+
+		-
+			message: '#^Access to an undefined property App\\Domains\\Tenancy\\Models\\OrganizationSetting\:\:\$openai_settings\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Domains/Tenancy/Actions/BuildOrganizationDashboardAction.php
+
+		-
+			message: '#^Access to an undefined property App\\Domains\\Tenancy\\Models\\OrganizationSetting\:\:\$smtp_settings\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Domains/Tenancy/Actions/BuildOrganizationDashboardAction.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 2
+			path: app/Domains/Workspace/Actions/BuildOfficeViewAction.php
+
+		-
+			message: '#^Access to an undefined property App\\Domains\\Tenancy\\Models\\OrganizationSetting\:\:\$openai_settings\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Domains/Workspace/Services/AiMapGeneratorService.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 1
+			path: app/Domains/Workspace/Services/AiMapGeneratorService.php
+
+		-
+			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
+			identifier: larastan.noEnvCallsOutsideOfConfig
+			count: 2
+			path: app/Http/Controllers/SuperAdminController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$logo_url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Web/OfficeController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$plan\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Web/OfficeController.php
+
+		-
+			message: '#^Access to an undefined property App\\Domains\\Tenancy\\Models\\OrganizationSetting\:\:\$openai_settings\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Web/OrganizationSettingsController.php
+
+		-
+			message: '#^Access to an undefined property App\\Domains\\Tenancy\\Models\\OrganizationSetting\:\:\$smtp_settings\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Web/OrganizationSettingsController.php
+
+		-
+			message: '#^Access to an undefined property App\\Domains\\Tenancy\\Models\\OrganizationSetting\:\:\$smtp_settings\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Support/OrganizationMailer.php

@@ -14,11 +14,13 @@ class FurnitureCategory extends Model
         'order',
     ];
 
+    /** @return HasMany<FurnitureItem, $this> */
     public function items(): HasMany
     {
         return $this->hasMany(FurnitureItem::class, 'category_id')->where('is_active', true);
     }
 
+    /** @return HasMany<FurnitureItem, $this> */
     public function allItems(): HasMany
     {
         return $this->hasMany(FurnitureItem::class, 'category_id');

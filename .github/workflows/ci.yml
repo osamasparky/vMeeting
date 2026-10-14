@@ -56,6 +56,9 @@ jobs:
       - name: Run Laravel Pint Code Style Check
         run: ./vendor/bin/pint --test
 
+      - name: Static analysis (Larastan, with baseline)
+        run: ./vendor/bin/phpstan analyse --no-progress --memory-limit=2G
+
       - name: Execute Tests via PHPUnit (SQLite)
         run: php artisan test
 

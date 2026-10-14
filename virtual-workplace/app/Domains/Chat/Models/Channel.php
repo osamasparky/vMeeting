@@ -28,11 +28,13 @@ class Channel extends Model
 
     // ── Relationships ──
 
+    /** @return BelongsTo<Room, $this> */
     public function room(): BelongsTo
     {
         return $this->belongsTo(Room::class);
     }
 
+    /** @return BelongsToMany<User, $this> */
     public function members(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'channel_members')
@@ -40,6 +42,7 @@ class Channel extends Model
             ->withTimestamps();
     }
 
+    /** @return HasMany<Message, $this> */
     public function messages(): HasMany
     {
         return $this->hasMany(Message::class)->orderBy('created_at', 'asc');

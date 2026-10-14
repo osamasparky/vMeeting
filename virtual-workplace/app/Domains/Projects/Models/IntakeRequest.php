@@ -21,16 +21,19 @@ class IntakeRequest extends Model
 
     protected $casts = ['snoozed_until' => 'date', 'reviewed_at' => 'datetime'];
 
+    /** @return BelongsTo<Project, $this> */
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
     }
 
+    /** @return BelongsTo<Task, $this> */
     public function task(): BelongsTo
     {
         return $this->belongsTo(Task::class);
     }
 
+    /** @return BelongsTo<Task, $this> */
     public function duplicateOf(): BelongsTo
     {
         return $this->belongsTo(Task::class, 'duplicate_of_task_id');

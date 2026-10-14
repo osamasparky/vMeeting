@@ -21,11 +21,13 @@ class CmsPage extends Model
         'status',
     ];
 
+    /** @return HasMany<CmsSection, $this> */
     public function sections(): HasMany
     {
         return $this->hasMany(CmsSection::class, 'page_id')->orderBy('display_order');
     }
 
+    /** @return HasMany<CmsSection, $this> */
     public function activeSections(): HasMany
     {
         return $this->hasMany(CmsSection::class, 'page_id')

@@ -21,11 +21,13 @@ class ProjectLabel extends Model
         'tone',
     ];
 
+    /** @return BelongsTo<Project, $this> */
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
     }
 
+    /** @return BelongsToMany<Task, $this> */
     public function tasks(): BelongsToMany
     {
         return $this->belongsToMany(Task::class, 'task_labels', 'label_id', 'task_id');

@@ -21,6 +21,7 @@ class Avatar extends Model
         'sprite_config' => 'array',
     ];
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

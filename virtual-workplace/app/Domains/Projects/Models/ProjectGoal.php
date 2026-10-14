@@ -31,16 +31,19 @@ class ProjectGoal extends Model
         'progress_percentage' => 'decimal:2',
     ];
 
+    /** @return BelongsTo<Project, $this> */
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
     }
 
+    /** @return BelongsTo<User, $this> */
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
     }
 
+    /** @return HasMany<ProjectGoalTarget, $this> */
     public function targets(): HasMany
     {
         return $this->hasMany(ProjectGoalTarget::class, 'goal_id');

@@ -28,11 +28,13 @@ class ProjectState extends Model
 
     protected $casts = ['position' => 'integer', 'is_default' => 'boolean'];
 
+    /** @return BelongsTo<Project, $this> */
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
     }
 
+    /** @return HasMany<Task, $this> */
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class, 'state_id');

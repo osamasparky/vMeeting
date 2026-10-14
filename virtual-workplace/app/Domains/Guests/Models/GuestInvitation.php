@@ -40,11 +40,13 @@ class GuestInvitation extends Model
 
     // ── Relationships ──
 
+    /** @return BelongsTo<Room, $this> */
     public function room(): BelongsTo
     {
         return $this->belongsTo(Room::class);
     }
 
+    /** @return BelongsTo<User, $this> */
     public function host(): BelongsTo
     {
         return $this->belongsTo(User::class, 'invited_by');

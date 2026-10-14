@@ -27,11 +27,13 @@ class TaskChecklistItem extends Model
         'order' => 'integer',
     ];
 
+    /** @return BelongsTo<Task, $this> */
     public function task(): BelongsTo
     {
         return $this->belongsTo(Task::class);
     }
 
+    /** @return BelongsTo<User, $this> */
     public function completedByUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'completed_by');

@@ -41,26 +41,31 @@ class Map extends Model
 
     // ── Relationships ──
 
+    /** @return BelongsTo<Floor, $this> */
     public function floor(): BelongsTo
     {
         return $this->belongsTo(Floor::class);
     }
 
+    /** @return HasMany<MapVersion, $this> */
     public function versions(): HasMany
     {
         return $this->hasMany(MapVersion::class)->orderByDesc('version');
     }
 
+    /** @return HasMany<Room, $this> */
     public function rooms(): HasMany
     {
         return $this->hasMany(Room::class);
     }
 
+    /** @return HasMany<Zone, $this> */
     public function zones(): HasMany
     {
         return $this->hasMany(Zone::class);
     }
 
+    /** @return HasMany<MapObject, $this> */
     public function objects(): HasMany
     {
         return $this->hasMany(MapObject::class);

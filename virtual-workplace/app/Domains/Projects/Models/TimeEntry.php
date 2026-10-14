@@ -61,26 +61,31 @@ class TimeEntry extends Model
 
     // ── Relationships ──
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /** @return BelongsTo<Project, $this> */
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
     }
 
+    /** @return BelongsTo<Task, $this> */
     public function task(): BelongsTo
     {
         return $this->belongsTo(Task::class);
     }
 
+    /** @return BelongsTo<Timesheet, $this> */
     public function timesheet(): BelongsTo
     {
         return $this->belongsTo(Timesheet::class);
     }
 
+    /** @return BelongsTo<User, $this> */
     public function approvedByUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');

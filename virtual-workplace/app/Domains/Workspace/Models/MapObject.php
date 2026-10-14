@@ -87,6 +87,7 @@ class MapObject extends Model
 
     // ── Relationships ──
 
+    /** @return BelongsTo<Map, $this> */
     public function map(): BelongsTo
     {
         return $this->belongsTo(Map::class);

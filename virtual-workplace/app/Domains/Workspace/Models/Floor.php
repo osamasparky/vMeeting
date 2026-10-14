@@ -105,11 +105,13 @@ class Floor extends Model
 
     // ── Relationships ──
 
+    /** @return HasMany<Map, $this> */
     public function maps(): HasMany
     {
         return $this->hasMany(Map::class);
     }
 
+    /** @return HasOne<Map, $this> */
     public function activeMap(): HasOne
     {
         return $this->hasOne(Map::class)->where('status', 'published')->latestOfMany();
@@ -120,6 +122,7 @@ class Floor extends Model
         return $this->hasManyThrough(Room::class, Map::class);
     }
 
+    /** @return BelongsToMany<OrganizationMember, $this> */
     public function members(): BelongsToMany
     {
         return $this->belongsToMany(OrganizationMember::class, 'member_office_access', 'floor_id', 'organization_member_id')

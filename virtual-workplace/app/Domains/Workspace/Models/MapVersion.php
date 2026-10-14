@@ -35,11 +35,13 @@ class MapVersion extends Model
 
     // ── Relationships ──
 
+    /** @return BelongsTo<Map, $this> */
     public function map(): BelongsTo
     {
         return $this->belongsTo(Map::class);
     }
 
+    /** @return BelongsTo<User, $this> */
     public function publishedByUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'published_by');

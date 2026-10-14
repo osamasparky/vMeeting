@@ -48,21 +48,25 @@ class ProjectDocument extends Model
         });
     }
 
+    /** @return BelongsTo<Project, $this> */
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
     }
 
+    /** @return BelongsTo<User, $this> */
     public function author(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
     }
 
+    /** @return BelongsTo<User, $this> */
     public function lastEditor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'last_edited_by');
     }
 
+    /** @return HasMany<ProjectDocumentVersion, $this> */
     public function versions(): HasMany
     {
         return $this->hasMany(ProjectDocumentVersion::class, 'document_id')->orderByDesc('version');
@@ -96,11 +100,13 @@ class ProjectDocument extends Model
         return true;
     }
 
+    /** @return BelongsTo<ProjectDocument, $this> */
     public function parent(): BelongsTo
     {
         return $this->belongsTo(ProjectDocument::class, 'parent_document_id');
     }
 
+    /** @return HasMany<ProjectDocument, $this> */
     public function children(): HasMany
     {
         return $this->hasMany(ProjectDocument::class, 'parent_document_id');

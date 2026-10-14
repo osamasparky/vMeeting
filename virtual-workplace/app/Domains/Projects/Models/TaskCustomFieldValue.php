@@ -27,11 +27,13 @@ class TaskCustomFieldValue extends Model
         'value_json' => 'array',
     ];
 
+    /** @return BelongsTo<Task, $this> */
     public function task(): BelongsTo
     {
         return $this->belongsTo(Task::class);
     }
 
+    /** @return BelongsTo<CustomFieldDefinition, $this> */
     public function definition(): BelongsTo
     {
         return $this->belongsTo(CustomFieldDefinition::class, 'custom_field_definition_id');

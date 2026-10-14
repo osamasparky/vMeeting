@@ -15,11 +15,13 @@ class ProjectDocumentVersion extends Model
 
     protected $casts = ['version' => 'integer', 'created_at' => 'datetime'];
 
+    /** @return BelongsTo<ProjectDocument, $this> */
     public function document(): BelongsTo
     {
         return $this->belongsTo(ProjectDocument::class, 'document_id');
     }
 
+    /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

@@ -44,11 +44,13 @@ class ProjectSprint extends Model
         'burndown_snapshot' => 'array',
     ];
 
+    /** @return BelongsTo<Project, $this> */
     public function project(): BelongsTo
     {
         return $this->belongsTo(Project::class);
     }
 
+    /** @return HasMany<Task, $this> */
     public function tasks(): HasMany
     {
         return $this->hasMany(Task::class, 'sprint_id');

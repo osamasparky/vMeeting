@@ -32,6 +32,7 @@ class ProjectGoalTarget extends Model
 
     public const AUTO_TYPES = ['tasks', 'milestones', 'hours'];
 
+    /** @return BelongsTo<ProjectGoal, $this> */
     public function goal(): BelongsTo
     {
         return $this->belongsTo(ProjectGoal::class, 'goal_id');

@@ -34,6 +34,7 @@ class FurnitureItem extends Model
         'elevation' => 'integer',
     ];
 
+    /** @return BelongsTo<FurnitureCategory, $this> */
     public function category(): BelongsTo
     {
         return $this->belongsTo(FurnitureCategory::class, 'category_id');

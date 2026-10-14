@@ -39,16 +39,19 @@ class Plan extends Model
         'is_active' => 'boolean',
     ];
 
+    /** @return HasMany<Organization, $this> */
     public function organizations(): HasMany
     {
         return $this->hasMany(Organization::class);
     }
 
+    /** @return HasMany<Subscription, $this> */
     public function subscriptions(): HasMany
     {
         return $this->hasMany(Subscription::class);
     }
 
+    /** @return HasMany<SubscriptionRequest, $this> */
     public function subscriptionRequests(): HasMany
     {
         return $this->hasMany(SubscriptionRequest::class);
