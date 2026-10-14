@@ -2,14 +2,13 @@ name: CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, ulaspace-rebuild ]
   pull_request:
-    branches: [ main, master ]
 
 jobs:
-  laravel-tests:
+  # Fast job: SQLite, plus the style check.
+  sqlite:
     runs-on: ubuntu-latest
-
     defaults:
       run:
         working-directory: virtual-workplace
@@ -57,6 +56,84 @@ jobs:
       - name: Run Laravel Pint Code Style Check
         run: ./vendor/bin/pint --test
 
-      - name: Execute Tests via PHPUnit
+      - name: Execute Tests via PHPUnit (SQLite)
         run: php artisan test
 
+  # Same suite on the live database engine. SQLite hides MySQL/MariaDB-only
+  # behaviour that has reached production before: the first NOT NULL TIMESTAMP
+  # column getting ON UPDATE CURRENT_TIMESTAMP, and unknown columns in a
+  # "double-quoted" identifier silently read as strings. Keep the image on the
+  # live server's version (MariaDB 10.6; 10.4 rejects window functions Laravel
+  # generates for eager-load limits under ONLY_FULL_GROUP_BY).
+  mariadb:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: virtual-workplace
+
+    services:
+      mariadb:
+        image: mariadb:10.6
+        env:
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: vw_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: vw_test
+      DB_USERNAME: root
+      DB_PASSWORD: root
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, bcmath, zip, gd
+          coverage: none
+
+      - name: Cache Composer Dependencies
+        uses: actions/cache@v4
+        with:
+          path: virtual-workplace/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('virtual-workplace/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install Composer Dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Prepare Environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Confirm the database behaves like live
+        run: mysql -h127.0.0.1 -uroot -proot -e "SELECT VERSION(), @@explicit_defaults_for_timestamp"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: virtual-workplace/package-lock.json
+
+      - name: Install NPM Dependencies & Build Assets
+        run: |
+          npm ci || npm install
+          npm run build
+
+      - name: Execute Tests via PHPUnit (MariaDB)
+        run: php artisan test

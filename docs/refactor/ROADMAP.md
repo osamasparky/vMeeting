@@ -39,6 +39,7 @@
 **Acceptance:** CI green on both jobs for the branch; a deliberately reintroduced `ON UPDATE` timestamp column fails the MySQL job (checked once, not committed).
 **Verify:** `vendor/bin/pint --test`; a local MySQL run if available; CI run link.
 **Rollback:** revert the workflow commit; formatting commit is independent.
+**Status (2026-10-14): done locally; CI run pending a push.** Pint passes repo-wide (51edc1d, route:list identical). The workflow runs on `ulaspace-rebuild` and every pull request, with a `mariadb:10.6` job (live is MariaDB 10.6.23, `explicit_defaults_for_timestamp=0`). Locally the suite was run against MariaDB 10.4, the only engine available: 359/371 pass. The 12 failures are window-function queries Laravel generates for eager-load limits, rejected by 10.4 under ONLY_FULL_GROUP_BY; the same query runs on live 10.6, and live logs show no such error. Acceptance check done: with migration 2026_10_14_000005 removed, the MariaDB run fails the attendance heartbeat test; restored, it passes. The duplicate `virtual-workplace/.github/workflows/ci.yml` (ignored by GitHub) was removed.
 
 ## Phase 3 — Uploads out of git, safely
 **Rationale:** §4.2.
