@@ -172,7 +172,7 @@ parameters:
 			message: '#^Called ''env'' outside of the config directory which returns null when the config is cached, use ''config''\.$#'
 			identifier: larastan.noEnvCallsOutsideOfConfig
 			count: 2
-			path: app/Http/Controllers/SuperAdminController.php
+			path: app/Http/Controllers/SuperAdmin/PlatformSettingsController.php
 
 		-
 			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$logo_url\.$#'

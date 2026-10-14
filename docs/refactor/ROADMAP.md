@@ -80,6 +80,7 @@
 **Scope:** one controller per area (Companies, Plans & subscriptions, Website content, Furniture & templates, Settings & translations). Routes and route names unchanged; methods moved verbatim.
 **Acceptance:** `php artisan route:list --path=superadmin` identical before/after (diffed); suite passes; every superadmin screen renders (in-process render check as used on live).
 **Rollback:** revert.
+**Status (2026-10-14): done.** `App\Http\Controllers\SuperAdmin\{Company,Plan,PlatformSettings,OfficeCatalog,WebsiteContent}Controller`; `SuperAdminController` keeps the dashboard, permission matrix, feature flags and health (1,880 → 142 lines). All 57 methods moved verbatim (compared body by body, whitespace ignored); the full route list (356) is identical apart from the controller class on 49 actions; all 16 superadmin GET pages render 200 in-process; suite 376/376; Larastan clean (baseline path updated).
 
 ## Phase 8 — First module out of `office.blade.php`
 **Rationale:** §4.7. Start with the attendance clock and heartbeat (self-contained, recently changed, well understood).

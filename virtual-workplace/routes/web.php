@@ -4,6 +4,11 @@ use App\Domains\Chat\Controllers\ChatController;
 use App\Domains\Collaboration\Controllers\RecordingController;
 use App\Domains\Meetings\Controllers\MeetingController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\SuperAdmin\CompanyController;
+use App\Http\Controllers\SuperAdmin\OfficeCatalogController;
+use App\Http\Controllers\SuperAdmin\PlanController;
+use App\Http\Controllers\SuperAdmin\PlatformSettingsController;
+use App\Http\Controllers\SuperAdmin\WebsiteContentController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\Web\AttendanceController;
 use App\Http\Controllers\Web\AuthController;
@@ -149,8 +154,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/organizations/{organization}/recordings/{recording}', [RecordingController::class, 'destroy'])->name('recordings.destroy');
 
     // Impersonation Exit Routes (SuperAdmin)
-    Route::post('/impersonate/leave', [SuperAdminController::class, 'leaveImpersonation'])->name('impersonate.leave');
-    Route::get('/impersonate/leave', [SuperAdminController::class, 'leaveImpersonation'])->name('impersonate.leave.get');
+    Route::post('/impersonate/leave', [CompanyController::class, 'leaveImpersonation'])->name('impersonate.leave');
+    Route::get('/impersonate/leave', [CompanyController::class, 'leaveImpersonation'])->name('impersonate.leave.get');
 
     // In-App Notification System Routes
     Route::get('/api/notifications', [DashboardController::class, 'getUserNotifications'])->name('notifications.index');
@@ -186,70 +191,70 @@ Route::post('/guest/join/{token}', [GuestAccessController::class, 'guestEnter'])
 // Super Admin Portal Routes
 Route::prefix('superadmin')->middleware(['auth', 'superadmin'])->name('superadmin.')->group(function () {
     Route::get('/', [SuperAdminController::class, 'dashboard'])->name('dashboard');
-    Route::get('/companies', [SuperAdminController::class, 'companies'])->name('companies');
-    Route::get('/companies/{organization}', [SuperAdminController::class, 'showCompany'])->name('companies.show');
-    Route::post('/companies/{organization}/impersonate', [SuperAdminController::class, 'impersonateCompany'])->name('companies.impersonate');
-    Route::put('/companies/{organization}', [SuperAdminController::class, 'updateCompanyDetails'])->name('companies.update');
-    Route::delete('/companies/{organization}', [SuperAdminController::class, 'deleteCompany'])->name('companies.delete');
-    Route::post('/companies/{organization}/plan', [SuperAdminController::class, 'updateCompanyPlan'])->name('companies.plan');
-    Route::post('/companies/{organization}/toggle-status', [SuperAdminController::class, 'toggleCompanyStatus'])->name('companies.toggle');
+    Route::get('/companies', [CompanyController::class, 'companies'])->name('companies');
+    Route::get('/companies/{organization}', [CompanyController::class, 'showCompany'])->name('companies.show');
+    Route::post('/companies/{organization}/impersonate', [CompanyController::class, 'impersonateCompany'])->name('companies.impersonate');
+    Route::put('/companies/{organization}', [CompanyController::class, 'updateCompanyDetails'])->name('companies.update');
+    Route::delete('/companies/{organization}', [CompanyController::class, 'deleteCompany'])->name('companies.delete');
+    Route::post('/companies/{organization}/plan', [CompanyController::class, 'updateCompanyPlan'])->name('companies.plan');
+    Route::post('/companies/{organization}/toggle-status', [CompanyController::class, 'toggleCompanyStatus'])->name('companies.toggle');
 
-    Route::get('/plans', [SuperAdminController::class, 'plans'])->name('plans');
-    Route::post('/plans', [SuperAdminController::class, 'storePlan'])->name('plans.store');
-    Route::put('/plans/{plan}', [SuperAdminController::class, 'updatePlan'])->name('plans.update');
-    Route::delete('/plans/{plan}', [SuperAdminController::class, 'deletePlan'])->name('plans.delete');
+    Route::get('/plans', [PlanController::class, 'plans'])->name('plans');
+    Route::post('/plans', [PlanController::class, 'storePlan'])->name('plans.store');
+    Route::put('/plans/{plan}', [PlanController::class, 'updatePlan'])->name('plans.update');
+    Route::delete('/plans/{plan}', [PlanController::class, 'deletePlan'])->name('plans.delete');
 
     // Subscription & Bank Transfer Payment Requests
-    Route::get('/subscriptions', [SuperAdminController::class, 'subscriptionRequests'])->name('subscriptions');
-    Route::post('/subscriptions/{subscriptionRequest}/approve', [SuperAdminController::class, 'approveSubscriptionRequest'])->name('subscriptions.approve');
-    Route::post('/subscriptions/{subscriptionRequest}/reject', [SuperAdminController::class, 'rejectSubscriptionRequest'])->name('subscriptions.reject');
-    Route::get('/subscriptions/{subscriptionRequest}/receipt', [SuperAdminController::class, 'viewSubscriptionReceipt'])->name('subscriptions.receipt');
+    Route::get('/subscriptions', [PlanController::class, 'subscriptionRequests'])->name('subscriptions');
+    Route::post('/subscriptions/{subscriptionRequest}/approve', [PlanController::class, 'approveSubscriptionRequest'])->name('subscriptions.approve');
+    Route::post('/subscriptions/{subscriptionRequest}/reject', [PlanController::class, 'rejectSubscriptionRequest'])->name('subscriptions.reject');
+    Route::get('/subscriptions/{subscriptionRequest}/receipt', [PlanController::class, 'viewSubscriptionReceipt'])->name('subscriptions.receipt');
 
     Route::get('/matrix', [SuperAdminController::class, 'matrix'])->name('matrix');
     Route::post('/matrix/sync', [SuperAdminController::class, 'syncMatrix'])->name('matrix.sync');
 
-    Route::get('/settings', [SuperAdminController::class, 'settings'])->name('settings');
-    Route::post('/settings', [SuperAdminController::class, 'updateSettings'])->name('settings.update');
-    Route::post('/settings/payment', [SuperAdminController::class, 'updatePaymentSettings'])->name('settings.payment');
-    Route::post('/settings/ai', [SuperAdminController::class, 'updateAiSettings'])->name('settings.ai');
-    Route::post('/settings/ai/test', [SuperAdminController::class, 'testAiConnection'])->name('settings.ai.test');
-    Route::post('/settings/default-blueprint', [SuperAdminController::class, 'uploadDefaultBlueprint'])->name('settings.blueprint');
+    Route::get('/settings', [PlatformSettingsController::class, 'settings'])->name('settings');
+    Route::post('/settings', [PlatformSettingsController::class, 'updateSettings'])->name('settings.update');
+    Route::post('/settings/payment', [PlatformSettingsController::class, 'updatePaymentSettings'])->name('settings.payment');
+    Route::post('/settings/ai', [PlatformSettingsController::class, 'updateAiSettings'])->name('settings.ai');
+    Route::post('/settings/ai/test', [PlatformSettingsController::class, 'testAiConnection'])->name('settings.ai.test');
+    Route::post('/settings/default-blueprint', [OfficeCatalogController::class, 'uploadDefaultBlueprint'])->name('settings.blueprint');
 
     // System Translations & Localization Manager
-    Route::get('/translations', [SuperAdminController::class, 'translations'])->name('translations');
-    Route::post('/translations', [SuperAdminController::class, 'updateTranslations'])->name('translations.update');
-    Route::post('/translations/add', [SuperAdminController::class, 'addTranslationKey'])->name('translations.add');
-    Route::post('/translations/delete', [SuperAdminController::class, 'deleteTranslationKey'])->name('translations.delete');
+    Route::get('/translations', [PlatformSettingsController::class, 'translations'])->name('translations');
+    Route::post('/translations', [PlatformSettingsController::class, 'updateTranslations'])->name('translations.update');
+    Route::post('/translations/add', [PlatformSettingsController::class, 'addTranslationKey'])->name('translations.add');
+    Route::post('/translations/delete', [PlatformSettingsController::class, 'deleteTranslationKey'])->name('translations.delete');
 
     // Default Office Template & Rooms Designer
-    Route::get('/template', [SuperAdminController::class, 'defaultTemplate'])->name('template');
-    Route::post('/template', [SuperAdminController::class, 'updateDefaultTemplate'])->name('template.update');
-    Route::post('/template/room', [SuperAdminController::class, 'saveTemplateRoom'])->name('template.room.save');
-    Route::post('/template/rooms/bulk', [SuperAdminController::class, 'saveAllTemplateRooms'])->name('template.rooms.bulk');
-    Route::delete('/template/room/{roomIndex}', [SuperAdminController::class, 'deleteTemplateRoom'])->name('template.room.delete');
-    Route::post('/template/background', [SuperAdminController::class, 'uploadTemplateBackground'])->name('template.background');
-    Route::post('/template/sync', [SuperAdminController::class, 'syncTemplateToOrganizations'])->name('template.sync');
+    Route::get('/template', [OfficeCatalogController::class, 'defaultTemplate'])->name('template');
+    Route::post('/template', [OfficeCatalogController::class, 'updateDefaultTemplate'])->name('template.update');
+    Route::post('/template/room', [OfficeCatalogController::class, 'saveTemplateRoom'])->name('template.room.save');
+    Route::post('/template/rooms/bulk', [OfficeCatalogController::class, 'saveAllTemplateRooms'])->name('template.rooms.bulk');
+    Route::delete('/template/room/{roomIndex}', [OfficeCatalogController::class, 'deleteTemplateRoom'])->name('template.room.delete');
+    Route::post('/template/background', [OfficeCatalogController::class, 'uploadTemplateBackground'])->name('template.background');
+    Route::post('/template/sync', [OfficeCatalogController::class, 'syncTemplateToOrganizations'])->name('template.sync');
 
     // Furniture & Assets Catalog Management
-    Route::get('/furniture', [SuperAdminController::class, 'furniture'])->name('furniture');
-    Route::post('/furniture/category', [SuperAdminController::class, 'storeFurnitureCategory'])->name('furniture.category.store');
-    Route::put('/furniture/category/{category}', [SuperAdminController::class, 'updateFurnitureCategory'])->name('furniture.category.update');
-    Route::delete('/furniture/category/{category}', [SuperAdminController::class, 'deleteFurnitureCategory'])->name('furniture.category.delete');
+    Route::get('/furniture', [OfficeCatalogController::class, 'furniture'])->name('furniture');
+    Route::post('/furniture/category', [OfficeCatalogController::class, 'storeFurnitureCategory'])->name('furniture.category.store');
+    Route::put('/furniture/category/{category}', [OfficeCatalogController::class, 'updateFurnitureCategory'])->name('furniture.category.update');
+    Route::delete('/furniture/category/{category}', [OfficeCatalogController::class, 'deleteFurnitureCategory'])->name('furniture.category.delete');
 
-    Route::post('/furniture/item', [SuperAdminController::class, 'storeFurnitureItem'])->name('furniture.item.store');
-    Route::put('/furniture/item/{item}', [SuperAdminController::class, 'updateFurnitureItem'])->name('furniture.item.update');
-    Route::delete('/furniture/item/{item}', [SuperAdminController::class, 'deleteFurnitureItem'])->name('furniture.item.delete');
+    Route::post('/furniture/item', [OfficeCatalogController::class, 'storeFurnitureItem'])->name('furniture.item.store');
+    Route::put('/furniture/item/{item}', [OfficeCatalogController::class, 'updateFurnitureItem'])->name('furniture.item.update');
+    Route::delete('/furniture/item/{item}', [OfficeCatalogController::class, 'deleteFurnitureItem'])->name('furniture.item.delete');
 
     // CMS & Website Management Routes
-    Route::get('/cms/pages', [SuperAdminController::class, 'cmsPages'])->name('cms.pages');
-    Route::get('/cms/pages/{page}', [SuperAdminController::class, 'editCmsPage'])->name('cms.pages.edit');
-    Route::put('/cms/pages/{page}', [SuperAdminController::class, 'updateCmsPage'])->name('cms.pages.update');
-    Route::put('/cms/sections/{section}', [SuperAdminController::class, 'updateCmsSection'])->name('cms.sections.update');
-    Route::post('/cms/sections/{section}/toggle', [SuperAdminController::class, 'toggleCmsSection'])->name('cms.sections.toggle');
+    Route::get('/cms/pages', [WebsiteContentController::class, 'cmsPages'])->name('cms.pages');
+    Route::get('/cms/pages/{page}', [WebsiteContentController::class, 'editCmsPage'])->name('cms.pages.edit');
+    Route::put('/cms/pages/{page}', [WebsiteContentController::class, 'updateCmsPage'])->name('cms.pages.update');
+    Route::put('/cms/sections/{section}', [WebsiteContentController::class, 'updateCmsSection'])->name('cms.sections.update');
+    Route::post('/cms/sections/{section}/toggle', [WebsiteContentController::class, 'toggleCmsSection'])->name('cms.sections.toggle');
 
-    Route::get('/cms/assets', [SuperAdminController::class, 'cmsAssets'])->name('cms.assets');
-    Route::post('/cms/assets/upload', [SuperAdminController::class, 'uploadCmsAsset'])->name('cms.assets.upload');
-    Route::delete('/cms/assets/{asset}', [SuperAdminController::class, 'deleteCmsAsset'])->name('cms.assets.delete');
+    Route::get('/cms/assets', [WebsiteContentController::class, 'cmsAssets'])->name('cms.assets');
+    Route::post('/cms/assets/upload', [WebsiteContentController::class, 'uploadCmsAsset'])->name('cms.assets.upload');
+    Route::delete('/cms/assets/{asset}', [WebsiteContentController::class, 'deleteCmsAsset'])->name('cms.assets.delete');
 
     Route::get('/features', [SuperAdminController::class, 'featureFlags'])->name('features');
     Route::post('/features/{flag}/toggle', [SuperAdminController::class, 'toggleFeature'])->name('features.toggle');
