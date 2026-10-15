@@ -3899,5 +3899,7 @@
     "Office default": "افتراضي المكتب",
     "Days before the attendance start date are not counted as absence. Annual leave applies to every member of the office unless their own balance is set.": "الأيام السابقة لتاريخ بداية احتساب الحضور لا تُحسب غيابًا. رصيد الإجازة السنوية يسري على كل أعضاء المكتب ما لم يُحدَّد رصيد خاص للعضو.",
     "office.mic_reconnect_failed": "لم يتصل الميكروفون في هذه الغرفة. أوقفه ثم شغّله مرة أخرى.",
-    "office.screen_shares": "الشاشات المشتركة"
+    "office.screen_shares": "الشاشات المشتركة",
+    "Created by": "أنشأها",
+    "Only managers can assign a task to someone else. Assign it to yourself or leave it unassigned.": "إسناد مهمة لشخص آخر متاح للمديرين فقط. أسندها لنفسك أو اتركها بدون إسناد."
 }

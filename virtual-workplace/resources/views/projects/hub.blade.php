@@ -3857,6 +3857,17 @@
             document.getElementById('task-modal-assignee').textContent = t.assignee ? t.assignee.name : '{{ __("Unassigned") }}';
             document.getElementById('task-modal-due').textContent = t.due_date ? new Date(t.due_date).toLocaleDateString() : '—';
             
+            // Who created the task, and when
+            const creatorChip = document.getElementById('task-modal-creator-chip');
+            if (creatorChip) {
+                document.getElementById('task-modal-creator').textContent = t.reporter ? t.reporter.name : '—';
+                const created = t.created_at ? new Date(t.created_at) : null;
+                document.getElementById('task-modal-created-at').textContent = created
+                    ? created.toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })
+                    : '';
+                creatorChip.style.display = t.reporter ? 'inline-flex' : 'none';
+            }
+
             // Milestone Chip
             const msChip = document.getElementById('task-modal-milestone-chip');
             const msText = document.getElementById('task-modal-milestone');

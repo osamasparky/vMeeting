@@ -216,6 +216,9 @@ class BuildProjectHubViewAction
             'workloadMatrix' => $workloadMatrix,
             // The bulk-assign menu reads $projectMembers; it was never passed, so it rendered empty.
             'projectMembers' => $allMembers,
+            // Assigning to someone else is for leads; others may only take a task themselves.
+            'canAssignOthers' => $user->isSuperAdmin() || $membership->role?->slug === 'company_admin'
+                || $membership->hasPermission('tasks.assign') || $project->manager_id === $user->id,
             'ganttTasks' => $ganttTasks,
             'ganttUnscheduled' => $ganttUnscheduled,
         ];

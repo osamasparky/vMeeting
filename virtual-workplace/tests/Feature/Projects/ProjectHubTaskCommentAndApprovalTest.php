@@ -111,6 +111,39 @@ class ProjectHubTaskCommentAndApprovalTest extends TestCase
         $this->assertNotNull($mentionNotification);
     }
 
+    public function test_a_full_name_mention_reaches_only_that_person(): void
+    {
+        $role = Role::where('slug', 'employee')->whereNull('organization_id')->first();
+        [$samy, $ali, $arabic] = collect(['mohammed samy', 'mohammed ali', 'بولا عادل'])->map(function ($name) use ($role) {
+            $u = User::factory()->create(['name' => $name]);
+            OrganizationMember::create(['organization_id' => $this->organization->id, 'user_id' => $u->id, 'role_id' => $role->id, 'status' => 'active']);
+
+            return $u;
+        })->all();
+
+        $this->actingAs($this->admin)->postJson("/tasks/{$this->task->id}/comments", [
+            'body' => '@mohammed samy and @بولا عادل, please review',
+        ])->assertOk();
+
+        $mentioned = fn (User $u) => WorkplaceNotification::where('user_id', $u->id)->where('type', 'task_mention')->exists();
+        $this->assertTrue($mentioned($samy));
+        $this->assertTrue($mentioned($arabic));
+        $this->assertFalse($mentioned($ali));
+    }
+
+    public function test_an_ambiguous_first_name_mentions_nobody(): void
+    {
+        $role = Role::where('slug', 'employee')->whereNull('organization_id')->first();
+        foreach (['mohammed samy', 'mohammed ali'] as $name) {
+            $u = User::factory()->create(['name' => $name]);
+            OrganizationMember::create(['organization_id' => $this->organization->id, 'user_id' => $u->id, 'role_id' => $role->id, 'status' => 'active']);
+        }
+
+        $this->actingAs($this->admin)->postJson("/tasks/{$this->task->id}/comments", ['body' => '@mohammed hi'])->assertOk();
+
+        $this->assertSame(0, WorkplaceNotification::where('type', 'task_mention')->count());
+    }
+
     public function test_project_admin_can_approve_a_task(): void
     {
         $response = $this->actingAs($this->admin)->postJson("/tasks/{$this->task->id}/approve");

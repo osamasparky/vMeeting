@@ -28,6 +28,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class TaskController extends Controller
 {
@@ -114,12 +115,35 @@ class TaskController extends Controller
         Organization $organization,
         CreateTaskAction $action
     ): JsonResponse {
-        $task = $action->execute($request->validated(), $organization, Auth::user());
+        $validated = $request->validated();
+
+        // Handing work to someone else is a team-lead action, as on update and
+        // PATCH /assign: others may only take a task themselves or leave it open.
+        $others = collect([$validated['assignee_id'] ?? null])->merge($validated['assignee_ids'] ?? [])
+            ->filter()->reject(fn ($id) => $id === Auth::id());
+        if ($others->isNotEmpty() && ! self::canAssignOthers($request, $validated['project_id'])) {
+            throw ValidationException::withMessages([
+                'assignee_id' => __('Only managers can assign a task to someone else. Assign it to yourself or leave it unassigned.'),
+            ]);
+        }
+
+        $task = $action->execute($validated, $organization, Auth::user());
 
         return response()->json([
             'message' => 'Task created successfully.',
             'task' => $task,
         ], 201);
+    }
+
+    /** Super admins, company admins, tasks.assign holders and the project's manager. */
+    public static function canAssignOthers(Request $request, ?string $projectId = null): bool
+    {
+        $membership = $request->get('current_membership');
+
+        return Auth::user()->isSuperAdmin()
+            || $membership?->role?->slug === 'company_admin'
+            || (bool) $membership?->hasPermission('tasks.assign')
+            || ($projectId && Project::whereKey($projectId)->value('manager_id') === Auth::id());
     }
 
     /**

@@ -109,6 +109,7 @@
                         <select name="assignee_id" style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                             <option value="">— {{ __('Unassigned') }} —</option>
                             @foreach($members as $m)
+                                @continue(! $canAssignOthers && $m->user_id !== $user->id)
                                 <option value="{{ $m->user_id }}">{{ $m->user->name }}</option>
                             @endforeach
                         </select>
@@ -539,6 +540,10 @@
                         <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-palm-600);">flag</span>
                         <span>{{ __('Milestone') }}: <strong id="task-modal-milestone">—</strong></span>
                     </span>
+                    <span id="task-modal-creator-chip" class="task-modal-chip" style="display: none;">
+                        <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-text-secondary);">person_add</span>
+                        <span>{{ __('Created by') }}: <strong id="task-modal-creator">—</strong> · <span id="task-modal-created-at" style="font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;"></span></span>
+                    </span>
                     <span id="task-modal-recurrence-chip" class="task-modal-chip" style="display: none;">
                         <span class="material-symbols-rounded" style="font-size: 16px; color: var(--ula-accent-default);">refresh</span>
                         <span>{{ __('Repeat') }}: <strong id="task-modal-recurrence">—</strong></span>
@@ -669,6 +674,7 @@
                             <span>{{ __('Post') }}</span>
                         </button>
                     </form>
+                    @include('partials.mention-picker', ['mentionMembers' => $members])
                 </div>
 
                 <!-- 5. Dependencies -->

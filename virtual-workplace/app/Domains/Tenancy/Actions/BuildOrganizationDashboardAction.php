@@ -217,6 +217,7 @@ class BuildOrganizationDashboardAction
             // Live figures: who is in the office now, and the owner's daily KPIs (real data only).
             ...$this->pulse($organization, $membership, $user, $rooms->count()),
             'projectMembersMap' => $projectMembersMap,
+            'canAssignOthers' => $user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign'),
         ];
     }
 
