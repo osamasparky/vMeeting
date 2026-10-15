@@ -62,7 +62,7 @@ class LeaveService
      */
     public function balance(string $userId, string $organizationId, int $year): array
     {
-        $entitled = (int) (OrganizationMember::where('organization_id', $organizationId)->where('user_id', $userId)->value('annual_leave_days') ?? 21);
+        $entitled = $this->entitlement($userId, $organizationId);
         [$from, $to] = ["{$year}-01-01", "{$year}-12-31"];
 
         $requests = LeaveRequest::withoutGlobalScopes()
@@ -80,6 +80,14 @@ class LeaveService
         }
 
         return ['year' => $year, 'entitled' => $entitled, 'used' => $used, 'pending' => $pending, 'remaining' => $entitled - $used - $pending];
+    }
+
+    /** Yearly leave days: the member's own figure when the owner set one, otherwise their office's. */
+    public function entitlement(string $userId, string $organizationId): int
+    {
+        $own = OrganizationMember::where('organization_id', $organizationId)->where('user_id', $userId)->value('annual_leave_days');
+
+        return (int) ($own ?? $this->officeFor($userId, $organizationId)?->annual_leave_days ?? Floor::DEFAULT_ANNUAL_LEAVE_DAYS);
     }
 
     public function request(Organization $organization, User $user, array $data): LeaveRequest

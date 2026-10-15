@@ -1283,7 +1283,7 @@
                     </div>
                     <div>
                         <label for="edit-member-leave-days" style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 4px;">{{ __('Annual Leave Days') }}</label>
-                        <input type="number" name="annual_leave_days" id="edit-member-leave-days" min="0" max="365" style="width: 100%; min-height: 44px; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
+                        <input type="number" name="annual_leave_days" id="edit-member-leave-days" min="0" max="365" placeholder="{{ __('Office default') }}" style="width: 100%; min-height: 44px; background: var(--ula-surface-raised); border: 1px solid var(--ula-border-subtle); border-radius: 8px; padding: 10px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; font-family: var(--ula-font-mono); direction: ltr; unicode-bidi: isolate;">
                     </div>
                 </div>
                 <div>

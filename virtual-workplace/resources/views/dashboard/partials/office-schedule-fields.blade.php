@@ -35,5 +35,16 @@
             <input type="number" name="late_grace_minutes" id="{{ $prefix }}-grace" required min="0" max="240" value="{{ $office?->late_grace_minutes ?? 15 }}" style="{{ $schedInput }}">
         </div>
     </div>
-    <p style="margin: 0; font-size: 11px; color: var(--ula-text-muted);">{{ __('Attendance reports compare each member against their home office’s working days and hours.') }}</p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px;">
+        <div>
+            <label for="{{ $prefix }}-att-start" style="{{ $schedLabel }}">{{ __('Attendance Starts On') }}</label>
+            <input type="date" name="attendance_starts_on" id="{{ $prefix }}-att-start" value="{{ $office?->attendance_starts_on?->format('Y-m-d') }}" style="{{ $schedInput }}">
+        </div>
+        <div>
+            <label for="{{ $prefix }}-leave-days" style="{{ $schedLabel }}">{{ __('Annual Leave Days') }} *</label>
+            <input type="number" name="annual_leave_days" id="{{ $prefix }}-leave-days" required min="0" max="365" value="{{ $office?->annual_leave_days ?? \App\Domains\Workspace\Models\Floor::DEFAULT_ANNUAL_LEAVE_DAYS }}" style="{{ $schedInput }}">
+        </div>
+    </div>
+    <p style="margin: 0; font-size: 11px; color: var(--ula-text-muted);">{{ __('Attendance reports compare each member against their home office’s working days and hours.') }} {{ __('Days before the attendance start date are not counted as absence. Annual leave applies to every member of the office unless their own balance is set.') }}</p>
 </fieldset>

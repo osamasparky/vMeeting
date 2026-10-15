@@ -337,7 +337,8 @@
                         document.getElementById('edit-member-hire-date').value = data.member.hire_date || '';
                         document.getElementById('edit-member-employment-type').value = data.member.employment_type || '';
                         document.getElementById('edit-member-manager').value = data.member.manager_user_id || '';
-                        document.getElementById('edit-member-leave-days').value = data.member.annual_leave_days ?? 21;
+                        // Empty = the office's figure; only a number typed here overrides it.
+                        document.getElementById('edit-member-leave-days').value = data.member.annual_leave_days ?? '';
                         const self = document.querySelector(`#edit-member-manager option[value="${data.member.user_id}"]`);
                         if (self) self.hidden = true;
                         if (data.member.allowed_office_ids && Array.isArray(data.member.allowed_office_ids)) {
@@ -388,6 +389,8 @@
             document.getElementById('edit-office-start').value = sched.start || '09:00';
             document.getElementById('edit-office-end').value = sched.end || '17:00';
             document.getElementById('edit-office-grace').value = sched.grace ?? 15;
+            document.getElementById('edit-office-att-start').value = sched.attendance_from || '';
+            document.getElementById('edit-office-leave-days').value = sched.leave_days ?? 21;
             document.getElementById('edit-office-modal').style.display = 'flex';
         }
         function closeEditOfficeModal() {

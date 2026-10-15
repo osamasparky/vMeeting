@@ -21,6 +21,8 @@ use Illuminate\Support\Carbon;
  *  - absent    a past working day with no attendance at all
  *  - today     today, nothing recorded yet
  *  - upcoming  later this month
+ *  - untracked before the member's attendance started (see trackingStart),
+ *              so it is neither a working day nor an absence
  *
  * Worked time is attendance: office presence or task time, overlaps counted
  * once. Expected time is the office's scheduled day on every working day that
@@ -48,6 +50,7 @@ class MonthlyAttendanceReport
         $first = Carbon::parse($month.'-01', $tz)->startOfMonth();
         [$from, $to] = [$first->format('Y-m-d'), $first->copy()->endOfMonth()->format('Y-m-d')];
         $today = now()->setTimezone($tz)->format('Y-m-d');
+        $trackFrom = $this->trackingStart($userId, $organizationId, $office, $tz);
 
         $holidays = $this->holidays->between($organizationId, $office?->id, $from, $to);
         $leaveDays = $this->approvedLeaveDays($userId, $organizationId, $from, $to);
@@ -70,6 +73,14 @@ class MonthlyAttendanceReport
 
             if ($w['first_in']) {
                 $row['first_in'] = Carbon::createFromTimestamp($w['first_in'])->setTimezone($tz)->format('H:i');
+            }
+
+            if ($trackFrom !== null && $date < $trackFrom) {
+                // Shown for reference, never counted: time logged then was trial use.
+                $row['status'] = $isWorkDay ? 'untracked' : 'weekend';
+                $days[] = $row;
+
+                continue;
             }
 
             if (! $isWorkDay) {
@@ -124,6 +135,7 @@ class MonthlyAttendanceReport
             'month' => $first->format('Y-m'),
             'timezone' => $tz,
             'office' => $office ? ['id' => $office->id, 'name' => $office->name, 'start' => $office->work_start, 'end' => $office->work_end, 'grace' => $grace] : null,
+            'tracking_from' => $trackFrom,
             'summary' => $sum,
             'days' => $days,
         ];
@@ -145,6 +157,28 @@ class MonthlyAttendanceReport
             ->map(fn ($m) => ['user_id' => $m->user_id, 'name' => $m->user?->name ?? '—', 'summary' => $this->forMember($m->user_id, $organizationId, $month)['summary']])
             ->values()
             ->all();
+    }
+
+    /**
+     * First day (Y-m-d, office time) the member's attendance counts: the latest
+     * of the office's go-live date, the member's hire date and the day they
+     * joined the workspace. Days before it were never expected in the system,
+     * so they are not absences.
+     */
+    private function trackingStart(string $userId, string $organizationId, ?Floor $office, string $tz): ?string
+    {
+        $member = OrganizationMember::withoutGlobalScopes()
+            ->where('organization_id', $organizationId)->where('user_id', $userId)
+            ->first(['hire_date', 'joined_at', 'created_at']);
+
+        $joined = $member?->joined_at ?? $member?->created_at;
+        $candidates = array_filter([
+            $office?->attendance_starts_on?->format('Y-m-d'),
+            $member?->hire_date?->format('Y-m-d'),
+            $joined ? Carbon::parse($joined)->setTimezone($tz)->format('Y-m-d') : null,
+        ]);
+
+        return $candidates ? max($candidates) : null;
     }
 
     /** @return array<string, string> Y-m-d => leave type label, approved leave only. */

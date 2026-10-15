@@ -31,6 +31,8 @@ class Floor extends Model
         'work_start',
         'work_end',
         'late_grace_minutes',
+        'attendance_starts_on',
+        'annual_leave_days',
         'description',
         'is_default',
         'order',
@@ -41,10 +43,14 @@ class Floor extends Model
         'is_default' => 'boolean',
         'work_days' => 'array',
         'late_grace_minutes' => 'integer',
+        'attendance_starts_on' => 'date:Y-m-d',
+        'annual_leave_days' => 'integer',
     ];
 
     /** Sunday–Thursday, the working week in Egypt and Saudi Arabia. Carbon numbering: 0 = Sunday. */
     public const DEFAULT_WORK_DAYS = [0, 1, 2, 3, 4];
+
+    public const DEFAULT_ANNUAL_LEAVE_DAYS = 21;
 
     /**
      * Every office has a timezone: working hours are counted in its local

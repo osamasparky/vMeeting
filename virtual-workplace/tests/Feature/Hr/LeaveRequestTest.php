@@ -73,6 +73,21 @@ class LeaveRequestTest extends TestCase
         $this->assertSame(1, LeaveRequest::count());
     }
 
+    public function test_the_office_sets_the_balance_and_a_member_figure_overrides_it(): void
+    {
+        $leaves = app(LeaveService::class);
+        $this->assertSame(21, $leaves->balance($this->employee->id, $this->organization->id, 2026)['entitled']);
+
+        $this->actingAs($this->owner)->put(route('offices.update', $this->office), [
+            'name' => 'Riyadh HQ', 'timezone' => 'Asia/Riyadh', 'annual_leave_days' => 30, 'attendance_starts_on' => '2026-10-15',
+        ])->assertSessionHasNoErrors();
+        $this->assertSame(30, $leaves->balance($this->employee->id, $this->organization->id, 2026)['entitled']);
+        $this->assertSame('2026-10-15', $this->office->fresh()->attendance_starts_on->format('Y-m-d'));
+
+        $this->memberOf($this->employee)->update(['annual_leave_days' => 10]);
+        $this->assertSame(10, $leaves->balance($this->employee->id, $this->organization->id, 2026)['entitled']);
+    }
+
     public function test_annual_leave_cannot_exceed_the_balance_but_other_types_can(): void
     {
         $this->memberOf($this->employee)->update(['annual_leave_days' => 3]);

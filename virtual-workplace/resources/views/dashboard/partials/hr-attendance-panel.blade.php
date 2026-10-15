@@ -38,14 +38,14 @@
                 <td class="px-5 py-3">
                     <button type="button" onclick="reloadAttendanceReport('{{ $row['user_id'] }}')" style="background: none; border: 0; padding: 0; min-height: 44px; color: var(--ula-text-link); font-weight: 700; cursor: pointer; text-align: start;">{{ $row['name'] }}</button>
                 </td>
-                <td class="px-5 py-3" style="{{ $num }}">{{ $s['present'] }} / {{ $s['working_days'] }}</td>
-                <td class="px-5 py-3" style="{{ $num }}">{{ $s['absent'] }}</td>
-                <td class="px-5 py-3" style="{{ $num }}">{{ $s['late'] }}@if($s['late_minutes']) <span style="color: var(--ula-text-muted);">({{ $s['late_minutes'] }}m)</span>@endif</td>
-                <td class="px-5 py-3" style="{{ $num }}">{{ $s['leave'] }}</td>
-                <td class="px-5 py-3" style="{{ $num }}">{{ $hm($s['worked_seconds']) }}</td>
-                <td class="px-5 py-3" style="{{ $num }}">{{ $hm($s['expected_seconds']) }}</td>
-                <td class="px-5 py-3" style="{{ $num }}">{{ $hm($s['overtime_seconds']) }}</td>
-                <td class="px-5 py-3" style="{{ $num }}">{{ $hm($s['shortfall_seconds']) }}</td>
+                <td class="px-5 py-3"><span style="{{ $num }}">{{ $s['present'] }} / {{ $s['working_days'] }}</span></td>
+                <td class="px-5 py-3"><span style="{{ $num }}">{{ $s['absent'] }}</span></td>
+                <td class="px-5 py-3"><span style="{{ $num }}">{{ $s['late'] }}@if($s['late_minutes']) <span style="color: var(--ula-text-muted);">({{ $s['late_minutes'] }}m)</span>@endif</span></td>
+                <td class="px-5 py-3"><span style="{{ $num }}">{{ $s['leave'] }}</span></td>
+                <td class="px-5 py-3"><span style="{{ $num }}">{{ $hm($s['worked_seconds']) }}</span></td>
+                <td class="px-5 py-3"><span style="{{ $num }}">{{ $hm($s['expected_seconds']) }}</span></td>
+                <td class="px-5 py-3"><span style="{{ $num }}">{{ $hm($s['overtime_seconds']) }}</span></td>
+                <td class="px-5 py-3"><span style="{{ $num }}">{{ $hm($s['shortfall_seconds']) }}</span></td>
             </tr>
         @endforeach
     </x-table>
@@ -59,6 +59,9 @@
             · <span>{{ __('Late after :minutes minutes', ['minutes' => $off['grace']]) }}</span>
         @endif
         · <span style="{{ $num }}">{{ $report['timezone'] }}</span>
+        @if($report['tracking_from'] && $report['tracking_from'] > $report['month'].'-01')
+            · <span>{{ __('Attendance counted from') }} <span style="{{ $num }}">{{ $report['tracking_from'] }}</span></span>
+        @endif
     </p>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--ula-space-4); margin-bottom: var(--ula-space-6);">
@@ -72,14 +75,14 @@
 
     <x-table :headers="[__('Date'), __('Status'), __('First arrival'), __('hr.day.late'), __('Hours worked'), __('Expected'), __('Overtime'), __('Note')]">
         @foreach($report['days'] as $d)
-            <tr @if(in_array($d['status'], ['weekend', 'upcoming'], true)) style="color: var(--ula-text-muted);" @endif>
+            <tr @if(in_array($d['status'], ['weekend', 'upcoming', 'untracked'], true)) style="color: var(--ula-text-muted);" @endif>
                 <td class="px-5 py-3"><span style="{{ $num }}">{{ $d['date'] }}</span> <span style="font-size: var(--ula-size-xs);">{{ $dayNames[$d['weekday']] }}</span></td>
                 <td class="px-5 py-3"><x-badge :variant="$statusVariant($d['status'])" size="sm">{{ \App\Http\Controllers\Web\HrController::dayStatusLabel($d['status']) }}</x-badge></td>
-                <td class="px-5 py-3" style="{{ $num }}">{{ $d['first_in'] ?? '—' }}</td>
-                <td class="px-5 py-3" style="{{ $num }}">@if($d['late_minutes']){{ $d['late_minutes'] }}m @else — @endif</td>
-                <td class="px-5 py-3" style="{{ $num }}">{{ $d['worked_seconds'] ? $hm($d['worked_seconds']) : '—' }}</td>
-                <td class="px-5 py-3" style="{{ $num }}">{{ $d['expected_seconds'] ? $hm($d['expected_seconds']) : '—' }}</td>
-                <td class="px-5 py-3" style="{{ $num }}">{{ $d['overtime_seconds'] ? $hm($d['overtime_seconds']) : '—' }}</td>
+                <td class="px-5 py-3"><span style="{{ $num }}">{{ $d['first_in'] ?? '—' }}</span></td>
+                <td class="px-5 py-3"><span style="{{ $num }}">@if($d['late_minutes']){{ $d['late_minutes'] }}m @else — @endif</span></td>
+                <td class="px-5 py-3"><span style="{{ $num }}">{{ $d['worked_seconds'] ? $hm($d['worked_seconds']) : '—' }}</span></td>
+                <td class="px-5 py-3"><span style="{{ $num }}">{{ $d['expected_seconds'] ? $hm($d['expected_seconds']) : '—' }}</span></td>
+                <td class="px-5 py-3"><span style="{{ $num }}">{{ $d['overtime_seconds'] ? $hm($d['overtime_seconds']) : '—' }}</span></td>
                 <td class="px-5 py-3" style="font-size: var(--ula-size-xs);">{{ $d['note'] }}</td>
             </tr>
         @endforeach

@@ -273,8 +273,10 @@ class OfficeController extends Controller
     }
 
     /**
-     * Office working hours. Optional, so clients that predate them keep
-     * working; a new office without them gets Sun–Thu 09:00–17:00, 15 min grace.
+     * Office working hours, attendance start and leave entitlement. Optional,
+     * so clients that predate them keep working; a new office without them gets
+     * Sun–Thu 09:00–17:00, 15 min grace, 21 leave days, counted from each
+     * member's join date.
      */
     private static function scheduleRules(): array
     {
@@ -284,6 +286,8 @@ class OfficeController extends Controller
             'work_start' => ['sometimes', 'required', 'date_format:H:i'],
             'work_end' => ['sometimes', 'required', 'date_format:H:i', 'different:work_start'],
             'late_grace_minutes' => ['sometimes', 'required', 'integer', 'between:0,240'],
+            'attendance_starts_on' => ['sometimes', 'nullable', 'date_format:Y-m-d'],
+            'annual_leave_days' => ['sometimes', 'required', 'integer', 'between:0,365'],
         ];
     }
 
@@ -296,6 +300,10 @@ class OfficeController extends Controller
             'work_start' => $validated['work_start'] ?? $floor?->work_start ?? '09:00',
             'work_end' => $validated['work_end'] ?? $floor?->work_end ?? '17:00',
             'late_grace_minutes' => (int) ($validated['late_grace_minutes'] ?? $floor?->late_grace_minutes ?? 15),
+            'attendance_starts_on' => array_key_exists('attendance_starts_on', $validated)
+                ? ($validated['attendance_starts_on'] ?: null)
+                : $floor?->attendance_starts_on?->format('Y-m-d'),
+            'annual_leave_days' => (int) ($validated['annual_leave_days'] ?? $floor?->annual_leave_days ?? Floor::DEFAULT_ANNUAL_LEAVE_DAYS),
         ];
     }
 

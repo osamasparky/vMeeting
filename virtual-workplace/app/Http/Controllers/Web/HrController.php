@@ -177,6 +177,7 @@ class HrController extends Controller
             'holiday' => __('hr.day.holiday'),
             'weekend' => __('hr.day.weekend'),
             'today' => __('hr.day.today'),
+            'untracked' => __('hr.day.untracked'),
             default => __('hr.day.upcoming'),
         };
     }

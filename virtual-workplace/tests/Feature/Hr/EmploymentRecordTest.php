@@ -81,6 +81,6 @@ class EmploymentRecordTest extends TestCase
 
         $this->actingAs($this->employee)->put(route('organization.members.update', $member), $this->payload(['annual_leave_days' => 365]))
             ->assertForbidden();
-        $this->assertSame(21, $member->fresh()->annual_leave_days);
+        $this->assertNull($member->fresh()->annual_leave_days, 'still on the office default');
     }
 }

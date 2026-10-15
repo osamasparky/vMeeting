@@ -24,7 +24,9 @@ class MonthlyAttendanceReportTest extends TestCase
         parent::setUp();
         $this->travelTo(Carbon::parse('2026-10-14 09:00:00', 'UTC'));
         $this->buildHrWorkspace();
-        $this->memberOf($this->employee)->update(['home_floor_id' => $this->office->id]);
+        // Joined in September, so all of October counts.
+        $this->memberOf($this->employee)->update(['home_floor_id' => $this->office->id, 'joined_at' => Carbon::parse('2026-09-01', 'UTC')]);
+        $this->memberOf($this->owner)->update(['joined_at' => Carbon::parse('2026-09-01', 'UTC')]);
     }
 
     /** A session in Riyadh local time. */
@@ -131,5 +133,51 @@ class MonthlyAttendanceReportTest extends TestCase
     {
         $this->actingAs($this->employee)->get(route('hr.panel', ['panel' => 'attendance', 'month' => '2026-13']))
             ->assertOk()->assertSee('value="2026-10"', false);
+    }
+
+    public function test_days_before_the_office_went_live_are_not_absences(): void
+    {
+        $this->office->update(['attendance_starts_on' => '2026-10-13']);
+        $this->present('2026-10-04', '09:00', '10:00'); // trial use before go-live: shown, not counted
+        $this->present('2026-10-13', '09:00', '17:00');
+
+        $report = app(MonthlyAttendanceReport::class)->forMember($this->employee->id, $this->organization->id, '2026-10');
+        $byDate = collect($report['days'])->keyBy('date');
+        $s = $report['summary'];
+
+        $this->assertSame('2026-10-13', $report['tracking_from']);
+        $this->assertSame('untracked', $byDate['2026-10-01']['status']);
+        $this->assertSame(['untracked', 3600], [$byDate['2026-10-04']['status'], $byDate['2026-10-04']['worked_seconds']]);
+        $this->assertSame('weekend', $byDate['2026-10-09']['status']);
+        $this->assertSame('untracked', $byDate['2026-10-12']['status']);
+        $this->assertSame('present', $byDate['2026-10-13']['status']);
+        // Working days counted: 13, 14 (today) and 15–29 upcoming; only the 13th is past.
+        $this->assertSame(0, $s['absent']);
+        $this->assertSame(1, $s['present']);
+        $this->assertSame(2, $s['elapsed_days']);
+        $this->assertSame(8 * 3600, $s['worked_seconds']);
+        $this->assertSame(0, $s['overtime_seconds']);
+    }
+
+    public function test_a_member_who_joined_mid_month_is_counted_from_their_join_day(): void
+    {
+        $this->memberOf($this->employee)->update(['joined_at' => Carbon::parse('2026-10-12 06:00', 'UTC')]);
+
+        $report = app(MonthlyAttendanceReport::class)->forMember($this->employee->id, $this->organization->id, '2026-10');
+        $byDate = collect($report['days'])->keyBy('date');
+
+        $this->assertSame('untracked', $byDate['2026-10-11']['status']);
+        $this->assertSame('absent', $byDate['2026-10-12']['status']);
+        $this->assertSame(2, $report['summary']['absent'], '12th and 13th');
+    }
+
+    public function test_a_later_hire_date_wins_over_the_join_date(): void
+    {
+        $this->memberOf($this->employee)->update(['hire_date' => '2026-10-13']);
+
+        $report = app(MonthlyAttendanceReport::class)->forMember($this->employee->id, $this->organization->id, '2026-10');
+
+        $this->assertSame('2026-10-13', $report['tracking_from']);
+        $this->assertSame(1, $report['summary']['absent']);
     }
 }

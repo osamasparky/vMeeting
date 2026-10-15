@@ -99,7 +99,7 @@
                 <x-btn variant="primary" size="sm" href="{{ route('office', ['office' => $off->id]) }}" icon="login" style="flex: 1; justify-content: center;">
                     {{ __('Enter Office') }}
                 </x-btn>
-                <x-btn variant="secondary" size="sm" :iconOnly="true" icon="edit" onclick="openEditOfficeModal('{{ $off->id }}', '{{ addslashes($off->name) }}', '{{ addslashes($off->city_location ?? '') }}', '{{ addslashes($off->description ?? '') }}', {{ $off->is_default ? 'true' : 'false' }}, '{{ $off->timezone ?? 'UTC' }}', {{ json_encode(['days' => $off->workDays(), 'start' => $off->work_start ?? '09:00', 'end' => $off->work_end ?? '17:00', 'grace' => $off->late_grace_minutes ?? 15]) }})" title="{{ __('Edit Branch Details') }}" />
+                <x-btn variant="secondary" size="sm" :iconOnly="true" icon="edit" onclick="openEditOfficeModal('{{ $off->id }}', '{{ addslashes($off->name) }}', '{{ addslashes($off->city_location ?? '') }}', '{{ addslashes($off->description ?? '') }}', {{ $off->is_default ? 'true' : 'false' }}, '{{ $off->timezone ?? 'UTC' }}', {{ json_encode(['days' => $off->workDays(), 'start' => $off->work_start ?? '09:00', 'end' => $off->work_end ?? '17:00', 'grace' => $off->late_grace_minutes ?? 15, 'attendance_from' => $off->attendance_starts_on?->format('Y-m-d'), 'leave_days' => $off->annual_leave_days ?? 21]) }})" title="{{ __('Edit Branch Details') }}" />
                 @if($offices->count() > 1)
                 <form method="POST" action="{{ route('offices.delete', $off->id) }}" onsubmit="return confirm('{{ __('Are you sure you want to permanently delete this office branch and its blueprint?') }}');" style="margin: 0;">
                     @csrf
