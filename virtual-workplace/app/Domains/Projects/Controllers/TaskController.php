@@ -116,6 +116,7 @@ class TaskController extends Controller
         CreateTaskAction $action
     ): JsonResponse {
         $validated = $request->validated();
+        abort_unless(Project::findOrFail($validated['project_id'])->isVisibleTo(Auth::user(), $request->get('current_membership')), 404);
 
         // Handing work to someone else is a team-lead action, as on update and
         // PATCH /assign: others may only take a task themselves or leave it open.

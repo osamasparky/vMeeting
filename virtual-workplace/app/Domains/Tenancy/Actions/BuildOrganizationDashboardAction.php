@@ -2,6 +2,8 @@
 
 namespace App\Domains\Tenancy\Actions;
 
+use App\Domains\Projects\Models\Project;
+use App\Domains\Projects\Models\TimeEntry;
 use App\Domains\Administration\Models\AuditLog;
 use App\Domains\Administration\Models\Role;
 use App\Domains\Guests\Models\GuestInvitation;
@@ -118,7 +120,7 @@ class BuildOrganizationDashboardAction
         ];
 
         // Project Management entities
-        $projects = $organization->projects()->with(['owner', 'manager', 'department'])->withCount('tasks')->latest()->get();
+        $projects = $organization->projects()->visibleTo($user, $membership)->with(['owner', 'manager', 'department'])->withCount('tasks')->latest()->get();
         $tasks = $organization->tasks()->with(['project', 'assignee', 'assignees:id,name', 'labels', 'reporter', 'phase', 'milestone'])->orderBy('order')->latest()->get();
         $myTasks = $tasks->filter(fn ($t) => $t->assignee_id === $user->id || $t->assignees->contains('id', $user->id))->values();
         $activeTimer = ActiveTimer::where('user_id', $user->id)->with(['project', 'task'])->first();
@@ -217,6 +219,8 @@ class BuildOrganizationDashboardAction
             // Live figures: who is in the office now, and the owner's daily KPIs (real data only).
             ...$this->pulse($organization, $membership, $user, $rooms->count()),
             'projectMembersMap' => $projectMembersMap,
+            'canLogManualTime' => TimeEntry::canLogManually($user, $membership),
+            'canSeeFinancials' => Project::seesFinancials($user, $membership),
             'canAssignOthers' => $user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || $membership->hasPermission('tasks.assign'),
         ];
     }

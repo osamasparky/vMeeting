@@ -147,7 +147,7 @@ class ProjectManagementRegressionTest extends TestCase
 
     public function test_manual_time_entry_is_accepted_and_measured(): void
     {
-        Sanctum::actingAs($this->employee);
+        Sanctum::actingAs($this->owner); // manual entries are the owner's
         $this->postJson($this->api('/time/entries/manual'), [
             'project_id' => $this->project->id,
             'started_at' => '2026-10-09 09:00:00',

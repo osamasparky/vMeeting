@@ -197,8 +197,12 @@ class User extends Authenticatable
             return true;
         }
 
-        return $this->memberships()->whereHas('role', function ($q) {
+        // Asked many times per page (every permission helper); look it up once per instance.
+        return $this->superAdminRole ??= $this->memberships()->whereHas('role', function ($q) {
             $q->where('slug', 'super_admin');
         })->exists();
     }
+
+    /** Memo for isSuperAdmin()'s role lookup; not a column. */
+    private ?bool $superAdminRole = null;
 }

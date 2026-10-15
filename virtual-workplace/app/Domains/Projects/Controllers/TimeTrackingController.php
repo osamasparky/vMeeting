@@ -117,8 +117,17 @@ class TimeTrackingController extends Controller
         Organization $organization,
         LogManualTimeAction $action
     ): JsonResponse {
+        abort_unless(
+            TimeEntry::canLogManually(Auth::user(), $request->get('current_membership')),
+            403,
+            __('Only the company owner can add time by hand. Use the timer to track your work.')
+        );
+
+        $validated = $request->validated();
+        $for = ! empty($validated['user_id']) ? User::findOrFail($validated['user_id']) : Auth::user();
+
         try {
-            $entry = $action->execute($request->validated(), $organization, Auth::user());
+            $entry = $action->execute($validated, $organization, $for);
         } catch (InvalidArgumentException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
@@ -208,6 +217,12 @@ class TimeTrackingController extends Controller
                 return response()->json(['message' => 'End time must be strictly after start time.'], 422);
             }
             $timeEntry->duration_seconds = (int) $timeEntry->started_at->diffInSeconds($timeEntry->ended_at);
+        }
+
+        // Stretching an entry is adding time by hand: the owner's call, like logManual.
+        if ($timeEntry->isDirty(['started_at', 'ended_at', 'duration_seconds'])
+            && ! TimeEntry::canLogManually(Auth::user(), $request->get('current_membership'))) {
+            abort(403, __('Only the company owner can change logged hours.'));
         }
 
         $timeEntry->save();

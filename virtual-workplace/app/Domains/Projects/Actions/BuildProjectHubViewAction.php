@@ -6,6 +6,7 @@ use App\Domains\Identity\Models\User;
 use App\Domains\Meetings\Models\Meeting;
 use App\Domains\Projects\Models\ActiveTimer;
 use App\Domains\Projects\Models\Project;
+use App\Domains\Projects\Models\TimeEntry;
 use App\Domains\Projects\Models\ProjectState;
 use App\Domains\Tenancy\Models\OrganizationMember;
 
@@ -191,7 +192,7 @@ class BuildProjectHubViewAction
             'total_projects' => $organization->projects()->count(),
             'total_tasks' => $organization->tasks()->count(),
         ];
-        $allProjects = $organization->projects()->select('id', 'name', 'code', 'status')->latest()->get();
+        $allProjects = $organization->projects()->visibleTo($user, $membership)->select('id', 'name', 'code', 'status')->latest()->get();
         $departments = $organization->departments()->withCount('teams')->get();
         $teams = $organization->teams()->with('department')->get();
         $myTasks = $organization->tasks()->assignedTo($user->id)->get();
@@ -217,6 +218,8 @@ class BuildProjectHubViewAction
             // The bulk-assign menu reads $projectMembers; it was never passed, so it rendered empty.
             'projectMembers' => $allMembers,
             // Assigning to someone else is for leads; others may only take a task themselves.
+            'canLogManualTime' => TimeEntry::canLogManually($user, $membership),
+            'canSeeFinancials' => Project::seesFinancials($user, $membership),
             'canAssignOthers' => $user->isSuperAdmin() || $membership->role?->slug === 'company_admin'
                 || $membership->hasPermission('tasks.assign') || $project->manager_id === $user->id,
             'ganttTasks' => $ganttTasks,

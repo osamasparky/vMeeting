@@ -142,7 +142,8 @@ class TimeTrackingAndTimesheetApiTest extends TestCase
 
     public function test_manual_time_logging_and_validation(): void
     {
-        Sanctum::actingAs($this->employeeA);
+        // Typing hours in by hand is the owner's (an employee gets 403, see ProjectVisibilityAndManualTimeTest).
+        Sanctum::actingAs($this->adminA);
 
         // Invalid: end before start
         $invalidRes = $this->postJson("/api/v1/organizations/{$this->orgA->id}/time/entries/manual", [

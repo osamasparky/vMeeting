@@ -23,12 +23,16 @@ use Illuminate\Validation\Rule;
 
 class ProjectController extends Controller
 {
+    /** Project columns only seesFinancials() may read. */
+    private const FINANCIAL_FIELDS = ['budget_amount'];
+
     /**
      * List projects for an organization.
      */
     public function index(Request $request, Organization $organization): JsonResponse
     {
         $query = Project::forOrganization($organization->id)
+            ->visibleTo(Auth::user(), $request->get('current_membership'))
             ->with(['owner:id,name,email', 'manager:id,name,email', 'department:id,name'])
             ->withCount(['tasks', 'members']);
 
@@ -53,6 +57,9 @@ class ProjectController extends Controller
         }
 
         $projects = $query->orderByDesc('created_at')->paginate($request->integer('per_page', 20));
+        if (! Project::seesFinancials(Auth::user(), $request->get('current_membership'))) {
+            $projects->getCollection()->each->makeHidden(self::FINANCIAL_FIELDS);
+        }
 
         return response()->json($projects);
     }
@@ -79,7 +86,7 @@ class ProjectController extends Controller
     /**
      * Show a project with detailed structure, tasks, and KPI statistics.
      */
-    public function show(Organization $organization, Project $project): JsonResponse
+    public function show(Request $request, Organization $organization, Project $project): JsonResponse
     {
         if ($project->organization_id !== $organization->id) {
             return response()->json(['message' => 'Project not found.'], 404);
@@ -150,6 +157,13 @@ class ProjectController extends Controller
             'gross_margin_pct' => $grossMarginPct,
             'team_members_count' => $project->members->count(),
         ];
+
+        // Budget, cost and rates are the owner's; the rest of the team sees the work.
+        if (! Project::seesFinancials(Auth::user(), $request->get('current_membership'))) {
+            $project->makeHidden(self::FINANCIAL_FIELDS);
+            $project->members->each->makeHidden(['cost_rate', 'billing_rate']);
+            $kpiData = array_merge($kpiData, array_fill_keys(['budget_amount', 'labor_cost', 'budget_variance', 'billable_revenue', 'gross_margin', 'gross_margin_pct'], null));
+        }
 
         return response()->json([
             'project' => $project,

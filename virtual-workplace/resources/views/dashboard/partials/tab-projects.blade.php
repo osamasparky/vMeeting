@@ -16,9 +16,12 @@
     <!-- Project KPI Metrics -->
     <div class="ula-kpi-row">
         <x-kpi-card density="default" icon="folder" iconColor="sage" :title="__('Total Projects')" :value="$projects->count()" :caption="$projects->where('status', 'active')->count() . ' ' . __('Active initiatives')" />
-        <x-kpi-card density="default" icon="task_alt" iconColor="gold" :title="__('Total Tasks')" :value="$tasks->count()" :caption="$tasks->where('status', '!=', 'done')->count() . ' ' . __('In progress / Backlog')" />
+        @php $projectTasks = $tasks->whereIn('project_id', $projects->pluck('id')); @endphp
+        <x-kpi-card density="default" icon="task_alt" iconColor="gold" :title="__('Total Tasks')" :value="$projectTasks->count()" :caption="$projectTasks->where('status', '!=', 'done')->count() . ' ' . __('In progress / Backlog')" />
         <x-kpi-card density="default" icon="timer" iconColor="muted" :title="__('Logged Hours')" :value="round($projects->sum(fn ($p) => $p->actualHours()), 1) . 'h'" :caption="__('Tracked across all tasks')" />
-        <x-kpi-card density="default" icon="payments" iconColor="sage" :title="__('Total Budget')" :value="'$' . number_format($projects->sum('budget_amount'), 0)" :caption="__('Allocated capital')" />
+        @if($canSeeFinancials)
+            <x-kpi-card density="default" icon="payments" iconColor="sage" :title="__('Total Budget')" :value="'$' . number_format($projects->sum('budget_amount'), 0)" :caption="__('Allocated capital')" />
+        @endif
     </div>
 
     <!-- Projects Table -->
@@ -41,7 +44,7 @@
                         <th>{{ __('Priority') }}</th>
                         <th>{{ __('Progress') }}</th>
                         <th>{{ __('Due Date') }}</th>
-                        <th>{{ __('Budget') }}</th>
+                        @if($canSeeFinancials)<th>{{ __('Budget') }}</th>@endif
                         <th>{{ __('Actions') }}</th>
                     </tr>
                 </thead>
@@ -101,7 +104,7 @@
                                 </div>
                             </td>
                             <td style="font-size: 12px; font-weight: 500; font-family: 'IBM Plex Mono', monospace;">{{ $p->due_date ? $p->due_date->format('M d, Y') : '—' }}</td>
-                            <td style="font-weight: 700; color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">${{ number_format($p->budget_amount ?? 0, 0) }}</td>
+                            @if($canSeeFinancials)<td style="font-weight: 700; color: var(--ula-text-primary); font-family: 'IBM Plex Mono', monospace;">${{ number_format($p->budget_amount ?? 0, 0) }}</td>@endif
                             <td>
                                 @if($canOpenHub)
                                     <x-btn variant="primary" size="sm" href="{{ route('projects.hub', $p->id) }}" onclick="event.stopPropagation();" icon="analytics">

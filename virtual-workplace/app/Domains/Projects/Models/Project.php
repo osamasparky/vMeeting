@@ -4,9 +4,11 @@ namespace App\Domains\Projects\Models;
 
 use App\Domains\Identity\Models\User;
 use App\Domains\People\Models\Department;
+use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Traits\Auditable;
 use App\Traits\BelongsToOrganization;
 use App\Traits\HasUuid;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -53,6 +55,49 @@ class Project extends Model
         'planned_hours' => 'decimal:2',
         'metadata' => 'array',
     ];
+
+    // ── Who sees what ──
+
+    /** Owners, super admins and project leads (projects.manage) see every project. */
+    public static function seesAllProjects(User $user, ?OrganizationMember $membership): bool
+    {
+        return $user->isSuperAdmin()
+            || $membership?->role?->slug === 'company_admin'
+            || (bool) $membership?->hasPermission('projects.manage');
+    }
+
+    /** Budgets, costs and rates: the owner and holders of reports.financials. */
+    public static function seesFinancials(User $user, ?OrganizationMember $membership): bool
+    {
+        return $user->isSuperAdmin()
+            || $membership?->role?->slug === 'company_admin'
+            || (bool) $membership?->hasPermission('reports.financials');
+    }
+
+    /**
+     * Projects a member works on: ones they own or manage, were added to, or
+     * have a task in. Leads see them all.
+     */
+    public function scopeVisibleTo(Builder $query, User $user, ?OrganizationMember $membership): Builder
+    {
+        if (self::seesAllProjects($user, $membership)) {
+            return $query;
+        }
+
+        $id = $user->id;
+
+        return $query->where(fn (Builder $q) => $q
+            ->where($q->qualifyColumn('owner_id'), $id)
+            ->orWhere($q->qualifyColumn('manager_id'), $id)
+            ->orWhereHas('members', fn ($m) => $m->where('user_id', $id))
+            ->orWhereHas('tasks', fn ($t) => $t->assignedTo($id)));
+    }
+
+    public function isVisibleTo(User $user, ?OrganizationMember $membership): bool
+    {
+        return self::seesAllProjects($user, $membership)
+            || self::whereKey($this->getKey())->visibleTo($user, $membership)->exists();
+    }
 
     // ── Relationships ──
 

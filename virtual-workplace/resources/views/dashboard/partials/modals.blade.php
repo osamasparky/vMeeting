@@ -275,6 +275,15 @@
             </div>
             <form id="manual-time-form" onsubmit="logManualTimeSubmit(event)" style="display: flex; flex-direction: column; gap: 14px;">
                 <div>
+                    <label for="manual-time-user" style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Employee') }} *</label>
+                    <select name="user_id" id="manual-time-user" required style="width: 100%; min-height: 44px; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
+                        @foreach($members->sortBy(fn ($m) => $m->user?->name) as $m)
+                            @continue(! $m->user || $m->status === 'suspended')
+                            <option value="{{ $m->user_id }}" @selected($m->user_id === $user->id)>{{ $m->user->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Project') }} *</label>
                     <select name="project_id" required style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600;">
                         @foreach($projects as $p)
@@ -371,8 +380,8 @@
                     <div id="hub-kpi-hours" class="kpi-value" style="font-size: 20px; color: var(--ula-accent-default);">0 / 0 h</div>
                     <div id="hub-kpi-hours-var" style="font-size: 11px; color: var(--ula-text-muted);">Variance: 0h</div>
                 </div>
-                <!-- Financials & Margin KPI -->
-                <div class="kpi-card" style="padding: 14px;">
+                <!-- Financials & Margin KPI (owner / financials only) -->
+                <div class="kpi-card" style="padding: 14px;{{ $canSeeFinancials ? '' : ' display: none;' }}">
                     <div class="kpi-header">
                         <span class="kpi-title">{{ __('Budget & Cost') }}</span>
                         <div class="kpi-icon-box"><span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">payments</span></div>

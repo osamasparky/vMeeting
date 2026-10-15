@@ -3,6 +3,7 @@
 namespace App\Domains\Projects\Models;
 
 use App\Domains\Identity\Models\User;
+use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Traits\Auditable;
 use App\Traits\BelongsToOrganization;
 use App\Traits\HasUuid;
@@ -29,6 +30,16 @@ class TimeEntry extends Model
     public const TYPE_TIMER = 'timer';
 
     public const TYPE_MANUAL = 'manual';
+
+    /**
+     * Typing hours in by hand is the owner's: everyone else tracks time with the
+     * timer, so their hours are what they actually ran. The owner may add an
+     * entry for any member (a forgotten timer, offline work).
+     */
+    public static function canLogManually(User $user, ?OrganizationMember $membership): bool
+    {
+        return $user->isSuperAdmin() || $membership?->role?->slug === 'company_admin';
+    }
 
     protected $fillable = [
         'organization_id',

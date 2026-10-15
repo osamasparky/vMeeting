@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsureOrganizationMember;
 use App\Http\Middleware\EnsurePermission;
+use App\Http\Middleware\EnsureProjectVisible;
 use App\Http\Middleware\SecurityHeadersMiddleware;
 use App\Http\Middleware\SetLocaleMiddleware;
 use App\Http\Middleware\SuperAdminMiddleware;
@@ -34,6 +35,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'org.member' => EnsureOrganizationMember::class,
             'permission' => EnsurePermission::class,
+            'project.visible' => EnsureProjectVisible::class,
             'superadmin' => SuperAdminMiddleware::class,
         ]);
 

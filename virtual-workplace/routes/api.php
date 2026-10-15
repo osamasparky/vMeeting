@@ -78,7 +78,7 @@ Route::prefix('v1')->group(function () {
 
         // ── Organization-scoped routes (require membership) ──
         Route::prefix('organizations/{organization}')
-            ->middleware('org.member')
+            ->middleware(['org.member', 'project.visible'])
             ->group(function () {
 
                 // Org details

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Projects;
 
+use App\Domains\Projects\Models\ProjectMember;
 use App\Domains\Projects\Models\SavedView;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -16,6 +17,8 @@ class SavedViewsAndInlineEditTest extends TestCase
     {
         parent::setUp();
         $this->buildProjectWorkspace();
+        // Both employees work on the project; these tests are about view ownership, not visibility.
+        ProjectMember::create(['organization_id' => $this->org->id, 'project_id' => $this->project->id, 'user_id' => $this->otherEmployee->id]);
     }
 
     public function test_member_saves_a_private_view_with_known_filters_only(): void

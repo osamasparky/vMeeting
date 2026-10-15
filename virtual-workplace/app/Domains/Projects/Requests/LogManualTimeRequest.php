@@ -24,6 +24,8 @@ class LogManualTimeRequest extends FormRequest
             'duration_seconds' => ['nullable', 'integer', 'min:1'],
             'description' => ['nullable', 'string', 'max:1000'],
             'is_billable' => ['nullable', 'boolean'],
+            // Whose time this is; the owner may log it for any member. Defaults to the caller.
+            'user_id' => ['nullable', 'string', $this->organizationMember()],
         ];
     }
 }

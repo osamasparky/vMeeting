@@ -115,6 +115,15 @@
             <form id="manual-time-form" onsubmit="logProjectTimeSubmit(event)" style="display: flex; flex-direction: column; gap: 14px;">
                 <input type="hidden" name="project_id" value="{{ $project->id }}">
                 <div>
+                    <label for="hub-manual-time-user" style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Employee') }} *</label>
+                    <select name="user_id" id="hub-manual-time-user" required class="form-input">
+                        @foreach($allMembers->sortBy(fn ($m) => $m->user?->name) as $m)
+                            @continue(! $m->user || $m->status === 'suspended')
+                            <option value="{{ $m->user_id }}" @selected($m->user_id === $user->id)>{{ $m->user->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Associated Task') }}</label>
                     <select name="task_id" class="form-input">
                         <option value="">— {{ __('General Project Work') }} —</option>

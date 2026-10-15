@@ -3901,5 +3901,7 @@
     "office.mic_reconnect_failed": "Your microphone did not reconnect in this room. Turn it off and on again.",
     "office.screen_shares": "Shared screens",
     "Created by": "Created by",
-    "Only managers can assign a task to someone else. Assign it to yourself or leave it unassigned.": "Only managers can assign a task to someone else. Assign it to yourself or leave it unassigned."
+    "Only managers can assign a task to someone else. Assign it to yourself or leave it unassigned.": "Only managers can assign a task to someone else. Assign it to yourself or leave it unassigned.",
+    "Only the company owner can add time by hand. Use the timer to track your work.": "Only the company owner can add time by hand. Use the timer to track your work.",
+    "Only the company owner can change logged hours.": "Only the company owner can change logged hours."
 }

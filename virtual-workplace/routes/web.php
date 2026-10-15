@@ -48,7 +48,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:6,1')->name('register.submit');
 });
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'project.visible'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name('dashboard');
     Route::get('/dashboard/pulse', [DashboardController::class, 'pulse'])->name('dashboard.pulse');

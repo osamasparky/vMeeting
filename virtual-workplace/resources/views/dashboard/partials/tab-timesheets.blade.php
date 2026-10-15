@@ -55,9 +55,11 @@
 
             <x-btn variant="outline" size="sm" icon="table_view" href="/api/v1/organizations/{{ $organization->id }}/timesheets/export?format=xlsx&lang={{ app()->getLocale() }}">{{ __('pm.export_timesheets') }}</x-btn>
             <x-btn variant="outline" size="sm" icon="schedule" href="/api/v1/organizations/{{ $organization->id }}/time/entries/export?format=xlsx&lang={{ app()->getLocale() }}">{{ __('pm.export_time') }}</x-btn>
+            @if($canLogManualTime)
             <x-btn variant="secondary" size="sm" onclick="openManualTimeModal()" icon="edit_note">
                 {{ __('Manual Time Entry') }}
             </x-btn>
+            @endif
             <x-btn variant="primary" size="sm" onclick="submitMyCurrentTimesheet()" icon="publish">
                 {{ __('Submit Weekly Timesheet') }}
             </x-btn>

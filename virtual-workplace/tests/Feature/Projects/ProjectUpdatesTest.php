@@ -20,6 +20,8 @@ class ProjectUpdatesTest extends TestCase
         Mail::fake();
         $this->buildProjectWorkspace();
         ProjectMember::create(['organization_id' => $this->org->id, 'project_id' => $this->project->id, 'user_id' => $this->employee->id]);
+        // On the project too, so the checks below are about authorship, not visibility.
+        ProjectMember::create(['organization_id' => $this->org->id, 'project_id' => $this->project->id, 'user_id' => $this->otherEmployee->id]);
     }
 
     public function test_posting_an_update_sets_health_and_notifies_the_project(): void

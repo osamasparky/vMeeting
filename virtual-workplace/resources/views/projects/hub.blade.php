@@ -998,7 +998,9 @@
                 </div>
                 <div class="ula-hub-actions">
                     <x-btn variant="outline" size="md" icon="videocam" onclick="openScheduleProjectMeetingModal()">{{ __('hub.meeting') }}</x-btn>
+                    @if($canLogManualTime)
                     <x-btn variant="outline" size="md" icon="more_time" onclick="openManualTimeModal()">{{ __('hub.log_time') }}</x-btn>
+                    @endif
                     <x-btn variant="primary" size="md" icon="add" onclick="openNewTaskModal()">{{ __('hub.create_task') }}</x-btn>
                 </div>
             </div>
@@ -1007,8 +1009,10 @@
             <div class="ula-kpi-row">
                 <x-kpi-card density="default" icon="task_alt" iconColor="sage" :title="__('hub.kpi_progress')" :value="($kpis['progress_pct'] ?? 0) . '%'" :caption="__('hub.kpi_done', ['count' => $kpis['completed_tasks'] ?? 0]) . ' · ' . __('hub.kpi_overdue', ['count' => $kpis['overdue_tasks'] ?? 0])" />
                 <x-kpi-card density="default" icon="schedule" iconColor="gold" :title="__('hub.kpi_hours')" :value="($hubActual + 0) . 'h'" :caption="__('hub.kpi_of') . ' ' . ($hubPlanned + 0) . 'h · ' . ($hubHoursPct > 0 ? '+' : '') . $hubHoursPct . '%'" />
+                @if($canSeeFinancials)
                 <x-kpi-card density="default" icon="payments" iconColor="muted" :title="__('hub.kpi_budget')" :value="'SAR ' . $hubCompact(abs($hubBudgetLeft))" :caption="__($hubBudgetLeft >= 0 ? 'hub.kpi_remaining' : 'hub.kpi_over', ['amount' => $hubCompact($hubBudget)])" />
                 <x-kpi-card density="default" icon="trending_up" iconColor="sage" :title="__('hub.kpi_margin')" :value="($kpis['gross_margin_pct'] ?? 0) . '%'" :caption="__('hub.kpi_margin_sub')" />
+                @endif
             </div>
 
             <!-- ── 5. VIEW TABS (underline, design-reference 35) ── -->
@@ -1422,9 +1426,11 @@
                             <x-btn variant="outline" size="sm" icon="table_view" onclick="pmExport('time', 'xlsx')">{{ __('pm.export_excel') }}</x-btn>
                             <x-btn variant="outline" size="sm" icon="csv" onclick="pmExport('time', 'csv')">{{ __('pm.export_csv') }}</x-btn>
                         </span>
+                        @if($canLogManualTime)
                         <button onclick="openManualTimeModal()" class="tactile-btn btn-primary" style="padding: 8px 16px; font-size: 12px;">
                             + {{ __('Log Manual Time Entry') }}
                         </button>
+                        @endif
                     </div>
 
                     <div style="overflow-x: auto;">
@@ -1609,7 +1615,7 @@
                                     <th>{{ __('Project Role') }}</th>
                                     <th>{{ __('Assigned Tasks') }}</th>
                                     <th>{{ __('Hours Contributed') }}</th>
-                                    <th>{{ __('Billing Rate') }}</th>
+                                    @if($canSeeFinancials)<th>{{ __('Billing Rate') }}</th>@endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -1639,9 +1645,11 @@
                                     <td style="font-family: monospace; font-weight: 900; color: var(--ula-text-primary); font-size: 14px;">
                                         {{ number_format($memberHours, 1) }}h
                                     </td>
+                                    @if($canSeeFinancials)
                                     <td style="font-family: monospace; font-weight: 700; color: var(--ula-text-secondary);">
                                         {{ number_format($pm->hourly_rate ?? 50, 2) }} {{ __('SAR') }}/h
                                     </td>
+                                    @endif
                                 </tr>
                                 @empty
                                 <tr>
