@@ -344,6 +344,45 @@
             max-width: 85vw;
             max-height: 75vh;
         }
+        /* Several people sharing at once: one screen shows, the tabs switch between them. */
+        .video-card.ss-hidden {
+            display: none !important;
+        }
+        .screen-share-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            max-width: min(520px, 85vw);
+            padding: 6px;
+            border-radius: var(--ula-radius-lg);
+            background: var(--ula-surface-capsule-strong);
+            border: 1px solid var(--ula-border-subtle);
+            box-shadow: var(--ula-shadow-lg);
+            pointer-events: auto;
+        }
+        .screen-share-tabs button {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 44px;
+            padding: 0 12px;
+            border-radius: var(--ula-radius-md);
+            border: 1px solid var(--ula-border-subtle);
+            background: var(--ula-surface-raised);
+            color: var(--ula-text-primary);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .screen-share-tabs button[aria-selected="true"] {
+            background: var(--ula-accent-default);
+            border-color: var(--ula-accent-default);
+            color: var(--ula-text-on-accent);
+        }
+        .screen-share-tabs button:focus-visible {
+            outline: none;
+            box-shadow: var(--ula-focus-ring);
+        }
         .video-card.collapsed-mode {
             height: 40px !important;
             width: 260px !important;
@@ -4972,7 +5011,19 @@
 
         // Media follows where you stand: each room is its own LiveKit room, and the open
         // area of the map is another one, so nothing said in a room reaches the floor.
-        async function syncLiveKitRoom(roomId) {
+        // Moves run one at a time and only the latest one connects: two joins racing
+        // each other used to leave the mic "on" in the UI but unpublished.
+        let liveKitSyncSeq = 0;
+        let liveKitSyncChain = Promise.resolve();
+        function syncLiveKitRoom(roomId) {
+            const seq = ++liveKitSyncSeq;
+            liveKitSyncChain = liveKitSyncChain
+                .then(() => (seq === liveKitSyncSeq ? doSyncLiveKitRoom(roomId, seq) : null))
+                .catch(err => console.warn('[LiveKit SFU] sync error:', err));
+            return liveKitSyncChain;
+        }
+
+        async function doSyncLiveKitRoom(roomId, seq) {
             if (!window.VWorkWebRTC) return;
             const mapId = CONFIG.map?.id || null;
             const targetRoomId = roomId ? String(roomId) : (mapId ? `open:${mapId}` : null);
@@ -4998,7 +5049,7 @@
                     : await window.VWorkWebRTC.fetchOpenAreaToken(CONFIG.org.id, mapId);
                 if (!res || !res.token) return;
                 // Moved on while the token was on its way: don't join the old place.
-                if (currentLiveKitRoomId !== targetRoomId) return;
+                if (currentLiveKitRoomId !== targetRoomId || seq !== liveKitSyncSeq) return;
 
                 console.log(`[LiveKit SFU] Connecting to room: ${targetRoomId}...`);
                 await window.VWorkWebRTC.joinLiveKitRoom(res.livekit_host, res.token, {
@@ -5016,13 +5067,42 @@
                     }
                 });
 
-                // Re-publish active states to SFU if enabled
-                if (micActive && window.VWorkWebRTC) await window.VWorkWebRTC.setMicrophoneEnabled(true).catch(()=>{});
-                if (camActive && window.VWorkWebRTC) await window.VWorkWebRTC.setCameraEnabled(true).catch(()=>{});
-                if (screenActive && window.VWorkWebRTC) await window.VWorkWebRTC.setScreenShareEnabled(true).catch(()=>{});
-
+                if (seq !== liveKitSyncSeq) return;
+                await republishLocalMedia(seq);
             } catch (err) {
                 console.warn('[LiveKit SFU] Connection error:', err);
+            }
+        }
+
+        function isLocalMicLive() {
+            const lp = window.VWorkWebRTC?.livekitRoom?.localParticipant;
+            if (!lp) return false;
+            const pub = Array.from(lp.audioTrackPublications?.values() || []).find(p => p.source === 'microphone');
+            return !!pub && !pub.isMuted && pub.track?.mediaStreamTrack?.readyState === 'live';
+        }
+
+        // Carry the mic, camera and screen into the room just joined. Opening the mic
+        // right after the previous room released it can fail on some devices, so the
+        // mic is checked and retried rather than assumed on.
+        async function republishLocalMedia(seq) {
+            const rtc = window.VWorkWebRTC;
+            if (camActive) await rtc.setCameraEnabled(true).catch(e => console.warn('[LiveKit SFU] camera republish:', e));
+            if (screenActive) await rtc.setScreenShareEnabled(true).catch(e => console.warn('[LiveKit SFU] screen republish:', e));
+            if (!micActive) return;
+
+            for (let attempt = 0; attempt < 4; attempt++) {
+                if (seq !== liveKitSyncSeq || !micActive) return;
+                try {
+                    if (attempt > 0) await rtc.setMicrophoneEnabled(false).catch(() => {});
+                    await rtc.setMicrophoneEnabled(true);
+                } catch (e) {
+                    console.warn(`[LiveKit SFU] mic republish attempt ${attempt + 1}:`, e);
+                }
+                if (isLocalMicLive()) return;
+                await new Promise(r => setTimeout(r, 400 * (attempt + 1)));
+            }
+            if (seq === liveKitSyncSeq && micActive && !isLocalMicLive()) {
+                showToast('⚠️ ' + @json(__('office.mic_reconnect_failed')));
             }
         }
 
@@ -5230,8 +5310,65 @@
             card.classList.toggle('collapsed-mode');
         }
 
+        // ── Several screen shares: show one, switch with tabs ──
+        let focusedScreenShareId = null;
+
+        function renderScreenShareTabs() {
+            const grid = document.getElementById('video-grid');
+            if (!grid) return;
+            const cards = Array.from(grid.querySelectorAll(':scope > .video-card'));
+            let bar = document.getElementById('screen-share-tabs');
+
+            if (cards.length < 2) {
+                cards.forEach(c => c.classList.remove('ss-hidden'));
+                focusedScreenShareId = cards[0]?.id || null;
+                if (bar) bar.remove();
+                return;
+            }
+            // A new presenter takes the stage; otherwise keep what the viewer picked.
+            if (!cards.some(c => c.id === focusedScreenShareId)) {
+                focusedScreenShareId = cards[cards.length - 1].id;
+            }
+            if (!bar) {
+                bar = document.createElement('div');
+                bar.id = 'screen-share-tabs';
+                bar.className = 'screen-share-tabs';
+                bar.setAttribute('role', 'tablist');
+                bar.setAttribute('aria-label', @json(__('office.screen_shares')));
+                grid.prepend(bar);
+            }
+            bar.innerHTML = '';
+            cards.forEach((card, i) => {
+                const active = card.id === focusedScreenShareId;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.setAttribute('role', 'tab');
+                btn.setAttribute('aria-selected', active ? 'true' : 'false');
+                const icon = document.createElement('span');
+                icon.className = 'material-symbols-rounded';
+                icon.style.fontSize = '16px';
+                icon.textContent = 'screen_share';
+                const label = document.createElement('span');
+                label.textContent = (card.querySelector('.user-title')?.textContent || `#${i + 1}`).replace(/^🖥️\s*/u, '');
+                btn.append(icon, label);
+                btn.addEventListener('click', () => {
+                    focusedScreenShareId = card.id;
+                    renderScreenShareTabs();
+                });
+                bar.appendChild(btn);
+                card.classList.toggle('ss-hidden', !active);
+            });
+        }
+
+        // Cards come and go from several places (track events, presence, room changes):
+        // watching the grid keeps the tabs right without touching each of them.
+        document.addEventListener('DOMContentLoaded', () => {
+            const grid = document.getElementById('video-grid');
+            if (grid) new MutationObserver(renderScreenShareTabs).observe(grid, { childList: true });
+        });
+
         function focusActiveScreenShare() {
-            const firstCard = document.querySelector('.video-grid-overlay .video-card');
+            const firstCard = document.querySelector('.video-grid-overlay .video-card:not(.ss-hidden)');
             if (firstCard) {
                 firstCard.classList.remove('collapsed-mode', 'size-small');
                 firstCard.classList.add('size-large');

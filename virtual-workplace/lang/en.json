@@ -3897,5 +3897,7 @@
     "Attendance counted from": "Attendance counted from",
     "Attendance Starts On": "Attendance Starts On",
     "Office default": "Office default",
-    "Days before the attendance start date are not counted as absence. Annual leave applies to every member of the office unless their own balance is set.": "Days before the attendance start date are not counted as absence. Annual leave applies to every member of the office unless their own balance is set."
+    "Days before the attendance start date are not counted as absence. Annual leave applies to every member of the office unless their own balance is set.": "Days before the attendance start date are not counted as absence. Annual leave applies to every member of the office unless their own balance is set.",
+    "office.mic_reconnect_failed": "Your microphone did not reconnect in this room. Turn it off and on again.",
+    "office.screen_shares": "Shared screens"
 }
