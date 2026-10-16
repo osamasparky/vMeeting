@@ -11,6 +11,7 @@ const token_verifier_js_1 = require("./auth/token-verifier.js");
 const presence_manager_js_1 = require("./state/presence-manager.js");
 const notification_hub_js_1 = require("./notifications/notification-hub.js");
 const shared_state_js_1 = require("./state/shared-state.js");
+const index_js_1 = require("./games/index.js");
 dotenv_1.default.config();
 const PORT = parseInt(process.env.REALTIME_PORT || '8080', 10);
 const HOST = process.env.REALTIME_HOST || '0.0.0.0';
@@ -54,6 +55,13 @@ const wss = new ws_1.WebSocketServer({ server });
 const tokenVerifier = new token_verifier_js_1.TokenVerifier(process.env.REALTIME_SECRET);
 const presence = new presence_manager_js_1.PresenceManager();
 const shared = new shared_state_js_1.SharedState();
+// Office arcade: one referee for every game machine; frames go only to the people at that machine.
+const games = new index_js_1.GameHub(index_js_1.GAMES, (userId, event) => {
+    const target = presence.findUserSocket(userId);
+    if (target)
+        presence.send(target, event);
+});
+setInterval(() => games.tick(), 1000 / index_js_1.TICK_HZ);
 /** Once nobody is left in a locked room its door reopens for everyone (rooms rest unlocked). */
 function reopenIfEmpty(orgId, mapId, roomId) {
     if (!roomId || !mapId || !shared.isDoorClosed(orgId, mapId, roomId))
@@ -134,9 +142,16 @@ wss.on('connection', (ws, req) => {
     ws.on('message', (raw) => {
         try {
             const event = JSON.parse(raw.toString());
+            if (typeof event?.type === 'string' && event.type.startsWith('game.')) {
+                const user = presence.getClient(ws)?.user;
+                if (user?.mapId)
+                    games.handle(user, event.type, event.payload);
+                return;
+            }
             switch (event.type) {
                 case 'map.join': {
                     const { mapId, initialPosition, gender } = event.payload || {};
+                    games.removeUser(conn.user.userId); // a game machine belongs to the floor you were on
                     const user = presence.joinMap(ws, mapId, initialPosition, gender);
                     if (!user)
                         break;
@@ -616,6 +631,7 @@ wss.on('connection', (ws, req) => {
     });
     // Handle client disconnect
     ws.on('close', () => {
+        games.removeUser(conn.user.userId);
         const leftRoomId = conn.user.currentRoomId;
         const left = presence.removeClient(ws);
         if (left && left.mapId)

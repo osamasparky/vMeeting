@@ -2081,6 +2081,7 @@
         // ── Controls & Keyboard Interaction ──
         const keys = { w: false, a: false, s: false, d: false, arrowup: false, arrowdown: false, arrowleft: false, arrowright: false };
         window.addEventListener('keydown', (e) => {
+            if (window.UlaGames?.capturesKeys()) return;
             const activeEl = document.activeElement;
             if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable)) return;
 
@@ -2110,6 +2111,8 @@
                         playDoorSlideSound();
                         showToast(`☕ ${__("Enjoying fresh drink from")} ${escapeHtml(item.name)}! Cheers! 🎉`);
                         triggerSpeechReaction('☕', 'emoji');
+                    } else if (item.interaction_type === 'game') {
+                        window.UlaGames?.open({ id: String(item.id), game: item.config?.game, name: item.name });
                     } else if (item.interaction_type === 'whiteboard') {
                         const boardModal = document.getElementById('whiteboard-modal');
                         if (boardModal) boardModal.style.display = 'flex';
@@ -2207,6 +2210,8 @@
                     promptEl.style.display = 'block';
                     if (found.interaction_type === 'drink') {
                         promptEl.innerHTML = `<span>☕ ${__('Press')} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> ${__('to Grab Drink')}</span>`;
+                    } else if (found.interaction_type === 'game') {
+                        promptEl.innerHTML = `<span>🕹️ ${__('Press')} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> ${escapeHtml(@json(__('games.press_to_play')))} · ${escapeHtml(found.name)}</span>`;
                     } else if (found.interaction_type === 'whiteboard') {
                         promptEl.innerHTML = `<span>📋 ${__('Press')} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> ${__('to Open Whiteboard')}</span>`;
                     } else if (found.interaction_type === 'youtube') {
@@ -4611,6 +4616,11 @@
                 ws.onmessage = (e) => {
                     try {
                         const data = JSON.parse(e.data);
+
+                        if (typeof data.type === 'string' && data.type.startsWith('game.')) {
+                            window.UlaGames?.receive(data);
+                            return;
+                        }
 
                         // 0. Session Replaced Event (Multi-tab / Multi-office lock)
                         if (data.type === 'session.replaced') {
@@ -7932,5 +7942,14 @@
         requestAnimationFrame(draw);
     </script>
     <script src="/js/office/attendance.js?v={{ filemtime(public_path('js/office/attendance.js')) }}" nonce="{{ $cspNonce ?? '' }}"></script>
+    @include('office.partials.games')
+    <script src="/js/office/games.js?v={{ filemtime(public_path('js/office/games.js')) }}" nonce="{{ $cspNonce ?? '' }}"></script>
+    <script nonce="{{ $cspNonce ?? '' }}">
+        window.UlaGames.init({
+            send: (msg) => { if (typeof ws !== 'undefined' && ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(msg)); },
+            me: { id: String(CONFIG.currentUser.id), name: CONFIG.currentUser.name },
+            text: window.UlaGamesText,
+        });
+    </script>
 </body>
 </html>

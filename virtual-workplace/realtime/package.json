@@ -7,7 +7,7 @@
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "test": "tsx test/realtime.test.ts"
+    "test": "tsx test/realtime.test.ts && tsx test/games.test.ts"
   },
   "dependencies": {
     "dotenv": "^16.4.5",

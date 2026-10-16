@@ -7,6 +7,7 @@ import { PresenceManager } from './state/presence-manager.js';
 import { InboundDirectRelay, InboundEvent, OfficeUser } from './events/event-types.js';
 import { NotificationHub, parsePublishBody, secretMatches } from './notifications/notification-hub.js';
 import { SharedState, cleanNote, cleanStroke } from './state/shared-state.js';
+import { GAMES, GameHub, TICK_HZ } from './games/index.js';
 
 dotenv.config();
 
@@ -55,6 +56,13 @@ const wss = new WebSocketServer({ server });
 const tokenVerifier = new TokenVerifier(process.env.REALTIME_SECRET);
 const presence = new PresenceManager();
 const shared = new SharedState();
+
+// Office arcade: one referee for every game machine; frames go only to the people at that machine.
+const games = new GameHub(GAMES, (userId, event) => {
+  const target = presence.findUserSocket(userId);
+  if (target) presence.send(target, event as any);
+});
+setInterval(() => games.tick(), 1000 / TICK_HZ);
 
 /** Once nobody is left in a locked room its door reopens for everyone (rooms rest unlocked). */
 function reopenIfEmpty(orgId: string, mapId: string, roomId: string | null | undefined): void {
@@ -140,9 +148,16 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
     try {
       const event: InboundEvent = JSON.parse(raw.toString());
 
+      if (typeof (event as any)?.type === 'string' && (event as any).type.startsWith('game.')) {
+        const user = presence.getClient(ws)?.user;
+        if (user?.mapId) games.handle(user, (event as any).type, (event as any).payload);
+        return;
+      }
+
       switch (event.type) {
         case 'map.join': {
           const { mapId, initialPosition, gender } = event.payload || {};
+          games.removeUser(conn.user.userId); // a game machine belongs to the floor you were on
           const user = presence.joinMap(ws, mapId, initialPosition, gender);
           if (!user) break;
 
@@ -675,6 +690,7 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
 
   // Handle client disconnect
   ws.on('close', () => {
+    games.removeUser(conn.user.userId);
     const leftRoomId = conn.user.currentRoomId;
     const left = presence.removeClient(ws);
     if (left && left.mapId) reopenIfEmpty(left.orgId, left.mapId, leftRoomId);

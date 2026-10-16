@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300" role="img" aria-label="سباق — RACING">
+  <!-- UlaSpace office arcade machine: RACING. Generated; edit the template in the commit that added it. -->
+  <ellipse cx="150" cy="286" rx="78" ry="8" fill="#0e1c17" opacity="0.25"/>
+  <path d="M84 30 h132 v250 h-132z" fill="#1b3223"/>
+  <path d="M84 30 h132 v8 h-132z" fill="#1e412f"/>
+  <rect x="78" y="24" width="8" height="258" rx="3" fill="#b98a37"/>
+  <rect x="214" y="24" width="8" height="258" rx="3" fill="#b98a37"/>
+  <!-- marquee -->
+  <rect x="88" y="36" width="124" height="56" rx="6" fill="#0e1c17" stroke="#d3a553" stroke-width="2"/>
+  <text x="150" y="66" font-size="22" font-weight="800" text-anchor="middle" fill="#e6c88b" font-family="Cairo, 'IBM Plex Sans Arabic', Tahoma, Arial, sans-serif" direction="rtl">سباق</text>
+  <text x="150" y="84" font-size="9" font-weight="700" letter-spacing="1.5" text-anchor="middle" fill="#ede6d9" font-family="Arial, sans-serif">RACING</text>
+  <!-- screen -->
+  <rect x="92" y="100" width="116" height="104" rx="8" fill="#0e1c17" stroke="#4a443c" stroke-width="3"/>
+  <rect x="96" y="104" width="108" height="96" rx="5" fill="#142b24"/>
+  
+   <path d="M104 190 C 130 150, 170 190, 196 140" fill="none" stroke="#857a6c" stroke-width="18" stroke-linecap="round"/>
+   <path d="M104 190 C 130 150, 170 190, 196 140" fill="none" stroke="#e6c88b" stroke-width="2" stroke-dasharray="6 6"/>
+   <rect x="142" y="158" width="22" height="12" rx="4" fill="#d99a6c" transform="rotate(-20 153 164)"/>
+   <line x1="112" y1="108" x2="112" y2="150" stroke="#f9f6ef" stroke-width="3"/>
+   <g transform="translate(114 108)"><rect x="0" y="0" width="8" height="8" fill="#f9f6ef"/><rect x="8" y="0" width="8" height="8" fill="#0e1c17"/><rect x="16" y="0" width="8" height="8" fill="#f9f6ef"/><rect x="24" y="0" width="8" height="8" fill="#0e1c17"/><rect x="0" y="8" width="8" height="8" fill="#0e1c17"/><rect x="8" y="8" width="8" height="8" fill="#f9f6ef"/><rect x="16" y="8" width="8" height="8" fill="#0e1c17"/><rect x="24" y="8" width="8" height="8" fill="#f9f6ef"/><rect x="0" y="16" width="8" height="8" fill="#f9f6ef"/><rect x="8" y="16" width="8" height="8" fill="#0e1c17"/><rect x="16" y="16" width="8" height="8" fill="#f9f6ef"/><rect x="24" y="16" width="8" height="8" fill="#0e1c17"/></g>
+  <!-- control panel -->
+  <path d="M84 212 h132 l10 26 h-152z" fill="#2a5439"/>
+  <circle cx="112" cy="224" r="3" fill="#4a443c"/><line x1="112" y1="224" x2="112" y2="214" stroke="#4a443c" stroke-width="3"/>
+  <circle cx="112" cy="212" r="5" fill="#d99a6c"/>
+  <circle cx="160" cy="226" r="5" fill="#d3a553"/><circle cx="176" cy="222" r="5" fill="#d99a6c"/><circle cx="192" cy="226" r="5" fill="#f9f6ef"/>
+  <!-- base with coin slot -->
+  <rect x="84" y="238" width="132" height="42" fill="#1e412f"/>
+  <rect x="140" y="250" width="20" height="16" rx="2" fill="#0e1c17"/><rect x="148" y="253" width="4" height="10" fill="#d3a553"/>
+</svg>
