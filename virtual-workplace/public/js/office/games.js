@@ -17,6 +17,8 @@
         racing: { w: 1000, h: 620 },
         karts: { w: 900, h: 600 },
         pool: { w: 1000, h: 560 },
+        run: { w: 840, h: 520 }, // 21 × 13 tiles of 40 px
+        quiz: null, // drawn with HTML, not on the canvas
     };
 
     // Player colours come from the design tokens; names are always drawn too, so colour is never the only cue.
@@ -35,6 +37,7 @@
     };
 
     let send = () => {};
+    let csrf = '';
     let me = { id: '', name: '' };
     let T = {};
     let rtl = false;
@@ -65,6 +68,7 @@
 
     function init(opts) {
         send = opts.send;
+        csrf = opts.csrf || '';
         me = opts.me;
         T = opts.text || {};
         rtl = document.documentElement.dir === 'rtl';
@@ -91,7 +95,7 @@
     }
 
     function open(m) {
-        if (!m || !FIELDS[m.game]) return;
+        if (!m || !(m.game in FIELDS)) return;
         if (machine && machine.id !== m.id) close();
         machine = m;
         state = null;
@@ -101,7 +105,11 @@
         $('game-title-en').textContent = '⁦' + t('games.name.' + m.game + '.en') + '⁩';
         $('game-help').textContent = t('games.help.' + m.game);
         $('game-close').focus();
+        quiz.pick = null;
+        quiz.error = '';
+        quiz.myPick = null;
         renderLobby();
+        if (m.game === 'quiz') loadQuizzes();
         send({ type: 'game.open', payload: { machineId: m.id, game: m.game } });
     }
 
@@ -126,14 +134,18 @@
         if (msg.type === 'game.state') {
             state = msg.payload;
             meta = state.meta || meta;
-            if (state.status !== 'playing') { frame = prev = null; releaseAll(); }
+            if (state.status !== 'playing') { frame = prev = null; releaseAll(); quiz.myPick = null; quiz.key = ''; }
             renderLobby();
         } else if (msg.type === 'game.frame') {
             prev = frame;
             prevAt = frameAt;
             frame = msg.payload.s;
             frameAt = performance.now();
-            if (!raf) raf = requestAnimationFrame(draw);
+            if (machine.game === 'quiz') renderQuiz();
+            else if (!raf) raf = requestAnimationFrame(draw);
+        } else if (msg.type === 'game.error') {
+            quiz.error = t('games.quiz.start_failed');
+            renderLobby();
         }
     }
 
@@ -155,15 +167,23 @@
 
     function renderLobby() {
         const playing = state?.status === 'playing';
+        const isQuiz = machine?.game === 'quiz';
         $('game-stage').hidden = !playing;
         $('game-lobby').hidden = playing && seated();
-        if (playing) fitCanvas();
+        $('game-canvas').hidden = isQuiz;
+        $('game-quiz').hidden = !isQuiz;
+        if (playing && isQuiz) renderQuiz();
+        else if (playing) fitCanvas();
 
         const seats = $('game-seats');
         seats.innerHTML = '';
         const max = state?.max || 0;
+        // Big tables (quiz: 10) list the people, then one line for the free seats.
+        const compact = max > 6;
+        const freeSeats = max - (state?.players?.length || 0);
         for (let i = 0; i < max; i++) {
             const p = state.players.find((x) => x.slot === i);
+            if (compact && !p) continue;
             const li = document.createElement('li');
             li.className = 'game-seat' + (p ? '' : ' is-empty');
             const dot = document.createElement('span');
@@ -172,6 +192,13 @@
             const name = document.createElement('span');
             name.textContent = p ? p.name + (p.id === me.id ? ` (${t('games.you')})` : '') + (p.id === state.hostId ? ' ★' : '') : t('games.empty_seat');
             li.append(dot, name);
+            seats.appendChild(li);
+        }
+
+        if (compact && freeSeats > 0) {
+            const li = document.createElement('li');
+            li.className = 'game-seat is-empty';
+            li.textContent = t('games.free_seats', { n: freeSeats });
             seats.appendChild(li);
         }
 
@@ -189,10 +216,16 @@
         } else if (seated()) {
             const host = state.hostId === me.id;
             const enough = state.players.length >= state.min;
-            if (host) actions.appendChild(button(t('games.start'), 'primary', () => send({ type: 'game.start', payload: {} }), !enough));
+            if (host && machine.game === 'quiz') {
+                actions.appendChild(quizPicker());
+                actions.appendChild(button(t('games.start'), 'primary', startQuiz, !enough || !quiz.pick));
+            } else if (host) {
+                actions.appendChild(button(t('games.start'), 'primary', () => send({ type: 'game.start', payload: {} }), !enough));
+            }
             actions.appendChild(button(t('games.stand'), 'outline', () => send({ type: 'game.stand', payload: {} })));
             if (!enough) note.textContent = t('games.need_players', { n: state.min });
             else if (!host) note.textContent = t('games.waiting_host', { name: state.players[0].name });
+            if (quiz.error) note.textContent = quiz.error;
         } else if (state.players.length < state.max) {
             actions.appendChild(button(t('games.sit'), 'primary', () => send({ type: 'game.sit', payload: {} })));
         } else {
@@ -223,6 +256,7 @@
         racing: { KeyW: 'up', ArrowUp: 'up', KeyS: 'down', ArrowDown: 'down', KeyA: 'left', ArrowLeft: 'left', KeyD: 'right', ArrowRight: 'right', Space: 'a', ShiftLeft: 'a', Enter: 'a' },
         karts: { KeyW: 'up', ArrowUp: 'up', KeyS: 'down', ArrowDown: 'down', KeyA: 'left', ArrowLeft: 'left', KeyD: 'right', ArrowRight: 'right', Space: 'a', ShiftLeft: 'a', Enter: 'a' },
         pool: { KeyA: 'left', ArrowLeft: 'left', KeyD: 'right', ArrowRight: 'right', Space: 'a' },
+        run: { KeyW: 'up', ArrowUp: 'up', KeyS: 'down', ArrowDown: 'down', KeyA: 'left', ArrowLeft: 'left', KeyD: 'right', ArrowRight: 'right' },
     };
 
     function onKey(e) {
@@ -231,6 +265,11 @@
         // The window is open: nothing reaches the office (no walking, no shortcuts).
         // Default actions still happen, so Enter/Space still press the lobby buttons.
         e.stopPropagation();
+        if (machine.game === 'quiz') {
+            const n = /^(?:Digit|Numpad)([1-4])$/.exec(e.code);
+            if (n && e.type === 'keydown' && !e.repeat) { e.preventDefault(); answer(Number(n[1]) - 1); }
+            return;
+        }
         const action = (KEYMAP[machine.game] || {})[e.code];
         if (!action || state?.status !== 'playing' || !seated()) return;
         e.preventDefault();
@@ -334,7 +373,7 @@
         ctx.setTransform(scale * dpr, 0, 0, scale * dpr, 0, 0);
         const span = Math.max(1, frameAt - prevAt);
         const alpha = Math.min(1, (performance.now() - frameAt) / span + 0.0);
-        ({ snipers: drawSnipers, racing: drawRacing, karts: drawKarts, pool: drawPool })[machine.game](ctx, alpha);
+        ({ snipers: drawSnipers, racing: drawRacing, karts: drawKarts, pool: drawPool, run: drawRun })[machine.game](ctx, alpha);
         raf = requestAnimationFrame(draw);
     }
 
@@ -579,6 +618,97 @@
         if (frame.countdown) banner(ctx, f, String(frame.countdown));
     }
 
+    // اهرب!
+    const TILE = 40;
+    const DIR_ANGLE = { right: 0, down: Math.PI / 2, left: Math.PI, up: -Math.PI / 2 };
+
+    function drawGhost(ctx, x, y, color) {
+        const r = 15;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.beginPath();
+        ctx.arc(0, -2, r, Math.PI, 0);
+        ctx.lineTo(r, r - 2);
+        for (let i = 0; i < 4; i++) ctx.lineTo(r - (i * 2 + 1) * (r / 4), i % 2 ? r - 2 : r - 7);
+        ctx.lineTo(-r, r - 2);
+        ctx.closePath();
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.strokeStyle = ART.white;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        for (const ex of [-5, 5]) {
+            ctx.beginPath();
+            ctx.arc(ex, -4, 4, 0, Math.PI * 2);
+            ctx.fillStyle = ART.white;
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(ex + 1, -4, 2, 0, Math.PI * 2);
+            ctx.fillStyle = ART.ink;
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+
+    function drawRun(ctx, alpha) {
+        const f = FIELDS.run;
+        ctx.fillStyle = ART.void;
+        ctx.fillRect(0, 0, f.w, f.h);
+        const walls = meta?.walls || [];
+        ctx.fillStyle = ART.grass;
+        ctx.strokeStyle = ART.platformEdge;
+        ctx.lineWidth = 2;
+        walls.forEach((row, y) => {
+            for (let x = 0; x < row.length; x++) {
+                if (row[x] !== '#') continue;
+                ctx.fillRect(x * TILE + 2, y * TILE + 2, TILE - 4, TILE - 4);
+                ctx.strokeRect(x * TILE + 2, y * TILE + 2, TILE - 4, TILE - 4);
+            }
+        });
+        const w = meta?.w || 21;
+        ctx.fillStyle = ART.box;
+        for (let k = 0; k < frame.coins.length; k++) {
+            if (frame.coins[k] !== '1') continue;
+            ctx.beginPath();
+            ctx.arc((k % w) * TILE + TILE / 2, Math.floor(k / w) * TILE + TILE / 2, 4, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        const movers = lerpList(frame.m, prev?.m, alpha);
+        // Runners first, ghosts on top.
+        for (const m of [...movers].sort((a, b) => Number(a.ghost) - Number(b.ghost))) {
+            const x = m.x * TILE + TILE / 2;
+            const y = m.y * TILE + TILE / 2;
+            if (m.ghost) {
+                drawGhost(ctx, x, y, m.ai ? ART.roof : colorOf(m.slot));
+                if (!m.ai) label(ctx, m.name, x, y - 24, ART.white, 11);
+                continue;
+            }
+            // A chomping circle facing where it goes.
+            const open = 0.25 + 0.2 * Math.abs(Math.sin(performance.now() / 90));
+            const a = DIR_ANGLE[m.dir] ?? 0;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.arc(x, y, 15, a + open, a + Math.PI * 2 - open);
+            ctx.closePath();
+            ctx.fillStyle = colorOf(m.slot);
+            ctx.fill();
+            ctx.strokeStyle = ART.white;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            label(ctx, m.name + (m.id === me.id ? ` (${t('games.you')})` : ''), x, y - 24, ART.white, 11);
+        }
+
+        const mine = frame.m.find((m) => m.id === me.id);
+        const left = rtl ? f.w - 12 : 12;
+        const align = rtl ? 'right' : 'left';
+        if (mine) {
+            label(ctx, `${mine.ghost ? '👻 ' + t('games.run.you_ghost') : '🏃 ' + t('games.run.you_run')} · ${mine.score}`, left, 14, ART.white, 13, align);
+        }
+        label(ctx, `${t('games.run.runners_left', { n: frame.runners })} · ${frame.timeLeft}`, rtl ? 12 : f.w - 12, 14, ART.window, 13, rtl ? 'left' : 'right');
+        if (frame.countdown) banner(ctx, f, String(frame.countdown));
+    }
+
     // بلياردو
     const CLOTH = { x1: 60, y1: 60, x2: 940, y2: 500 };
     const POCKETS = [[60, 60], [500, 56], [940, 60], [60, 500], [500, 504], [940, 500]];
@@ -679,6 +809,161 @@
         label(ctx, frame.phase === 'aim' ? `${status} · ${frame.clock}` : status, f.w / 2, f.h - 16 - (aim.charging ? 18 : 0), ART.white, 13);
         if (frame.message === 'foul') label(ctx, t('games.foul'), f.w / 2, 15, ART.box, 14);
         if (frame.message === 'timeout') label(ctx, t('games.timeout'), f.w / 2, 15, ART.box, 14);
+    }
+
+    // ── quiz (سؤال وجواب) ──
+
+    const quiz = { list: null, pick: null, error: '', myPick: null, key: '', qi: -1 };
+    // Answer colours are tokens from four different families (the palette has no more), each with its
+    // own text colour for contrast and its own shape, so colour is never the only cue.
+    const ANSWER_STYLE = [
+        ['--ula-status-danger', '--ula-text-on-accent', '▲'],
+        ['--ula-surface-dark', '--ula-text-on-dark', '◆'],
+        ['--ula-tone-gold-dot', '--ula-text-on-gold', '●'],
+        ['--ula-status-success', '--ula-text-on-accent', '■'],
+    ];
+
+    async function loadQuizzes() {
+        try {
+            const res = await fetch('/games/quizzes', { headers: { Accept: 'application/json' }, credentials: 'same-origin' });
+            const data = await res.json();
+            quiz.list = data.quizzes || [];
+            quiz.pick = quiz.list[0]?.id || null;
+        } catch (e) {
+            quiz.list = [];
+        }
+        renderLobby();
+    }
+
+    function quizPicker() {
+        const wrap = document.createElement('label');
+        wrap.className = 'game-quiz-picker';
+        const span = document.createElement('span');
+        span.textContent = t('games.quiz.pick');
+        const sel = document.createElement('select');
+        for (const q of quiz.list || []) {
+            const o = document.createElement('option');
+            o.value = q.id;
+            o.textContent = `${q.title} · ${q.count}`;
+            o.selected = q.id === quiz.pick;
+            sel.appendChild(o);
+        }
+        sel.addEventListener('change', () => { quiz.pick = sel.value; quiz.error = ''; renderLobby(); });
+        wrap.append(span, sel);
+        return wrap;
+    }
+
+    async function startQuiz() {
+        if (!quiz.pick) return;
+        quiz.error = '';
+        try {
+            const res = await fetch(`/games/quizzes/${encodeURIComponent(quiz.pick)}/ticket`, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { Accept: 'application/json', 'X-CSRF-TOKEN': csrf },
+            });
+            if (!res.ok) throw new Error(String(res.status));
+            const data = await res.json();
+            send({ type: 'game.start', payload: { ticket: data.ticket } });
+        } catch (e) {
+            quiz.error = t('games.quiz.start_failed');
+            renderLobby();
+        }
+    }
+
+    function answer(i) {
+        if (!frame || frame.phase !== 'question' || !seated() || quiz.myPick !== null || i >= frame.c.length) return;
+        quiz.myPick = i;
+        send({ type: 'game.action', payload: { data: { choice: i } } });
+        renderQuiz();
+    }
+
+    function el(tag, cls, text) {
+        const n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (text !== undefined) n.textContent = text;
+        return n;
+    }
+
+    function renderQuiz() {
+        const box = $('game-quiz');
+        const f = frame;
+        if (!f) { box.textContent = ''; return; }
+        if (f.phase === 'question' && quiz.qi !== f.i) { quiz.qi = f.i; quiz.myPick = null; }
+        const key = [f.phase, f.i, f.left, f.answered.length, quiz.myPick].join('|');
+        if (key === quiz.key) return;
+        quiz.key = key;
+        box.textContent = '';
+
+        const head = el('div', 'game-quiz__head');
+        head.append(
+            el('span', 'game-quiz__count', t('games.quiz.progress', { i: f.i + 1, n: f.n })),
+            el('span', 'game-quiz__title', f.title),
+        );
+        if (f.phase === 'question') {
+            const timer = el('span', 'game-quiz__timer', String(f.left));
+            timer.setAttribute('aria-label', t('games.quiz.seconds_left', { s: f.left }));
+            head.appendChild(timer);
+        }
+        box.appendChild(head);
+
+        if (f.phase === 'intro') {
+            box.append(el('p', 'game-quiz__ready', t('games.quiz.get_ready')), el('p', 'game-quiz__big', String(f.left)));
+            return;
+        }
+
+        box.appendChild(el('h3', 'game-quiz__question', f.q));
+
+        const grid = el('div', 'game-quiz__answers');
+        const reveal = f.phase === 'reveal';
+        const canAnswer = f.phase === 'question' && seated() && quiz.myPick === null;
+        f.c.forEach((text, i) => {
+            const [color, ink, shape] = ANSWER_STYLE[i];
+            const b = el('button', 'game-quiz__answer');
+            b.type = 'button';
+            b.style.background = `var(${color})`;
+            b.style.color = `var(${ink})`;
+            b.disabled = !canAnswer;
+            if (quiz.myPick === i) b.classList.add('is-mine');
+            if (reveal) b.classList.add(i === f.correct ? 'is-correct' : 'is-wrong');
+            b.append(el('span', 'game-quiz__shape', shape), el('span', 'game-quiz__text', text));
+            if (reveal && f.picks) {
+                const pickers = Object.values(f.picks).filter((v) => v === i).length;
+                b.appendChild(el('span', 'game-quiz__picks', String(pickers)));
+            }
+            b.setAttribute('aria-label', `${i + 1}. ${text}`);
+            b.addEventListener('click', () => answer(i));
+            grid.appendChild(b);
+        });
+        box.appendChild(grid);
+
+        const status = el('p', 'game-quiz__status');
+        status.setAttribute('role', 'status');
+        if (f.phase === 'question') {
+            status.textContent = quiz.myPick !== null
+                ? t('games.quiz.answer_sent')
+                : seated() ? t('games.quiz.answered', { a: f.answered.length, n: f.scores.length }) : t('games.playing_now');
+        } else if (reveal && seated()) {
+            const got = (f.gained && f.gained[me.id]) || 0;
+            status.textContent = got > 0 ? t('games.quiz.right', { p: got }) : t('games.quiz.wrong');
+            status.classList.add(got > 0 ? 'is-right' : 'is-wrong');
+        }
+        box.appendChild(status);
+
+        if (reveal) {
+            const board = el('ol', 'game-quiz__board');
+            f.scores.slice(0, 5).forEach((s) => {
+                const li = el('li', s.id === me.id ? 'is-me' : '');
+                const dot = el('span', 'game-seat__dot');
+                dot.style.background = colorOf(s.slot);
+                const gained = (f.gained && f.gained[s.id]) || 0;
+                li.append(dot, el('span', 'game-quiz__name', s.name));
+                if (gained) li.appendChild(el('span', 'game-quiz__gained', `+${gained}`));
+                li.appendChild(el('span', 'game-quiz__score', String(s.score)));
+                board.appendChild(li);
+            });
+            box.appendChild(board);
+        }
     }
 
     window.UlaGames = { init, open, receive, capturesKeys };

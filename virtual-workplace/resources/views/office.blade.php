@@ -7948,6 +7948,7 @@
         window.UlaGames.init({
             send: (msg) => { if (typeof ws !== 'undefined' && ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(msg)); },
             me: { id: String(CONFIG.currentUser.id), name: CONFIG.currentUser.name },
+            csrf: CONFIG.csrf,
             text: window.UlaGamesText,
         });
     </script>

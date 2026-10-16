@@ -45,11 +45,25 @@ export interface Game {
   leave(playerId: string): void;
 }
 
+/** Who is asking: enough of the office user to seat them and reach them. */
+export interface GameUser {
+  userId: string;
+  name: string;
+  organizationId: string;
+  mapId: string;
+  isGuest?: boolean;
+}
+
 export interface GameDef {
   key: string;
   minPlayers: number;
   maxPlayers: number;
-  create(players: GamePlayer[]): Game;
+  /**
+   * Games that need something from the host to start (the quiz's sealed
+   * questions) check it here; null refuses the start.
+   */
+  setup?(payload: unknown, host: GameUser): unknown | null;
+  create(players: GamePlayer[], options?: unknown): Game;
 }
 
 export const clamp = (v: number, lo: number, hi: number): number => Math.max(lo, Math.min(hi, v));

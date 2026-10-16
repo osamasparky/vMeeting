@@ -14,6 +14,7 @@ use App\Http\Controllers\Web\AttendanceController;
 use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\GuestAccessController;
+use App\Domains\Workspace\Controllers\QuizController;
 use App\Http\Controllers\Web\HrController;
 use App\Http\Controllers\Web\NotificationPreferencesController;
 use App\Http\Controllers\Web\OfficeController;
@@ -81,6 +82,13 @@ Route::middleware(['auth', 'project.visible'])->group(function () {
     Route::post('/organization/ai-map/generate', [OfficeController::class, 'generateAiOffice'])->middleware('throttle:expensive')->name('organization.ai_map.generate');
 
     // Personnel affairs: official holidays
+    // Office quiz machine: list / start (sealed ticket) for everyone; the owner writes the company's quizzes.
+    Route::get('/games/quizzes', [QuizController::class, 'index'])->name('games.quizzes.index');
+    Route::post('/games/quizzes', [QuizController::class, 'store'])->name('games.quizzes.store');
+    Route::post('/games/quizzes/{id}/ticket', [QuizController::class, 'ticket'])->middleware('throttle:30,1')->name('games.quizzes.ticket');
+    Route::put('/games/quizzes/{quiz}', [QuizController::class, 'update'])->name('games.quizzes.update');
+    Route::delete('/games/quizzes/{quiz}', [QuizController::class, 'destroy'])->name('games.quizzes.destroy');
+
     Route::get('/hr/panel/{panel}', [HrController::class, 'panel'])->name('hr.panel');
     Route::post('/hr/holidays', [HrController::class, 'storeHoliday'])->name('hr.holidays.store');
     Route::delete('/hr/holidays/{holiday}', [HrController::class, 'deleteHoliday'])->name('hr.holidays.delete');

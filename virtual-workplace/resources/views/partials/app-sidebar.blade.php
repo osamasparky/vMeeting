@@ -22,6 +22,7 @@
             ['office', 'nav.office', 'location_on', true, 'external'],
             ['chat', 'nav.chat', 'forum', true, 'live'],
             ['editor', 'nav.editor', 'architecture', $membership->hasPermission('maps.manage'), 'external'],
+            ['quizzes', 'nav.quizzes', 'quiz', $isCompanyAdmin || auth()->user()?->isSuperAdmin(), null],
         ]],
         ['nav.projects_section', [
             ['projects', 'nav.projects', 'folder', true, null],

@@ -22,10 +22,10 @@ class GameMachinesTest extends TestCase
         $category = FurnitureCategory::where('slug', 'games')->firstOrFail();
         $machines = FurnitureItem::where('category_id', $category->id)->orderBy('slug')->get();
 
-        $this->assertSame(['arcade_karts', 'arcade_pool', 'arcade_racing', 'arcade_snipers'], $machines->pluck('slug')->all());
+        $this->assertSame(['arcade_karts', 'arcade_pool', 'arcade_quiz', 'arcade_racing', 'arcade_run', 'arcade_snipers'], $machines->pluck('slug')->all());
         foreach ($machines as $m) {
             $this->assertSame('game', $m->interaction_type);
-            $this->assertContains($m->interaction_config['game'], ['snipers', 'racing', 'karts', 'pool']);
+            $this->assertContains($m->interaction_config['game'], ['snipers', 'racing', 'karts', 'pool', 'quiz', 'run']);
             $this->assertFileExists(public_path(ltrim($m->image_url, '/')));
         }
     }

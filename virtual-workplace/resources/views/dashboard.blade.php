@@ -1733,6 +1733,10 @@
         @include('dashboard.partials.tab-leaves')
         @include('dashboard.partials.tab-attendance')
 
+        @if($membership->isCompanyOwner() || $user->isSuperAdmin())
+            @include('dashboard.partials.tab-quizzes')
+        @endif
+
     </main>
 
     <!-- MODALS & SCRIPTS -->

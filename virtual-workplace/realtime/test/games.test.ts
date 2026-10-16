@@ -4,6 +4,9 @@ import { RacingGame, TRACK, LAPS, locate, HALF_WIDTH } from '../src/games/racing
 import { KartsGame, LIVES } from '../src/games/karts.js';
 import { PoolGame, POCKETS } from '../src/games/pool.js';
 import { GamePlayer } from '../src/games/types.js';
+import { QuizGame, openTicket, quizDef } from '../src/games/quiz.js';
+import crypto from 'crypto';
+import { RunGame, W as RUN_W, H as RUN_H, open as runOpen } from '../src/games/run.js';
 
 let passed = 0;
 function check(cond: unknown, msg: string): void {
@@ -213,6 +216,119 @@ console.log('🎮 Game tests');
   const r = e.finished();
   check(r && r[0].id === 'u1', 'potting the 8 before your group loses');
   console.log('   ✓ pool');
+}
+
+// ── Quiz ──
+{
+  const SECRET = 'quiz-secret';
+  // Sealed the way App\Domains\Workspace\Games\QuizTicket does it.
+  const seal = (data: object, secret = SECRET) => {
+    const key = crypto.createHash('sha256').update(secret).digest();
+    const iv = crypto.randomBytes(12);
+    const c = crypto.createCipheriv('aes-256-gcm', key, iv);
+    const body = Buffer.concat([c.update(JSON.stringify(data), 'utf8'), c.final()]);
+    return Buffer.concat([iv, c.getAuthTag(), body]).toString('base64');
+  };
+  const quiz = { title: 'Q', questions: [
+    { q: 'one', c: ['a', 'b', 'c', 'd'], a: 1, s: 10 },
+    { q: 'two', c: ['yes', 'no'], a: 0, s: 10 },
+  ] };
+  const exp = Math.floor(Date.now() / 1000) + 60;
+  check(openTicket(seal({ org: 'org', exp, ...quiz }), SECRET, 'org')?.questions.length === 2, 'a sealed ticket opens');
+  check(openTicket(seal({ org: 'other', exp, ...quiz }), SECRET, 'org') === null, "another company's ticket is refused");
+  check(openTicket(seal({ org: 'org', exp: exp - 120, ...quiz }), SECRET, 'org') === null, 'an expired ticket is refused');
+  check(openTicket(seal({ org: 'org', exp, ...quiz }, 'wrong'), SECRET, 'org') === null, 'a forged ticket is refused');
+  const sealed = seal({ org: 'org', exp, ...quiz });
+  check(openTicket(sealed.slice(0, -4) + 'AAAA', SECRET, 'org') === null, 'a tampered ticket is refused');
+
+  // Hub: the host must bring a valid ticket.
+  const sent: any[] = [];
+  const hub = new GameHub({ quiz: quizDef(SECRET) }, (to, e) => sent.push({ to, ...e }));
+  hub.handle(user('a'), 'game.open', { machineId: 'qm', game: 'quiz' });
+  hub.handle(user('a'), 'game.sit', {});
+  hub.handle(user('a'), 'game.start', { ticket: 'nonsense' });
+  check(sent.some((m) => m.type === 'game.error'), 'a bad ticket does not start the quiz');
+  hub.handle(user('a'), 'game.start', { ticket: seal({ org: 'org', exp, ...quiz }) });
+  check([...sent].reverse().find((m) => m.type === 'game.state').payload.status === 'playing', 'a good ticket starts it (solo is fine)');
+
+  // Scoring: fast right answers score more, streaks add, the answer stays hidden until the reveal.
+  const g = new QuizGame(players(3), quiz) as any;
+  run(g, 3.1); // intro
+  check(g.snapshot().phase === 'question' && g.snapshot().correct === null, 'question phase hides the answer');
+  g.action('u0', { choice: 1 }); // right, instantly
+  run(g, 4);
+  g.action('u1', { choice: 1 }); // right, 4 s in
+  g.action('u1', { choice: 2 }); // a second answer is ignored
+  g.action('u2', { choice: 3 }); // wrong
+  g.step(1 / 30); // everyone has answered → reveal now, not after 10 s
+  const r = g.snapshot();
+  check(r.phase === 'reveal' && r.correct === 1, 'all answered: reveal early with the right answer');
+  check(r.gained.u0 > r.gained.u1 && r.gained.u1 >= 500 && r.gained.u2 === 0, 'faster right answers score more; wrong scores 0');
+  run(g, 5.1);
+  g.action('u0', { choice: 0 });
+  run(g, 10.1);
+  check(g.snapshot().gained.u0 > 900 && g.seats[0].streak === 2, 'a streak builds and adds a bonus');
+  run(g, 5.1);
+  const res = g.finished();
+  check(res && res[0].id === 'u0' && res.length === 3, 'the quiz ends with standings');
+  console.log('   ✓ quiz');
+}
+
+// ── Run (اهرب!) ──
+{
+  // Every open tile can be reached from every other: no sealed-off corners.
+  const openTiles: string[] = [];
+  for (let y = 0; y < RUN_H; y++) for (let x = 0; x < RUN_W; x++) if (runOpen(x, y)) openTiles.push(`${x},${y}`);
+  const seen = new Set(['1,1']);
+  const q = [[1, 1]];
+  while (q.length) {
+    const [x, y] = q.shift()!;
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const k = `${x + dx},${y + dy}`;
+      if (runOpen(x + dx, y + dy) && !seen.has(k)) { seen.add(k); q.push([x + dx, y + dy]); }
+    }
+  }
+  check(seen.size === openTiles.length, 'the maze is fully connected');
+
+  let seed = 7;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const g = new RunGame(players(2), rnd) as any;
+  run(g, 3.05); // countdown
+  const a = g.movers[0];
+  check(a.x === 1 && a.y === 1 && !a.ghost, 'runner A starts in a corner');
+  g.input('u0', { right: true });
+  run(g, 0.5);
+  check(a.y === 1 && a.x > 2 && a.x < 4.5, 'holding right runs along the corridor');
+  check(a.coins >= 2, 'coins on the way are picked up');
+  g.input('u0', { right: false });
+  g.input('u0', { left: true });
+  const before = a.x;
+  g.step(1 / 30);
+  check(a.x < before, 'reversing is immediate');
+  g.input('u0', { left: false });
+  g.input('u0', { up: true });
+  run(g, 1);
+  check(a.y === 1, 'turning into a wall does nothing');
+
+  // A ghost on top of a runner catches them; the runner becomes a ghost.
+  const b = g.movers[1];
+  const ai = g.movers.find((m: any) => m.ai);
+  ai.x = b.x; ai.y = b.y;
+  g.step(1 / 30);
+  check(b.ghost === true, 'a caught runner becomes a ghost');
+  const res = g.finished();
+  check(res && res[0].id === 'u0', 'the last runner standing wins (and gets the bonus)');
+
+  // A player ghost earns points for a catch.
+  const h = new RunGame(players(4), rnd) as any;
+  run(h, 3.05);
+  const [p0, p1, p2] = h.movers;
+  p0.ghost = true;
+  p0.x = p1.x; p0.y = p1.y;
+  h.step(1 / 30);
+  check(p1.ghost && p0.catches === 1 && p0.score >= 150 && !h.finished(), 'ghost players score catches; the round goes on while 2+ run');
+  check(!p2.ghost, 'others keep running');
+  console.log('   ✓ run');
 }
 
 console.log(`\n✅ ${passed} game checks passed`);

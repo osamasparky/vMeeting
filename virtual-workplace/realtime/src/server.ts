@@ -7,7 +7,7 @@ import { PresenceManager } from './state/presence-manager.js';
 import { InboundDirectRelay, InboundEvent, OfficeUser } from './events/event-types.js';
 import { NotificationHub, parsePublishBody, secretMatches } from './notifications/notification-hub.js';
 import { SharedState, cleanNote, cleanStroke } from './state/shared-state.js';
-import { GAMES, GameHub, TICK_HZ } from './games/index.js';
+import { buildGames, GameHub, TICK_HZ } from './games/index.js';
 
 dotenv.config();
 
@@ -58,11 +58,17 @@ const presence = new PresenceManager();
 const shared = new SharedState();
 
 // Office arcade: one referee for every game machine; frames go only to the people at that machine.
-const games = new GameHub(GAMES, (userId, event) => {
+const games = new GameHub(buildGames(process.env.REALTIME_SECRET), (userId, event) => {
   const target = presence.findUserSocket(userId);
   if (target) presence.send(target, event as any);
 });
-setInterval(() => games.tick(), 1000 / TICK_HZ);
+// Games advance by the time that really passed, not by how often the timer managed to fire.
+let lastGameTick = performance.now();
+setInterval(() => {
+  const now = performance.now();
+  games.tick((now - lastGameTick) / 1000);
+  lastGameTick = now;
+}, 1000 / TICK_HZ);
 
 /** Once nobody is left in a locked room its door reopens for everyone (rooms rest unlocked). */
 function reopenIfEmpty(orgId: string, mapId: string, roomId: string | null | undefined): void {

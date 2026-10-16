@@ -1,13 +1,6 @@
-import { Game, GameDef, GameInput, GamePlayer, GameResult } from './types.js';
+import { Game, GameDef, GameInput, GamePlayer, GameResult, GameUser } from './types.js';
 
-/** Who is asking: enough of the office user to seat them and reach them. */
-export interface GameUser {
-  userId: string;
-  name: string;
-  organizationId: string;
-  mapId: string;
-  isGuest?: boolean;
-}
+export type { GameUser };
 
 type Send = (userId: string, event: { type: string; payload: unknown }) => void;
 
@@ -55,7 +48,7 @@ export class GameHub {
       case 'game.stand':
         return this.stand(user.userId);
       case 'game.start':
-        return this.start(user.userId);
+        return this.start(user, payload);
       case 'game.input':
         return this.input(user.userId, payload?.input);
       case 'game.action':
@@ -77,11 +70,19 @@ export class GameHub {
     this.broadcastState(s);
   }
 
-  /** Advance every running match; called TICK_HZ times a second. */
+  /**
+   * Advance every running match by dt seconds of real time and send one frame.
+   * Timers fire late (often ~25×/s when asked for 30), so the caller passes
+   * the time that really passed; it is stepped in slices of at most one tick
+   * so the physics stays the same whatever the timer does.
+   */
   tick(dt = 1 / TICK_HZ): void {
+    const total = Math.min(Math.max(dt, 0), 0.25); // a stalled process doesn't fast-forward
     for (const s of this.sessions.values()) {
       if (s.status !== 'playing' || !s.game) continue;
-      s.game.step(dt);
+      for (let left = total; left > 1e-9 && !s.game.finished(); left -= 1 / TICK_HZ) {
+        s.game.step(Math.min(left, 1 / TICK_HZ));
+      }
       const frame = { type: 'game.frame', payload: { machineId: s.machineId, s: s.game.snapshot() } };
       for (const id of s.viewers.keys()) this.send(id, frame);
 
@@ -135,11 +136,19 @@ export class GameHub {
   }
 
   /** The host is the first person seated; they start once enough have sat down. */
-  private start(userId: string): void {
-    const s = this.sessionOf(userId);
-    if (!s || s.status !== 'lobby' || s.players[0]?.id !== userId) return;
+  private start(user: GameUser, payload: unknown): void {
+    const s = this.sessionOf(user.userId);
+    if (!s || s.status !== 'lobby' || s.players[0]?.id !== user.userId) return;
     if (s.players.length < s.def.minPlayers) return;
-    s.game = s.def.create(s.players.map((p) => ({ ...p })));
+    let options: unknown;
+    if (s.def.setup) {
+      options = s.def.setup(payload, user);
+      if (options === null || options === undefined) {
+        this.send(user.userId, { type: 'game.error', payload: { machineId: s.machineId, code: 'setup' } });
+        return;
+      }
+    }
+    s.game = s.def.create(s.players.map((p) => ({ ...p })), options);
     s.status = 'playing';
     s.startedAt = Date.now();
     s.lastResults = null;

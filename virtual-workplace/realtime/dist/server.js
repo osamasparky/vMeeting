@@ -56,12 +56,18 @@ const tokenVerifier = new token_verifier_js_1.TokenVerifier(process.env.REALTIME
 const presence = new presence_manager_js_1.PresenceManager();
 const shared = new shared_state_js_1.SharedState();
 // Office arcade: one referee for every game machine; frames go only to the people at that machine.
-const games = new index_js_1.GameHub(index_js_1.GAMES, (userId, event) => {
+const games = new index_js_1.GameHub((0, index_js_1.buildGames)(process.env.REALTIME_SECRET), (userId, event) => {
     const target = presence.findUserSocket(userId);
     if (target)
         presence.send(target, event);
 });
-setInterval(() => games.tick(), 1000 / index_js_1.TICK_HZ);
+// Games advance by the time that really passed, not by how often the timer managed to fire.
+let lastGameTick = performance.now();
+setInterval(() => {
+    const now = performance.now();
+    games.tick((now - lastGameTick) / 1000);
+    lastGameTick = now;
+}, 1000 / index_js_1.TICK_HZ);
 /** Once nobody is left in a locked room its door reopens for everyone (rooms rest unlocked). */
 function reopenIfEmpty(orgId, mapId, roomId) {
     if (!roomId || !mapId || !shared.isDoorClosed(orgId, mapId, roomId))
