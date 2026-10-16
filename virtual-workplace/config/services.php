@@ -59,6 +59,10 @@ return [
     // unset env var grants nobody — never hardcode real addresses here.
     'super_admin_emails' => env('SUPER_ADMIN_EMAILS', ''),
 
+    // Where furniture catalogue images were originally hosted; furniture:localize-images copies
+    // anything still loaded from there onto this server. Unset = nothing to copy.
+    'furniture_assets_source' => env('FURNITURE_ASSETS_SOURCE'),
+
     'turn' => [
         'url' => env('TURN_URL'),
         'username' => env('TURN_USERNAME'),

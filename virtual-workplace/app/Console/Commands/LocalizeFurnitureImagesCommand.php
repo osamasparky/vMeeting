@@ -9,9 +9,10 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 
 /**
- * Copies the furniture catalogue images (and sound effects) loaded from assets.kumospace.com onto this
- * server (public/images/furniture/catalog/…) and points the catalogue and every placed object
- * at the copies, so the office no longer depends on that site being up.
+ * Copies furniture catalogue images (and sound effects) still loaded from an outside asset host
+ * (config services.furniture_assets_source, env FURNITURE_ASSETS_SOURCE) onto this server
+ * (public/images/furniture/catalog/…) and points the catalogue and every placed object at the
+ * copies, so the office never depends on another site being up.
  *
  * Safe to re-run: files already copied are kept, and only images that were copied are re-pointed
  * (anything that failed keeps its original address). Dry-run by default.
@@ -24,7 +25,6 @@ class LocalizeFurnitureImagesCommand extends Command
 
     protected $description = 'Copy hot-linked furniture images onto this server and use the copies';
 
-    private const HOST = 'https://assets.kumospace.com/';
 
     private const LOCAL_DIR = 'images/furniture/catalog';
 
@@ -32,10 +32,18 @@ class LocalizeFurnitureImagesCommand extends Command
 
     private const MAX_AUDIO_BYTES = 20 * 1024 * 1024; // some sound effects are whole songs
 
+    private string $host = '';
+
     public function handle(): int
     {
+        $this->host = rtrim((string) config('services.furniture_assets_source'), '/').'/';
+        if ($this->host === '/') {
+            $this->info('No outside asset host is configured (FURNITURE_ASSETS_SOURCE); nothing to copy.');
+
+            return self::SUCCESS;
+        }
         $urls = $this->collectUrls();
-        $this->info(count($urls).' furniture images are loaded from '.self::HOST);
+        $this->info(count($urls).' furniture images are loaded from '.$this->host);
         if (! $urls) {
             return self::SUCCESS;
         }
@@ -112,11 +120,11 @@ class LocalizeFurnitureImagesCommand extends Command
     {
         $found = [];
         $add = function ($value) use (&$found, &$add) {
-            if (is_string($value) && str_starts_with($value, self::HOST)) {
+            if (is_string($value) && str_starts_with($value, $this->host)) {
                 $found[$value] = true;
             } elseif (is_array($value)) {
                 array_walk_recursive($value, function ($v) use (&$found) {
-                    if (is_string($v) && str_starts_with($v, self::HOST)) {
+                    if (is_string($v) && str_starts_with($v, $this->host)) {
                         $found[$v] = true;
                     }
                 });
@@ -138,7 +146,7 @@ class LocalizeFurnitureImagesCommand extends Command
     /** public/ path for a remote image, or null if the address isn't a plain file path. */
     private function localPath(string $url): ?string
     {
-        $path = substr(strtok($url, '?'), strlen(self::HOST));
+        $path = substr(strtok($url, '?'), strlen($this->host));
         if ($path === '' || str_contains($path, '..') || ! preg_match('#^[A-Za-z0-9._\-/]+\.(png|jpe?g|webp|gif|svg|mp3|ogg|wav)$#i', $path)) {
             return null;
         }

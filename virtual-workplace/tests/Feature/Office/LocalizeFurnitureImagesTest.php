@@ -18,6 +18,7 @@ class LocalizeFurnitureImagesTest extends TestCase
     {
         parent::setUp();
         $this->dir = public_path('images/furniture/catalog/test-qa');
+        config(['services.furniture_assets_source' => 'https://assets.example.test']);
         File::deleteDirectory($this->dir);
     }
 
@@ -29,16 +30,16 @@ class LocalizeFurnitureImagesTest extends TestCase
 
     public function test_images_are_copied_and_only_copied_ones_are_repointed(): void
     {
-        $ok = 'https://assets.kumospace.com/test-qa/desk-01/0.png';
-        $broken = 'https://assets.kumospace.com/test-qa/lamp-01/0.png';
+        $ok = 'https://assets.example.test/test-qa/desk-01/0.png';
+        $broken = 'https://assets.example.test/test-qa/lamp-01/0.png';
         $cat = DB::table('furniture_categories')->insertGetId(['name' => 'T', 'slug' => 't-qa', 'icon' => 'x', 'order' => 1]);
         DB::table('furniture_items')->insert([
             ['category_id' => $cat, 'name' => 'Desk', 'slug' => 'desk-qa', 'image_url' => $ok, 'thumbnail_url' => $ok, 'interaction_config' => json_encode(['frames' => [$ok]]), 'width' => 1, 'height' => 1, 'collision' => false, 'colors' => '[]', 'is_active' => true],
             ['category_id' => $cat, 'name' => 'Lamp', 'slug' => 'lamp-qa', 'image_url' => $broken, 'thumbnail_url' => null, 'interaction_config' => null, 'width' => 1, 'height' => 1, 'collision' => false, 'colors' => '[]', 'is_active' => true],
         ]);
         Http::fake([
-            'assets.kumospace.com/test-qa/desk-01/*' => Http::response('PNGDATA', 200, ['Content-Type' => 'image/png']),
-            'assets.kumospace.com/test-qa/lamp-01/*' => Http::response('nope', 404),
+            'assets.example.test/test-qa/desk-01/*' => Http::response('PNGDATA', 200, ['Content-Type' => 'image/png']),
+            'assets.example.test/test-qa/lamp-01/*' => Http::response('nope', 404),
         ]);
 
         $this->artisan('furniture:localize-images')->assertSuccessful();
