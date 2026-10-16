@@ -1294,6 +1294,26 @@
             attendancePolicy: @json($attendancePolicy),
         };
 
+        // ── Open-area proximity ──
+        // Everyone outside a room has a circle of PROXIMITY_RADIUS around them. Two people are
+        // connected — hear each other, see cameras, see shared screens — exactly when their circles
+        // touch or overlap, i.e. their centres are within twice the radius. Rooms ignore this:
+        // everyone in the same room is connected.
+        const PROXIMITY_RADIUS = 50;
+        const PROXIMITY_CONNECT = PROXIMITY_RADIUS * 2;
+        // A little slack before cutting media, so standing right on the edge doesn't flicker.
+        const PROXIMITY_RELEASE = PROXIMITY_CONNECT + 12;
+        function proximityDistance(av) {
+            return Math.hypot(localAvatar.x - av.x, localAvatar.y - av.y);
+        }
+        /** Same room, or both on the open floor with touching circles. */
+        function isConnectedTo(av) {
+            const myRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
+            const theirRoom = getCurrentRoom(av.x, av.y);
+            if (myRoom) return !!theirRoom && theirRoom.id === myRoom.id;
+            return !theirRoom && proximityDistance(av) <= PROXIMITY_CONNECT;
+        }
+
         const canvas = document.getElementById('office-canvas');
         const ctx = canvas.getContext('2d');
         const container = document.getElementById('canvas-container');
@@ -3603,7 +3623,7 @@
                 av.y += (av.targetY - av.y) * glide;
 
                 const remoteRoom = getCurrentRoom(av.x, av.y);
-                const isInSameRoom = localRoom ? (remoteRoom && remoteRoom.id === localRoom.id) : (!remoteRoom && Math.hypot(localAvatar.x - av.x, localAvatar.y - av.y) <= 250);
+                const isInSameRoom = isConnectedTo(av);
 
                 // 1. Spatial Audio & Voice Isolation Engine (Strict Circle / Wall Boundary)
                 const audioEl = peerAudioElements.get(av.id);
@@ -3616,14 +3636,15 @@
                         if (remoteRoom) {
                             audioEl.volume = 0;
                         } else {
-                            // Only hear colleagues who are within our visible hearing circle radius (100px)
-                            const dist = Math.hypot(localAvatar.x - av.x, localAvatar.y - av.y);
-                            const hearingCircleRadius = 100;
-                            if (dist > hearingCircleRadius) {
+                            // Heard only while the two circles touch: full volume up close,
+                            // easing to 40 % right at the edge, silent beyond it.
+                            const dist = proximityDistance(av);
+                            if (dist > PROXIMITY_CONNECT) {
                                 audioEl.volume = 0;
+                            } else if (dist <= PROXIMITY_RADIUS) {
+                                audioEl.volume = 1.0;
                             } else {
-                                const factor = 1 - (dist / hearingCircleRadius);
-                                audioEl.volume = Math.max(0, Math.min(1.0, factor * 1.2));
+                                audioEl.volume = 1 - 0.6 * ((dist - PROXIMITY_RADIUS) / PROXIMITY_RADIUS);
                             }
                         }
                     }
@@ -3636,7 +3657,29 @@
                 }
             });
 
+            syncProximitySubscriptions();
             broadcastPosition();
+        }
+
+        // On the open floor everyone shares one media room, so the browser would otherwise
+        // receive every voice, camera and screen there. Receive only from connected people:
+        // less bandwidth, and nothing to overhear from across the office.
+        let lastProximitySync = 0;
+        function syncProximitySubscriptions() {
+            const room = window.VWorkWebRTC?.livekitRoom;
+            if (!room || !String(currentLiveKitRoomId || '').startsWith('open:')) return;
+            const now = Date.now();
+            if (now - lastProximitySync < 300) return;
+            lastProximitySync = now;
+            room.remoteParticipants?.forEach((participant) => {
+                const av = remoteAvatars.get(participant.identity);
+                const dist = av && !getCurrentRoom(av.x, av.y) ? proximityDistance(av) : Infinity;
+                participant.trackPublications?.forEach((pub) => {
+                    if (typeof pub.setSubscribed !== 'function') return;
+                    if (!pub.isSubscribed && dist <= PROXIMITY_CONNECT) pub.setSubscribed(true);
+                    else if (pub.isSubscribed && dist > PROXIMITY_RELEASE) pub.setSubscribed(false);
+                });
+            });
         }
 
         let lastSentX = -999, lastSentY = -999;
@@ -4201,7 +4244,7 @@
 
             // 1. Spatial Voice Hearing Circle (Visible when outside in open area)
             if (!avRoom) {
-                const hearingRadius = 100;
+                const hearingRadius = PROXIMITY_RADIUS;
                 const circleGrad = ctx.createRadialGradient(x, y, 8, x, y, hearingRadius);
                 circleGrad.addColorStop(0, isSelf ? 'rgba(16, 185, 129, 0.28)' : 'rgba(59, 130, 246, 0.22)');
                 circleGrad.addColorStop(0.7, isSelf ? 'rgba(16, 185, 129, 0.08)' : 'rgba(59, 130, 246, 0.06)');
@@ -4247,10 +4290,7 @@
             } else if (lRoom) {
                 canSeeLiveCam = (rRoom && rRoom.id === lRoom.id);
             } else {
-                if (!rRoom) {
-                    const dist = Math.hypot(localAvatar.x - av.x, localAvatar.y - av.y);
-                    canSeeLiveCam = (dist <= 280);
-                }
+                canSeeLiveCam = isConnectedTo(av);
             }
 
             // 4. Live Camera Video OR User Profile Picture / Gradient Monogram (Clean Circular Avatar)
@@ -6906,7 +6946,7 @@
                 const av = remoteAvatars.get(userId);
                 const lRoom = getCurrentRoom(localAvatar.x, localAvatar.y);
                 const rRoom = av ? getCurrentRoom(av.x, av.y) : null;
-                const canSee = lRoom ? (rRoom && rRoom.id === lRoom.id) : (!rRoom && av && Math.hypot(localAvatar.x - av.x, localAvatar.y - av.y) <= 300);
+                const canSee = !!av && isConnectedTo(av);
 
                 if (canSee && av) {
                     if (av.livekitVideoTrack) {
@@ -7558,16 +7598,8 @@
                 
                 const remoteRoom = getCurrentRoom(av.x, av.y);
                 let canViewRemoteVideo = false;
-                if (localRoom) {
-                    // Inside a room: only see colleagues in the same room
-                    canViewRemoteVideo = (remoteRoom && remoteRoom.id === localRoom.id);
-                } else {
-                    // On open floor: only see colleagues on open floor within proximity
-                    if (!remoteRoom) {
-                        const dist = Math.hypot(localAvatar.x - av.x, localAvatar.y - av.y);
-                        canViewRemoteVideo = (dist <= 300);
-                    }
-                }
+                // Same room, or touching circles on the open floor.
+                canViewRemoteVideo = isConnectedTo(av);
 
                 const vidEl = av.videoEl || peerVideoCards.get(av.id)?.querySelector('video');
                 let videoAttached = false;
