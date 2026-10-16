@@ -18,7 +18,10 @@
         karts: { w: 900, h: 600 },
         pool: { w: 1000, h: 560 },
         run: { w: 840, h: 520 }, // 21 × 13 tiles of 40 px
-        quiz: null, // drawn with HTML, not on the canvas
+        // Drawn with HTML, not on the canvas:
+        quiz: null,
+        chess: null,
+        tictactoe: null,
     };
 
     // Player colours come from the design tokens; names are always drawn too, so colour is never the only cue.
@@ -134,14 +137,14 @@
         if (msg.type === 'game.state') {
             state = msg.payload;
             meta = state.meta || meta;
-            if (state.status !== 'playing') { frame = prev = null; releaseAll(); quiz.myPick = null; quiz.key = ''; }
+            if (state.status !== 'playing') { frame = prev = null; releaseAll(); quiz.myPick = null; quiz.key = ''; board.key = ''; board.sel = -1; board.promo = null; }
             renderLobby();
         } else if (msg.type === 'game.frame') {
             prev = frame;
             prevAt = frameAt;
             frame = msg.payload.s;
             frameAt = performance.now();
-            if (machine.game === 'quiz') renderQuiz();
+            if (FIELDS[machine.game] === null) renderDom();
             else if (!raf) raf = requestAnimationFrame(draw);
         } else if (msg.type === 'game.error') {
             quiz.error = t('games.quiz.start_failed');
@@ -167,12 +170,12 @@
 
     function renderLobby() {
         const playing = state?.status === 'playing';
-        const isQuiz = machine?.game === 'quiz';
+        const isDom = !!machine && FIELDS[machine.game] === null;
         $('game-stage').hidden = !playing;
         $('game-lobby').hidden = playing && seated();
-        $('game-canvas').hidden = isQuiz;
-        $('game-quiz').hidden = !isQuiz;
-        if (playing && isQuiz) renderQuiz();
+        $('game-canvas').hidden = isDom;
+        $('game-dom').hidden = !isDom;
+        if (playing && isDom) renderDom();
         else if (playing) fitCanvas();
 
         const seats = $('game-seats');
@@ -270,6 +273,7 @@
             if (n && e.type === 'keydown' && !e.repeat) { e.preventDefault(); answer(Number(n[1]) - 1); }
             return;
         }
+        if (FIELDS[machine.game] === null) return; // board games: buttons and Tab/Enter
         const action = (KEYMAP[machine.game] || {})[e.code];
         if (!action || state?.status !== 'playing' || !seated()) return;
         e.preventDefault();
@@ -886,7 +890,7 @@
     }
 
     function renderQuiz() {
-        const box = $('game-quiz');
+        const box = $('game-dom');
         const f = frame;
         if (!f) { box.textContent = ''; return; }
         if (f.phase === 'question' && quiz.qi !== f.i) { quiz.qi = f.i; quiz.myPick = null; }
@@ -964,6 +968,178 @@
             });
             box.appendChild(board);
         }
+    }
+
+    // ── board games: شطرنج and إكس أو ──
+
+    const board = { sel: -1, promo: null, key: '' };
+    // ︎ asks for the text form: the pawn otherwise turns into an emoji that ignores our colours.
+    const GLYPH = { k: '♚︎', q: '♛︎', r: '♜︎', b: '♝︎', n: '♞︎', p: '♟︎' };
+    const PIECE_NAME = { k: 'king', q: 'queen', r: 'rook', b: 'bishop', n: 'knight', p: 'pawn' };
+    const sqName = (s) => 'abcdefgh'[s % 8] + (Math.floor(s / 8) + 1);
+    const clockText = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+
+    function chessAct(data) {
+        send({ type: 'game.action', payload: { data } });
+    }
+
+    function renderChess(box) {
+        const f = frame;
+        const myColor = f.white.id === me.id ? 'w' : f.black.id === me.id ? 'b' : null;
+        const flip = myColor === 'b';
+        const myTurn = myColor === f.turn && !f.outcome;
+        const key = [f.board, f.turn, f.clocks.w, f.clocks.b, board.sel, board.promo?.to, f.drawOffer, f.outcome?.reason].join('|');
+        if (key === board.key) return;
+        board.key = key;
+        if (!myTurn) { board.sel = -1; board.promo = null; }
+        box.textContent = '';
+
+        const wrap = el('div', 'game-chess');
+        const side = (c) => {
+            const p = c === 'w' ? f.white : f.black;
+            const row = el('div', 'game-chess__player' + (f.turn === c && !f.outcome ? ' is-turn' : ''));
+            const dot = el('span', 'game-seat__dot');
+            dot.style.background = colorOf(p.slot);
+            row.append(dot, el('span', 'game-chess__name', `${c === 'w' ? '♔' : '♚'} ${p.name}${p.id === me.id ? ` (${t('games.you')})` : ''}`), el('span', 'game-chess__clock', clockText(f.clocks[c])));
+            return row;
+        };
+        const top = side(flip ? 'w' : 'b');
+        const bottom = side(flip ? 'b' : 'w');
+
+        const grid = el('div', 'game-chess__board');
+        grid.setAttribute('role', 'grid');
+        grid.setAttribute('aria-label', t('games.name.chess.ar'));
+        const targets = new Map((board.sel >= 0 ? f.legal.filter((m) => m[0] === board.sel) : []).map((m) => [m[1], m[2]]));
+        const mine = (pc) => myColor && pc !== '.' && ((pc === pc.toUpperCase()) === (myColor === 'w'));
+        for (let row = 0; row < 8; row++) {
+            for (let col = 0; col < 8; col++) {
+                const r = flip ? row : 7 - row;
+                const c = flip ? 7 - col : col;
+                const s = r * 8 + c;
+                const pc = f.board[s];
+                const b = el('button', 'game-chess__sq ' + ((r + c) % 2 ? 'is-light' : 'is-dark'));
+                b.type = 'button';
+                if (f.last && (f.last[0] === s || f.last[1] === s)) b.classList.add('is-last');
+                if (f.check === s) b.classList.add('is-check');
+                if (board.sel === s) b.classList.add('is-selected');
+                if (targets.has(s)) b.classList.add(pc === '.' ? 'is-target' : 'is-capture');
+                if (pc !== '.') {
+                    const g = el('span', 'game-chess__piece ' + (pc === pc.toUpperCase() ? 'is-white' : 'is-black'), GLYPH[pc.toLowerCase()]);
+                    b.appendChild(g);
+                }
+                b.setAttribute('aria-label', `${sqName(s)}${pc !== '.' ? ' ' + (pc === pc.toUpperCase() ? 'white' : 'black') + ' ' + PIECE_NAME[pc.toLowerCase()] : ''}`);
+                b.disabled = !myTurn;
+                b.addEventListener('click', () => {
+                    if (targets.has(s)) {
+                        if (targets.get(s)) { board.promo = { from: board.sel, to: s }; board.key = ''; renderDom(); return; }
+                        chessAct({ from: board.sel, to: s });
+                        board.sel = -1;
+                    } else {
+                        board.sel = mine(pc) && board.sel !== s ? s : -1;
+                    }
+                    board.key = '';
+                    renderDom();
+                });
+                grid.appendChild(b);
+            }
+        }
+
+        const panel = el('div', 'game-chess__panel');
+        const status = el('p', 'game-chess__status');
+        status.setAttribute('role', 'status');
+        if (f.outcome) {
+            const winner = f.outcome.winner === 'w' ? f.white : f.outcome.winner === 'b' ? f.black : null;
+            status.textContent = (winner ? t('games.chess.wins', { name: winner.name }) : t('games.chess.draw')) + ' — ' + t('games.chess.reason.' + f.outcome.reason);
+        } else {
+            status.textContent = myTurn ? t('games.your_turn') : t('games.their_turn', { name: (f.turn === 'w' ? f.white : f.black).name });
+        }
+        panel.appendChild(status);
+
+        if (board.promo) {
+            const pick = el('div', 'game-chess__promo');
+            pick.appendChild(el('span', '', t('games.chess.promote')));
+            for (const p of ['q', 'r', 'b', 'n']) {
+                const pb = el('button', 'ula-btn ula-btn--outline ula-btn--md', GLYPH[p]);
+                pb.type = 'button';
+                pb.setAttribute('aria-label', PIECE_NAME[p]);
+                pb.addEventListener('click', () => { chessAct({ ...board.promo, promo: p }); board.promo = null; board.sel = -1; board.key = ''; });
+                pick.appendChild(pb);
+            }
+            panel.appendChild(pick);
+        }
+
+        if (myColor && !f.outcome) {
+            const acts = el('div', 'game-chess__actions');
+            const them = myColor === 'w' ? 'b' : 'w';
+            if (f.drawOffer === them) {
+                panel.appendChild(el('p', 'game-chess__offer', t('games.chess.offered')));
+                acts.append(button(t('games.chess.accept'), 'primary', () => chessAct({ draw: 'accept' })), button(t('games.chess.decline'), 'outline', () => chessAct({ draw: 'decline' })));
+            } else if (f.drawOffer === myColor) {
+                panel.appendChild(el('p', 'game-chess__offer', t('games.chess.offer_sent')));
+            } else {
+                acts.appendChild(button(t('games.chess.offer'), 'outline', () => chessAct({ draw: 'offer' })));
+            }
+            acts.appendChild(button(t('games.chess.resign'), 'danger', () => { if (confirm(t('games.chess.resign_confirm'))) chessAct({ resign: true }); }));
+            panel.appendChild(acts);
+        }
+
+        const col = el('div', 'game-chess__col');
+        col.append(top, grid, bottom);
+        wrap.append(col, panel);
+        box.appendChild(wrap);
+    }
+
+    function renderTicTacToe(box) {
+        const f = frame;
+        const meP = f.players.find((p) => p.id === me.id);
+        const myTurn = !!meP && f.turn === me.id && !f.pause && !f.over;
+        const key = [f.cells, f.turn, f.clock, f.round, f.pause, f.over].join('|');
+        if (key === board.key) return;
+        board.key = key;
+        box.textContent = '';
+
+        const head = el('div', 'game-ttt__score');
+        f.players.forEach((p) => {
+            const s = el('div', 'game-ttt__player' + (f.turn === p.id && !f.pause ? ' is-turn' : ''));
+            const dot = el('span', 'game-seat__dot');
+            dot.style.background = colorOf(p.slot);
+            s.append(dot, el('span', 'game-ttt__mark', p.mark), el('span', '', p.name + (p.id === me.id ? ` (${t('games.you')})` : '')), el('span', 'game-ttt__wins', String(p.wins)));
+            head.appendChild(s);
+        });
+        box.appendChild(head);
+        box.appendChild(el('p', 'game-ttt__round', t('games.ttt.round', { r: f.round, n: f.need })));
+
+        const cells = f.cells.split(',');
+        const grid = el('div', 'game-ttt__grid');
+        cells.forEach((v, i) => {
+            const b = el('button', 'game-ttt__cell' + (f.line && f.line.includes(i) ? ' is-line' : ''), v);
+            b.type = 'button';
+            b.disabled = !myTurn || !!v;
+            b.setAttribute('aria-label', `${i + 1}${v ? ' ' + v : ''}`);
+            b.addEventListener('click', () => chessAct({ cell: i }));
+            grid.appendChild(b);
+        });
+        box.appendChild(grid);
+
+        const status = el('p', 'game-ttt__status');
+        status.setAttribute('role', 'status');
+        if (f.pause) {
+            const w = f.players.find((p) => p.id === f.roundWinner);
+            status.textContent = f.roundWinner === 'draw' ? t('games.draw') : t('games.round_won', { name: w ? w.name : '' });
+        } else {
+            const who = f.players.find((p) => p.id === f.turn);
+            status.textContent = `${myTurn ? t('games.your_turn') : t('games.their_turn', { name: who ? who.name : '' })} · ${f.clock}`;
+        }
+        box.appendChild(status);
+    }
+
+    /** HTML-drawn games (quiz, chess, tic-tac-toe) share one stage. */
+    function renderDom() {
+        const box = $('game-dom');
+        if (!frame) { box.textContent = ''; return; }
+        if (machine.game === 'quiz') return renderQuiz();
+        if (machine.game === 'chess') return renderChess(box);
+        if (machine.game === 'tictactoe') return renderTicTacToe(box);
     }
 
     window.UlaGames = { init, open, receive, capturesKeys };

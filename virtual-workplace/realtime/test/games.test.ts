@@ -6,6 +6,9 @@ import { PoolGame, POCKETS } from '../src/games/pool.js';
 import { GamePlayer } from '../src/games/types.js';
 import { QuizGame, openTicket, quizDef } from '../src/games/quiz.js';
 import crypto from 'crypto';
+import { ChessGame } from '../src/games/chess.js';
+import { fromFen as chessFen, perft as chessPerft } from '../src/games/chess-rules.js';
+import { TicTacToeGame } from '../src/games/tictactoe.js';
 import { RunGame, W as RUN_W, H as RUN_H, open as runOpen } from '../src/games/run.js';
 
 let passed = 0;
@@ -55,7 +58,7 @@ console.log('🎮 Game tests');
 
   hub.handle(user('g', { isGuest: true }), 'game.open', { machineId: 'm2', game: 'snipers' });
   hub.handle(user('x'), 'game.open', { machineId: 'bad id!', game: 'snipers' });
-  hub.handle(user('y'), 'game.open', { machineId: 'm3', game: 'chess' });
+  hub.handle(user('y'), 'game.open', { machineId: 'm3', game: 'checkers' });
   check(hub.sessionCount() === 0, 'guests, bad machine ids and unknown games are ignored');
 
   const sameName = new GameHub(GAMES, () => {});
@@ -329,6 +332,83 @@ console.log('🎮 Game tests');
   check(p1.ghost && p0.catches === 1 && p0.score >= 150 && !h.finished(), 'ghost players score catches; the round goes on while 2+ run');
   check(!p2.ghost, 'others keep running');
   console.log('   ✓ run');
+}
+
+// ── Chess ──
+{
+  const sq = (s: string) => s.charCodeAt(0) - 97 + (Number(s[1]) - 1) * 8;
+  const mv = (g: any, who: string, a: string, b: string, promo?: string) => g.action(who, { from: sq(a), to: sq(b), promo });
+
+  // The move generator matches the standard reference counts.
+  check(chessPerft(chessFen('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'), 3) === 8902, 'perft(3) from the start = 8902');
+  check(chessPerft(chessFen('r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1'), 2) === 2039, 'kiwipete perft(2) = 2039 (castling, en passant, promotion)');
+
+  const g = new ChessGame(players(2)) as any;
+  mv(g, 'u1', 'e7', 'e5');
+  check(g.snapshot().moves === 0, 'black cannot move first');
+  mv(g, 'u0', 'e2', 'e5');
+  check(g.snapshot().moves === 0, 'an illegal move is ignored');
+  mv(g, 'u0', 'f2', 'f3'); mv(g, 'u1', 'e7', 'e5'); mv(g, 'u0', 'g2', 'g4'); mv(g, 'u1', 'd8', 'h4');
+  const s = g.snapshot();
+  check(s.outcome?.winner === 'b' && s.outcome.reason === 'mate', "fool's mate: black wins by mate");
+  check(g.finished() === null, 'the final position stays up for a moment');
+  run(g, 5.1);
+  check(g.finished()?.[0].id === 'u1', 'then black is first in the results');
+
+  const c = new ChessGame(players(2)) as any;
+  c.step(10);
+  check(c.snapshot().clocks.w === 300, "white's clock starts only after the first move");
+  mv(c, 'u0', 'e2', 'e4');
+  c.step(301);
+  check(c.snapshot().outcome?.reason === 'time' && c.snapshot().outcome.winner === 'w', 'running out of time loses');
+
+  const d = new ChessGame(players(2)) as any;
+  d.action('u0', { draw: 'offer' });
+  d.action('u0', { draw: 'accept' });
+  check(!d.snapshot().outcome, 'you cannot accept your own offer');
+  d.action('u1', { draw: 'accept' });
+  check(d.snapshot().outcome?.reason === 'agreed', 'an accepted offer is a draw');
+
+  const promo = new ChessGame(players(2), '8/P6k/8/8/8/8/8/K7 w - - 0 1') as any;
+  mv(promo, 'u0', 'a7', 'a8', 'n');
+  check(promo.pos.board[sq('a8')] === 'N', 'promotion to the chosen piece');
+
+  const pin = new ChessGame(players(2), 'k7/8/8/8/8/8/8/1R5K w - - 0 1') as any;
+  mv(pin, 'u0', 'h1', 'h2');
+  mv(pin, 'u1', 'a8', 'b8'); // the rook covers the b-file: refused
+  check(pin.snapshot().moves === 1 && pin.pos.board[sq('a8')] === 'k', 'a move into check is refused');
+  mv(pin, 'u1', 'a8', 'a7');
+  check(pin.snapshot().moves === 2, 'a safe king move is accepted');
+  const st2 = new ChessGame(players(2), '7k/8/6Q1/8/8/8/8/K7 w - - 0 1') as any;
+  mv(st2, 'u0', 'g6', 'f7');
+  check(st2.snapshot().outcome?.reason === 'stalemate', 'no legal move and not in check = stalemate');
+  console.log('   ✓ chess');
+}
+
+// ── Tic-tac-toe ──
+{
+  const g = new TicTacToeGame(players(2)) as any;
+  const put = (who: string, cell: number) => g.action(who, { cell });
+  put('u1', 0);
+  check(g.cells.every((c: string) => !c), 'O cannot open the first round');
+  put('u0', 0); put('u1', 3); put('u0', 1); put('u1', 4);
+  put('u1', 5);
+  check(g.cells[5] === '', 'no playing twice in a row');
+  put('u0', 2);
+  let s = g.snapshot();
+  check(s.roundWinner === 'u0' && JSON.stringify(s.line) === '[0,1,2]', 'three in a row wins the round');
+  run(g, 2.3);
+  s = g.snapshot();
+  check(s.round === 2 && s.turn === 'u1' && s.players[1].mark === 'X', 'the other player starts the next round as X');
+  run(g, 15.1);
+  check(g.snapshot().roundWinner === 'u0', 'too slow: the round goes to the other player');
+  run(g, 2.3);
+  // Round 3: u0 starts again; let them win a third time.
+  put('u0', 4); put('u1', 0); put('u0', 2); put('u1', 1); put('u0', 6);
+  run(g, 3.2);
+  const res = g.finished();
+  check(res && res[0].id === 'u0' && res[0].score === '3', 'first to 3 rounds wins the match');
+  console.log('   ✓ tic-tac-toe');
 }
 
 console.log(`\n✅ ${passed} game checks passed`);

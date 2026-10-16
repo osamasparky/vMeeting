@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300" role="img" aria-label="شطرنج — CHESS">
+  <!-- UlaSpace office arcade machine: CHESS. Generated; edit the template in the commit that added it. -->
+  <ellipse cx="150" cy="286" rx="78" ry="8" fill="#0e1c17" opacity="0.25"/>
+  <path d="M84 30 h132 v250 h-132z" fill="#1b3223"/>
+  <path d="M84 30 h132 v8 h-132z" fill="#1e412f"/>
+  <rect x="78" y="24" width="8" height="258" rx="3" fill="#b98a37"/>
+  <rect x="214" y="24" width="8" height="258" rx="3" fill="#b98a37"/>
+  <!-- marquee -->
+  <rect x="88" y="36" width="124" height="56" rx="6" fill="#0e1c17" stroke="#d3a553" stroke-width="2"/>
+  <text x="150" y="66" font-size="22" font-weight="800" text-anchor="middle" fill="#e6c88b" font-family="Cairo, 'IBM Plex Sans Arabic', Tahoma, Arial, sans-serif" direction="rtl">شطرنج</text>
+  <text x="150" y="84" font-size="9" font-weight="700" letter-spacing="1.5" text-anchor="middle" fill="#ede6d9" font-family="Arial, sans-serif">CHESS</text>
+  <!-- screen -->
+  <rect x="92" y="100" width="116" height="104" rx="8" fill="#0e1c17" stroke="#4a443c" stroke-width="3"/>
+  <rect x="96" y="104" width="108" height="96" rx="5" fill="#142b24"/>
+   <rect x="106" y="108" width="15" height="15" fill="#ede6d9"/><rect x="121" y="108" width="15" height="15" fill="#5e8a6c"/><rect x="136" y="108" width="15" height="15" fill="#ede6d9"/><rect x="151" y="108" width="15" height="15" fill="#5e8a6c"/><rect x="166" y="108" width="15" height="15" fill="#ede6d9"/><rect x="181" y="108" width="15" height="15" fill="#5e8a6c"/><rect x="106" y="123" width="15" height="15" fill="#5e8a6c"/><rect x="121" y="123" width="15" height="15" fill="#ede6d9"/><rect x="136" y="123" width="15" height="15" fill="#5e8a6c"/><rect x="151" y="123" width="15" height="15" fill="#ede6d9"/><rect x="166" y="123" width="15" height="15" fill="#5e8a6c"/><rect x="181" y="123" width="15" height="15" fill="#ede6d9"/><rect x="106" y="138" width="15" height="15" fill="#ede6d9"/><rect x="121" y="138" width="15" height="15" fill="#5e8a6c"/><rect x="136" y="138" width="15" height="15" fill="#ede6d9"/><rect x="151" y="138" width="15" height="15" fill="#5e8a6c"/><rect x="166" y="138" width="15" height="15" fill="#ede6d9"/><rect x="181" y="138" width="15" height="15" fill="#5e8a6c"/><rect x="106" y="153" width="15" height="15" fill="#5e8a6c"/><rect x="121" y="153" width="15" height="15" fill="#ede6d9"/><rect x="136" y="153" width="15" height="15" fill="#5e8a6c"/><rect x="151" y="153" width="15" height="15" fill="#ede6d9"/><rect x="166" y="153" width="15" height="15" fill="#5e8a6c"/><rect x="181" y="153" width="15" height="15" fill="#ede6d9"/><rect x="106" y="168" width="15" height="15" fill="#ede6d9"/><rect x="121" y="168" width="15" height="15" fill="#5e8a6c"/><rect x="136" y="168" width="15" height="15" fill="#ede6d9"/><rect x="151" y="168" width="15" height="15" fill="#5e8a6c"/><rect x="166" y="168" width="15" height="15" fill="#ede6d9"/><rect x="181" y="168" width="15" height="15" fill="#5e8a6c"/><rect x="106" y="183" width="15" height="15" fill="#5e8a6c"/><rect x="121" y="183" width="15" height="15" fill="#ede6d9"/><rect x="136" y="183" width="15" height="15" fill="#5e8a6c"/><rect x="151" y="183" width="15" height="15" fill="#ede6d9"/><rect x="166" y="183" width="15" height="15" fill="#5e8a6c"/><rect x="181" y="183" width="15" height="15" fill="#ede6d9"/>
+   <text x="128" y="160" font-size="34" text-anchor="middle" fill="#0e1c17" font-family="Segoe UI Symbol, DejaVu Sans, sans-serif">♚</text>
+   <text x="172" y="190" font-size="30" text-anchor="middle" fill="#f9f6ef" stroke="#0e1c17" stroke-width="1.2" font-family="Segoe UI Symbol, DejaVu Sans, sans-serif">♞</text>
+  <!-- control panel -->
+  <path d="M84 212 h132 l10 26 h-152z" fill="#2a5439"/>
+  <circle cx="112" cy="224" r="3" fill="#4a443c"/><line x1="112" y1="224" x2="112" y2="214" stroke="#4a443c" stroke-width="3"/>
+  <circle cx="112" cy="212" r="5" fill="#d99a6c"/>
+  <circle cx="160" cy="226" r="5" fill="#d3a553"/><circle cx="176" cy="222" r="5" fill="#d99a6c"/><circle cx="192" cy="226" r="5" fill="#f9f6ef"/>
+  <!-- base with coin slot -->
+  <rect x="84" y="238" width="132" height="42" fill="#1e412f"/>
+  <rect x="140" y="250" width="20" height="16" rx="2" fill="#0e1c17"/><rect x="148" y="253" width="4" height="10" fill="#d3a553"/>
+</svg>

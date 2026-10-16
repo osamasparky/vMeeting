@@ -5,10 +5,12 @@ import { karts } from './karts.js';
 import { pool } from './pool.js';
 import { quizDef } from './quiz.js';
 import { run } from './run.js';
+import { chess } from './chess.js';
+import { tictactoe } from './tictactoe.js';
 
 /** Every game a machine can run, by the key stored on the furniture item. */
 export function buildGames(secret: string | undefined): Record<string, GameDef> {
-  return { snipers, racing, karts, pool, run, quiz: quizDef(secret) };
+  return { snipers, racing, karts, pool, run, chess, tictactoe, quiz: quizDef(secret) };
 }
 
 /** Without the secret: everything but the quiz (which can then never start). */

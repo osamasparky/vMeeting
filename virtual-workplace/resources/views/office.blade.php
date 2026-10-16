@@ -2111,8 +2111,8 @@
                         playDoorSlideSound();
                         showToast(`☕ ${__("Enjoying fresh drink from")} ${escapeHtml(item.name)}! Cheers! 🎉`);
                         triggerSpeechReaction('☕', 'emoji');
-                    } else if (item.interaction_type === 'game') {
-                        window.UlaGames?.open({ id: String(item.id), game: item.config?.game, name: item.name });
+                    } else if (item.interaction_type === 'game' || item.interaction_type === 'chess') {
+                        window.UlaGames?.open({ id: String(item.id), game: item.interaction_type === 'chess' ? 'chess' : item.config?.game, name: item.name });
                     } else if (item.interaction_type === 'whiteboard') {
                         const boardModal = document.getElementById('whiteboard-modal');
                         if (boardModal) boardModal.style.display = 'flex';
@@ -2210,7 +2210,7 @@
                     promptEl.style.display = 'block';
                     if (found.interaction_type === 'drink') {
                         promptEl.innerHTML = `<span>☕ ${__('Press')} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> ${__('to Grab Drink')}</span>`;
-                    } else if (found.interaction_type === 'game') {
+                    } else if (found.interaction_type === 'game' || found.interaction_type === 'chess') {
                         promptEl.innerHTML = `<span>🕹️ ${__('Press')} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> ${escapeHtml(@json(__('games.press_to_play')))} · ${escapeHtml(found.name)}</span>`;
                     } else if (found.interaction_type === 'whiteboard') {
                         promptEl.innerHTML = `<span>📋 ${__('Press')} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> ${__('to Open Whiteboard')}</span>`;
