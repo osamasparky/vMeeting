@@ -177,7 +177,12 @@
                 state.first = false;
                 renderBadge();
                 renderList();
-            } catch (e) { /* polling failures are retried on the next tick */ }
+                // Others (the office assistant) follow the bell instead of polling on their own.
+                document.dispatchEvent(new CustomEvent('notifications:updated', { detail: { unread, items: state.items } }));
+            } catch (e) {
+                /* polling failures are retried on the next tick */
+                document.dispatchEvent(new CustomEvent('notifications:failed'));
+            }
         }
 
         async function open(id) {

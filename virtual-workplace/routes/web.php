@@ -14,6 +14,7 @@ use App\Http\Controllers\Web\AttendanceController;
 use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\DashboardController;
 use App\Http\Controllers\Web\GuestAccessController;
+use App\Domains\Assistant\Controllers\AssistantController;
 use App\Domains\Workspace\Controllers\QuizController;
 use App\Http\Controllers\Web\HrController;
 use App\Http\Controllers\Web\NotificationPreferencesController;
@@ -82,6 +83,10 @@ Route::middleware(['auth', 'project.visible'])->group(function () {
     Route::post('/organization/ai-map/generate', [OfficeController::class, 'generateAiOffice'])->middleware('throttle:expensive')->name('organization.ai_map.generate');
 
     // Personnel affairs: official holidays
+    // Office assistant: personal briefing + typed requests (read-only, own data).
+    Route::get('/assistant/briefing', [AssistantController::class, 'briefing'])->middleware('throttle:60,1')->name('assistant.briefing');
+    Route::post('/assistant/ask', [AssistantController::class, 'ask'])->middleware('throttle:30,1')->name('assistant.ask');
+
     // Office quiz machine: list / start (sealed ticket) for everyone; the owner writes the company's quizzes.
     Route::get('/games/quizzes', [QuizController::class, 'index'])->name('games.quizzes.index');
     Route::post('/games/quizzes', [QuizController::class, 'store'])->name('games.quizzes.store');

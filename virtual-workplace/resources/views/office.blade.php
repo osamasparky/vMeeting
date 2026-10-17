@@ -3087,6 +3087,22 @@
             }
         }
 
+        // For the assistant: walk to a room on this floor (true), or say it isn't here (false).
+        window.ulaGoToRoom = function (roomId) {
+            const room = rooms.find(r => String(r.id) === String(roomId));
+            if (!room || !room.bounds) return false;
+            const cx = (room.bounds.x + room.bounds.width / 2) * TILE_SIZE;
+            const cy = (room.bounds.y + room.bounds.height / 2) * TILE_SIZE;
+            navigateToRoomWithRoute(room, cx, cy);
+            return true;
+        };
+        // For the assistant: open a direct message when that person is in the office.
+        window.ulaOpenDm = function (userId) {
+            if (!remoteAvatars.has(String(userId))) return false;
+            openDirectMessage(String(userId));
+            return true;
+        };
+
         function triggerDoorAnimation(roomId) {
             let state = doorAnimationStates.get(roomId);
             if (!state) {
@@ -7974,6 +7990,10 @@
         requestAnimationFrame(draw);
     </script>
     <script src="/js/office/attendance.js?v={{ filemtime(public_path('js/office/attendance.js')) }}" nonce="{{ $cspNonce ?? '' }}"></script>
+    @if(empty($user->is_guest))
+        @include('office.partials.assistant')
+        <script src="/js/office/assistant.js?v={{ filemtime(public_path('js/office/assistant.js')) }}" nonce="{{ $cspNonce ?? '' }}"></script>
+    @endif
     @include('office.partials.games')
     <script src="/js/office/games.js?v={{ filemtime(public_path('js/office/games.js')) }}" nonce="{{ $cspNonce ?? '' }}"></script>
     <script nonce="{{ $cspNonce ?? '' }}">

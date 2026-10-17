@@ -21,6 +21,10 @@ class AppServiceProvider extends ServiceProvider
     {
         // One per request / job, so pending pings never leak between them.
         $this->app->scoped(RealtimeNotifier::class);
+
+        // The office assistant answers by rules from the member's own data. Bind a
+        // language-model responder here once one is configured (see AssistantResponder).
+        $this->app->bind(\App\Domains\Assistant\Responders\AssistantResponder::class, \App\Domains\Assistant\Responders\RuleBasedResponder::class);
     }
 
     /**

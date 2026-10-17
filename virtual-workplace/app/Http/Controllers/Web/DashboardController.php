@@ -7,13 +7,13 @@ use App\Domains\Meetings\Actions\ScheduleMeetingAction;
 use App\Domains\Meetings\Models\Meeting;
 use App\Domains\Meetings\Requests\ScheduleMeetingRequest;
 use App\Domains\Notifications\Models\WorkplaceNotification;
+use App\Domains\Notifications\Support\NotificationCategories;
 use App\Domains\People\Services\WorkspacePulse;
 use App\Domains\Tenancy\Actions\BuildOrganizationDashboardAction;
 use App\Domains\Tenancy\Models\Organization;
 use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Http\Controllers\Controller;
 use App\Services\FileUploadService;
-use App\Support\NotificationPreferences;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -184,12 +184,8 @@ class DashboardController extends Controller
             ]);
         }
 
-        $filter = $request->validate(['filter' => ['nullable', 'in:all,unread,task,meeting,office']])['filter'] ?? 'all';
-        $page = WorkplaceNotification::forUser($user->id)
-            ->when($filter === 'unread', fn ($q) => $q->unread())
-            ->when($filter === 'task', fn ($q) => $q->where('type', 'like', 'task%'))
-            ->when($filter === 'meeting', fn ($q) => $q->where('type', 'like', 'meeting%'))
-            ->when($filter === 'office', fn ($q) => $q->where(fn ($w) => $w->whereIn('type', NotificationPreferences::OFFICE_TYPES)->orWhere('type', 'like', 'room%')))
+        $filter = $request->validate(['filter' => ['nullable', 'in:'.implode(',', NotificationCategories::FILTERS)]])['filter'] ?? 'all';
+        $page = NotificationCategories::apply(WorkplaceNotification::forUser($user->id), $filter)
             ->orderByDesc('created_at')
             ->paginate(30);
 
