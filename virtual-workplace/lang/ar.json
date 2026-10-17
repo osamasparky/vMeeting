@@ -4064,5 +4064,17 @@
     "assistant.suggest.meetings": "ما اجتماعاتي اليوم؟",
     "assistant.suggest.overdue": "ما المهام المتأخرة؟",
     "assistant.suggest.office_alerts": "أرني تنبيهات المكتب",
-    "assistant.suggest.messages": "هل وصلتني رسائل؟"
+    "assistant.suggest.messages": "هل وصلتني رسائل؟",
+    "assistant.show_alerts": "عرض التنبيهات",
+    "assistant.bubble_label": "رسالة المساعد",
+    "assistant.previous": "التنبيه السابق",
+    "assistant.next": "التنبيه التالي",
+    "assistant.counter": ":i من :n",
+    "assistant.alert_kind.task": "مهمة",
+    "assistant.alert_kind.meeting": "اجتماع",
+    "assistant.alert_kind.office": "المكتب",
+    "assistant.alert_kind.other": "تنبيه",
+    "assistant.no_more_alerts": "أنهيت كل التنبيهات — لا يوجد غير مقروء.",
+    "assistant.no_alerts_filtered": "لا توجد تنبيهات غير مقروءة من هذا النوع.",
+    "assistant.unread_cta": ":count تنبيهات غير مقروءة"
 }

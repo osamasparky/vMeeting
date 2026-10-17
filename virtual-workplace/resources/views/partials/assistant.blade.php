@@ -1,13 +1,17 @@
-{{-- Office assistant: a floating avatar at the bottom inline-end corner of the office (the corner
-     no other control uses), a short speech bubble, and a panel with the person's summary, their
-     alerts (the existing notifications) and a box to ask for things.
-     Behaviour: public/js/office/assistant.js. Data: AssistantController + /api/notifications. --}}
+{{-- The personal assistant, on every member page (dashboard, project hub, office, map editor):
+     a floating avatar in the bottom inline-end corner, a speech bubble that shows one unread
+     notification at a time (with previous / next) or the one thing that matters now, and a
+     panel with the person's summary and a box to ask for things.
+     Behaviour: public/js/assistant.js. Data: AssistantController + the existing /api/notifications.
+     A page that has something in that corner sets --ula-assistant-offset (see the office). --}}
+@auth
+@if(empty(auth()->user()->is_guest))
 <style>
     .ula-assistant {
         position: fixed;
-        inset-block-end: var(--ula-space-6);
+        inset-block-end: var(--ula-assistant-offset, var(--ula-space-6));
         inset-inline-end: var(--ula-space-6);
-        z-index: 70;
+        z-index: 900;
         display: flex;
         flex-direction: column;
         align-items: flex-end;
@@ -15,8 +19,8 @@
         pointer-events: none;
     }
     .ula-assistant > * { pointer-events: auto; }
-    /* Below this width the bottom toolbar reaches the corner: sit above it. */
-    @media (max-width: 1279px) { .ula-assistant { inset-block-end: 104px; } }
+    /* The dashboard's and the project hub's toasts use this corner too: they stack above the avatar. */
+    #toast-container, #hub-toast-container { bottom: calc(var(--ula-assistant-offset, var(--ula-space-6)) + 84px); }
 
     .ula-assistant__avatar {
         position: relative;
@@ -78,8 +82,24 @@
         border-block-end: 1px solid var(--ula-border-subtle);
         transform: rotate(45deg);
     }
-    .ula-assistant__bubble p { margin: 0 0 var(--ula-space-2); font-size: var(--ula-size-sm); font-weight: 700; line-height: 1.6; }
-    .ula-assistant__bubble-actions { display: flex; align-items: center; gap: var(--ula-space-2); }
+    .ula-assistant__bubble { width: min(340px, calc(100vw - 48px)); }
+    .ula-assistant__bubble-head { display: flex; align-items: center; gap: var(--ula-space-2); margin-block-end: 4px; font-size: var(--ula-size-xs); font-weight: 800; color: var(--ula-text-secondary); }
+    .ula-assistant__bubble-head .material-symbols-rounded { font-size: 18px; color: var(--ula-icon-highlight); }
+    .ula-assistant__bubble-kicker { flex: 1; min-width: 0; }
+    /* "1 من 3" / "1 of 3": a sentence in the page's language, kept apart from its neighbours. */
+    .ula-assistant__bubble-counter { unicode-bidi: isolate; white-space: nowrap; }
+    .ula-assistant__bubble-title { margin: 0; font-size: var(--ula-size-sm); font-weight: 800; line-height: 1.6; overflow-wrap: anywhere; }
+    .ula-assistant__bubble-sub { margin: 2px 0 0; font-size: var(--ula-size-xs); color: var(--ula-text-secondary); line-height: 1.6; overflow-wrap: anywhere; }
+    .ula-assistant__bubble-sub:empty { display: none; }
+    .ula-assistant__bubble-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ula-space-2); margin-block-start: var(--ula-space-2); }
+    .ula-assistant__bubble-actions .ula-assistant__spacer { flex: 1; }
+    .ula-assistant__bubble-actions [hidden] { display: none; }
+    .ula-assistant__icon-btn:disabled { opacity: .35; cursor: default; }
+    .ula-assistant__icon-btn .material-symbols-rounded { font-size: 20px; }
+    /* Arrows point the way the pages turn: mirrored in RTL. */
+    [dir="rtl"] .ula-assistant__flip { transform: scaleX(-1); }
+    .ula-assistant__alerts-cta { display: flex; align-items: center; gap: var(--ula-space-2); padding: var(--ula-space-2) var(--ula-space-3); border-radius: var(--ula-radius-md); background: var(--ula-surface-gold-soft); }
+    .ula-assistant__alerts-cta p { flex: 1; margin: 0; font-size: var(--ula-size-sm); font-weight: 800; }
     .ula-assistant__icon-btn {
         min-width: 44px;
         min-height: 44px;
@@ -225,10 +245,26 @@
 </style>
 
 <div id="ula-assistant" class="ula-assistant">
-    <div id="ula-assistant-bubble" class="ula-assistant__bubble" role="status" aria-live="polite" hidden>
-        <p id="ula-assistant-bubble-text"></p>
+    <div id="ula-assistant-bubble" class="ula-assistant__bubble" role="region" aria-label="{{ __('assistant.bubble_label') }}" hidden>
+        <div class="ula-assistant__bubble-head">
+            <span class="material-symbols-rounded" id="ula-assistant-bubble-icon" aria-hidden="true">notifications</span>
+            <span class="ula-assistant__bubble-kicker" id="ula-assistant-bubble-kicker"></span>
+            <span class="ula-assistant__bubble-counter" id="ula-assistant-bubble-counter"></span>
+        </div>
+        <div aria-live="polite">
+            <p class="ula-assistant__bubble-title" id="ula-assistant-bubble-text"></p>
+            <p class="ula-assistant__bubble-sub" id="ula-assistant-bubble-sub"></p>
+        </div>
         <div class="ula-assistant__bubble-actions">
             <button type="button" id="ula-assistant-bubble-action" class="ula-btn ula-btn--primary ula-btn--sm" hidden></button>
+            <button type="button" id="ula-assistant-bubble-read" class="ula-btn ula-btn--ghost ula-btn--sm" hidden>{{ __('assistant.mark_read') }}</button>
+            <span class="ula-assistant__spacer"></span>
+            <button type="button" id="ula-assistant-bubble-prev" class="ula-assistant__icon-btn" aria-label="{{ __('assistant.previous') }}" hidden>
+                <span class="material-symbols-rounded ula-assistant__flip" aria-hidden="true">chevron_left</span>
+            </button>
+            <button type="button" id="ula-assistant-bubble-next" class="ula-assistant__icon-btn" aria-label="{{ __('assistant.next') }}" hidden>
+                <span class="material-symbols-rounded ula-assistant__flip" aria-hidden="true">chevron_right</span>
+            </button>
             <button type="button" id="ula-assistant-bubble-close" class="ula-assistant__icon-btn" aria-label="{{ __('assistant.dismiss') }}">
                 <span class="material-symbols-rounded" aria-hidden="true">close</span>
             </button>
@@ -242,13 +278,15 @@
                 <h2 id="ula-assistant-title" class="ula-headline-ar">{{ __('assistant.name') }}</h2>
                 @if(app()->getLocale() === 'ar')<p class="ula-headline-en" lang="en" dir="ltr">Your assistant</p>@endif
             </div>
+            <button type="button" id="ula-assistant-alerts" class="ula-assistant__icon-btn" aria-label="{{ __('assistant.show_alerts') }}" title="{{ __('assistant.show_alerts') }}">
+                <span class="material-symbols-rounded" aria-hidden="true">notifications</span>
+            </button>
             <button type="button" id="ula-assistant-close" class="ula-assistant__icon-btn" aria-label="{{ __('assistant.close') }}">
                 <span class="material-symbols-rounded" aria-hidden="true">close</span>
             </button>
         </header>
         <div class="ula-assistant__tabs" role="tablist" aria-label="{{ __('assistant.name') }}">
             <button type="button" role="tab" class="ula-assistant__tab" id="ula-assistant-tab-summary" data-tab="summary" aria-controls="ula-assistant-body" aria-selected="true">{{ __('assistant.tab.summary') }}</button>
-            <button type="button" role="tab" class="ula-assistant__tab" id="ula-assistant-tab-alerts" data-tab="alerts" aria-controls="ula-assistant-body" aria-selected="false" tabindex="-1">{{ __('assistant.tab.alerts') }}<span class="ula-assistant__count" id="ula-assistant-tab-count"></span></button>
             <button type="button" role="tab" class="ula-assistant__tab" id="ula-assistant-tab-ask" data-tab="ask" aria-controls="ula-assistant-body" aria-selected="false" tabindex="-1">{{ __('assistant.tab.ask') }}</button>
         </div>
         <p id="ula-assistant-offline" class="ula-assistant__notice" role="status" hidden>{{ __('assistant.offline') }}</p>
@@ -273,9 +311,15 @@
         'name', 'close', 'dismiss', 'section.meetings', 'section.invitations', 'section.tasks', 'section.messages', 'section.alerts',
         'filter.all', 'filter.unread', 'filter.task', 'filter.meeting', 'filter.office', 'mark_read', 'mark_all', 'empty_alerts',
         'loading', 'error', 'retry', 'rules_note', 'unread_badge', 'room_elsewhere', 'overdue', 'live_now', 'answer.all_clear',
-        'action.open', 'action.view', 'open',
+        'action.open', 'action.view', 'open', 'show_alerts', 'alert_kind.task', 'alert_kind.meeting', 'alert_kind.office',
+        'alert_kind.other', 'no_more_alerts', 'no_alerts_filtered', 'counter', 'unread_cta', 'previous', 'next',
     ])->mapWithKeys(fn ($k) => [$k => __('assistant.'.$k)])->all();
 @endphp
 <script nonce="{{ $cspNonce ?? '' }}">
     window.UlaAssistantText = @json($assistantText);
+    // The same office notification types the bell files under "office".
+    window.UlaAssistantOfficeTypes = @json(\App\Support\NotificationPreferences::OFFICE_TYPES);
 </script>
+<script src="/js/assistant.js?v={{ filemtime(public_path('js/assistant.js')) }}" nonce="{{ $cspNonce ?? '' }}"></script>
+@endif
+@endauth

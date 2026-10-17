@@ -4130,5 +4130,6 @@
 
     {{-- Project-management feature scripts (labels, views, sprints, intake, …) --}}
     @include('projects.partials.pm.scripts')
+    @include('partials.assistant')
 </body>
 </html>

@@ -1743,5 +1743,6 @@
     @include('dashboard.partials.modals')
     @include('dashboard.partials.scripts')
     @include('dashboard.partials.my-work-scripts')
+    @include('partials.assistant')
 </body>
 </html>

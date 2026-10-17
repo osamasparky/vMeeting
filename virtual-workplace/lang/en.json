@@ -4064,5 +4064,17 @@
     "assistant.suggest.meetings": "What are my meetings today?",
     "assistant.suggest.overdue": "Which tasks are overdue?",
     "assistant.suggest.office_alerts": "Show my office alerts",
-    "assistant.suggest.messages": "Any new messages?"
+    "assistant.suggest.messages": "Any new messages?",
+    "assistant.show_alerts": "Show alerts",
+    "assistant.bubble_label": "Assistant message",
+    "assistant.previous": "Previous alert",
+    "assistant.next": "Next alert",
+    "assistant.counter": ":i of :n",
+    "assistant.alert_kind.task": "Task",
+    "assistant.alert_kind.meeting": "Meeting",
+    "assistant.alert_kind.office": "Office",
+    "assistant.alert_kind.other": "Alert",
+    "assistant.no_more_alerts": "You're all caught up — no unread alerts.",
+    "assistant.no_alerts_filtered": "No unread alerts of this kind.",
+    "assistant.unread_cta": ":count unread alerts"
 }

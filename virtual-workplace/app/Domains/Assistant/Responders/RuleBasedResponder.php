@@ -37,7 +37,7 @@ class RuleBasedResponder implements AssistantResponder
         if ($has('alerts')) {
             $filter = $has('office') ? 'office' : ($has('meeting') ? 'meeting' : ($has('task') ? 'task' : 'all'));
 
-            return $this->answer('alerts', __('assistant.answer.alerts.'.$filter), [], [], ['type' => 'panel', 'tab' => 'alerts', 'filter' => $filter]);
+            return $this->answer('alerts', __('assistant.answer.alerts.'.$filter), [], [], ['type' => 'alerts', 'filter' => $filter, 'label' => __('assistant.show_alerts')]);
         }
         if ($has('invite')) {
             $items = array_map(fn ($m) => $this->meetingItem($m), $briefing['invitations']);

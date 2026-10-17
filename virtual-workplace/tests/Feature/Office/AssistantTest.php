@@ -104,7 +104,8 @@ class AssistantTest extends TestCase
         $this->assertSame($this->task->title, $r['items'][0]['title']);
 
         $r = $ask('أرني تنبيهات المكتب');
-        $this->assertSame(['type' => 'panel', 'tab' => 'alerts', 'filter' => 'office'], $r['action']);
+        $this->assertSame('alerts', $r['action']['type']);
+        $this->assertSame('office', $r['action']['filter']);
 
         $r = $ask('افتح اجتماع الفريق');
         $this->assertSame('open_meeting', $r['intent']);
@@ -143,11 +144,23 @@ class AssistantTest extends TestCase
         $this->assertCount(4, $titles('all'));
     }
 
-    public function test_the_office_shows_the_assistant_to_members(): void
+    public function test_every_member_page_has_the_assistant(): void
     {
-        $this->actingAs($this->employee)->get('/office')->assertOk()
-            ->assertSee('id="ula-assistant"', false)
-            ->assertSee('/js/office/assistant.js', false)
-            ->assertSee('/images/assistant/ula-assistant-avatar.webp', false);
+        foreach (['/office', '/dashboard', '/projects/'.$this->project->id, '/editor'] as $url) {
+            $html = $this->actingAs($this->owner)->get($url)->assertOk()->getContent();
+            $this->assertSame(1, substr_count($html, 'id="ula-assistant"'), "{$url} has the assistant once");
+            $this->assertStringContainsString('/js/assistant.js', $html, $url);
+            $this->assertStringContainsString('/images/assistant/ula-assistant-avatar.webp', $html, $url);
+        }
+    }
+
+    public function test_mentions_point_the_bubble_at_task_alerts(): void
+    {
+        WorkplaceNotification::create(['user_id' => $this->employee->id, 'organization_id' => $this->org->id, 'type' => 'task_mention', 'title' => 'Mentioned', 'is_read' => false]);
+        $this->task->update(['due_date' => now()->addWeek()->toDateString()]);
+
+        $h = $this->actingAs($this->employee)->getJson('/assistant/briefing')->assertOk()->json('headline');
+
+        $this->assertSame(['type' => 'alerts', 'filter' => 'task'], array_intersect_key($h['action'], ['type' => 1, 'filter' => 1]));
     }
 }

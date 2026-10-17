@@ -7990,10 +7990,9 @@
         requestAnimationFrame(draw);
     </script>
     <script src="/js/office/attendance.js?v={{ filemtime(public_path('js/office/attendance.js')) }}" nonce="{{ $cspNonce ?? '' }}"></script>
-    @if(empty($user->is_guest))
-        @include('office.partials.assistant')
-        <script src="/js/office/assistant.js?v={{ filemtime(public_path('js/office/assistant.js')) }}" nonce="{{ $cspNonce ?? '' }}"></script>
-    @endif
+    {{-- Below 1280px the bottom toolbar reaches the assistant's corner: it sits above it. --}}
+    <style>@media (max-width: 1279px) { .ula-assistant { --ula-assistant-offset: 104px; } }</style>
+    @include('partials.assistant')
     @include('office.partials.games')
     <script src="/js/office/games.js?v={{ filemtime(public_path('js/office/games.js')) }}" nonce="{{ $cspNonce ?? '' }}"></script>
     <script nonce="{{ $cspNonce ?? '' }}">

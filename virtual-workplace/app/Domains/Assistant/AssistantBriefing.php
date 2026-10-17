@@ -80,7 +80,8 @@ class AssistantBriefing
             'project' => $m->project?->name,
             'invited' => $m->created_by !== $user->id,
             'action' => $m->room_id
-                ? ['type' => 'room', 'room_id' => $m->room_id, 'label' => __('assistant.action.join')]
+                // In the office the client walks there; elsewhere it opens the office at that room.
+                ? ['type' => 'room', 'room_id' => $m->room_id, 'url' => '/office?room='.$m->room_id, 'label' => __('assistant.action.join')]
                 : ['type' => 'url', 'url' => '/dashboard#meetings', 'label' => __('assistant.action.view')],
         ];
 
@@ -195,7 +196,7 @@ class AssistantBriefing
             return ['text' => trans_choice('assistant.headline.overdue', $tasks['overdue_count'], ['count' => $tasks['overdue_count']]), 'action' => ['type' => 'panel', 'tab' => 'summary'], 'key' => 'overdue-'.$tasks['overdue_count']];
         }
         if ($notifications['mentions'] > 0) {
-            return ['text' => trans_choice('assistant.headline.mentions', $notifications['mentions'], ['count' => $notifications['mentions']]), 'action' => ['type' => 'panel', 'tab' => 'alerts', 'filter' => 'task'], 'key' => 'mentions-'.$notifications['mentions']];
+            return ['text' => trans_choice('assistant.headline.mentions', $notifications['mentions'], ['count' => $notifications['mentions']]), 'action' => ['type' => 'alerts', 'filter' => 'task', 'label' => __('assistant.show_alerts')], 'key' => 'mentions-'.$notifications['mentions']];
         }
         if ($meetings['invitations']) {
             $first = $meetings['invitations'][0];
@@ -206,7 +207,7 @@ class AssistantBriefing
             return ['text' => __('assistant.headline.message', ['name' => $messages[0]['from']]), 'action' => $messages[0]['action'], 'key' => 'msg-'.$messages[0]['at']];
         }
         if ($notifications['unread'] > 0) {
-            return ['text' => trans_choice('assistant.headline.unread', $notifications['unread'], ['count' => $notifications['unread']]), 'action' => ['type' => 'panel', 'tab' => 'alerts'], 'key' => 'unread-'.$notifications['unread']];
+            return ['text' => trans_choice('assistant.headline.unread', $notifications['unread'], ['count' => $notifications['unread']]), 'action' => ['type' => 'alerts', 'filter' => 'all', 'label' => __('assistant.show_alerts')], 'key' => 'unread-'.$notifications['unread']];
         }
 
         return null;

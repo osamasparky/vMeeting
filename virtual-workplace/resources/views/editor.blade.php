@@ -4131,5 +4131,6 @@
         </div>
     </div>
     @endif
+    @include('partials.assistant')
 </body>
 </html>
