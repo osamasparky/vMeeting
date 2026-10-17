@@ -1259,7 +1259,7 @@
 
     <!-- ── Floating In-World Contextual Prompts & Menus ── -->
     <div id="furniture-sit-prompt" style="display: none; position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); background: var(--ula-surface-capsule-strong); backdrop-filter: blur(20px); border: 1px solid var(--ula-highlight-default); border-radius: 24px; padding: 6px 18px; color: var(--ula-text-on-dark)); font-size: 12px; font-weight: 700; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5); z-index: 9999; pointer-events: none; transition: opacity 0.2s ease;">
-        <span id="furniture-sit-prompt-text"><span class="material-symbols-rounded" style="font-size: 14px; vertical-align: text-bottom;">chair</span> {{ __('Press') }} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> {{ __('to Sit at Desk') }}</span>
+        <span id="furniture-sit-prompt-text"></span>
     </div>
 
     <div id="floating-reaction-popover" style="display: none; position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); background: var(--ula-surface-capsule-strong); backdrop-filter: blur(20px); border: 1px solid var(--ula-border-on-dark-subtle); border-radius: 32px; padding: 6px 14px; align-items: center; gap: 8px; box-shadow: 0 16px 36px rgba(0,0,0,0.6); z-index: 100000;">
@@ -1590,13 +1590,10 @@
             micActive: false,
             camActive: false,
             isSpeaking: false,
-            isSitting: false,
-            sittingFurnitureId: null,
             currentRoomId: (isGuest && guestAllowedRoomId) ? guestAllowedRoomId : null
         };
         const remoteAvatars = new Map();
         const speechBubbles = new Map(); // userId -> { text, emoji, timestamp, type }
-        let nearbyChair = null;
         let isSessionReplaced = false;
         let wsReconnectAttempts = 0;
 
@@ -2111,21 +2108,9 @@
                 avatarWaypoints = []; // Interrupt automated walking when player uses arrow keys
             }
 
-            // 'E' Key to Interact with Furniture / Objects / Sit
+            // 'E' Key to Interact with Furniture / Objects
             if (k === 'e') {
-                if (localAvatar.isSitting) {
-                    localAvatar.isSitting = false;
-                    localAvatar.sittingFurnitureId = null;
-                    if (localAvatar.standPos) {
-                        localAvatar.x = localAvatar.targetX = localAvatar.standPos.x;
-                        localAvatar.y = localAvatar.targetY = localAvatar.standPos.y;
-                        localAvatar.standPos = null;
-                    }
-                    if (ws && ws.readyState === WebSocket.OPEN) {
-                        ws.send(JSON.stringify({ type: 'user.sit', payload: { isSitting: false } }));
-                    }
-                    showToast('🧍 ' + __('Stood up'));
-                } else if (nearbyInteractive) {
+                if (nearbyInteractive) {
                     const item = nearbyInteractive;
                     if (item.interaction_type === 'drink') {
                         playDoorSlideSound();
@@ -2145,31 +2130,6 @@
                         playDoorSlideSound();
                         showToast(`🎹 ${__("Playing musical note on")} ${escapeHtml(item.name)}! 🎶`);
                         triggerSpeechReaction('🎶', 'emoji');
-                    } else if (nearbyChair && (
-                        minWallDistance(nearbyChair.x, nearbyChair.y, nearbyChair.id) < AVATAR_COLLISION_RADIUS ||
-                        (getCurrentRoom(nearbyChair.x, nearbyChair.y)?.id || null) !== (getCurrentRoom(localAvatar.x, localAvatar.y)?.id || null)
-                    )) {
-                        // The seat sits on a wall or in another room: sitting there would put the avatar inside a wall.
-                        showToast('ℹ️ ' + @json(__('office.sit_blocked')));
-                    } else if (nearbyChair) {
-                        localAvatar.standPos = { x: localAvatar.x, y: localAvatar.y };
-                        localAvatar.isSitting = true;
-                        localAvatar.sittingFurnitureId = nearbyChair.id;
-                        localAvatar.x = nearbyChair.x;
-                        localAvatar.y = nearbyChair.y;
-                        localAvatar.targetX = nearbyChair.x;
-                        localAvatar.targetY = nearbyChair.y;
-                        if (ws && ws.readyState === WebSocket.OPEN) {
-                            ws.send(JSON.stringify({
-                                type: 'user.sit',
-                                payload: {
-                                    isSitting: true,
-                                    furnitureId: nearbyChair.id,
-                                    seatPosition: { x: nearbyChair.x, y: nearbyChair.y }
-                                }
-                            }));
-                        }
-                        showToast('🪑 ' + __('Seated at Desk'));
                     }
                 }
             }
@@ -2186,6 +2146,7 @@
 
         let nearbyInteractive = null;
         let lastFurnitureCheck = 0;
+        const E_INTERACTIONS = ['drink', 'game', 'chess', 'whiteboard', 'soundEffect', 'instrument', 'staticMusic'];
 
         function checkNearbyFurniture(force = false) {
             const now = Date.now();
@@ -2193,11 +2154,6 @@
             lastFurnitureCheck = now;
 
             const promptEl = document.getElementById('furniture-sit-prompt');
-            if (localAvatar.isSitting) {
-                if (promptEl) promptEl.style.display = 'none';
-                return;
-            }
-
             const objects = (CONFIG.map && CONFIG.map.objects) || [];
             let found = null;
             for (const obj of objects) {
@@ -2206,8 +2162,9 @@
                 const oy = ((obj.position ? obj.position.y : (obj.y || 0)) + (obj.height || (obj.size ? obj.size.height : 1)) / 2) * TILE_SIZE;
                 const dist = Math.hypot(localAvatar.x - ox, localAvatar.y - oy);
                 if (dist < 48) {
-                    const behType = obj.interaction_type || (obj.interaction_config && obj.interaction_config.behavior?.type) || ((obj.type && (obj.type.includes('chair') || obj.type.includes('desk') || obj.type.includes('sofa') || obj.type.includes('seating'))) ? 'sit' : null);
-                    if (behType && behType !== 'none') {
+                    // Only objects that E actually does something with; the rest (notes, links, branding) open on click.
+                    const behType = obj.interaction_type || (obj.interaction_config && obj.interaction_config.behavior?.type) || null;
+                    if (E_INTERACTIONS.includes(behType)) {
                         found = {
                             id: obj.id || `obj_${ox}_${oy}`,
                             x: ox,
@@ -2223,7 +2180,6 @@
             }
 
             nearbyInteractive = found;
-            nearbyChair = (found && (found.interaction_type === 'sit' || !found.interaction_type)) ? found : null;
 
             if (promptEl) {
                 if (found) {
@@ -2234,16 +2190,10 @@
                         promptEl.innerHTML = `<span>🕹️ ${__('Press')} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> ${escapeHtml(@json(__('games.press_to_play')))} · ${escapeHtml(found.name)}</span>`;
                     } else if (found.interaction_type === 'whiteboard') {
                         promptEl.innerHTML = `<span>📋 ${__('Press')} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> ${__('to Open Whiteboard')}</span>`;
-                    } else if (found.interaction_type === 'youtube') {
-                        promptEl.innerHTML = `<span>📺 ${__('Press')} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> ${__('to Watch Stream')}</span>`;
                     } else if (found.interaction_type === 'soundEffect') {
                         promptEl.innerHTML = `<span>🔔 ${__('Press')} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> ${__('to Ring Bell')}</span>`;
                     } else if (found.interaction_type === 'instrument' || found.interaction_type === 'staticMusic') {
                         promptEl.innerHTML = `<span>🎹 ${__('Press')} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> ${__('to Play Music')}</span>`;
-                    } else if (found.interaction_type === 'stickyNote') {
-                        promptEl.innerHTML = `<span>📝 ${__('Press')} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> ${__('to Read Note')}</span>`;
-                    } else {
-                        promptEl.innerHTML = `<span>🪑 ${__('Press')} <kbd style="background: var(--ula-tone-gold-bg); border: 1px solid var(--ula-highlight-default); padding: 2px 7px; border-radius: 6px; font-family: monospace; font-size: 11px; color: var(--ula-tone-gold-fg);">E</kbd> ${__('to Sit at Desk')}</span>`;
                     }
                 } else {
                     promptEl.style.display = 'none';
@@ -3491,41 +3441,30 @@
             let nextX = localAvatar.x;
             let nextY = localAvatar.y;
 
-            if (localAvatar.isSitting) {
-                // If user moves while sitting, auto stand up!
-                if (dx !== 0 || dy !== 0) {
-                    localAvatar.isSitting = false;
-                    localAvatar.sittingFurnitureId = null;
-                    if (ws && ws.readyState === WebSocket.OPEN) {
-                        ws.send(JSON.stringify({ type: 'user.sit', payload: { isSitting: false } }));
-                    }
-                    showToast('🧍 {{ __("Stood up") }}');
-                }
+            if (dx !== 0 || dy !== 0) {
+                avatarWaypoints = []; // Clear waypoints if manual key pressed
+                const len = Math.sqrt(dx * dx + dy * dy);
+                nextX += (dx / len) * step;
+                nextY += (dy / len) * step;
+                localAvatar.targetX = nextX;
+                localAvatar.targetY = nextY;
             } else {
-                if (dx !== 0 || dy !== 0) {
-                    avatarWaypoints = []; // Clear waypoints if manual key pressed
-                    const len = Math.sqrt(dx * dx + dy * dy);
-                    nextX += (dx / len) * step;
-                    nextY += (dy / len) * step;
-                    localAvatar.targetX = nextX;
-                    localAvatar.targetY = nextY;
-                } else {
-                    const diffX = localAvatar.targetX - localAvatar.x;
-                    const diffY = localAvatar.targetY - localAvatar.y;
-                    const dist = Math.sqrt(diffX * diffX + diffY * diffY);
-                    if (dist > 3) {
-                        const move = Math.min(step, dist);
-                        nextX += (diffX / dist) * move;
-                        nextY += (diffY / dist) * move;
-                    } else if (avatarWaypoints.length > 0) {
-                        // Reached waypoint, advance to next waypoint!
-                        const nextWp = avatarWaypoints.shift();
-                        localAvatar.targetX = nextWp.x;
-                        localAvatar.targetY = nextWp.y;
-                        if (nextWp.action) nextWp.action();
-                    }
+                const diffX = localAvatar.targetX - localAvatar.x;
+                const diffY = localAvatar.targetY - localAvatar.y;
+                const dist = Math.sqrt(diffX * diffX + diffY * diffY);
+                if (dist > 3) {
+                    const move = Math.min(step, dist);
+                    nextX += (diffX / dist) * move;
+                    nextY += (diffY / dist) * move;
+                } else if (avatarWaypoints.length > 0) {
+                    // Reached waypoint, advance to next waypoint!
+                    const nextWp = avatarWaypoints.shift();
+                    localAvatar.targetX = nextWp.x;
+                    localAvatar.targetY = nextWp.y;
+                    if (nextWp.action) nextWp.action();
                 }
             }
+
 
             checkNearbyFurniture();
 
@@ -4395,7 +4334,6 @@
             }
 
             // 7. Small Compact Person Name Pill Under the Circular Avatar
-            const isSitting = isSelf ? localAvatar.isSitting : av.isSitting;
             // Short tag (e.g. "SO", "ن‌ق"): full names made the pill too wide. The people panel shows the full name.
             const displayName = officeShortTag(av.name);
             ctx.font = '600 8.5px "IBM Plex Sans Arabic", "IBM Plex Sans", sans-serif';
@@ -4403,7 +4341,7 @@
             const badgeH = 14;
             const badgeY = y + radius + 3;
 
-            ctx.fillStyle = isSitting ? 'rgba(60, 107, 76, 0.95)' : 'rgba(14, 25, 19, 0.92)';
+            ctx.fillStyle = 'rgba(14, 25, 19, 0.92)';
             ctx.beginPath();
             if (ctx.roundRect) ctx.roundRect(x - nameW / 2, badgeY, nameW, badgeH, 4);
             else ctx.rect(x - nameW / 2, badgeY, nameW, badgeH);
@@ -4416,7 +4354,7 @@
             else ctx.rect(x - nameW / 2, badgeY, nameW, badgeH);
             ctx.stroke();
 
-            ctx.fillStyle = isSitting ? OC('--ula-text-on-dark') : (isSelf ? OC('--ula-status-success-on-dark') : OC('--ula-text-on-dark'));
+            ctx.fillStyle = isSelf ? OC('--ula-status-success-on-dark') : OC('--ula-text-on-dark');
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(displayName, x, badgeY + (badgeH / 2));
@@ -4893,22 +4831,6 @@
                                 const ringModal = document.getElementById('incoming-ring-modal');
                                 if (ringModal) ringModal.style.display = 'flex';
                                 showToast(`🔔 ${escapeHtml(data.payload.senderName)} ${__('is ringing you!')}`);
-                            }
-                        }
-
-                        // 8e. User Seating State Updated
-                        else if (data.type === 'user.sit_updated' && data.payload) {
-                            const { userId, isSitting, furnitureId, seatPosition } = data.payload;
-                            const av = remoteAvatars.get(userId);
-                            if (av) {
-                                av.isSitting = !!isSitting;
-                                av.sittingFurnitureId = furnitureId || null;
-                                if (seatPosition) {
-                                    av.x = seatPosition.x;
-                                    av.y = seatPosition.y;
-                                    av.targetX = seatPosition.x;
-                                    av.targetY = seatPosition.y;
-                                }
                             }
                         }
 
