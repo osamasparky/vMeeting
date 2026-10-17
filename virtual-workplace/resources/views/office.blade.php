@@ -5837,6 +5837,14 @@
             showToast(`${emoji} {{ __("Reaction sent!") }}`);
         }
 
+        // E on a drink, bell or instrument: the emoji over your avatar, for everyone in the room (no toast/popover).
+        function triggerSpeechReaction(emoji) {
+            spawnSpeechBubble(localAvatar.id, localAvatar.name, null, emoji);
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'user.reaction', payload: { emoji } }));
+            }
+        }
+
         function sendWaveToSpotlightUser() {
             const modal = document.getElementById('user-spotlight-modal');
             const targetId = modal ? modal.getAttribute('data-active-user-id') : null;
