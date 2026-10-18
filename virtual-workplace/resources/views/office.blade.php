@@ -1672,7 +1672,7 @@
 
         function fitMapToCanvas() {
             centerCamera();
-            if (typeof draw === 'function') draw();
+            if (typeof requestDraw === 'function') requestDraw();
             showToast('📐 ' + __('Fit Map to Canvas'));
         }
 
@@ -1761,7 +1761,7 @@
                 cameraOffset.x = startX + (endX - startX) * ease;
                 cameraOffset.y = startY + (endY - startY) * ease;
 
-                if (typeof draw === 'function') draw();
+                if (typeof requestDraw === 'function') requestDraw();
 
                 if (progress < 1.0) {
                     requestAnimationFrame(animateLocate);
@@ -1790,12 +1790,12 @@
             cameraOffset.x = centerX - worldX * zoomLevel;
             cameraOffset.y = centerY - worldY * zoomLevel;
 
-            if (typeof draw === 'function') draw();
+            if (typeof requestDraw === 'function') requestDraw();
         }
 
         function resizeCanvas() {
             centerCamera();
-            if (typeof draw === 'function') draw();
+            if (typeof requestDraw === 'function') requestDraw();
         }
         window.addEventListener('resize', resizeCanvas);
         centerCamera();
@@ -1848,14 +1848,14 @@
                     cameraOffset.x = panCamStartX + (e.clientX - panStartX);
                     cameraOffset.y = panCamStartY + (e.clientY - panStartY);
                     canvas.style.cursor = 'grabbing';
-                    if (typeof draw === 'function') draw();
+                    if (typeof requestDraw === 'function') requestDraw();
                 } else if (e.buttons === 1 && mapDragArmed) {
                     const dist = Math.hypot(e.clientX - panStartX, e.clientY - panStartY);
                     if (dist > 8) {
                         hasMovedMouseDuringDrag = true;
                         cameraOffset.x = panCamStartX + (e.clientX - panStartX);
                         cameraOffset.y = panCamStartY + (e.clientY - panStartY);
-                        if (typeof draw === 'function') draw();
+                        if (typeof requestDraw === 'function') requestDraw();
                     }
                 }
             });
@@ -1907,7 +1907,7 @@
                             MAP_HEIGHT_PX = BLUEPRINT_IMAGE.naturalHeight;
                         }
                         centerCamera('fill');
-                        if (typeof draw === 'function') draw();
+                        if (typeof requestDraw === 'function') requestDraw();
                         showToast('✅ ' + __('Floor Image Updated'));
                     };
                 } else {
@@ -3761,7 +3761,7 @@
                     if (!sprImg) {
                         sprImg = new Image();
                         sprImg.src = imgUrl;
-                        sprImg.onload = () => { if (typeof draw === 'function') draw(); };
+                        sprImg.onload = () => { if (typeof requestDraw === 'function') requestDraw(); };
                         window._officeObjImgCache.set(imgUrl, sprImg);
                     }
                     if (sprImg && sprImg.complete && sprImg.naturalWidth > 0) {
@@ -4193,7 +4193,19 @@
             });
 
             ctx.restore();
-            requestAnimationFrame(draw);
+            requestDraw();
+        }
+
+        // One frame pending at most. draw() used to be called directly (image loads, every pan
+        // mousemove, zoom steps, resize) and each call re-armed its own requestAnimationFrame, so every
+        // call left one more endless loop running: the office drew 19x per frame after a minute of use.
+        function requestDraw() {
+            if (window._ulaDrawPending) return;
+            window._ulaDrawPending = true;
+            requestAnimationFrame(() => {
+                window._ulaDrawPending = false;
+                draw();
+            });
         }
 
         // ── Modern Profile & Live Video Node Rendering ──
@@ -4505,6 +4517,8 @@
                             gender: userGender
                         }
                     }));
+                    // A game window open across a reconnect: back to the same machine, seat kept.
+                    window.UlaGames?.rejoin?.();
 
                     // Immediate position beacon to guarantee instant rendering for all peers
                     setTimeout(() => {
@@ -7933,7 +7947,7 @@
         }
 
         // Start animation loop
-        requestAnimationFrame(draw);
+        requestDraw();
     </script>
     <script src="/js/office/attendance.js?v={{ filemtime(public_path('js/office/attendance.js')) }}" nonce="{{ $cspNonce ?? '' }}"></script>
     {{-- Below 1280px the bottom toolbar reaches the assistant's corner: it sits above it. --}}
