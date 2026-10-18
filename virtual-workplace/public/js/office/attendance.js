@@ -15,6 +15,9 @@ const idlePromptMinutes = Number(idlePolicy.idle_prompt_minutes || 15);
 const idleGraceSeconds = Number(idlePolicy.idle_response_grace_seconds || 180);
 let lastUserActivityTimestamp = Date.now();
 let idleCountdownSeconds = idleGraceSeconds;
+// Wall-clock deadline: background tabs run timers about once a minute, so counting ticks
+// would stretch the 3-minute grace into hours.
+let idleDeadlineAt = 0;
 let idleCountdownInterval = null;
 let isIdleCheckModalOpen = false;
 
@@ -121,8 +124,22 @@ function registerUserActivity() {
     lastUserActivityTimestamp = Date.now();
 }
 
-['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'].forEach(evt => {
-    window.addEventListener(evt, registerUserActivity, { passive: true });
+// Browsers fire a synthetic mousemove when the page changes under a still cursor (the idle
+// prompt itself appearing does it); only a pointer that actually moved is activity.
+let lastPointerX = null, lastPointerY = null;
+function registerPointerMove(e) {
+    if (e.screenX === lastPointerX && e.screenY === lastPointerY) return;
+    lastPointerX = e.screenX; lastPointerY = e.screenY;
+    registerUserActivity();
+}
+
+// Pointer and wheel too: the map pans and zooms with them, and a canvas wheel never fires "scroll".
+// Speaking into the mic also counts — the office calls registerUserActivity() from the active-speaker update.
+['mousedown', 'pointerdown', 'wheel', 'keydown', 'touchstart', 'scroll', 'click'].forEach(evt => {
+    window.addEventListener(evt, registerUserActivity, { passive: true, capture: true });
+});
+['mousemove', 'pointermove'].forEach(evt => {
+    window.addEventListener(evt, registerPointerMove, { passive: true, capture: true });
 });
 
 // Inactivity Check Loop (Runs every 10 seconds)
@@ -144,6 +161,7 @@ setInterval(() => {
 
 function showIdleCheckModal() {
     isIdleCheckModalOpen = true;
+    idleDeadlineAt = Date.now() + idleGraceSeconds * 1000;
     idleCountdownSeconds = idleGraceSeconds;
     const modal = document.getElementById('office-idle-check-modal');
     const clock = document.getElementById('idle-countdown-clock');
@@ -151,11 +169,12 @@ function showIdleCheckModal() {
 
     if (modal) modal.style.display = 'flex';
     updateIdleCountdownUI();
+    alertIdleCheckIfHidden();
 
     if (idleCountdownInterval) clearInterval(idleCountdownInterval);
 
     idleCountdownInterval = setInterval(() => {
-        idleCountdownSeconds--;
+        idleCountdownSeconds = Math.max(0, Math.ceil((idleDeadlineAt - Date.now()) / 1000));
         updateIdleCountdownUI();
 
         if (idleCountdownSeconds <= 0) {
@@ -164,6 +183,29 @@ function showIdleCheckModal() {
             handleIdleTimeoutExpiration();
         }
     }, 1000);
+}
+
+// The prompt is easy to miss in a background tab: chime, flash the tab title, and show a
+// desktop notification when the member already allowed them.
+let idleTitleFlash = null;
+function alertIdleCheckIfHidden() {
+    if (document.visibilityState === 'visible') return;
+    try { if (typeof playDoorKnockSound === 'function') playDoorKnockSound(); } catch (e) {}
+    const original = document.title;
+    const alertTitle = '⏰ ' + (attendanceText.idleTitle || original);
+    let on = false;
+    clearInterval(idleTitleFlash);
+    idleTitleFlash = setInterval(() => { on = !on; document.title = on ? alertTitle : original; }, 1000);
+    const stop = () => { clearInterval(idleTitleFlash); idleTitleFlash = null; document.title = original; };
+    document.addEventListener('visibilitychange', function onVisible() {
+        if (document.visibilityState === 'visible') { stop(); document.removeEventListener('visibilitychange', onVisible); }
+    });
+    try {
+        if ('Notification' in window && Notification.permission === 'granted') {
+            const n = new Notification(attendanceText.idleTitle || original, { body: attendanceText.idleBody || '', tag: 'ula-idle-check', requireInteraction: true });
+            n.onclick = () => { window.focus(); n.close(); };
+        }
+    } catch (e) {}
 }
 
 function updateIdleCountdownUI() {
@@ -201,7 +243,7 @@ function handleIdleTimeoutExpiration() {
     if (pausedOverlay) pausedOverlay.style.display = 'flex';
     isOfficePresencePaused = true;
     // The server ends the session at the last activity, so the idle stretch is not counted.
-    logAttendance('idle_pause', Math.round((Date.now() - lastUserActivityTimestamp) / 1000));
+    logAttendance('idle_pause', Math.min(86400, Math.round((Date.now() - lastUserActivityTimestamp) / 1000)));
 }
 
 function resumeUserPresenceFromPaused() {

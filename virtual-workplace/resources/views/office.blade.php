@@ -5250,6 +5250,8 @@
                 av.isSpeaking = speakerIds.has(id);
             });
             localAvatar.isSpeaking = speakerIds.has(localAvatar.id);
+            // Talking in a meeting is presence, even with hands off the mouse (attendance.js).
+            if (localAvatar.isSpeaking && typeof registerUserActivity === 'function') registerUserActivity();
         }
 
         // ── Video & Screen Share Window Sizing Controls ──
@@ -7909,6 +7911,8 @@
         const attendanceText = {
             presenceConfirmed: @json(__("Presence confirmed! Your time calculation is active.")),
             presenceResumed: @json(__("Welcome back! Presence tracking resumed.")),
+            idleTitle: @json(__('Are you still online?')),
+            idleBody: @json(__('We noticed you have been inactive for a while. Please confirm you are still working so your office attendance time continues calculating.')),
         };
 
         // On Page Load, fetch active timer state if member
