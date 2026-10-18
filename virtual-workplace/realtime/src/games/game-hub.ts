@@ -20,6 +20,8 @@ interface Session {
 export const TICK_HZ = 30;
 /** Hard stop for any match, whatever the game says. */
 const MAX_MATCH_SECONDS = 6 * 60;
+/** How long a dropped connection keeps its seat. */
+export const RECONNECT_GRACE_MS = 15_000;
 
 const MACHINE_ID = /^[\w:.-]{1,80}$/;
 
@@ -33,11 +35,18 @@ export class GameHub {
   private sessions = new Map<string, Session>();
   /** userId → session key: a person is at one machine at a time. */
   private at = new Map<string, string>();
+  /** userId → timer that removes them unless they come back (see disconnect). */
+  private pendingDrops = new Map<string, ReturnType<typeof setTimeout>>();
 
-  constructor(private readonly defs: Record<string, GameDef>, private readonly send: Send) {}
+  constructor(
+    private readonly defs: Record<string, GameDef>,
+    private readonly send: Send,
+    private readonly reconnectGraceMs: number = RECONNECT_GRACE_MS,
+  ) {}
 
   handle(user: GameUser, type: string, payload: any): void {
     if (user.isGuest || !user.mapId) return;
+    this.cancelDrop(user.userId); // back after a dropped connection: keep their seat
     switch (type) {
       case 'game.open':
         return this.open(user, payload?.machineId, payload?.game);
@@ -56,8 +65,42 @@ export class GameHub {
     }
   }
 
-  /** Disconnects, leaving the map, or closing the window. */
+  /**
+   * A connection dropped. Connections blip (reload, Wi-Fi, a deploy, a newer tab replacing the
+   * old one) and the page reconnects within seconds, so the seat is held for RECONNECT_GRACE_MS:
+   * any game message from the user in that time — the page re-opens the machine on reconnect —
+   * keeps them in. Dropping at once left the other player alone and the window showing a dead
+   * lobby.
+   */
+  disconnect(userId: string): void {
+    if (!this.at.has(userId)) return;
+    this.cancelDrop(userId);
+    this.pendingDrops.set(userId, setTimeout(() => {
+      this.pendingDrops.delete(userId);
+      this.removeUser(userId);
+    }, this.reconnectGraceMs));
+  }
+
+  /** Joined a map: a machine on another map is left; one on this map is kept (a reconnect). */
+  joinedMap(userId: string, organizationId: string, mapId: string): void {
+    const key = this.at.get(userId);
+    if (key && !key.startsWith(`${organizationId}:${mapId}:`)) {
+      this.cancelDrop(userId);
+      this.removeUser(userId);
+    }
+  }
+
+  private cancelDrop(userId: string): void {
+    const t = this.pendingDrops.get(userId);
+    if (t) {
+      clearTimeout(t);
+      this.pendingDrops.delete(userId);
+    }
+  }
+
+  /** Leaving the map, or closing the window. */
   removeUser(userId: string): void {
+    this.cancelDrop(userId);
     const s = this.sessionOf(userId);
     this.at.delete(userId);
     if (!s) return;

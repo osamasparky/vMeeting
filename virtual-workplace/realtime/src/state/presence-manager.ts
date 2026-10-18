@@ -152,6 +152,14 @@ export class PresenceManager {
     return { mapId, userId, orgId: organizationId };
   }
 
+  /** Another live office connection for this user (the tab that replaced this one). */
+  public hasOtherClient(userId: string, ws: WebSocket): boolean {
+    for (const [otherWs, conn] of this.clients.entries()) {
+      if (otherWs !== ws && conn.user.userId === userId) return true;
+    }
+    return false;
+  }
+
   public removeClient(ws: WebSocket): { mapId: string; userId: string; orgId: string } | null {
     const leftInfo = this.leaveMap(ws);
     this.clients.delete(ws);

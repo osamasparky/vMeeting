@@ -411,4 +411,37 @@ console.log('🎮 Game tests');
   console.log('   ✓ tic-tac-toe');
 }
 
-console.log(`\n✅ ${passed} game checks passed`);
+// ── Hub: a dropped connection keeps its seat for a moment ──
+(async () => {
+  const sent: { to: string; type: string; payload: any }[] = [];
+  const hub = new GameHub(GAMES, (to, e) => sent.push({ to, type: e.type, payload: e.payload }), 40);
+  const last = (to: string, type: string) => [...sent].reverse().find((m) => m.to === to && m.type === type)?.payload;
+  const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  for (const id of ['a', 'b']) {
+    hub.handle(user(id), 'game.open', { machineId: 'm1', game: 'karts' });
+    hub.handle(user(id), 'game.sit', {});
+  }
+
+  // b's connection drops and comes back (the page re-opens the machine on reconnect): still seated.
+  hub.disconnect('b');
+  hub.joinedMap('b', 'org', 'map');
+  hub.handle(user('b'), 'game.open', { machineId: 'm1', game: 'karts' });
+  await wait(80);
+  check(last('a', 'game.state').players.length === 2, 'a reconnect within the grace keeps the seat');
+
+  // b drops and never returns: freed after the grace, and a sees it.
+  hub.disconnect('b');
+  check(last('a', 'game.state').players.length === 2, 'the seat is held during the grace');
+  await wait(80);
+  check(last('a', 'game.state').players.length === 1, 'the seat is freed once the grace runs out');
+
+  // Joining another floor leaves the machine at once.
+  hub.handle(user('b'), 'game.open', { machineId: 'm1', game: 'karts' });
+  hub.handle(user('b'), 'game.sit', {});
+  hub.joinedMap('b', 'org', 'other-map');
+  check(last('a', 'game.state').players.length === 1, 'moving to another floor leaves the machine');
+  console.log('   ✓ reconnect grace');
+})().then(
+  () => console.log(`\n✅ ${passed} game checks passed`),
+  (err) => { console.error(err); process.exit(1); },
+);

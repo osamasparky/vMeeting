@@ -123,6 +123,14 @@ class PresenceManager {
         conn.user.currentRoomId = null;
         return { mapId, userId, orgId: organizationId };
     }
+    /** Another live office connection for this user (the tab that replaced this one). */
+    hasOtherClient(userId, ws) {
+        for (const [otherWs, conn] of this.clients.entries()) {
+            if (otherWs !== ws && conn.user.userId === userId)
+                return true;
+        }
+        return false;
+    }
     removeClient(ws) {
         const leftInfo = this.leaveMap(ws);
         this.clients.delete(ws);

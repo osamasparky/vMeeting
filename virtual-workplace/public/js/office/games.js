@@ -7,7 +7,7 @@
  * (or, for pool, the shot). Rules and physics live on the server
  * (realtime/src/games), so everyone sees the same match.
  *
- * window.UlaGames = { init, open, receive, capturesKeys }
+ * window.UlaGames = { init, open, receive, capturesKeys, rejoin }
  */
 (function () {
     'use strict';
@@ -125,6 +125,15 @@
         cancelAnimationFrame(raf);
         raf = 0;
         $('game-modal').hidden = true;
+    }
+
+    /**
+     * The office connection came back: re-open the machine so the server knows we are still here
+     * (it holds our seat for a few seconds) and sends the current lobby or match.
+     */
+    function rejoin() {
+        if (!machine) return;
+        send({ type: 'game.open', payload: { machineId: machine.id, game: machine.game } });
     }
 
     /** True while the game window is open: the office ignores keys so your avatar stays put. */
@@ -1142,5 +1151,5 @@
         if (machine.game === 'tictactoe') return renderTicTacToe(box);
     }
 
-    window.UlaGames = { init, open, receive, capturesKeys };
+    window.UlaGames = { init, open, receive, capturesKeys, rejoin };
 })();

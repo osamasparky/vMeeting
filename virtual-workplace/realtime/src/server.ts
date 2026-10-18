@@ -163,7 +163,8 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
       switch (event.type) {
         case 'map.join': {
           const { mapId, initialPosition, gender } = event.payload || {};
-          games.removeUser(conn.user.userId); // a game machine belongs to the floor you were on
+          // A game machine belongs to the floor you were on; rejoining the same floor (a reconnect) keeps it.
+          games.joinedMap(conn.user.userId, conn.user.organizationId, mapId);
           const user = presence.joinMap(ws, mapId, initialPosition, gender);
           if (!user) break;
 
@@ -696,7 +697,9 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
 
   // Handle client disconnect
   ws.on('close', () => {
-    games.removeUser(conn.user.userId);
+    // Seat held briefly: the page reconnects and re-opens the machine. A tab replaced by a newer
+    // one closes after the new one is in; that one is still playing.
+    if (!presence.hasOtherClient(conn.user.userId, ws)) games.disconnect(conn.user.userId);
     const leftRoomId = conn.user.currentRoomId;
     const left = presence.removeClient(ws);
     if (left && left.mapId) reopenIfEmpty(left.orgId, left.mapId, leftRoomId);
