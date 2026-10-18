@@ -98,7 +98,8 @@ class ProjectHubController extends Controller
             'project_id' => $project->id,
             'user_id' => $user->id,
             'file_name' => $originalName,
-            'file_path' => $stored['path'],
+            // Relative to public/: the absolute server path (~192 chars) overflowed the 191-char column.
+            'file_path' => 'uploads/projects/'.$project->id.'/'.$stored['filename'],
             'file_url' => '/uploads/projects/'.$project->id.'/'.$stored['filename'],
             'file_size' => $stored['size'],
             'mime_type' => $mimeType,
@@ -144,9 +145,9 @@ class ProjectHubController extends Controller
             abort(403, __('Unauthorized to delete this file.'));
         }
 
-        if ($file->file_path && file_exists($file->file_path)) {
-            @unlink($file->file_path);
-        } elseif (Storage::disk('public')->exists($file->file_path)) {
+        if ($onDisk = FileUploadService::publicFileOnDisk($file->file_path)) {
+            @unlink($onDisk);
+        } elseif ($file->file_path && Storage::disk('public')->exists($file->file_path)) {
             Storage::disk('public')->delete($file->file_path);
         }
 
@@ -190,7 +191,8 @@ class ProjectHubController extends Controller
             'task_id' => $task->id,
             'user_id' => $user->id,
             'file_name' => $originalName,
-            'file_path' => $stored['path'],
+            // Relative to public/: the absolute server path (~192 chars) overflowed the 191-char column.
+            'file_path' => 'uploads/tasks/'.$task->id.'/'.$stored['filename'],
             'file_url' => '/uploads/tasks/'.$task->id.'/'.$stored['filename'],
             'file_size' => $stored['size'],
             'mime_type' => $mimeType,
@@ -219,8 +221,8 @@ class ProjectHubController extends Controller
             403
         );
 
-        if ($attachment->file_path && file_exists($attachment->file_path)) {
-            @unlink($attachment->file_path);
+        if ($onDisk = FileUploadService::publicFileOnDisk($attachment->file_path)) {
+            @unlink($onDisk);
         }
         $attachment->delete();
 

@@ -84,6 +84,23 @@ class FileUploadService
      *
      * @return array{filename: string, path: string, size: int}
      */
+    /**
+     * The file on disk for a path stored in the database: relative to public/ (current
+     * uploads), or absolute (older rows). Null when it is not there.
+     */
+    public static function publicFileOnDisk(?string $stored): ?string
+    {
+        if (! $stored) {
+            return null;
+        }
+        if (file_exists($stored)) {
+            return $stored;
+        }
+        $path = public_path(ltrim($stored, '/\\'));
+
+        return file_exists($path) ? $path : null;
+    }
+
     public static function moveToPublicUploads(UploadedFile $file, string $destDir, string $filenamePrefix, string $extension): array
     {
         self::ensureDirectory($destDir, 0755);
