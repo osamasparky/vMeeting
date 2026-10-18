@@ -930,3 +930,75 @@ textarea.pm-field { padding-block: var(--ula-space-3); }
 }
 [dir="rtl"] .ed-bounds-banner { transform: translateX(50%); }
 .ed-bounds-banner .ed-bounds-text { flex: 1; }
+
+/* ── Team picker: who works on a project (people grouped by department) ── */
+.pm-team { display: grid; gap: var(--ula-space-3); }
+.pm-team-head { display: flex; align-items: center; justify-content: space-between; gap: var(--ula-space-3); }
+.pm-team-count { font-size: var(--ula-size-xs); color: var(--ula-text-secondary); }
+.pm-team-hint { margin: 0; }
+.pm-team-search { inline-size: 100%; }
+.pm-team-groups {
+  display: grid;
+  gap: var(--ula-space-3);
+  max-block-size: 320px;
+  overflow-y: auto;
+  padding: var(--ula-space-3);
+  border: 1px solid var(--ula-border-subtle);
+  border-radius: var(--ula-radius-md);
+  background: var(--ula-surface-sunken);
+}
+.pm-team-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+.pm-team-group[hidden] { display: none; }
+.pm-team-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ula-space-3);
+  inline-size: 100%;
+  min-block-size: var(--ula-size-touch-target);
+  padding: 0;
+  font-weight: 700;
+}
+.pm-team-group-count { font-size: var(--ula-size-xs); color: var(--ula-text-muted); }
+.pm-team-people { display: grid; padding-inline-start: var(--ula-space-6); }
+.pm-team-person {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ula-space-3);
+  min-block-size: var(--ula-size-touch-target);
+}
+.pm-team-person[hidden] { display: none; }
+.pm-team-role { font-size: var(--ula-size-xs); color: var(--ula-text-muted); text-align: end; }
+
+/* ── Edit project modal ──────────────────────────────────────────────── */
+.pm-edit-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ula-space-4);
+}
+.pm-edit-form > label { display: grid; gap: var(--ula-space-2); }
+.pm-edit-form .pm-field { inline-size: 100%; }
+.pm-edit-full { grid-column: 1 / -1; }
+.pm-team-note { margin: var(--ula-space-2) 0 0; }
+.pm-edit-error {
+  margin: 0;
+  padding: var(--ula-space-3) var(--ula-space-4);
+  border-radius: var(--ula-radius-sm);
+  background: var(--ula-tone-terracotta-bg);
+  color: var(--ula-tone-terracotta-fg);
+  font-size: var(--ula-size-sm);
+}
+.pm-edit-actions { display: flex; justify-content: flex-end; gap: var(--ula-space-3); }
+@media (max-width: 640px) {
+  .pm-edit-form { grid-template-columns: 1fr; }
+}
+/* The project page resets padding on every element (hub.blade.php "* { padding: 0 }", unlayered),
+   which beats x-modal's Tailwind p-6; restore it for this modal's header and body. */
+#pm-edit-project-modal > div > div:first-child { padding: var(--ula-space-5) var(--ula-space-6); }
+#pm-edit-project-modal > div > div:last-child { padding: var(--ula-space-5) var(--ula-space-6) var(--ula-space-6); }

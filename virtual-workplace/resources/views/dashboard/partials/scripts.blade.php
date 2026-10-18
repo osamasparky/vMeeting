@@ -817,6 +817,9 @@
             const form = document.getElementById('new-project-form');
             const formData = new FormData(form);
             const payload = Object.fromEntries(formData.entries());
+            // Who works on it: Object.fromEntries keeps one checkbox only, so read the picker.
+            delete payload['member_ids[]'];
+            payload.member_ids = window.UlaTeamPicker ? window.UlaTeamPicker.selected(document.getElementById('new-project-team')) : [];
 
             try {
                 const res = await fetch(`/api/v1/organizations/${ORG_ID}/projects`, {

@@ -220,6 +220,8 @@ class BuildProjectHubViewAction
             // Assigning to someone else is for leads; others may only take a task themselves.
             'canLogManualTime' => TimeEntry::canLogManually($user, $membership),
             'canSeeFinancials' => Project::seesFinancials($user, $membership),
+            // Edit details and team: same rule as the PATCH route (permission:projects.edit).
+            'canEditProject' => $user->isSuperAdmin() || $membership->role?->slug === 'company_admin' || $membership->hasPermission('projects.edit'),
             'canAssignOthers' => $user->isSuperAdmin() || $membership->role?->slug === 'company_admin'
                 || $membership->hasPermission('tasks.assign') || $project->manager_id === $user->id,
             'ganttTasks' => $ganttTasks,

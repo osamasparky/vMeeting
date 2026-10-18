@@ -76,6 +76,13 @@
                     <label style="display: block; font-size: 12px; font-weight: 700; color: var(--ula-text-secondary); margin-bottom: 6px;">{{ __('Description') }}</label>
                     <textarea name="description" rows="2" placeholder="Brief project summary..." style="width: 100%; background: var(--ula-surface-page-alt); border: 1px solid var(--ula-border-subtle); border-radius: 10px; padding: 10px 14px; color: var(--ula-text-primary); outline: none; font-size: 13px; font-weight: 600; box-shadow: var(--ula-shadow-xs);"></textarea>
                 </div>
+                @include('projects.partials.team-picker', [
+                    'pickerId' => 'new-project-team',
+                    'pickerMembers' => $members,
+                    'pickerDepartments' => $departments,
+                    'pickerSelected' => [],
+                    'pickerOrganizationId' => $organization->id,
+                ])
                 <button type="submit" class="tactile-btn btn-primary" style="margin-top: 8px; padding: 12px; font-size: 14px; justify-content: center; width: 100%;">
                     <span class="material-symbols-rounded" style="font-size: 1em; vertical-align: text-bottom;">rocket_launch</span> {{ __('Create Project') }}
                 </button>

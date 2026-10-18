@@ -979,8 +979,8 @@
                             <span><span class="material-symbols-rounded">person</span>{{ __('hub.manager') }}: {{ $project->manager->name ?? __('Unassigned') }}</span>
                             <span><span class="material-symbols-rounded">account_tree</span>{{ __('hub.department') }}: {{ $project->department->name ?? __('General') }}</span>
                             <span><span class="material-symbols-rounded">event</span>{{ __('hub.due') }}:
-                                @if($project->end_date)
-                                    <span class="ula-hub-num">{{ $project->end_date->format('d M Y') }}</span>
+                                @if($project->due_date)
+                                    <span class="ula-hub-num">{{ $project->due_date->format('d M Y') }}</span>
                                 @else
                                     {{ __('hub.no_deadline') }}
                                 @endif
@@ -997,6 +997,9 @@
                     </div>
                 </div>
                 <div class="ula-hub-actions">
+                    @if($canEditProject)
+                    <x-btn variant="outline" size="md" icon="edit" onclick="openEditProjectModal()">{{ __('pm.edit_project') }}</x-btn>
+                    @endif
                     <x-btn variant="outline" size="md" icon="videocam" onclick="openScheduleProjectMeetingModal()">{{ __('hub.meeting') }}</x-btn>
                     @if($canLogManualTime)
                     <x-btn variant="outline" size="md" icon="more_time" onclick="openManualTimeModal()">{{ __('hub.log_time') }}</x-btn>
@@ -2111,6 +2114,7 @@
 
 @include('projects.partials.modals')
 @include('projects.partials.pm.doc-editor')
+@include('projects.partials.edit-project')
 
         <script nonce="{{ $cspNonce ?? '' }}">
         const ORG_ID = "{{ $organization->id }}";

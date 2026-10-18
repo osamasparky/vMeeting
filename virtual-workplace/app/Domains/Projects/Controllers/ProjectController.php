@@ -4,6 +4,7 @@ namespace App\Domains\Projects\Controllers;
 
 use App\Domains\Projects\Actions\CreateProjectAction;
 use App\Domains\Projects\Actions\ProjectTemplateActions;
+use App\Domains\Projects\Actions\SyncProjectMembersAction;
 use App\Domains\Projects\Actions\UpdateProjectAction;
 use App\Domains\Projects\Models\Project;
 use App\Domains\Projects\Models\ProjectDocument;
@@ -14,6 +15,7 @@ use App\Domains\Projects\Models\ProjectTemplate;
 use App\Domains\Projects\Requests\StoreProjectRequest;
 use App\Domains\Projects\Requests\UpdateProjectRequest;
 use App\Domains\Tenancy\Models\Organization;
+use App\Domains\Tenancy\Models\OrganizationMember;
 use App\Support\HtmlSanitizer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -76,6 +78,10 @@ class ProjectController extends Controller
         $project = ! empty($data['template_id'])
             ? app(ProjectTemplateActions::class)->instantiate(ProjectTemplate::findOrFail($data['template_id']), $data, $organization, Auth::user())
             : $action->execute($data, $organization, Auth::user());
+
+        if (isset($data['member_ids'])) {
+            $project = app(SyncProjectMembersAction::class)->execute($project, $data['member_ids']);
+        }
 
         return response()->json([
             'message' => 'Project created successfully.',
@@ -185,7 +191,14 @@ class ProjectController extends Controller
             return response()->json(['message' => 'Project not found.'], 404);
         }
 
-        $updated = $action->execute($project, $request->validated());
+        $data = $request->validated();
+        // Budget is a financial figure: only those who see financials change it.
+        $membership = OrganizationMember::forUser(Auth::id())->where('organization_id', $organization->id)->first();
+        if (! Project::seesFinancials(Auth::user(), $membership)) {
+            unset($data['budget_amount']);
+        }
+
+        $updated = $action->execute($project, $data);
 
         return response()->json([
             'message' => 'Project updated successfully.',

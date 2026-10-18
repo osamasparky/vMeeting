@@ -25,10 +25,13 @@ class UpdateProjectRequest extends FormRequest
             'status' => ['nullable', 'string', 'in:planning,active,on_hold,completed,cancelled'],
             'priority' => ['nullable', 'string', 'in:low,medium,high,urgent'],
             'start_date' => ['nullable', 'date'],
-            'due_date' => ['nullable', 'date'],
+            'due_date' => ['nullable', 'date', 'after_or_equal:start_date'],
             'budget_amount' => ['nullable', 'numeric', 'min:0'],
             'planned_hours' => ['nullable', 'numeric', 'min:0'],
             'color' => ['nullable', 'string', 'max:16'],
+            // Who works on the project: any people, from one or several departments.
+            'member_ids' => ['sometimes', 'array', 'max:500'],
+            'member_ids.*' => ['string', 'distinct', $this->organizationMember()],
         ];
     }
 }

@@ -4076,5 +4076,18 @@
     "assistant.alert_kind.other": "Alert",
     "assistant.no_more_alerts": "You're all caught up — no unread alerts.",
     "assistant.no_alerts_filtered": "No unread alerts of this kind.",
-    "assistant.unread_cta": ":count unread alerts"
+    "assistant.unread_cta": ":count unread alerts",
+    "pm.edit_project": "Edit project",
+    "pm.lead_department": "Lead department",
+    "pm.budget_sar": "Budget (SAR)",
+    "pm.team_title": "Who works on this project",
+    "pm.team_selected": "selected",
+    "pm.team_hint": "Tick a whole department, several departments, or only some people inside one. You can change this any time.",
+    "pm.team_search": "Search people",
+    "pm.team_no_department": "No department",
+    "pm.team_empty": "No members to choose from yet.",
+    "pm.team_owner_note": "The project owner and manager always stay on the team.",
+    "pm.save_changes": "Save changes",
+    "pm.project_name_required": "Enter the project name.",
+    "pm.save_failed": "Could not save. Check the fields and try again."
 }

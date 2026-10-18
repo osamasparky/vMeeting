@@ -35,6 +35,9 @@ class StoreProjectRequest extends FormRequest
             'members.*.cost_rate' => ['nullable', 'numeric', 'min:0'],
             'members.*.billing_rate' => ['nullable', 'numeric', 'min:0'],
             'template_id' => ['nullable', 'integer', $this->existsInOrganization('project_templates')],
+            // Who works on the project: any people, from one or several departments.
+            'member_ids' => ['sometimes', 'array', 'max:500'],
+            'member_ids.*' => ['string', 'distinct', $this->organizationMember()],
         ];
     }
 }

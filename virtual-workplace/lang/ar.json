@@ -4076,5 +4076,18 @@
     "assistant.alert_kind.other": "تنبيه",
     "assistant.no_more_alerts": "أنهيت كل التنبيهات — لا يوجد غير مقروء.",
     "assistant.no_alerts_filtered": "لا توجد تنبيهات غير مقروءة من هذا النوع.",
-    "assistant.unread_cta": ":count تنبيهات غير مقروءة"
+    "assistant.unread_cta": ":count تنبيهات غير مقروءة",
+    "pm.edit_project": "تعديل المشروع",
+    "pm.lead_department": "القسم المسؤول",
+    "pm.budget_sar": "الميزانية (ريال)",
+    "pm.team_title": "فريق العمل على المشروع",
+    "pm.team_selected": "محدد",
+    "pm.team_hint": "حدّد قسماً كاملاً أو أكثر من قسم، أو أشخاصاً بعينهم داخل القسم. يمكنك التعديل في أي وقت.",
+    "pm.team_search": "ابحث عن شخص",
+    "pm.team_no_department": "بدون قسم",
+    "pm.team_empty": "لا يوجد أعضاء للاختيار بعد.",
+    "pm.team_owner_note": "صاحب المشروع ومديره يبقيان دائماً ضمن الفريق.",
+    "pm.save_changes": "حفظ التعديلات",
+    "pm.project_name_required": "اكتب اسم المشروع.",
+    "pm.save_failed": "تعذّر الحفظ. راجع الحقول وحاول مرة أخرى."
 }
