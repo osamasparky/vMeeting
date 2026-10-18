@@ -4358,9 +4358,9 @@
             }
 
             // 7. Small Compact Person Name Pill Under the Circular Avatar
-            // Short tag (e.g. "SO", "ن‌ق"): full names made the pill too wide. The people panel shows the full name.
-            const displayName = officeShortTag(av.name);
-            ctx.font = '600 8.5px "IBM Plex Sans Arabic", "IBM Plex Sans", sans-serif';
+            // First name (the people panel shows the full one); very long ones are cut so the pill stays small.
+            const displayName = officeFirstName(av.name);
+            ctx.font = '700 9px "IBM Plex Sans Arabic", "IBM Plex Sans", sans-serif';
             const nameW = ctx.measureText(displayName).width + 10;
             const badgeH = 14;
             const badgeY = y + radius + 3;
@@ -4378,7 +4378,8 @@
             else ctx.rect(x - nameW / 2, badgeY, nameW, badgeH);
             ctx.stroke();
 
-            ctx.fillStyle = isSelf ? OC('--ula-status-success-on-dark') : OC('--ula-text-on-dark');
+            // White on the dark pill for everyone; your own pill keeps its green outline.
+            ctx.fillStyle = OC('--ula-white');
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(displayName, x, badgeY + (badgeH / 2));
@@ -6517,6 +6518,12 @@
         }
         // Name tag under an avatar: first letter of the first name + first letter of the last name,
         // or the first two letters of a single name. "(Super Admin)"-style suffixes are ignored.
+        function officeFirstName(name) {
+            const first = String(name || '').replace(/\([^)]*\)/g, '').trim().split(/\s+/)[0] || '?';
+            const chars = Array.from(first);
+            return chars.length > 12 ? chars.slice(0, 11).join('') + '…' : first;
+        }
+
         function officeShortTag(name) {
             const clean = String(name || '').replace(/\([^)]*\)/g, '').trim();
             const words = clean.split(/\s+/).filter(Boolean);
