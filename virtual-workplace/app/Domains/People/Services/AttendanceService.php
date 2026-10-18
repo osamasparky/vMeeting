@@ -253,9 +253,9 @@ class AttendanceService
     }
 
     /**
-     * Pause the session after the idle prompt went unanswered. The user stopped
-     * being active $idleSeconds ago (prompt delay + grace countdown), so the
-     * session ends then — that idle stretch is not office time.
+     * Pause the session after the idle prompt went unanswered. The prompt
+     * appeared $idleSeconds ago (the grace countdown), so the session ends then:
+     * the time up to the prompt counts, the unanswered grace does not.
      */
     public function pauseSessionForIdle(User $user, Organization $organization, ?int $idleSeconds = null): ?AttendanceSession
     {

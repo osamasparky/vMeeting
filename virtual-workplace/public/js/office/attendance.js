@@ -18,6 +18,9 @@ let idleCountdownSeconds = idleGraceSeconds;
 // Wall-clock deadline: background tabs run timers about once a minute, so counting ticks
 // would stretch the 3-minute grace into hours.
 let idleDeadlineAt = 0;
+// When the prompt appeared: an unanswered prompt ends office time here, so the minutes
+// before it count and only the grace period after it does not.
+let idlePromptAt = 0;
 let idleCountdownInterval = null;
 let isIdleCheckModalOpen = false;
 
@@ -162,6 +165,8 @@ setInterval(() => {
 function showIdleCheckModal() {
     isIdleCheckModalOpen = true;
     idleDeadlineAt = Date.now() + idleGraceSeconds * 1000;
+    // A throttled background tab can open the prompt late; it is due at last activity + the prompt delay.
+    idlePromptAt = Math.min(Date.now(), lastUserActivityTimestamp + idlePromptMinutes * 60 * 1000);
     idleCountdownSeconds = idleGraceSeconds;
     const modal = document.getElementById('office-idle-check-modal');
     const clock = document.getElementById('idle-countdown-clock');
@@ -242,8 +247,9 @@ function handleIdleTimeoutExpiration() {
     const pausedOverlay = document.getElementById('office-idle-paused-overlay');
     if (pausedOverlay) pausedOverlay.style.display = 'flex';
     isOfficePresencePaused = true;
-    // The server ends the session at the last activity, so the idle stretch is not counted.
-    logAttendance('idle_pause', Math.min(86400, Math.round((Date.now() - lastUserActivityTimestamp) / 1000)));
+    // The server ends the session this many seconds ago: when the prompt appeared. The time
+    // up to the prompt counts; the unanswered grace period and whatever follows do not.
+    logAttendance('idle_pause', Math.min(86400, Math.max(0, Math.round((Date.now() - idlePromptAt) / 1000))));
 }
 
 function resumeUserPresenceFromPaused() {

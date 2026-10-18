@@ -44,7 +44,7 @@ class AttendanceController extends Controller
             // The office the client is in; checked against the organization's offices.
             'floor_id' => 'nullable|uuid',
             'action' => 'required|in:enter,leave,heartbeat,idle_pause,idle_resume',
-            // For idle_pause: seconds since the user's last activity. Otherwise informational only.
+            // For idle_pause: seconds since the idle prompt appeared. Otherwise informational only.
             'duration_seconds' => 'nullable|integer|min:0|max:86400',
         ]);
 
