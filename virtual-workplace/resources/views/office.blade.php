@@ -2155,31 +2155,43 @@
 
             const promptEl = document.getElementById('furniture-sit-prompt');
             const objects = (CONFIG.map && CONFIG.map.objects) || [];
+            // Reach is measured to the object's footprint, not its centre: a big machine (5x6 tiles)
+            // is reached by standing in front of it. Of several in reach, the closest wins.
+            const E_REACH = 28;
             let found = null;
+            let foundDist = Infinity;
             for (const obj of objects) {
-                // Centre of the object, in the same units it is drawn with (tiles x TILE_SIZE).
-                const ox = ((obj.position ? obj.position.x : (obj.x || 0)) + (obj.width || (obj.size ? obj.size.width : 1)) / 2) * TILE_SIZE;
-                const oy = ((obj.position ? obj.position.y : (obj.y || 0)) + (obj.height || (obj.size ? obj.size.height : 1)) / 2) * TILE_SIZE;
-                const dist = Math.hypot(localAvatar.x - ox, localAvatar.y - oy);
-                if (dist < 48) {
-                    // Only objects that E actually does something with; the rest (notes, links, branding) open on click.
-                    const behType = obj.interaction_type || (obj.interaction_config && obj.interaction_config.behavior?.type) || null;
-                    if (E_INTERACTIONS.includes(behType)) {
-                        found = {
-                            id: obj.id || `obj_${ox}_${oy}`,
-                            x: ox,
-                            y: oy,
-                            name: obj.name || 'Furniture',
-                            type: obj.type,
-                            interaction_type: behType,
-                            config: obj.interaction_config
-                        };
-                        break;
-                    }
+                // Only objects that E actually does something with; the rest (notes, links, branding) open on click.
+                const behType = obj.interaction_type || (obj.interaction_config && obj.interaction_config.behavior?.type) || null;
+                if (!E_INTERACTIONS.includes(behType)) continue;
+                const px = Number(obj.position ? obj.position.x : (obj.x || 0));
+                const py = Number(obj.position ? obj.position.y : (obj.y || 0));
+                let w = Number(obj.width || (obj.size ? obj.size.width : 1)) || 1;
+                let h = Number(obj.height || (obj.size ? obj.size.height : 1)) || 1;
+                const cx = (px + w / 2) * TILE_SIZE, cy = (py + h / 2) * TILE_SIZE;
+                const rot = (((Number(obj.position?.rotation ?? obj.rotation ?? 0)) % 360) + 360) % 360;
+                if (rot === 90 || rot === 270) [w, h] = [h, w]; // drawn turned around its centre
+                const halfW = w * TILE_SIZE / 2, halfH = h * TILE_SIZE / 2;
+                const dx = Math.max(0, Math.abs(localAvatar.x - cx) - halfW);
+                const dy = Math.max(0, Math.abs(localAvatar.y - cy) - halfH);
+                const dist = Math.hypot(dx, dy);
+                if (dist <= E_REACH && dist < foundDist) {
+                    foundDist = dist;
+                    found = {
+                        id: obj.id || `obj_${cx}_${cy}`,
+                        x: cx,
+                        y: cy,
+                        name: obj.name || 'Furniture',
+                        type: obj.type,
+                        interaction_type: behType,
+                        config: obj.interaction_config
+                    };
                 }
             }
 
             nearbyInteractive = found;
+            // A game window is open: its own controls are on screen, the hint would sit on top of them.
+            if (window.UlaGames?.capturesKeys?.()) found = null;
 
             if (promptEl) {
                 if (found) {
