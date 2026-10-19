@@ -2,9 +2,13 @@
 
 namespace App\Providers;
 
+use App\Domains\Assistant\Responders\AssistantResponder;
+use App\Domains\Assistant\Responders\RuleBasedResponder;
 use App\Domains\Projects\Models\Task;
 use App\Policies\TaskPolicy;
 use App\Support\RealtimeNotifier;
+use App\Support\TranslationOverrideLoader;
+use App\Support\TranslationOverrides;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -24,7 +28,12 @@ class AppServiceProvider extends ServiceProvider
 
         // The office assistant answers by rules from the member's own data. Bind a
         // language-model responder here once one is configured (see AssistantResponder).
-        $this->app->bind(\App\Domains\Assistant\Responders\AssistantResponder::class, \App\Domains\Assistant\Responders\RuleBasedResponder::class);
+        $this->app->bind(AssistantResponder::class, RuleBasedResponder::class);
+
+        // Phrases edited in the super-admin translations console live under storage/,
+        // laid over lang/*.json (which deploys replace and the web server can't write).
+        $this->app->bind(TranslationOverrides::class);
+        $this->app->extend('translation.loader', fn ($loader, $app) => new TranslationOverrideLoader($loader, $app->make(TranslationOverrides::class)));
     }
 
     /**

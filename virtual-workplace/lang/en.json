@@ -4089,5 +4089,8 @@
     "pm.team_owner_note": "The project owner and manager always stay on the team.",
     "pm.save_changes": "Save changes",
     "pm.project_name_required": "Enter the project name.",
-    "pm.save_failed": "Could not save. Check the fields and try again."
+    "pm.save_failed": "Could not save. Check the fields and try again.",
+    "Edit title": "Edit title",
+    "Edit description": "Edit description",
+    "Task updated.": "Task updated."
 }

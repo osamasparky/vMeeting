@@ -1682,3 +1682,4 @@
 
 
     
+@include('partials.task-modal-edit')

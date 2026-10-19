@@ -150,6 +150,16 @@ class ProjectAndTaskApiTest extends TestCase
 
         $taskId = $createRes->json('task.id');
 
+        // 1b. Edit the title and description (task details modal)
+        $this->patchJson("/api/v1/organizations/{$this->orgA->id}/tasks/{$taskId}", [
+            'title' => 'Build WebSocket Client v2',
+            'description' => 'Reconnect with backoff',
+        ])->assertStatus(200)
+            ->assertJsonPath('task.title', 'Build WebSocket Client v2')
+            ->assertJsonPath('task.description', 'Reconnect with backoff');
+        $this->patchJson("/api/v1/organizations/{$this->orgA->id}/tasks/{$taskId}", ['title' => ''])
+            ->assertStatus(422);
+
         // 2. Status Transition (e.g. Kanban move)
         $statusRes = $this->patchJson("/api/v1/organizations/{$this->orgA->id}/tasks/{$taskId}/status", [
             'status' => 'in_progress',

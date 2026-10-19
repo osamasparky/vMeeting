@@ -640,3 +640,5 @@
     <!-- Toast Notifications Container -->
     <div id="hub-toast-container"></div>
 
+
+@include('partials.task-modal-edit')

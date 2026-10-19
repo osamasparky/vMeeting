@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Domains\Administration\Models\SystemSetting;
 use App\Domains\Tenancy\Models\Plan;
 use App\Http\Controllers\Controller;
+use App\Support\TranslationOverrides;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
@@ -222,17 +223,14 @@ class PlatformSettingsController extends Controller
     /**
      * Translations & Localization Management Console.
      */
-    public function translations(Request $request)
+    public function translations(Request $request, TranslationOverrides $overrides)
     {
         $user = Auth::user();
         $search = trim((string) $request->input('search', ''));
         $selectedLang = $request->input('lang', 'ar');
 
-        $arPath = base_path('lang/ar.json');
-        $enPath = base_path('lang/en.json');
-
-        $arJson = file_exists($arPath) ? json_decode(file_get_contents($arPath), true) ?: [] : [];
-        $enJson = file_exists($enPath) ? json_decode(file_get_contents($enPath), true) ?: [] : [];
+        $arJson = $overrides->merged('ar');
+        $enJson = $overrides->merged('en');
 
         // Collect all unique keys
         $allKeys = array_unique(array_merge(array_keys($arJson), array_keys($enJson)));
@@ -285,43 +283,26 @@ class PlatformSettingsController extends Controller
     /**
      * Save updated translations.
      */
-    public function updateTranslations(Request $request)
+    public function updateTranslations(Request $request, TranslationOverrides $overrides)
     {
         try {
             $keys = $request->input('keys', []);
             $arVals = $request->input('ar', []);
             $enVals = $request->input('en', []);
 
-            $arPath = base_path('lang/ar.json');
-            $enPath = base_path('lang/en.json');
-
-            $arJson = file_exists($arPath) ? json_decode(file_get_contents($arPath), true) ?: [] : [];
-            $enJson = file_exists($enPath) ? json_decode(file_get_contents($enPath), true) ?: [] : [];
-
             for ($i = 0; $i < count($keys); $i++) {
-                $key = $keys[$i];
+                $key = (string) $keys[$i];
                 if ($key !== '') {
                     if (isset($arVals[$i])) {
-                        $arJson[$key] = $arVals[$i];
+                        $overrides->set($key, 'ar', (string) $arVals[$i]);
                     }
                     if (isset($enVals[$i])) {
-                        $enJson[$key] = $enVals[$i];
+                        $overrides->set($key, 'en', (string) $enVals[$i]);
                     }
                 }
             }
 
-            if (! file_exists(dirname($arPath))) {
-                @mkdir(dirname($arPath), 0775, true);
-            }
-            if (file_exists($arPath) && ! is_writable($arPath)) {
-                @chmod($arPath, 0666);
-            }
-            if (file_exists($enPath) && ! is_writable($enPath)) {
-                @chmod($enPath, 0666);
-            }
-
-            file_put_contents($arPath, json_encode($arJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-            file_put_contents($enPath, json_encode($enJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            $overrides->save();
 
             Artisan::call('view:clear');
 
@@ -343,7 +324,7 @@ class PlatformSettingsController extends Controller
     /**
      * Add new translation key.
      */
-    public function addTranslationKey(Request $request)
+    public function addTranslationKey(Request $request, TranslationOverrides $overrides)
     {
         $request->validate([
             'key' => 'required|string|max:1000',
@@ -356,24 +337,9 @@ class PlatformSettingsController extends Controller
             $arVal = trim($request->input('ar'));
             $enVal = trim($request->input('en', $key)) ?: $key;
 
-            $arPath = base_path('lang/ar.json');
-            $enPath = base_path('lang/en.json');
-
-            $arJson = file_exists($arPath) ? json_decode(file_get_contents($arPath), true) ?: [] : [];
-            $enJson = file_exists($enPath) ? json_decode(file_get_contents($enPath), true) ?: [] : [];
-
-            $arJson[$key] = $arVal;
-            $enJson[$key] = $enVal;
-
-            if (file_exists($arPath) && ! is_writable($arPath)) {
-                @chmod($arPath, 0666);
-            }
-            if (file_exists($enPath) && ! is_writable($enPath)) {
-                @chmod($enPath, 0666);
-            }
-
-            file_put_contents($arPath, json_encode($arJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-            file_put_contents($enPath, json_encode($enJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            $overrides->set($key, 'ar', $arVal);
+            $overrides->set($key, 'en', $enVal);
+            $overrides->save();
 
             Artisan::call('view:clear');
 
@@ -388,30 +354,14 @@ class PlatformSettingsController extends Controller
     /**
      * Delete translation key.
      */
-    public function deleteTranslationKey(Request $request)
+    public function deleteTranslationKey(Request $request, TranslationOverrides $overrides)
     {
         $request->validate(['key' => 'required|string']);
         $key = $request->input('key');
 
         try {
-            $arPath = base_path('lang/ar.json');
-            $enPath = base_path('lang/en.json');
-
-            $arJson = file_exists($arPath) ? json_decode(file_get_contents($arPath), true) ?: [] : [];
-            $enJson = file_exists($enPath) ? json_decode(file_get_contents($enPath), true) ?: [] : [];
-
-            unset($arJson[$key]);
-            unset($enJson[$key]);
-
-            if (file_exists($arPath) && ! is_writable($arPath)) {
-                @chmod($arPath, 0666);
-            }
-            if (file_exists($enPath) && ! is_writable($enPath)) {
-                @chmod($enPath, 0666);
-            }
-
-            file_put_contents($arPath, json_encode($arJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-            file_put_contents($enPath, json_encode($enJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            $overrides->delete($key);
+            $overrides->save();
 
             Artisan::call('view:clear');
 
