@@ -1222,6 +1222,8 @@
         function filterAllTasksTable() {
             const query = (document.getElementById('alltasks-filter-search')?.value || '').toLowerCase().trim();
             const proj = document.getElementById('alltasks-filter-project')?.value || '';
+            // The main assignee or any co-assignee.
+            const hasAssignee = (el, id) => (el.dataset.assignees || el.dataset.assigneeId || '').split(',').includes(id);
             const status = document.getElementById('alltasks-filter-status')?.value || '';
             const priority = document.getElementById('alltasks-filter-priority')?.value || '';
             const assignee = document.getElementById('alltasks-filter-assignee')?.value || '';
@@ -1241,7 +1243,7 @@
                 const matchesProj = !proj || rProj === proj;
                 const matchesStatus = !status || rStatus === status;
                 const matchesPriority = !priority || rPriority === priority;
-                const matchesAssignee = !assignee || rAssignee === assignee;
+                const matchesAssignee = !assignee || rAssignee === assignee || hasAssignee(r, assignee);
 
                 if (matchesQuery && matchesProj && matchesStatus && matchesPriority && matchesAssignee) {
                     r.style.display = '';
@@ -1256,7 +1258,8 @@
 
             // 2. Filter Global Kanban Cards & Update Column Counters
             const colCounts = { backlog: 0, ready: 0, in_progress: 0, review: 0, done: 0 };
-            const cards = document.querySelectorAll('.global-kanban-card');
+            // Only this tab's board — My Tasks cards share the .global-kanban-card class.
+            const cards = document.querySelectorAll('#alltasks-view-kanban .global-kanban-card');
 
             cards.forEach(card => {
                 const title = (card.dataset.title || '').toLowerCase();
@@ -1270,7 +1273,7 @@
                 const matchesProj = !proj || cProj === proj;
                 const matchesStatus = !status || cStatus === status;
                 const matchesPriority = !priority || cPriority === priority;
-                const matchesAssignee = !assignee || cAssignee === assignee;
+                const matchesAssignee = !assignee || cAssignee === assignee || hasAssignee(card, assignee);
 
                 if (matchesQuery && matchesProj && matchesStatus && matchesPriority && matchesAssignee) {
                     card.style.display = 'block';
@@ -1288,6 +1291,12 @@
                 if (badge) badge.textContent = colCounts[st];
             });
         }
+
+        // Browsers restore the filter fields on reload / back; apply what they show.
+        window.addEventListener('pageshow', () => {
+            const ids = ['search', 'project', 'status', 'priority', 'assignee'];
+            if (ids.some(id => document.getElementById(`alltasks-filter-${id}`)?.value)) filterAllTasksTable();
+        });
 
         // Global Drag & Drop Engine
         let globalDraggedTaskId = null;

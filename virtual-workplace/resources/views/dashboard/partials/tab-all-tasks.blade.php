@@ -122,11 +122,12 @@
                     @forelse($tasks as $t)
                         <tr class="alltask-row" 
                             data-id="{{ $t->id }}"
-                            data-title="{{ strtolower($t->title) }}"
+                            data-title="{{ mb_strtolower($t->title) }} #{{ $t->task_number }} {{ mb_strtolower(($t->project->code ?? '').'-'.sprintf('%02d', $t->task_number ?? 1)) }}"
                             data-project-id="{{ $t->project_id }}"
-                            data-status="{{ $t->status }}"
+                            data-status="{{ $t->status === 'qa' ? 'review' : $t->status }}"
                             data-priority="{{ $t->priority }}"
                             data-assignee-id="{{ $t->assignee_id }}"
+                            data-assignees="{{ $t->assignees->pluck('id')->push($t->assignee_id)->filter()->unique()->implode(',') }}"
                             onclick="openTaskDetails('{{ $t->id }}')"
                             oncontextmenu="event.preventDefault(); event.stopPropagation(); openTaskContextMenu(event, '{{ $t->id }}', '{{ $t->project_id }}', '{{ addslashes($t->title) }}')"
                             style="border-bottom: 1px solid var(--ula-border-subtle); cursor: pointer;">
