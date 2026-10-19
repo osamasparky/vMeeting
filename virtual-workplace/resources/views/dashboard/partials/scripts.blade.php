@@ -1276,12 +1276,12 @@
                 const matchesAssignee = !assignee || cAssignee === assignee || hasAssignee(card, assignee);
 
                 if (matchesQuery && matchesProj && matchesStatus && matchesPriority && matchesAssignee) {
-                    card.style.display = 'block';
+                    card.hidden = false;
                     if (colCounts[cStatus] !== undefined) {
                         colCounts[cStatus]++;
                     }
                 } else {
-                    card.style.display = 'none';
+                    card.hidden = true;
                 }
             });
 

@@ -1254,6 +1254,11 @@ body, button, input, select, textarea, optgroup {
   box-sizing: border-box !important;
 }
 
+/* Filters hide cards with the hidden attribute; the display rule above would override an inline display: none. */
+.kanban-task-card[hidden], .global-kanban-card[hidden], .kanban-card[hidden] {
+  display: none !important;
+}
+
 .kanban-task-card:hover, .global-kanban-card:hover, .kanban-card:hover {
   transform: translateY(-2px) !important;
   box-shadow: 0 6px 16px rgba(27, 53, 36, 0.08), 0 2px 4px rgba(27, 53, 36, 0.04) !important;

@@ -3158,7 +3158,7 @@
             if (clearBtn) clearBtn.style.display = active ? 'flex' : 'none';
 
             document.querySelectorAll('.kanban-card').forEach(card => {
-                card.style.display = hubTaskMatches(card, f) ? 'block' : 'none';
+                card.hidden = !hubTaskMatches(card, f);
             });
             document.querySelectorAll('#hub-section-tasks tbody tr[data-task-id]').forEach(row => {
                 row.style.display = hubTaskMatches(row, f) ? '' : 'none';
