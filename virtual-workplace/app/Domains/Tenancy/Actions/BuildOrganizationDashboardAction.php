@@ -121,7 +121,8 @@ class BuildOrganizationDashboardAction
 
         // Project Management entities
         $projects = $organization->projects()->visibleTo($user, $membership)->with(['owner', 'manager', 'department'])->withCount('tasks')->latest()->get();
-        $tasks = $organization->tasks()->with(['project', 'assignee', 'assignees:id,name', 'labels', 'reporter', 'phase', 'milestone'])->orderBy('order')->latest()->get();
+        // Only tasks in projects this member can see (visibility includes projects they have tasks in).
+        $tasks = $organization->tasks()->whereIn('project_id', $projects->pluck('id'))->with(['project', 'assignee', 'assignees:id,name', 'labels', 'reporter', 'phase', 'milestone'])->orderBy('order')->latest()->get();
         $myTasks = $tasks->filter(fn ($t) => $t->assignee_id === $user->id || $t->assignees->contains('id', $user->id))->values();
         $activeTimer = ActiveTimer::where('user_id', $user->id)->with(['project', 'task'])->first();
         $recentTimeEntries = $organization->timeEntries()->where('user_id', $user->id)->with(['project', 'task'])->latest()->take(30)->get();
